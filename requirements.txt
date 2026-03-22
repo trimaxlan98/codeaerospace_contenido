@@ -1,0 +1,10 @@
+# Core animation engine
+manim
+
+# Scientific computing
+numpy
+
+# Jupyter support for scene preview
+jupyter
+jupyterlab
+ipywidgets

@@ -1,0 +1,64 @@
+{
+  "name": "Manim Community Dev Environment",
+
+  // Build from the local Dockerfile at the project root
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  // Mount the project root into /workspace inside the container
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // Run the verification script after the container is created
+  "postCreateCommand": "bash /workspace/setup.sh",
+
+  // ── VS Code extensions ───────────────────────────────────────────────────────
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-renderers",
+        "James-Yu.latex-workshop"
+      ],
+      "settings": {
+        // Python interpreter inside the container
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvironment": true,
+
+        // Jupyter: render output inline
+        "jupyter.notebookFileRoot": "/workspace",
+
+        // LaTeX-Workshop: use latexmk compiler
+        "latex-workshop.latex.tools": [
+          {
+            "name": "latexmk",
+            "command": "latexmk",
+            "args": ["-pdf", "-interaction=nonstopmode", "-synctex=1", "%DOC%"]
+          }
+        ],
+        "latex-workshop.view.pdf.viewer": "tab",
+
+        // Editor quality-of-life
+        "editor.formatOnSave": true,
+        "editor.rulers": [88],
+        "files.trimTrailingWhitespace": true
+      }
+    }
+  },
+
+  // Forward Jupyter port so it is accessible from the host browser
+  "forwardPorts": [8888],
+  "portsAttributes": {
+    "8888": {
+      "label": "JupyterLab",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // Run as root so all system tools are accessible without sudo
+  "remoteUser": "root"
+}
