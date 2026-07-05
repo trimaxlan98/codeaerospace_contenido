@@ -1,0 +1,24 @@
+- slug: espacio
+  name: El Espacio
+- slug: satelites
+  name: Satélites
+- slug: dinamica-orbital
+  name: Dinámica Orbital
+- slug: apuntamiento-satelital
+  name: Apuntamiento Satelital
+- slug: redes-telecomunicaciones
+  name: Redes de Telecomunicaciones
+- slug: redes-datos
+  name: Redes de Datos
+- slug: sistemas-distribuidos
+  name: Sistemas Distribuidos
+- slug: redes-6g
+  name: Redes 6G
+- slug: inteligencia-artificial
+  name: Inteligencia Artificial
+- slug: agentes-ia
+  name: Agentes de IA
+- slug: ia-agentica
+  name: IA Agéntica
+- slug: tecnologia-frontera
+  name: Tecnología de Frontera
