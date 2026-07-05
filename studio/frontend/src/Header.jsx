@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ThemePicker from './ThemePicker.jsx'
 
 function useUtcClock() {
   const [now, setNow] = useState(() => new Date())
@@ -50,6 +51,7 @@ export default function Header({ view, onView, metrics, orbitState, onLogout }) 
           </>
         )}
         <span className="chip chip--clock">{clock} UTC</span>
+        <ThemePicker />
         <button className="btn btn--ghost" onClick={onLogout}>Cerrar sesión</button>
       </div>
     </header>

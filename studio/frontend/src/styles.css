@@ -11,8 +11,55 @@
   --ok: #63c98a;
   --err: #e86a6a;
   --warn: #e8a04b;
+  --grad-a: #0a1220;
+  --grad-b: #101c33;
+  --grad-c: #17263f;
+  --star-1: #2c4266;
+  --star-2: #223753;
   --mono: ui-monospace, "JetBrains Mono", "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+:root[data-theme="aurora"] {
+  --void: #06120f; --panel: #0b1b17; --panel-2: #0e211c; --line: #1b3a31;
+  --ink: #d8f0e6; --muted: #6f9c8d; --gold: #5ee6a8; --cyan: #9d7bff;
+  --ok: #63c98a; --err: #e86a6a; --warn: #e8b84b;
+  --grad-a: #071612; --grad-b: #0c2b1f; --grad-c: #16223a;
+  --star-1: #2b5c48; --star-2: #23414a;
+}
+:root[data-theme="deepspace"] {
+  --void: #000000; --panel: #0a0a0f; --panel-2: #101018; --line: #23232f;
+  --ink: #e8e6f0; --muted: #77748c; --gold: #ff5fa2; --cyan: #7f7cff;
+  --ok: #58c88a; --err: #ff6a6a; --warn: #e8a04b;
+  --grad-a: #000000; --grad-b: #0d0716; --grad-c: #160b22;
+  --star-1: #3a3a55; --star-2: #2a2a40;
+}
+:root[data-theme="daylight"] {
+  --void: #f4f1ea; --panel: #ffffff; --panel-2: #f7f4ee; --line: #ddd6c8;
+  --ink: #2b2a26; --muted: #8a8577; --gold: #a3742c; --cyan: #2b7a9e;
+  --ok: #2f9e60; --err: #c04545; --warn: #c07f2f;
+  --grad-a: #f2ede2; --grad-b: #e8eef2; --grad-c: #f6f0e4;
+  --star-1: transparent; --star-2: transparent;
+}
+:root[data-theme="nebula"] {
+  --void: #0d0716; --panel: #150d24; --panel-2: #1a1130; --line: #2e2050;
+  --ink: #e6dcf5; --muted: #8d7fae; --gold: #b388ff; --cyan: #ff8fd4;
+  --ok: #63c98a; --err: #e86a6a; --warn: #e8b84b;
+  --grad-a: #0e0819; --grad-b: #1d1033; --grad-c: #241243;
+  --star-1: #4a3a70; --star-2: #382a58;
+}
+:root[data-theme="ion"] {
+  --void: #04121c; --panel: #082030; --panel-2: #0a2839; --line: #14405a;
+  --ink: #d6ecf7; --muted: #6d94a8; --gold: #2fd4ff; --cyan: #45e0c0;
+  --ok: #45e0a0; --err: #ff7a7a; --warn: #ffc86b;
+  --grad-a: #051624; --grad-b: #082b40; --grad-c: #0b3550;
+  --star-1: #1e4e6e; --star-2: #17405c;
+}
+:root[data-theme="solar"] {
+  --void: #120c06; --panel: #1c1408; --panel-2: #241a0b; --line: #3a2d15;
+  --ink: #f0e6d4; --muted: #9c8a67; --gold: #ffb347; --cyan: #ff7847;
+  --ok: #8fc963; --err: #e86a6a; --warn: #ffd36b;
+  --grad-a: #150e07; --grad-b: #2a1c0c; --grad-c: #331f0e;
+  --star-1: #55401f; --star-2: #453318;
 }
 
 * { box-sizing: border-box; margin: 0; }
@@ -25,13 +72,14 @@ body {
   font-family: var(--sans);
   font-size: 14px;
   line-height: 1.45;
+  transition: background-color .25s ease, color .25s ease;
   /* campo de estrellas sutil, estático */
   background-image:
-    radial-gradient(1px 1px at 12% 28%, #2c4266 50%, transparent 51%),
-    radial-gradient(1px 1px at 68% 12%, #2c4266 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 84% 64%, #223753 50%, transparent 51%),
-    radial-gradient(1px 1px at 38% 82%, #223753 50%, transparent 51%),
-    radial-gradient(1px 1px at 55% 45%, #1b2c45 50%, transparent 51%);
+    radial-gradient(1px 1px at 12% 28%, var(--star-1) 50%, transparent 51%),
+    radial-gradient(1px 1px at 68% 12%, var(--star-1) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 64%, var(--star-2) 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 82%, var(--star-2) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 45%, var(--star-2) 50%, transparent 51%);
 }
 
 .boot {
@@ -82,6 +130,34 @@ body {
 }
 .chip b { color: var(--cyan); font-weight: 600; }
 .chip--clock { color: var(--ink); letter-spacing: .08em; }
+
+.themepicker { position: relative; }
+.themepicker__btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1px solid var(--line); border-radius: 3px;
+  color: var(--muted); font: inherit; font-size: 12px;
+  padding: 4px 10px; cursor: pointer;
+}
+.themepicker__btn:hover { color: var(--ink); }
+.themepicker__menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 50;
+  min-width: 170px; padding: 4px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+}
+.themepicker__item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: none; border: 0; border-radius: 4px; color: var(--ink);
+  font: inherit; font-size: 13px; padding: 7px 9px; cursor: pointer;
+  text-align: left;
+}
+.themepicker__item:hover { background: var(--panel-2); }
+.themepicker__item--on { color: var(--gold); }
+.themepicker__dots { display: flex; gap: 3px; }
+.themepicker__dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
 
 /* ── glifo orbital (firma) ──────────────────────────────────────────────── */
 .orbit__body { fill: var(--cyan); opacity: .85; }
