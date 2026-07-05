@@ -31,6 +31,7 @@ export const api = {
   cancelJob: (id) => request('POST', `/api/jobs/${id}/cancel`),
   deleteJob: (id) => request('DELETE', `/api/jobs/${id}`),
   metrics: () => request('GET', '/api/metrics'),
+  metricsHistory: () => request('GET', '/api/metrics/history'),
 }
 
 export function videoUrl(id) {

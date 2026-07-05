@@ -27,6 +27,8 @@ db = Database(cfg.db_path)
 bus = EventBus()
 runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
+# 30 min de historia al intervalo configurado (450 muestras a 4 s).
+history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 
 
 @asynccontextmanager
@@ -57,6 +59,7 @@ async def _metrics_loop() -> None:
                 payload["containers"] = await runner.stats()
             except Exception:
                 payload["containers"] = None  # runner caido: se informa en UI
+            history.add(payload["host"], payload["containers"])
             bus.publish(payload)
         except Exception as e:
             print(f"[metrics] error: {e!r}")
@@ -247,6 +250,12 @@ async def get_metrics(_=Depends(require_auth)):
     except Exception:
         pass
     return payload
+
+
+@app.get("/api/metrics/history")
+async def metrics_history(_=Depends(require_auth)):
+    """Ultimos ~30 min de CPU/RAM/disco (+ contenedor de render si lo hubo)."""
+    return {"interval": cfg.metrics_interval, "samples": list(history.samples)}
 
 
 def _sse(event: dict) -> str:

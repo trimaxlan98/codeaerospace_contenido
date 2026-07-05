@@ -231,6 +231,28 @@ body {
 
 .meter__detail { display: block; margin-top: 5px; font-size: 11.5px; color: var(--muted); }
 
+/* graficas historicas (SVG a mano) */
+.charts {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px; padding: 14px;
+}
+.chart { margin: 0; }
+.chart__head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.chart__title { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--muted); }
+.chart__val { font-family: var(--mono); font-size: 12.5px; }
+.chart__svg {
+  width: 100%; height: auto; display: block; background: var(--void);
+  border: 1px solid var(--line); border-radius: 3px;
+}
+.chart__grid { stroke: var(--line); stroke-width: .6; opacity: .6; }
+.chart__tick { fill: var(--muted); font-family: var(--mono); font-size: 8.5px; }
+.chart__band { fill: var(--gold); opacity: .13; }
+.chart__legendband {
+  display: inline-block; width: 14px; height: 9px; border-radius: 2px;
+  background: color-mix(in srgb, var(--gold) 22%, var(--panel));
+  border: 1px solid var(--line); vertical-align: -1px; margin-right: 4px;
+}
+
 .tablewrap { overflow-x: auto; }
 
 .ctable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
