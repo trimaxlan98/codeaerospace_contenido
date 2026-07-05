@@ -13,7 +13,7 @@ import yaml
 
 # id valido: "<categoria>/<NN>-<slug>" — sin puntos ni barras extra, lo que
 # tambien bloquea cualquier path traversal.
-RE_LESSON_ID = re.compile(r"^[a-z0-9][a-z0-9-]*/[0-9]{2}-[a-z0-9][a-z0-9-]*$")
+RE_LESSON_ID = re.compile(r"^[a-z0-9][a-z0-9-]*/[0-9]{2}-[a-z0-9][a-z0-9-]*\Z")
 
 
 def _meta(meta: dict, lesson_id: str) -> dict:
@@ -43,7 +43,10 @@ class LessonStore:
         parts = text.split("---", 2)
         if len(parts) < 3:
             return {}, text
-        meta = yaml.safe_load(parts[1]) or {}
+        try:
+            meta = yaml.safe_load(parts[1]) or {}
+        except yaml.YAMLError:
+            meta = {}
         return (meta if isinstance(meta, dict) else {}), parts[2].lstrip("\n")
 
     def _tree_mtime(self) -> float:
@@ -59,9 +62,14 @@ class LessonStore:
     def _build_index(self) -> dict:
         cats_file = self.root / "categories.yaml"
         try:
-            cats = yaml.safe_load(cats_file.read_text(encoding="utf-8")) or []
-        except OSError:
-            cats = []
+            cats_raw = yaml.safe_load(cats_file.read_text(encoding="utf-8")) or []
+        except (OSError, yaml.YAMLError):
+            cats_raw = []
+
+        # Filtrar que sean dicts con slug y name
+        cats = [c for c in (cats_raw if isinstance(cats_raw, list) else [])
+                if isinstance(c, dict) and "slug" in c and "name" in c]
+
         categories = []
         for cat in cats:
             cat_dir = self.root / cat["slug"]
@@ -87,7 +95,7 @@ class LessonStore:
             return self._index
 
     def get(self, lesson_id: str) -> dict | None:
-        if not RE_LESSON_ID.match(lesson_id):
+        if not RE_LESSON_ID.fullmatch(lesson_id):
             return None
         path = self.root / f"{lesson_id}.md"  # el regex garantiza ruta interna
         try:

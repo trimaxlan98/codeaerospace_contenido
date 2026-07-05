@@ -82,3 +82,60 @@ def test_indice_se_actualiza_al_cambiar_archivos(authed, tmp_path):
     time.sleep(0.02)  # asegura mtime distinto
     (root / "satelites" / "01-anatomia.md").write_text(nueva, encoding="utf-8")
     assert authed.get("/api/lessons").json()["categories"][1]["count"] == 1
+
+
+def test_frontmatter_corrupto_no_tumba_el_indice(authed, tmp_path):
+    """YAML corrupto en una leccion no debe tumbar el indice completo."""
+    root = Path(os.environ["MS_LESSONS_DIR"])
+    (root / "dinamica-orbital").mkdir(parents=True, exist_ok=True)
+    (root / "categories.yaml").write_text(CATS, encoding="utf-8")
+
+    # Leccion valida
+    (root / "dinamica-orbital" / "01-orbitas-kepler.md").write_text(
+        LESSON, encoding="utf-8")
+    # Leccion con frontmatter YAML corrupto (list sin cierre)
+    corrupt = "---\ntitle: [unclosed\n---\n\n# Contenido\n"
+    (root / "dinamica-orbital" / "02-corrupt.md").write_text(
+        corrupt, encoding="utf-8")
+
+    # GET /api/lessons debe devolver 200 e incluir ambas
+    r = authed.get("/api/lessons")
+    assert r.status_code == 200
+    cats = r.json()["categories"]
+    assert len(cats) == 2
+    dyn = cats[0]
+    assert dyn["count"] == 2
+    ids = {l["id"] for l in dyn["lessons"]}
+    assert "dinamica-orbital/01-orbitas-kepler" in ids
+    assert "dinamica-orbital/02-corrupt" in ids
+
+    # Leccion corrupta debe tener title con su id (default)
+    corrupt_lesson = [l for l in dyn["lessons"]
+                      if l["id"] == "dinamica-orbital/02-corrupt"][0]
+    assert corrupt_lesson["title"] == "dinamica-orbital/02-corrupt"
+
+    # GET /api/lessons/<corrupta> debe devolver 200 con markdown
+    r = authed.get("/api/lessons/dinamica-orbital/02-corrupt")
+    assert r.status_code == 200
+    assert "# Contenido" in r.json()["markdown"]
+
+
+def test_borrar_leccion_actualiza_indice(authed, tmp_path):
+    """Borrar archivo .md debe actualizar el indice."""
+    _seed(tmp_path)
+
+    # Verificar que hay 1 leccion
+    r = authed.get("/api/lessons")
+    assert r.status_code == 200
+    assert r.json()["categories"][0]["count"] == 1
+
+    # Borrar el archivo
+    root = Path(os.environ["MS_LESSONS_DIR"])
+    md_path = root / "dinamica-orbital" / "01-orbitas-kepler.md"
+    time.sleep(0.02)  # asegura mtime distinto
+    md_path.unlink()
+
+    # Verificar que el indice se actualizo
+    r = authed.get("/api/lessons")
+    assert r.status_code == 200
+    assert r.json()["categories"][0]["count"] == 0
