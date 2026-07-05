@@ -3,7 +3,7 @@ title: Geometría de apuntamiento
 level: intro
 summary: Azimut, elevación, ángulo de elevación mínimo y radio de huella determinan cuándo y hacia dónde apuntar una estación terrena a un satélite visible.
 tags: [azimut-elevacion, huella, visibilidad, pases]
-minutes: 7
+minutes: 8
 order: 1
 ---
 

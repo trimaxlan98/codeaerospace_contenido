@@ -3,7 +3,7 @@ title: El sistema solar como escenario de misiones
 level: intro
 summary: Las regiones orbitales de interés, los puntos de Lagrange y su uso, y el papel del viento solar en el clima espacial.
 tags: [sistema-solar, lagrange, leo, geo, viento-solar]
-minutes: 7
+minutes: 8
 order: 2
 ---
 
