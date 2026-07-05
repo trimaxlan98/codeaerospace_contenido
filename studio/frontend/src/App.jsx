@@ -8,6 +8,7 @@ import Library from './Library.jsx'
 
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
+  const [aiEnabled, setAiEnabled] = useState(false)
   const [view, setView] = useState('studio')
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
@@ -31,8 +32,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    api.me().then((d) => setAuth(d.authenticated)).catch(() => setAuth(false))
-  }, [])
+    api.me().then((d) => {
+      setAuth(d.authenticated)
+      setAiEnabled(Boolean(d.ai_enabled))
+    }).catch(() => setAuth(false))
+  }, [auth === true]) // re-consulta el flag de IA tras cada login
 
   // Stream SSE unico: metricas + estados de job + logs en vivo.
   useEffect(() => {
@@ -94,7 +98,7 @@ export default function App() {
       />
       {view === 'studio' ? (
         <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
-          onJobsChanged={refreshJobs} />
+          onJobsChanged={refreshJobs} aiEnabled={aiEnabled} />
       ) : view === 'library' ? (
         <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
       ) : (

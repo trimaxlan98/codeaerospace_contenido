@@ -39,6 +39,15 @@ class Settings:
         # Cuota total de disco para render_jobs/ (videos + scripts + logs).
         self.max_storage_mb = int(os.environ.get("MS_MAX_STORAGE_MB", "2048"))
 
+        # Asistente IA (Vertex AI). Feature-flag: sin credenciales, la app
+        # funciona igual y la UI de IA se oculta.
+        self.gcp_key_path = Path(os.environ.get(
+            "MS_GCP_KEY_PATH", str(Path(__file__).resolve().parents[1] / "gcp-key.json")))
+        self.gcp_location = os.environ.get("MS_GCP_LOCATION", "us-central1")
+        self.gemini_model_fast = os.environ.get("MS_GEMINI_MODEL_FAST", "gemini-2.5-flash")
+        self.gemini_model_deep = os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro")
+        self.ai_rate_limit_per_min = int(os.environ.get("MS_AI_RATE_LIMIT", "10"))
+
 
 settings: Settings | None = None
 

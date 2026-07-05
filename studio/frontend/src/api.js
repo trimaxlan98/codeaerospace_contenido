@@ -32,6 +32,9 @@ export const api = {
   deleteJob: (id) => request('DELETE', `/api/jobs/${id}`),
   metrics: () => request('GET', '/api/metrics'),
   metricsHistory: () => request('GET', '/api/metrics/history'),
+  aiExplain: (payload) => request('POST', '/api/ai/explain', payload),
+  aiFix: (payload) => request('POST', '/api/ai/fix', payload),
+  aiGenerate: (payload) => request('POST', '/api/ai/generate', payload),
 }
 
 export function videoUrl(id) {

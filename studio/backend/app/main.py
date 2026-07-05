@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import metrics
+from .ai import AIError, Assistant
 from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
@@ -29,6 +30,7 @@ runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
+assistant = Assistant(cfg)
 
 
 @asynccontextmanager
@@ -111,7 +113,8 @@ async def logout(response: Response, _=Depends(require_auth)):
 @app.get("/api/me")
 async def me(request: Request):
     if session_valid(cfg, request):
-        return {"authenticated": True, "user": cfg.admin_user}
+        return {"authenticated": True, "user": cfg.admin_user,
+                "ai_enabled": assistant.enabled}
     return {"authenticated": False}
 
 
@@ -238,6 +241,41 @@ async def delete_job(job_id: str, _=Depends(require_auth)):
                             detail="El job esta activo: cancelalo antes de borrarlo")
     manager.delete_job(job_id)
     return {"ok": True, "storage": _storage_public()}
+
+
+# ── asistente IA ──────────────────────────────────────────────────────────────
+
+class AIDebugBody(BaseModel):
+    script: str = Field(max_length=200_000)
+    logs: str = Field(default="", max_length=400_000)
+
+
+class AIGenerateBody(BaseModel):
+    prompt: str = Field(min_length=3, max_length=8_000)
+
+
+@app.post("/api/ai/explain")
+async def ai_explain(body: AIDebugBody, _=Depends(require_auth)):
+    try:
+        return {"explanation": await assistant.explain(body.script, body.logs)}
+    except AIError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+@app.post("/api/ai/fix")
+async def ai_fix(body: AIDebugBody, _=Depends(require_auth)):
+    try:
+        return {"script": await assistant.fix(body.script, body.logs)}
+    except AIError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+@app.post("/api/ai/generate")
+async def ai_generate(body: AIGenerateBody, _=Depends(require_auth)):
+    try:
+        return {"script": await assistant.generate(body.prompt)}
+    except AIError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
 
 
 # ── monitoreo / SSE ───────────────────────────────────────────────────────────

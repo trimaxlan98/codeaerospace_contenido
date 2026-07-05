@@ -20,6 +20,9 @@ def _set_env(tmp_path: Path) -> None:
     os.environ["MS_DB_PATH"] = str(tmp_path / "test.db")
     os.environ["MS_RUNNER_SOCKET"] = str(tmp_path / "runner.sock")
     os.environ["MS_COOKIE_SECURE"] = "0"
+    # El asistente IA queda deshabilitado en tests (la clave no existe en tmp);
+    # los tests de IA que lo necesitan crean este archivo y mockean el cliente.
+    os.environ["MS_GCP_KEY_PATH"] = str(tmp_path / "gcp-key.json")
 
 
 @pytest.fixture()

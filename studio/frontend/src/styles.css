@@ -330,6 +330,48 @@ body {
 }
 .lightbox__video { width: 100%; display: block; background: #000; }
 
+/* ── asistente IA ───────────────────────────────────────────────────────── */
+.panel__actions { display: flex; gap: 6px; }
+.btn--ai { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+
+.drawer {
+  position: fixed; inset: 0; z-index: 60;
+  background: color-mix(in srgb, var(--void) 55%, transparent);
+  display: flex; justify-content: flex-end;
+}
+.drawer__box {
+  width: min(560px, 100%); height: 100%; background: var(--panel);
+  border-left: 1px solid var(--line); display: flex; flex-direction: column;
+}
+.drawer__tabs { margin: 12px 14px 0; align-self: flex-start; }
+.drawer__body {
+  flex: 1; overflow: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 12px; align-items: flex-start;
+}
+.drawer__hint { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.drawer__answer {
+  white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--ink);
+  background: var(--void); border: 1px solid var(--line); border-radius: 4px;
+  padding: 12px; width: 100%;
+}
+.drawer__prompt {
+  width: 100%; background: var(--void); color: var(--ink); font: inherit;
+  border: 1px solid var(--line); border-radius: 3px; padding: 9px 10px; resize: vertical;
+}
+.drawer__prompt:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+
+.diff {
+  width: 100%; margin: 0; overflow: auto; max-height: 46vh;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
+  background: var(--void); border: 1px solid var(--line); border-radius: 4px;
+  padding: 8px 0;
+}
+.diff > div { padding: 0 10px; white-space: pre-wrap; word-break: break-word; }
+.diff__add { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.diff__del { background: color-mix(in srgb, var(--err) 12%, transparent); color: var(--err); }
+.diff__ctx { color: #a8bcd4; }
+.diff--plain { padding: 8px 10px; color: #a8bcd4; white-space: pre-wrap; }
+
 /* ── login ──────────────────────────────────────────────────────────────── */
 .login { display: grid; place-items: center; height: 100%; padding: 20px; }
 

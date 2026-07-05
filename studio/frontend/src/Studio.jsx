@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { api, videoUrl } from './api.js'
+import Assistant from './Assistant.jsx'
 
 const SAMPLE = `from manim import *
 
@@ -38,7 +39,7 @@ function duration(job) {
   return `${(end - job.started_at).toFixed(0)}s`
 }
 
-export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged }) {
+export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled }) {
   const [script, setScript] = useState(SAMPLE)
   const [scenes, setScenes] = useState(['Orbita'])
   const [scene, setScene] = useState('Orbita')
@@ -48,6 +49,9 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged }) {
   const [submitError, setSubmitError] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [selectedLogs, setSelectedLogs] = useState([])
+  const [aiOpen, setAiOpen] = useState(false)
+  const [aiMode, setAiMode] = useState('explain')
+  const [aiAutoRun, setAiAutoRun] = useState(0)
   const logRef = useRef(null)
   const debounceRef = useRef(null)
 
@@ -143,6 +147,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged }) {
             <button className="btn btn--primary" onClick={submit} disabled={!canSubmit}>
               Renderizar
             </button>
+            {aiEnabled && (
+              <button className="btn" title="asistente IA (Gemini 2.5)"
+                onClick={() => { setAiMode('generate'); setAiOpen(true) }}>
+                ✨ Asistente
+              </button>
+            )}
           </div>
         </div>
         {(sceneError || submitError) && (
@@ -194,9 +204,20 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged }) {
               REGISTRO {selected ? `· ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
             </span>
             {selected && (
-              <button className="btn btn--tiny" onClick={() => loadScript(selected.id)}>
-                Cargar script al editor
-              </button>
+              <span className="panel__actions">
+                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
+                  <button className="btn btn--tiny btn--ai"
+                    onClick={() => {
+                      setAiMode('explain'); setAiOpen(true)
+                      setAiAutoRun((n) => n + 1)
+                    }}>
+                    ✨ Explicar error
+                  </button>
+                )}
+                <button className="btn btn--tiny" onClick={() => loadScript(selected.id)}>
+                  Cargar script al editor
+                </button>
+              </span>
             )}
           </div>
           <pre className="log" ref={logRef}>
@@ -221,6 +242,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged }) {
           </div>
         )}
       </section>
+
+      {aiEnabled && (
+        <Assistant open={aiOpen} mode={aiMode} onMode={setAiMode}
+          onClose={() => setAiOpen(false)} job={selected} jobLogs={logs}
+          autoRun={aiAutoRun} onApply={setScript} />
+      )}
     </main>
   )
 }
