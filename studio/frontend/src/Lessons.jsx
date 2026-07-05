@@ -66,9 +66,14 @@ export default function Lessons() {
     setProgress(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100)
   }
 
-  const idx = lesson && cat ? cat.lessons.findIndex((l) => l.id === lesson.id) : -1
-  const prev = idx > 0 ? cat.lessons[idx - 1] : null
-  const next = idx >= 0 && idx < cat.lessons.length - 1 ? cat.lessons[idx + 1] : null
+  // Categoria de la leccion ABIERTA (no la de la pestana activa: el usuario
+  // puede cambiar de pestana con una leccion de otra categoria abierta).
+  const lessonCat = lesson && index
+    ? index.categories.find((c) => lesson.id.startsWith(c.slug + '/'))
+    : null
+  const idx = lesson && lessonCat ? lessonCat.lessons.findIndex((l) => l.id === lesson.id) : -1
+  const prev = idx > 0 ? lessonCat.lessons[idx - 1] : null
+  const next = idx >= 0 && idx < lessonCat.lessons.length - 1 ? lessonCat.lessons[idx + 1] : null
   const html = useMemo(
     () => (lesson ? renderMarkdown(lesson.markdown) : ''), [lesson])
 
@@ -118,7 +123,7 @@ export default function Lessons() {
             </div>
             <div className="lessons__scroll" onScroll={onScroll} ref={readerRef}>
               <header className="lessons__head">
-                <p className="lessons__crumb">{cat?.name}</p>
+                <p className="lessons__crumb">{lessonCat?.name}</p>
                 <h1>{lesson.title}</h1>
                 <p className="lessons__sub">
                   {LEVEL_LABEL[lesson.level] || lesson.level} · {lesson.minutes} min
