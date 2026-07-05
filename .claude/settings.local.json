@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(docker stats *)",
+      "Bash(sqlite3 *)",
+      "Bash(python3 *)",
+      "Artifact",
+      "Bash(git config *)"
     ]
   }
 }

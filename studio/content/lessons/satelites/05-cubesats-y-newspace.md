@@ -54,8 +54,6 @@ Las ventajas de este enfoque incluyen: tolerancia a fallos a nivel de flota (la 
 
 Ambos casos son posibles gracias a la cadena de valor especializada y modular que ha desarrollado el ecosistema NewSpace, en contraste con los programas espaciales gubernamentales tradicionales, verticalmente integrados:
 
-El ecosistema NewSpace ha desarrollado una cadena de valor especializada y modular que contrasta con los programas espaciales gubernamentales tradicionales, verticalmente integrados:
-
 - **Fabricantes de bus estándar**: empresas que venden plataformas CubeSat o small-sat listas para integrar carga útil, reduciendo el tiempo de desarrollo de años a meses.
 - **Proveedores de componentes COTS espacializados**: fabricantes que califican componentes comerciales para el ambiente espacial sin llegar al costo de calificación rad-hard completa.
 - **Operadores de lanzamiento rideshare**: SpaceX (Transporter), Rocket Lab y otros que agregan demanda de múltiples clientes en misiones compartidas.

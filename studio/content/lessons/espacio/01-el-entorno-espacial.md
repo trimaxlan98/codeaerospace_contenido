@@ -41,7 +41,7 @@ Por encima de la termosfera, la densidad de partículas es tan baja que se consi
 
 Hay dos cinturones principales:
 
-- **Cinturón interior**: entre 1000 y 6000 km de altitud (0.2 a 2 radios terrestres), compuesto principalmente por protones de alta energía (hasta cientos de MeV), relativamente estable en el tiempo.
+- **Cinturón interior**: entre 1000 y 6000 km de altitud (~1.2 a ~2 radios terrestres, medidos desde el centro de la Tierra), compuesto principalmente por protones de alta energía (hasta cientos de MeV), relativamente estable en el tiempo.
 - **Cinturón exterior**: entre 13 000 y 60 000 km de altitud (3 a 10 radios terrestres), dominado por electrones relativistas, mucho más dinámico y variable con la actividad solar.
 
 Entre ambos existe una "zona de ranura" (*slot region*) de menor flujo, alrededor de 2–3 radios terrestres, que en ocasiones se llena temporalmente tras tormentas geomagnéticas intensas. Los satélites GEO (35 786 km) orbitan cerca del borde exterior del cinturón exterior y reciben dosis de radiación significativas a lo largo de su vida útil, por lo que su electrónica requiere blindaje y componentes tolerantes a radiación (rad-hard). Las órbitas MEO usadas por constelaciones de navegación como GPS (~20 200 km) atraviesan de lleno el cinturón interior, lo que obliga a diseños electrónicos especialmente robustos.
