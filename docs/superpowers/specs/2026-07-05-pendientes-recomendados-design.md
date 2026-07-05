@@ -105,12 +105,11 @@ vacío sin excepción.
 **Diseño.** `git config` **repo-local** (sin `--global`, solo este repositorio):
 
 ```
-git config user.name  "<NOMBRE>"
-git config user.email "<EMAIL>"
+git config user.name  "Alan R."
+git config user.email "ingalanr@gmail.com"
 ```
 
-Valores pendientes de confirmar con el usuario (email candidato:
-`ingalanr@gmail.com`). No reescribe historia previa; aplica a commits nuevos.
+No reescribe historia previa; aplica a commits nuevos.
 
 **Verificación.** `git config user.name && git config user.email` y un
 `git log --format='%an <%ae>'` en el próximo commit.
