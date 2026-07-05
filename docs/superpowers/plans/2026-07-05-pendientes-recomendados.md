@@ -153,6 +153,16 @@ git commit -m "Sprint 5: cachear storage_usage (TTL 15s + invalidacion en fin/bo
   - `History.load(path, interval: float, now: float | None = None) -> None` — recarga muestras cuyo `ts` cae dentro de la ventana `maxlen * interval` respecto a `now` (por defecto `time.time()`); archivo ausente o corrupto → no falla.
 - Consumes: `cfg.metrics_interval: float` (ya existe) para calcular la ventana en `main.py`.
 
+> **Extensión durante implementación (aprobada por el usuario):** el guardado
+> solo-al-apagar NO corre en prod — con una conexión SSE `/api/events` abierta,
+> uvicorn se cuelga drenando y systemd hace SIGKILL a los 90 s antes del shutdown
+> del `lifespan` (confirmado por `journalctl`; el snapshot nunca se escribía). Se
+> añade guardado **periódico** dentro de `_metrics_loop` cada
+> `cfg.metrics_snapshot_interval` s (env `MS_METRICS_SNAPSHOT_INTERVAL`, def. 120)
+> y se conserva el `save` al apagar. `main.py` importa `time`. Verificación E2E:
+> reiniciar el servicio, esperar >1 intervalo, confirmar que
+> `metrics_history.json` aparece y es JSON válido no vacío.
+
 - [ ] **Step 1: Write the failing tests**
 
 Añadir a `studio/backend/tests/test_metrics_history.py`:

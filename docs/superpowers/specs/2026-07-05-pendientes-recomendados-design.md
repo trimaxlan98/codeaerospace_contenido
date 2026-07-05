@@ -87,9 +87,15 @@ en caliente), pero un snapshot al apagar evita perder la ventana en cada deploy.
 - `main.py` `lifespan`:
   - **startup** (antes de crear `_metrics_loop`): `history.load(path)`.
   - **shutdown** (tras `yield`, junto a `manager.stop()`): `history.save(path)`.
-- **Frecuencia: solo al apagar.** `systemctl stop` envía SIGTERM → el shutdown
-  del lifespan de uvicorn corre limpio antes de un deploy. No se añade guardado
-  periódico (YAGNI; el objetivo es sobrevivir deploys, no crashes duros).
+- **Frecuencia: periódico (~2 min) + al apagar.** *Revisado durante la
+  implementación:* el guardado solo-al-apagar NO se ejecuta en este servidor —
+  con una conexión SSE `/api/events` abierta (Monitor), uvicorn se cuelga
+  drenando conexiones al recibir SIGTERM y systemd lo mata con SIGKILL a los 90 s
+  (`TimeoutStopUSec`) antes de que corra el shutdown del `lifespan`. Confirmado
+  por `journalctl` (el snapshot nunca se escribía). Solución: guardar dentro del
+  `_metrics_loop` cada `metrics_snapshot_interval` s (env
+  `MS_METRICS_SNAPSHOT_INTERVAL`, por defecto 120), robusto ante deploys Y
+  crashes duros. Se conserva además el `save` al apagar (inocuo cuando corre).
 - `.gitignore`: añadir el archivo de snapshot (nunca al repo).
 
 **Test.** En `tests/test_metrics_history.py`: `save` luego `load` restaura las
