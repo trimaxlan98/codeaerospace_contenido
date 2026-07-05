@@ -56,3 +56,21 @@ def test_logout_clears_session(client):
     r = client.post("/api/logout")
     assert r.status_code == 200
     assert client.get("/api/me").json()["authenticated"] is False
+
+
+def test_rate_limiter_poda_entradas_expiradas(monkeypatch):
+    """Muchas IPs distintas no deben dejar residuos tras expirar su ventana."""
+    from app.auth import LoginRateLimiter
+
+    t = [1000.0]
+    monkeypatch.setattr("app.auth.time.time", lambda: t[0])
+
+    rl = LoginRateLimiter(max_failures=5, lockout_seconds=60)
+    for i in range(200):
+        rl.record_failure(f"10.0.{i // 250}.{i % 250}")
+    assert len(rl._failures) > 100  # 200 ips + global
+
+    t[0] = 1000.0 + 61  # ventana y bloqueos expirados
+    rl.check("10.9.9.9")  # cualquier consulta dispara la poda
+    assert rl._failures == {}
+    assert rl._locked_until == {}

@@ -35,9 +35,23 @@ class LoginRateLimiter:
     def _keys(self, ip: str) -> tuple[str, str]:
         return (f"ip:{ip}", "global")
 
+    def _prune(self, now: float) -> None:
+        """Elimina fallos fuera de ventana y bloqueos vencidos.
+
+        Sin poda, el dict crece una entrada por IP atacante para siempre
+        (fuga de memoria lenta en un proceso de larga vida).
+        """
+        window = self.lockout_seconds
+        self._failures = {
+            k: kept for k, ts in self._failures.items()
+            if (kept := [x for x in ts if now - x < window])
+        }
+        self._locked_until = {k: u for k, u in self._locked_until.items() if u > now}
+
     def check(self, ip: str) -> float:
         """Devuelve segundos restantes de bloqueo (0 si puede intentar)."""
         now = time.time()
+        self._prune(now)
         remaining = 0.0
         for key in self._keys(ip):
             until = self._locked_until.get(key, 0)
@@ -47,6 +61,7 @@ class LoginRateLimiter:
 
     def record_failure(self, ip: str) -> None:
         now = time.time()
+        self._prune(now)
         window = self.lockout_seconds
         for key in self._keys(ip):
             fails = [t for t in self._failures.get(key, []) if now - t < window]
