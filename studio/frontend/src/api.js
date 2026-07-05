@@ -29,9 +29,14 @@ export const api = {
   getJob: (id) => request('GET', `/api/jobs/${id}`),
   getScript: (id) => request('GET', `/api/jobs/${id}/script`),
   cancelJob: (id) => request('POST', `/api/jobs/${id}/cancel`),
+  deleteJob: (id) => request('DELETE', `/api/jobs/${id}`),
   metrics: () => request('GET', '/api/metrics'),
 }
 
 export function videoUrl(id) {
   return `/api/jobs/${id}/video`
+}
+
+export function thumbUrl(id) {
+  return `/api/jobs/${id}/thumb`
 }

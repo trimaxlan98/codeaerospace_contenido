@@ -146,14 +146,28 @@ async def create_job(body: JobBody, _=Depends(require_auth)):
     if body.scene not in available:
         raise HTTPException(status_code=422,
                             detail=f"La escena '{body.scene}' no existe en el script")
+    quota = cfg.max_storage_mb * 1024 * 1024
+    used = manager.storage_usage()
+    if used >= quota:
+        raise HTTPException(
+            status_code=507,
+            detail=(f"Almacenamiento lleno: {used / 2**20:.0f} MB usados de "
+                    f"{cfg.max_storage_mb} MB. Borra videos de la Biblioteca "
+                    "para liberar espacio."))
     return manager.create_job(body.script, body.scene, body.quality, timeout)
+
+
+def _storage_public() -> dict:
+    return {"used_bytes": manager.storage_usage(),
+            "quota_bytes": cfg.max_storage_mb * 1024 * 1024}
 
 
 @app.get("/api/jobs")
 async def list_jobs(_=Depends(require_auth)):
     return {"jobs": [job_public(j) | {"script_len": j.get("script_len")}
                      for j in db.list_jobs()],
-            "current": manager.current_job_id}
+            "current": manager.current_job_id,
+            "storage": _storage_public()}
 
 
 def _get_job_or_404(job_id: str) -> dict:
@@ -198,6 +212,29 @@ async def get_video(job_id: str, _=Depends(require_auth)):
         raise HTTPException(status_code=404, detail="Video no disponible")
     return FileResponse(video, media_type="video/mp4",
                         filename=f"{job['scene']}_{job_id}.mp4")
+
+
+@app.get("/api/jobs/{job_id}/thumb")
+async def get_thumb(job_id: str, _=Depends(require_auth)):
+    job = _get_job_or_404(job_id)
+    if not job.get("thumb_path"):
+        raise HTTPException(status_code=404, detail="Miniatura no disponible")
+    thumb = Path(job["thumb_path"]).resolve()
+    # Misma defensa en profundidad que /video: solo dentro del dir del job.
+    job_dir = (cfg.render_jobs_dir / job_id).resolve()
+    if not thumb.is_file() or job_dir not in thumb.parents:
+        raise HTTPException(status_code=404, detail="Miniatura no disponible")
+    return FileResponse(thumb, media_type="image/jpeg")
+
+
+@app.delete("/api/jobs/{job_id}")
+async def delete_job(job_id: str, _=Depends(require_auth)):
+    job = _get_job_or_404(job_id)
+    if job["status"] in ("queued", "running"):
+        raise HTTPException(status_code=409,
+                            detail="El job esta activo: cancelalo antes de borrarlo")
+    manager.delete_job(job_id)
+    return {"ok": True, "storage": _storage_public()}
 
 
 # ── monitoreo / SSE ───────────────────────────────────────────────────────────

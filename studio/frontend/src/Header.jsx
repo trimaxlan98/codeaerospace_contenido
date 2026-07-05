@@ -37,6 +37,8 @@ export default function Header({ view, onView, metrics, orbitState, onLogout }) 
       <nav className="hdr__nav" aria-label="vistas">
         <button className={view === 'studio' ? 'tab tab--on' : 'tab'}
           onClick={() => onView('studio')}>Estudio</button>
+        <button className={view === 'library' ? 'tab tab--on' : 'tab'}
+          onClick={() => onView('library')}>Biblioteca</button>
         <button className={view === 'monitor' ? 'tab tab--on' : 'tab'}
           onClick={() => onView('monitor')}>Monitoreo</button>
       </nav>

@@ -51,6 +51,13 @@ class RunnerClient:
     async def cancel(self, job_id: str) -> None:
         await self._request_one({"cmd": "cancel", "job_id": job_id}, timeout=30)
 
+    async def thumbnail(self, job_id: str) -> str:
+        """Pide al runner extraer thumb.jpg del video del job (ffmpeg en contenedor)."""
+        resp = await self._request_one({"cmd": "thumbnail", "job_id": job_id}, timeout=120)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "thumbnail fallo"))
+        return resp.get("thumb", "")
+
     async def render(
         self, job_id: str, scene: str, quality: str, timeout: int
     ) -> AsyncIterator[dict]:

@@ -25,8 +25,8 @@ LOG_BUFFER_MAX = 5000
 def job_public(job: dict) -> dict:
     """Vista del job para la API (sin el script completo)."""
     keys = ("id", "scene", "quality", "timeout", "status", "video_path", "error",
-            "created_at", "started_at", "finished_at")
-    return {k: job.get(k) for k in keys}
+            "created_at", "started_at", "finished_at", "size_bytes")
+    return {k: job.get(k) for k in keys} | {"has_thumb": bool(job.get("thumb_path"))}
 
 
 class JobManager:
@@ -94,7 +94,39 @@ class JobManager:
 
     def get_logs(self, job_id: str) -> list[str]:
         buf = self.logs.get(job_id)
-        return list(buf) if buf is not None else []
+        if buf is not None:
+            return list(buf)
+        # Fallback: render.log persistido (sobrevive reinicios del backend).
+        # job_id ya paso el regex de la API; la ruta es la canonica del job.
+        log_file = self.cfg.render_jobs_dir / job_id / "render.log"
+        try:
+            return log_file.read_text(encoding="utf-8", errors="replace") \
+                           .splitlines()[-LOG_BUFFER_MAX:]
+        except OSError:
+            return []
+
+    def delete_job(self, job_id: str) -> bool:
+        """Borra fila + directorio. Jobs activos deben cancelarse antes."""
+        job = self.db.get_job(job_id)
+        if not job or job["status"] in ACTIVE_STATES:
+            return False
+        self.logs.pop(job_id, None)
+        self.delete_job_files(job_id)
+        self.db.delete_job(job_id)
+        return True
+
+    def storage_usage(self) -> int:
+        """Bytes totales usados por render_jobs/ (videos, scripts, logs)."""
+        total = 0
+        root = self.cfg.render_jobs_dir
+        if root.is_dir():
+            for p in root.rglob("*"):
+                try:
+                    if p.is_file():
+                        total += p.stat().st_size
+                except OSError:
+                    pass
+        return total
 
     # ── worker ───────────────────────────────────────────────────────────────
 
@@ -152,12 +184,27 @@ class JobManager:
             video = self._find_video(job_id)
             if video:
                 self._cleanup_partial_files(job_id)
-                self._finish(job_id, "done", video_path=str(video))
+                extra = {"size_bytes": video.stat().st_size}
+                thumb = await self._make_thumbnail(job_id, buf)
+                if thumb:
+                    extra["thumb_path"] = thumb
+                self._finish(job_id, "done", video_path=str(video), **extra)
             else:
                 self._finish(job_id, "error",
                              error="render termino sin producir video (revisa los logs)")
         else:
             self._finish(job_id, "error", error=f"manim salio con codigo {exit_code}")
+
+    async def _make_thumbnail(self, job_id: str, buf: deque) -> str | None:
+        """Miniatura via runner (ffmpeg dentro del contenedor). No fatal si falla."""
+        try:
+            thumb_rel = await self.runner.thumbnail(job_id)
+            thumb = (self.cfg.workspace / thumb_rel).resolve()
+            if thumb.is_file():
+                return str(thumb)
+        except (RunnerError, asyncio.TimeoutError) as e:
+            buf.append(f"[studio] miniatura no generada: {e}")
+        return None
 
     def _find_video(self, job_id: str) -> Path | None:
         media = self.cfg.render_jobs_dir / job_id / "media"
@@ -174,7 +221,26 @@ class JobManager:
         self.db.update_job(job_id, status=status, finished_at=time.time(), **extra)
         if status in ("error", "timeout", "cancelled"):
             self.delete_job_files(job_id)
+        if status in ("done", "error", "timeout"):
+            # Persistir el log y liberar el buffer en memoria (get_logs hace
+            # fallback al archivo). Para error/timeout el directorio quedo
+            # vacio: se recrea solo con render.log (pocos KB) para que el
+            # diagnostico sobreviva reinicios del backend.
+            self._persist_log(job_id)
+        elif status == "cancelled":
+            self.logs.pop(job_id, None)
         self._publish_job(job_id)
+
+    def _persist_log(self, job_id: str) -> None:
+        buf = self.logs.pop(job_id, None)
+        if not buf:
+            return
+        try:
+            job_dir = self.cfg.render_jobs_dir / job_id
+            job_dir.mkdir(parents=True, exist_ok=True)
+            (job_dir / "render.log").write_text("\n".join(buf) + "\n", encoding="utf-8")
+        except OSError as e:
+            print(f"[jobs] no se pudo persistir render.log de {job_id}: {e!r}")
 
     def _publish_job(self, job_id: str) -> None:
         job = self.db.get_job(job_id)

@@ -248,6 +248,66 @@ body {
 .state--exited, .state--dead { color: var(--muted); }
 .state--restarting, .state--paused { color: var(--warn); }
 
+/* ── biblioteca ─────────────────────────────────────────────────────────── */
+.library {
+  flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 12px;
+  overflow: auto;
+}
+.library__storage { padding: 14px 16px; }
+.meter--storage { max-width: 560px; }
+
+.panel--grid { flex: none; }
+
+.cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px; padding: 14px;
+}
+
+.card {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.card__thumb {
+  position: relative; display: block; width: 100%; aspect-ratio: 16 / 9;
+  background: var(--void); border: none; border-bottom: 1px solid var(--line);
+  cursor: pointer; padding: 0;
+}
+.card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card__noimg {
+  display: grid; place-items: center; height: 100%;
+  color: var(--muted); font-size: 26px;
+}
+.card__play {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: var(--gold); font-size: 30px; opacity: 0;
+  background: color-mix(in srgb, var(--void) 55%, transparent);
+  transition: opacity .15s ease;
+}
+.card__thumb:hover .card__play, .card__thumb:focus-visible .card__play { opacity: 1; }
+
+.card__body { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.card__title {
+  font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card__meta { color: var(--muted); font-size: 11.5px; }
+.card__actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+
+.btn--danger {
+  background: color-mix(in srgb, var(--err) 18%, var(--panel-2));
+  border-color: var(--err); color: var(--err);
+}
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--void) 78%, transparent); padding: 24px;
+}
+.lightbox__box {
+  width: min(860px, 100%); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+}
+.lightbox__video { width: 100%; display: block; background: #000; }
+
 /* ── login ──────────────────────────────────────────────────────────────── */
 .login { display: grid; place-items: center; height: 100%; padding: 20px; }
 

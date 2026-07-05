@@ -4,6 +4,7 @@ import Login from './Login.jsx'
 import Header from './Header.jsx'
 import Studio from './Studio.jsx'
 import Monitor from './Monitor.jsx'
+import Library from './Library.jsx'
 
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
@@ -11,6 +12,7 @@ export default function App() {
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
   const [jobs, setJobs] = useState([])
+  const [storage, setStorage] = useState(null)
   const [liveLog, setLiveLog] = useState({ jobId: null, lines: [] })
   const esRef = useRef(null)
 
@@ -24,6 +26,7 @@ export default function App() {
     try {
       const data = await api.listJobs()
       setJobs(data.jobs)
+      if (data.storage) setStorage(data.storage)
     } catch { /* la sesion pudo expirar; lo detecta el proximo request */ }
   }, [])
 
@@ -47,6 +50,8 @@ export default function App() {
           const rest = prev.filter((j) => j.id !== ev.job.id)
           return [ev.job, ...rest].sort((a, b) => b.created_at - a.created_at)
         })
+        // Al terminar un job cambia el uso de disco: refrescar cuota.
+        if (!['queued', 'running'].includes(ev.job.status)) refreshJobs()
       } else if (ev.type === 'joblog') {
         setLiveLog((prev) =>
           prev.jobId === ev.job_id
@@ -90,6 +95,8 @@ export default function App() {
       {view === 'studio' ? (
         <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
           onJobsChanged={refreshJobs} />
+      ) : view === 'library' ? (
+        <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
       ) : (
         <Monitor metrics={metrics} containers={containers} />
       )}

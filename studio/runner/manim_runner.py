@@ -22,6 +22,7 @@ import asyncio
 import grp
 import json
 import os
+import pwd
 import re
 import signal
 import sys
@@ -42,6 +43,12 @@ STATS_CACHE_TTL = 4.0  # docker stats es caro; cachear para no castigar 2 vCPU
 
 _stats_cache = {"ts": 0.0, "data": None}
 _stats_lock = asyncio.Lock()
+
+# Los contenedores de render/miniatura corren con el uid:gid de manimstudio:
+# asi los archivos que crean en render_jobs/ pueden ser limpiados/borrados por
+# el backend (que corre como ese usuario). HOME=/tmp para las caches de manim.
+_ms = pwd.getpwnam("manimstudio")
+RUN_AS_ARGS = ("--user", f"{_ms.pw_uid}:{_ms.pw_gid}", "-e", "HOME=/tmp")
 
 
 def log(msg: str) -> None:
@@ -97,7 +104,7 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     container = CONTAINER_PREFIX + job_id
     argv = [
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
-        "run", "--rm", "--no-deps", "-T", "--name", container,
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, "--name", container,
         "manim-render",
         "manim", "render", f"-{quality}", "--disable_caching",
         "--media_dir", f"/workspace/{RENDER_JOBS_DIR}/{job_id}/media",
@@ -140,6 +147,56 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
 
     await send(writer, {"type": "done", "exit_code": exit_code, "timed_out": timed_out})
     log(f"[render] job={job_id} exit={exit_code} timed_out={timed_out}")
+
+
+async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Extrae 1 frame del video final del job como thumb.jpg.
+
+    Corre DENTRO del contenedor manim-render (el backend no tiene ffmpeg).
+    Solo recibe job_id: el video se localiza en la ruta canonica del job,
+    nunca se aceptan rutas arbitrarias.
+    """
+    job_id = str(req.get("job_id", ""))
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+
+    media_abs = os.path.join(PROJECT_DIR, RENDER_JOBS_DIR, job_id, "media", "videos")
+    video_rel = None
+    newest = -1.0
+    for root, _dirs, files in os.walk(media_abs):
+        if "partial_movie_files" in root:
+            continue
+        for f in files:
+            if f.endswith(".mp4"):
+                p = os.path.join(root, f)
+                mtime = os.path.getmtime(p)
+                if mtime > newest:
+                    newest = mtime
+                    video_rel = os.path.relpath(p, PROJECT_DIR)
+    if video_rel is None:
+        await send(writer, {"type": "error", "error": "video del job no encontrado"})
+        return
+
+    thumb_rel = f"{RENDER_JOBS_DIR}/{job_id}/thumb.jpg"
+    container = f"{CONTAINER_PREFIX}{job_id}-thumb"
+    code, _out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, "--name", container,
+        "--entrypoint", "ffmpeg", "manim-render",
+        "-y", "-i", f"/workspace/{video_rel}",
+        "-frames:v", "1", "-vf", "scale=320:-1",
+        f"/workspace/{thumb_rel}",
+        timeout=90,
+    )
+    if code != 0:
+        await force_remove(container)
+        log(f"[thumbnail] job={job_id} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"ffmpeg salio con codigo {code}: {err[-300:]}"})
+        return
+    log(f"[thumbnail] job={job_id} ok")
+    await send(writer, {"type": "ok", "thumb": thumb_rel})
 
 
 async def force_remove(container: str) -> None:
@@ -228,6 +285,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_render(req, writer)
         elif cmd == "cancel":
             await handle_cancel(req, writer)
+        elif cmd == "thumbnail":
+            await handle_thumbnail(req, writer)
         elif cmd == "stats":
             await handle_stats(writer)
         elif cmd == "ping":

@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS jobs (
 CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at DESC);
 """
 
+# Migraciones aditivas (ALTER TABLE ADD COLUMN es no destructivo en SQLite).
+MIGRATIONS = (
+    ("size_bytes", "ALTER TABLE jobs ADD COLUMN size_bytes INTEGER"),
+    ("thumb_path", "ALTER TABLE jobs ADD COLUMN thumb_path TEXT"),
+)
+
 
 class Database:
     def __init__(self, path: Path) -> None:
@@ -38,6 +44,10 @@ class Database:
         with self._lock:
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.executescript(SCHEMA)
+            cols = {r["name"] for r in self._conn.execute("PRAGMA table_info(jobs)")}
+            for col, ddl in MIGRATIONS:
+                if col not in cols:
+                    self._conn.execute(ddl)
             self._conn.commit()
 
     def insert_job(self, job: dict) -> None:
@@ -67,7 +77,8 @@ class Database:
         with self._lock:
             rows = self._conn.execute(
                 "SELECT id, scene, quality, timeout, status, video_path, error,"
-                " created_at, started_at, finished_at, length(script) AS script_len"
+                " created_at, started_at, finished_at, size_bytes, thumb_path,"
+                " length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()
@@ -77,6 +88,12 @@ class Database:
         with self._lock:
             row = self._conn.execute("SELECT script FROM jobs WHERE id = ?", (job_id,)).fetchone()
         return row["script"] if row else None
+
+    def delete_job(self, job_id: str) -> bool:
+        with self._lock:
+            cur = self._conn.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+            self._conn.commit()
+        return cur.rowcount > 0
 
     def mark_interrupted(self) -> int:
         """Jobs que quedaron 'queued'/'running' tras un reinicio del backend."""

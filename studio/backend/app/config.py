@@ -36,6 +36,9 @@ class Settings:
 
         self.metrics_interval = float(os.environ.get("MS_METRICS_INTERVAL", "4.0"))
 
+        # Cuota total de disco para render_jobs/ (videos + scripts + logs).
+        self.max_storage_mb = int(os.environ.get("MS_MAX_STORAGE_MB", "2048"))
+
 
 settings: Settings | None = None
 
