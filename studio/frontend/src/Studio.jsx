@@ -214,6 +214,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                     ✨ Explicar error
                   </button>
                 )}
+                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
+                  <button className="btn btn--tiny btn--ai"
+                    onClick={() => { setAiMode('fix'); setAiOpen(true) }}>
+                    🔧 Corregir con IA
+                  </button>
+                )}
                 <button className="btn btn--tiny" onClick={() => loadScript(selected.id)}>
                   Cargar script al editor
                 </button>
