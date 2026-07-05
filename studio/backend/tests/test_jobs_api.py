@@ -55,9 +55,16 @@ def test_create_job_writes_script_and_lists(authed, tmp_path):
     assert r.status_code == 201
     job = r.json()
     assert job["status"] in ("queued", "running", "error")
-    # el script quedo escrito en la ruta canonica del workspace
+    # el script quedo escrito en la ruta canonica del workspace. Sin runner en
+    # tests el worker puede terminar el job en error y borrar su dir antes de
+    # esta lectura; _finish fija status="error" ANTES de delete_job_files, asi
+    # que si scene.py ya no esta, el job debe estar en error (el contenido se
+    # verifica igual via /script, respaldado por DB, mas abajo).
     script_file = tmp_path / "render_jobs" / job["id"] / "scene.py"
-    assert script_file.read_text() == VALID_SCRIPT
+    try:
+        assert script_file.read_text() == VALID_SCRIPT
+    except FileNotFoundError:
+        assert authed.get(f"/api/jobs/{job['id']}").json()["status"] == "error"
 
     listed = authed.get("/api/jobs").json()["jobs"]
     assert any(j["id"] == job["id"] for j in listed)
