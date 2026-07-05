@@ -8,7 +8,8 @@ const MB = 1024 ** 2
 function fmtSize(bytes) {
   if (bytes == null) return '—'
   if (bytes >= 1024 * MB) return `${(bytes / (1024 * MB)).toFixed(2)} GB`
-  return `${(bytes / MB).toFixed(1)} MB`
+  if (bytes >= MB) return `${(bytes / MB).toFixed(1)} MB`
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`
 }
 
 function fmtDate(ts) {

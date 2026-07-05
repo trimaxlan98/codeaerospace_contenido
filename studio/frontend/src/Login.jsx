@@ -16,7 +16,10 @@ export default function Login({ onLogin }) {
       await api.login(username, password)
       onLogin()
     } catch (err) {
-      setError(err.status === 429 ? err.message : 'Credenciales inválidas')
+      if (!err.status) setError('No se pudo conectar con el servidor')
+      else if (err.status === 429) setError(err.message)
+      else if (err.status === 401) setError('Credenciales inválidas')
+      else setError(`Error del servidor (${err.status})`)
     } finally {
       setBusy(false)
     }

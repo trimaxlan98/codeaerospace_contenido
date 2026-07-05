@@ -31,12 +31,18 @@ export default function App() {
     } catch { /* la sesion pudo expirar; lo detecta el proximo request */ }
   }, [])
 
-  useEffect(() => {
-    api.me().then((d) => {
+  // Consulta /api/me: fija sesion y flag de IA en una sola pasada.
+  const refreshMe = useCallback(async () => {
+    try {
+      const d = await api.me()
       setAuth(d.authenticated)
       setAiEnabled(Boolean(d.ai_enabled))
-    }).catch(() => setAuth(false))
-  }, [auth === true]) // re-consulta el flag de IA tras cada login
+    } catch {
+      setAuth(false)
+    }
+  }, [])
+
+  useEffect(() => { refreshMe() }, [refreshMe]) // consulta inicial al montar
 
   // Stream SSE unico: metricas + estados de job + logs en vivo.
   useEffect(() => {
@@ -72,7 +78,7 @@ export default function App() {
     return <div className="boot">CONECTANDO…</div>
   }
   if (auth === false) {
-    return <Login onLogin={() => setAuth(true)} />
+    return <Login onLogin={refreshMe} />
   }
 
   const rendering = jobs.some((j) => j.status === 'running')
