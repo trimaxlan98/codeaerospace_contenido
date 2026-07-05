@@ -1,7 +1,10 @@
 """Metricas de sistema del host (psutil) para el centro de monitoreo."""
 
+import json
+import os
 import time
 from collections import deque
+from pathlib import Path
 
 import psutil
 
@@ -34,6 +37,33 @@ class History:
             "render_cpu": render.get("cpu_pct") if render else None,
             "render_mem": render.get("mem_pct") if render else None,
         })
+
+    def save(self, path) -> None:
+        """Vuelca las muestras a JSON de forma atomica. Nunca lanza."""
+        try:
+            path = Path(path)
+            tmp = path.with_suffix(path.suffix + ".tmp")
+            tmp.write_text(json.dumps(list(self.samples)), encoding="utf-8")
+            os.replace(tmp, path)
+        except OSError as e:
+            print(f"[metrics] no se pudo guardar snapshot: {e!r}")
+
+    def load(self, path, interval: float, now: float | None = None) -> None:
+        """Recarga muestras dentro de la ventana maxlen*interval. Nunca lanza."""
+        path = Path(path)
+        if not path.is_file():
+            return
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            print(f"[metrics] snapshot ilegible, se ignora: {e!r}")
+            return
+        if now is None:
+            now = time.time()
+        cutoff = now - (self.samples.maxlen or 0) * interval
+        for s in raw:
+            if isinstance(s, dict) and s.get("ts", 0) >= cutoff:
+                self.samples.append(s)
 
 
 def host_metrics() -> dict:

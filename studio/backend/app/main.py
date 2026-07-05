@@ -3,6 +3,7 @@
 import asyncio
 import json
 import re
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -35,10 +36,12 @@ assistant = Assistant(cfg)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    history.load(cfg.metrics_snapshot_path, cfg.metrics_interval)
     manager.start()
     metrics_task = asyncio.get_event_loop().create_task(_metrics_loop())
     yield
     metrics_task.cancel()
+    history.save(cfg.metrics_snapshot_path)
     await manager.stop()
     db.close()
 
@@ -54,6 +57,7 @@ async def _metrics_loop() -> None:
     refinamiento; el runner ya cachea stats 4s, y el intervalo es moderado
     (sin polling agresivo) para respetar las 2 vCPU compartidas.
     """
+    last_snapshot = time.time()
     while True:
         try:
             payload = {"type": "metrics", "host": metrics.host_metrics()}
@@ -63,6 +67,10 @@ async def _metrics_loop() -> None:
                 payload["containers"] = None  # runner caido: se informa en UI
             history.add(payload["host"], payload["containers"])
             bus.publish(payload)
+            now = time.time()
+            if now - last_snapshot >= cfg.metrics_snapshot_interval:
+                history.save(cfg.metrics_snapshot_path)  # persistencia periodica: no depende del shutdown limpio
+                last_snapshot = now
         except Exception as e:
             print(f"[metrics] error: {e!r}")
         await asyncio.sleep(cfg.metrics_interval)

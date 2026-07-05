@@ -35,6 +35,9 @@ class Settings:
         self.max_timeout = int(os.environ.get("MS_MAX_TIMEOUT", "1800"))
 
         self.metrics_interval = float(os.environ.get("MS_METRICS_INTERVAL", "4.0"))
+        self.metrics_snapshot_path = Path(os.environ.get(
+            "MS_METRICS_SNAPSHOT", str(self.db_path.parent / "metrics_history.json")))
+        self.metrics_snapshot_interval = float(os.environ.get("MS_METRICS_SNAPSHOT_INTERVAL", "120.0"))
 
         # Cuota total de disco para render_jobs/ (videos + scripts + logs).
         self.max_storage_mb = int(os.environ.get("MS_MAX_STORAGE_MB", "2048"))

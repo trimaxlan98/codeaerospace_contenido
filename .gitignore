@@ -35,6 +35,7 @@ studio/backend/.env
 studio/backend/manimstudio.db*
 studio/frontend/node_modules/
 studio/frontend/dist/
+metrics_history.json
 
 # Credenciales GCP del asistente IA — JAMAS al repo
 studio/backend/gcp-key.json
