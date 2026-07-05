@@ -97,3 +97,22 @@ def test_video_404_before_done(authed):
 def test_unknown_job_404(authed):
     assert authed.get("/api/jobs/deadbeef00000000").status_code == 404
     assert authed.get("/api/jobs/../../etc/passwd").status_code == 404
+
+
+def test_storage_usage_cached_until_invalidated(client):
+    from app.main import manager
+    root = manager.cfg.render_jobs_dir
+    root.mkdir(parents=True, exist_ok=True)
+
+    (root / "a.bin").write_bytes(b"x" * 100)
+    assert manager.storage_usage() == 100          # primera lectura: calcula
+
+    (root / "b.bin").write_bytes(b"y" * 50)
+    assert manager.storage_usage() == 100          # dentro del TTL: cacheado
+
+    manager._invalidate_storage()
+    assert manager.storage_usage() == 150          # invalidado: recalcula
+
+    (root / "c.bin").write_bytes(b"z" * 10)
+    manager._storage_cache_at = 0.0                # simula TTL expirado
+    assert manager.storage_usage() == 160          # recalcula por TTL

@@ -20,6 +20,7 @@ from .runner_client import RunnerClient, RunnerError
 QUALITIES = {"ql", "qm", "qh"}
 ACTIVE_STATES = ("queued", "running")
 LOG_BUFFER_MAX = 5000
+STORAGE_TTL = 15.0  # s: caché de storage_usage() para no recorrer el FS en cada request
 
 
 def job_public(job: dict) -> dict:
@@ -40,6 +41,8 @@ class JobManager:
         self.current_job_id: str | None = None
         self._cancelled: set[str] = set()
         self._worker_task: asyncio.Task | None = None
+        self._storage_cache: int | None = None
+        self._storage_cache_at: float = 0.0
 
     # ── ciclo de vida ────────────────────────────────────────────────────────
 
@@ -112,11 +115,19 @@ class JobManager:
             return False
         self.logs.pop(job_id, None)
         self.delete_job_files(job_id)
+        self._invalidate_storage()  # se liberó espacio; la Biblioteca debe reflejar la cuota al instante
         self.db.delete_job(job_id)
         return True
 
     def storage_usage(self) -> int:
-        """Bytes totales usados por render_jobs/ (videos, scripts, logs)."""
+        """Bytes totales usados por render_jobs/ (videos, scripts, logs).
+
+        Cacheado STORAGE_TTL s: recorrer el FS en cada GET /api/jobs es
+        O(nº archivos). Se invalida al terminar o borrar un job.
+        """
+        now = time.time()
+        if self._storage_cache is not None and now - self._storage_cache_at < STORAGE_TTL:
+            return self._storage_cache
         total = 0
         root = self.cfg.render_jobs_dir
         if root.is_dir():
@@ -126,7 +137,13 @@ class JobManager:
                         total += p.stat().st_size
                 except OSError:
                     pass
+        self._storage_cache = total
+        self._storage_cache_at = now
         return total
+
+    def _invalidate_storage(self) -> None:
+        """Fuerza recálculo de storage_usage() en la próxima lectura."""
+        self._storage_cache = None
 
     # ── worker ───────────────────────────────────────────────────────────────
 
@@ -229,6 +246,7 @@ class JobManager:
             self._persist_log(job_id)
         elif status == "cancelled":
             self.logs.pop(job_id, None)
+        self._invalidate_storage()  # el tamaño en disco cambió (video nuevo o archivos borrados)
         self._publish_job(job_id)
 
     def _persist_log(self, job_id: str) -> None:
