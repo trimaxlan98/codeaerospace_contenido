@@ -19,6 +19,7 @@ def _set_env(tmp_path: Path) -> None:
     os.environ["MS_WORKSPACE"] = str(tmp_path)
     os.environ["MS_DB_PATH"] = str(tmp_path / "test.db")
     os.environ["MS_RUNNER_SOCKET"] = str(tmp_path / "runner.sock")
+    os.environ["MS_LESSONS_DIR"] = str(tmp_path / "lessons")
     os.environ["MS_COOKIE_SECURE"] = "0"
     # El asistente IA queda deshabilitado en tests (la clave no existe en tmp);
     # los tests de IA que lo necesitan crean este archivo y mockean el cliente.

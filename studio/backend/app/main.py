@@ -19,6 +19,7 @@ from .config import get_settings
 from .db import Database
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
+from .lessons import LessonStore
 from .runner_client import RunnerClient
 from .scenes import detect_scenes
 
@@ -32,6 +33,7 @@ manager = JobManager(cfg, db, runner, bus)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 assistant = Assistant(cfg)
+lessons_store = LessonStore(cfg.lessons_dir)
 
 
 @asynccontextmanager
@@ -265,6 +267,21 @@ async def delete_job(job_id: str, _=Depends(require_auth)):
                             detail="El job esta activo: cancelalo antes de borrarlo")
     manager.delete_job(job_id)
     return {"ok": True, "storage": _storage_public()}
+
+
+# ── biblioteca de lecciones ───────────────────────────────────────────────────
+
+@app.get("/api/lessons")
+async def lessons_index(_=Depends(require_auth)):
+    return lessons_store.index()
+
+
+@app.get("/api/lessons/{lesson_id:path}")
+async def lesson_detail(lesson_id: str, _=Depends(require_auth)):
+    lesson = lessons_store.get(lesson_id)
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Leccion no encontrada")
+    return lesson
 
 
 # ── asistente IA ──────────────────────────────────────────────────────────────

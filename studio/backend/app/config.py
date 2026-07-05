@@ -21,6 +21,8 @@ class Settings:
         self.render_jobs_dir = self.workspace / "render_jobs"
         self.db_path = Path(os.environ.get("MS_DB_PATH", str(self.workspace / "studio" / "manimstudio.db")))
         self.runner_socket = os.environ.get("MS_RUNNER_SOCKET", "/run/manimstudio/runner.sock")
+        self.lessons_dir = Path(os.environ.get(
+            "MS_LESSONS_DIR", str(self.workspace / "studio" / "content" / "lessons")))
 
         self.cookie_name = "ms_session"
         self.cookie_secure = os.environ.get("MS_COOKIE_SECURE", "1") == "1"
