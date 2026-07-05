@@ -123,3 +123,53 @@ def test_storage_usage_cached_until_invalidated(client):
     (root / "c.bin").write_bytes(b"z" * 10)
     manager._storage_cache_at = 0.0                # simula TTL expirado
     assert manager.storage_usage() == 160          # recalcula por TTL
+
+
+import time as _time
+import uuid as _uuid
+
+
+def _seed_job(status, finished_ago_s=0, size=0):
+    """Inserta un job directamente en la BD de la app cargada."""
+    import app.main as main
+    job_id = _uuid.uuid4().hex[:16]
+    now = _time.time()
+    main.db.insert_job({
+        "id": job_id, "scene": "Escena", "quality": "ql", "timeout": 120,
+        "status": "queued", "script": "class Escena: pass", "created_at": now,
+    })
+    main.db.update_job(job_id, status=status,
+                       finished_at=now - finished_ago_s, size_bytes=size)
+    return job_id
+
+
+def test_delete_failed_borra_solo_fallidos(authed):
+    fallido = _seed_job("error")
+    cancelado = _seed_job("cancelled")
+    bueno = _seed_job("done")
+    r = authed.delete("/api/jobs/failed")
+    assert r.status_code == 200
+    assert r.json()["deleted"] == 2
+    ids = {j["id"] for j in authed.get("/api/jobs").json()["jobs"]}
+    assert bueno in ids and fallido not in ids and cancelado not in ids
+
+
+def test_purga_por_antiguedad_no_toca_recientes_ni_activos(authed):
+    viejo = _seed_job("done", finished_ago_s=40 * 86400, size=1000)
+    reciente = _seed_job("done", finished_ago_s=1 * 86400, size=500)
+    r = authed.delete("/api/jobs/older-than/30")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["deleted"] == 1
+    assert body["freed_bytes"] == 1000
+    ids = {j["id"] for j in authed.get("/api/jobs").json()["jobs"]}
+    assert reciente in ids and viejo not in ids
+
+
+def test_purga_valida_rango_de_dias(authed):
+    assert authed.delete("/api/jobs/older-than/0").status_code == 422
+
+
+def test_bulk_requiere_auth(client):
+    assert client.delete("/api/jobs/failed").status_code == 401
+    assert client.delete("/api/jobs/older-than/30").status_code == 401

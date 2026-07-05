@@ -31,6 +31,8 @@ def job_public(job: dict) -> dict:
 
 
 class JobManager:
+    FAILED_STATES = ("error", "timeout", "cancelled")
+
     def __init__(self, cfg: Settings, db: Database, runner: RunnerClient, bus: EventBus) -> None:
         self.cfg = cfg
         self.db = db
@@ -266,6 +268,29 @@ class JobManager:
             self.bus.publish({"type": "job", "job": job_public(job)})
 
     # ── mantenimiento ────────────────────────────────────────────────────────
+
+    def delete_failed_jobs(self) -> int:
+        """Borra todos los jobs fallidos/cancelados. Devuelve el conteo."""
+        count = 0
+        for job in self.db.list_jobs(limit=100_000):
+            if job["status"] in self.FAILED_STATES and self.delete_job(job["id"]):
+                count += 1
+        return count
+
+    def delete_jobs_older_than(self, days: int) -> tuple[int, int]:
+        """Borra jobs 'done' terminados hace mas de `days` dias.
+
+        Devuelve (conteo, bytes liberados segun size_bytes registrado).
+        """
+        cutoff = time.time() - days * 86400
+        count = freed = 0
+        for job in self.db.list_jobs(limit=100_000):
+            if job["status"] == "done" and (job.get("finished_at") or 0) < cutoff:
+                size = job.get("size_bytes") or 0
+                if self.delete_job(job["id"]):
+                    count += 1
+                    freed += size
+        return count, freed
 
     def _cleanup_partial_files(self, job_id: str) -> None:
         """Elimina los archivos parciales de manim tras un render exitoso."""

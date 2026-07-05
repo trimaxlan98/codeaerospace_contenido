@@ -241,6 +241,22 @@ async def get_thumb(job_id: str, _=Depends(require_auth)):
     return FileResponse(thumb, media_type="image/jpeg")
 
 
+@app.delete("/api/jobs/failed")
+async def delete_failed_jobs(_=Depends(require_auth)):
+    """Borra en lote todos los jobs error/timeout/cancelled."""
+    deleted = manager.delete_failed_jobs()
+    return {"deleted": deleted, "storage": _storage_public()}
+
+
+@app.delete("/api/jobs/older-than/{days}")
+async def delete_old_jobs(days: int, _=Depends(require_auth)):
+    """Purga jobs 'done' con mas de `days` dias de antiguedad."""
+    if not (1 <= days <= 3650):
+        raise HTTPException(status_code=422, detail="Dias fuera de rango (1-3650)")
+    deleted, freed = manager.delete_jobs_older_than(days)
+    return {"deleted": deleted, "freed_bytes": freed, "storage": _storage_public()}
+
+
 @app.delete("/api/jobs/{job_id}")
 async def delete_job(job_id: str, _=Depends(require_auth)):
     job = _get_job_or_404(job_id)
