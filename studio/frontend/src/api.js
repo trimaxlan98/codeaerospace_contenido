@@ -1,0 +1,37 @@
+// Cliente API — rutas relativas /api, cookies de sesion same-origin.
+
+export class ApiError extends Error {
+  constructor(status, detail) {
+    super(detail || `HTTP ${status}`)
+    this.status = status
+  }
+}
+
+async function request(method, path, body) {
+  const res = await fetch(path, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  let data = null
+  try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (!res.ok) throw new ApiError(res.status, data?.detail)
+  return data
+}
+
+export const api = {
+  me: () => request('GET', '/api/me'),
+  login: (username, password) => request('POST', '/api/login', { username, password }),
+  logout: () => request('POST', '/api/logout'),
+  scenes: (script) => request('POST', '/api/scenes', { script }),
+  createJob: (payload) => request('POST', '/api/jobs', payload),
+  listJobs: () => request('GET', '/api/jobs'),
+  getJob: (id) => request('GET', `/api/jobs/${id}`),
+  getScript: (id) => request('GET', `/api/jobs/${id}/script`),
+  cancelJob: (id) => request('POST', `/api/jobs/${id}/cancel`),
+  metrics: () => request('GET', '/api/metrics'),
+}
+
+export function videoUrl(id) {
+  return `/api/jobs/${id}/video`
+}

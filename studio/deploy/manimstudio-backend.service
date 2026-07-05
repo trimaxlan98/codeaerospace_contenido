@@ -1,0 +1,29 @@
+[Unit]
+Description=ManimStudio backend (FastAPI, 127.0.0.1:3002)
+After=network.target manimstudio-runner.service
+Wants=manimstudio-runner.service
+
+[Service]
+Type=simple
+User=manimstudio
+Group=manimstudio
+WorkingDirectory=/var/www/codeaerospace_contenido/studio/backend
+EnvironmentFile=/var/www/codeaerospace_contenido/studio/backend/.env
+# Un solo worker: la cola de renders y el bus SSE viven en memoria del proceso.
+ExecStart=/var/www/codeaerospace_contenido/studio/backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 3002 --workers 1
+Restart=always
+RestartSec=3
+
+# Hardening: proceso web-facing sin privilegios, sin acceso a docker.sock.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospace_contenido/studio/backend
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

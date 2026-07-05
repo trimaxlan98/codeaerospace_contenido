@@ -1,0 +1,50 @@
+# Limites de recursos compartidos: nunca deben competir sin freno con el
+# resto de apps del servidor (solo 2 vCPU / 7.8GB RAM disponibles en total).
+x-manim-limits: &manim-limits
+  cpus: "1.5"
+  memory: 2g
+
+x-manim-reservations: &manim-reservations
+  cpus: "0.25"
+  memory: 256m
+
+x-manim-resources: &manim-resources
+  resources:
+    limits: *manim-limits
+    reservations: *manim-reservations
+
+x-manim-base: &manim-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  working_dir: /workspace
+  volumes:
+    - .:/workspace
+
+services:
+  manim:
+    <<: *manim-base
+    container_name: codeaerospace-contenido
+    ports:
+      - "127.0.0.1:8888:8888"
+    tty: true
+    stdin_open: true
+    deploy: *manim-resources
+
+  # Servicio usado por ManimStudio para renders bajo demanda (docker compose
+  # run). Misma imagen y limites que `manim`, pero sin red, sin puertos y sin
+  # TTY: cada render ejecuta codigo Python arbitrario y se trata como no
+  # confiable. El perfil "render" evita que arranque con `docker compose up`.
+  manim-render:
+    <<: *manim-base
+    image: codeaerospace_contenido-manim
+    network_mode: "none"
+    profiles: ["render"]
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          <<: *manim-limits
+          pids: 256
+        reservations: *manim-reservations

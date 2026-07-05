@@ -28,3 +28,10 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# ManimStudio
+render_jobs/
+studio/backend/.env
+studio/backend/manimstudio.db*
+studio/frontend/node_modules/
+studio/frontend/dist/

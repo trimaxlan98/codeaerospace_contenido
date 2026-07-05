@@ -1,0 +1,20 @@
+[Unit]
+Description=ManimStudio runner (unico proceso con acceso a Docker)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+# Root: necesita el socket de Docker. Su superficie es minima por diseño
+# (ver studio/runner/manim_runner.py): render/cancel/stats de ESTE compose.
+ExecStart=/usr/bin/python3 /var/www/codeaerospace_contenido/studio/runner/manim_runner.py
+RuntimeDirectory=manimstudio
+RuntimeDirectoryMode=0750
+Restart=always
+RestartSec=3
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
