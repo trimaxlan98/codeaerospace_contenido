@@ -5,6 +5,7 @@ import Header from './Header.jsx'
 import Studio from './Studio.jsx'
 import Admin from './Admin.jsx'
 import Library from './Library.jsx'
+import Lessons from './Lessons.jsx'
 
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
@@ -107,6 +108,8 @@ export default function App() {
           onJobsChanged={refreshJobs} aiEnabled={aiEnabled} />
       ) : view === 'library' ? (
         <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
+      ) : view === 'lessons' ? (
+        <Lessons />
       ) : (
         <Admin metrics={metrics} containers={containers} jobs={jobs}
           storage={storage} onJobsChanged={refreshJobs} />

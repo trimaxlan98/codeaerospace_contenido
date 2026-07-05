@@ -40,6 +40,8 @@ export default function Header({ view, onView, metrics, orbitState, onLogout }) 
           onClick={() => onView('studio')}>Estudio</button>
         <button className={view === 'library' ? 'tab tab--on' : 'tab'}
           onClick={() => onView('library')}>Biblioteca</button>
+        <button className={view === 'lessons' ? 'tab tab--on' : 'tab'}
+          onClick={() => onView('lessons')}>Aprender</button>
         <button className={view === 'admin' ? 'tab tab--on' : 'tab'}
           onClick={() => onView('admin')}>Admin</button>
       </nav>
