@@ -346,6 +346,25 @@ body {
 .state--exited, .state--dead { color: var(--muted); }
 .state--restarting, .state--paused { color: var(--warn); }
 
+.kpis {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px; padding: 12px 14px 4px;
+}
+.kpi {
+  display: grid; gap: 2px; padding: 10px 12px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px;
+}
+.kpi__label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .12em; }
+.kpi__value { font-family: var(--mono); font-size: 26px; font-weight: 600; color: var(--ink); }
+.kpi__value small { font-size: 13px; color: var(--muted); margin-left: 2px; }
+.kpi--warn .kpi__value { color: var(--warn); }
+.kpi--crit .kpi__value { color: var(--err); }
+.kpi--ok .kpi__value { color: var(--ok); }
+
+.admin__actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px 4px; }
+.armed { display: inline-flex; gap: 6px; }
+.admin .notice { margin: 8px 14px 0; }
+
 /* ── biblioteca ─────────────────────────────────────────────────────────── */
 .library {
   flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 12px;

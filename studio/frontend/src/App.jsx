@@ -3,7 +3,7 @@ import { api } from './api.js'
 import Login from './Login.jsx'
 import Header from './Header.jsx'
 import Studio from './Studio.jsx'
-import Monitor from './Monitor.jsx'
+import Admin from './Admin.jsx'
 import Library from './Library.jsx'
 
 export default function App() {
@@ -108,7 +108,8 @@ export default function App() {
       ) : view === 'library' ? (
         <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
       ) : (
-        <Monitor metrics={metrics} containers={containers} />
+        <Admin metrics={metrics} containers={containers} jobs={jobs}
+          storage={storage} onJobsChanged={refreshJobs} />
       )}
     </div>
   )
