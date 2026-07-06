@@ -161,5 +161,19 @@ Renderizar esté deshabilitado, y añadir "Vaciar historial" + purga con días l
    en Aprender/Animaciones la columna de categorías se acota a `45dvh` como
    guardarraíl (su rediseño es el punto 4). Verificado con QA Playwright
    (17 checks de geometría en 390×844 y 1440×900).
-4. **Animaciones/Aprender:** acordeón o grid de tarjetas + búsqueda global.
-5. **P0-4/P0-6** (401 → login, indicador de conexión, ErrorBoundary) + toasts de fin de render.
+4. ~~**Animaciones/Aprender:** acordeón o grid de tarjetas + búsqueda global.~~ — **hecho
+   2026-07-06**: sidebar compartida `CategoryBrowser` con acordeón (la categoría expande sus
+   ítems debajo, estilo submenu; sigue a la categoría del ítem abierto en deep-links) y
+   búsqueda global sobre todo el índice agrupada por categoría (título+escena en Animaciones,
+   título+tags en Aprender). Además: confirmación antes de pisar trabajo propio en el editor
+   ("Abrir en el Estudio", "Cargar al editor" y "Aplicar" de la IA pasan por `replaceScript`),
+   y una lección se marca leída al TERMINARLA (IntersectionObserver sobre el pie; funciona con
+   scroll interno en escritorio y de página en móvil), no al abrirla.
+5. ~~**P0-4/P0-6** (401 → login, indicador de conexión, ErrorBoundary) + toasts de fin de
+   render.~~ — **hecho 2026-07-06**: cualquier 401 de la API (salvo `/api/login`) dispara
+   `setAuth(false)` → login inmediato; si el SSE cae se sondea `/api/me` (acelerado a 8 s) por
+   si la sesión expiró; chip ámbar "sin señal Ns" en el header cuando el stream calla >10 s;
+   ErrorBoundary raíz con mensaje y recarga (adiós pantalla en negro) + defensa en `useHistory`
+   ante `samples` con forma inesperada; toasts de fin de render (clic → Estudio) y
+   `document.title` con "● Renderizando…" mientras corre un job. QA Playwright: 18 checks
+   funcionales de los bloques 4+5, más regresión de los 17 del bloque 3.

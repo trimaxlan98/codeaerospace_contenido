@@ -103,8 +103,11 @@ export function useHistory(metrics, containers) {
     api.metricsHistory()
       .then((d) => {
         if (!alive) return
-        setSamples(d.samples)
-        lastTs.current = d.samples.length ? d.samples[d.samples.length - 1].ts : 0
+        // Defensa: una respuesta con forma inesperada no debe tirar la vista
+        // (visto en QA: `samples` undefined dejaba la pantalla en negro).
+        const s = Array.isArray(d?.samples) ? d.samples : []
+        setSamples(s)
+        lastTs.current = s.length ? s[s.length - 1].ts : 0
       })
       .catch(() => {})
     return () => { alive = false }

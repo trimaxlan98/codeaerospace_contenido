@@ -7,6 +7,11 @@ export class ApiError extends Error {
   }
 }
 
+// Un 401 fuera de /api/login significa sesion expirada: avisar a la app para
+// volver al login en vez de dejar una interfaz zombi con errores cripticos.
+let onUnauthorized = null
+export function setUnauthorizedHandler(fn) { onUnauthorized = fn }
+
 async function request(method, path, body) {
   const res = await fetch(path, {
     method,
@@ -15,6 +20,7 @@ async function request(method, path, body) {
   })
   let data = null
   try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (res.status === 401 && path !== '/api/login') onUnauthorized?.()
   if (!res.ok) throw new ApiError(res.status, data?.detail)
   return data
 }

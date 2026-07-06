@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LogOut } from 'lucide-react'
+import { LogOut, WifiOff } from 'lucide-react'
 import ThemePicker from './ThemePicker.jsx'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -36,8 +36,8 @@ function MeterChip({ label, pct }) {
   )
 }
 
-export default function Header({ view, onView, metrics, orbitState, onLogout }) {
-  const clock = useUtcClock()
+export default function Header({ view, onView, metrics, orbitState, staleSince, onLogout }) {
+  const clock = useUtcClock() // ademas re-renderiza cada segundo: el contador de "sin señal" avanza solo
   return (
     // En movil el header ocupa dos filas: marca + acciones arriba y la nav a
     // lo ancho debajo (order-last + w-full); en md+ vuelve a una sola fila.
@@ -71,6 +71,15 @@ export default function Header({ view, onView, metrics, orbitState, onLogout }) 
       </nav>
 
       <div className="ml-auto flex items-center gap-2">
+        {staleSince && (
+          <span role="status"
+            className="flex items-center gap-1.5 rounded-md border border-warn/40 bg-warn/10 px-2 py-1 font-mono text-[11px] text-warn"
+            title="el stream de telemetria no envia eventos; los datos en pantalla estan congelados">
+            <WifiOff className="h-3 w-3" />
+            <span className="hidden sm:inline">sin señal</span>
+            {Math.max(0, Math.floor((Date.now() - staleSince) / 1000))}s
+          </span>
+        )}
         {metrics && (
           <>
             <MeterChip label="CPU" pct={metrics.cpu_pct} />
