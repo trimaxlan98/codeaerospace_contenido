@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from . import metrics
 from .ai import AIError, Assistant
+from .animations import AnimationStore
 from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
@@ -34,6 +35,7 @@ manager = JobManager(cfg, db, runner, bus)
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 assistant = Assistant(cfg)
 lessons_store = LessonStore(cfg.lessons_dir)
+animations_store = AnimationStore(cfg.animations_dir, lessons_store)
 
 
 @asynccontextmanager
@@ -282,6 +284,21 @@ async def lesson_detail(lesson_id: str, _=Depends(require_auth)):
     if not lesson:
         raise HTTPException(status_code=404, detail="Leccion no encontrada")
     return lesson
+
+
+# ── biblioteca de animaciones ─────────────────────────────────────────────────
+
+@app.get("/api/animations")
+async def animations_index(_=Depends(require_auth)):
+    return animations_store.index()
+
+
+@app.get("/api/animations/{animation_id:path}")
+async def animation_detail(animation_id: str, _=Depends(require_auth)):
+    animation = animations_store.get(animation_id)
+    if not animation:
+        raise HTTPException(status_code=404, detail="Animación no encontrada")
+    return animation
 
 
 # ── asistente IA ──────────────────────────────────────────────────────────────

@@ -39,7 +39,8 @@ function duration(job) {
   return `${(end - job.started_at).toFixed(0)}s`
 }
 
-export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled }) {
+export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
+  pendingScript, onConsumePendingScript }) {
   const [script, setScript] = useState(SAMPLE)
   const [scenes, setScenes] = useState(['Orbita'])
   const [scene, setScene] = useState('Orbita')
@@ -54,6 +55,13 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const [aiAutoRun, setAiAutoRun] = useState(0)
   const logRef = useRef(null)
   const debounceRef = useRef(null)
+
+  // Una animacion abierta desde la Biblioteca reemplaza el editor una sola vez.
+  useEffect(() => {
+    if (pendingScript == null) return
+    setScript(pendingScript)
+    onConsumePendingScript()
+  }, [pendingScript, onConsumePendingScript])
 
   // Deteccion de escenas con debounce (el backend usa ast, nunca ejecuta).
   useEffect(() => {

@@ -39,6 +39,8 @@ export const api = {
   aiGenerate: (payload) => request('POST', '/api/ai/generate', payload),
   lessonsIndex: () => request('GET', '/api/lessons'),
   getLesson: (id) => request('GET', `/api/lessons/${id}`),
+  animationsIndex: () => request('GET', '/api/animations'),
+  getAnimation: (id) => request('GET', `/api/animations/${id}`),
 }
 
 export function videoUrl(id) {

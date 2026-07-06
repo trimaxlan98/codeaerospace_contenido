@@ -23,6 +23,8 @@ class Settings:
         self.runner_socket = os.environ.get("MS_RUNNER_SOCKET", "/run/manimstudio/runner.sock")
         self.lessons_dir = Path(os.environ.get(
             "MS_LESSONS_DIR", str(self.workspace / "studio" / "content" / "lessons")))
+        self.animations_dir = Path(os.environ.get(
+            "MS_ANIMATIONS_DIR", str(self.workspace / "studio" / "content" / "animations")))
 
         self.cookie_name = "ms_session"
         self.cookie_secure = os.environ.get("MS_COOKIE_SECURE", "1") == "1"

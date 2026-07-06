@@ -6,11 +6,13 @@ import Studio from './Studio.jsx'
 import Admin from './Admin.jsx'
 import Library from './Library.jsx'
 import Lessons from './Lessons.jsx'
+import Animations from './Animations.jsx'
 
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
   const [aiEnabled, setAiEnabled] = useState(false)
   const [view, setView] = useState('studio')
+  const [pendingScript, setPendingScript] = useState(null)
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
   const [jobs, setJobs] = useState([])
@@ -105,11 +107,14 @@ export default function App() {
       />
       {view === 'studio' ? (
         <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
-          onJobsChanged={refreshJobs} aiEnabled={aiEnabled} />
+          onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
+          pendingScript={pendingScript} onConsumePendingScript={() => setPendingScript(null)} />
       ) : view === 'library' ? (
         <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
       ) : view === 'lessons' ? (
         <Lessons />
+      ) : view === 'animations' ? (
+        <Animations onOpenInStudio={(script) => { setPendingScript(script); setView('studio') }} />
       ) : (
         <Admin metrics={metrics} containers={containers} jobs={jobs}
           storage={storage} onJobsChanged={refreshJobs} />
