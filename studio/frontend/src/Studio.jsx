@@ -5,6 +5,7 @@ import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X } from
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
 import { Button } from './components/ui/button.jsx'
+import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
 import { cn } from '@/lib/utils'
 
@@ -207,15 +208,24 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const [aiOpen, setAiOpen] = useState(false)
   const [aiMode, setAiMode] = useState('explain')
   const [aiAutoRun, setAiAutoRun] = useState(0)
+  const [confirmScript, setConfirmScript] = useState(null) // script entrante a confirmar
   const logRef = useRef(null)
   const debounceRef = useRef(null)
 
-  // Una animacion abierta desde la Biblioteca reemplaza el editor una sola vez.
+  // Toda accion que pisa el editor (Abrir en el Estudio, Cargar al editor,
+  // Aplicar de la IA) pasa por aqui: si hay trabajo propio, pide confirmacion.
+  const replaceScript = useCallback((next) => {
+    const cur = script.trim()
+    if (!cur || cur === next.trim() || cur === SAMPLE.trim()) setScript(next)
+    else setConfirmScript(next)
+  }, [script])
+
+  // Una animacion abierta desde Animaciones reemplaza el editor una sola vez.
   useEffect(() => {
     if (pendingScript == null) return
-    setScript(pendingScript)
+    replaceScript(pendingScript)
     onConsumePendingScript()
-  }, [pendingScript, onConsumePendingScript])
+  }, [pendingScript, onConsumePendingScript, replaceScript])
 
   // Guardado local del script con debounce (una escritura por pausa de tipeo).
   useEffect(() => {
@@ -323,7 +333,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const loadScript = async (id) => {
     try {
       const d = await api.getScript(id)
-      if (d.script) setScript(d.script)
+      if (d.script) replaceScript(d.script)
     } catch { /* sin script */ }
   }
 
@@ -505,8 +515,28 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
       {aiEnabled && (
         <Assistant open={aiOpen} mode={aiMode} onMode={setAiMode}
           onClose={() => setAiOpen(false)} job={selected} jobLogs={logs}
-          autoRun={aiAutoRun} onApply={setScript} />
+          autoRun={aiAutoRun} onApply={replaceScript} />
       )}
+
+      {/* Confirmacion antes de pisar trabajo propio en el editor. */}
+      <Dialog open={confirmScript != null} onOpenChange={(o) => !o && setConfirmScript(null)}>
+        <DialogContent className="w-[min(420px,94vw)] p-5" showClose={false}>
+          <DialogTitle className="font-display text-[15px] font-semibold text-ink">
+            ¿Reemplazar el contenido del editor?
+          </DialogTitle>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">
+            El script actual del editor se descartará. Si quieres conservarlo,
+            cancela y cópialo antes.
+          </p>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setConfirmScript(null)}>Conservar</Button>
+            <Button variant="primary"
+              onClick={() => { setScript(confirmScript); setConfirmScript(null) }}>
+              Reemplazar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

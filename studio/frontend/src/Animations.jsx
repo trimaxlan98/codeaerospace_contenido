@@ -1,20 +1,17 @@
 // Biblioteca de animaciones: categorias + lista + vista previa del script,
 // con un boton para abrirlo en el Estudio y renderizarlo.
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { api } from './api.js'
-import { Input } from './components/ui/input.jsx'
+import CategoryBrowser from './components/CategoryBrowser.jsx'
 import { Button } from './components/ui/button.jsx'
-import { cn } from '@/lib/utils'
 
 export default function Animations({ onOpenInStudio, routeId, onRoute }) {
   const [index, setIndex] = useState(null)
   const [error, setError] = useState('')
-  const [catSlug, setCatSlug] = useState(null)
   const [animation, setAnimation] = useState(null) // {id, title, scene, script}
-  const [query, setQuery] = useState('')
   const requestedRef = useRef(null) // ultima animacion pedida (dedupe ruta/clic)
 
   useEffect(() => {
@@ -22,31 +19,16 @@ export default function Animations({ onOpenInStudio, routeId, onRoute }) {
       .then((d) => {
         // Las categorias sin animaciones (las del curso de Manim) no se
         // muestran en esta pestana.
-        const conContenido = { categories: d.categories.filter((c) => c.count > 0) }
-        setIndex(conContenido)
-        if (conContenido.categories.length) setCatSlug(conContenido.categories[0].slug)
+        setIndex({ categories: d.categories.filter((c) => c.count > 0) })
       })
       .catch((err) => setError(err.message))
   }, [])
 
-  const cat = index?.categories.find((c) => c.slug === catSlug)
-  const list = useMemo(() => {
-    if (!cat) return []
-    if (!query.trim()) return cat.animations
-    const q = query.toLowerCase()
-    return cat.animations.filter((a) => a.title.toLowerCase().includes(q))
-  }, [cat, query])
-
-  const open = async (id, { fromRoute = false } = {}) => {
+  const open = async (id) => {
     requestedRef.current = id
     setError('')
     try {
       setAnimation(await api.getAnimation(id))
-      if (fromRoute) {
-        // Deep-link: alinear la categoria activa con la animacion abierta.
-        const c = index?.categories.find((c) => id.startsWith(c.slug + '/'))
-        if (c) setCatSlug(c.slug)
-      }
     } catch (err) {
       setError(err.status === 404 ? 'Animación no encontrada' : err.message)
     }
@@ -58,10 +40,11 @@ export default function Animations({ onOpenInStudio, routeId, onRoute }) {
     onRoute?.(id)
   }
 
-  // #/animaciones/<id> (carga inicial o atras/adelante) abre esa animacion.
+  // #/animaciones/<id> (carga inicial o atras/adelante) abre esa animacion;
+  // el acordeon sigue solo a la categoria del item abierto.
   useEffect(() => {
     if (!index || !routeId || routeId === requestedRef.current) return
-    open(routeId, { fromRoute: true })
+    open(routeId)
   }, [index, routeId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalCount = index ? index.categories.reduce((n, c) => n + c.count, 0) : 0
@@ -80,41 +63,20 @@ export default function Animations({ onOpenInStudio, routeId, onRoute }) {
       {/* En movil la columna de categorias se acota a media pantalla (la lista
           scrollea por dentro) para que la vista previa quede al alcance. */}
       <aside className="panel flex max-h-[45dvh] min-h-0 flex-col overflow-hidden lg:max-h-none">
-        <div className="border-b border-line px-3 py-2"><span className="eyebrow">Animaciones</span></div>
-        <div className="p-2.5">
-          <Input type="search" placeholder="Buscar…" value={query}
-            onChange={(e) => setQuery(e.target.value)} aria-label="buscar animaciones" />
-        </div>
-        <nav className="flex flex-col gap-0.5 px-2" aria-label="categorías">
-          {index.categories.map((c) => {
-            const on = c.slug === catSlug
-            return (
-              <button key={c.slug} onClick={() => { setCatSlug(c.slug); setQuery('') }}
-                className={cn(
-                  'flex items-center justify-between rounded-md px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
-                  on ? 'bg-surface-2 text-accent' : 'text-muted hover:bg-surface-2 hover:text-ink',
-                )}>
-                <span>{c.name}</span>
-                <span className="font-mono text-[11px]">{c.count}</span>
-              </button>
-            )
-          })}
-        </nav>
-        <ul className="mt-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto border-t border-line p-2">
-          {list.map((a) => (
-            <li key={a.id}>
-              <button onClick={() => openAndRoute(a.id)}
-                className={cn(
-                  'flex w-full flex-col gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
-                  animation?.id === a.id ? 'bg-surface-2 outline outline-1 outline-line' : 'hover:bg-surface-2',
-                )}>
-                <span className="text-[13px] text-ink">{a.title}</span>
-                <span className="font-mono text-[11px] text-muted">{a.scene || 'sin escena'}</span>
-              </button>
-            </li>
-          ))}
-          {list.length === 0 && <li className="px-2.5 py-3 text-[13px] text-muted">Sin resultados.</li>}
-        </ul>
+        <CategoryBrowser
+          title="Animaciones"
+          categories={index.categories}
+          itemsOf={(c) => c.animations}
+          searchText={(a) => `${a.title} ${a.scene || ''}`}
+          activeId={animation?.id}
+          onOpen={openAndRoute}
+          renderItem={(a) => (
+            <>
+              <span className="block text-[13px] text-ink">{a.title}</span>
+              <span className="block font-mono text-[11px] text-muted">{a.scene || 'sin escena'}</span>
+            </>
+          )}
+        />
       </aside>
 
       <section className="panel flex min-h-[50dvh] flex-col overflow-hidden lg:min-h-0" aria-label="vista previa">

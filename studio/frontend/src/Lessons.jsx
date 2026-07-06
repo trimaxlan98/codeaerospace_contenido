@@ -1,9 +1,9 @@
 // Biblioteca educativa: categorias + lista + lector con progreso de lectura.
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from './api.js'
 import { renderMarkdown } from './markdown.js'
-import { Input } from './components/ui/input.jsx'
+import CategoryBrowser from './components/CategoryBrowser.jsx'
 import { Button } from './components/ui/button.jsx'
 import { cn } from '@/lib/utils'
 import 'katex/dist/katex.min.css'
@@ -20,12 +20,11 @@ const LEVEL_LABEL = { intro: 'intro', medio: 'medio', avanzado: 'avanzado' }
 export default function Lessons({ routeId, onRoute, active = true }) {
   const [index, setIndex] = useState(null)
   const [error, setError] = useState('')
-  const [catSlug, setCatSlug] = useState(null)
   const [lesson, setLesson] = useState(null) // {id,...,markdown}
-  const [query, setQuery] = useState('')
   const [read, setRead] = useState(readSet)
   const [progress, setProgress] = useState(0)
   const readerRef = useRef(null)
+  const endRef = useRef(null) // pie de la leccion: al verlo se marca leida
   const scrollRef = useRef(0) // scroll del lector, para restaurarlo al volver
   const requestedRef = useRef(null) // ultima leccion pedida (dedupe ruta/clic)
 
@@ -34,24 +33,21 @@ export default function Lessons({ routeId, onRoute, active = true }) {
       .then((d) => {
         // Las categorias sin lecciones (las de dominio, que solo agrupan
         // animaciones) no se muestran en Aprender.
-        const conContenido = { categories: d.categories.filter((c) => c.count > 0) }
-        setIndex(conContenido)
-        if (conContenido.categories.length) setCatSlug(conContenido.categories[0].slug)
+        setIndex({ categories: d.categories.filter((c) => c.count > 0) })
       })
       .catch((err) => setError(err.message))
   }, [])
 
-  const cat = index?.categories.find((c) => c.slug === catSlug)
-  const list = useMemo(() => {
-    if (!cat) return []
-    if (!query.trim()) return cat.lessons
-    const q = query.toLowerCase()
-    return cat.lessons.filter((l) =>
-      l.title.toLowerCase().includes(q)
-      || l.tags.some((t) => String(t).toLowerCase().includes(q)))
-  }, [cat, query])
+  const markRead = useCallback((id) => {
+    setRead((prev) => {
+      if (prev.has(id)) return prev
+      const next = new Set(prev).add(id)
+      try { localStorage.setItem(READ_KEY, JSON.stringify([...next])) } catch { /* no critico */ }
+      return next
+    })
+  }, [])
 
-  const open = async (id, { fromRoute = false } = {}) => {
+  const open = async (id) => {
     requestedRef.current = id
     setError('')
     try {
@@ -60,20 +56,21 @@ export default function Lessons({ routeId, onRoute, active = true }) {
       setProgress(0)
       scrollRef.current = 0
       readerRef.current?.scrollTo(0, 0)
-      if (fromRoute) {
-        // Deep-link: alinear la pestana de categoria con la leccion abierta.
-        const c = index?.categories.find((c) => id.startsWith(c.slug + '/'))
-        if (c) setCatSlug(c.slug)
-      }
-      setRead((prev) => {
-        const next = new Set(prev).add(id)
-        localStorage.setItem(READ_KEY, JSON.stringify([...next]))
-        return next
-      })
     } catch (err) {
       setError(err.status === 404 ? 'Lección no encontrada' : err.message)
     }
   }
+
+  // Leida al TERMINARLA, no al abrirla: cuando el pie de la leccion entra en
+  // pantalla (sirve igual con scroll interno en escritorio y de pagina en movil).
+  useEffect(() => {
+    if (!lesson || !endRef.current) return
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) markRead(lesson.id)
+    }, { threshold: 0.6 })
+    io.observe(endRef.current)
+    return () => io.disconnect()
+  }, [lesson, markRead])
 
   // Clic del usuario: abre y refleja la leccion en el hash (deep-link, atras).
   const openAndRoute = (id) => {
@@ -81,10 +78,11 @@ export default function Lessons({ routeId, onRoute, active = true }) {
     onRoute?.(id)
   }
 
-  // #/aprender/<id> (carga inicial o atras/adelante) abre esa leccion.
+  // #/aprender/<id> (carga inicial o atras/adelante) abre esa leccion;
+  // el acordeon sigue solo a la categoria de la leccion abierta.
   useEffect(() => {
     if (!index || !routeId || routeId === requestedRef.current) return
-    open(routeId, { fromRoute: true })
+    open(routeId)
   }, [index, routeId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // La vista vive oculta (keep-alive) y display:none pierde el scroll del
@@ -122,50 +120,25 @@ export default function Lessons({ routeId, onRoute, active = true }) {
       {/* En movil la columna de categorias se acota a media pantalla (la lista
           scrollea por dentro) para que el lector quede al alcance. */}
       <aside className="panel flex max-h-[45dvh] min-h-0 flex-col overflow-hidden lg:max-h-none">
-        <div className="border-b border-line px-3 py-2"><span className="eyebrow">Aprender</span></div>
-        <div className="p-2.5">
-          <Input type="search" placeholder="Buscar…" value={query}
-            onChange={(e) => setQuery(e.target.value)} aria-label="buscar lecciones" />
-        </div>
-        <nav className="flex flex-col gap-0.5 px-2" aria-label="categorías">
-          {index.categories.map((c) => {
-            const on = c.slug === catSlug
-            return (
-              <button key={c.slug} onClick={() => { setCatSlug(c.slug); setQuery('') }}
-                className={cn(
-                  'flex items-center justify-between rounded-md px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
-                  on ? 'bg-surface-2 text-accent' : 'text-muted hover:bg-surface-2 hover:text-ink',
-                )}>
-                <span>{c.name}</span>
-                <span className="font-mono text-[11px]">{c.count}</span>
-              </button>
-            )
-          })}
-        </nav>
-        <ul className="mt-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto border-t border-line p-2">
-          {list.map((l) => {
-            const on = lesson?.id === l.id
-            const isRead = read.has(l.id)
-            return (
-              <li key={l.id}>
-                <button onClick={() => openAndRoute(l.id)}
-                  className={cn(
-                    'grid w-full grid-cols-[10px_1fr] gap-x-2.5 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
-                    on ? 'bg-surface-2 outline outline-1 outline-line' : 'hover:bg-surface-2',
-                  )}>
-                  <span aria-label={isRead ? 'leída' : 'no leída'}
-                    className={cn('mt-[5px] h-[7px] w-[7px] rounded-full border',
-                      isRead ? 'border-ok bg-ok' : 'border-muted')} />
-                  <span className="text-[13px] text-ink">{l.title}</span>
-                  <span className="col-start-2 font-mono text-[11px] text-muted">
-                    {LEVEL_LABEL[l.level] || l.level} · {l.minutes} min
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-          {list.length === 0 && <li className="px-2.5 py-3 text-[13px] text-muted">Sin resultados.</li>}
-        </ul>
+        <CategoryBrowser
+          title="Aprender"
+          categories={index.categories}
+          itemsOf={(c) => c.lessons}
+          searchText={(l) => `${l.title} ${l.tags.join(' ')}`}
+          activeId={lesson?.id}
+          onOpen={openAndRoute}
+          renderItem={(l) => (
+            <span className="grid grid-cols-[10px_1fr] gap-x-2.5">
+              <span aria-label={read.has(l.id) ? 'leída' : 'no leída'}
+                className={cn('mt-[5px] h-[7px] w-[7px] rounded-full border',
+                  read.has(l.id) ? 'border-ok bg-ok' : 'border-muted')} />
+              <span className="text-[13px] text-ink">{l.title}</span>
+              <span className="col-start-2 font-mono text-[11px] text-muted">
+                {LEVEL_LABEL[l.level] || l.level} · {l.minutes} min
+              </span>
+            </span>
+          )}
+        />
       </aside>
 
       <section className="panel relative flex min-h-[50dvh] flex-col overflow-hidden lg:min-h-0" aria-label="lector">
@@ -184,7 +157,7 @@ export default function Lessons({ routeId, onRoute, active = true }) {
                 </p>
               </header>
               <article className="reader" dangerouslySetInnerHTML={{ __html: html }} />
-              <footer className="mx-auto mt-8 flex max-w-[70ch] justify-between gap-2.5">
+              <footer ref={endRef} className="mx-auto mt-8 flex max-w-[70ch] justify-between gap-2.5">
                 {prev ? (
                   <Button variant="default" onClick={() => openAndRoute(prev.id)}>← {prev.title}</Button>
                 ) : <span />}
