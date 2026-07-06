@@ -48,8 +48,12 @@ class Settings:
 
         # Asistente IA (Vertex AI). Feature-flag: sin credenciales, la app
         # funciona igual y la UI de IA se oculta.
+        # Por defecto fuera del arbol montado en el contenedor de render
+        # (/var/www/codeaerospace_contenido = /workspace ahi dentro): el
+        # mount read-only ya evita la escritura, esto evita tambien la
+        # lectura del secreto desde codigo no confiable.
         self.gcp_key_path = Path(os.environ.get(
-            "MS_GCP_KEY_PATH", str(Path(__file__).resolve().parents[1] / "gcp-key.json")))
+            "MS_GCP_KEY_PATH", "/etc/manimstudio/gcp-key.json"))
         self.gcp_location = os.environ.get("MS_GCP_LOCATION", "us-central1")
         self.gemini_model_fast = os.environ.get("MS_GEMINI_MODEL_FAST", "gemini-2.5-flash")
         self.gemini_model_deep = os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro")
