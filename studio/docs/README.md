@@ -56,11 +56,37 @@ Decisiones clave (y por qué):
   `GET /api/jobs/{id}/thumb` con la misma defensa de path que `/video`.
 - `DELETE /api/jobs/{id}` borra fila SQLite + directorio; los jobs activos devuelven 409
   (cancelar primero).
+- **Acciones en lote** (botones de la pestaña Admin, todas devuelven el uso de disco actualizado):
+  - `DELETE /api/jobs/failed` — purga todos los jobs `error`/`timeout`/`cancelled`.
+  - `DELETE /api/jobs/older-than/{days}` — purga los jobs `done` con más de `days` días
+    (rango 1–3650; fuera de rango → 422).
 - **Cuota de disco**: `MS_MAX_STORAGE_MB` (default 2048). Si `render_jobs/` supera la cuota,
   crear un job responde **507** con mensaje claro; la barra de uso se muestra en la pestaña.
 - El log de cada render se persiste como `render_jobs/<id>/render.log` al terminar (done,
   error y timeout) y sobrevive reinicios del backend: `get_logs` cae a ese archivo cuando el
   buffer en memoria ya no existe (el buffer se libera al terminar → sin fugas de memoria).
+
+### Biblioteca de lecciones (pestaña «Aprender»)
+
+- Contenido educativo en Markdown + frontmatter YAML, versionado en git (sin CRUD web) en
+  `studio/content/lessons/<categoria>/<NN>-<slug>.md`. El orden de categorías y sus nombres
+  legibles viven en `studio/content/lessons/categories.yaml`. Estado actual: **12 categorías
+  × 5 lecciones = 60** (del espacio y los satélites a IA, agentes, IA agéntica y tecnología
+  de frontera).
+- Formato de archivo: frontmatter con `title`, `level` (`intro`/`medio`/`avanzado`),
+  `summary`, `tags`, `minutes`, `order`; cuerpo Markdown con matemáticas en sintaxis KaTeX
+  (`$…$` en línea, `$$…$$` en bloque). El `order` fija la posición dentro de la categoría.
+- Endpoints (auth obligatoria):
+  - `GET /api/lessons` — índice: categorías con sus lecciones (solo metadatos, sin cuerpo).
+  - `GET /api/lessons/{categoria}/{NN-slug}` — detalle con el Markdown ya sin frontmatter.
+- **Cache**: el índice se construye una vez y se guarda en memoria; se invalida solo cuando
+  cambia el `mtime` más reciente del árbol de `lessons/` (editar/añadir/borrar un `.md` lo
+  refresca en la siguiente petición, sin reiniciar). Ver `app/lessons.py` (`LessonStore`).
+- **Seguridad**: el id de lección se valida con un regex estricto
+  (`^[a-z0-9][a-z0-9-]*/[0-9]{2}-[a-z0-9][a-z0-9-]*$`) que impide cualquier path traversal;
+  un frontmatter YAML corrupto degrada con gracia (título = id) sin tumbar el índice.
+- El frontend renderiza el Markdown con `marked` + `dompurify` (sanitizado) y las fórmulas
+  con `katex`; todo autocontenido, sin CDN. El lector añade ~270 KB min al bundle.
 
 ### Monitoreo histórico (pestaña «Monitoreo»)
 
