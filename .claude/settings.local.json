@@ -6,7 +6,12 @@
       "Bash(sqlite3 *)",
       "Bash(python3 *)",
       "Artifact",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(git -C /var/www/codeaerospace_contenido status)",
+      "Bash(git -C /var/www/codeaerospace_contenido log --oneline -5)"
     ]
+  },
+  "worktree": {
+    "baseRef": "head"
   }
 }
