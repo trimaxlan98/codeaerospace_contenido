@@ -35,11 +35,25 @@ services:
   # run). Misma imagen y limites que `manim`, pero sin red, sin puertos y sin
   # TTY: cada render ejecuta codigo Python arbitrario y se trata como no
   # confiable. El perfil "render" evita que arranque con `docker compose up`.
+  #
+  # El repo se monta READ-ONLY (a diferencia de `manim`, que lo monta rw para
+  # uso interactivo): codigo no confiable no debe poder leer .env/gcp-key.json
+  # con intencion de exfiltrarlos ni, sobre todo, reescribir manim_runner.py o
+  # este mismo compose file (que el runner root ejecuta despues). El unico
+  # directorio escribible es el del job en curso, montado por invocacion
+  # desde manim_runner.py (ver RUN_AS_ARGS / argv en ese archivo).
   manim-render:
     <<: *manim-base
     image: codeaerospace_contenido-manim
+    volumes:
+      - .:/workspace:ro
     network_mode: "none"
     profiles: ["render"]
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
     deploy:
