@@ -6,8 +6,8 @@ import { api } from './api.js'
 export const GB = 1024 ** 3
 const WINDOW_S = 1800 // 30 min
 const W = 600
-const H = 130
-const PAD = { l: 30, r: 6, t: 8, b: 16 }
+const H = 220
+const PAD = { l: 30, r: 6, t: 10, b: 18 }
 
 function scaleX(ts, now) {
   const x0 = now - WINDOW_S
