@@ -102,9 +102,15 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
         return
 
     container = CONTAINER_PREFIX + job_id
+    # El repo se monta read-only (docker-compose.yml); solo el directorio de
+    # ESTE job se monta rw, por invocacion, para que Manim pueda escribir
+    # media/ sin exponer el resto del repo en escritura.
+    job_mount = f"{os.path.join(PROJECT_DIR, RENDER_JOBS_DIR, job_id)}:/workspace/{RENDER_JOBS_DIR}/{job_id}:rw"
     argv = [
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
-        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, "--name", container,
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
         "manim-render",
         "manim", "render", f"-{quality}", "--disable_caching",
         "--media_dir", f"/workspace/{RENDER_JOBS_DIR}/{job_id}/media",
@@ -180,9 +186,12 @@ async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
 
     thumb_rel = f"{RENDER_JOBS_DIR}/{job_id}/thumb.jpg"
     container = f"{CONTAINER_PREFIX}{job_id}-thumb"
+    job_mount = f"{os.path.join(PROJECT_DIR, RENDER_JOBS_DIR, job_id)}:/workspace/{RENDER_JOBS_DIR}/{job_id}:rw"
     code, _out, err = await run_cmd(
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
-        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, "--name", container,
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
         "--entrypoint", "ffmpeg", "manim-render",
         "-y", "-i", f"/workspace/{video_rel}",
         "-frames:v", "1", "-vf", "scale=320:-1",
