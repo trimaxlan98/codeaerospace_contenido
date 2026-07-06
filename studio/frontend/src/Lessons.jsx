@@ -27,8 +27,11 @@ export default function Lessons() {
   useEffect(() => {
     api.lessonsIndex()
       .then((d) => {
-        setIndex(d)
-        if (d.categories.length) setCatSlug(d.categories[0].slug)
+        // Las categorias sin lecciones (las de dominio, que solo agrupan
+        // animaciones) no se muestran en Aprender.
+        const conContenido = { categories: d.categories.filter((c) => c.count > 0) }
+        setIndex(conContenido)
+        if (conContenido.categories.length) setCatSlug(conContenido.categories[0].slug)
       })
       .catch((err) => setError(err.message))
   }, [])

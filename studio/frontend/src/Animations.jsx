@@ -16,8 +16,11 @@ export default function Animations({ onOpenInStudio }) {
   useEffect(() => {
     api.animationsIndex()
       .then((d) => {
-        setIndex(d)
-        if (d.categories.length) setCatSlug(d.categories[0].slug)
+        // Las categorias sin animaciones (las del curso de Manim) no se
+        // muestran en esta pestana.
+        const conContenido = { categories: d.categories.filter((c) => c.count > 0) }
+        setIndex(conContenido)
+        if (conContenido.categories.length) setCatSlug(conContenido.categories[0].slug)
       })
       .catch((err) => setError(err.message))
   }, [])

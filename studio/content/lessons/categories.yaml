@@ -1,3 +1,15 @@
+# Categorias con lecciones (curso de Manim) van primero; las de dominio
+# permanecen porque agrupan las animaciones de la pestana Animaciones.
+- slug: manim-fundamentos
+  name: Manim · Fundamentos
+- slug: manim-intermedio
+  name: Manim · Intermedio
+- slug: manim-primitivas
+  name: Manim · Primitivas del Estudio
+- slug: manim-flujo
+  name: Manim · Flujo de trabajo
+- slug: experimentacion
+  name: Experimentación
 - slug: espacio
   name: El Espacio
 - slug: satelites
@@ -22,5 +34,3 @@
   name: IA Agéntica
 - slug: tecnologia-frontera
   name: Tecnología de Frontera
-- slug: experimentacion
-  name: Experimentación
