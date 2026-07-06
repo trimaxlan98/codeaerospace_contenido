@@ -9,5 +9,10 @@ export default defineConfig({
   server: {
     proxy: { '/api': 'http://127.0.0.1:3002' },
   },
-  build: { chunkSizeWarningLimit: 900 },
+  build: {
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: { manualChunks: { reader: ['marked', 'dompurify', 'katex'] } },
+    },
+  },
 })
