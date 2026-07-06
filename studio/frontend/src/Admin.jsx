@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { api } from './api.js'
 import { Chart, useHistory, GB } from './charts.jsx'
 import Primitives from './Primitives.jsx'
+import { Button } from './components/ui/button.jsx'
+import { cn } from '@/lib/utils'
 
 const MB = 1024 ** 2
 
@@ -23,49 +25,73 @@ function fmtDate(ts) {
   })
 }
 
-function Kpi({ label, value, unit, level }) {
+const TONE = { crit: 'text-err', warn: 'text-warn', ok: 'text-ok' }
+
+function stateColor(s) {
+  if (s === 'running' || s === 'done') return 'text-ok'
+  if (s === 'error' || s === 'timeout') return 'text-err'
+  if (s === 'restarting' || s === 'paused' || s === 'queued') return 'text-warn'
+  return 'text-muted'
+}
+
+function PanelHead({ title, aside }) {
   return (
-    <div className={`kpi${level ? ` kpi--${level}` : ''}`}>
-      <span className="kpi__label">{label}</span>
-      <span className="kpi__value">{value}<small>{unit}</small></span>
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
+      <span className="eyebrow">{title}</span>
+      {aside != null && <span className="font-mono text-[11px] text-faint">{aside}</span>}
     </div>
   )
 }
 
-function ArmedButton({ label, confirmLabel, onFire, danger }) {
+function StatTile({ label, value, unit, level }) {
+  return (
+    <div className="rounded-lg border border-line bg-surface-2 px-3.5 py-3">
+      <div className="eyebrow">{label}</div>
+      <div className={cn('mt-1.5 font-mono text-[26px] font-semibold leading-none', TONE[level] || 'text-ink')}>
+        {value}<span className="ml-0.5 text-[13px] font-normal text-muted">{unit}</span>
+      </div>
+    </div>
+  )
+}
+
+function Meter({ label, pct, detail, warnAt = 80 }) {
+  const tone = pct >= 92 ? 'bg-err' : pct >= warnAt ? 'bg-warn' : 'bg-cyan'
+  return (
+    <div>
+      <div className="mb-1.5 flex items-center justify-between">
+        <span className="eyebrow">{label}</span>
+        <span className="font-mono text-xs tabular-nums text-ink">{pct.toFixed(1)}%</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full border border-line bg-canvas"
+        role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+        <div className={cn('h-full rounded-full transition-[width] duration-500', tone)}
+          style={{ width: `${Math.min(pct, 100)}%` }} />
+      </div>
+      <p className="mt-1.5 text-[11.5px] text-muted">{detail}</p>
+    </div>
+  )
+}
+
+// Accion destructiva en dos toques: arma y confirma.
+function ArmedButton({ label, confirmLabel, onFire }) {
   const [arming, setArming] = useState(false)
   if (arming) {
     return (
-      <span className="armed">
-        <button className="btn btn--tiny btn--danger"
-          onClick={() => { setArming(false); onFire() }}>{confirmLabel}</button>
-        <button className="btn btn--tiny" onClick={() => setArming(false)}>No</button>
+      <span className="inline-flex gap-1.5">
+        <Button size="xs" variant="danger" onClick={() => { setArming(false); onFire() }}>{confirmLabel}</Button>
+        <Button size="xs" variant="ghost" onClick={() => setArming(false)}>No</Button>
       </span>
     )
   }
-  return (
-    <button className={`btn btn--tiny${danger ? ' btn--danger' : ''}`}
-      onClick={() => setArming(true)}>{label}</button>
-  )
+  return <Button size="xs" variant="danger" onClick={() => setArming(true)}>{label}</Button>
 }
 
-function Bar({ label, pct, detail, warnAt = 80 }) {
-  const level = pct >= 92 ? 'crit' : pct >= warnAt ? 'warn' : 'ok'
-  return (
-    <div className="meter">
-      <div className="meter__head">
-        <span className="meter__label">{label}</span>
-        <span className="meter__val">{pct.toFixed(1)}%</span>
-      </div>
-      <div className="meter__track" role="progressbar" aria-valuenow={Math.round(pct)}
-        aria-valuemin="0" aria-valuemax="100" aria-label={label}>
-        <div className={`meter__fill meter__fill--${level}`}
-          style={{ width: `${Math.min(pct, 100)}%` }} />
-      </div>
-      <span className="meter__detail">{detail}</span>
-    </div>
-  )
-}
+const TABS = [
+  { id: 'salud', label: 'Salud' },
+  { id: 'jobs', label: 'Jobs' },
+  { id: 'recursos', label: 'Recursos' },
+  { id: 'experimentacion', label: 'Experimentación' },
+]
 
 export default function Admin({ metrics, containers, jobs, storage, onJobsChanged,
   fableEnabled, primitives, onPrimitivesChanged }) {
@@ -77,8 +103,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
   const done = jobs.filter((j) => j.status === 'done')
   const failed = jobs.filter((j) => ['error', 'timeout', 'cancelled'].includes(j.status))
   const active = jobs.filter((j) => ['queued', 'running'].includes(j.status))
-  const storagePct = storage?.quota_bytes
-    ? (storage.used_bytes / storage.quota_bytes) * 100 : 0
+  const storagePct = storage?.quota_bytes ? (storage.used_bytes / storage.quota_bytes) * 100 : 0
 
   const run = async (fn, msg) => {
     setNotice('')
@@ -91,174 +116,161 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
     }
   }
 
-  const clearFailed = () => run(api.deleteFailedJobs,
-    (r) => `${r.deleted} job(s) fallidos eliminados.`)
+  const clearFailed = () => run(api.deleteFailedJobs, (r) => `${r.deleted} job(s) fallidos eliminados.`)
   const purge = (days) => run(() => api.purgeJobsOlderThan(days),
     (r) => `${r.deleted} render(s) purgados · ${fmtSize(r.freed_bytes)} liberados.`)
 
   return (
-    <main className="monitor admin">
-      <div className="seg admin__tabs" role="tablist" aria-label="secciones de administracion">
-        {[
-          { id: 'salud', label: 'Salud' },
-          { id: 'jobs', label: 'Jobs' },
-          { id: 'recursos', label: 'Recursos' },
-          { id: 'experimentacion', label: 'Experimentación' },
-        ].map((t) => (
-          <button key={t.id} role="tab" aria-selected={tab === t.id}
-            className={tab === t.id ? 'seg__opt seg__opt--on' : 'seg__opt'}
-            onClick={() => setTab(t.id)}>{t.label}</button>
-        ))}
+    <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
+      <div role="tablist" aria-label="secciones de administración"
+        className="flex w-fit flex-wrap gap-1 rounded-lg border border-line bg-canvas/40 p-1">
+        {TABS.map((t) => {
+          const on = tab === t.id
+          return (
+            <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)}
+              className={cn(
+                'rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                on ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
+              )}>
+              {t.label}
+            </button>
+          )
+        })}
       </div>
 
       {tab === 'salud' && (
         <>
-      <section className="panel" aria-label="salud del sistema">
-        <div className="panel__bar">
-          <span className="panel__title">SALUD DEL SISTEMA</span>
-          {metrics && (
-            <span className="panel__aside">
-              load {metrics.load.join(' / ')} · {metrics.cpu_count} vCPU
-            </span>
-          )}
-        </div>
-        {!metrics ? <p className="empty">Esperando telemetría…</p> : (
-          <>
-            <div className="kpis">
-              <Kpi label="CPU" value={metrics.cpu_pct.toFixed(0)} unit="%"
-                level={metrics.cpu_pct >= 90 ? 'crit' : metrics.cpu_pct >= 75 ? 'warn' : 'ok'} />
-              <Kpi label="RAM" value={metrics.mem.pct.toFixed(0)} unit="%"
-                level={metrics.mem.pct >= 92 ? 'crit' : metrics.mem.pct >= 80 ? 'warn' : 'ok'} />
-              <Kpi label="DISCO /" value={metrics.disk.pct.toFixed(0)} unit="%"
-                level={metrics.disk.pct >= 92 ? 'crit' : metrics.disk.pct >= 80 ? 'warn' : 'ok'} />
-              <Kpi label="RENDERS" value={String(done.length)} unit=" ok" level="ok" />
-              <Kpi label="ACTIVOS" value={String(active.length)} unit=""
-                level={active.length ? 'warn' : 'ok'} />
-            </div>
-            <div className="meters">
-              <Bar label="CPU" pct={metrics.cpu_pct} warnAt={75}
-                detail={`${metrics.cpu_count} vCPU compartidas con producción`} />
-              <Bar label="RAM" pct={metrics.mem.pct}
-                detail={`${fmtGB(metrics.mem.used)} / ${fmtGB(metrics.mem.total)} · disp ${fmtGB(metrics.mem.available)}`} />
-              <Bar label="SWAP" pct={metrics.swap.pct} warnAt={40}
-                detail={`${fmtGB(metrics.swap.used)} / ${fmtGB(metrics.swap.total)}`} />
-              <Bar label="DISCO /" pct={metrics.disk.pct}
-                detail={`${fmtGB(metrics.disk.used)} / ${fmtGB(metrics.disk.total)} · libres ${fmtGB(metrics.disk.free)}`} />
-            </div>
-          </>
-        )}
-      </section>
+          <section className="panel" aria-label="salud del sistema">
+            <PanelHead title="Salud del sistema"
+              aside={metrics ? `load ${metrics.load.join(' / ')} · ${metrics.cpu_count} vCPU` : null} />
+            {!metrics ? <p className="p-4 text-[13px] text-muted">Esperando telemetría…</p> : (
+              <>
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2.5 p-3.5 pb-1">
+                  <StatTile label="CPU" value={metrics.cpu_pct.toFixed(0)} unit="%"
+                    level={metrics.cpu_pct >= 90 ? 'crit' : metrics.cpu_pct >= 75 ? 'warn' : 'ok'} />
+                  <StatTile label="RAM" value={metrics.mem.pct.toFixed(0)} unit="%"
+                    level={metrics.mem.pct >= 92 ? 'crit' : metrics.mem.pct >= 80 ? 'warn' : 'ok'} />
+                  <StatTile label="Disco /" value={metrics.disk.pct.toFixed(0)} unit="%"
+                    level={metrics.disk.pct >= 92 ? 'crit' : metrics.disk.pct >= 80 ? 'warn' : 'ok'} />
+                  <StatTile label="Renders" value={String(done.length)} unit=" ok" level="ok" />
+                  <StatTile label="Activos" value={String(active.length)} unit="" level={active.length ? 'warn' : 'ok'} />
+                </div>
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-4 p-4">
+                  <Meter label="CPU" pct={metrics.cpu_pct} warnAt={75}
+                    detail={`${metrics.cpu_count} vCPU compartidas con producción`} />
+                  <Meter label="RAM" pct={metrics.mem.pct}
+                    detail={`${fmtGB(metrics.mem.used)} / ${fmtGB(metrics.mem.total)} · disp ${fmtGB(metrics.mem.available)}`} />
+                  <Meter label="SWAP" pct={metrics.swap.pct} warnAt={40}
+                    detail={`${fmtGB(metrics.swap.used)} / ${fmtGB(metrics.swap.total)}`} />
+                  <Meter label="Disco /" pct={metrics.disk.pct}
+                    detail={`${fmtGB(metrics.disk.used)} / ${fmtGB(metrics.disk.total)} · libres ${fmtGB(metrics.disk.free)}`} />
+                </div>
+              </>
+            )}
+          </section>
 
-      <section className="panel" aria-label="graficas historicas">
-        <div className="panel__bar">
-          <span className="panel__title">HISTORIA · ÚLTIMOS 30 MIN</span>
-          <span className="panel__aside">
-            <span className="chart__legendband" aria-hidden="true" /> render activo
-          </span>
-        </div>
-        {samples.length < 2 ? (
-          <p className="empty">Acumulando historia… (una muestra cada pocos segundos)</p>
-        ) : (
-          <div className="charts">
-            <Chart title="CPU" field="cpu" color="var(--cyan)" samples={samples} now={now} />
-            <Chart title="RAM" field="mem" color="var(--gold)" samples={samples} now={now} />
-            <Chart title="DISCO /" field="disk" color="var(--ok)" samples={samples} now={now} />
-          </div>
-        )}
-      </section>
+          <section className="panel" aria-label="gráficas históricas">
+            <PanelHead title="Historia · últimos 30 min" aside="banda ámbar = render activo" />
+            {samples.length < 2 ? (
+              <p className="p-4 text-[13px] text-muted">Acumulando historia… (una muestra cada pocos segundos)</p>
+            ) : (
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4 p-4">
+                <Chart title="CPU" field="cpu" color="var(--cyan)" samples={samples} now={now} />
+                <Chart title="RAM" field="mem" color="var(--accent)" samples={samples} now={now} />
+                <Chart title="Disco /" field="disk" color="var(--ok)" samples={samples} now={now} />
+              </div>
+            )}
+          </section>
         </>
       )}
 
       {tab === 'jobs' && (
-      <section className="panel" aria-label="gestion de jobs">
-        <div className="panel__bar">
-          <span className="panel__title">GESTIÓN DE JOBS</span>
-          <span className="panel__aside">
-            {done.length} ok · {failed.length} fallidos · {active.length} activos
-          </span>
-        </div>
-        <div className="admin__actions">
-          <ArmedButton danger label={`Eliminar fallidos (${failed.length})`}
-            confirmLabel="¿Confirmar?" onFire={clearFailed} />
-          <ArmedButton danger label="Purgar renders > 30 días"
-            confirmLabel="¿Confirmar purga?" onFire={() => purge(30)} />
-          <ArmedButton danger label="Purgar renders > 7 días"
-            confirmLabel="¿Confirmar purga?" onFire={() => purge(7)} />
-        </div>
-        {notice && <p className="notice" role="status">{notice}</p>}
-        <div className="tablewrap">
-          <table className="ctable">
-            <thead>
-              <tr><th>Escena</th><th>Estado</th><th>Creado</th><th>Duración</th><th>Tamaño</th></tr>
-            </thead>
-            <tbody>
-              {jobs.slice(0, 25).map((j) => (
-                <tr key={j.id}>
-                  <td className="mono">{j.scene}</td>
-                  <td><span className={`state state--${j.status}`}>{j.status}</span></td>
-                  <td>{fmtDate(j.created_at)}</td>
-                  <td className="num">
-                    {j.started_at && j.finished_at
-                      ? `${(j.finished_at - j.started_at).toFixed(0)}s` : '—'}
-                  </td>
-                  <td className="mono num">{fmtSize(j.size_bytes)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <section className="panel" aria-label="gestión de jobs">
+          <PanelHead title="Gestión de jobs"
+            aside={`${done.length} ok · ${failed.length} fallidos · ${active.length} activos`} />
+          <div className="flex flex-wrap gap-2 p-3.5 pb-2">
+            <ArmedButton label={`Eliminar fallidos (${failed.length})`} confirmLabel="¿Confirmar?" onFire={clearFailed} />
+            <ArmedButton label="Purgar renders > 30 días" confirmLabel="¿Confirmar purga?" onFire={() => purge(30)} />
+            <ArmedButton label="Purgar renders > 7 días" confirmLabel="¿Confirmar purga?" onFire={() => purge(7)} />
+          </div>
+          {notice && <p role="status" className="px-3.5 pb-1 text-[12.5px] text-muted">{notice}</p>}
+          <div className="overflow-x-auto p-1">
+            <table className="w-full border-collapse text-[12.5px]">
+              <thead>
+                <tr>{['Escena', 'Estado', 'Creado', 'Duración', 'Tamaño'].map((h) => (
+                  <th key={h} className="border-b border-line px-3 py-2 text-left font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-muted">{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody>
+                {jobs.slice(0, 25).map((j) => (
+                  <tr key={j.id}>
+                    <td className="border-b border-line/40 px-3 py-1.5 font-mono">{j.scene}</td>
+                    <td className="border-b border-line/40 px-3 py-1.5">
+                      <span className={cn('font-mono text-[11px]', stateColor(j.status))}>{j.status}</span>
+                    </td>
+                    <td className="border-b border-line/40 px-3 py-1.5">{fmtDate(j.created_at)}</td>
+                    <td className="border-b border-line/40 px-3 py-1.5 text-right tabular-nums">
+                      {j.started_at && j.finished_at ? `${(j.finished_at - j.started_at).toFixed(0)}s` : '—'}
+                    </td>
+                    <td className="border-b border-line/40 px-3 py-1.5 text-right font-mono tabular-nums">{fmtSize(j.size_bytes)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
 
       {tab === 'recursos' && (
         <>
-      <section className="panel" aria-label="almacenamiento">
-        <div className="panel__bar">
-          <span className="panel__title">ALMACENAMIENTO · render_jobs/</span>
-          <span className="panel__aside">{done.length} videos</span>
-        </div>
-        {storage && (
-          <Bar label="CUOTA" pct={storagePct} warnAt={75}
-            detail={`${fmtSize(storage.used_bytes)} de ${fmtSize(storage.quota_bytes)} · al superar la cuota no se aceptan nuevos renders`} />
-        )}
-      </section>
+          <section className="panel" aria-label="almacenamiento">
+            <PanelHead title="Almacenamiento · render_jobs/" aside={`${done.length} videos`} />
+            {storage && (
+              <div className="p-4">
+                <Meter label="Cuota" pct={storagePct} warnAt={75}
+                  detail={`${fmtSize(storage.used_bytes)} de ${fmtSize(storage.quota_bytes)} · al superar la cuota no se aceptan nuevos renders`} />
+              </div>
+            )}
+          </section>
 
-      <section className="panel" aria-label="contenedores">
-        <div className="panel__bar">
-          <span className="panel__title">CONTENEDORES DOCKER</span>
-          <span className="panel__aside">solo lectura · sin controles</span>
-        </div>
-        {containers === null || containers === undefined ? (
-          <p className="empty">Telemetría de contenedores no disponible (runner desconectado).</p>
-        ) : (
-          <div className="tablewrap">
-            <table className="ctable">
-              <thead>
-                <tr><th>Contenedor</th><th>Estado</th><th>CPU %</th><th>MEM %</th><th>Memoria</th></tr>
-              </thead>
-              <tbody>
-                {containers.map((c) => {
-                  const own = c.name === 'codeaerospace-contenido'
-                    || c.name.startsWith('manimstudio-render-')
-                  return (
-                    <tr key={c.name} className={own ? 'ctable__own' : ''}>
-                      <td className="mono">{c.name}{own ? ' ◆' : ''}</td>
-                      <td><span className={`state state--${c.state}`}>{c.state}</span></td>
-                      <td className="num">{c.cpu_pct.toFixed(1)}</td>
-                      <td className="num">{c.mem_pct.toFixed(1)}</td>
-                      <td className="mono num">{c.mem_usage || '—'}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-        <p className="finePrint">
-          ◆ contenedores de ManimStudio. El resto pertenece a otros proyectos de este VPS:
-          esta consola solo muestra métricas agregadas y no permite ninguna acción sobre ellos.
-        </p>
-      </section>
+          <section className="panel" aria-label="contenedores">
+            <PanelHead title="Contenedores Docker" aside="solo lectura · sin controles" />
+            {containers === null || containers === undefined ? (
+              <p className="p-4 text-[13px] text-muted">Telemetría de contenedores no disponible (runner desconectado).</p>
+            ) : (
+              <div className="overflow-x-auto p-1">
+                <table className="w-full border-collapse text-[12.5px]">
+                  <thead>
+                    <tr>{['Contenedor', 'Estado', 'CPU %', 'MEM %', 'Memoria'].map((h) => (
+                      <th key={h} className="border-b border-line px-3 py-2 text-left font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-muted">{h}</th>
+                    ))}</tr>
+                  </thead>
+                  <tbody>
+                    {containers.map((c) => {
+                      const own = c.name === 'codeaerospace-contenido' || c.name.startsWith('manimstudio-render-')
+                      return (
+                        <tr key={c.name} className={own ? 'bg-accent/[0.06]' : ''}>
+                          <td className="border-b border-line/40 px-3 py-1.5 font-mono">
+                            {c.name}{own ? ' ◆' : ''}
+                          </td>
+                          <td className="border-b border-line/40 px-3 py-1.5">
+                            <span className={cn('font-mono text-[11px]', stateColor(c.state))}>{c.state}</span>
+                          </td>
+                          <td className="border-b border-line/40 px-3 py-1.5 text-right tabular-nums">{c.cpu_pct.toFixed(1)}</td>
+                          <td className="border-b border-line/40 px-3 py-1.5 text-right tabular-nums">{c.mem_pct.toFixed(1)}</td>
+                          <td className="border-b border-line/40 px-3 py-1.5 text-right font-mono tabular-nums">{c.mem_usage || '—'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <p className="border-t border-line px-3 py-3 text-[11.5px] text-muted">
+              ◆ contenedores de ManimStudio. El resto pertenece a otros proyectos de este VPS:
+              esta consola solo muestra métricas agregadas y no permite ninguna acción sobre ellos.
+            </p>
+          </section>
         </>
       )}
 

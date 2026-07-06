@@ -159,22 +159,6 @@ body {
   border: 1px solid rgba(255, 255, 255, .18);
 }
 
-/* ── glifo orbital (firma) ──────────────────────────────────────────────── */
-.orbit__body { fill: var(--cyan); opacity: .85; }
-.orbit__path { fill: none; stroke: var(--line); stroke-width: 1.2; }
-.orbit__sat { fill: var(--muted); }
-.orbit__spin { transform-origin: 24px 24px; animation: orbit 14s linear infinite; }
-.orbit--rendering .orbit__spin { animation-duration: 1.6s; }
-.orbit--rendering .orbit__sat { fill: var(--gold); }
-.orbit--error .orbit__sat { fill: var(--err); }
-.orbit--error .orbit__spin { animation-duration: 30s; }
-
-@keyframes orbit { to { transform: rotate(360deg); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .orbit__spin { animation: none; }
-}
-
 /* ── paneles ────────────────────────────────────────────────────────────── */
 .panel {
   background: var(--panel);

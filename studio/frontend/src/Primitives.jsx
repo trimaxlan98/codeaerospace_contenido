@@ -5,6 +5,10 @@
 
 import { useState } from 'react'
 import { api, videoUrl } from './api.js'
+import { Input } from './components/ui/input.jsx'
+import { Button } from './components/ui/button.jsx'
+
+const promptCls = 'w-full resize-y rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan'
 
 function statusLabel(proposal, job) {
   if (proposal.status === 'generating') return 'generando con Fable 5…'
@@ -33,47 +37,43 @@ function ProposalCard({ proposal, job, onApprove, onReject, onIterate }) {
 
   return (
     <div className="panel" aria-label={`propuesta ${proposal.slug}`}>
-      <div className="panel__bar">
-        <span className="panel__title">{proposal.slug.toUpperCase()}</span>
-        <span className="panel__aside">{statusLabel(proposal, job)}</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
+        <span className="eyebrow">{proposal.slug}</span>
+        <span className="font-mono text-[11px] text-faint">{statusLabel(proposal, job)}</span>
       </div>
-      <p className="drawer__hint">{proposal.description}</p>
-      {proposal.explanation && <p className="drawer__hint">{proposal.explanation}</p>}
-      {proposal.primitive_code && (
-        <pre className="diff diff--plain">{proposal.primitive_code}</pre>
-      )}
-      {renderReady && (
-        <video key={job.id} className="video" controls preload="metadata"
-          src={videoUrl(job.id)} />
-      )}
-      {(renderReady || proposal.status === 'failed') && (
-        <div className="admin__actions">
-          {renderReady && (
-            <button className="btn btn--primary" disabled={busy}
-              onClick={() => wrap(() => onApprove(proposal.id))}>
-              Aprobar
-            </button>
-          )}
-          <button className="btn btn--tiny btn--danger" disabled={busy}
-            onClick={() => wrap(() => onReject(proposal.id))}>
-            Rechazar
-          </button>
-        </div>
-      )}
-      {canIterate && (
-        <div className="admin__actions">
-          <textarea className="drawer__prompt" rows={2} value={feedback}
-            placeholder="feedback para que Fable 5 corrija esta version…"
-            onChange={(e) => setFeedback(e.target.value)} />
-          <button className="btn btn--tiny" disabled={busy || feedback.trim().length < 1}
-            onClick={() => wrap(async () => {
-              await onIterate(proposal.id, feedback)
-              setFeedback('')
-            })}>
-            Iterar con feedback
-          </button>
-        </div>
-      )}
+      <div className="flex flex-col gap-3 p-4">
+        <p className="text-[13px] leading-relaxed text-muted">{proposal.description}</p>
+        {proposal.explanation && <p className="text-[13px] leading-relaxed text-muted">{proposal.explanation}</p>}
+        {proposal.primitive_code && (
+          <pre className="max-h-[46vh] w-full overflow-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-3 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">{proposal.primitive_code}</pre>
+        )}
+        {renderReady && (
+          <video key={job.id} className="w-full rounded-md border border-line bg-black" controls preload="metadata"
+            src={videoUrl(job.id)} />
+        )}
+        {(renderReady || proposal.status === 'failed') && (
+          <div className="flex flex-wrap gap-2">
+            {renderReady && (
+              <Button variant="primary" size="sm" disabled={busy}
+                onClick={() => wrap(() => onApprove(proposal.id))}>Aprobar</Button>
+            )}
+            <Button variant="danger" size="sm" disabled={busy}
+              onClick={() => wrap(() => onReject(proposal.id))}>Rechazar</Button>
+          </div>
+        )}
+        {canIterate && (
+          <div className="flex flex-col gap-2">
+            <textarea className={promptCls} rows={2} value={feedback}
+              placeholder="feedback para que Fable 5 corrija esta versión…"
+              onChange={(e) => setFeedback(e.target.value)} />
+            <Button variant="default" size="sm" className="w-fit"
+              disabled={busy || feedback.trim().length < 1}
+              onClick={() => wrap(async () => { await onIterate(proposal.id, feedback); setFeedback('') })}>
+              Iterar con feedback
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -101,9 +101,9 @@ export default function Primitives({ fableEnabled, primitives, jobs, onChanged }
 
   if (!fableEnabled) {
     return (
-      <section className="panel" aria-label="experimentacion fable 5">
-        <div className="panel__bar"><span className="panel__title">EXPERIMENTACIÓN · FABLE 5</span></div>
-        <p className="empty">Fable 5 no está configurado (falta la API key de Anthropic).</p>
+      <section className="panel" aria-label="experimentación fable 5">
+        <div className="border-b border-line px-3 py-2"><span className="eyebrow">Experimentación · Fable 5</span></div>
+        <p className="p-4 text-[13px] text-muted">Fable 5 no está configurado (falta la API key de Anthropic).</p>
       </section>
     )
   }
@@ -113,29 +113,30 @@ export default function Primitives({ fableEnabled, primitives, jobs, onChanged }
   return (
     <>
       <section className="panel" aria-label="proponer primitiva">
-        <div className="panel__bar">
-          <span className="panel__title">PROPONER PRIMITIVA NUEVA</span>
+        <div className="border-b border-line px-3 py-2"><span className="eyebrow">Proponer primitiva nueva</span></div>
+        <div className="flex flex-col gap-3 p-4">
+          <p className="text-[13px] leading-relaxed text-muted">
+            Describe un efecto visual nuevo; Fable 5 propone una primitiva de Manim
+            (Mobject/Animation) y una escena de muestra, que se renderiza automáticamente
+            para tu revisión antes de entrar a la biblioteca.
+          </p>
+          {error && (
+            <p role="alert" className="rounded-md border border-err/40 bg-err/10 px-3 py-2 text-[13px] text-err">{error}</p>
+          )}
+          <Input value={slug} placeholder="slug (p. ej. disolucion-particulas)"
+            onChange={(e) => setSlug(e.target.value)} />
+          <textarea className={promptCls} rows={3} value={description}
+            placeholder="p. ej. texto que se disuelve en partículas y forma la siguiente ecuación"
+            onChange={(e) => setDescription(e.target.value)} />
+          <Button variant="default" size="sm" className="w-fit"
+            disabled={busy || !validSlug || description.trim().length < 3} onClick={propose}>
+            {busy ? 'Enviando…' : 'Proponer a Fable 5'}
+          </Button>
         </div>
-        <p className="drawer__hint">
-          Describe un efecto visual nuevo; Fable 5 propone una primitiva de Manim
-          (Mobject/Animation) y una escena de muestra, que se renderiza automáticamente
-          para tu revisión antes de entrar a la biblioteca.
-        </p>
-        {error && <p className="notice notice--warn" role="alert">{error}</p>}
-        <input className="drawer__prompt" style={{ marginBottom: '0.5rem' }}
-          value={slug} placeholder="slug (p. ej. disolucion-particulas)"
-          onChange={(e) => setSlug(e.target.value)} />
-        <textarea className="drawer__prompt" rows={3} value={description}
-          placeholder="p. ej. texto que se disuelve en particulas y forma la siguiente ecuación"
-          onChange={(e) => setDescription(e.target.value)} />
-        <button className="btn" disabled={busy || !validSlug || description.trim().length < 3}
-          onClick={propose}>
-          {busy ? 'Enviando…' : 'Proponer a Fable 5'}
-        </button>
       </section>
 
       {primitives.length === 0 ? (
-        <p className="empty">Sin propuestas todavía.</p>
+        <p className="px-1 py-2 text-[13px] text-muted">Sin propuestas todavía.</p>
       ) : (
         primitives.map((p) => (
           <ProposalCard key={p.id} proposal={p} job={jobById(p.job_id)}

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
+import { Play, Sparkles, Wrench, Download, FileCode, X } from 'lucide-react'
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
+import { Button } from './components/ui/button.jsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
+import { cn } from '@/lib/utils'
 
 const SAMPLE = `from manim import *
 
@@ -23,9 +27,14 @@ const QUALITIES = [
   { id: 'qh', label: '1080p', hint: 'alta' },
 ]
 
-const STATUS_LABEL = {
-  queued: 'en cola', running: 'renderizando', done: 'listo',
-  error: 'error', cancelled: 'cancelado', timeout: 'timeout',
+const STATUS_META = {
+  queued: { label: 'en cola', dot: 'bg-cyan', text: 'text-cyan' },
+  running: { label: 'renderizando', dot: 'bg-accent', text: 'text-accent' },
+  done: { label: 'listo', dot: 'bg-ok', text: 'text-ok' },
+  error: { label: 'error', dot: 'bg-err', text: 'text-err' },
+  timeout: { label: 'timeout', dot: 'bg-err', text: 'text-err' },
+  cancelled: { label: 'cancelado', dot: 'bg-muted', text: 'text-muted' },
+  default: { label: '—', dot: 'bg-muted', text: 'text-muted' },
 }
 
 function fmtTime(ts) {
@@ -37,6 +46,65 @@ function duration(job) {
   if (!job.started_at) return null
   const end = job.finished_at || Date.now() / 1000
   return `${(end - job.started_at).toFixed(0)}s`
+}
+
+// Control segmentado (calidad). role=radiogroup para accesibilidad.
+function Segmented({ options, value, onChange, ariaLabel }) {
+  return (
+    <div role="radiogroup" aria-label={ariaLabel}
+      className="flex rounded-md border border-line bg-canvas p-0.5">
+      {options.map((o) => {
+        const on = value === o.id
+        return (
+          <button key={o.id} type="button" role="radio" aria-checked={on} title={o.hint}
+            onClick={() => onChange(o.id)}
+            className={cn(
+              'rounded-[5px] px-2.5 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+              on ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
+            )}>
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// Ficha de la tira de cola. Div interactivo (el boton Cancelar anida dentro).
+function JobChip({ job, selected, onSelect, onCancel }) {
+  const m = STATUS_META[job.status] || STATUS_META.default
+  const active = ['queued', 'running'].includes(job.status)
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect() } }}
+      className={cn(
+        'flex w-[196px] shrink-0 cursor-pointer flex-col gap-1 rounded-lg border p-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+        selected ? 'border-accent/50 bg-surface-2' : 'border-line bg-surface hover:border-line-strong',
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot, job.status === 'running' && 'animate-pulse')} />
+        <span className="truncate font-mono text-[13px] text-ink">{job.scene}</span>
+        <span className={cn('ml-auto shrink-0 font-mono text-[10px] uppercase tracking-wide', m.text)}>{m.label}</span>
+      </div>
+      <div className="flex items-center gap-1.5 pl-4 font-mono text-[11px] text-muted">
+        <span>{job.quality}</span>
+        <span className="text-faint">·</span>
+        <span>{fmtTime(job.created_at)}</span>
+        {duration(job) && (<><span className="text-faint">·</span><span>{duration(job)}</span></>)}
+      </div>
+      {active && (
+        <button type="button"
+          onClick={(e) => { e.stopPropagation(); onCancel(job.id) }}
+          className="mt-0.5 inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-muted transition-colors hover:bg-err/10 hover:text-err">
+          <X className="h-3 w-3" /> Cancelar
+        </button>
+      )}
+    </div>
+  )
 }
 
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
@@ -126,136 +194,142 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   }
 
   const canSubmit = scenes.includes(scene) && !jobs.some((j) => j.status === 'queued')
+  const errorish = selected && ['error', 'timeout'].includes(selected.status)
 
   return (
-    <main className="studio">
-      <section className="panel panel--editor" aria-label="editor">
-        <div className="panel__bar">
-          <span className="panel__title">ESCENA.PY</span>
-          <div className="controls">
-            <label className="ctl">
-              <span>Escena</span>
-              <select value={scene} onChange={(e) => setScene(e.target.value)}
-                disabled={!scenes.length}>
-                {scenes.map((s) => <option key={s}>{s}</option>)}
-              </select>
-            </label>
-            <div className="seg" role="radiogroup" aria-label="calidad">
-              {QUALITIES.map((q) => (
-                <button key={q.id} title={q.hint}
-                  className={quality === q.id ? 'seg__opt seg__opt--on' : 'seg__opt'}
-                  onClick={() => setQuality(q.id)}>{q.label}</button>
-              ))}
+    <main className="flex min-h-0 flex-1 flex-col gap-3 p-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
+        {/* ── Editor ── */}
+        <section className="panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" aria-label="editor">
+          <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
+            <div className="flex items-center gap-2">
+              <FileCode className="h-4 w-4 text-muted" />
+              <span className="font-mono text-[13px] text-ink">escena.py</span>
             </div>
-            <label className="ctl">
-              <span>Timeout</span>
-              <input type="number" min="30" max="1800" step="30" value={timeoutS}
-                onChange={(e) => setTimeoutS(e.target.value)} />
+            <div className="mx-1 hidden h-5 w-px bg-line sm:block" />
+            <label className="flex items-center gap-1.5">
+              <span className="eyebrow">Escena</span>
+              <Select value={scene} onValueChange={setScene} disabled={!scenes.length}>
+                <SelectTrigger className="h-8 w-[150px]">
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  {scenes.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </label>
-            <button className="btn btn--primary" onClick={submit} disabled={!canSubmit}>
-              Renderizar
-            </button>
-            {aiEnabled && (
-              <button className="btn" title="asistente IA (Gemini 2.5)"
-                onClick={() => { setAiMode('generate'); setAiOpen(true) }}>
-                ✨ Asistente
-              </button>
-            )}
-          </div>
-        </div>
-        {(sceneError || submitError) && (
-          <p className="notice notice--warn" role="alert">{sceneError || submitError}</p>
-        )}
-        <CodeMirror
-          value={script}
-          onChange={setScript}
-          extensions={[python()]}
-          theme="dark"
-          height="100%"
-          className="editor"
-          basicSetup={{ foldGutter: false, highlightActiveLine: true }}
-        />
-      </section>
 
-      <section className="side">
-        <div className="panel panel--queue" aria-label="cola de renders">
-          <div className="panel__bar"><span className="panel__title">COLA DE RENDERS</span></div>
-          {jobs.length === 0 && (
-            <p className="empty">Sin renders todavía. Escribe una escena y pulsa Renderizar.</p>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Segmented options={QUALITIES} value={quality} onChange={setQuality} ariaLabel="calidad" />
+              <label className="flex items-center gap-1.5">
+                <span className="eyebrow">Timeout</span>
+                <input type="number" min="30" max="1800" step="30" value={timeoutS}
+                  onChange={(e) => setTimeoutS(e.target.value)}
+                  className="h-8 w-[68px] rounded-md border border-line bg-canvas px-2 text-sm tabular-nums text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan" />
+                <span className="text-xs text-faint">s</span>
+              </label>
+              {aiEnabled && (
+                <Button variant="accent" size="sm" title="asistente IA (Gemini 2.5)"
+                  onClick={() => { setAiMode('generate'); setAiOpen(true) }}>
+                  <Sparkles className="h-4 w-4" /> Asistente
+                </Button>
+              )}
+              <Button variant="primary" size="sm" onClick={submit} disabled={!canSubmit}>
+                <Play className="h-4 w-4" /> Renderizar
+              </Button>
+            </div>
+          </div>
+
+          {(sceneError || submitError) && (
+            <p role="alert" className="border-b border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">
+              {sceneError || submitError}
+            </p>
           )}
-          <ul className="jobs">
-            {jobs.slice(0, 12).map((j) => (
-              <li key={j.id}
-                className={`job ${selected?.id === j.id ? 'job--sel' : ''}`}
-                onClick={() => setSelectedId(j.id)}>
-                <span className={`dot dot--${j.status}`} aria-hidden="true" />
-                <span className="job__scene">{j.scene}</span>
-                <span className="job__meta">{j.quality} · {fmtTime(j.created_at)}
-                  {duration(j) ? ` · ${duration(j)}` : ''}</span>
-                <span className={`job__status job__status--${j.status}`}>
-                  {STATUS_LABEL[j.status] || j.status}
-                </span>
-                {['queued', 'running'].includes(j.status) && (
-                  <button className="btn btn--tiny"
-                    onClick={(e) => { e.stopPropagation(); cancel(j.id) }}>
-                    Cancelar
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="panel panel--log" aria-label="registro del render">
-          <div className="panel__bar">
-            <span className="panel__title">
-              REGISTRO {selected ? `· ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
-            </span>
-            {selected && (
-              <span className="panel__actions">
-                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
-                  <button className="btn btn--tiny btn--ai"
-                    onClick={() => {
-                      setAiMode('explain'); setAiOpen(true)
-                      setAiAutoRun((n) => n + 1)
-                    }}>
-                    ✨ Explicar error
-                  </button>
-                )}
-                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
-                  <button className="btn btn--tiny btn--ai"
-                    onClick={() => { setAiMode('fix'); setAiOpen(true) }}>
-                    🔧 Corregir con IA
-                  </button>
-                )}
-                <button className="btn btn--tiny" onClick={() => loadScript(selected.id)}>
-                  Cargar script al editor
-                </button>
-              </span>
-            )}
-          </div>
-          <pre className="log" ref={logRef}>
-            {logs.length ? logs.join('\n')
-              : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'
-              : selected?.error ? `✕ ${selected.error}`
-              : 'Sin registro.'}
-            {selected?.status !== 'running' && selected?.error && logs.length
-              ? `\n✕ ${selected.error}` : ''}
-          </pre>
-        </div>
+          <CodeMirror
+            value={script}
+            onChange={setScript}
+            extensions={[python()]}
+            theme="dark"
+            height="100%"
+            className="editor min-h-0 flex-1 overflow-auto text-[13px]"
+            basicSetup={{ foldGutter: false, highlightActiveLine: true }}
+          />
+        </section>
 
-        {selected?.status === 'done' && (
-          <div className="panel panel--video" aria-label="previsualizacion">
-            <div className="panel__bar">
-              <span className="panel__title">RESULTADO</span>
-              <a className="btn btn--tiny" href={videoUrl(selected.id)}
-                download={`${selected.scene}.mp4`}>Descargar MP4</a>
+        {/* ── Rail de resultado ── */}
+        <aside className="flex min-h-0 w-full shrink-0 flex-col gap-3 lg:w-[440px]" aria-label="resultado">
+          {selected?.status === 'done' && (
+            <div className="panel shrink-0 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
+                <span className="eyebrow truncate">Resultado · {selected.scene}</span>
+                <a href={videoUrl(selected.id)} download={`${selected.scene}.mp4`}
+                  className="inline-flex shrink-0 items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink">
+                  <Download className="h-3.5 w-3.5" /> MP4
+                </a>
+              </div>
+              <video key={selected.id} className="block w-full bg-black" controls preload="metadata"
+                src={videoUrl(selected.id)} />
             </div>
-            <video key={selected.id} className="video" controls preload="metadata"
-              src={videoUrl(selected.id)} />
+          )}
+
+          <div className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
+              <span className="eyebrow truncate">
+                Registro{selected ? ` · ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
+              </span>
+              {selected && (
+                <div className="flex items-center gap-1.5">
+                  {aiEnabled && errorish && (
+                    <Button size="xs" variant="accent"
+                      onClick={() => { setAiMode('explain'); setAiOpen(true); setAiAutoRun((n) => n + 1) }}>
+                      <Sparkles className="h-3.5 w-3.5" /> Explicar
+                    </Button>
+                  )}
+                  {aiEnabled && errorish && (
+                    <Button size="xs" variant="accent"
+                      onClick={() => { setAiMode('fix'); setAiOpen(true) }}>
+                      <Wrench className="h-3.5 w-3.5" /> Corregir
+                    </Button>
+                  )}
+                  <Button size="xs" variant="ghost" onClick={() => loadScript(selected.id)}>
+                    Cargar al editor
+                  </Button>
+                </div>
+              )}
+            </div>
+            <pre ref={logRef}
+              className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-b-[13px] bg-canvas px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">
+              {logs.length ? logs.join('\n')
+                : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'
+                : selected?.error ? `✕ ${selected.error}`
+                : 'Sin registro.'}
+              {selected?.status !== 'running' && selected?.error && logs.length
+                ? `\n✕ ${selected.error}` : ''}
+            </pre>
+          </div>
+        </aside>
+      </div>
+
+      {/* ── Tira de cola (horizontal, sin scroll vertical diminuto) ── */}
+      <div className="panel shrink-0 overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-line px-3 py-1.5">
+          <span className="eyebrow">Cola de renders</span>
+          <span className="font-mono text-[11px] text-faint">{jobs.length}</span>
+        </div>
+        {jobs.length === 0 ? (
+          <p className="px-3 py-3 text-[13px] text-muted">
+            Sin renders todavía. Escribe una escena y pulsa Renderizar.
+          </p>
+        ) : (
+          <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
+            {jobs.slice(0, 20).map((j) => (
+              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+                onSelect={() => setSelectedId(j.id)} onCancel={cancel} />
+            ))}
           </div>
         )}
-      </section>
+      </div>
 
       {aiEnabled && (
         <Assistant open={aiOpen} mode={aiMode} onMode={setAiMode}

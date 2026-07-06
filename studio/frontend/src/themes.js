@@ -1,14 +1,12 @@
 // Temas: conjuntos de variables CSS aplicados via data-theme en <html>.
-// El id 'orbital' es el tema por defecto (los valores de :root).
+// Curados a 4 (antes 7) para no diluir la identidad. 'orbital' = :root.
+// swatch = [lienzo, acento, secundario] para la muestra del selector.
 
 export const THEMES = [
-  { id: 'orbital', name: 'Orbital', swatch: ['#070b12', '#e8b84b', '#6fc3df'] },
-  { id: 'aurora', name: 'Aurora', swatch: ['#06120f', '#5ee6a8', '#9d7bff'] },
-  { id: 'deepspace', name: 'Deep Space', swatch: ['#000000', '#ff5fa2', '#7f7cff'] },
-  { id: 'daylight', name: 'Daylight', swatch: ['#f4f1ea', '#a3742c', '#2b7a9e'] },
-  { id: 'nebula', name: 'Nebula', swatch: ['#0d0716', '#b388ff', '#ff8fd4'] },
+  { id: 'orbital', name: 'Orbital', swatch: ['#0a0d13', '#f2b347', '#56c7df'] },
   { id: 'ion', name: 'Ion', swatch: ['#04121c', '#2fd4ff', '#45e0c0'] },
-  { id: 'solar', name: 'Solar', swatch: ['#120c06', '#ffb347', '#ff7847'] },
+  { id: 'nebula', name: 'Nebula', swatch: ['#0d0716', '#b388ff', '#ff8fd4'] },
+  { id: 'daylight', name: 'Daylight', swatch: ['#f2efe7', '#a56a12', '#1f6f8b'] },
 ]
 
 export function currentTheme() {

@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from './api.js'
 import { renderMarkdown } from './markdown.js'
+import { Input } from './components/ui/input.jsx'
+import { Button } from './components/ui/button.jsx'
+import { cn } from '@/lib/utils'
 import 'katex/dist/katex.min.css'
 
 const READ_KEY = 'ms_lessons_read'
@@ -77,84 +80,101 @@ export default function Lessons() {
   const idx = lesson && lessonCat ? lessonCat.lessons.findIndex((l) => l.id === lesson.id) : -1
   const prev = idx > 0 ? lessonCat.lessons[idx - 1] : null
   const next = idx >= 0 && idx < lessonCat.lessons.length - 1 ? lessonCat.lessons[idx + 1] : null
-  const html = useMemo(
-    () => (lesson ? renderMarkdown(lesson.markdown) : ''), [lesson])
+  const html = useMemo(() => (lesson ? renderMarkdown(lesson.markdown) : ''), [lesson])
 
-  if (error && !index) return <main className="lessons"><p className="empty">{error}</p></main>
-  if (!index) return <main className="lessons"><p className="empty">Cargando biblioteca…</p></main>
+  if (error && !index) {
+    return <main className="grid min-h-0 flex-1 place-items-center p-6 text-[13px] text-muted">{error}</main>
+  }
+  if (!index) {
+    return <main className="grid min-h-0 flex-1 place-items-center p-6 text-[13px] text-muted">Cargando biblioteca…</main>
+  }
 
   return (
-    <main className="lessons">
-      <aside className="lessons__nav panel">
-        <div className="panel__bar"><span className="panel__title">APRENDER</span></div>
-        <input className="lessons__search" type="search" placeholder="Buscar…"
-          value={query} onChange={(e) => setQuery(e.target.value)}
-          aria-label="buscar lecciones" />
-        <nav className="lessons__cats" aria-label="categorías">
-          {index.categories.map((c) => (
-            <button key={c.slug}
-              className={`lessons__cat${c.slug === catSlug ? ' lessons__cat--on' : ''}`}
-              onClick={() => { setCatSlug(c.slug); setQuery('') }}>
-              {c.name} <span className="lessons__count">{c.count}</span>
-            </button>
-          ))}
-        </nav>
-        <ul className="lessons__list">
-          {list.map((l) => (
-            <li key={l.id}>
-              <button
-                className={`lessons__item${lesson?.id === l.id ? ' lessons__item--on' : ''}`}
-                onClick={() => open(l.id)}>
-                <span className={`lessons__dotread${read.has(l.id) ? ' lessons__dotread--yes' : ''}`}
-                  aria-label={read.has(l.id) ? 'leída' : 'no leída'} />
-                <span className="lessons__ititle">{l.title}</span>
-                <span className="lessons__imeta">
-                  {LEVEL_LABEL[l.level] || l.level} · {l.minutes} min
-                </span>
+    <main className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_1fr]">
+      <aside className="panel flex min-h-0 flex-col overflow-hidden">
+        <div className="border-b border-line px-3 py-2"><span className="eyebrow">Aprender</span></div>
+        <div className="p-2.5">
+          <Input type="search" placeholder="Buscar…" value={query}
+            onChange={(e) => setQuery(e.target.value)} aria-label="buscar lecciones" />
+        </div>
+        <nav className="flex flex-col gap-0.5 px-2" aria-label="categorías">
+          {index.categories.map((c) => {
+            const on = c.slug === catSlug
+            return (
+              <button key={c.slug} onClick={() => { setCatSlug(c.slug); setQuery('') }}
+                className={cn(
+                  'flex items-center justify-between rounded-md px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                  on ? 'bg-surface-2 text-accent' : 'text-muted hover:bg-surface-2 hover:text-ink',
+                )}>
+                <span>{c.name}</span>
+                <span className="font-mono text-[11px]">{c.count}</span>
               </button>
-            </li>
-          ))}
-          {list.length === 0 && <li className="empty">Sin resultados.</li>}
+            )
+          })}
+        </nav>
+        <ul className="mt-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto border-t border-line p-2">
+          {list.map((l) => {
+            const on = lesson?.id === l.id
+            const isRead = read.has(l.id)
+            return (
+              <li key={l.id}>
+                <button onClick={() => open(l.id)}
+                  className={cn(
+                    'grid w-full grid-cols-[10px_1fr] gap-x-2.5 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                    on ? 'bg-surface-2 outline outline-1 outline-line' : 'hover:bg-surface-2',
+                  )}>
+                  <span aria-label={isRead ? 'leída' : 'no leída'}
+                    className={cn('mt-[5px] h-[7px] w-[7px] rounded-full border',
+                      isRead ? 'border-ok bg-ok' : 'border-muted')} />
+                  <span className="text-[13px] text-ink">{l.title}</span>
+                  <span className="col-start-2 font-mono text-[11px] text-muted">
+                    {LEVEL_LABEL[l.level] || l.level} · {l.minutes} min
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+          {list.length === 0 && <li className="px-2.5 py-3 text-[13px] text-muted">Sin resultados.</li>}
         </ul>
       </aside>
 
-      <section className="lessons__reader panel" aria-label="lector">
+      <section className="panel relative flex min-h-0 flex-col overflow-hidden" aria-label="lector">
         {lesson ? (
           <>
-            <div className="lessons__progress" aria-hidden="true">
-              <div style={{ width: `${progress}%` }} />
+            <div className="absolute inset-x-0 top-0 z-[2] h-0.5 bg-line" aria-hidden="true">
+              <div className="h-full bg-accent transition-[width] duration-100" style={{ width: `${progress}%` }} />
             </div>
-            <div className="lessons__scroll" onScroll={onScroll} ref={readerRef}>
-              <header className="lessons__head">
-                <p className="lessons__crumb">{lessonCat?.name}</p>
-                <h1>{lesson.title}</h1>
-                <p className="lessons__sub">
+            <div className="min-h-0 flex-1 overflow-y-auto px-8 py-7" onScroll={onScroll} ref={readerRef}>
+              <header className="mx-auto mb-5 max-w-[70ch]">
+                <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-accent">{lessonCat?.name}</p>
+                <h1 className="mt-1.5 font-display text-[26px] font-semibold text-ink">{lesson.title}</h1>
+                <p className="mt-1 text-xs text-muted">
                   {LEVEL_LABEL[lesson.level] || lesson.level} · {lesson.minutes} min
                   {lesson.tags.length > 0 && <> · {lesson.tags.join(' · ')}</>}
                 </p>
               </header>
               <article className="reader" dangerouslySetInnerHTML={{ __html: html }} />
-              <footer className="lessons__foot">
+              <footer className="mx-auto mt-8 flex max-w-[70ch] justify-between gap-2.5">
                 {prev ? (
-                  <button className="btn" onClick={() => open(prev.id)}>← {prev.title}</button>
+                  <Button variant="default" onClick={() => open(prev.id)}>← {prev.title}</Button>
                 ) : <span />}
                 {next && (
-                  <button className="btn btn--primary" onClick={() => open(next.id)}>
-                    {next.title} →
-                  </button>
+                  <Button variant="primary" onClick={() => open(next.id)}>{next.title} →</Button>
                 )}
               </footer>
             </div>
           </>
         ) : (
-          <div className="lessons__welcome">
-            <p className="empty">
+          <div className="grid flex-1 place-items-center p-6 text-center">
+            <p className="text-[13px] text-muted">
               Elige una lección. {index.categories.reduce((n, c) => n + c.count, 0)} lecciones
               en {index.categories.length} categorías.
             </p>
           </div>
         )}
-        {error && index && <p className="notice notice--warn" role="alert">{error}</p>}
+        {error && index && (
+          <p role="alert" className="border-t border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">{error}</p>
+        )}
       </section>
     </main>
   )

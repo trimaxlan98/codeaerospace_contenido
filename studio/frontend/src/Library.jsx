@@ -1,7 +1,11 @@
 // Biblioteca: videos renderizados (grid de tarjetas) + gestión de disco.
 
 import { useEffect, useState } from 'react'
+import { Play, Download } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
+import { Button } from './components/ui/button.jsx'
+import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
+import { cn } from '@/lib/utils'
 
 const MB = 1024 ** 2
 
@@ -25,10 +29,13 @@ function duration(job) {
 }
 
 const QUALITY_LABEL = { ql: '480p', qm: '720p', qh: '1080p' }
-const STATUS_LABEL = {
-  error: 'error', cancelled: 'cancelado', timeout: 'timeout',
+const FAIL_META = {
+  error: { label: 'error', dot: 'bg-err', text: 'text-err' },
+  timeout: { label: 'timeout', dot: 'bg-err', text: 'text-err' },
+  cancelled: { label: 'cancelado', dot: 'bg-muted', text: 'text-muted' },
 }
 
+// Borrado en dos toques: el primero arma, el segundo confirma (se desarma solo).
 function DeleteButton({ onDelete }) {
   const [arming, setArming] = useState(false)
   useEffect(() => {
@@ -37,31 +44,32 @@ function DeleteButton({ onDelete }) {
     return () => clearTimeout(t)
   }, [arming])
   return arming ? (
-    <button className="btn btn--tiny btn--danger" onClick={onDelete}>¿Confirmar borrado?</button>
+    <Button size="xs" variant="danger" onClick={onDelete}>¿Confirmar?</Button>
   ) : (
-    <button className="btn btn--tiny" onClick={() => setArming(true)}>Borrar</button>
+    <Button size="xs" variant="ghost" onClick={() => setArming(true)}>Borrar</Button>
   )
 }
 
 function StorageBar({ storage }) {
   if (!storage) return null
   const pct = storage.quota_bytes ? (storage.used_bytes / storage.quota_bytes) * 100 : 0
-  const level = pct >= 92 ? 'crit' : pct >= 75 ? 'warn' : 'ok'
+  const tone = pct >= 92 ? 'bg-err' : pct >= 75 ? 'bg-warn' : 'bg-cyan'
   return (
-    <div className="meter meter--storage">
-      <div className="meter__head">
-        <span className="meter__label">ALMACENAMIENTO · render_jobs/</span>
-        <span className="meter__val">{pct.toFixed(1)}%</span>
+    <div className="max-w-xl">
+      <div className="mb-1.5 flex items-center justify-between">
+        <span className="eyebrow">Almacenamiento · render_jobs/</span>
+        <span className="font-mono text-xs tabular-nums text-ink">{pct.toFixed(1)}%</span>
       </div>
-      <div className="meter__track" role="progressbar" aria-valuenow={Math.round(pct)}
-        aria-valuemin="0" aria-valuemax="100" aria-label="uso de disco de renders">
-        <div className={`meter__fill meter__fill--${level}`}
+      <div className="h-2 overflow-hidden rounded-full border border-line bg-canvas"
+        role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}
+        aria-label="uso de disco de renders">
+        <div className={cn('h-full rounded-full transition-[width] duration-500', tone)}
           style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
-      <span className="meter__detail">
-        {fmtSize(storage.used_bytes)} de {fmtSize(storage.quota_bytes)} · al superar la
-        cuota no se aceptan nuevos renders
-      </span>
+      <p className="mt-1.5 text-[11.5px] text-muted">
+        {fmtSize(storage.used_bytes)} de {fmtSize(storage.quota_bytes)} · al superar la cuota
+        no se aceptan nuevos renders
+      </p>
     </div>
   )
 }
@@ -85,42 +93,51 @@ export default function Library({ jobs, storage, onJobsChanged }) {
   }
 
   return (
-    <main className="library">
+    <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
       <section className="panel" aria-label="uso de disco">
-        <div className="panel__bar">
-          <span className="panel__title">BIBLIOTECA</span>
-          <span className="panel__aside">{videos.length} video{videos.length === 1 ? '' : 's'}</span>
+        <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
+          <span className="eyebrow">Biblioteca</span>
+          <span className="font-mono text-[11px] text-faint">
+            {videos.length} video{videos.length === 1 ? '' : 's'}
+          </span>
         </div>
-        <div className="library__storage">
+        <div className="p-4">
           <StorageBar storage={storage} />
         </div>
-        {error && <p className="notice notice--warn" role="alert">{error}</p>}
+        {error && (
+          <p role="alert" className="border-t border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">{error}</p>
+        )}
       </section>
 
-      <section className="panel panel--grid" aria-label="videos renderizados">
+      <section className="panel" aria-label="videos renderizados">
         {videos.length === 0 ? (
-          <p className="empty">Sin videos todavía. Los renders exitosos aparecen aquí.</p>
+          <p className="p-4 text-[13px] text-muted">Sin videos todavía. Los renders exitosos aparecen aquí.</p>
         ) : (
-          <div className="cards">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5 p-4">
             {videos.map((j) => (
-              <article key={j.id} className="card">
-                <button className="card__thumb" onClick={() => setPlaying(j)}
-                  aria-label={`ver ${j.scene}`}>
+              <article key={j.id} className="group flex flex-col overflow-hidden rounded-lg border border-line bg-surface-2 transition-colors hover:border-line-strong">
+                <button onClick={() => setPlaying(j)} aria-label={`ver ${j.scene}`}
+                  className="relative block aspect-video w-full border-b border-line bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
                   {j.has_thumb
-                    ? <img src={thumbUrl(j.id)} alt={`miniatura de ${j.scene}`} loading="lazy" />
-                    : <span className="card__noimg">▶</span>}
-                  <span className="card__play" aria-hidden="true">▶</span>
+                    ? <img src={thumbUrl(j.id)} alt={`miniatura de ${j.scene}`} loading="lazy"
+                        className="h-full w-full object-cover" />
+                    : <span className="grid h-full place-items-center text-faint"><Play className="h-7 w-7" /></span>}
+                  <span className="absolute inset-0 grid place-items-center bg-canvas/45 text-accent opacity-0 transition-opacity group-hover:opacity-100">
+                    <Play className="h-9 w-9" fill="currentColor" />
+                  </span>
                 </button>
-                <div className="card__body">
-                  <h3 className="card__title" title={j.scene}>{j.scene}</h3>
-                  <p className="card__meta">
-                    {fmtDate(j.created_at)} · {duration(j) || '—'} ·{' '}
-                    {QUALITY_LABEL[j.quality] || j.quality} · {fmtSize(j.size_bytes)}
+                <div className="flex flex-col gap-1.5 p-3">
+                  <h3 className="truncate font-mono text-[13px] font-semibold text-ink" title={j.scene}>{j.scene}</h3>
+                  <p className="text-[11.5px] text-muted">
+                    {fmtDate(j.created_at)} · {duration(j) || '—'} · {QUALITY_LABEL[j.quality] || j.quality} · {fmtSize(j.size_bytes)}
                   </p>
-                  <div className="card__actions">
-                    <button className="btn btn--tiny" onClick={() => setPlaying(j)}>Ver</button>
-                    <a className="btn btn--tiny" href={videoUrl(j.id)}
-                      download={`${j.scene}.mp4`}>Descargar</a>
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    <Button size="xs" variant="default" onClick={() => setPlaying(j)}>Ver</Button>
+                    <Button size="xs" variant="default" asChild>
+                      <a href={videoUrl(j.id)} download={`${j.scene}.mp4`}>
+                        <Download className="h-3.5 w-3.5" /> Descargar
+                      </a>
+                    </Button>
                     <DeleteButton onDelete={() => remove(j.id)} />
                   </div>
                 </div>
@@ -132,39 +149,39 @@ export default function Library({ jobs, storage, onJobsChanged }) {
 
       {failed.length > 0 && (
         <section className="panel" aria-label="historial de fallos">
-          <div className="panel__bar">
-            <span className="panel__title">FALLIDOS / CANCELADOS</span>
-            <span className="panel__aside">sin video · solo registro</span>
+          <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
+            <span className="eyebrow">Fallidos / cancelados</span>
+            <span className="font-mono text-[11px] text-faint">sin video · solo registro</span>
           </div>
-          <ul className="jobs">
-            {failed.map((j) => (
-              <li key={j.id} className="job">
-                <span className={`dot dot--${j.status}`} aria-hidden="true" />
-                <span className="job__scene">{j.scene}</span>
-                <span className="job__meta">{fmtDate(j.created_at)}</span>
-                <span className={`job__status job__status--${j.status}`}>
-                  {STATUS_LABEL[j.status] || j.status}
-                </span>
-                <DeleteButton onDelete={() => remove(j.id)} />
-              </li>
-            ))}
+          <ul className="divide-y divide-line/40">
+            {failed.map((j) => {
+              const m = FAIL_META[j.status] || FAIL_META.error
+              return (
+                <li key={j.id} className="flex flex-wrap items-center gap-3 px-3 py-2">
+                  <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot)} />
+                  <span className="font-mono text-[13px] text-ink">{j.scene}</span>
+                  <span className="text-[11.5px] text-muted">{fmtDate(j.created_at)}</span>
+                  <span className={cn('font-mono text-[11px] uppercase tracking-wide', m.text)}>{m.label}</span>
+                  <span className="ml-auto"><DeleteButton onDelete={() => remove(j.id)} /></span>
+                </li>
+              )
+            })}
           </ul>
         </section>
       )}
 
-      {playing && (
-        <div className="lightbox" role="dialog" aria-label={`video ${playing.scene}`}
-          onClick={() => setPlaying(null)}>
-          <div className="lightbox__box" onClick={(e) => e.stopPropagation()}>
-            <div className="panel__bar">
-              <span className="panel__title">{playing.scene} · {playing.id.slice(0, 8)}</span>
-              <button className="btn btn--tiny" onClick={() => setPlaying(null)}>Cerrar ✕</button>
+      <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
+        {playing && (
+          <DialogContent className="p-0">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2 pr-12">
+              <DialogTitle className="truncate font-mono text-[13px] text-ink">
+                {playing.scene} <span className="text-faint">· {playing.id.slice(0, 8)}</span>
+              </DialogTitle>
             </div>
-            <video className="lightbox__video" controls autoPlay
-              src={videoUrl(playing.id)} />
-          </div>
-        </div>
-      )}
+            <video className="block max-h-[78vh] w-full bg-black" controls autoPlay src={videoUrl(playing.id)} />
+          </DialogContent>
+        )}
+      </Dialog>
     </main>
   )
 }

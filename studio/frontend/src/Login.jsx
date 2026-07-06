@@ -1,21 +1,10 @@
 import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { api } from './api.js'
-import { OrbitGlyph } from './Header.jsx'
-
-function EyeIcon({ off }) {
-  return off ? (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-      stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-      <path d="M3 3l18 18M10.6 10.7a2.8 2.8 0 0 0 3.9 4M6.6 6.8C4.6 8 3 9.8 2 12c1.8 3.9 5.5 6.5 10 6.5 1.9 0 3.7-.5 5.2-1.3M9.9 5.8A10.8 10.8 0 0 1 12 5.5c4.5 0 8.2 2.6 10 6.5a13 13 0 0 1-2.6 3.6" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-      stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-      <path d="M2 12c1.8-3.9 5.5-6.5 10-6.5S20.2 8.1 22 12c-1.8 3.9-5.5 6.5-10 6.5S3.8 15.9 2 12z" />
-      <circle cx="12" cy="12" r="2.8" />
-    </svg>
-  )
-}
+import { OrbitGlyph } from './components/OrbitGlyph.jsx'
+import { Input } from './components/ui/input.jsx'
+import { Button } from './components/ui/button.jsx'
+import { cn } from '@/lib/utils'
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('')
@@ -42,38 +31,65 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div className="login">
+    <div className="relative grid h-full place-items-center overflow-hidden p-5">
       <div className="login__sky" aria-hidden="true" />
-      <form className={`login__card${error ? ' login__card--shake' : ''}`}
-        onSubmit={submit}>
-        <div className="login__brand">
-          <OrbitGlyph state="idle" />
-          <h1 className="login__mark">MANIM·STUDIO</h1>
-          <p className="login__sub">Consola privada de renderizado · coderesearch.space</p>
-        </div>
-        <label className="field">
-          <span>Usuario</span>
-          <input value={username} onChange={(e) => setUsername(e.target.value)}
-            autoComplete="username" autoFocus required />
-        </label>
-        <label className="field field--pass">
-          <span>Contraseña</span>
-          <div className="field__wrap">
-            <input type={showPass ? 'text' : 'password'} value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password" required />
-            <button type="button" className="field__eye"
-              onClick={() => setShowPass(!showPass)}
-              aria-pressed={showPass}
-              aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
-              <EyeIcon off={showPass} />
-            </button>
+      <div aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,var(--canvas)_100%)] opacity-80" />
+
+      <form
+        onSubmit={submit}
+        className={cn(
+          'relative z-[1] w-[min(400px,100%)] rounded-2xl border border-white/10 bg-surface/65 p-8',
+          'shadow-[0_24px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl',
+          'animate-in fade-in slide-in-from-bottom-3 duration-500',
+          error && 'animate-shake',
+        )}
+      >
+        <div className="flex flex-col items-center gap-3 text-center">
+          <OrbitGlyph state="idle" size={56} />
+          <div>
+            <h1 className="font-display text-[22px] font-semibold tracking-tight text-ink">ManimStudio</h1>
+            <p className="mt-1 text-xs text-muted">Consola privada de renderizado</p>
           </div>
-        </label>
-        {error && <p className="login__error" role="alert">{error}</p>}
-        <button className="btn btn--primary" disabled={busy}>
-          {busy ? 'Verificando…' : 'Entrar'}
-        </button>
+          <span className="eyebrow mt-1">coderesearch.space</span>
+        </div>
+
+        <div className="mt-7 flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="eyebrow">Usuario</span>
+            <Input value={username} onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username" autoFocus required />
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="eyebrow">Contraseña</span>
+            <div className="relative">
+              <Input
+                type={showPass ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                aria-pressed={showPass}
+                aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="absolute right-1.5 top-1/2 grid -translate-y-1/2 place-items-center rounded p-1.5 text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+              >
+                {showPass ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+              </button>
+            </div>
+          </label>
+
+          {error && <p role="alert" className="text-center text-[13px] text-err">{error}</p>}
+
+          <Button variant="primary" size="lg" disabled={busy} className="mt-1 w-full">
+            {busy ? 'Verificando…' : 'Entrar'}
+          </Button>
+        </div>
       </form>
     </div>
   )
