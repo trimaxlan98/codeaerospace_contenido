@@ -18,6 +18,7 @@ from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
 from .db import Database
+from .fable import FableAssistant
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
@@ -34,6 +35,7 @@ manager = JobManager(cfg, db, runner, bus)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 assistant = Assistant(cfg)
+fable_assistant = FableAssistant(cfg)
 lessons_store = LessonStore(cfg.lessons_dir)
 animations_store = AnimationStore(cfg.animations_dir, lessons_store)
 
