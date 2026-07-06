@@ -22,6 +22,7 @@ from .fable import FableAssistant
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
+from .primitives import PrimitiveError, PrimitiveManager
 from .runner_client import RunnerClient
 from .scenes import detect_scenes
 
@@ -36,6 +37,7 @@ manager = JobManager(cfg, db, runner, bus)
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 assistant = Assistant(cfg)
 fable_assistant = FableAssistant(cfg)
+primitives_manager = PrimitiveManager(cfg, fable_assistant, manager, bus)
 lessons_store = LessonStore(cfg.lessons_dir)
 animations_store = AnimationStore(cfg.animations_dir, lessons_store)
 
