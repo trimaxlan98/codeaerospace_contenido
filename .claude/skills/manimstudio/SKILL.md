@@ -37,7 +37,7 @@ There is **no Docker container for the frontend**. The global `deploy-frontend` 
 ## Tests
 
 ```bash
-cd studio/backend && venv/bin/pytest -q      # 81 tests; the runner does NOT run in tests
+cd studio/backend && venv/bin/pytest -q      # 86 tests; the runner does NOT run in tests
 ```
 Tests reload `app*` modules per `tmp_path` (see `conftest.py`); the AI assistant is disabled unless a test creates the key and mocks `_call_model`. Tests that read a job's `scene.py` from disk must tolerate `FileNotFoundError` when the job is already `error` (the worker deletes the job dir on failure — a real race, not a flake).
 
