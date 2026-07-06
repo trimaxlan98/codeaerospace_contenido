@@ -1,7 +1,7 @@
 // Biblioteca de animaciones: categorias + lista + vista previa del script,
 // con un boton para abrirlo en el Estudio y renderizarlo.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { api } from './api.js'
@@ -9,12 +9,13 @@ import { Input } from './components/ui/input.jsx'
 import { Button } from './components/ui/button.jsx'
 import { cn } from '@/lib/utils'
 
-export default function Animations({ onOpenInStudio }) {
+export default function Animations({ onOpenInStudio, routeId, onRoute }) {
   const [index, setIndex] = useState(null)
   const [error, setError] = useState('')
   const [catSlug, setCatSlug] = useState(null)
   const [animation, setAnimation] = useState(null) // {id, title, scene, script}
   const [query, setQuery] = useState('')
+  const requestedRef = useRef(null) // ultima animacion pedida (dedupe ruta/clic)
 
   useEffect(() => {
     api.animationsIndex()
@@ -36,14 +37,32 @@ export default function Animations({ onOpenInStudio }) {
     return cat.animations.filter((a) => a.title.toLowerCase().includes(q))
   }, [cat, query])
 
-  const open = async (id) => {
+  const open = async (id, { fromRoute = false } = {}) => {
+    requestedRef.current = id
     setError('')
     try {
       setAnimation(await api.getAnimation(id))
+      if (fromRoute) {
+        // Deep-link: alinear la categoria activa con la animacion abierta.
+        const c = index?.categories.find((c) => id.startsWith(c.slug + '/'))
+        if (c) setCatSlug(c.slug)
+      }
     } catch (err) {
       setError(err.status === 404 ? 'Animación no encontrada' : err.message)
     }
   }
+
+  // Clic del usuario: abre y refleja la animacion en el hash.
+  const openAndRoute = (id) => {
+    open(id)
+    onRoute?.(id)
+  }
+
+  // #/animaciones/<id> (carga inicial o atras/adelante) abre esa animacion.
+  useEffect(() => {
+    if (!index || !routeId || routeId === requestedRef.current) return
+    open(routeId, { fromRoute: true })
+  }, [index, routeId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalCount = index ? index.categories.reduce((n, c) => n + c.count, 0) : 0
 
@@ -82,7 +101,7 @@ export default function Animations({ onOpenInStudio }) {
         <ul className="mt-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto border-t border-line p-2">
           {list.map((a) => (
             <li key={a.id}>
-              <button onClick={() => open(a.id)}
+              <button onClick={() => openAndRoute(a.id)}
                 className={cn(
                   'flex w-full flex-col gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                   animation?.id === a.id ? 'bg-surface-2 outline outline-1 outline-line' : 'hover:bg-surface-2',

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from './api.js'
+import { useRoute } from './router.js'
 import Login from './Login.jsx'
 import Header from './Header.jsx'
 import Studio from './Studio.jsx'
@@ -11,7 +12,13 @@ import Animations from './Animations.jsx'
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
   const [aiEnabled, setAiEnabled] = useState(false)
-  const [view, setView] = useState('studio')
+  const [route, navigate] = useRoute()
+  const view = route.view
+  // Vistas keep-alive: se montan al visitarlas por primera vez y despues solo
+  // se ocultan, para que su estado (editor, leccion abierta, tab de Admin…)
+  // sobreviva a los cambios de pestana.
+  const visited = useRef(new Set())
+  visited.current.add(view)
   const [pendingScript, setPendingScript] = useState(null)
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
@@ -96,28 +103,53 @@ export default function App() {
     try { await api.logout() } finally { setAuth(false) }
   }
 
+  // display:contents mantiene al <main> de cada vista como hijo directo del
+  // flex del shell; hidden (display:none) lo saca de layout sin desmontarlo.
+  const show = (id) => (view === id ? 'contents' : 'hidden')
+
   return (
     <div className="shell">
       <Header
         view={view}
-        onView={setView}
+        onView={navigate}
         metrics={metrics}
         orbitState={orbitState}
         onLogout={logout}
       />
-      {view === 'studio' ? (
-        <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
-          onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
-          pendingScript={pendingScript} onConsumePendingScript={() => setPendingScript(null)} />
-      ) : view === 'library' ? (
-        <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
-      ) : view === 'lessons' ? (
-        <Lessons />
-      ) : view === 'animations' ? (
-        <Animations onOpenInStudio={(script) => { setPendingScript(script); setView('studio') }} />
-      ) : (
-        <Admin metrics={metrics} containers={containers} jobs={jobs}
-          storage={storage} onJobsChanged={refreshJobs} />
+      {visited.current.has('studio') && (
+        <div className={show('studio')}>
+          <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
+            onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
+            pendingScript={pendingScript} onConsumePendingScript={() => setPendingScript(null)} />
+        </div>
+      )}
+      {visited.current.has('library') && (
+        <div className={show('library')}>
+          <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
+        </div>
+      )}
+      {visited.current.has('lessons') && (
+        <div className={show('lessons')}>
+          <Lessons active={view === 'lessons'}
+            routeId={view === 'lessons' ? route.param : null}
+            onRoute={(id) => navigate('lessons', id)} />
+        </div>
+      )}
+      {visited.current.has('animations') && (
+        <div className={show('animations')}>
+          <Animations
+            routeId={view === 'animations' ? route.param : null}
+            onRoute={(id) => navigate('animations', id)}
+            onOpenInStudio={(script) => { setPendingScript(script); navigate('studio') }} />
+        </div>
+      )}
+      {visited.current.has('admin') && (
+        <div className={show('admin')}>
+          <Admin metrics={metrics} containers={containers} jobs={jobs}
+            storage={storage} onJobsChanged={refreshJobs}
+            routeTab={view === 'admin' ? route.param : null}
+            onRoute={(tab) => navigate('admin', tab)} />
+        </div>
       )}
     </div>
   )

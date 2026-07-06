@@ -1,6 +1,6 @@
 // Panel de administracion: salud del host, contenedores, gestion de jobs y disco.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from './api.js'
 import { Chart, useHistory, GB } from './charts.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -91,11 +91,19 @@ const TABS = [
   { id: 'recursos', label: 'Recursos' },
 ]
 
-export default function Admin({ metrics, containers, jobs, storage, onJobsChanged }) {
+export default function Admin({ metrics, containers, jobs, storage, onJobsChanged,
+  routeTab, onRoute }) {
   const samples = useHistory(metrics, containers)
   const now = metrics?.ts || Date.now() / 1000
   const [notice, setNotice] = useState('')
-  const [tab, setTab] = useState('salud')
+  const isTab = (t) => TABS.some((x) => x.id === t)
+  const [tab, setTab] = useState(() => (isTab(routeTab) ? routeTab : 'salud'))
+
+  // #/admin/<tab> (deep-link o atras/adelante) manda sobre el estado local;
+  // sin parametro en el hash se conserva la ultima pestana visitada.
+  useEffect(() => {
+    if (routeTab && routeTab !== tab && isTab(routeTab)) setTab(routeTab)
+  }, [routeTab]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const done = jobs.filter((j) => j.status === 'done')
   const failed = jobs.filter((j) => ['error', 'timeout', 'cancelled'].includes(j.status))
@@ -124,7 +132,8 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
         {TABS.map((t) => {
           const on = tab === t.id
           return (
-            <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)}
+            <button key={t.id} role="tab" aria-selected={on}
+              onClick={() => { setTab(t.id); onRoute?.(t.id) }}
               className={cn(
                 'rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                 on ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',

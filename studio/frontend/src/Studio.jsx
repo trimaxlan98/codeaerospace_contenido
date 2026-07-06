@@ -27,6 +27,24 @@ const QUALITIES = [
   { id: 'qh', label: '1080p', hint: 'alta' },
 ]
 
+// Persistencia local del area de trabajo: el script (y sus ajustes) deben
+// sobrevivir a F5 y a cambios de vista. localStorage puede fallar (modo
+// privado, cuota): nunca es fatal.
+const LS = {
+  script: 'ms_studio_script',
+  scene: 'ms_studio_scene',
+  quality: 'ms_studio_quality',
+  timeout: 'ms_studio_timeout',
+}
+
+function lsGet(key) {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+function lsSet(key, value) {
+  try { localStorage.setItem(key, value) } catch { /* no critico */ }
+}
+
 const STATUS_META = {
   queued: { label: 'en cola', dot: 'bg-cyan', text: 'text-cyan' },
   running: { label: 'renderizando', dot: 'bg-accent', text: 'text-accent' },
@@ -109,12 +127,18 @@ function JobChip({ job, selected, onSelect, onCancel }) {
 
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
   pendingScript, onConsumePendingScript }) {
-  const [script, setScript] = useState(SAMPLE)
-  const [scenes, setScenes] = useState(['Orbita'])
-  const [scene, setScene] = useState('Orbita')
+  const [script, setScript] = useState(() => lsGet(LS.script) ?? SAMPLE)
+  const [scenes, setScenes] = useState(() => [lsGet(LS.scene) || 'Orbita'])
+  const [scene, setScene] = useState(() => lsGet(LS.scene) || 'Orbita')
   const [sceneError, setSceneError] = useState('')
-  const [quality, setQuality] = useState('ql')
-  const [timeoutS, setTimeoutS] = useState(600)
+  const [quality, setQuality] = useState(() => {
+    const q = lsGet(LS.quality)
+    return QUALITIES.some((o) => o.id === q) ? q : 'ql'
+  })
+  const [timeoutS, setTimeoutS] = useState(() => {
+    const t = Number(lsGet(LS.timeout))
+    return t >= 30 && t <= 1800 ? t : 600
+  })
   const [submitError, setSubmitError] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [selectedLogs, setSelectedLogs] = useState([])
@@ -130,6 +154,18 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     setScript(pendingScript)
     onConsumePendingScript()
   }, [pendingScript, onConsumePendingScript])
+
+  // Guardado local del script con debounce (una escritura por pausa de tipeo).
+  useEffect(() => {
+    const t = setTimeout(() => lsSet(LS.script, script), 400)
+    return () => clearTimeout(t)
+  }, [script])
+
+  useEffect(() => {
+    lsSet(LS.scene, scene)
+    lsSet(LS.quality, quality)
+    lsSet(LS.timeout, String(timeoutS))
+  }, [scene, quality, timeoutS])
 
   // Deteccion de escenas con debounce (el backend usa ast, nunca ejecuta).
   useEffect(() => {

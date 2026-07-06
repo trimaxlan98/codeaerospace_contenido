@@ -17,7 +17,7 @@ function readSet() {
 
 const LEVEL_LABEL = { intro: 'intro', medio: 'medio', avanzado: 'avanzado' }
 
-export default function Lessons() {
+export default function Lessons({ routeId, onRoute, active = true }) {
   const [index, setIndex] = useState(null)
   const [error, setError] = useState('')
   const [catSlug, setCatSlug] = useState(null)
@@ -26,6 +26,8 @@ export default function Lessons() {
   const [read, setRead] = useState(readSet)
   const [progress, setProgress] = useState(0)
   const readerRef = useRef(null)
+  const scrollRef = useRef(0) // scroll del lector, para restaurarlo al volver
+  const requestedRef = useRef(null) // ultima leccion pedida (dedupe ruta/clic)
 
   useEffect(() => {
     api.lessonsIndex()
@@ -49,13 +51,20 @@ export default function Lessons() {
       || l.tags.some((t) => String(t).toLowerCase().includes(q)))
   }, [cat, query])
 
-  const open = async (id) => {
+  const open = async (id, { fromRoute = false } = {}) => {
+    requestedRef.current = id
     setError('')
     try {
       const l = await api.getLesson(id)
       setLesson(l)
       setProgress(0)
+      scrollRef.current = 0
       readerRef.current?.scrollTo(0, 0)
+      if (fromRoute) {
+        // Deep-link: alinear la pestana de categoria con la leccion abierta.
+        const c = index?.categories.find((c) => id.startsWith(c.slug + '/'))
+        if (c) setCatSlug(c.slug)
+      }
       setRead((prev) => {
         const next = new Set(prev).add(id)
         localStorage.setItem(READ_KEY, JSON.stringify([...next]))
@@ -66,9 +75,28 @@ export default function Lessons() {
     }
   }
 
+  // Clic del usuario: abre y refleja la leccion en el hash (deep-link, atras).
+  const openAndRoute = (id) => {
+    open(id)
+    onRoute?.(id)
+  }
+
+  // #/aprender/<id> (carga inicial o atras/adelante) abre esa leccion.
+  useEffect(() => {
+    if (!index || !routeId || routeId === requestedRef.current) return
+    open(routeId, { fromRoute: true })
+  }, [index, routeId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // La vista vive oculta (keep-alive) y display:none pierde el scroll del
+  // lector: al reactivarla se restaura la ultima posicion conocida.
+  useEffect(() => {
+    if (active && readerRef.current) readerRef.current.scrollTop = scrollRef.current
+  }, [active])
+
   const onScroll = (e) => {
     const el = e.target
     const max = el.scrollHeight - el.clientHeight
+    scrollRef.current = el.scrollTop
     setProgress(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100)
   }
 
@@ -118,7 +146,7 @@ export default function Lessons() {
             const isRead = read.has(l.id)
             return (
               <li key={l.id}>
-                <button onClick={() => open(l.id)}
+                <button onClick={() => openAndRoute(l.id)}
                   className={cn(
                     'grid w-full grid-cols-[10px_1fr] gap-x-2.5 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     on ? 'bg-surface-2 outline outline-1 outline-line' : 'hover:bg-surface-2',
@@ -156,10 +184,10 @@ export default function Lessons() {
               <article className="reader" dangerouslySetInnerHTML={{ __html: html }} />
               <footer className="mx-auto mt-8 flex max-w-[70ch] justify-between gap-2.5">
                 {prev ? (
-                  <Button variant="default" onClick={() => open(prev.id)}>← {prev.title}</Button>
+                  <Button variant="default" onClick={() => openAndRoute(prev.id)}>← {prev.title}</Button>
                 ) : <span />}
                 {next && (
-                  <Button variant="primary" onClick={() => open(next.id)}>{next.title} →</Button>
+                  <Button variant="primary" onClick={() => openAndRoute(next.id)}>{next.title} →</Button>
                 )}
               </footer>
             </div>
