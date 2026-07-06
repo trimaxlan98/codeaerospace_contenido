@@ -130,7 +130,8 @@ async def logout(response: Response, _=Depends(require_auth)):
 async def me(request: Request):
     if session_valid(cfg, request):
         return {"authenticated": True, "user": cfg.admin_user,
-                "ai_enabled": assistant.enabled}
+                "ai_enabled": assistant.enabled,
+                "fable_enabled": fable_assistant.enabled}
     return {"authenticated": False}
 
 
@@ -337,6 +338,63 @@ async def ai_generate(body: AIGenerateBody, _=Depends(require_auth)):
     try:
         return {"script": await assistant.generate(body.prompt)}
     except AIError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+# ── biblioteca de primitivas (Fable 5) ────────────────────────────────────────
+
+class PrimitiveProposeBody(BaseModel):
+    slug: str = Field(pattern=r"^[a-z0-9][a-z0-9-]*$", max_length=64)
+    description: str = Field(min_length=3, max_length=4_000)
+
+
+class PrimitiveFeedbackBody(BaseModel):
+    feedback: str = Field(min_length=1, max_length=2_000)
+
+
+@app.get("/api/primitives")
+async def list_primitives(_=Depends(require_auth)):
+    return {"proposals": primitives_manager.list_proposals()}
+
+
+@app.get("/api/primitives/{proposal_id}")
+async def get_primitive(proposal_id: str, _=Depends(require_auth)):
+    proposal = primitives_manager.get_proposal(proposal_id)
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Propuesta no encontrada")
+    return proposal
+
+
+@app.post("/api/primitives", status_code=201)
+async def propose_primitive(body: PrimitiveProposeBody, _=Depends(require_auth)):
+    try:
+        return primitives_manager.propose(body.slug, body.description)
+    except PrimitiveError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+@app.post("/api/primitives/{proposal_id}/approve")
+async def approve_primitive(proposal_id: str, _=Depends(require_auth)):
+    try:
+        return primitives_manager.approve(proposal_id)
+    except PrimitiveError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+@app.post("/api/primitives/{proposal_id}/reject")
+async def reject_primitive(proposal_id: str, _=Depends(require_auth)):
+    try:
+        return primitives_manager.reject(proposal_id)
+    except PrimitiveError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+@app.post("/api/primitives/{proposal_id}/iterate")
+async def iterate_primitive(proposal_id: str, body: PrimitiveFeedbackBody,
+                            _=Depends(require_auth)):
+    try:
+        return primitives_manager.iterate(proposal_id, body.feedback)
+    except PrimitiveError as e:
         raise HTTPException(status_code=e.status, detail=e.detail)
 
 
