@@ -361,6 +361,8 @@ body {
 .kpi--crit .kpi__value { color: var(--err); }
 .kpi--ok .kpi__value { color: var(--ok); }
 
+.admin__tabs { margin: 12px 12px 0; align-self: flex-start; }
+
 .admin__actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px 4px; }
 .armed { display: inline-flex; gap: 6px; }
 .admin .notice { margin: 8px 14px 0; }
@@ -579,6 +581,8 @@ body {
 .lessons__dotread--yes { background: var(--ok); border-color: var(--ok); }
 .lessons__ititle { font-size: 13px; }
 .lessons__imeta { grid-column: 2; color: var(--muted); font-size: 11px; }
+.lessons__item--flat { grid-template-columns: 1fr; }
+.lessons__item--flat .lessons__imeta { grid-column: 1; font-family: var(--mono); }
 
 .lessons__reader { position: relative; display: flex; flex-direction: column; min-height: 0; }
 .lessons__progress {

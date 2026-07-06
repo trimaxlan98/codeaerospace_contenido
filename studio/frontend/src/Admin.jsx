@@ -70,6 +70,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
   const samples = useHistory(metrics, containers)
   const now = metrics?.ts || Date.now() / 1000
   const [notice, setNotice] = useState('')
+  const [tab, setTab] = useState('salud')
 
   const done = jobs.filter((j) => j.status === 'done')
   const failed = jobs.filter((j) => ['error', 'timeout', 'cancelled'].includes(j.status))
@@ -95,6 +96,20 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
 
   return (
     <main className="monitor admin">
+      <div className="seg admin__tabs" role="tablist" aria-label="secciones de administracion">
+        {[
+          { id: 'salud', label: 'Salud' },
+          { id: 'jobs', label: 'Jobs' },
+          { id: 'recursos', label: 'Recursos' },
+        ].map((t) => (
+          <button key={t.id} role="tab" aria-selected={tab === t.id}
+            className={tab === t.id ? 'seg__opt seg__opt--on' : 'seg__opt'}
+            onClick={() => setTab(t.id)}>{t.label}</button>
+        ))}
+      </div>
+
+      {tab === 'salud' && (
+        <>
       <section className="panel" aria-label="salud del sistema">
         <div className="panel__bar">
           <span className="panel__title">SALUD DEL SISTEMA</span>
@@ -148,7 +163,10 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
           </div>
         )}
       </section>
+        </>
+      )}
 
+      {tab === 'jobs' && (
       <section className="panel" aria-label="gestion de jobs">
         <div className="panel__bar">
           <span className="panel__title">GESTIÓN DE JOBS</span>
@@ -187,7 +205,10 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
           </table>
         </div>
       </section>
+      )}
 
+      {tab === 'recursos' && (
+        <>
       <section className="panel" aria-label="almacenamiento">
         <div className="panel__bar">
           <span className="panel__title">ALMACENAMIENTO · render_jobs/</span>
@@ -235,6 +256,8 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
           esta consola solo muestra métricas agregadas y no permite ninguna acción sobre ellos.
         </p>
       </section>
+        </>
+      )}
     </main>
   )
 }
