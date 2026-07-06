@@ -39,7 +39,9 @@ function MeterChip({ label, pct }) {
 export default function Header({ view, onView, metrics, orbitState, onLogout }) {
   const clock = useUtcClock()
   return (
-    <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-line bg-surface/80 px-4 backdrop-blur-md">
+    // En movil el header ocupa dos filas: marca + acciones arriba y la nav a
+    // lo ancho debajo (order-last + w-full); en md+ vuelve a una sola fila.
+    <header className="sticky top-0 z-40 flex shrink-0 flex-wrap items-center gap-x-3 border-b border-line bg-surface/80 px-3 pt-2 backdrop-blur-md md:h-14 md:flex-nowrap md:gap-4 md:px-4 md:pt-0">
       <div className="flex shrink-0 items-center gap-2.5">
         <OrbitGlyph state={orbitState} size={34} />
         <div className="leading-none">
@@ -49,7 +51,7 @@ export default function Header({ view, onView, metrics, orbitState, onLogout }) 
       </div>
 
       <nav aria-label="vistas"
-        className="ml-1 flex items-center gap-1 overflow-x-auto rounded-lg border border-line bg-canvas/40 p-1">
+        className="order-last -mx-1 flex w-full items-center gap-1 overflow-x-auto p-1 md:order-none md:mx-0 md:ml-1 md:w-auto md:rounded-lg md:border md:border-line md:bg-canvas/40">
         {NAV.map((n) => {
           const active = view === n.id
           return (

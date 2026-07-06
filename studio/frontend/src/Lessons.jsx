@@ -118,8 +118,10 @@ export default function Lessons({ routeId, onRoute, active = true }) {
   }
 
   return (
-    <main className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_1fr]">
-      <aside className="panel flex min-h-0 flex-col overflow-hidden">
+    <main className="grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-3 p-3 lg:grid-cols-[300px_1fr] lg:grid-rows-1">
+      {/* En movil la columna de categorias se acota a media pantalla (la lista
+          scrollea por dentro) para que el lector quede al alcance. */}
+      <aside className="panel flex max-h-[45dvh] min-h-0 flex-col overflow-hidden lg:max-h-none">
         <div className="border-b border-line px-3 py-2"><span className="eyebrow">Aprender</span></div>
         <div className="p-2.5">
           <Input type="search" placeholder="Buscar…" value={query}
@@ -166,7 +168,7 @@ export default function Lessons({ routeId, onRoute, active = true }) {
         </ul>
       </aside>
 
-      <section className="panel relative flex min-h-0 flex-col overflow-hidden" aria-label="lector">
+      <section className="panel relative flex min-h-[50dvh] flex-col overflow-hidden lg:min-h-0" aria-label="lector">
         {lesson ? (
           <>
             <div className="absolute inset-x-0 top-0 z-[2] h-0.5 bg-line" aria-hidden="true">

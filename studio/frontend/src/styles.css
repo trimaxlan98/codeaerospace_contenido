@@ -88,8 +88,6 @@ body {
 }
 
 /* ── header ─────────────────────────────────────────────────────────────── */
-.shell { display: flex; flex-direction: column; height: 100%; }
-
 .hdr {
   display: flex; align-items: center; gap: 20px;
   padding: 10px 18px;

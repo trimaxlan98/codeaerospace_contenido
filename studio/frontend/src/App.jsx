@@ -108,7 +108,9 @@ export default function App() {
   const show = (id) => (view === id ? 'contents' : 'hidden')
 
   return (
-    <div className="shell">
+    // Shell responsive: en movil la pagina scrollea (min-h) y cada vista fija
+    // alturas minimas por panel; en lg+ vuelve el layout de viewport fijo.
+    <div className="flex min-h-dvh flex-col lg:h-dvh">
       <Header
         view={view}
         onView={navigate}

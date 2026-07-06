@@ -152,6 +152,14 @@ Renderizar esté deshabilitado, y añadir "Vaciar historial" + purga con días l
    de 1 encolado y el doble-submit; nuevos `DELETE /api/jobs/finished` y
    `POST /api/jobs/{id}/retry`; listado sube de 50 a 500 (`JOBS_LIST_LIMIT`) para que la
    Biblioteca no oculte videos que consumen cuota. 73 tests backend + QA Playwright.
-3. **P0-2/P0-3** layout móvil + `shrink-0`.
+3. ~~**P0-2/P0-3** layout móvil + `shrink-0`.~~ — **hecho 2026-07-06**: el shell
+   abandona el viewport fijo en `<lg` (`min-h-dvh` + scroll de página; en `lg+` sigue
+   `h-dvh`); en el Estudio móvil el editor fija `62dvh` y el registro `45dvh` (ambos
+   scrollean por dentro), con Renderizar y toolbar visibles; `shrink-0` en todas las
+   secciones de Biblioteca y Admin (adiós solapes, también en escritorio); header en
+   dos filas en móvil (marca + acciones / nav a lo ancho con scroll horizontal);
+   en Aprender/Animaciones la columna de categorías se acota a `45dvh` como
+   guardarraíl (su rediseño es el punto 4). Verificado con QA Playwright
+   (17 checks de geometría en 390×844 y 1440×900).
 4. **Animaciones/Aprender:** acordeón o grid de tarjetas + búsqueda global.
 5. **P0-4/P0-6** (401 → login, indicador de conexión, ErrorBoundary) + toasts de fin de render.

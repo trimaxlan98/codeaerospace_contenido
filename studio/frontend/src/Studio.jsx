@@ -348,10 +348,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
       ].filter(Boolean).join(' · ')
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col gap-3 p-3">
-      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
+    <main className="flex flex-1 flex-col gap-3 p-3 lg:min-h-0">
+      {/* En movil cada panel fija su altura (la pagina scrollea); en lg+ el
+          conjunto llena el viewport y cada panel scrollea por dentro. */}
+      <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* ── Editor ── */}
-        <section className="panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" aria-label="editor">
+        <section className="panel flex h-[62dvh] min-w-0 flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1" aria-label="editor">
           <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
             <div className="flex items-center gap-2">
               <FileCode className="h-4 w-4 text-muted" />
@@ -410,7 +412,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
         </section>
 
         {/* ── Rail de resultado ── */}
-        <aside className="flex min-h-0 w-full shrink-0 flex-col gap-3 lg:w-[440px]" aria-label="resultado">
+        <aside className="flex w-full flex-col gap-3 lg:min-h-0 lg:w-[440px] lg:shrink-0" aria-label="resultado">
           {selected?.status === 'done' && (
             <div className="panel shrink-0 overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
@@ -425,7 +427,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             </div>
           )}
 
-          <div className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="panel flex h-[45dvh] flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
               <span className="eyebrow truncate">
                 Registro{selected ? ` · ${selected.scene} (${selected.id.slice(0, 8)})` : ''}

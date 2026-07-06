@@ -76,8 +76,10 @@ export default function Animations({ onOpenInStudio, routeId, onRoute }) {
   const crumb = animation && index.categories.find((c) => animation.id.startsWith(c.slug + '/'))?.name
 
   return (
-    <main className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_1fr]">
-      <aside className="panel flex min-h-0 flex-col overflow-hidden">
+    <main className="grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-3 p-3 lg:grid-cols-[300px_1fr] lg:grid-rows-1">
+      {/* En movil la columna de categorias se acota a media pantalla (la lista
+          scrollea por dentro) para que la vista previa quede al alcance. */}
+      <aside className="panel flex max-h-[45dvh] min-h-0 flex-col overflow-hidden lg:max-h-none">
         <div className="border-b border-line px-3 py-2"><span className="eyebrow">Animaciones</span></div>
         <div className="p-2.5">
           <Input type="search" placeholder="Buscar…" value={query}
@@ -115,7 +117,7 @@ export default function Animations({ onOpenInStudio, routeId, onRoute }) {
         </ul>
       </aside>
 
-      <section className="panel flex min-h-0 flex-col overflow-hidden" aria-label="vista previa">
+      <section className="panel flex min-h-[50dvh] flex-col overflow-hidden lg:min-h-0" aria-label="vista previa">
         {animation ? (
           <>
             <header className="border-b border-line px-4 py-3">

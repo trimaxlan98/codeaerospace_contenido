@@ -129,8 +129,10 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
+      {/* shrink-0 en tabs y secciones: sin el, se comprimen para caber en el
+          viewport y su contenido se pinta encima de la siguiente. */}
       <div role="tablist" aria-label="secciones de administración"
-        className="flex w-fit flex-wrap gap-1 rounded-lg border border-line bg-canvas/40 p-1">
+        className="flex w-fit shrink-0 flex-wrap gap-1 rounded-lg border border-line bg-canvas/40 p-1">
         {TABS.map((t) => {
           const on = tab === t.id
           return (
@@ -148,7 +150,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
 
       {tab === 'salud' && (
         <>
-          <section className="panel" aria-label="salud del sistema">
+          <section className="panel shrink-0" aria-label="salud del sistema">
             <PanelHead title="Salud del sistema"
               aside={metrics ? `load ${metrics.load.join(' / ')} · ${metrics.cpu_count} vCPU` : null} />
             {!metrics ? <p className="p-4 text-[13px] text-muted">Esperando telemetría…</p> : (
@@ -177,7 +179,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
             )}
           </section>
 
-          <section className="panel" aria-label="gráficas históricas">
+          <section className="panel shrink-0" aria-label="gráficas históricas">
             <PanelHead title="Historia · últimos 30 min" aside="banda ámbar = render activo" />
             {samples.length < 2 ? (
               <p className="p-4 text-[13px] text-muted">Acumulando historia… (una muestra cada pocos segundos)</p>
@@ -193,7 +195,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
       )}
 
       {tab === 'jobs' && (
-        <section className="panel" aria-label="gestión de jobs">
+        <section className="panel shrink-0" aria-label="gestión de jobs">
           <PanelHead title="Gestión de jobs"
             aside={`${done.length} ok · ${failed.length} fallidos · ${active.length} activos · tabla: últimos ${Math.min(25, jobs.length)}`} />
           <div className="flex flex-wrap gap-2 p-3.5 pb-2">
@@ -233,7 +235,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
 
       {tab === 'recursos' && (
         <>
-          <section className="panel" aria-label="almacenamiento">
+          <section className="panel shrink-0" aria-label="almacenamiento">
             <PanelHead title="Almacenamiento · render_jobs/" aside={`${done.length} videos`} />
             {storage && (
               <div className="p-4">
@@ -243,7 +245,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
             )}
           </section>
 
-          <section className="panel" aria-label="contenedores">
+          <section className="panel shrink-0" aria-label="contenedores">
             <PanelHead title="Contenedores Docker" aside="solo lectura · sin controles" />
             {containers === null || containers === undefined ? (
               <p className="p-4 text-[13px] text-muted">Telemetría de contenedores no disponible (runner desconectado).</p>

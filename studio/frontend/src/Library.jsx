@@ -94,7 +94,9 @@ export default function Library({ jobs, storage, onJobsChanged }) {
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
-      <section className="panel" aria-label="uso de disco">
+      {/* shrink-0: sin el, las secciones se comprimen para caber en el
+          viewport y su contenido se pinta encima de la siguiente. */}
+      <section className="panel shrink-0" aria-label="uso de disco">
         <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
           <span className="eyebrow">Biblioteca</span>
           <span className="font-mono text-[11px] text-faint">
@@ -109,7 +111,7 @@ export default function Library({ jobs, storage, onJobsChanged }) {
         )}
       </section>
 
-      <section className="panel" aria-label="videos renderizados">
+      <section className="panel shrink-0" aria-label="videos renderizados">
         {videos.length === 0 ? (
           <p className="p-4 text-[13px] text-muted">Sin videos todavía. Los renders exitosos aparecen aquí.</p>
         ) : (
@@ -148,7 +150,7 @@ export default function Library({ jobs, storage, onJobsChanged }) {
       </section>
 
       {failed.length > 0 && (
-        <section className="panel" aria-label="historial de fallos">
+        <section className="panel shrink-0" aria-label="historial de fallos">
           <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
             <span className="eyebrow">Fallidos / cancelados</span>
             <span className="font-mono text-[11px] text-faint">sin video · solo registro</span>

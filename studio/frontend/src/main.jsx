@@ -4,7 +4,7 @@ import '@fontsource-variable/inter'
 import '@fontsource-variable/space-grotesk'
 import '@fontsource-variable/jetbrains-mono'
 import './theme.css'   // sistema de diseño (Tailwind v4 + tokens)
-import './styles.css'  // legacy: vistas aun no migradas (Biblioteca/Aprender/Admin)
+import './styles.css'  // legacy: solo quedan .boot, .editor, .login__sky y .reader
 import App from './App.jsx'
 import { currentTheme, applyTheme } from './themes.js'
 
