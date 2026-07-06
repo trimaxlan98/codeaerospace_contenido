@@ -51,11 +51,22 @@ class AIRateLimiter:
 
 
 class Assistant:
-    def __init__(self, cfg: Settings) -> None:
+    def __init__(self, cfg: Settings, conocimiento=None) -> None:
         self.cfg = cfg
+        self.conocimiento = conocimiento  # Conocimiento del proyecto (opcional)
         self.limiter = AIRateLimiter(cfg.ai_rate_limit_per_min)
         self._client = None
         self._project_id: str | None = None
+
+    def _contexto_proyecto(self) -> str:
+        """Paquete de conocimiento (primitivas + convenciones) para que las
+        respuestas usen la biblioteca del canal en vez de inventar APIs."""
+        if self.conocimiento is None:
+            return ""
+        try:
+            return "\n\n" + self.conocimiento.contexto()
+        except Exception:
+            return ""  # el asistente debe funcionar aunque el paquete falle
 
     @property
     def enabled(self) -> bool:
@@ -134,7 +145,7 @@ class Assistant:
             "el estilo y la intencion del original; corrige solo lo necesario. "
             "Responde UNICAMENTE con el codigo Python dentro de un bloque "
             "```python```. Sin explicaciones fuera del bloque."
-        )
+        ) + self._contexto_proyecto()
         user = (f"SCRIPT:\n{_clip(script, MAX_SCRIPT_CHARS)}\n\n"
                 f"LOG DEL RENDER (final):\n{_clip_tail(logs, MAX_LOG_CHARS)}")
         text = await self._generate(self.cfg.gemini_model_deep, system, user)
@@ -142,13 +153,15 @@ class Assistant:
 
     async def generate(self, prompt: str) -> str:
         system = (
-            "Eres un experto en Manim Community Edition (v0.18+). El usuario "
-            "describe una animacion; devuelve un script manim completo y "
-            "autocontenido: `from manim import *`, una o mas clases Scene con "
-            "`construct`, sin dependencias externas, sin acceso a red ni a "
-            "archivos. Apunta a renders cortos (< 30 s de animacion). Responde "
-            "UNICAMENTE con el codigo dentro de un bloque ```python```."
-        )
+            "Eres un experto en Manim Community Edition (v0.20). El usuario "
+            "describe una animacion; devuelve un script manim completo: "
+            "`from manim import *`, UNA clase Scene con `construct`, sin "
+            "dependencias externas, sin acceso a red ni a archivos. Apunta a "
+            "renders cortos (10-20 s de animacion). Sigue la guia del "
+            "proyecto y USA sus primitivas cuando encajen (con las lineas de "
+            "sys.path del inicio). Responde UNICAMENTE con el codigo dentro "
+            "de un bloque ```python```."
+        ) + self._contexto_proyecto()
         text = await self._generate(self.cfg.gemini_model_deep, system,
                                     _clip(prompt, MAX_PROMPT_CHARS))
         return _extract_code(text)

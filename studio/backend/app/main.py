@@ -17,6 +17,7 @@ from .animations import AnimationStore
 from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
+from .conocimiento import Conocimiento
 from .db import Database
 from .fable import FableAssistant
 from .events import EventBus
@@ -35,7 +36,8 @@ runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
-assistant = Assistant(cfg)
+conocimiento = Conocimiento(cfg)
+assistant = Assistant(cfg, conocimiento)
 fable_assistant = FableAssistant(cfg)
 primitives_manager = PrimitiveManager(cfg, fable_assistant, manager, bus)
 lessons_store = LessonStore(cfg.lessons_dir)
