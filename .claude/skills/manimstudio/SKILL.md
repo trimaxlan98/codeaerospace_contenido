@@ -37,13 +37,13 @@ There is **no Docker container for the frontend**. The global `deploy-frontend` 
 ## Tests
 
 ```bash
-cd studio/backend && venv/bin/pytest -q      # 45 tests; the runner does NOT run in tests
+cd studio/backend && venv/bin/pytest -q      # 81 tests; the runner does NOT run in tests
 ```
 Tests reload `app*` modules per `tmp_path` (see `conftest.py`); the AI assistant is disabled unless a test creates the key and mocks `_call_model`. Tests that read a job's `scene.py` from disk must tolerate `FileNotFoundError` when the job is already `error` (the worker deletes the job dir on failure — a real race, not a flake).
 
 ## E2E against the running API (no password needed)
 
-The admin password only exists as a hash. Sign a session cookie with `MS_SECRET_KEY` from `studio/backend/.env`:
+The admin password only exists as a hash. Sign a session cookie with `MS_SECRET_KEY` from `/etc/manimstudio/env` (moved out of the repo tree so render containers can't read it; the systemd unit reads `EnvironmentFile` from there):
 
 ```python
 from itsdangerous import TimestampSigner
@@ -55,11 +55,14 @@ cookie = TimestampSigner(SECRET, salt="manimstudio-session").sign(f"{user}:{hex}
 
 - **`lifespan` shutdown is unreliable in prod.** With a Monitor open (SSE `/api/events`), uvicorn hangs draining on SIGTERM and systemd SIGKILLs at 90 s (`TimeoutStopUSec`) before the shutdown hook runs. So the metrics ring buffer is snapshotted **periodically** (`_metrics_loop`, ~120 s, `MS_METRICS_SNAPSHOT_INTERVAL`), not only at exit. Any other shutdown logic (`db.close`, etc.) suffers the same — don't rely on it.
 - **Render containers run as uid `manimstudio`** (`--user` + `HOME=/tmp`, constant `RUN_AS_ARGS` in `manim_runner.py`). If root-owned files reappear in `render_jobs/`, that flag was reverted and the backend can't delete `media/`.
-- **AI assistant is a feature-flag by file existence:** `studio/backend/gcp-key.json` (600, `manimstudio`, gitignored, GCP project `codeaerospace-tech`). No file → app works, AI UI hidden. Only Gemini 2.5 in `us-central1`.
+- **AI assistant is a feature-flag by file existence:** `/etc/manimstudio/gcp-key.json` (640, `root:manimstudio`, GCP project `codeaerospace-tech`). No file → app works, AI UI hidden. Only Gemini 2.5 in `us-central1`.
+- **Fable 5 primitives (Admin → Experimentación) is a feature-flag by env var:** `MS_ANTHROPIC_API_KEY` in `/etc/manimstudio/env`. Without it, `/api/primitives` returns 503 and the UI shows "no configurado". Proposals stage in `pending_primitives/` (gitignored); approved ones land in `studio/content/manim_extensions/` (git).
+- **The render container mounts the repo read-only** (`.:/workspace:ro`, `cap_drop: ALL`, rootfs `read_only`); only `render_jobs/<job_id>/` is mounted rw per invocation from `manim_runner.py`. If renders start failing with write errors, check the `-v job_mount` flag wasn't reverted.
+- **OpenGL headless renders work** (Mesa/EGL in the image) but require `--write_to_movie` — without it the OpenGL renderer exits 0 writing no video. The UI pipeline still uses Cairo by default.
 - **`JobManager.storage_usage()` is cached** (TTL 15 s), invalidated in `_finish` and `delete_job`; it does not walk the FS on every `GET /api/jobs`.
 - Config is env vars with prefix `MS_` (`studio/backend/app/config.py`); required: `MS_ADMIN_USER`, `MS_ADMIN_PASSWORD_HASH`, `MS_SECRET_KEY`.
 
 ## Hard rules
 
-- **NEVER commit** `.env`, `gcp-key.json`, `render_jobs/`, `manimstudio.db*`, or `metrics_history.json*` (all gitignored — keep it that way).
+- **NEVER commit** `.env`, `gcp-key.json`, `render_jobs/`, `pending_primitives/`, `manimstudio.db*`, or `metrics_history.json*` (all gitignored — keep it that way).
 - One **atomic commit per sprint**; commit subject lines **sin acentos**.
