@@ -11,6 +11,8 @@ import Animations from './Animations.jsx'
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
   const [aiEnabled, setAiEnabled] = useState(false)
+  const [fableEnabled, setFableEnabled] = useState(false)
+  const [primitives, setPrimitives] = useState([])
   const [view, setView] = useState('studio')
   const [pendingScript, setPendingScript] = useState(null)
   const [metrics, setMetrics] = useState(null)
@@ -34,12 +36,20 @@ export default function App() {
     } catch { /* la sesion pudo expirar; lo detecta el proximo request */ }
   }, [])
 
-  // Consulta /api/me: fija sesion y flag de IA en una sola pasada.
+  const refreshPrimitives = useCallback(async () => {
+    try {
+      const data = await api.listPrimitives()
+      setPrimitives(data.proposals)
+    } catch { /* fable puede estar deshabilitado o la sesion expiro */ }
+  }, [])
+
+  // Consulta /api/me: fija sesion y flags de IA en una sola pasada.
   const refreshMe = useCallback(async () => {
     try {
       const d = await api.me()
       setAuth(d.authenticated)
       setAiEnabled(Boolean(d.ai_enabled))
+      setFableEnabled(Boolean(d.fable_enabled))
     } catch {
       setAuth(false)
     }
@@ -51,6 +61,7 @@ export default function App() {
   useEffect(() => {
     if (auth !== true) return
     refreshJobs()
+    refreshPrimitives()
     const es = new EventSource('/api/events')
     esRef.current = es
     es.onmessage = (msg) => {
@@ -71,11 +82,16 @@ export default function App() {
             ? { jobId: ev.job_id, lines: [...prev.lines.slice(-4999), ev.line] }
             : { jobId: ev.job_id, lines: [ev.line] },
         )
+      } else if (ev.type === 'primitive') {
+        setPrimitives((prev) => {
+          const rest = prev.filter((p) => p.id !== ev.proposal.id)
+          return [ev.proposal, ...rest].sort((a, b) => b.created_at - a.created_at)
+        })
       }
     }
     es.onerror = () => { /* EventSource reintenta solo */ }
     return () => { es.close(); esRef.current = null }
-  }, [auth, refreshJobs])
+  }, [auth, refreshJobs, refreshPrimitives])
 
   if (auth === null) {
     return <div className="boot">CONECTANDO…</div>
@@ -117,7 +133,9 @@ export default function App() {
         <Animations onOpenInStudio={(script) => { setPendingScript(script); setView('studio') }} />
       ) : (
         <Admin metrics={metrics} containers={containers} jobs={jobs}
-          storage={storage} onJobsChanged={refreshJobs} />
+          storage={storage} onJobsChanged={refreshJobs}
+          fableEnabled={fableEnabled} primitives={primitives}
+          onPrimitivesChanged={refreshPrimitives} />
       )}
     </div>
   )

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { api } from './api.js'
 import { Chart, useHistory, GB } from './charts.jsx'
+import Primitives from './Primitives.jsx'
 
 const MB = 1024 ** 2
 
@@ -66,7 +67,8 @@ function Bar({ label, pct, detail, warnAt = 80 }) {
   )
 }
 
-export default function Admin({ metrics, containers, jobs, storage, onJobsChanged }) {
+export default function Admin({ metrics, containers, jobs, storage, onJobsChanged,
+  fableEnabled, primitives, onPrimitivesChanged }) {
   const samples = useHistory(metrics, containers)
   const now = metrics?.ts || Date.now() / 1000
   const [notice, setNotice] = useState('')
@@ -101,6 +103,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
           { id: 'salud', label: 'Salud' },
           { id: 'jobs', label: 'Jobs' },
           { id: 'recursos', label: 'Recursos' },
+          { id: 'experimentacion', label: 'Experimentación' },
         ].map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id}
             className={tab === t.id ? 'seg__opt seg__opt--on' : 'seg__opt'}
@@ -257,6 +260,11 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
         </p>
       </section>
         </>
+      )}
+
+      {tab === 'experimentacion' && (
+        <Primitives fableEnabled={fableEnabled} primitives={primitives}
+          jobs={jobs} onChanged={onPrimitivesChanged} />
       )}
     </main>
   )
