@@ -41,6 +41,13 @@ export const api = {
   getLesson: (id) => request('GET', `/api/lessons/${id}`),
   animationsIndex: () => request('GET', '/api/animations'),
   getAnimation: (id) => request('GET', `/api/animations/${id}`),
+  listPrimitives: () => request('GET', '/api/primitives'),
+  getPrimitive: (id) => request('GET', `/api/primitives/${id}`),
+  proposePrimitive: (payload) => request('POST', '/api/primitives', payload),
+  approvePrimitive: (id) => request('POST', `/api/primitives/${id}/approve`),
+  rejectPrimitive: (id) => request('POST', `/api/primitives/${id}/reject`),
+  iteratePrimitive: (id, feedback) =>
+    request('POST', `/api/primitives/${id}/iterate`, { feedback }),
 }
 
 export function videoUrl(id) {
