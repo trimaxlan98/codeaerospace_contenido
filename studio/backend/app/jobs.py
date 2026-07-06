@@ -277,6 +277,21 @@ class JobManager:
                 count += 1
         return count
 
+    def delete_finished_jobs(self) -> tuple[int, int]:
+        """Borra todo el historial (done/error/timeout/cancelled), videos
+        incluidos. Los jobs activos no se tocan.
+
+        Devuelve (conteo, bytes liberados segun size_bytes registrado).
+        """
+        count = freed = 0
+        for job in self.db.list_jobs(limit=100_000):
+            if job["status"] not in ACTIVE_STATES:
+                size = job.get("size_bytes") or 0
+                if self.delete_job(job["id"]):
+                    count += 1
+                    freed += size
+        return count, freed
+
     def delete_jobs_older_than(self, days: int) -> tuple[int, int]:
         """Borra jobs 'done' terminados hace mas de `days` dias.
 

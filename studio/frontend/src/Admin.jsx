@@ -122,6 +122,8 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
   }
 
   const clearFailed = () => run(api.deleteFailedJobs, (r) => `${r.deleted} job(s) fallidos eliminados.`)
+  const clearHistory = () => run(api.deleteFinishedJobs,
+    (r) => `${r.deleted} render(s) borrados · ${fmtSize(r.freed_bytes)} liberados.`)
   const purge = (days) => run(() => api.purgeJobsOlderThan(days),
     (r) => `${r.deleted} render(s) purgados · ${fmtSize(r.freed_bytes)} liberados.`)
 
@@ -193,11 +195,13 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
       {tab === 'jobs' && (
         <section className="panel" aria-label="gestión de jobs">
           <PanelHead title="Gestión de jobs"
-            aside={`${done.length} ok · ${failed.length} fallidos · ${active.length} activos`} />
+            aside={`${done.length} ok · ${failed.length} fallidos · ${active.length} activos · tabla: últimos ${Math.min(25, jobs.length)}`} />
           <div className="flex flex-wrap gap-2 p-3.5 pb-2">
             <ArmedButton label={`Eliminar fallidos (${failed.length})`} confirmLabel="¿Confirmar?" onFire={clearFailed} />
             <ArmedButton label="Purgar renders > 30 días" confirmLabel="¿Confirmar purga?" onFire={() => purge(30)} />
             <ArmedButton label="Purgar renders > 7 días" confirmLabel="¿Confirmar purga?" onFire={() => purge(7)} />
+            <ArmedButton label={`Vaciar historial (${done.length + failed.length})`}
+              confirmLabel="¿Borrar todo (videos incl.)?" onFire={clearHistory} />
           </div>
           {notice && <p role="status" className="px-3.5 pb-1 text-[12.5px] text-muted">{notice}</p>}
           <div className="overflow-x-auto p-1">

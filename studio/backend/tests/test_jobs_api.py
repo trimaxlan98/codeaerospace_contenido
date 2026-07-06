@@ -170,6 +170,48 @@ def test_purga_valida_rango_de_dias(authed):
     assert authed.delete("/api/jobs/older-than/0").status_code == 422
 
 
+def test_vaciar_historial_borra_terminados_pero_no_activos(authed):
+    ok = _seed_job("done", size=700)
+    fallido = _seed_job("error")
+    cancelado = _seed_job("cancelled")
+    activo = _seed_job("queued")
+    r = authed.delete("/api/jobs/finished")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["deleted"] == 3
+    assert body["freed_bytes"] == 700
+    ids = {j["id"] for j in authed.get("/api/jobs").json()["jobs"]}
+    assert activo in ids
+    assert not {ok, fallido, cancelado} & ids
+
+
+def test_retry_crea_job_nuevo_con_el_mismo_script(authed):
+    viejo = _seed_job("error")
+    r = authed.post(f"/api/jobs/{viejo}/retry")
+    assert r.status_code == 201
+    nuevo = r.json()
+    assert nuevo["id"] != viejo
+    assert nuevo["scene"] == "Escena"
+    assert nuevo["quality"] == "ql"
+    src = authed.get(f"/api/jobs/{nuevo['id']}/script").json()
+    assert src["script"] == "class Escena: pass"
+
+
+def test_retry_rechaza_jobs_activos_y_desconocidos(authed):
+    activo = _seed_job("queued")
+    assert authed.post(f"/api/jobs/{activo}/retry").status_code == 409
+    assert authed.post("/api/jobs/deadbeef00000000/retry").status_code == 404
+
+
+def test_listado_no_oculta_jobs_viejos(authed):
+    """El limite del listado debe superar con holgura los 50 historicos."""
+    ids = {_seed_job("done") for _ in range(60)}
+    listed = {j["id"] for j in authed.get("/api/jobs").json()["jobs"]}
+    assert ids <= listed
+
+
 def test_bulk_requiere_auth(client):
     assert client.delete("/api/jobs/failed").status_code == 401
     assert client.delete("/api/jobs/older-than/30").status_code == 401
+    assert client.delete("/api/jobs/finished").status_code == 401
+    assert client.post("/api/jobs/aaaabbbbccccdddd/retry").status_code == 401

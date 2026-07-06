@@ -145,8 +145,13 @@ Renderizar esté deshabilitado, y añadir "Vaciar historial" + purga con días l
    `App.jsx`), rutas `#/estudio|biblioteca|aprender/<id>|animaciones/<id>|admin/<tab>` con
    atrás/adelante y deep-links, y editor/escena/calidad/timeout persistidos en localStorage
    (sobreviven F5). Verificado con QA Playwright (15 checks funcionales).
-2. **Cola:** separar activa/historial, motivo visible del botón deshabilitado, Reintentar,
-   Vaciar historial, y subir/paginar el límite de 50 para que Biblioteca no oculte videos.
+2. ~~**Cola:** separar activa/historial, motivo visible del botón deshabilitado, Reintentar,
+   Vaciar historial, y subir/paginar el límite de 50 para que Biblioteca no oculte videos.~~ —
+   **hecho 2026-07-06**: tira dividida en Cola (running/queued con posición `#n` y Cancelar) e
+   Historial (Reintentar, Borrar en dos toques, Vaciar historial); eliminado el límite invisible
+   de 1 encolado y el doble-submit; nuevos `DELETE /api/jobs/finished` y
+   `POST /api/jobs/{id}/retry`; listado sube de 50 a 500 (`JOBS_LIST_LIMIT`) para que la
+   Biblioteca no oculte videos que consumen cuota. 73 tests backend + QA Playwright.
 3. **P0-2/P0-3** layout móvil + `shrink-0`.
 4. **Animaciones/Aprender:** acordeón o grid de tarjetas + búsqueda global.
 5. **P0-4/P0-6** (401 → login, indicador de conexión, ErrorBoundary) + toasts de fin de render.

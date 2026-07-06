@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
-import { Play, Sparkles, Wrench, Download, FileCode, X } from 'lucide-react'
+import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X } from 'lucide-react'
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -88,10 +88,31 @@ function Segmented({ options, value, onChange, ariaLabel }) {
   )
 }
 
-// Ficha de la tira de cola. Div interactivo (el boton Cancelar anida dentro).
-function JobChip({ job, selected, onSelect, onCancel }) {
+// Accion secundaria dentro de una ficha (no dispara el onSelect del chip).
+function ChipAction({ onClick, danger, title, children }) {
+  return (
+    <button type="button" title={title}
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      className={cn(
+        'inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-muted transition-colors',
+        danger ? 'hover:bg-err/10 hover:text-err' : 'hover:bg-surface-2 hover:text-ink',
+      )}>
+      {children}
+    </button>
+  )
+}
+
+// Ficha de la tira de renders. Div interactivo (las acciones anidan dentro).
+// queuePos: posicion 1-based entre los encolados (solo status=queued).
+function JobChip({ job, selected, onSelect, onCancel, onRetry, onDelete, queuePos }) {
   const m = STATUS_META[job.status] || STATUS_META.default
   const active = ['queued', 'running'].includes(job.status)
+  const [arming, setArming] = useState(false)
+  useEffect(() => {
+    if (!arming) return
+    const t = setTimeout(() => setArming(false), 3500)
+    return () => clearTimeout(t)
+  }, [arming])
   return (
     <div
       role="button"
@@ -106,7 +127,9 @@ function JobChip({ job, selected, onSelect, onCancel }) {
       <div className="flex items-center gap-2">
         <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot, job.status === 'running' && 'animate-pulse')} />
         <span className="truncate font-mono text-[13px] text-ink">{job.scene}</span>
-        <span className={cn('ml-auto shrink-0 font-mono text-[10px] uppercase tracking-wide', m.text)}>{m.label}</span>
+        <span className={cn('ml-auto shrink-0 font-mono text-[10px] uppercase tracking-wide', m.text)}>
+          {job.status === 'queued' && queuePos ? `en cola #${queuePos}` : m.label}
+        </span>
       </div>
       <div className="flex items-center gap-1.5 pl-4 font-mono text-[11px] text-muted">
         <span>{job.quality}</span>
@@ -114,14 +137,52 @@ function JobChip({ job, selected, onSelect, onCancel }) {
         <span>{fmtTime(job.created_at)}</span>
         {duration(job) && (<><span className="text-faint">·</span><span>{duration(job)}</span></>)}
       </div>
-      {active && (
-        <button type="button"
-          onClick={(e) => { e.stopPropagation(); onCancel(job.id) }}
-          className="mt-0.5 inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-muted transition-colors hover:bg-err/10 hover:text-err">
+      {active ? (
+        <ChipAction danger onClick={() => onCancel(job.id)}>
           <X className="h-3 w-3" /> Cancelar
-        </button>
+        </ChipAction>
+      ) : (
+        <div className="mt-0.5 flex items-center gap-1">
+          <ChipAction onClick={() => onRetry(job.id)} title="volver a renderizar con el mismo script">
+            <RotateCcw className="h-3 w-3" /> Reintentar
+          </ChipAction>
+          {arming ? (
+            <ChipAction danger onClick={() => { setArming(false); onDelete(job.id) }}
+              title={job.status === 'done' ? 'borra tambien el video' : 'borrar del historial'}>
+              ¿Confirmar?
+            </ChipAction>
+          ) : (
+            <ChipAction danger onClick={() => setArming(true)}
+              title={job.status === 'done' ? 'borra tambien el video' : 'borrar del historial'}>
+              <Trash2 className="h-3 w-3" /> Borrar
+            </ChipAction>
+          )}
+        </div>
       )}
     </div>
+  )
+}
+
+// Vaciar historial en dos toques; borra tambien los videos, y se dice.
+function ClearHistoryButton({ count, onFire }) {
+  const [arming, setArming] = useState(false)
+  useEffect(() => {
+    if (!arming) return
+    const t = setTimeout(() => setArming(false), 4000)
+    return () => clearTimeout(t)
+  }, [arming])
+  return arming ? (
+    <span className="inline-flex items-center gap-1.5">
+      <Button size="xs" variant="danger" onClick={() => { setArming(false); onFire() }}>
+        ¿Borrar {count} (videos incluidos)?
+      </Button>
+      <Button size="xs" variant="ghost" onClick={() => setArming(false)}>No</Button>
+    </span>
+  ) : (
+    <Button size="xs" variant="ghost" onClick={() => setArming(true)}
+      title="borra todos los renders terminados, videos incluidos">
+      <Trash2 className="h-3.5 w-3.5" /> Vaciar historial
+    </Button>
   )
 }
 
@@ -140,6 +201,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     return t >= 30 && t <= 1800 ? t : 600
   })
   const [submitError, setSubmitError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [selectedLogs, setSelectedLogs] = useState([])
   const [aiOpen, setAiOpen] = useState(false)
@@ -209,17 +271,53 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
 
   const submit = useCallback(async () => {
     setSubmitError('')
+    setSubmitting(true) // evita el doble encolado por doble clic
     try {
       const job = await api.createJob({ script, scene, quality, timeout: Number(timeoutS) })
       setSelectedId(job.id)
       onJobsChanged()
     } catch (err) {
       setSubmitError(err.message)
+    } finally {
+      setSubmitting(false)
     }
   }, [script, scene, quality, timeoutS, onJobsChanged])
 
   const cancel = async (id) => {
     try { await api.cancelJob(id) } catch { /* ya termino */ }
+  }
+
+  const retry = async (id) => {
+    setSubmitError('')
+    try {
+      const job = await api.retryJob(id)
+      setSelectedId(job.id)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
+  }
+
+  const removeJob = async (id) => {
+    setSubmitError('')
+    try {
+      await api.deleteJob(id)
+      if (selectedId === id) setSelectedId(null)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
+  }
+
+  const clearHistory = async () => {
+    setSubmitError('')
+    try {
+      await api.deleteFinishedJobs()
+      setSelectedId(null)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
   }
 
   const loadScript = async (id) => {
@@ -229,8 +327,25 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     } catch { /* sin script */ }
   }
 
-  const canSubmit = scenes.includes(scene) && !jobs.some((j) => j.status === 'queued')
+  const canSubmit = scenes.includes(scene) && !submitting
+  const submitHint = !scenes.includes(scene)
+    ? 'Define una Scene valida en el script para renderizar'
+    : 'Encolar el render (se ejecutan de a uno)'
   const errorish = selected && ['error', 'timeout'].includes(selected.status)
+
+  // Tira inferior: cola activa (running + queued en orden de ejecucion) y
+  // historial reciente por separado — antes se mezclaban bajo un solo rotulo.
+  const activeJobs = jobs
+    .filter((j) => ['queued', 'running'].includes(j.status))
+    .sort((a, b) => a.created_at - b.created_at)
+  const queuedIds = activeJobs.filter((j) => j.status === 'queued').map((j) => j.id)
+  const historyJobs = jobs.filter((j) => !['queued', 'running'].includes(j.status))
+  const queueLabel = activeJobs.length === 0
+    ? 'libre'
+    : [
+        activeJobs.some((j) => j.status === 'running') && '1 renderizando',
+        queuedIds.length > 0 && `${queuedIds.length} en espera`,
+      ].filter(Boolean).join(' · ')
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 p-3">
@@ -270,8 +385,9 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                   <Sparkles className="h-4 w-4" /> Asistente
                 </Button>
               )}
-              <Button variant="primary" size="sm" onClick={submit} disabled={!canSubmit}>
-                <Play className="h-4 w-4" /> Renderizar
+              <Button variant="primary" size="sm" onClick={submit} disabled={!canSubmit}
+                title={submitHint}>
+                <Play className="h-4 w-4" /> {submitting ? 'Encolando…' : 'Renderizar'}
               </Button>
             </div>
           </div>
@@ -347,21 +463,38 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
         </aside>
       </div>
 
-      {/* ── Tira de cola (horizontal, sin scroll vertical diminuto) ── */}
+      {/* ── Tira inferior: cola activa + historial reciente ── */}
       <div className="panel shrink-0 overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-line px-3 py-1.5">
-          <span className="eyebrow">Cola de renders</span>
-          <span className="font-mono text-[11px] text-faint">{jobs.length}</span>
+        <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-1.5">
+          <span className="eyebrow">Cola</span>
+          <span className="font-mono text-[11px] text-faint">{queueLabel}</span>
+          <span className="mx-1 h-4 w-px bg-line" aria-hidden="true" />
+          <span className="eyebrow">Historial</span>
+          <span className="font-mono text-[11px] text-faint">{historyJobs.length}</span>
+          {historyJobs.length > 0 && (
+            <span className="ml-auto">
+              <ClearHistoryButton count={historyJobs.length} onFire={clearHistory} />
+            </span>
+          )}
         </div>
         {jobs.length === 0 ? (
           <p className="px-3 py-3 text-[13px] text-muted">
             Sin renders todavía. Escribe una escena y pulsa Renderizar.
           </p>
         ) : (
-          <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
-            {jobs.slice(0, 20).map((j) => (
+          <div className="flex items-stretch gap-2 overflow-x-auto px-3 py-2.5">
+            {activeJobs.map((j) => (
               <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+                queuePos={j.status === 'queued' ? queuedIds.indexOf(j.id) + 1 : null}
                 onSelect={() => setSelectedId(j.id)} onCancel={cancel} />
+            ))}
+            {activeJobs.length > 0 && historyJobs.length > 0 && (
+              <span className="mx-1 w-px shrink-0 self-stretch bg-line" aria-hidden="true" />
+            )}
+            {historyJobs.slice(0, 20).map((j) => (
+              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+                onSelect={() => setSelectedId(j.id)}
+                onCancel={cancel} onRetry={retry} onDelete={removeJob} />
             ))}
           </div>
         )}

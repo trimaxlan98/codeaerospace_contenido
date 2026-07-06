@@ -27,6 +27,11 @@ from .scenes import detect_scenes
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 
+# Techo del listado de jobs. Con el limite historico de 50, los renders mas
+# viejos desaparecian de la Biblioteca pero seguian contando contra la cuota
+# de disco; 500 cubre con holgura el uso real de un solo usuario.
+JOBS_LIST_LIMIT = 500
+
 cfg = get_settings()
 db = Database(cfg.db_path)
 bus = EventBus()
@@ -166,6 +171,11 @@ async def create_job(body: JobBody, _=Depends(require_auth)):
     if body.scene not in available:
         raise HTTPException(status_code=422,
                             detail=f"La escena '{body.scene}' no existe en el script")
+    _check_quota()
+    return manager.create_job(body.script, body.scene, body.quality, timeout)
+
+
+def _check_quota() -> None:
     quota = cfg.max_storage_mb * 1024 * 1024
     used = manager.storage_usage()
     if used >= quota:
@@ -174,7 +184,6 @@ async def create_job(body: JobBody, _=Depends(require_auth)):
             detail=(f"Almacenamiento lleno: {used / 2**20:.0f} MB usados de "
                     f"{cfg.max_storage_mb} MB. Borra videos de la Biblioteca "
                     "para liberar espacio."))
-    return manager.create_job(body.script, body.scene, body.quality, timeout)
 
 
 def _storage_public() -> dict:
@@ -185,7 +194,7 @@ def _storage_public() -> dict:
 @app.get("/api/jobs")
 async def list_jobs(_=Depends(require_auth)):
     return {"jobs": [job_public(j) | {"script_len": j.get("script_len")}
-                     for j in db.list_jobs()],
+                     for j in db.list_jobs(limit=JOBS_LIST_LIMIT)],
             "current": manager.current_job_id,
             "storage": _storage_public()}
 
@@ -252,6 +261,24 @@ async def delete_failed_jobs(_=Depends(require_auth)):
     """Borra en lote todos los jobs error/timeout/cancelled."""
     deleted = manager.delete_failed_jobs()
     return {"deleted": deleted, "storage": _storage_public()}
+
+
+@app.delete("/api/jobs/finished")
+async def delete_finished_jobs(_=Depends(require_auth)):
+    """Vacia el historial completo (terminados, videos incluidos)."""
+    deleted, freed = manager.delete_finished_jobs()
+    return {"deleted": deleted, "freed_bytes": freed, "storage": _storage_public()}
+
+
+@app.post("/api/jobs/{job_id}/retry", status_code=201)
+async def retry_job(job_id: str, _=Depends(require_auth)):
+    """Reencola un job terminado con su mismo script/escena/calidad/timeout."""
+    job = _get_job_or_404(job_id)
+    if job["status"] in ("queued", "running"):
+        raise HTTPException(status_code=409, detail="El job ya esta activo")
+    _check_quota()
+    return manager.create_job(job["script"], job["scene"], job["quality"],
+                              job["timeout"])
 
 
 @app.delete("/api/jobs/older-than/{days}")
