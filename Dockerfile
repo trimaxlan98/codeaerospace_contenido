@@ -21,6 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # Cairo / pkg-config (required by pycairo / manim)
     pkg-config \
     libcairo2-dev \
+    # OpenGL headless (Mesa/EGL): permite --renderer=opengl sin GPU/display
+    libgl1-mesa-glx \
+    libegl1-mesa \
+    libglu1-mesa \
     # Build utilities
     build-essential \
     git \
