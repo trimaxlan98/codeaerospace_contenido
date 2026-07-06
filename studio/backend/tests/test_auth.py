@@ -8,8 +8,7 @@ def test_login_ok_sets_cookie(client):
     assert r.status_code == 200
     assert "ms_session" in r.cookies
     r2 = client.get("/api/me")
-    assert r2.json() == {"authenticated": True, "user": "tester", "ai_enabled": False,
-                         "fable_enabled": False}
+    assert r2.json() == {"authenticated": True, "user": "tester", "ai_enabled": False}
 
 
 def test_login_bad_password(client):

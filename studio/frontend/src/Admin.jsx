@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { api } from './api.js'
 import { Chart, useHistory, GB } from './charts.jsx'
-import Primitives from './Primitives.jsx'
 import { Button } from './components/ui/button.jsx'
 import { cn } from '@/lib/utils'
 
@@ -90,11 +89,9 @@ const TABS = [
   { id: 'salud', label: 'Salud' },
   { id: 'jobs', label: 'Jobs' },
   { id: 'recursos', label: 'Recursos' },
-  { id: 'experimentacion', label: 'Experimentación' },
 ]
 
-export default function Admin({ metrics, containers, jobs, storage, onJobsChanged,
-  fableEnabled, primitives, onPrimitivesChanged }) {
+export default function Admin({ metrics, containers, jobs, storage, onJobsChanged }) {
   const samples = useHistory(metrics, containers)
   const now = metrics?.ts || Date.now() / 1000
   const [notice, setNotice] = useState('')
@@ -272,11 +269,6 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
             </p>
           </section>
         </>
-      )}
-
-      {tab === 'experimentacion' && (
-        <Primitives fableEnabled={fableEnabled} primitives={primitives}
-          jobs={jobs} onChanged={onPrimitivesChanged} />
       )}
     </main>
   )

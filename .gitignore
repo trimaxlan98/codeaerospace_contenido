@@ -31,7 +31,6 @@ Thumbs.db
 
 # ManimStudio
 render_jobs/
-pending_primitives/
 studio/backend/.env
 studio/backend/manimstudio.db*
 studio/frontend/node_modules/
