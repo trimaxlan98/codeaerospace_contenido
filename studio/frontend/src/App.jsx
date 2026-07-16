@@ -10,6 +10,7 @@ import Admin from './Admin.jsx'
 import Library from './Library.jsx'
 import Lessons from './Lessons.jsx'
 import Animations from './Animations.jsx'
+import StarfieldBackground from './components/StarfieldBackground.jsx'
 
 const TOAST_META = {
   done: { label: 'listo', dot: 'bg-ok', text: 'text-ok' },
@@ -165,7 +166,8 @@ export default function App() {
   return (
     // Shell responsive: en movil la pagina scrollea (min-h) y cada vista fija
     // alturas minimas por panel; en lg+ vuelve el layout de viewport fijo.
-    <div className="flex min-h-dvh flex-col lg:h-dvh">
+    <div className="flex min-h-dvh flex-col lg:h-dvh relative">
+      <StarfieldBackground />
       <Header
         view={view}
         onView={navigate}

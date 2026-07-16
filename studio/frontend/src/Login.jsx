@@ -5,6 +5,8 @@ import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Button } from './components/ui/button.jsx'
 import { cn } from '@/lib/utils'
+import { GlowCard } from './components/GlowCard.jsx'
+
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('')
@@ -36,10 +38,13 @@ export default function Login({ onLogin }) {
       <div aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,var(--canvas)_100%)] opacity-80" />
 
-      <form
+      <GlowCard
+        as="form"
         onSubmit={submit}
+        customSize={true}
+        glowColor="purple"
         className={cn(
-          'relative z-[1] w-[min(400px,100%)] rounded-2xl border border-white/10 bg-surface/65 p-8',
+          'relative z-[1] w-[min(400px,100%)] p-8',
           'shadow-[0_24px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl',
           'animate-in fade-in slide-in-from-bottom-3 duration-500',
           error && 'animate-shake',
@@ -90,7 +95,7 @@ export default function Login({ onLogin }) {
             {busy ? 'Verificando…' : 'Entrar'}
           </Button>
         </div>
-      </form>
+      </GlowCard>
     </div>
   )
 }

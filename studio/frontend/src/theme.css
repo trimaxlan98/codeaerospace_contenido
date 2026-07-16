@@ -35,57 +35,139 @@
 }
 
 @layer base {
-  /* ── Orbital — sala de control (por defecto) ── */
+  /* ── Liquid Glass — default ── */
   :root {
-    --canvas: #0a0d13;
-    --surface: #111620;
-    --surface-2: #161c28;
-    --line: #232b3a;
-    --line-strong: #323c50;
+    --canvas: #030712;
+    --surface: rgba(23, 23, 23, 0.05);
+    --surface-2: rgba(23, 23, 23, 0.1);
+    --line: transparent;                     /* No borders for seamless glassmorphism */
+    --line-strong: transparent;
     --ink: #e6eaf2;
     --muted: #8a97ad;
     --faint: #5c6a80;
-    --accent: #f2b347;      /* firma: oro orbital */
-    --accent-ink: #1a1403;  /* tinta sobre acento */
-    --cyan: #56c7df;        /* datos / telemetria */
-    --ok: #4ed08a;
-    --warn: #f2a93b;
-    --err: #f0655f;
-    --grad-a: #0a1220;
-    --grad-b: #101c33;
-    --grad-c: #17263f;
-    --star-1: #2c4266;
-    --star-2: #223753;
+    --accent: #00d8f6;      /* signature: Liquid Cyan */
+    --accent-ink: #020617;
+    --cyan: #3b82f6;
+    --ok: #10b981;
+    --warn: #f59e0b;
+    --err: #f43f5e;
+    --grad-a: #030712;
+    --grad-b: #0a122c;
+    --grad-c: #111e43;
+    --star-1: rgba(56, 189, 248, 0.15);
+    --star-2: rgba(99, 102, 241, 0.2);
+    
+    /* Neon shaders active background config */
+    --glow-primary: rgba(59, 130, 246, 0.12);   /* Indigo glow */
+    --glow-secondary: rgba(6, 182, 212, 0.12);  /* Cyan glow */
+    --glow-tertiary: rgba(99, 102, 241, 0.08);   /* Purple glow */
+    
+    --glass-bg: rgba(23, 23, 23, 0.05);
+    --glass-blur: blur(25px) saturate(100%);
+    --glass-shadow-glow: rgba(0, 0, 0, 0.35);
+    --glass-inset: rgba(255, 255, 255, 0.06);
     color-scheme: dark;
   }
 
+  /* ── Emerald Glass — ion ── */
   [data-theme="ion"] {
-    --canvas: #04121c; --surface: #082030; --surface-2: #0a2839;
-    --line: #14405a; --line-strong: #1e5473; --ink: #d6ecf7; --muted: #6d94a8; --faint: #4a6b7e;
-    --accent: #2fd4ff; --accent-ink: #04121c; --cyan: #45e0c0;
-    --ok: #45e0a0; --warn: #ffc86b; --err: #ff7a7a;
-    --grad-a: #051624; --grad-b: #082b40; --grad-c: #0b3550;
-    --star-1: #1e4e6e; --star-2: #17405c;
+    --canvas: #010c08;
+    --surface: rgba(6, 40, 24, 0.05);
+    --surface-2: rgba(6, 40, 24, 0.1);
+    --line: transparent;
+    --line-strong: transparent;
+    --ink: #dcfce7;
+    --muted: #6ebd93;
+    --faint: #438e62;
+    --accent: #10b981;      /* signature: Emerald Mint */
+    --accent-ink: #022c22;
+    --cyan: #34d399;
+    --ok: #34d399;
+    --warn: #f59e0b;
+    --err: #ff6b6b;
+    --grad-a: #010c08;
+    --grad-b: #042618;
+    --grad-c: #063922;
+    --star-1: rgba(16, 185, 129, 0.15);
+    --star-2: rgba(52, 211, 153, 0.2);
+
+    /* Neon shaders active background config */
+    --glow-primary: rgba(16, 185, 129, 0.1);
+    --glow-secondary: rgba(52, 211, 153, 0.08);
+    --glow-tertiary: rgba(5, 150, 105, 0.06);
+
+    --glass-bg: rgba(6, 40, 24, 0.05);
+    --glass-blur: blur(25px) saturate(100%);
+    --glass-shadow-glow: rgba(0, 0, 0, 0.4);
+    --glass-inset: rgba(255, 255, 255, 0.06);
     color-scheme: dark;
   }
 
+  /* ── Nebula Glass — nebula ── */
   [data-theme="nebula"] {
-    --canvas: #0d0716; --surface: #150d24; --surface-2: #1a1130;
-    --line: #2e2050; --line-strong: #3d2b68; --ink: #e6dcf5; --muted: #8d7fae; --faint: #62557f;
-    --accent: #b388ff; --accent-ink: #0d0716; --cyan: #ff8fd4;
-    --ok: #63c98a; --warn: #e8b84b; --err: #e86a6a;
-    --grad-a: #0e0819; --grad-b: #1d1033; --grad-c: #241243;
-    --star-1: #4a3a70; --star-2: #382a58;
+    --canvas: #06010d;
+    --surface: rgba(21, 13, 36, 0.05);
+    --surface-2: rgba(21, 13, 36, 0.1);
+    --line: transparent;
+    --line-strong: transparent;
+    --ink: #f3e8ff;
+    --muted: #a78bfa;
+    --faint: #7c3aed;
+    --accent: #d946ef;      /* signature: Electric Magenta */
+    --accent-ink: #0d0716;
+    --cyan: #a855f7;
+    --ok: #10b981;
+    --warn: #e8b84b;
+    --err: #e86a6a;
+    --grad-a: #06010d;
+    --grad-b: #190a2c;
+    --grad-c: #2a1144;
+    --star-1: rgba(168, 85, 247, 0.15);
+    --star-2: rgba(217, 70, 239, 0.2);
+
+    /* Neon shaders active background config */
+    --glow-primary: rgba(168, 85, 247, 0.12);
+    --glow-secondary: rgba(217, 70, 239, 0.1);
+    --glow-tertiary: rgba(124, 58, 237, 0.08);
+
+    --glass-bg: rgba(21, 13, 36, 0.05);
+    --glass-blur: blur(25px) saturate(100%);
+    --glass-shadow-glow: rgba(0, 0, 0, 0.4);
+    --glass-inset: rgba(255, 255, 255, 0.06);
     color-scheme: dark;
   }
 
+  /* ── Ice Glass — daylight ── */
   [data-theme="daylight"] {
-    --canvas: #f2efe7; --surface: #ffffff; --surface-2: #f7f4ee;
-    --line: #e3dccd; --line-strong: #d0c8b6; --ink: #23221e; --muted: #736e60; --faint: #a29c8b;
-    --accent: #a56a12; --accent-ink: #ffffff; --cyan: #1f6f8b;
-    --ok: #2f9e60; --warn: #b4771f; --err: #c0453f;
-    --grad-a: #eee9dd; --grad-b: #e6eef2; --grad-c: #f4eee1;
-    --star-1: transparent; --star-2: transparent;
+    --canvas: #f1f5f9;
+    --surface: rgba(255, 255, 255, 0.25);
+    --surface-2: rgba(255, 255, 255, 0.4);
+    --line: transparent;
+    --line-strong: transparent;
+    --ink: #0f172a;
+    --muted: #475569;
+    --faint: #94a3b8;
+    --accent: #0ea5e9;      /* signature: Frosted Ice Sky */
+    --accent-ink: #ffffff;
+    --cyan: #0284c7;
+    --ok: #10b981;
+    --warn: #ca8a04;
+    --err: #ef4444;
+    --grad-a: #f1f5f9;
+    --grad-b: #e2e8f0;
+    --grad-c: #cbd5e1;
+    --star-1: rgba(14, 165, 233, 0.1);
+    --star-2: rgba(2, 132, 199, 0.15);
+
+    /* Neon shaders active background config */
+    --glow-primary: rgba(56, 189, 248, 0.25);
+    --glow-secondary: rgba(14, 165, 233, 0.15);
+    --glow-tertiary: rgba(255, 255, 255, 0.95);
+
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-blur: blur(25px) saturate(100%);
+    --glass-shadow-glow: rgba(15, 23, 42, 0.04);
+    --glass-inset: rgba(255, 255, 255, 0.35);
     color-scheme: light;
   }
 
@@ -103,13 +185,17 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: "cv05", "ss01";
     transition: background-color .3s ease, color .3s ease;
-    /* campo de estrellas sutil y estatico */
+    
+    /* Neon shaders dynamic active liquid gradients */
     background-image:
+      radial-gradient(circle at 10% 15%, var(--glow-primary) 0%, transparent 45%),
+      radial-gradient(circle at 90% 85%, var(--glow-secondary) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, var(--glow-tertiary) 0%, transparent 40%),
       radial-gradient(1px 1px at 12% 28%, var(--star-1) 50%, transparent 51%),
-      radial-gradient(1px 1px at 68% 12%, var(--star-1) 50%, transparent 51%),
       radial-gradient(1.5px 1.5px at 84% 64%, var(--star-2) 50%, transparent 51%),
       radial-gradient(1px 1px at 38% 82%, var(--star-2) 50%, transparent 51%),
       radial-gradient(1px 1px at 55% 45%, var(--star-2) 50%, transparent 51%);
+    background-attachment: fixed;
   }
 
   /* Scrollbars finos y con tema — clave para que deje de sentirse "hecho a mano". */
@@ -136,9 +222,45 @@
 
 /* ── Utilidades de composicion reutilizables ─────────────────────────────── */
 @utility panel {
-  background-color: var(--surface);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
+  box-shadow: 0px 16px 60px 0 var(--glass-shadow-glow),
+    inset 0px 0px 4px 2px var(--glass-inset);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reflection highlights (two-layer overlay) on all panels */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  /* angled edge reflection */
+  background: linear-gradient(to left top, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 50%);
+  z-index: 1;
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  /* subtle top-to-bottom sheen */
+  background: linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+  z-index: 1;
 }
 
 /* Eyebrow: etiqueta breve en mono, el rotulo del sistema de "instrumento". */
