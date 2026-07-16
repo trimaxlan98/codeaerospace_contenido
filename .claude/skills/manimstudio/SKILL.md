@@ -37,7 +37,7 @@ There is **no Docker container for the frontend**. The global `deploy-frontend` 
 ## Tests
 
 ```bash
-cd studio/backend && venv/bin/pytest -q      # 69 tests; the runner does NOT run in tests
+cd studio/backend && venv/bin/pytest -q      # 111 tests; the runner does NOT run in tests
 ```
 Tests reload `app*` modules per `tmp_path` (see `conftest.py`); the AI assistant is disabled unless a test creates the key and mocks `_call_model`. Tests that read a job's `scene.py` from disk must tolerate `FileNotFoundError` when the job is already `error` (the worker deletes the job dir on failure — a real race, not a flake).
 
@@ -57,6 +57,7 @@ cookie = TimestampSigner(SECRET, salt="manimstudio-session").sign(f"{user}:{hex}
 - **Render containers run as uid `manimstudio`** (`--user` + `HOME=/tmp`, constant `RUN_AS_ARGS` in `manim_runner.py`). If root-owned files reappear in `render_jobs/`, that flag was reverted and the backend can't delete `media/`.
 - **AI assistant is a feature-flag by file existence:** `/etc/manimstudio/gcp-key.json` (640, `root:manimstudio`, GCP project `codeaerospace-tech`). No file → app works, AI UI hidden. Only Gemini 2.5 in `us-central1`.
 - **There is NO Anthropic/Fable API integration.** The curated primitives in `studio/content/manim_extensions/` were written directly (not via API) and are read-only content consumed by `conocimiento.py` and the Animaciones demos. The old Fable-by-API flow (`/api/primitives`, Admin → Experimentación, `MS_ANTHROPIC_API_KEY`) was removed 2026-07-06 — do not reintroduce it.
+- **Animaciones has web-create (2026-07-16):** `POST /api/animations/categories` and `POST /api/animations` write into `studio/content/` (AST-validated, files land untracked in git). This needs `ReadWritePaths` covering `studio/content/animations` + `studio/content/lessons` in the backend unit and `manimstudio` ownership of those paths — if creation starts failing with 500s, check neither was reverted. Edit/delete remains git-only.
 - **The render container mounts the repo read-only** (`.:/workspace:ro`, `cap_drop: ALL`, rootfs `read_only`); only `render_jobs/<job_id>/` is mounted rw per invocation from `manim_runner.py`. If renders start failing with write errors, check the `-v job_mount` flag wasn't reverted.
 - **OpenGL headless renders work** (Mesa/EGL in the image) but require `--write_to_movie` — without it the OpenGL renderer exits 0 writing no video. The UI pipeline still uses Cairo by default.
 - **`JobManager.storage_usage()` is cached** (TTL 15 s), invalidated in `_finish` and `delete_job`; it does not walk the FS on every `GET /api/jobs`.

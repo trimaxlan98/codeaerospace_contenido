@@ -3,12 +3,14 @@
 // sobre todo el indice — antes cada busqueda solo filtraba la categoria activa.
 
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Plus } from 'lucide-react'
 import { Input } from './ui/input.jsx'
 import { cn } from '@/lib/utils'
 
+// onAddCategory / onAddItem son opcionales: Animaciones los pasa para el alta
+// web de secciones/animaciones; Aprender no, y su UI queda identica.
 export default function CategoryBrowser({ title, categories, itemsOf, searchText,
-  renderItem, activeId, onOpen }) {
+  renderItem, activeId, onOpen, onAddCategory, onAddItem }) {
   const [query, setQuery] = useState('')
   // null = el acordeon sigue a la categoria del item abierto; '' = todo plegado.
   const [expanded, setExpanded] = useState(null)
@@ -39,7 +41,15 @@ export default function CategoryBrowser({ title, categories, itemsOf, searchText
 
   return (
     <>
-      <div className="border-b border-line px-3 py-2"><span className="eyebrow">{title}</span></div>
+      <div className="flex items-center justify-between border-b border-line px-3 py-2">
+        <span className="eyebrow">{title}</span>
+        {onAddCategory && (
+          <button onClick={onAddCategory} title="Nueva sección"
+            className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] text-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+            <Plus className="h-3.5 w-3.5" /> Sección
+          </button>
+        )}
+      </div>
       <div className="p-2.5 pb-2">
         <Input type="search" placeholder="Buscar en todo…" value={query}
           onChange={(e) => setQuery(e.target.value)} aria-label={`buscar en ${title}`} />
@@ -77,6 +87,14 @@ export default function CategoryBrowser({ title, categories, itemsOf, searchText
                   {on && (
                     <ul className="mb-1 ml-[15px] space-y-0.5 border-l border-line pl-1.5 pt-0.5">
                       {itemsOf(c).map((it) => <li key={it.id}>{itemButton(it)}</li>)}
+                      {onAddItem && (
+                        <li>
+                          <button onClick={() => onAddItem(c)}
+                            className="flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-[12.5px] text-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+                            <Plus className="h-3.5 w-3.5 shrink-0" /> Añadir animación
+                          </button>
+                        </li>
+                      )}
                     </ul>
                   )}
                 </li>

@@ -324,9 +324,44 @@ async def lesson_detail(lesson_id: str, _=Depends(require_auth)):
 
 # ── biblioteca de animaciones ─────────────────────────────────────────────────
 
+class AnimationCategoryBody(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+
+
+class AnimationCreateBody(BaseModel):
+    category: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=120)
+    script: str
+
+
 @app.get("/api/animations")
 async def animations_index(_=Depends(require_auth)):
     return animations_store.index()
+
+
+@app.post("/api/animations/categories", status_code=201)
+async def create_animation_category(body: AnimationCategoryBody,
+                                    _=Depends(require_auth)):
+    try:
+        return animations_store.create_category(body.name)
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@app.post("/api/animations", status_code=201)
+async def create_animation(body: AnimationCreateBody, _=Depends(require_auth)):
+    _check_script(body.script)
+    try:
+        return animations_store.create_animation(body.category, body.title,
+                                                 body.script)
+    except LookupError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 
 @app.get("/api/animations/{animation_id:path}")

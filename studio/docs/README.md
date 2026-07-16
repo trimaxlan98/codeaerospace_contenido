@@ -88,6 +88,26 @@ Decisiones clave (y por qué):
 - El frontend renderiza el Markdown con `marked` + `dompurify` (sanitizado) y las fórmulas
   con `katex`; todo autocontenido, sin CDN. El lector añade ~270 KB min al bundle.
 
+### Biblioteca de animaciones (pestaña «Animaciones»)
+
+- Scripts Manim ejecutables en `studio/content/animations/<categoria>/<NN>-<slug>.py`,
+  versionados en git. Comparten `categories.yaml` con las lecciones; el título y el orden
+  se toman de la lección homónima cuando existe (si no, se derivan del slug).
+- **Alta web** (auth obligatoria): desde la pestaña se pueden añadir secciones nuevas y
+  animaciones a una sección; editar/borrar sigue siendo por git.
+  - `POST /api/animations/categories` `{name}` — crea la sección: añade la entrada a
+    `categories.yaml` (escritura atómica) y crea su directorio. 409 si el slug ya existe.
+  - `POST /api/animations` `{category, title, script}` — valida el script por AST (debe
+    definir al menos una escena; nunca se ejecuta) y escribe `<NN>-<slug>.py` con el
+    siguiente `NN` libre. 404 si la sección no existe, 422 si el script no vale.
+  - Los archivos creados quedan como *untracked* en el árbol de git hasta que se
+    commiteen; el índice (`GET /api/animations`) los sirve al instante (cache por mtime).
+- El índice marca cada categoría con `has_dir`: la pestaña muestra las que tienen
+  animaciones o directorio propio (p. ej. recién creadas, aún vacías) y oculta las
+  solo-lecciones del curso de Manim.
+- Requiere que el servicio pueda escribir en `studio/content/animations` y
+  `studio/content/lessons` (`ReadWritePaths` en la unit + ownership `manimstudio`).
+
 ### Monitoreo histórico (pestaña «Monitoreo»)
 
 - Ring buffer en memoria (`deque`, ~30 min al intervalo configurado; 450 muestras a 4 s)

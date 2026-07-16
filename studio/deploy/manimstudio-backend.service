@@ -19,7 +19,9 @@ NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
-ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospace_contenido/studio/backend /var/www/codeaerospace_contenido/pending_primitives /var/www/codeaerospace_contenido/studio/content/manim_extensions
+# animations y lessons: alta web de secciones/animaciones (escribe
+# <categoria>/<NN>-<slug>.py y categories.yaml). manim_extensions solo se lee.
+ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospace_contenido/studio/backend /var/www/codeaerospace_contenido/studio/content/animations /var/www/codeaerospace_contenido/studio/content/lessons
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictSUIDSGID=yes
