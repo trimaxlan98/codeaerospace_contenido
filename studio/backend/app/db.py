@@ -26,12 +26,41 @@ CREATE TABLE IF NOT EXISTS jobs (
     finished_at REAL
 );
 CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS projects (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    quality TEXT NOT NULL,
+    style_block TEXT DEFAULT '',
+    created_at REAL NOT NULL,
+    updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS clips (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL REFERENCES projects(id),
+    position INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    script TEXT NOT NULL DEFAULT '',
+    scene TEXT DEFAULT '',
+    final_state TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    job_id TEXT,
+    rendered_hash TEXT,
+    created_at REAL NOT NULL,
+    updated_at REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_clips_project ON clips(project_id, position);
 """
 
 # Migraciones aditivas (ALTER TABLE ADD COLUMN es no destructivo en SQLite).
 MIGRATIONS = (
     ("size_bytes", "ALTER TABLE jobs ADD COLUMN size_bytes INTEGER"),
     ("thumb_path", "ALTER TABLE jobs ADD COLUMN thumb_path TEXT"),
+    ("project_id", "ALTER TABLE jobs ADD COLUMN project_id TEXT"),
+    ("clip_id", "ALTER TABLE jobs ADD COLUMN clip_id TEXT"),
+    ("content_hash", "ALTER TABLE jobs ADD COLUMN content_hash TEXT"),
 )
 
 
@@ -109,3 +138,109 @@ class Database:
     def close(self) -> None:
         with self._lock:
             self._conn.close()
+
+    # ── proyectos ────────────────────────────────────────────────────────────
+
+    def insert_project(self, p: dict) -> None:
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO projects (id, name, description, quality, style_block,"
+                " created_at, updated_at)"
+                " VALUES (:id, :name, :description, :quality, :style_block,"
+                " :created_at, :updated_at)",
+                p,
+            )
+            self._conn.commit()
+
+    def get_project(self, pid: str) -> dict | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM projects WHERE id = ?", (pid,)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def list_projects(self) -> list[dict]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT * FROM projects ORDER BY updated_at DESC"
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def update_project(self, pid: str, **fields) -> None:
+        if not fields:
+            return
+        cols = ", ".join(f"{k} = :{k}" for k in fields)
+        fields["id"] = pid
+        with self._lock:
+            self._conn.execute(f"UPDATE projects SET {cols} WHERE id = :id", fields)
+            self._conn.commit()
+
+    def delete_project(self, pid: str) -> None:
+        with self._lock:
+            self._conn.execute("DELETE FROM clips WHERE project_id = ?", (pid,))
+            self._conn.execute("DELETE FROM projects WHERE id = ?", (pid,))
+            self._conn.commit()
+
+    # ── clips ────────────────────────────────────────────────────────────────
+
+    def insert_clip(self, c: dict) -> None:
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO clips (id, project_id, position, title, script, scene,"
+                " final_state, notes, job_id, rendered_hash, created_at, updated_at)"
+                " VALUES (:id, :project_id, :position, :title, :script, :scene,"
+                " :final_state, :notes, :job_id, :rendered_hash, :created_at, :updated_at)",
+                c,
+            )
+            self._conn.commit()
+
+    def get_clip(self, cid: str) -> dict | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM clips WHERE id = ?", (cid,)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def list_clips(self, pid: str) -> list[dict]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT * FROM clips WHERE project_id = ? ORDER BY position", (pid,)
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def update_clip(self, cid: str, **fields) -> None:
+        if not fields:
+            return
+        cols = ", ".join(f"{k} = :{k}" for k in fields)
+        fields["id"] = cid
+        with self._lock:
+            self._conn.execute(f"UPDATE clips SET {cols} WHERE id = :id", fields)
+            self._conn.commit()
+
+    def delete_clip(self, cid: str) -> None:
+        with self._lock:
+            self._conn.execute("DELETE FROM clips WHERE id = ?", (cid,))
+            self._conn.commit()
+
+    def clip_job_ids(self) -> set[str]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT job_id FROM clips WHERE job_id IS NOT NULL"
+            ).fetchall()
+        return {r["job_id"] for r in rows}
+
+    def clips_unlink_job(self, job_id: str) -> None:
+        with self._lock:
+            self._conn.execute(
+                "UPDATE clips SET job_id = NULL, rendered_hash = NULL WHERE job_id = ?",
+                (job_id,),
+            )
+            self._conn.commit()
+
+    def renumber_clips(self, pid: str, ordered_ids: list[str]) -> None:
+        with self._lock:
+            self._conn.executemany(
+                "UPDATE clips SET position = ? WHERE id = ? AND project_id = ?",
+                [(i, cid, pid) for i, cid in enumerate(ordered_ids)],
+            )
+            self._conn.commit()
