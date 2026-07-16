@@ -7,19 +7,33 @@ crea `db`/`manager`/`service` y llama a `make_router(cfg, db, manager,
 service)` despues.
 """
 
+import json
+import os
 import re
+import tempfile
+import zipfile
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
+from starlette.background import BackgroundTask
 
 from .auth import require_auth
 from .db import Database
 from .jobs import JobManager
 from .projects import (QUALITIES, ProjectService, clip_public, compose_script,
-                       content_hash, style_offset)
+                       content_hash, project_slug, style_offset)
 from .scenes import detect_scenes
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
+
+
+def _public_manifest(manifest: dict) -> dict:
+    """Quita los campos internos (`video_path`, `job_id`) del manifiesto."""
+    clips = [{k: v for k, v in c.items() if k not in ("video_path", "job_id")}
+             for c in manifest["clips"]]
+    return {**manifest, "clips": clips}
 
 
 # ── modelos ───────────────────────────────────────────────────────────────────
@@ -275,5 +289,69 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService)
             queued.append(job["id"])
 
         return {"queued": queued, "skipped": skipped}
+
+    # ── exportacion ──────────────────────────────────────────────────────────
+
+    def _jobs_for_project(pid: str) -> dict[str, dict]:
+        jobs: dict[str, dict] = {}
+        for clip in db.list_clips(pid):
+            job_id = clip.get("job_id")
+            if job_id and job_id not in jobs:
+                job = db.get_job(job_id)
+                if job:
+                    jobs[job_id] = job
+        return jobs
+
+    @router.get("/{pid}/export")
+    async def export_project(pid: str, _=Depends(require_auth)):
+        _require_project(pid)
+        manifest = service.export_full_manifest(pid, _jobs_for_project(pid))
+        return _public_manifest(manifest)
+
+    @router.get("/{pid}/archive")
+    async def archive_project(pid: str, _=Depends(require_auth)):
+        project = _require_project(pid)
+        manifest = service.export_full_manifest(pid, _jobs_for_project(pid))
+        video_clips = [c for c in manifest["clips"] if c["has_video"]]
+        if not video_clips:
+            raise HTTPException(
+                status_code=404,
+                detail="El proyecto no tiene ningun clip con video vigente")
+
+        public_manifest = _public_manifest(manifest)
+
+        tmp = tempfile.NamedTemporaryFile(delete=False, dir=tempfile.gettempdir(),
+                                          suffix=".zip")
+        tmp_path = tmp.name
+        tmp.close()
+        try:
+            with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_STORED) as zf:
+                for clip in video_clips:
+                    video = Path(clip["video_path"]).resolve()
+                    # Misma defensa en profundidad que /api/jobs/{id}/video: el
+                    # video debe vivir dentro del directorio del job.
+                    job_dir = (cfg.render_jobs_dir / clip["job_id"]).resolve()
+                    if not video.is_file() or job_dir not in video.parents:
+                        continue  # desaparecio a mitad de la exportacion: se salta
+                    zf.write(video, arcname=clip["filename"])
+                zf.writestr("concat.txt",
+                            "".join(f"{line}\n" for line in manifest["concat"]))
+                zf.writestr("manifest.json",
+                            json.dumps(public_manifest, indent=2, ensure_ascii=False))
+                zf.writestr(
+                    "LEEME.txt",
+                    "Para unir los clips de este curso en un solo video:\n\n"
+                    "  ffmpeg -f concat -safe 0 -i concat.txt -c copy curso.mp4\n")
+        except BaseException:
+            # Si el zip revienta a mitad (disco lleno, fallo leyendo un mp4...),
+            # el tempfile queda huerfano porque el BackgroundTask que lo borra
+            # solo se agenda si llegamos a construir el FileResponse.
+            Path(tmp_path).unlink(missing_ok=True)
+            raise
+
+        filename = f"{project_slug(project['name'])}.zip"
+        return FileResponse(tmp_path, media_type="application/zip",
+                            filename=filename,
+                            background=BackgroundTask(os.unlink, tmp_path))
 
     return router

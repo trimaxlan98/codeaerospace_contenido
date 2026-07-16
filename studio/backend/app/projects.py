@@ -68,6 +68,11 @@ def _slugify(title: str) -> str:
     return slug or "clip"
 
 
+def project_slug(name: str) -> str:
+    """Slug de nombre de proyecto, para el nombre de archivo del zip."""
+    return _slugify(name)
+
+
 def clip_public(clip: dict) -> dict:
     """Vista del clip sin el script completo (evita respuestas pesadas)."""
     public = {k: v for k, v in clip.items() if k != "script"}
@@ -277,4 +282,77 @@ class ProjectService:
             "resolution": spec["resolution"],
             "fps": spec["fps"],
             "clips": items,
+        }
+
+    def export_full_manifest(self, pid: str, jobs_by_id: dict[str, dict]) -> dict:
+        """Manifiesto completo del curso, para los endpoints /export y /archive.
+
+        A diferencia de `export_manifest` (uso interno del Sprint 1, que solo
+        lista clips con render vigente), este incluye TODOS los clips del
+        proyecto -- con o sin render, vigente o no -- para que la UI y el zip
+        de exportacion puedan mostrar el estado completo del curso. `has_video`
+        solo es `True` si el clip tiene un render vigente (no `stale`) con
+        video asociado: un clip desactualizado no entra en `concat` aunque su
+        video anterior siga en disco.
+        """
+        project = self.db.get_project(pid)
+        if not project:
+            raise ValueError("proyecto no encontrado")
+        spec = QUALITY_SPECS[project["quality"]]
+
+        clips = []
+        concat = []
+        for clip in self.db.list_clips(pid):
+            job_id = clip.get("job_id")
+            expected = content_hash(project["style_block"], clip.get("script") or "",
+                                    clip.get("scene") or "")
+            has_render = bool(job_id)
+            stale = has_render and clip.get("rendered_hash") != expected
+            job = jobs_by_id.get(job_id) if job_id else None
+            # Alineado con /api/jobs/{id}/video (main.py): solo cuenta como
+            # video vigente si el job terminó en "done" (evita ofrecer un
+            # video_path de un job aún en curso o fallido).
+            has_video = bool(job and job.get("status") == "done"
+                             and job.get("video_path") and not stale)
+            filename = f"{clip['position'] + 1:03d}-{_slugify(clip['title'])}.mp4"
+
+            duration_s = None
+            size_bytes = None
+            video_path = None
+            if has_video:
+                started = job.get("started_at")
+                finished = job.get("finished_at")
+                if started is not None and finished is not None:
+                    duration_s = finished - started
+                size_bytes = job.get("size_bytes")
+                video_path = job.get("video_path")
+
+            clips.append({
+                "position": clip["position"],
+                "title": clip["title"],
+                "scene": clip.get("scene") or "",
+                "filename": filename,
+                "has_video": has_video,
+                "duration_s": duration_s,
+                "size_bytes": size_bytes,
+                "stale": stale,
+                # Internos, no forman parte del manifiesto publico (se
+                # descartan antes de responder / escribir manifest.json):
+                "video_path": video_path,
+                "job_id": job_id if has_video else None,
+            })
+            if has_video:
+                concat.append(f"file '{filename}'")
+
+        return {
+            "project": {
+                "id": project["id"],
+                "name": project["name"],
+                "description": project["description"],
+                "quality": project["quality"],
+            },
+            "specs": spec,
+            "generated_at": time.time(),
+            "clips": clips,
+            "concat": concat,
         }
