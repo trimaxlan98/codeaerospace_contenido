@@ -1,6 +1,9 @@
 """Autenticacion de ManimStudio: usuario unico, cookie firmada, anti fuerza bruta.
 
-- Password verificada contra hash bcrypt sembrado por variable de entorno.
+- Usuario fijado por variable de entorno (MS_ADMIN_USER); password mutable
+  en la fila unica de la tabla `auth` de la DB (sembrada al arrancar desde
+  MS_ADMIN_PASSWORD_HASH como valor de emergencia/instalacion inicial).
+  Cambiar la password no requiere reiniciar el servicio.
 - Sesion: token firmado con itsdangerous (TimestampSigner) en cookie
   httpOnly + Secure + SameSite=Strict. SameSite=Strict + API solo-JSON
   actua ademas como defensa CSRF para esta app de un solo usuario.
@@ -8,6 +11,9 @@
   bloquea el login durante un periodo fijo. La comparacion de usuario usa
   secrets.compare_digest y ante usuario inexistente se verifica igualmente
   un hash dummy para no filtrar por timing.
+- `must_change_password`: flag en la misma fila; el middleware de main.py
+  bloquea toda la API (salvo login/logout/me/change-password/health)
+  mientras este activo, para forzar el cambio en el primer login.
 """
 
 import secrets
@@ -94,14 +100,36 @@ def client_ip(request: Request) -> str:
     return request.headers.get("x-real-ip") or (request.client.host if request.client else "?")
 
 
-def verify_credentials(cfg: Settings, username: str, password: str) -> bool:
+def verify_credentials(cfg: Settings, db, username: str, password: str) -> bool:
     user_ok = secrets.compare_digest(username.encode(), cfg.admin_user.encode())
-    target_hash = cfg.admin_password_hash.encode() if user_ok else _DUMMY_HASH
+    auth_row = db.get_auth() if user_ok else None
+    target_hash = auth_row["password_hash"].encode() if auth_row else _DUMMY_HASH
     try:
         pass_ok = bcrypt.checkpw(password.encode(), target_hash)
     except ValueError:
         pass_ok = False
     return user_ok and pass_ok
+
+
+MIN_PASSWORD_LEN = 8
+
+
+def change_password(db, current_password: str, new_password: str) -> None:
+    """Verifica la password actual y guarda la nueva; limpia must_change_password.
+
+    Lanza ValueError (-> 422 en la API) con un mensaje seguro de mostrar al
+    usuario en cualquier caso invalido.
+    """
+    auth_row = db.get_auth()
+    if not auth_row or not bcrypt.checkpw(current_password.encode(),
+                                          auth_row["password_hash"].encode()):
+        raise ValueError("La contraseña actual no es correcta")
+    if len(new_password) < MIN_PASSWORD_LEN:
+        raise ValueError(f"La contraseña nueva debe tener al menos {MIN_PASSWORD_LEN} caracteres")
+    if secrets.compare_digest(new_password.encode(), current_password.encode()):
+        raise ValueError("La contraseña nueva debe ser distinta de la actual")
+    new_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt(rounds=12)).decode()
+    db.set_password(new_hash, must_change_password=False)
 
 
 def _signer(cfg: Settings) -> TimestampSigner:

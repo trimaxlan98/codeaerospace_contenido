@@ -4,6 +4,7 @@ import { api, setUnauthorizedHandler } from './api.js'
 import { useRoute } from './router.js'
 import { cn } from '@/lib/utils'
 import Login from './Login.jsx'
+import ChangePassword from './ChangePassword.jsx'
 import Header from './Header.jsx'
 import Studio from './Studio.jsx'
 import Admin from './Admin.jsx'
@@ -22,6 +23,7 @@ const TOAST_META = {
 
 export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
+  const [mustChangePassword, setMustChangePassword] = useState(false)
   const [aiEnabled, setAiEnabled] = useState(false)
   const [route, navigate] = useRoute()
   const view = route.view
@@ -81,6 +83,7 @@ export default function App() {
       const d = await api.me()
       setAuth(d.authenticated)
       setAiEnabled(Boolean(d.ai_enabled))
+      setMustChangePassword(Boolean(d.must_change_password))
     } catch {
       setAuth(false)
     }
@@ -90,7 +93,7 @@ export default function App() {
 
   // Stream SSE unico: metricas + estados de job + logs en vivo.
   useEffect(() => {
-    if (auth !== true) return
+    if (auth !== true || mustChangePassword) return
     refreshJobs()
     lastEventRef.current = Date.now()
     setStaleSince(null)
@@ -135,7 +138,7 @@ export default function App() {
       setStaleSince(Date.now() - lastEventRef.current > 10_000 ? lastEventRef.current : null)
     }, 3000)
     return () => { clearInterval(staleTimer); es.close(); esRef.current = null }
-  }, [auth, refreshJobs, refreshMe, pushToast])
+  }, [auth, mustChangePassword, refreshJobs, refreshMe, pushToast])
 
   const rendering = jobs.some((j) => j.status === 'running')
 
@@ -147,11 +150,18 @@ export default function App() {
       : 'ManimStudio · coderesearch.space'
   }, [rendering])
 
+  const logout = async () => {
+    try { await api.logout() } finally { setAuth(false); setMustChangePassword(false) }
+  }
+
   if (auth === null) {
     return <div className="boot">CONECTANDO…</div>
   }
   if (auth === false) {
     return <Login onLogin={refreshMe} />
+  }
+  if (mustChangePassword) {
+    return <ChangePassword onChanged={refreshMe} onLogout={logout} />
   }
 
   const lastFinished = jobs.find((j) => !['queued', 'running'].includes(j.status))
@@ -160,10 +170,6 @@ export default function App() {
     : lastFinished && ['error', 'timeout'].includes(lastFinished.status)
       ? 'error'
       : 'idle'
-
-  const logout = async () => {
-    try { await api.logout() } finally { setAuth(false) }
-  }
 
   // display:contents mantiene al <main> de cada vista como hijo directo del
   // flex del shell; hidden (display:none) lo saca de layout sin desmontarlo.

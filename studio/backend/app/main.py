@@ -8,13 +8,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import metrics
 from .ai import AIError, Assistant
 from .animations import AnimationStore
-from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
+from .auth import (change_password as auth_change_password, client_ip,
+                   clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
 from .conocimiento import Conocimiento
@@ -36,6 +37,7 @@ JOBS_LIST_LIMIT = 500
 
 cfg = get_settings()
 db = Database(cfg.db_path)
+db.ensure_auth_seed(cfg.admin_password_hash)
 bus = EventBus()
 runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
@@ -64,6 +66,26 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
 app.include_router(make_projects_router(cfg, db, manager, service))
+
+# Endpoints que deben seguir accesibles con must_change_password activo: sin
+# ellos el usuario quedaria atrapado sin poder ni cambiar la password ni
+# salir. Todo lo demas bajo /api/ se bloquea con 403 hasta que la cambie.
+_PASSWORD_GATE_EXEMPT = {"/api/login", "/api/logout", "/api/me",
+                        "/api/change-password", "/api/health"}
+
+
+@app.middleware("http")
+async def _enforce_password_change(request: Request, call_next):
+    path = request.url.path
+    if (path.startswith("/api/") and path not in _PASSWORD_GATE_EXEMPT
+            and session_valid(cfg, request)):
+        auth_row = db.get_auth()
+        if auth_row and auth_row["must_change_password"]:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Debes cambiar la contraseña antes de continuar",
+                        "code": "PASSWORD_CHANGE_REQUIRED"})
+    return await call_next(request)
 
 
 async def _metrics_loop() -> None:
@@ -99,6 +121,11 @@ class LoginBody(BaseModel):
     password: str = Field(max_length=256)
 
 
+class ChangePasswordBody(BaseModel):
+    current_password: str = Field(min_length=1, max_length=256)
+    new_password: str = Field(min_length=1, max_length=256)
+
+
 class ScenesBody(BaseModel):
     script: str
 
@@ -120,12 +147,14 @@ async def login(body: LoginBody, request: Request, response: Response):
     if wait > 0:
         raise HTTPException(status_code=429,
                             detail=f"Demasiados intentos. Espera {int(wait)} s.")
-    if not verify_credentials(cfg, body.username, body.password):
+    if not verify_credentials(cfg, db, body.username, body.password):
         limiter.record_failure(ip)
         raise HTTPException(status_code=401, detail="Credenciales invalidas")
     limiter.record_success(ip)
     create_session(cfg, response)
-    return {"ok": True, "user": cfg.admin_user}
+    auth_row = db.get_auth()
+    return {"ok": True, "user": cfg.admin_user,
+            "must_change_password": bool(auth_row and auth_row["must_change_password"])}
 
 
 @app.post("/api/logout")
@@ -137,9 +166,20 @@ async def logout(response: Response, _=Depends(require_auth)):
 @app.get("/api/me")
 async def me(request: Request):
     if session_valid(cfg, request):
+        auth_row = db.get_auth()
         return {"authenticated": True, "user": cfg.admin_user,
-                "ai_enabled": assistant.enabled}
+                "ai_enabled": assistant.enabled,
+                "must_change_password": bool(auth_row and auth_row["must_change_password"])}
     return {"authenticated": False}
+
+
+@app.post("/api/change-password")
+async def change_password(body: ChangePasswordBody, _=Depends(require_auth)):
+    try:
+        auth_change_password(db, body.current_password, body.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"ok": True}
 
 
 # ── escenas y jobs ────────────────────────────────────────────────────────────

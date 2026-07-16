@@ -52,6 +52,17 @@ CREATE TABLE IF NOT EXISTS clips (
     updated_at REAL NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_clips_project ON clips(project_id, position);
+
+-- Fila unica (id=1): password vigente + flag de cambio obligatorio. Vive en
+-- la DB (mutable) en vez de en /etc/manimstudio/env (solo lectura para el
+-- proceso, ver ReadOnlyPaths/ProtectSystem del unit) para poder cambiarla
+-- desde /api/change-password sin reiniciar el servicio.
+CREATE TABLE IF NOT EXISTS auth (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    password_hash TEXT NOT NULL,
+    must_change_password INTEGER NOT NULL DEFAULT 0,
+    updated_at REAL NOT NULL
+);
 """
 
 # Migraciones aditivas (ALTER TABLE ADD COLUMN es no destructivo en SQLite).
@@ -143,6 +154,40 @@ class Database:
     def close(self) -> None:
         with self._lock:
             self._conn.close()
+
+    # ── autenticacion (password mutable + flag de cambio obligatorio) ─────────
+
+    def ensure_auth_seed(self, password_hash: str) -> None:
+        """Siembra la fila unica de auth desde el hash de entorno la primera vez.
+
+        Solo inserta si la tabla esta vacia: no pisa una password ya cambiada
+        por el usuario en una instalacion existente. must_change_password
+        arranca en 0 (comportamiento historico); forzar el cambio en un
+        usuario concreto es una operacion explicita via set_password().
+        """
+        with self._lock:
+            row = self._conn.execute("SELECT 1 FROM auth WHERE id = 1").fetchone()
+            if row is None:
+                self._conn.execute(
+                    "INSERT INTO auth (id, password_hash, must_change_password, updated_at)"
+                    " VALUES (1, ?, 0, ?)",
+                    (password_hash, time.time()),
+                )
+                self._conn.commit()
+
+    def get_auth(self) -> dict | None:
+        with self._lock:
+            row = self._conn.execute("SELECT * FROM auth WHERE id = 1").fetchone()
+        return dict(row) if row else None
+
+    def set_password(self, password_hash: str, must_change_password: bool) -> None:
+        with self._lock:
+            self._conn.execute(
+                "UPDATE auth SET password_hash = ?, must_change_password = ?, updated_at = ?"
+                " WHERE id = 1",
+                (password_hash, int(must_change_password), time.time()),
+            )
+            self._conn.commit()
 
     # ── proyectos ────────────────────────────────────────────────────────────
 

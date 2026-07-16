@@ -29,6 +29,8 @@ export const api = {
   me: () => request('GET', '/api/me'),
   login: (username, password) => request('POST', '/api/login', { username, password }),
   logout: () => request('POST', '/api/logout'),
+  changePassword: (currentPassword, newPassword) => request('POST', '/api/change-password',
+    { current_password: currentPassword, new_password: newPassword }),
   scenes: (script) => request('POST', '/api/scenes', { script }),
   createJob: (payload) => request('POST', '/api/jobs', payload),
   listJobs: () => request('GET', '/api/jobs'),

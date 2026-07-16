@@ -4,7 +4,8 @@ Consola web privada (un solo usuario) para renderizar escenas de Manim Community
 contenedor Docker existente de `codeaerospace_contenido`, con biblioteca de videos,
 monitoreo en tiempo real e histórico del VPS y asistente IA de depuración (Vertex AI).
 
-**URL:** https://coderesearch.space · **Usuario:** `admin` · **Password:** `/root/.manimstudio_admin_password`
+**URL:** https://coderesearch.space · **Usuario:** `alanrosasp` · la password vigente vive en
+la DB (tabla `auth`, ver «Autenticación y cambio de contraseña» más abajo), no en un archivo.
 
 ## Arquitectura
 
@@ -226,9 +227,27 @@ journalctl -u manimstudio-runner -f                       # logs renders/docker
 systemctl restart manimstudio-backend                     # reinicio (jobs activos → error)
 ```
 
-- Config del backend: `studio/backend/.env` (chmod 600). Cambiar password:
+- Config del backend: `EnvironmentFile=/etc/manimstudio/env` (chmod 640, `root:manimstudio`),
+  fuera del árbol del repo (ver `.claude/skills/manimstudio/SKILL.md`).
+
+### Autenticación y cambio de contraseña
+
+- **Usuario único** fijado por `MS_ADMIN_USER` en `/etc/manimstudio/env` — cambiarlo exige
+  editar el archivo y `systemctl restart manimstudio-backend`.
+- **Password mutable en runtime**: vive en la fila única de la tabla `auth` de la DB
+  (`app/db.py`), no en el env. `MS_ADMIN_PASSWORD_HASH` solo actúa como semilla la primera
+  vez que arranca el backend (`db.ensure_auth_seed`); tras eso la DB manda.
+- **Cambio de password desde la UI**: `POST /api/change-password` (autenticado) con
+  `current_password` + `new_password` (mínimo 8 caracteres, distinta de la actual).
+  `app/auth.py::change_password` reverifica la actual con bcrypt antes de guardar la nueva.
+- **Forzar el cambio en el primer login de una cuenta nueva**: poner a mano
+  `must_change_password=1` en esa fila (p. ej. `Database.set_password(hash, True)`, o UPDATE
+  directo). Un middleware en `main.py` (`_enforce_password_change`) bloquea con 403
+  `PASSWORD_CHANGE_REQUIRED` toda la API bajo `/api/` salvo login/logout/me/change-password/
+  health mientras el flag siga activo; el frontend muestra `ChangePassword.jsx` en vez de la
+  app hasta que se limpia. Restablecer el hash sin querer forzar el cambio:
   `venv/bin/python -c "import bcrypt;print(bcrypt.hashpw(b'NUEVA', bcrypt.gensalt(12)).decode())"`
-  → pegar en `MS_ADMIN_PASSWORD_HASH` → `systemctl restart manimstudio-backend`.
+  → `Database(...).set_password(hash, must_change_password=False)`.
 - Rebuild frontend: `cd studio/frontend && npm ci && npx vite build` (nginx sirve `dist/` al instante).
 - Artefactos de renders: `render_jobs/<job_id>/` (script + media + thumb.jpg + render.log).
   Limpieza normal: pestaña Biblioteca (o `DELETE /api/jobs/<id>`); borra fila + directorio.

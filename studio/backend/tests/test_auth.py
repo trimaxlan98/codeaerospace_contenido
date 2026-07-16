@@ -6,9 +6,11 @@ from .conftest import TEST_PASSWORD
 def test_login_ok_sets_cookie(client):
     r = client.post("/api/login", json={"username": "tester", "password": TEST_PASSWORD})
     assert r.status_code == 200
+    assert r.json()["must_change_password"] is False
     assert "ms_session" in r.cookies
     r2 = client.get("/api/me")
-    assert r2.json() == {"authenticated": True, "user": "tester", "ai_enabled": False}
+    assert r2.json() == {"authenticated": True, "user": "tester", "ai_enabled": False,
+                         "must_change_password": False}
 
 
 def test_login_bad_password(client):
