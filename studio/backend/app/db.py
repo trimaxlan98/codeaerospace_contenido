@@ -80,10 +80,15 @@ class Database:
             self._conn.commit()
 
     def insert_job(self, job: dict) -> None:
+        # project_id/clip_id/content_hash son opcionales (jobs sueltos de
+        # /api/jobs no los traen): se completan con None si faltan.
+        job = {"project_id": None, "clip_id": None, "content_hash": None, **job}
         with self._lock:
             self._conn.execute(
-                "INSERT INTO jobs (id, scene, quality, timeout, status, script, created_at)"
-                " VALUES (:id, :scene, :quality, :timeout, :status, :script, :created_at)",
+                "INSERT INTO jobs (id, scene, quality, timeout, status, script,"
+                " created_at, project_id, clip_id, content_hash)"
+                " VALUES (:id, :scene, :quality, :timeout, :status, :script,"
+                " :created_at, :project_id, :clip_id, :content_hash)",
                 job,
             )
             self._conn.commit()
@@ -107,7 +112,7 @@ class Database:
             rows = self._conn.execute(
                 "SELECT id, scene, quality, timeout, status, video_path, error,"
                 " created_at, started_at, finished_at, size_bytes, thumb_path,"
-                " length(script) AS script_len"
+                " project_id, clip_id, length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()
@@ -244,3 +249,32 @@ class Database:
                 [(i, cid, pid) for i, cid in enumerate(ordered_ids)],
             )
             self._conn.commit()
+
+    def reorder_clips(self, pid: str, cid: str, position: int | None,
+                       delete: bool = False) -> list[str] | None:
+        """Mueve o borra `cid` y renumera el proyecto bajo UN solo lock.
+
+        Lee el orden actual, borra o reubica el clip y renumera todo en la
+        misma seccion critica (evita la carrera de leer-luego-renumerar en
+        dos llamadas separadas). Devuelve el nuevo orden de ids, o None si
+        `cid` no pertenece a `pid` (el llamador decide como reportarlo).
+        """
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id FROM clips WHERE project_id = ? ORDER BY position", (pid,)
+            ).fetchall()
+            ids = [r["id"] for r in rows]
+            if cid not in ids:
+                return None
+            ids.remove(cid)
+            if delete:
+                self._conn.execute("DELETE FROM clips WHERE id = ?", (cid,))
+            else:
+                position = max(0, min(position, len(ids)))
+                ids.insert(position, cid)
+            self._conn.executemany(
+                "UPDATE clips SET position = ? WHERE id = ? AND project_id = ?",
+                [(i, x, pid) for i, x in enumerate(ids)],
+            )
+            self._conn.commit()
+        return ids

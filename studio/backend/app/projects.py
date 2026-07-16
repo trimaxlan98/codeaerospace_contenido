@@ -40,10 +40,20 @@ def compose_script(style_block: str, script: str) -> str:
     return f"{style_block.rstrip()}\n\n{STYLE_MARKER}\n\n{script}"
 
 
-def content_hash(style_block: str, script: str) -> str:
-    """sha256 hex del script compuesto (estilo + clip)."""
+def content_hash(style_block: str, script: str, scene: str) -> str:
+    """sha256 hex del script compuesto (estilo + clip) mas la escena.
+
+    La escena participa del hash a proposito: dos renders del mismo script
+    compuesto pero con `scene` distinta producen videos distintos (el
+    script puede definir varias escenas, p.ej. Intro y Outro), asi que un
+    cambio de escena sin tocar el script debe marcar el clip como `stale`
+    igual que un cambio de script. La combinacion es determinista: mismo
+    (style_block, script, scene) siempre produce el mismo hash.
+    """
     composed = compose_script(style_block, script)
-    return hashlib.sha256(composed.encode("utf-8")).hexdigest()
+    digest = hashlib.sha256(composed.encode("utf-8"))
+    digest.update(b"\n# scene: " + scene.encode("utf-8"))
+    return digest.hexdigest()
 
 
 def style_offset(style_block: str) -> int:
@@ -94,7 +104,8 @@ class ProjectService:
             return None
         clips = []
         for clip in self.db.list_clips(pid):
-            expected = content_hash(project["style_block"], clip.get("script") or "")
+            expected = content_hash(project["style_block"], clip.get("script") or "",
+                                    clip.get("scene") or "")
             has_render = bool(clip.get("job_id"))
             stale = has_render and clip.get("rendered_hash") != expected
             if not has_render:
@@ -114,7 +125,8 @@ class ProjectService:
             for clip in clips:
                 if not clip.get("job_id"):
                     continue
-                expected = content_hash(project["style_block"], clip.get("script") or "")
+                expected = content_hash(project["style_block"], clip.get("script") or "",
+                                        clip.get("scene") or "")
                 if clip.get("rendered_hash") != expected:
                     stale_count += 1
                 else:
@@ -160,7 +172,7 @@ class ProjectService:
             composed = compose_script(project["style_block"], script)
             if adopt_job.get("quality") == project["quality"] and composed == adopt_job.get("script"):
                 job_id = adopt_job.get("id")
-                rendered_hash = content_hash(project["style_block"], script)
+                rendered_hash = content_hash(project["style_block"], script, scene)
 
         existing = self.db.list_clips(pid)
         n = len(existing)
@@ -191,19 +203,16 @@ class ProjectService:
         return self.db.get_clip(cid)
 
     def move_clip(self, pid: str, cid: str, position: int) -> None:
-        clips = self.db.list_clips(pid)
-        ids = [c["id"] for c in clips]
-        if cid not in ids:
+        # list+renumber en una sola seccion critica (evita la carrera entre
+        # leer el orden y renumerar que existia con list_clips+renumber_clips).
+        if self.db.reorder_clips(pid, cid, position) is None:
             raise ValueError("clip no encontrado en el proyecto")
-        ids.remove(cid)
-        position = max(0, min(position, len(ids)))
-        ids.insert(position, cid)
-        self.db.renumber_clips(pid, ids)
 
     def delete_clip(self, pid: str, cid: str) -> None:
-        self.db.delete_clip(cid)
-        remaining = [c["id"] for c in self.db.list_clips(pid)]
-        self.db.renumber_clips(pid, remaining)
+        # Misma seccion critica que move_clip; ademas valida que el clip
+        # pertenezca al proyecto antes de borrar (igual que move_clip).
+        if self.db.reorder_clips(pid, cid, position=None, delete=True) is None:
+            raise ValueError("clip no encontrado en el proyecto")
 
     # ── ciclo de vida del render ─────────────────────────────────────────────
 
@@ -243,7 +252,8 @@ class ProjectService:
             job = jobs_by_id.get(job_id)
             if not job:
                 continue
-            expected = content_hash(project["style_block"], clip.get("script") or "")
+            expected = content_hash(project["style_block"], clip.get("script") or "",
+                                    clip.get("scene") or "")
             if clip.get("rendered_hash") != expected:
                 continue  # desactualizado: no entra en el manifiesto
             filename = f"{clip['position'] + 1:03d}-{_slugify(clip['title'])}.mp4"

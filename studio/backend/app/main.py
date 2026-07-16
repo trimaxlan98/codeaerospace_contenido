@@ -22,6 +22,8 @@ from .db import Database
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
+from .projects import ProjectService
+from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
 from .scenes import detect_scenes
 
@@ -37,6 +39,8 @@ db = Database(cfg.db_path)
 bus = EventBus()
 runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
+service = ProjectService(db)
+manager.on_job_done = service.handle_job_done
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
@@ -59,6 +63,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
+app.include_router(make_projects_router(cfg, db, manager, service))
 
 
 async def _metrics_loop() -> None:
@@ -278,7 +283,9 @@ async def retry_job(job_id: str, _=Depends(require_auth)):
         raise HTTPException(status_code=409, detail="El job ya esta activo")
     _check_quota()
     return manager.create_job(job["script"], job["scene"], job["quality"],
-                              job["timeout"])
+                              job["timeout"], project_id=job.get("project_id"),
+                              clip_id=job.get("clip_id"),
+                              content_hash=job.get("content_hash"))
 
 
 @app.delete("/api/jobs/older-than/{days}")

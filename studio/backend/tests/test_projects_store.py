@@ -41,13 +41,15 @@ def test_compose_and_hash():
     assert "# --- fin estilo del proyecto ---" in composed
     assert composed.endswith("print(1)")
 
-    # El hash cambia si cambia el estilo o el script.
-    h1 = content_hash("COLOR = 'red'", "print(1)")
-    h2 = content_hash("COLOR = 'blue'", "print(1)")
-    h3 = content_hash("COLOR = 'red'", "print(2)")
+    # El hash cambia si cambia el estilo, el script o la escena.
+    h1 = content_hash("COLOR = 'red'", "print(1)", "Demo")
+    h2 = content_hash("COLOR = 'blue'", "print(1)", "Demo")
+    h3 = content_hash("COLOR = 'red'", "print(2)", "Demo")
+    h4 = content_hash("COLOR = 'red'", "print(1)", "Otra")
     assert h1 != h2
     assert h1 != h3
-    assert h1 == content_hash("COLOR = 'red'", "print(1)")
+    assert h1 != h4
+    assert h1 == content_hash("COLOR = 'red'", "print(1)", "Demo")
 
     # style_offset
     assert style_offset("") == 0
@@ -98,7 +100,7 @@ def test_clip_ordering(svc):
 def test_stale_detection(svc):
     p = svc.create_project("Curso", "", "ql", "")
     clip = svc.add_clip(p["id"], "A", script="print(1)")
-    h = content_hash("", "print(1)")
+    h = content_hash("", "print(1)", "")
     svc.db.update_clip(clip["id"], job_id="job1", rendered_hash=h)
 
     detail = svc.get_project_detail(p["id"])
@@ -118,6 +120,27 @@ def test_stale_detection(svc):
     detail = svc.get_project_detail(p["id"])
     c = detail["clips"][0]
     assert c["stale"] is True
+
+
+def test_stale_detection_by_scene(svc):
+    # Cambiar solo la escena (sin tocar script ni estilo) debe marcar
+    # stale: el mismo script puede definir varias escenas y el video
+    # renderizado corresponde a una escena concreta.
+    p = svc.create_project("Curso", "", "ql", "")
+    clip = svc.add_clip(p["id"], "A", script="print(1)", scene="Intro")
+    h = content_hash("", "print(1)", "Intro")
+    svc.db.update_clip(clip["id"], job_id="job1", rendered_hash=h)
+
+    detail = svc.get_project_detail(p["id"])
+    c = detail["clips"][0]
+    assert c["stale"] is False
+    assert c["status"] == "rendered"
+
+    svc.update_clip(clip["id"], scene="Outro")
+    detail = svc.get_project_detail(p["id"])
+    c = detail["clips"][0]
+    assert c["stale"] is True
+    assert c["status"] == "stale"
 
 
 def test_handle_job_done(svc):
@@ -163,7 +186,7 @@ def test_adopt_job(svc):
     clip = svc.add_clip(p["id"], "A", adopt_job=job)
     assert clip["job_id"] == "jobX"
     assert clip["script"] == "print(1)"
-    assert clip["rendered_hash"] == content_hash("", "print(1)")
+    assert clip["rendered_hash"] == content_hash("", "print(1)", "Demo")
 
     job2 = {"id": "jobY", "script": "print(2)", "scene": "Demo", "quality": "qh"}
     clip2 = svc.add_clip(p["id"], "B", adopt_job=job2)
@@ -177,8 +200,8 @@ def test_manifest(svc):
     c1 = svc.add_clip(p["id"], "Sin render", script="print(2)")
     c2 = svc.add_clip(p["id"], "Cierre", script="print(3)")
 
-    h0 = content_hash("", "print(1)")
-    h2 = content_hash("", "print(3)")
+    h0 = content_hash("", "print(1)", "")
+    h2 = content_hash("", "print(3)", "")
     svc.db.update_clip(c0["id"], job_id="job0", rendered_hash=h0)
     svc.db.update_clip(c2["id"], job_id="job2", rendered_hash=h2)
 
