@@ -49,6 +49,18 @@ export const api = {
   getLesson: (id) => request('GET', `/api/lessons/${id}`),
   animationsIndex: () => request('GET', '/api/animations'),
   getAnimation: (id) => request('GET', `/api/animations/${id}`),
+  listProjects: () => request('GET', '/api/projects'),
+  createProject: (body) => request('POST', '/api/projects', body),
+  getProject: (id) => request('GET', `/api/projects/${id}`),
+  patchProject: (id, body) => request('PATCH', `/api/projects/${id}`, body),
+  deleteProject: (id) => request('DELETE', `/api/projects/${id}`),
+  createClip: (pid, body) => request('POST', `/api/projects/${pid}/clips`, body),
+  patchClip: (pid, cid, body) => request('PATCH', `/api/projects/${pid}/clips/${cid}`, body),
+  deleteClip: (pid, cid) => request('DELETE', `/api/projects/${pid}/clips/${cid}`),
+  moveClip: (pid, cid, position) => request('POST', `/api/projects/${pid}/clips/${cid}/move`, { position }),
+  renderClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/render`),
+  renderStale: (pid) => request('POST', `/api/projects/${pid}/render-stale`),
+  getClipScript: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/script`),
 }
 
 export function videoUrl(id) {
@@ -57,4 +69,12 @@ export function videoUrl(id) {
 
 export function thumbUrl(id) {
   return `/api/jobs/${id}/thumb`
+}
+
+export function projectExportUrl(id) {
+  return `/api/projects/${id}/export`
+}
+
+export function projectArchiveUrl(id) {
+  return `/api/projects/${id}/archive`
 }

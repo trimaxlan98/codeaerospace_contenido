@@ -1,10 +1,11 @@
 // Biblioteca: videos renderizados (grid de tarjetas) + gestión de disco.
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Play, Download } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
 import { Button } from './components/ui/button.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
+import DeleteButton from './components/DeleteButton.jsx'
 import { cn } from '@/lib/utils'
 
 const MB = 1024 ** 2
@@ -33,21 +34,6 @@ const FAIL_META = {
   error: { label: 'error', dot: 'bg-err', text: 'text-err' },
   timeout: { label: 'timeout', dot: 'bg-err', text: 'text-err' },
   cancelled: { label: 'cancelado', dot: 'bg-muted', text: 'text-muted' },
-}
-
-// Borrado en dos toques: el primero arma, el segundo confirma (se desarma solo).
-function DeleteButton({ onDelete }) {
-  const [arming, setArming] = useState(false)
-  useEffect(() => {
-    if (!arming) return
-    const t = setTimeout(() => setArming(false), 3500)
-    return () => clearTimeout(t)
-  }, [arming])
-  return arming ? (
-    <Button size="xs" variant="danger" onClick={onDelete}>¿Confirmar?</Button>
-  ) : (
-    <Button size="xs" variant="ghost" onClick={() => setArming(true)}>Borrar</Button>
-  )
 }
 
 function StorageBar({ storage }) {

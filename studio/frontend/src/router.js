@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 const HASH_TO_VIEW = {
   estudio: 'studio',
+  proyectos: 'projects',
   biblioteca: 'library',
   aprender: 'lessons',
   animaciones: 'animations',

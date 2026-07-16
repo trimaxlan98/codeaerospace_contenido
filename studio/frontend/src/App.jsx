@@ -10,6 +10,7 @@ import Admin from './Admin.jsx'
 import Library from './Library.jsx'
 import Lessons from './Lessons.jsx'
 import Animations from './Animations.jsx'
+import Projects from './Projects.jsx'
 import StarfieldBackground from './components/StarfieldBackground.jsx'
 
 const TOAST_META = {
@@ -30,6 +31,9 @@ export default function App() {
   const visited = useRef(new Set())
   visited.current.add(view)
   const [pendingScript, setPendingScript] = useState(null)
+  // Contexto del clip abierto desde Proyectos para editar en el Estudio
+  // (el Estudio lo consume recien en el Sprint 5; aqui solo se define y navega).
+  const [clipContext, setClipContext] = useState(null)
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
   const [jobs, setJobs] = useState([])
@@ -204,6 +208,18 @@ export default function App() {
           <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
             onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
             pendingScript={pendingScript} onConsumePendingScript={() => setPendingScript(null)} />
+        </div>
+      )}
+      {visited.current.has('projects') && (
+        <div className={show('projects')}>
+          <Projects jobs={jobs}
+            routeId={view === 'projects' ? route.param : null}
+            onRoute={(id) => navigate('projects', id)}
+            onEditClip={(ctx, script, scene) => {
+              setPendingScript(script)
+              setClipContext(ctx)
+              navigate('studio')
+            }} />
         </div>
       )}
       {visited.current.has('library') && (

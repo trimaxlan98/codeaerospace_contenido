@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LogOut, WifiOff } from 'lucide-react'
+import { FolderKanban, LogOut, WifiOff } from 'lucide-react'
 import ThemePicker from './ThemePicker.jsx'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 
 const NAV = [
   { id: 'studio', label: 'Estudio' },
+  { id: 'projects', label: 'Proyectos', icon: FolderKanban },
   { id: 'library', label: 'Biblioteca' },
   { id: 'lessons', label: 'Aprender' },
   { id: 'animations', label: 'Animaciones' },
@@ -54,16 +55,18 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
         className="order-last -mx-1 flex w-full items-center gap-1 overflow-x-auto p-1 md:order-none md:mx-0 md:ml-1 md:w-auto md:rounded-lg md:border md:border-line md:bg-canvas/40">
         {NAV.map((n) => {
           const active = view === n.id
+          const Icon = n.icon
           return (
             <button
               key={n.id}
               onClick={() => onView(n.id)}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                'flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                 active ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
               )}
             >
+              {Icon && <Icon className="h-3.5 w-3.5" />}
               {n.label}
             </button>
           )
