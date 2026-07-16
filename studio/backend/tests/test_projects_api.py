@@ -153,10 +153,16 @@ def test_clip_render_composes_style(authed):
 
 
 def test_from_job_id(authed):
-    r = authed.post("/api/jobs", json={"script": VALID_SCRIPT, "scene": "Demo",
-                                       "quality": "ql"})
-    assert r.status_code == 201
-    job_id = r.json()["id"]
+    from app.main import db
+
+    # Job sembrado directo en DB (via POST /api/jobs el worker sin runner lo
+    # marcaria error y la adopcion exige un job done con video).
+    job_id = "cafe00002222beef"
+    db.insert_job({"id": job_id, "scene": "Demo", "quality": "ql", "timeout": 120,
+                   "status": "queued", "script": VALID_SCRIPT,
+                   "created_at": time.time()})
+    db.update_job(job_id, status="done", finished_at=time.time(),
+                  video_path="/tmp/x.mp4", size_bytes=1)
 
     project = _create_project(authed)  # sin estilo, misma calidad (ql)
     pid = project["id"]
@@ -170,6 +176,13 @@ def test_from_job_id(authed):
     detail = authed.get(f"/api/projects/{pid}").json()
     adopted = next(c for c in detail["clips"] if c["id"] == clip["id"])
     assert adopted["status"] == "rendered"  # job_id enlazado desde la adopcion
+
+    # El job adoptado tambien debe quedar enlazado de vuelta al clip: la
+    # Biblioteca decide el aviso "el clip quedara sin video" leyendo
+    # j.clip_id, no clips.job_id.
+    job_after = authed.get(f"/api/jobs/{job_id}").json()
+    assert job_after["clip_id"] == clip["id"]
+    assert job_after["project_id"] == pid
 
     # M4: misma calidad pero proyecto con estilo no vacio -> NO adopta
     project2 = _create_project(authed, style_block="X = 1")

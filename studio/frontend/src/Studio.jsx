@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
-import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X } from 'lucide-react'
+import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save, FolderKanban, LogOut } from 'lucide-react'
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -27,6 +27,8 @@ const QUALITIES = [
   { id: 'qm', label: '720p', hint: 'media' },
   { id: 'qh', label: '1080p', hint: 'alta' },
 ]
+
+const QUALITY_LABEL = Object.fromEntries(QUALITIES.map((q) => [q.id, q.label]))
 
 // Persistencia local del area de trabajo: el script (y sus ajustes) deben
 // sobrevivir a F5 y a cambios de vista. localStorage puede fallar (modo
@@ -68,18 +70,22 @@ function duration(job) {
 }
 
 // Control segmentado (calidad). role=radiogroup para accesibilidad.
-function Segmented({ options, value, onChange, ariaLabel }) {
+// disabled: se usa cuando el Estudio esta en contexto de clip — la calidad
+// la fija el proyecto y no se puede cambiar desde aqui.
+function Segmented({ options, value, onChange, ariaLabel, disabled }) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel}
-      className="flex rounded-md border border-line bg-canvas p-0.5">
+    <div role="radiogroup" aria-label={ariaLabel} aria-disabled={disabled || undefined}
+      className={cn('flex rounded-md border border-line bg-canvas p-0.5', disabled && 'opacity-60')}>
       {options.map((o) => {
         const on = value === o.id
         return (
           <button key={o.id} type="button" role="radio" aria-checked={on} title={o.hint}
+            disabled={disabled}
             onClick={() => onChange(o.id)}
             className={cn(
               'rounded-[5px] px-2.5 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
               on ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
+              disabled && 'cursor-not-allowed',
             )}>
             {o.label}
           </button>
@@ -188,7 +194,7 @@ function ClearHistoryButton({ count, onFire }) {
 }
 
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
-  pendingScript, onConsumePendingScript }) {
+  pendingScript, pendingScene, onConsumePendingScript, clipContext, onExitClip }) {
   const [script, setScript] = useState(() => lsGet(LS.script) ?? SAMPLE)
   const [scenes, setScenes] = useState(() => [lsGet(LS.scene) || 'Orbita'])
   const [scene, setScene] = useState(() => lsGet(LS.scene) || 'Orbita')
@@ -203,29 +209,38 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   })
   const [submitError, setSubmitError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [savingClip, setSavingClip] = useState(false)
+  const [clipSaved, setClipSaved] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [selectedLogs, setSelectedLogs] = useState([])
   const [aiOpen, setAiOpen] = useState(false)
   const [aiMode, setAiMode] = useState('explain')
   const [aiAutoRun, setAiAutoRun] = useState(0)
-  const [confirmScript, setConfirmScript] = useState(null) // script entrante a confirmar
+  const [confirmScript, setConfirmScript] = useState(null) // {script, scene} entrante a confirmar
   const logRef = useRef(null)
   const debounceRef = useRef(null)
 
   // Toda accion que pisa el editor (Abrir en el Estudio, Cargar al editor,
   // Aplicar de la IA) pasa por aqui: si hay trabajo propio, pide confirmacion.
-  const replaceScript = useCallback((next) => {
+  // nextScene es opcional (solo lo trae el flujo "Editar en Estudio" de un
+  // clip, para preseleccionar su escena real).
+  const replaceScript = useCallback((next, nextScene) => {
     const cur = script.trim()
-    if (!cur || cur === next.trim() || cur === SAMPLE.trim()) setScript(next)
-    else setConfirmScript(next)
+    if (!cur || cur === next.trim() || cur === SAMPLE.trim()) {
+      setScript(next)
+      if (nextScene) setScene(nextScene)
+    } else {
+      setConfirmScript({ script: next, scene: nextScene })
+    }
   }, [script])
 
-  // Una animacion abierta desde Animaciones reemplaza el editor una sola vez.
+  // Una animacion (o un clip de Proyectos) abierto reemplaza el editor una
+  // sola vez; pendingScene solo viaja desde el flujo de clips.
   useEffect(() => {
     if (pendingScript == null) return
-    replaceScript(pendingScript)
+    replaceScript(pendingScript, pendingScene)
     onConsumePendingScript()
-  }, [pendingScript, onConsumePendingScript, replaceScript])
+  }, [pendingScript, pendingScene, onConsumePendingScript, replaceScript])
 
   // Guardado local del script con debounce (una escritura por pausa de tipeo).
   useEffect(() => {
@@ -279,11 +294,21 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
   }, [logs.length])
 
+  // En contexto de clip el render no pasa por /api/jobs: primero se guarda
+  // el script/escena en el clip (mismo endpoint que "Guardar en clip") y
+  // luego se dispara el render propio del clip, que compone el estilo del
+  // proyecto en el backend y hereda su calidad fija.
   const submit = useCallback(async () => {
     setSubmitError('')
     setSubmitting(true) // evita el doble encolado por doble clic
     try {
-      const job = await api.createJob({ script, scene, quality, timeout: Number(timeoutS) })
+      let job
+      if (clipContext) {
+        await api.patchClip(clipContext.projectId, clipContext.clipId, { script, scene })
+        job = await api.renderClip(clipContext.projectId, clipContext.clipId)
+      } else {
+        job = await api.createJob({ script, scene, quality, timeout: Number(timeoutS) })
+      }
       setSelectedId(job.id)
       onJobsChanged()
     } catch (err) {
@@ -291,7 +316,24 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     } finally {
       setSubmitting(false)
     }
-  }, [script, scene, quality, timeoutS, onJobsChanged])
+  }, [script, scene, quality, timeoutS, onJobsChanged, clipContext])
+
+  // Boton "Guardar en clip": guarda sin renderizar (patchClip {script, scene}).
+  const saveClip = async () => {
+    if (!clipContext) return
+    setSubmitError('')
+    setSavingClip(true)
+    setClipSaved(false)
+    try {
+      await api.patchClip(clipContext.projectId, clipContext.clipId, { script, scene })
+      setClipSaved(true)
+      setTimeout(() => setClipSaved(false), 2500)
+    } catch (err) {
+      setSubmitError(err.message)
+    } finally {
+      setSavingClip(false)
+    }
+  }
 
   const cancel = async (id) => {
     try { await api.cancelJob(id) } catch { /* ya termino */ }
@@ -340,8 +382,16 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const canSubmit = scenes.includes(scene) && !submitting
   const submitHint = !scenes.includes(scene)
     ? 'Define una Scene valida en el script para renderizar'
-    : 'Encolar el render (se ejecutan de a uno)'
+    : clipContext
+      ? 'Guarda el clip y encola su render (compone el estilo del proyecto)'
+      : 'Encolar el render (se ejecutan de a uno)'
   const errorish = selected && ['error', 'timeout'].includes(selected.status)
+  // Nota de desfase de líneas: los errores de escenas/render pueden citar
+  // numeros de linea del script COMPUESTO (estilo + clip), que no coinciden
+  // con los del editor (que solo muestra el script del clip).
+  const styleNote = clipContext && clipContext.styleOffset > 0
+    ? `El estilo del proyecto añade ${clipContext.styleOffset} líneas antes del script; los numeros de linea de arriba pueden estar desplazados.`
+    : ''
 
   // Tira inferior: cola activa (running + queued en orden de ejecucion) y
   // historial reciente por separado — antes se mezclaban bajo un solo rotulo.
@@ -359,6 +409,23 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
 
   return (
     <main className="flex flex-1 flex-col gap-3 p-3 lg:min-h-0">
+      {/* Contexto de clip: se llega aqui desde "Editar en Estudio" de un
+          proyecto. La calidad queda fija a la del proyecto y el render usa
+          el endpoint del clip (compone el estilo) en vez de /api/jobs. */}
+      {clipContext && (
+        <div className="panel flex shrink-0 flex-wrap items-center gap-2 px-3 py-2" aria-label="contexto de clip">
+          <FolderKanban className="h-4 w-4 shrink-0 text-accent" />
+          <span className="text-[13px] text-ink">
+            Proyecto <strong className="font-semibold">{clipContext.projectName}</strong>
+            {' · clip "'}<strong className="font-semibold">{clipContext.clipTitle}</strong>{'"'}
+            {' · calidad '}{QUALITY_LABEL[clipContext.quality] || clipContext.quality}{' (fija)'}
+          </span>
+          <Button size="xs" variant="ghost" className="ml-auto" onClick={onExitClip}
+            title="Vuelve al render libre; no borra el script del editor">
+            <LogOut className="h-3.5 w-3.5" /> Salir del clip
+          </Button>
+        </div>
+      )}
       {/* En movil cada panel fija su altura (la pagina scrollea); en lg+ el
           conjunto llena el viewport y cada panel scrollea por dentro. */}
       <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:flex-row">
@@ -383,7 +450,10 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             </label>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <Segmented options={QUALITIES} value={quality} onChange={setQuality} ariaLabel="calidad" />
+              <Segmented options={QUALITIES}
+                value={clipContext ? clipContext.quality : quality}
+                onChange={clipContext ? () => {} : setQuality} ariaLabel="calidad"
+                disabled={!!clipContext} />
               <label className="flex items-center gap-1.5">
                 <span className="eyebrow">Timeout</span>
                 <input type="number" min="30" max="1800" step="30" value={timeoutS}
@@ -397,6 +467,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                   <Sparkles className="h-4 w-4" /> Asistente
                 </Button>
               )}
+              {clipContext && (
+                <Button variant="default" size="sm" onClick={saveClip} disabled={savingClip}
+                  title="Guarda el script y la escena en el clip sin renderizar">
+                  <Save className="h-4 w-4" /> {savingClip ? 'Guardando…' : clipSaved ? 'Guardado ✓' : 'Guardar en clip'}
+                </Button>
+              )}
               <Button variant="primary" size="sm" onClick={submit} disabled={!canSubmit}
                 title={submitHint}>
                 <Play className="h-4 w-4" /> {submitting ? 'Encolando…' : 'Renderizar'}
@@ -407,6 +483,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
           {(sceneError || submitError) && (
             <p role="alert" className="border-b border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">
               {sceneError || submitError}
+              {styleNote && <span className="mt-0.5 block text-[12px] text-warn/80">{styleNote}</span>}
             </p>
           )}
 
@@ -529,9 +606,20 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             cancela y cópialo antes.
           </p>
           <div className="mt-4 flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setConfirmScript(null)}>Conservar</Button>
+            <Button variant="ghost" onClick={() => {
+              // Si el pendingScript traia un clipContext (viene de "Editar en
+              // Estudio") y el usuario decide conservar su script propio, el
+              // contexto de clip debe apagarse: si no, "Guardar en clip" o
+              // "Renderizar" sobrescribirian el clip ajeno con este script.
+              if (clipContext) onExitClip()
+              setConfirmScript(null)
+            }}>Conservar</Button>
             <Button variant="primary"
-              onClick={() => { setScript(confirmScript); setConfirmScript(null) }}>
+              onClick={() => {
+                setScript(confirmScript.script)
+                if (confirmScript.scene) setScene(confirmScript.scene)
+                setConfirmScript(null)
+              }}>
               Reemplazar
             </Button>
           </div>

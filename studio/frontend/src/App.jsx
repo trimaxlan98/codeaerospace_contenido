@@ -31,8 +31,10 @@ export default function App() {
   const visited = useRef(new Set())
   visited.current.add(view)
   const [pendingScript, setPendingScript] = useState(null)
-  // Contexto del clip abierto desde Proyectos para editar en el Estudio
-  // (el Estudio lo consume recien en el Sprint 5; aqui solo se define y navega).
+  // Escena a preseleccionar junto con pendingScript (viaja solo cuando el
+  // origen es un clip de Proyectos; Animaciones no la usa).
+  const [pendingScene, setPendingScene] = useState(null)
+  // Contexto del clip abierto desde Proyectos para editar en el Estudio.
   const [clipContext, setClipContext] = useState(null)
   const [metrics, setMetrics] = useState(null)
   const [containers, setContainers] = useState(null)
@@ -207,7 +209,9 @@ export default function App() {
         <div className={show('studio')}>
           <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
             onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
-            pendingScript={pendingScript} onConsumePendingScript={() => setPendingScript(null)} />
+            pendingScript={pendingScript} pendingScene={pendingScene}
+            onConsumePendingScript={() => { setPendingScript(null); setPendingScene(null) }}
+            clipContext={clipContext} onExitClip={() => setClipContext(null)} />
         </div>
       )}
       {visited.current.has('projects') && (
@@ -217,6 +221,7 @@ export default function App() {
             onRoute={(id) => navigate('projects', id)}
             onEditClip={(ctx, script, scene) => {
               setPendingScript(script)
+              setPendingScene(scene)
               setClipContext(ctx)
               navigate('studio')
             }} />

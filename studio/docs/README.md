@@ -96,6 +96,91 @@ Decisiones clave (y por qué):
   CPU, RAM y disco de los últimos 30 min, actualizadas en vivo por el SSE, con bandas
   doradas en los intervalos donde hubo un render activo.
 
+### Proyectos (cursos) (pestaña «Proyectos»)
+
+Agrupan varios renders (**clips**) en un curso con continuidad narrativa y estilo visual
+compartido, y permiten exportar el resultado como un solo video sin salir de ManimStudio.
+
+**Modelo:**
+
+- **Proyecto**: `name`, `description`, `quality` (fija para todos sus clips, `ql`/`qm`/`qh`),
+  `style_block` (código Python opcional que se antepone a cada clip antes de renderizar —
+  imports, paleta de colores, helpers de continuidad…).
+- **Clip**: pertenece a un proyecto, tiene `position` (orden dentro del curso), `title`,
+  `script` (el código del clip, **sin** el estilo del proyecto), `scene` (nombre de la clase
+  `Scene` a renderizar), `final_state` (nota de en qué queda la escena al terminar, visible
+  como contexto para el clip siguiente) y `notes` libres.
+- Cada clip enlaza como mucho a un job de render (`job_id`); su estado se deriva comparando
+  el hash del contenido compuesto (ver abajo) contra `rendered_hash`.
+
+**Reglas de continuidad y estilo:**
+
+- **Calidad fija por proyecto**: todos los clips de un proyecto se renderizan a la misma
+  calidad (`project.quality`); el Estudio no permite cambiarla mientras se edita un clip.
+- **Estilo compuesto**: al renderizar, el backend antepone `style_block` al `script` del
+  clip (`compose_script`) y detecta las escenas (`detect_scenes`) sobre ese script
+  **compuesto**, no sobre el script crudo. Si el estilo ocupa `N` líneas, los mensajes de
+  error de sintaxis/escena citan números de línea del compuesto — el Estudio muestra ese
+  desfase (`style_offset`, vía `GET .../clips/{cid}/script`) junto a esos errores.
+- **Stale (desactualizado)**: cada clip guarda `rendered_hash`, el hash de
+  `style_block + script + scene` en el momento de su último render exitoso. Si cualquiera de
+  los tres cambia (se edita el script del clip, su escena, o el estilo del proyecto), el hash
+  actual ya no coincide y el clip pasa a `stale` — se resalta en la UI y puede
+  re-renderizarse individualmente o con «Re-renderizar desactualizados» (que encola solo los
+  que no tengan ya un render en curso).
+- **Un render a la vez**: los renders de clips comparten la misma cola global que los renders
+  sueltos del Estudio (`JobManager`, un worker); un clip con job `queued`/`running` no se
+  vuelve a encolar hasta que termine.
+
+**Endpoints** (todos `Depends(require_auth)`, prefijo `/api/projects`):
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `` | lista con contadores (`clip_count`, `rendered_count`, `stale_count`) |
+| POST | `` | crea proyecto (`name`, `description`, `quality`, `style_block`) |
+| GET | `/{pid}` | detalle con clips ordenados |
+| PATCH | `/{pid}` | edita nombre/descripción/calidad/estilo (413 si `style_block` > 200 KB) |
+| DELETE | `/{pid}` | borra proyecto y sus clips (no los jobs/videos ya generados) |
+| POST | `/{pid}/clips` | crea clip; `from_job_id` adopta un job existente como ya renderizado *si* su calidad coincide con la del proyecto y el estilo compuesto es idéntico al script del job (en la práctica: proyecto sin `style_block`) |
+| PATCH | `/{pid}/clips/{cid}` | edita `title`/`script`/`scene`/`final_state`/`notes` (413 si `script` > 200 KB) |
+| DELETE | `/{pid}/clips/{cid}` | borra el clip (no el job/video que tuviera enlazado) |
+| POST | `/{pid}/clips/{cid}/move` | reordena (`position`) |
+| GET | `/{pid}/clips/{cid}/script` | `{script, style_offset}` — script crudo del clip (sin estilo) + líneas que antepone el estilo actual |
+| POST | `/{pid}/clips/{cid}/render` | compone estilo+script, valida la escena y encola el render (201, devuelve el job); 422 si no hay escena asignada, si el script compuesto es inválido, o si la escena no existe en él |
+| POST | `/{pid}/render-stale` | encola todos los clips `stale`/`no_render` sin job en vuelo; devuelve `{queued, skipped}` |
+| GET | `/{pid}/export` | manifiesto JSON del curso (clips, orden, estado, sin campos internos) |
+| GET | `/{pid}/archive` | ZIP con los videos vigentes + `concat.txt` + `manifest.json` + `LEEME.txt`; 404 si ningún clip tiene video vigente |
+
+**Estudio en contexto de clip**: desde un proyecto, «Editar en Estudio» abre el script del
+clip en el editor con un banner (`Proyecto · clip · calidad fija`) y botón «Salir del clip»
+(vuelve al render libre sin tocar el script del editor). Mientras el contexto está activo:
+la calidad queda fija a la del proyecto, «Guardar en clip» hace `PATCH .../clips/{cid}`
+(`script`, `scene`) sin renderizar, y «Renderizar» guarda primero y luego llama a
+`POST .../clips/{cid}/render` (en vez de `POST /api/jobs`) para que el render use el estilo
+compuesto del proyecto.
+
+**Biblioteca → Proyectos**: cada video renderizado tiene un botón «Añadir a proyecto…» que
+crea un clip en el proyecto elegido a partir de ese job (`from_job_id`). Al borrar un video
+que es el render vigente de un clip, la confirmación avisa de que el clip se queda sin video
+(el clip en sí no se borra, solo pierde su render).
+
+**Flujo de unión externa** (cuando se quiere el curso completo como un solo archivo, algo que
+ManimStudio no hace en el servidor para no sumar otro paso de render):
+
+1. Renderizar todos los clips del proyecto (individualmente o con «Re-renderizar
+   desactualizados»).
+2. Descargar el curso: botón «Descargar curso (.zip)» → `GET /api/projects/{pid}/archive`.
+3. Dentro del ZIP, unir los clips en orden con ffmpeg (copia sin recodificar):
+
+   ```bash
+   unzip curso.zip -d curso/
+   cd curso/
+   ffmpeg -f concat -safe 0 -i concat.txt -c copy curso.mp4
+   ```
+
+   `concat.txt` ya trae los archivos en el orden del proyecto; `-c copy` es posible porque
+   todos los clips de un proyecto comparten calidad (mismo códec/resolución).
+
 ### Asistente IA (Vertex AI · Gemini 2.5 · us-central1)
 
 - Feature-flag: si no existe `studio/backend/gcp-key.json` (service account GCP, chmod 600,

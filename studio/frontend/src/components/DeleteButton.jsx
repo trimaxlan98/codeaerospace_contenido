@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react'
 import { Button } from './ui/button.jsx'
 
-export default function DeleteButton({ onDelete }) {
+// confirmText: texto opcional del boton de confirmacion (p.ej. avisar que
+// el video pertenece a un clip de un proyecto). Por defecto "¿Confirmar?".
+export default function DeleteButton({ onDelete, confirmText = '¿Confirmar?' }) {
   const [arming, setArming] = useState(false)
   useEffect(() => {
     if (!arming) return
@@ -12,7 +14,7 @@ export default function DeleteButton({ onDelete }) {
     return () => clearTimeout(t)
   }, [arming])
   return arming ? (
-    <Button size="xs" variant="danger" onClick={onDelete}>¿Confirmar?</Button>
+    <Button size="xs" variant="danger" onClick={onDelete}>{confirmText}</Button>
   ) : (
     <Button size="xs" variant="ghost" onClick={() => setArming(true)}>Borrar</Button>
   )

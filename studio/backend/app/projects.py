@@ -175,7 +175,13 @@ class ProjectService:
             script = adopt_job.get("script") or ""
             scene = adopt_job.get("scene") or ""
             composed = compose_script(project["style_block"], script)
-            if adopt_job.get("quality") == project["quality"] and composed == adopt_job.get("script"):
+            # Solo se adopta como render vigente un job terminado con video real;
+            # la API no filtra por estado (la UI si) y un job error/queued
+            # dejaria un clip "renderizado" sin video exportable.
+            if (adopt_job.get("quality") == project["quality"]
+                    and composed == adopt_job.get("script")
+                    and adopt_job.get("status") == "done"
+                    and adopt_job.get("video_path")):
                 job_id = adopt_job.get("id")
                 rendered_hash = content_hash(project["style_block"], script, scene)
 
@@ -199,6 +205,14 @@ class ProjectService:
         ordered_ids = [c["id"] for c in existing]
         ordered_ids.insert(position, cid)
         self.db.renumber_clips(pid, ordered_ids)
+
+        if job_id:
+            # El job adoptado debe apuntar de vuelta al clip/proyecto: sin
+            # esto el job queda "suelto" (clip_id/project_id en None) y la
+            # Biblioteca no puede avisar "el clip quedara sin video" al
+            # borrarlo (lee j.clip_id). La proteccion de purgas ya funciona
+            # via clips.job_id; esto es solo la señal para la UI.
+            self.db.update_job(job_id, clip_id=cid, project_id=pid)
 
         return self.db.get_clip(cid)
 

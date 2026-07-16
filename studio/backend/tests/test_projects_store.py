@@ -182,16 +182,48 @@ def test_quality_immutable_with_renders(svc):
 
 def test_adopt_job(svc):
     p = svc.create_project("Curso", "", "ql", "")
-    job = {"id": "jobX", "script": "print(1)", "scene": "Demo", "quality": "ql"}
+    job = {"id": "jobX", "script": "print(1)", "scene": "Demo", "quality": "ql",
+           "status": "done", "video_path": "/tmp/Demo.mp4"}
     clip = svc.add_clip(p["id"], "A", adopt_job=job)
     assert clip["job_id"] == "jobX"
     assert clip["script"] == "print(1)"
     assert clip["rendered_hash"] == content_hash("", "print(1)", "Demo")
 
-    job2 = {"id": "jobY", "script": "print(2)", "scene": "Demo", "quality": "qh"}
+    job2 = {"id": "jobY", "script": "print(2)", "scene": "Demo", "quality": "qh",
+            "status": "done", "video_path": "/tmp/Demo.mp4"}
     clip2 = svc.add_clip(p["id"], "B", adopt_job=job2)
     assert clip2["job_id"] is None
     assert clip2["script"] == "print(2)"
+
+    # Un job sin terminar (o sin video) nunca se adopta como render vigente,
+    # aunque calidad y script coincidan: quedaria "renderizado" sin video.
+    job3 = {"id": "jobW", "script": "print(3)", "scene": "Demo", "quality": "ql",
+            "status": "error", "video_path": None}
+    clip3 = svc.add_clip(p["id"], "C", adopt_job=job3)
+    assert clip3["job_id"] is None
+
+
+def test_adopt_job_updates_job_back_reference(svc, db):
+    # Al adoptar un job (misma calidad y compuesto igual, sin estilo) el
+    # clip queda con job_id, pero el job tambien debe quedar enlazado al
+    # clip/proyecto: si no, la Biblioteca no puede avisar "el clip quedara
+    # sin video" al borrarlo (lee j.clip_id, no clips.job_id).
+    p = svc.create_project("Curso", "", "ql", "")
+    db.insert_job({
+        "id": "jobZ", "scene": "Demo", "quality": "ql", "timeout": 600,
+        "status": "done", "script": "print(1)", "created_at": time.time(),
+    })
+    db.update_job("jobZ", video_path="/tmp/Demo.mp4")
+    job = db.get_job("jobZ")
+    assert job["clip_id"] is None
+    assert job["project_id"] is None
+
+    clip = svc.add_clip(p["id"], "A", adopt_job=job)
+    assert clip["job_id"] == "jobZ"
+
+    updated_job = db.get_job("jobZ")
+    assert updated_job["clip_id"] == clip["id"]
+    assert updated_job["project_id"] == p["id"]
 
 
 def test_manifest(svc):
