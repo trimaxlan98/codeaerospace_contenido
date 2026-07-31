@@ -40,3 +40,6 @@ metrics_history.json*
 # Credenciales GCP del asistente IA — JAMAS al repo
 studio/backend/gcp-key.json
 *.gcp-key.json
+
+# Permisos locales de Claude Code (por máquina, puede contener rutas/credenciales)
+.claude/settings.local.json
