@@ -6,6 +6,9 @@ monitoreo en tiempo real e histórico del VPS y asistente IA de depuración (Ver
 
 **URL:** https://coderesearch.space · **Usuario:** `admin` · **Password:** `/root/.manimstudio_admin_password`
 
+Este documento describe el **despliegue en el VPS**. Para levantarlo en una máquina de
+desarrollo, ver [`docs/entorno_desarrollo/`](../../docs/entorno_desarrollo/README.md).
+
 ## Arquitectura
 
 ```
@@ -70,9 +73,11 @@ Decisiones clave (y por qué):
 
 - Contenido educativo en Markdown + frontmatter YAML, versionado en git (sin CRUD web) en
   `studio/content/lessons/<categoria>/<NN>-<slug>.md`. El orden de categorías y sus nombres
-  legibles viven en `studio/content/lessons/categories.yaml`. Estado actual: **12 categorías
-  × 5 lecciones = 60** (del espacio y los satélites a IA, agentes, IA agéntica y tecnología
-  de frontera).
+  legibles viven en `studio/content/lessons/categories.yaml`. Estado actual: **18 lecciones
+  en 4 categorías** — Manim · Fundamentos (5), Intermedio (5), Primitivas del Estudio (5) y
+  Flujo de trabajo (3). `categories.yaml` declara 17 categorías porque las de dominio
+  (espacio, satélites, redes, IA…) siguen agrupando las animaciones de la pestaña
+  «Animaciones»; aparecen vacías en «Aprender».
 - Formato de archivo: frontmatter con `title`, `level` (`intro`/`medio`/`avanzado`),
   `summary`, `tags`, `minutes`, `order`; cuerpo Markdown con matemáticas en sintaxis KaTeX
   (`$…$` en línea, `$$…$$` en bloque). El `order` fija la posición dentro de la categoría.
