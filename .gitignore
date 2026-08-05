@@ -41,3 +41,6 @@ metrics_history.json*
 # Credenciales GCP del asistente IA — JAMAS al repo
 studio/backend/gcp-key.json
 *.gcp-key.json
+
+# Socket del runner en desarrollo local (studio/dev.sh)
+.run/
