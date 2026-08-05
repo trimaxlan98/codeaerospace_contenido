@@ -233,6 +233,10 @@ systemctl restart manimstudio-backend                     # reinicio (jobs activ
   pantalla completa (fractales) renderizan a ~2.5 fps en Cairo y un clip de ~50 s
   no cabía en los 600 s por defecto. El contenedor sigue capado a 1.5 vCPU, así que
   el cambio solo alarga la espera permitida, no la carga.
+- Librerías de animación propias en `studio/content/manim_extensions/`: `fractales.py`
+  (ver `FRACTALES.md`) y `satelites.py` — constelaciones Walker/NTN, mapa mundial y
+  cobertura raster, visuales de RL (ver `SATELITES-IA.md`). Cursos que las usan:
+  «Fractales» y «Satélites e IA» en la pestaña Proyectos.
 
 ### Autenticación y cambio de contraseña
 
