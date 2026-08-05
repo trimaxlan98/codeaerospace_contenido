@@ -229,6 +229,10 @@ systemctl restart manimstudio-backend                     # reinicio (jobs activ
 
 - Config del backend: `EnvironmentFile=/etc/manimstudio/env` (chmod 640, `root:manimstudio`),
   fuera del árbol del repo (ver `.claude/skills/manimstudio/SKILL.md`).
+- `MS_DEFAULT_TIMEOUT=1200` en ese env (2026-08-05): los clips con `ImageMobject` a
+  pantalla completa (fractales) renderizan a ~2.5 fps en Cairo y un clip de ~50 s
+  no cabía en los 600 s por defecto. El contenedor sigue capado a 1.5 vCPU, así que
+  el cambio solo alarga la espera permitida, no la carga.
 
 ### Autenticación y cambio de contraseña
 
