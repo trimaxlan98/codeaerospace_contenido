@@ -1,0 +1,56 @@
+{
+  "name": "Agentes de IA: máquinas que operan el mundo",
+  "description": "Curso de divulgación en 8 clips sobre agentes de IA: del LLM que solo escribe al lazo percibir-razonar-actuar, las herramientas y sus contratos JSON, el patrón ReAct, los sistemas multi-agente, la prompt injection y los niveles de autonomía con sus frenos. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-cerebro-en-una-caja.py",
+      "title": "1 · Un cerebro en una caja",
+      "scene": "Clip1",
+      "final_state": "Bloque LLM cian a la izquierda, tres mini-cajas violeta (correo, archivos, web) a la derecha, línea vertical punteada gris aún separándolos; título «Un cerebro en una caja» arriba y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-lazo.py",
+      "title": "2 · El lazo: percibir, razonar, actuar",
+      "scene": "Clip2",
+      "final_state": "Lazo circular completo centrado con sus tres nodos etiquetados PERCIBIR/RAZONAR/ACTUAR y flechas de arco ámbar; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-herramientas.py",
+      "title": "3 · Herramientas: las manos del agente",
+      "scene": "Clip3",
+      "final_state": "Bloque AGENTE arriba-izquierda y catálogo de 6 herramientas arriba-derecha; burbuja de observación violeta («TLE recibido...») abajo-izquierda; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-contrato-json.py",
+      "title": "4 · El contrato: JSON Schema",
+      "scene": "Clip4",
+      "final_state": "Dos tarjetas JSON válidas (borde/palomita verde) lado a lado en el centro; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-react.py",
+      "title": "5 · Pensar en voz alta: ReAct",
+      "scene": "Clip5",
+      "final_state": "Traza ReAct de 6 burbujas (pensamiento/acción/observación) en columna a la izquierda; lazo pequeño a la derecha; la última observación en verde; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-muchos-agentes.py",
+      "title": "6 · Muchos agentes, un objetivo",
+      "scene": "Clip6",
+      "final_state": "Bloque ORQUESTADOR arriba conectado a tres especialistas (PLANIFICA, EJECUTA, VERIFICA) abajo; burbuja con palomita verde junto a VERIFICA; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-superficie-de-ataque.py",
+      "title": "7 · La superficie de ataque",
+      "scene": "Clip7",
+      "final_state": "Agente con escudo verde a la izquierda; burbuja de correo con la línea maliciosa en rojo a la derecha; abajo dos tarjetas JSON: borrar_archivos() tachada en rojo y leer_agenda() válida en verde; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-autonomia-con-frenos.py",
+      "title": "8 · Autonomía con frenos",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («Agentes de IA» + «máquinas que operan el mundo» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
