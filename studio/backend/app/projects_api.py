@@ -34,6 +34,10 @@ MUX_SH = """#!/bin/sh
 # Une cada clip con su narracion y concatena el curso completo.
 # Requiere ffmpeg (ffprobe y awk incluidos). Uso:  sh mux.sh
 set -e
+# Locale C: con LANG=es_* (y mawk) el printf de abajo escribe el ratio con
+# coma decimal -> "atempo=1,1500", que ffmpeg rechaza; ademas romperia la
+# comparacion con "1.0000". En el VPS no se ve porque ya corre en locale C.
+export LC_ALL=C
 mkdir -p con_audio
 dur() {
   ffprobe -v error -show_entries format=duration -of csv=p=0 "$1"
