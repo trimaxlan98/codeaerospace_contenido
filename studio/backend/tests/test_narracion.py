@@ -345,6 +345,116 @@ def test_mux_ajusta_la_voz_que_no_cabe_en_vez_de_cortarla():
     assert "ffprobe" in MUX_SH
 
 
+def _stub_ffmpeg(bindir, log):
+    """Stubs de ffmpeg/ffprobe en un dir que se antepone al PATH.
+
+    `ffmpeg` apunta cada invocacion (cwd + args) en `log` y toca el archivo de
+    salida (ultimo argumento) para que el `set -e` del script siga adelante;
+    `ffprobe` finge que la voz dura 12 s y el video 10 s, para ejercitar
+    tambien la rama de atempo (ratio 1.2, que el script capa a 1.15).
+    """
+    bindir.mkdir(parents=True, exist_ok=True)
+    ffmpeg = bindir / "ffmpeg"
+    ffmpeg.write_text(
+        "#!/bin/sh\n"
+        "{ printf '%s' \"$PWD\"\n"
+        "  for a in \"$@\"; do printf '\\t%s' \"$a\"; done\n"
+        f"  printf '\\n'; }} >> '{log}'\n"
+        "out=\"\"\n"
+        "for a in \"$@\"; do out=\"$a\"; done\n"
+        "mkdir -p \"$(dirname \"$out\")\"\n"
+        ": > \"$out\"\n"
+    )
+    ffprobe = bindir / "ffprobe"
+    ffprobe.write_text(
+        "#!/bin/sh\n"
+        "f=\"\"\n"
+        "for a in \"$@\"; do f=\"$a\"; done\n"
+        "case \"$f\" in\n"
+        "  *.wav) echo 12.0 ;;\n"
+        "  *) echo 10.0 ;;\n"
+        "esac\n"
+    )
+    for f in (ffmpeg, ffprobe):
+        f.chmod(0o755)
+
+
+def test_mux_sh_corre_de_verdad(tmp_path):
+    """Ejecuta el mux.sh real con ffmpeg/ffprobe stubeados, en vez de mirar si
+    ciertas cadenas siguen en el script.
+
+    Cubre las dos regresiones que se comieron el audio del curso:
+
+    1. El concat leia `../concat.txt` desde con_audio/, y como ffmpeg resuelve
+       las rutas de un concat file respecto al directorio del propio fichero,
+       unia los mp4 originales: el curso salia entero pero mudo.
+    2. Con LANG=es_* el `printf "%.4f"` de mawk escribe el ratio con coma
+       ("atempo=1,1500"), que ffmpeg rechaza. Solo pasa fuera del VPS, que
+       corre en locale C — de ahi el `export LC_ALL=C` del script.
+    """
+    import os
+    import re
+    import shutil
+    import subprocess
+    from pathlib import Path
+
+    from app.projects_api import MUX_SH
+
+    sh = shutil.which("sh")
+    assert sh, "hace falta un /bin/sh para este test"
+
+    # Curso de dos clips: el primero con narracion, el segundo sin ella.
+    (tmp_path / "001-intro.mp4").write_bytes(b"video")
+    (tmp_path / "001-intro.wav").write_bytes(b"audio")
+    (tmp_path / "002-cierre.mp4").write_bytes(b"video")
+    (tmp_path / "concat.txt").write_text(
+        "file '001-intro.mp4'\nfile '002-cierre.mp4'\n")
+    (tmp_path / "mux.sh").write_text(MUX_SH)
+
+    log = tmp_path / "ffmpeg.log"
+    _stub_ffmpeg(tmp_path / "bin", log)
+    # Locale con coma decimal (si la maquina lo tiene instalado); el script
+    # tiene que imponer el suyo por dentro.
+    env = {**os.environ,
+           "PATH": f"{tmp_path / 'bin'}{os.pathsep}{os.environ['PATH']}",
+           "LC_ALL": "es_ES.UTF-8"}
+    r = subprocess.run([sh, "mux.sh"], cwd=tmp_path, env=env,
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+
+    invocaciones = [linea.split("\t") for linea in
+                    log.read_text().splitlines() if linea]
+    # Un mux por clip + el concat final
+    assert len(invocaciones) == 3, invocaciones
+
+    intro, cierre, concat = invocaciones
+    # Clip con voz: se acelera lo justo (1.2 capado a 1.15) y se rellena con
+    # apad. Con punto decimal, pase el locale que pase.
+    assert "atempo=1.1500,apad" in intro
+    # Clip sin voz: pista de silencio, para no mezclar clips con y sin audio
+    assert any(a.startswith("anullsrc") for a in cierre)
+
+    # El concat final: la lista que recibe ffmpeg debe apuntar a los mp4 de
+    # con_audio/, resolviendo como lo hace ffmpeg (relativo a la lista, no al cwd).
+    cwd_concat = Path(concat[0])
+    assert "-f" in concat and concat[concat.index("-f") + 1] == "concat"
+    lista = cwd_concat / concat[concat.index("-i") + 1]
+    assert lista.is_file(), f"la lista del concat no existe: {lista}"
+
+    entradas = re.findall(r"^file '(.+)'$", lista.read_text(), re.M)
+    assert entradas == ["001-intro.mp4", "002-cierre.mp4"]
+    muxeados = {(tmp_path / "con_audio" / n).resolve() for n in entradas}
+    for entrada in entradas:
+        resuelto = (lista.parent / entrada).resolve()
+        assert resuelto in muxeados, (
+            f"{entrada} resuelve a {resuelto}, que no es el mp4 muxeado")
+
+    # Y la salida es el curso completo, un nivel por encima de con_audio/
+    assert Path(concat[-1]).name == "curso_narrado.mp4"
+    assert (cwd_concat / concat[-1]).resolve() == (
+        tmp_path / "curso_narrado.mp4").resolve()
+
+
 def test_audio_404_sin_narracion(authed):
     project = _create_project(authed)
     clip = _add_clip(authed, project["id"])
