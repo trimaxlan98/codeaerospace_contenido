@@ -1,0 +1,7 @@
+Para que un mensaje viaje lejos, lo montamos sobre una portadora de alta frecuencia. Es lo que llamamos modular.
+
+Una opción es que la altura de la portadora siga al mensaje. La envolvente lo delata.
+
+Otra, que su ritmo se acelere y frene con él.
+
+Y en digital, usamos saltos de fase para codificar ceros y unos.

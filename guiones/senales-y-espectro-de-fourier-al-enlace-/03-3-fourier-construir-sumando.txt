@@ -1,0 +1,9 @@
+Partimos de una onda simple, nuestro primer bloque de construcción.
+
+El objetivo es construir una onda cuadrada sumando más senoides.
+
+Al sumar otra, la onda se aplana, acercándose a la forma.
+
+Cada nueva onda refina el resultado.
+
+Esta es la gran idea de Fourier: cualquier señal se puede descomponer.

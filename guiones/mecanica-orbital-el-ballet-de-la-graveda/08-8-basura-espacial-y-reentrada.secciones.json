@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 0.5,
+    "t_fin": 6.0,
+    "momento": "Nube de basura espacial",
+    "texto": "El espacio que rodea la Tierra no es infinito. Décadas de actividad han creado una peligrosa nube de basura."
+  },
+  {
+    "t_inicio": 10.8,
+    "t_fin": 18.3,
+    "momento": "Colisión y cascada de Kessler",
+    "texto": "Una colisión genera miles de proyectiles, iniciando una cascada de más choques."
+  },
+  {
+    "t_inicio": 19.2,
+    "t_fin": 28.2,
+    "momento": "Reentrada atmosférica",
+    "texto": "Por suerte, en órbitas bajas la atmósfera frena los objetos hasta que arden y se desintegran al reentrar."
+  },
+  {
+    "t_inicio": 29.6,
+    "t_fin": 34.4,
+    "momento": "Mensaje final",
+    "texto": "Sus leyes son inmutables. De nosotros depende usar este recurso de forma inteligente y sostenible."
+  }
+]

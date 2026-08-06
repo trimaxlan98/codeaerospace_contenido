@@ -1,0 +1,74 @@
+{
+  "506bf80ac89f466a": {
+    "hash": "fc801084f642fa02a48057536ac09d4bc685f835fdfb006137a5bb9b6019937e",
+    "etiqueta": "01-1-caer-sin-llegar-al-suelo",
+    "voz": "Charon",
+    "video_s": 27.3,
+    "audio_s": 24.1,
+    "palabras": 42,
+    "generado": 1785996004.5530832
+  },
+  "0f04d6b66a094b35": {
+    "hash": "3d6fa98e76ed74919ea5058dea0163b8933a8f9656a4072e99ca2f0bb0e9ca61",
+    "etiqueta": "02-2-las-tres-leyes-de-kepler",
+    "voz": "Charon",
+    "video_s": 28.5,
+    "audio_s": 27.0,
+    "palabras": 47,
+    "generado": 1785996107.4807343
+  },
+  "505c45a703154f3c": {
+    "hash": "b0c8a8270a06f2e3ce631d02a9249bebd7e6fb4fbca71461b0b2723fe0432cc9",
+    "etiqueta": "03-3-energia-y-vis-viva",
+    "voz": "Charon",
+    "video_s": 25.7,
+    "audio_s": 26.9,
+    "palabras": 44,
+    "generado": 1785996160.3458276
+  },
+  "5617f41f1af74e72": {
+    "hash": "d933fa37eaef7525a1948b1310d75ddc8e55a5744e45bde0ee0549f2e33a98e4",
+    "etiqueta": "04-4-la-transferencia-de-hohmann",
+    "voz": "Charon",
+    "video_s": 27.9,
+    "audio_s": 24.1,
+    "palabras": 41,
+    "generado": 1785996254.3540199
+  },
+  "cac55991572948e1": {
+    "hash": "55a7b96ae33fb8b992fecb246a2b9d614a603377d5801fbfe73f548c4b8753ec",
+    "etiqueta": "05-5-el-impuesto-de-cambiar-de-plano",
+    "voz": "Charon",
+    "video_s": 27.7,
+    "audio_s": 26.3,
+    "palabras": 49,
+    "generado": 1785996356.0637324
+  },
+  "2da15460e8c2494e": {
+    "hash": "1ba6209816c3c574547ef7afdc88133608e5d3f01ff82b271cd0fb7987d4ac80",
+    "etiqueta": "06-6-asistencia-gravitatoria",
+    "voz": "Charon",
+    "video_s": 28.2,
+    "audio_s": 29.6,
+    "palabras": 57,
+    "generado": 1785996421.3668466
+  },
+  "887726bb201a41a6": {
+    "hash": "f1cbf09aad2db089a21cbc691e2ea86e0cf0932b051c29f2a476af0e766e81e2",
+    "etiqueta": "07-7-los-puntos-de-lagrange",
+    "voz": "Charon",
+    "video_s": 27.7,
+    "audio_s": 29.1,
+    "palabras": 48,
+    "generado": 1785996519.4500303
+  },
+  "0d741aad4c6c404a": {
+    "hash": "d683493ba9e0393a95714fbadc4017579ab15106d498e185bf22a2fccd390b35",
+    "etiqueta": "08-8-basura-espacial-y-reentrada",
+    "voz": "Charon",
+    "video_s": 34.4,
+    "audio_s": 36.1,
+    "palabras": 64,
+    "generado": 1785996582.5844283
+  }
+}

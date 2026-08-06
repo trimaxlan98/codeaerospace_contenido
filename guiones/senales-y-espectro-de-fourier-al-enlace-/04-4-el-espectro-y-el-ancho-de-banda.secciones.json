@@ -1,0 +1,32 @@
+[
+  {
+    "t_inicio": 1.2,
+    "t_fin": 4.3,
+    "momento": "Pantalla partida: tiempo y frecuencia",
+    "texto": "Con Fourier, vemos la señal desde el dominio de la frecuencia."
+  },
+  {
+    "t_inicio": 4.3,
+    "t_fin": 8.9,
+    "momento": "Componentes se convierten en espectro",
+    "texto": "Cada componente es una raya en el espectro."
+  },
+  {
+    "t_inicio": 8.9,
+    "t_fin": 14.4,
+    "momento": "Definición de ancho de banda",
+    "texto": "El tramo de frecuencias que ocupa es su ancho de banda."
+  },
+  {
+    "t_inicio": 14.4,
+    "t_fin": 20.2,
+    "momento": "Efecto de recortar el ancho de banda",
+    "texto": "Recortarlo deforma la señal al perder detalle."
+  },
+  {
+    "t_inicio": 20.2,
+    "t_fin": 28.4,
+    "momento": "Comparación de espectros reales",
+    "texto": "Más banda transmite señales más complejas, con más datos."
+  }
+]

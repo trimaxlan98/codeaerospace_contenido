@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 5.9,
+    "momento": "De círculo a elipse, 1ª ley",
+    "texto": "La órbita real es una elipse, con el cuerpo masivo en un foco. El otro está vacío."
+  },
+  {
+    "t_inicio": 6.5,
+    "t_fin": 17.0,
+    "momento": "Áreas iguales, velocidad variable, 2ª ley",
+    "texto": "La velocidad cambia para barrer áreas iguales en tiempos iguales: más rápido al estar más cerca."
+  },
+  {
+    "t_inicio": 18.8,
+    "t_fin": 28.5,
+    "momento": "Órbitas y periodos, 3ª ley",
+    "texto": "Y la tercera ley: a mayor órbita, mayor período. El viaje es más largo."
+  }
+]

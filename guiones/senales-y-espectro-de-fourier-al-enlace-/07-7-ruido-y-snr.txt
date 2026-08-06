@@ -1,0 +1,7 @@
+El canal nunca es perfecto: siempre añade ruido a la señal.
+
+En recepción, los símbolos ideales forman esta constelación de puntos.
+
+El ruido los dispersa. Si la nube de puntos invade un cuadrante vecino, hay un error.
+
+La relación señal-ruido, o SNR, mide esta separación. Es la métrica clave del enlace.

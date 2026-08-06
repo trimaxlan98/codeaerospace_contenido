@@ -1,0 +1,74 @@
+{
+  "632c60951ee94170": {
+    "hash": "e5f8f7491c79dacde110a2ded5c4d7c2b99e3712e03966c4d868243b460d2a7f",
+    "etiqueta": "01-1-que-es-una-senal",
+    "voz": "Charon",
+    "video_s": 31.1,
+    "audio_s": 25.3,
+    "palabras": 39,
+    "generado": 1785996723.8374224
+  },
+  "30418f9068b94180": {
+    "hash": "57083ad9c568ce0e32e6fbf9d543e10d4d3aacdedeb65a800ca5e45d2c11dcd4",
+    "etiqueta": "02-2-la-senoide-y-su-circulo",
+    "voz": "Charon",
+    "video_s": 30.8,
+    "audio_s": 32.3,
+    "palabras": 59,
+    "generado": 1785996778.5668383
+  },
+  "2633944360664f0c": {
+    "hash": "e4372e808fac250bfdc6db80909c1d6d583760bc9083a963f380a8f891725454",
+    "etiqueta": "03-3-fourier-construir-sumando",
+    "voz": "Charon",
+    "video_s": 27.8,
+    "audio_s": 29.2,
+    "palabras": 49,
+    "generado": 1785996889.3170874
+  },
+  "0b763200983f4926": {
+    "hash": "d4fce23843ea8ab15811cb5617b088b824f4f5d4095ca25523472847fb956f97",
+    "etiqueta": "04-4-el-espectro-y-el-ancho-de-banda",
+    "voz": "Charon",
+    "video_s": 28.4,
+    "audio_s": 26.6,
+    "palabras": 46,
+    "generado": 1785997027.3662465
+  },
+  "867974008d884c56": {
+    "hash": "1dd5399a299b6dd2d535f6236eff9d99d1ecc6c81676395d0fc88961d6465ff3",
+    "etiqueta": "05-5-muestreo-y-aliasing",
+    "voz": "Charon",
+    "video_s": 28.9,
+    "audio_s": 30.1,
+    "palabras": 43,
+    "generado": 1785997147.739979
+  },
+  "852ae67b92354299": {
+    "hash": "b93bcd9c0c5aed1f78a594c8582d0a6e2b43b2d3b992707ae766283d11f4a2ab",
+    "etiqueta": "06-6-modulacion-subir-el-mensaje",
+    "voz": "Charon",
+    "video_s": 26.8,
+    "audio_s": 28.2,
+    "palabras": 57,
+    "generado": 1785997217.1365798
+  },
+  "e14da1ab06b54463": {
+    "hash": "5f2b40106afe3935ce07a4001b716196392f57eb3bf8c191b070eb83db448cf0",
+    "etiqueta": "07-7-ruido-y-snr",
+    "voz": "Charon",
+    "video_s": 29.0,
+    "audio_s": 30.4,
+    "palabras": 51,
+    "generado": 1785997360.9450212
+  },
+  "20b7c32497634c3a": {
+    "hash": "60045a516f1aaef611506785fb01f30a542da6fdcf6649f767b51064a3052265",
+    "etiqueta": "08-8-el-presupuesto-del-enlace-satelital",
+    "voz": "Charon",
+    "video_s": 35.4,
+    "audio_s": 37.2,
+    "palabras": 74,
+    "generado": 1785997433.8746142
+  }
+}

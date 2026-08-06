@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 7.6,
+    "momento": "Órbitas inicial y final",
+    "texto": "Para viajar entre órbitas circulares, la ruta más barata no es la más corta."
+  },
+  {
+    "t_inicio": 7.6,
+    "t_fin": 11.4,
+    "momento": "Primer impulso y elipse de transferencia",
+    "texto": "Un primer empujón nos pone en una elipse de transferencia."
+  },
+  {
+    "t_inicio": 11.4,
+    "t_fin": 20.4,
+    "momento": "Viaje y segundo impulso",
+    "texto": "Tras media órbita, un segundo empujón nos estabiliza en el destino."
+  },
+  {
+    "t_inicio": 20.4,
+    "t_fin": 27.9,
+    "momento": "Órbita final y resumen",
+    "texto": "Así funciona la transferencia de Hohmann."
+  }
+]

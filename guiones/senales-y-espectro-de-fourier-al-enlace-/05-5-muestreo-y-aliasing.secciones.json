@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 4.4,
+    "t_fin": 8.1,
+    "momento": "Muestreo rápido",
+    "texto": "Para digitalizar una señal, tomamos muestras. Si son frecuentes, podemos reconstruir la onda original."
+  },
+  {
+    "t_inicio": 13.0,
+    "t_fin": 17.0,
+    "momento": "Muestreo lento y onda fantasma",
+    "texto": "Pero con pocas muestras, aparece una onda fantasma. Es el fenómeno de 'aliasing'."
+  },
+  {
+    "t_inicio": 22.5,
+    "t_fin": 25.0,
+    "momento": "Fórmula de Nyquist",
+    "texto": "Para evitarlo, hay que muestrear al menos al doble de la frecuencia máxima de la señal."
+  }
+]

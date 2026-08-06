@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 0.5,
+    "t_fin": 2.9,
+    "momento": "El bloque 'Canal' introduce ruido",
+    "texto": "El canal nunca es perfecto: siempre añade ruido a la señal."
+  },
+  {
+    "t_inicio": 4.2,
+    "t_fin": 7.2,
+    "momento": "Aparece la constelación ideal",
+    "texto": "En recepción, los símbolos ideales forman esta constelación de puntos."
+  },
+  {
+    "t_inicio": 7.2,
+    "t_fin": 17.7,
+    "momento": "El ruido dispersa la constelación y causa errores",
+    "texto": "El ruido los dispersa. Si la nube de puntos invade un cuadrante vecino, hay un error."
+  },
+  {
+    "t_inicio": 21.1,
+    "t_fin": 25.1,
+    "momento": "La métrica SNR",
+    "texto": "La relación señal-ruido, o SNR, mide esta separación. Es la métrica clave del enlace."
+  }
+]

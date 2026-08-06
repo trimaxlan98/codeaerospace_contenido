@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 2.2,
+    "t_fin": 9.3,
+    "momento": "Generación de la senoide con un fasor",
+    "texto": "Toda senoide nace de un movimiento circular. Su proyección vertical traza la curva en el tiempo, describiendo tres parámetros clave."
+  },
+  {
+    "t_inicio": 20.4,
+    "t_fin": 26.9,
+    "momento": "Dos ondas en contrafase se cancelan",
+    "texto": "Por ejemplo, si sumamos una segunda onda que arranca en el punto opuesto del círculo, sus efectos se anulan por completo."
+  },
+  {
+    "t_inicio": 26.9,
+    "t_fin": 30.8,
+    "momento": "Conclusión: sumar ondas construye o destruye",
+    "texto": "Esta idea de sumar y restar ondas es la clave de todo lo que sigue en nuestro viaje."
+  }
+]

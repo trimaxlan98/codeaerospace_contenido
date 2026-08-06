@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 2.0,
+    "t_fin": 10.85,
+    "momento": "Diagrama de comunicación y portadora",
+    "texto": "Para que un mensaje viaje lejos, lo montamos sobre una portadora de alta frecuencia. Es lo que llamamos modular."
+  },
+  {
+    "t_inicio": 10.85,
+    "t_fin": 15.55,
+    "momento": "Modulación de Amplitud (AM)",
+    "texto": "Una opción es que la altura de la portadora siga al mensaje. La envolvente lo delata."
+  },
+  {
+    "t_inicio": 15.55,
+    "t_fin": 19.35,
+    "momento": "Modulación de Frecuencia (FM)",
+    "texto": "Otra, que su ritmo se acelere y frene con él."
+  },
+  {
+    "t_inicio": 19.35,
+    "t_fin": 25.55,
+    "momento": "Modulación digital (fase)",
+    "texto": "Y en digital, usamos saltos de fase para codificar ceros y unos."
+  }
+]

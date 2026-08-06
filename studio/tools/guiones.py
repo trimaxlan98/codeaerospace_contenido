@@ -20,9 +20,10 @@ Por cada clip del proyecto produce en guiones/<slug-proyecto>/:
 
 El guion se ajusta a la duracion real del video renderizado (leida del
 atomo mvhd del mp4, sin ffprobe): ~2.2 palabras/s con margen del 10 %.
-Si el audio sintetizado excede la duracion del video se reintenta una
-vez con un presupuesto de palabras mas corto; si aun asi no cabe, se
-conserva y se avisa (el montaje puede estirar el video o cortar pausas).
+Si el audio no cabe en el video se ataca en tres niveles: se comprimen los
+silencios entre secciones, se piden hasta MAX_INTENTOS_GUION guiones mas
+cortos (conservando el que mejor encaja, no el ultimo) y, si aun asi sobra,
+el mux.sh del zip lo acelera con atempo al montar. La voz nunca se corta.
 
 Reusa la service account del asistente IA (/etc/manimstudio/gcp-key.json,
 feature-flag: sin credenciales el comando falla con un mensaje claro).

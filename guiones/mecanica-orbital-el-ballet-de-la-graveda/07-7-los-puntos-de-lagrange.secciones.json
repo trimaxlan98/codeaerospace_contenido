@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 1.3,
+    "t_fin": 5.9,
+    "momento": "Sistema Sol-Tierra y puntos colineales L1, L2, L3.",
+    "texto": "Entre dos cuerpos, la gravedad crea cinco puntos de equilibrio. Tres son inestables, alineados con los cuerpos."
+  },
+  {
+    "t_inicio": 6.7,
+    "t_fin": 14.0,
+    "momento": "Puntos L4 y L5 (triángulos equiláteros) y asteroides troyanos.",
+    "texto": "Los otros dos son estables y forman triángulos perfectos. Por eso atrapan nubes de asteroides."
+  },
+  {
+    "t_inicio": 15.5,
+    "t_fin": 22.8,
+    "momento": "Inestabilidad de L1 y órbita halo del JWST en L2.",
+    "texto": "Los inestables, en cambio, son ideales para aparcar satélites con poco combustible, como el James Webb."
+  }
+]

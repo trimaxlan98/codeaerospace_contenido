@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 6.1,
+    "t_fin": 11.0,
+    "momento": "Aparece una onda compleja, como la voz.",
+    "texto": "Una señal puede ser la presión del aire cuando hablas."
+  },
+  {
+    "t_inicio": 11.0,
+    "t_fin": 14.7,
+    "momento": "La onda se transforma en una señal cuadrada (digital).",
+    "texto": "O los ceros y unos que viajan por un cable."
+  },
+  {
+    "t_inicio": 14.7,
+    "t_fin": 18.2,
+    "momento": "La señal se transforma en una onda senoidal pura.",
+    "texto": "Esta forma de onda es simple, pero muy potente."
+  },
+  {
+    "t_inicio": 18.5,
+    "t_fin": 24.4,
+    "momento": "Se señalan la amplitud y el ciclo de la onda.",
+    "texto": "Su altura es la amplitud. Y su ritmo, la frecuencia."
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "t_inicio": 1.1,
+    "t_fin": 4.2,
+    "momento": "Aparece la senoide fundamental",
+    "texto": "Partimos de una onda simple, nuestro primer bloque de construcción."
+  },
+  {
+    "t_inicio": 4.2,
+    "t_fin": 7.3,
+    "momento": "Aparece el objetivo (onda cuadrada)",
+    "texto": "El objetivo es construir una onda cuadrada sumando más senoides."
+  },
+  {
+    "t_inicio": 7.3,
+    "t_fin": 11.6,
+    "momento": "Se suma el tercer armónico",
+    "texto": "Al sumar otra, la onda se aplana, acercándose a la forma."
+  },
+  {
+    "t_inicio": 11.6,
+    "t_fin": 17.1,
+    "momento": "Se suman los siguientes armónicos",
+    "texto": "Cada nueva onda refina el resultado."
+  },
+  {
+    "t_inicio": 17.1,
+    "t_fin": 27.8,
+    "momento": "Conclusión: la serie de Fourier",
+    "texto": "Esta es la gran idea de Fourier: cualquier señal se puede descomponer."
+  }
+]
