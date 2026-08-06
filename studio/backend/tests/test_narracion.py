@@ -325,6 +325,26 @@ def test_archive_y_manifest_con_narracion(authed, tmp_path, monkeypatch):
     assert clip["id"] is not None
 
 
+def test_mux_concatena_los_clips_con_audio_no_los_originales():
+    """Regresion: ffmpeg resuelve las rutas relativas de un concat.txt contra
+    el directorio DEL ARCHIVO, no contra el cwd. Leer `../concat.txt` desde
+    con_audio/ concatenaba los mp4 originales y el curso salia MUDO, sin que
+    nada fallara. La lista tiene que vivir dentro de con_audio/."""
+    from app.projects_api import MUX_SH
+
+    assert "cp concat.txt con_audio/concat.txt" in MUX_SH
+    assert "-i ../concat.txt" not in MUX_SH
+
+
+def test_mux_ajusta_la_voz_que_no_cabe_en_vez_de_cortarla():
+    """La voz mas larga que el video se acelera con atempo (preserva el tono);
+    -shortest a secas le cortaria la cola."""
+    from app.projects_api import MUX_SH
+
+    assert "atempo=" in MUX_SH
+    assert "ffprobe" in MUX_SH
+
+
 def test_audio_404_sin_narracion(authed):
     project = _create_project(authed)
     clip = _add_clip(authed, project["id"])

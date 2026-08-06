@@ -241,7 +241,10 @@ ManimStudio no hace en el servidor para no sumar otro paso de render):
   cada mp4, `mux.sh` y el estado de narración en `manifest.json`. `mux.sh` mide con
   `ffprobe`: si la voz cabe, `apad -shortest` (cada clip conserva su duración exacta y el
   concat no se desincroniza); si no cabe, `atempo` con el ratio justo (tope 1.15, preserva
-  el tono) para no perder la cola de la narración.
+  el tono) para no perder la cola de la narración. La lista de concat se **copia dentro de
+  `con_audio/`**: ffmpeg resuelve las rutas relativas de un `concat.txt` contra el
+  directorio del archivo, no contra el cwd — leerla desde `../` concatenaba los mp4
+  originales y el curso salía mudo sin que nada fallara.
 - CLI equivalente: `studio/tools/guiones.py` (`--solo-guion`, `--solo-audio`, `--voz`,
   `--force`); comparte la lógica de `app/narracion.py`.
 - Operación: la unidad systemd necesita `ReadWritePaths` sobre `guiones/` y el directorio

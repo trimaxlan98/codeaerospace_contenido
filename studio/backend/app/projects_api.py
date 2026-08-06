@@ -64,7 +64,11 @@ for v in [0-9][0-9][0-9]-*.mp4; do
       -c:v copy -c:a aac -b:a 192k -shortest "con_audio/$v"
   fi
 done
-cd con_audio && ffmpeg -y -f concat -safe 0 -i ../concat.txt -c copy \\
+# La lista se copia DENTRO de con_audio a proposito: ffmpeg resuelve las rutas
+# relativas de un concat.txt respecto al directorio del propio archivo, no al
+# cwd. Leerla desde ../ concatenaba los mp4 originales, sin narracion.
+cp concat.txt con_audio/concat.txt
+cd con_audio && ffmpeg -y -f concat -safe 0 -i concat.txt -c copy \\
   ../curso_narrado.mp4
 echo "Listo: curso_narrado.mp4"
 """

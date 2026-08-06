@@ -45,3 +45,6 @@ studio/backend/gcp-key.json
 
 # Permisos locales de Claude Code (por máquina, puede contener rutas/credenciales)
 .claude/settings.local.json
+
+# Cursos montados con narracion (mux.sh) — binarios, fuera del repo
+exports/
