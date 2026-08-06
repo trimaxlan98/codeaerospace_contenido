@@ -1,0 +1,9 @@
+Este es el plano de los números complejos. Un mapa donde cada punto es un número.
+
+Por ejemplo, este de aquí. Para localizarlo, nos fijamos en sus dos coordenadas.
+
+Su parte real, en el eje horizontal, y su parte imaginaria, en el vertical.
+
+Y sumar números complejos es tan fácil como encadenar sus flechas, una a continuación de la otra.
+
+El resultado es el punto al que llegamos desde el origen. Geométricamente, sumar es simplemente desplazarse por este mapa.

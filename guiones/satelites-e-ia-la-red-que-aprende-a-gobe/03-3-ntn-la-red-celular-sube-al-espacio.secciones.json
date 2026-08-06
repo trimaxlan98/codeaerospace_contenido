@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 0.8,
+    "t_fin": 6.0,
+    "momento": "Línea de tiempo 5G-6G",
+    "texto": "La red móvil evoluciona. Con el estándar 5G, la cobertura por fin llega al espacio."
+  },
+  {
+    "t_inicio": 6.4,
+    "t_fin": 15.0,
+    "momento": "Arquitectura NTN y flujo de datos",
+    "texto": "El satélite se convierte en una estación base, procesando la señal directamente en órbita."
+  },
+  {
+    "t_inicio": 16.1,
+    "t_fin": 20.7,
+    "momento": "Visión 6G: red unificada",
+    "texto": "El futuro es una única red global."
+  }
+]

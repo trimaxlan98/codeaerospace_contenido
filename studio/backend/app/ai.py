@@ -143,6 +143,8 @@ class Assistant:
             "manim que fallo al renderizar y su log de error. Devuelve el "
             "script COMPLETO corregido, funcional con `manim render`. Manten "
             "el estilo y la intencion del original; corrige solo lo necesario. "
+            "Si el original usa la identidad CO.DE Academy de la guia, "
+            "conservala intacta; nunca la quites al arreglar. "
             "Responde UNICAMENTE con el codigo Python dentro de un bloque "
             "```python```. Sin explicaciones fuera del bloque."
         ) + self._contexto_proyecto()
@@ -159,8 +161,12 @@ class Assistant:
             "dependencias externas, sin acceso a red ni a archivos. Apunta a "
             "renders cortos (10-20 s de animacion). Sigue la guia del "
             "proyecto y USA sus primitivas cuando encajen (con las lineas de "
-            "sys.path del inicio). Responde UNICAMENTE con el codigo dentro "
-            "de un bloque ```python```."
+            "sys.path del inicio). La identidad CO.DE Academy de la guia "
+            "(paleta ambar sobre casi-negro, titulos con titulo_marca, "
+            "etiquetas con etiqueta_hud, relevos con Rotulos) es el minimo "
+            "visual: aplicala siempre, no es negociable ni configurable. "
+            "Responde UNICAMENTE con el codigo dentro de un bloque "
+            "```python```."
         ) + self._contexto_proyecto()
         text = await self._generate(self.cfg.gemini_model_deep, system,
                                     _clip(prompt, MAX_PROMPT_CHARS))

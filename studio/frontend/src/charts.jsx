@@ -36,44 +36,58 @@ function renderBands(samples, now) {
 
 export function Chart({ title, samples, field, color, now }) {
   const visible = samples.filter((s) => s.ts >= now - WINDOW_S && s[field] != null)
-  const points = visible
-    .map((s) => `${scaleX(s.ts, now).toFixed(1)},${scaleY(s[field]).toFixed(1)}`)
-    .join(' ')
+  const coords = visible.map((s) => [scaleX(s.ts, now), scaleY(s[field])])
+  const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+  const baseY = scaleY(0)
+  const area = coords.length > 1
+    ? `${coords[0][0].toFixed(1)},${baseY} ${points} ${coords[coords.length - 1][0].toFixed(1)},${baseY}`
+    : ''
   const last = visible.length ? visible[visible.length - 1][field] : null
   const bands = renderBands(samples.filter((s) => s.ts >= now - WINDOW_S), now)
+  const gid = `chartgrad-${field}`
   const fmtT = (ts) => new Date(ts * 1000).toLocaleTimeString('es',
     { hour: '2-digit', minute: '2-digit', hour12: false })
 
   return (
-    <figure className="chart">
-      <figcaption className="chart__head">
-        <span className="chart__title">{title}</span>
-        <span className="chart__val" style={{ color }}>
+    <figure className="m-0 flex flex-col gap-2">
+      <figcaption className="flex items-center justify-between">
+        <span className="eyebrow">{title}</span>
+        <span className="font-mono text-[13px] tabular-nums" style={{ color }}>
           {last == null ? '—' : `${last.toFixed(1)}%`}
         </span>
       </figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} className="chart__svg" role="img"
+      <svg viewBox={`0 0 ${W} ${H}`} role="img"
+        className="block w-full rounded-md border border-line bg-canvas"
         aria-label={`serie temporal de ${title}, ultimo valor ${last == null ? 'sin datos' : `${last.toFixed(0)}%`}`}>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
         {bands.map((b, i) => (
           <rect key={i} x={b.x} y={PAD.t} width={b.w} height={H - PAD.t - PAD.b}
-            className="chart__band" />
+            fill="var(--accent)" opacity="0.12" />
         ))}
         {[0, 25, 50, 75, 100].map((v) => (
           <g key={v}>
             <line x1={PAD.l} x2={W - PAD.r} y1={scaleY(v)} y2={scaleY(v)}
-              className="chart__grid" />
+              stroke="var(--line)" strokeWidth="0.6" opacity="0.7" />
             {(v === 0 || v === 50 || v === 100) && (
-              <text x={PAD.l - 5} y={scaleY(v) + 3} className="chart__tick"
-                textAnchor="end">{v}</text>
+              <text x={PAD.l - 5} y={scaleY(v) + 3} textAnchor="end"
+                fill="var(--muted)" fontSize="8.5" fontFamily="var(--font-mono)">{v}</text>
             )}
           </g>
         ))}
-        {visible.length > 1 && (
+        {coords.length > 1 && <polygon points={area} fill={`url(#${gid})`} />}
+        {coords.length > 1 && (
           <polyline points={points} fill="none" stroke={color}
             strokeWidth="1.6" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         )}
-        <text x={PAD.l} y={H - 3} className="chart__tick">{fmtT(now - WINDOW_S)}</text>
-        <text x={W - PAD.r} y={H - 3} className="chart__tick" textAnchor="end">{fmtT(now)}</text>
+        <text x={PAD.l} y={H - 3} fill="var(--muted)" fontSize="8.5"
+          fontFamily="var(--font-mono)">{fmtT(now - WINDOW_S)}</text>
+        <text x={W - PAD.r} y={H - 3} textAnchor="end" fill="var(--muted)"
+          fontSize="8.5" fontFamily="var(--font-mono)">{fmtT(now)}</text>
       </svg>
     </figure>
   )
@@ -89,8 +103,11 @@ export function useHistory(metrics, containers) {
     api.metricsHistory()
       .then((d) => {
         if (!alive) return
-        setSamples(d.samples)
-        lastTs.current = d.samples.length ? d.samples[d.samples.length - 1].ts : 0
+        // Defensa: una respuesta con forma inesperada no debe tirar la vista
+        // (visto en QA: `samples` undefined dejaba la pantalla en negro).
+        const s = Array.isArray(d?.samples) ? d.samples : []
+        setSamples(s)
+        lastTs.current = s.length ? s[s.length - 1].ts : 0
       })
       .catch(() => {})
     return () => { alive = false }

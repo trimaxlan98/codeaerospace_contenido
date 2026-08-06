@@ -1,0 +1,74 @@
+{
+  "3688d311d46a40af": {
+    "hash": "d4d3048b1da240d29114fb8cdfa6de1e9fc2f3d367deb368bf9016c79a77fe12",
+    "etiqueta": "01-1-la-red-que-no-se-queda-quieta",
+    "voz": "Charon",
+    "video_s": 27.9,
+    "audio_s": 27.0,
+    "palabras": 40,
+    "generado": 1785989212.8322084
+  },
+  "8246257b1f224fde": {
+    "hash": "b8719c4866528f6d900baceb0289c31fc4d598cd848693742a391eefb2ec1360",
+    "etiqueta": "02-2-el-zoologico-orbital",
+    "voz": "Charon",
+    "video_s": 24.6,
+    "audio_s": 27.2,
+    "palabras": 41,
+    "generado": 1785989317.47625
+  },
+  "35635d2b7abb40b4": {
+    "hash": "cd1e6f74abeb603d2189073ba6e7ea7a893e8731d3ca4db2c824c8d9cdb216fc",
+    "etiqueta": "03-3-ntn-la-red-celular-sube-al-espacio",
+    "voz": "Charon",
+    "video_s": 20.7,
+    "audio_s": 22.2,
+    "palabras": 36,
+    "generado": 1785989408.4516418
+  },
+  "cccf5a3e089d4c81": {
+    "hash": "33528633f2e2355d252c12def3405a7217cb7f08cd3e4fe2609cca2468388e8a",
+    "etiqueta": "04-4-la-topologia-que-respira",
+    "voz": "Charon",
+    "video_s": 31.4,
+    "audio_s": 35.3,
+    "palabras": 42,
+    "generado": 1785989524.5587447
+  },
+  "7d66052201484d89": {
+    "hash": "d5a6b8b123e682d2b11cbe28bac576a3470c2e03ee417b00c162858a3d3e9afc",
+    "etiqueta": "05-5-un-agente-que-aprende",
+    "voz": "Charon",
+    "video_s": 20.9,
+    "audio_s": 16.2,
+    "palabras": 23,
+    "generado": 1785989604.581371
+  },
+  "5d5d8166d93a48fa": {
+    "hash": "e8f6052d597998293b17dcc0c7f11f4581a188f4870a23c921c11db99da9079c",
+    "etiqueta": "06-6-muchos-agentes-una-constelacion",
+    "voz": "Charon",
+    "video_s": 30.5,
+    "audio_s": 29.9,
+    "palabras": 50,
+    "generado": 1785989733.3822052
+  },
+  "2b50a3baedd2447d": {
+    "hash": "9306792ceaff63650033b4d4ec30f17c2a7fd02269425724e0fe0e0014914895",
+    "etiqueta": "07-7-y-si-un-satelite-miente",
+    "voz": "Charon",
+    "video_s": 28.5,
+    "audio_s": 30.1,
+    "palabras": 44,
+    "generado": 1785989836.3784354
+  },
+  "266de127c3c74ddf": {
+    "hash": "bd8fe2754559e84b6da20433c9fcf2ed9fa141d3b54a8e097362b1dd4b79e8d2",
+    "etiqueta": "08-8-pada-gobernanza-que-se-vigila-a-si-mis",
+    "voz": "Charon",
+    "video_s": 28.7,
+    "audio_s": 25.2,
+    "palabras": 43,
+    "generado": 1785989949.0762146
+  }
+}

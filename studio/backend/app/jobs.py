@@ -12,6 +12,7 @@ import uuid
 from collections import deque
 from pathlib import Path
 
+from . import branding
 from .config import Settings
 from .db import Database
 from .events import EventBus
@@ -26,7 +27,8 @@ STORAGE_TTL = 15.0  # s: caché de storage_usage() para no recorrer el FS en cad
 def job_public(job: dict) -> dict:
     """Vista del job para la API (sin el script completo)."""
     keys = ("id", "scene", "quality", "timeout", "status", "video_path", "error",
-            "created_at", "started_at", "finished_at", "size_bytes")
+            "created_at", "started_at", "finished_at", "size_bytes",
+            "project_id", "clip_id")
     return {k: job.get(k) for k in keys} | {"has_thumb": bool(job.get("thumb_path"))}
 
 
@@ -45,6 +47,10 @@ class JobManager:
         self._worker_task: asyncio.Task | None = None
         self._storage_cache: int | None = None
         self._storage_cache_at: float = 0.0
+        # Callback opcional (ProjectService.handle_job_done): se invoca al
+        # terminar un job en 'done', antes de publicar por SSE, para que el
+        # clip llegue ya enlazado al cliente.
+        self.on_job_done = None
 
     # ── ciclo de vida ────────────────────────────────────────────────────────
 
@@ -64,17 +70,24 @@ class JobManager:
 
     # ── API publica ──────────────────────────────────────────────────────────
 
-    def create_job(self, script: str, scene: str, quality: str, timeout: int) -> dict:
+    def create_job(self, script: str, scene: str, quality: str, timeout: int,
+                   project_id: str | None = None, clip_id: str | None = None,
+                   content_hash: str | None = None) -> dict:
         job_id = uuid.uuid4().hex[:16]
         now = time.time()
         job = {
             "id": job_id, "scene": scene, "quality": quality, "timeout": timeout,
             "status": "queued", "script": script, "created_at": now,
+            "project_id": project_id, "clip_id": clip_id, "content_hash": content_hash,
         }
-        # El script se escribe en la ruta canonica que el runner espera.
+        # El script se escribe en la ruta canonica que el runner espera, con
+        # la identidad del canal garantizada (branding.aplicar). Lo que se
+        # guarda en la DB es el script del autor, sin tocar: la marca es del
+        # render, no del codigo que el usuario edita.
         job_dir = self.cfg.render_jobs_dir / job_id
         job_dir.mkdir(parents=True, exist_ok=True)
-        (job_dir / "scene.py").write_text(script, encoding="utf-8")
+        (job_dir / "scene.py").write_text(branding.aplicar(script),
+                                          encoding="utf-8")
 
         self.db.insert_job(job)
         self.logs[job_id] = deque(maxlen=LOG_BUFFER_MAX)
@@ -119,6 +132,7 @@ class JobManager:
         self.delete_job_files(job_id)
         self._invalidate_storage()  # se liberó espacio; la Biblioteca debe reflejar la cuota al instante
         self.db.delete_job(job_id)
+        self.db.clips_unlink_job(job_id)  # el clip pierde su render vigente
         return True
 
     def storage_usage(self) -> int:
@@ -249,6 +263,13 @@ class JobManager:
         elif status == "cancelled":
             self.logs.pop(job_id, None)
         self._invalidate_storage()  # el tamaño en disco cambió (video nuevo o archivos borrados)
+        if status == "done" and self.on_job_done:
+            try:
+                job = self.db.get_job(job_id)
+                if job:
+                    self.on_job_done(job)
+            except Exception as e:  # el callback nunca debe romper el worker
+                print(f"[jobs] error en on_job_done para {job_id}: {e!r}")
         self._publish_job(job_id)
 
     def _persist_log(self, job_id: str) -> None:
@@ -270,21 +291,52 @@ class JobManager:
     # ── mantenimiento ────────────────────────────────────────────────────────
 
     def delete_failed_jobs(self) -> int:
-        """Borra todos los jobs fallidos/cancelados. Devuelve el conteo."""
+        """Borra todos los jobs fallidos/cancelados. Devuelve el conteo.
+
+        Protege los jobs que un clip de proyecto sigue referenciando como su
+        render vigente (se borran solo via delete_job individual, que
+        desenlaza el clip primero).
+        """
+        protected = self.db.clip_job_ids()
         count = 0
         for job in self.db.list_jobs(limit=100_000):
+            if job["id"] in protected:
+                continue
             if job["status"] in self.FAILED_STATES and self.delete_job(job["id"]):
                 count += 1
         return count
 
+    def delete_finished_jobs(self) -> tuple[int, int]:
+        """Borra todo el historial (done/error/timeout/cancelled), videos
+        incluidos. Los jobs activos no se tocan.
+
+        Protege los jobs enlazados a un clip (ver delete_failed_jobs).
+        Devuelve (conteo, bytes liberados segun size_bytes registrado).
+        """
+        protected = self.db.clip_job_ids()
+        count = freed = 0
+        for job in self.db.list_jobs(limit=100_000):
+            if job["id"] in protected:
+                continue
+            if job["status"] not in ACTIVE_STATES:
+                size = job.get("size_bytes") or 0
+                if self.delete_job(job["id"]):
+                    count += 1
+                    freed += size
+        return count, freed
+
     def delete_jobs_older_than(self, days: int) -> tuple[int, int]:
         """Borra jobs 'done' terminados hace mas de `days` dias.
 
+        Protege los jobs enlazados a un clip (ver delete_failed_jobs).
         Devuelve (conteo, bytes liberados segun size_bytes registrado).
         """
+        protected = self.db.clip_job_ids()
         cutoff = time.time() - days * 86400
         count = freed = 0
         for job in self.db.list_jobs(limit=100_000):
+            if job["id"] in protected:
+                continue
             if job["status"] == "done" and (job.get("finished_at") or 0) < cutoff:
                 size = job.get("size_bytes") or 0
                 if self.delete_job(job["id"]):

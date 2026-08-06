@@ -1,0 +1,3 @@
+Un satélite aprende a gestionar la red como un agente autónomo.
+
+Prueba acciones, recibe una recompensa y, con el tiempo, mejora su estrategia.

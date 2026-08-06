@@ -1,0 +1,7 @@
+Los satélites viven en órbitas de distinta altura: baja, media y geoestacionaria.
+
+Cuanto más lejos, más tarda la señal en viajar.
+
+Pero a cambio, ven una porción mucho mayor del planeta.
+
+Este es el gran dilema de las comunicaciones por satélite.

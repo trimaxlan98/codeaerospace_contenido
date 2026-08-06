@@ -1,10 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import '@fontsource-variable/inter'
+import '@fontsource-variable/space-grotesk'
+import '@fontsource-variable/jetbrains-mono'
+import './theme.css'   // sistema de diseño (Tailwind v4 + tokens)
+import './styles.css'  // legacy: solo quedan .boot, .editor, .login__sky y .reader
 import App from './App.jsx'
-import './styles.css'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { currentTheme, applyTheme } from './themes.js'
+
+// Aplica el tema guardado antes del primer render para evitar parpadeo.
+applyTheme(currentTheme())
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>,
 )

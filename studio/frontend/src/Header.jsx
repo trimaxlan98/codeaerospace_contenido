@@ -1,5 +1,18 @@
 import { useEffect, useState } from 'react'
+import { FolderKanban, LogOut, WifiOff } from 'lucide-react'
 import ThemePicker from './ThemePicker.jsx'
+import { OrbitGlyph } from './components/OrbitGlyph.jsx'
+import { Button } from './components/ui/button.jsx'
+import { cn } from '@/lib/utils'
+
+const NAV = [
+  { id: 'studio', label: 'Estudio' },
+  { id: 'projects', label: 'Proyectos', icon: FolderKanban },
+  { id: 'library', label: 'Biblioteca' },
+  { id: 'lessons', label: 'Aprender' },
+  { id: 'animations', label: 'Animaciones' },
+  { id: 'admin', label: 'Admin' },
+]
 
 function useUtcClock() {
   const [now, setNow] = useState(() => new Date())
@@ -10,53 +23,80 @@ function useUtcClock() {
   return now.toISOString().slice(11, 19)
 }
 
-// Firma visual: el satelite orbita lento en reposo, rapido y ambar mientras
-// renderiza, rojo tras un fallo. El estado del sistema ES el ornamento.
-export function OrbitGlyph({ state }) {
+function MeterChip({ label, pct }) {
+  const tone = pct >= 90 ? 'bg-err' : pct >= 70 ? 'bg-warn' : 'bg-cyan'
   return (
-    <svg className={`orbit orbit--${state}`} viewBox="0 0 48 48" width="34" height="34"
-      role="img" aria-label={`estado: ${state}`}>
-      <circle cx="24" cy="24" r="5.5" className="orbit__body" />
-      <ellipse cx="24" cy="24" rx="19" ry="8.5" className="orbit__path"
-        transform="rotate(-18 24 24)" />
-      <g className="orbit__spin">
-        <circle cx="43" cy="24" r="2.6" className="orbit__sat"
-          transform="rotate(-18 24 24)" />
-      </g>
-    </svg>
+    <div className="hidden items-center gap-2 rounded-md border border-line bg-surface-2/50 px-2.5 py-1.5 lg:flex">
+      <span className="eyebrow">{label}</span>
+      <span className="font-mono text-xs tabular-nums text-ink">{pct.toFixed(0)}%</span>
+      <span className="block h-1 w-8 overflow-hidden rounded-full bg-canvas">
+        <span className={cn('block h-full rounded-full transition-[width] duration-500', tone)}
+          style={{ width: `${Math.min(100, pct)}%` }} />
+      </span>
+    </div>
   )
 }
 
-export default function Header({ view, onView, metrics, orbitState, onLogout }) {
-  const clock = useUtcClock()
+export default function Header({ view, onView, metrics, orbitState, staleSince, onLogout }) {
+  const clock = useUtcClock() // ademas re-renderiza cada segundo: el contador de "sin señal" avanza solo
   return (
-    <header className="hdr">
-      <div className="hdr__brand">
-        <OrbitGlyph state={orbitState} />
-        <span className="hdr__mark">MANIM·STUDIO</span>
+    // En movil el header ocupa dos filas: marca + acciones arriba y la nav a
+    // lo ancho debajo (order-last + w-full); en md+ vuelve a una sola fila.
+    <header className="sticky top-0 z-40 flex shrink-0 flex-wrap items-center gap-x-3 border-b border-line bg-surface/80 px-3 pt-2 backdrop-blur-md md:h-14 md:flex-nowrap md:gap-4 md:px-4 md:pt-0">
+      <div className="flex shrink-0 items-center gap-2.5">
+        <OrbitGlyph state={orbitState} size={34} />
+        <div className="leading-none">
+          <div className="font-display text-[15px] font-semibold tracking-tight text-ink">ManimStudio</div>
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-faint">Render console</div>
+        </div>
       </div>
-      <nav className="hdr__nav" aria-label="vistas">
-        <button className={view === 'studio' ? 'tab tab--on' : 'tab'}
-          onClick={() => onView('studio')}>Estudio</button>
-        <button className={view === 'library' ? 'tab tab--on' : 'tab'}
-          onClick={() => onView('library')}>Biblioteca</button>
-        <button className={view === 'lessons' ? 'tab tab--on' : 'tab'}
-          onClick={() => onView('lessons')}>Aprender</button>
-        <button className={view === 'animations' ? 'tab tab--on' : 'tab'}
-          onClick={() => onView('animations')}>Animaciones</button>
-        <button className={view === 'admin' ? 'tab tab--on' : 'tab'}
-          onClick={() => onView('admin')}>Admin</button>
+
+      <nav aria-label="vistas"
+        className="order-last -mx-1 flex w-full items-center gap-1 overflow-x-auto p-1 md:order-none md:mx-0 md:ml-1 md:w-auto md:rounded-lg md:border md:border-line md:bg-canvas/40">
+        {NAV.map((n) => {
+          const active = view === n.id
+          const Icon = n.icon
+          return (
+            <button
+              key={n.id}
+              onClick={() => onView(n.id)}
+              aria-current={active ? 'page' : undefined}
+              className={cn(
+                'flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                active ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
+              )}
+            >
+              {Icon && <Icon className="h-3.5 w-3.5" />}
+              {n.label}
+            </button>
+          )
+        })}
       </nav>
-      <div className="hdr__telemetry">
+
+      <div className="ml-auto flex items-center gap-2">
+        {staleSince && (
+          <span role="status"
+            className="flex items-center gap-1.5 rounded-md border border-warn/40 bg-warn/10 px-2 py-1 font-mono text-[11px] text-warn"
+            title="el stream de telemetria no envia eventos; los datos en pantalla estan congelados">
+            <WifiOff className="h-3 w-3" />
+            <span className="hidden sm:inline">sin señal</span>
+            {Math.max(0, Math.floor((Date.now() - staleSince) / 1000))}s
+          </span>
+        )}
         {metrics && (
           <>
-            <span className="chip">CPU <b>{metrics.cpu_pct.toFixed(0)}%</b></span>
-            <span className="chip">RAM <b>{metrics.mem.pct.toFixed(0)}%</b></span>
+            <MeterChip label="CPU" pct={metrics.cpu_pct} />
+            <MeterChip label="RAM" pct={metrics.mem.pct} />
           </>
         )}
-        <span className="chip chip--clock">{clock} UTC</span>
+        <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted md:inline">
+          {clock} <span className="text-faint">UTC</span>
+        </span>
         <ThemePicker />
-        <button className="btn btn--ghost" onClick={onLogout}>Cerrar sesión</button>
+        <Button variant="ghost" size="sm" onClick={onLogout} title="Cerrar sesión">
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Salir</span>
+        </Button>
       </div>
     </header>
   )

@@ -1,0 +1,5 @@
+Para cada punto 'c', aplicamos la regla. Si la órbita que genera escapa, coloreamos el punto según su velocidad. Si no, lo dejamos negro.
+
+Al refinar la cuadrícula, emerge esta figura. Los puntos negros forman el conjunto de Mandelbrot.
+
+Y esa frontera, al ampliarla, revela una complejidad que nunca termina.

@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
+import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save, FolderKanban, LogOut } from 'lucide-react'
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
+import { Button } from './components/ui/button.jsx'
+import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
+import { cn } from '@/lib/utils'
 
 const SAMPLE = `from manim import *
 
@@ -23,9 +28,34 @@ const QUALITIES = [
   { id: 'qh', label: '1080p', hint: 'alta' },
 ]
 
-const STATUS_LABEL = {
-  queued: 'en cola', running: 'renderizando', done: 'listo',
-  error: 'error', cancelled: 'cancelado', timeout: 'timeout',
+const QUALITY_LABEL = Object.fromEntries(QUALITIES.map((q) => [q.id, q.label]))
+
+// Persistencia local del area de trabajo: el script (y sus ajustes) deben
+// sobrevivir a F5 y a cambios de vista. localStorage puede fallar (modo
+// privado, cuota): nunca es fatal.
+const LS = {
+  script: 'ms_studio_script',
+  scene: 'ms_studio_scene',
+  quality: 'ms_studio_quality',
+  timeout: 'ms_studio_timeout',
+}
+
+function lsGet(key) {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+function lsSet(key, value) {
+  try { localStorage.setItem(key, value) } catch { /* no critico */ }
+}
+
+const STATUS_META = {
+  queued: { label: 'en cola', dot: 'bg-cyan', text: 'text-cyan' },
+  running: { label: 'renderizando', dot: 'bg-accent', text: 'text-accent' },
+  done: { label: 'listo', dot: 'bg-ok', text: 'text-ok' },
+  error: { label: 'error', dot: 'bg-err', text: 'text-err' },
+  timeout: { label: 'timeout', dot: 'bg-err', text: 'text-err' },
+  cancelled: { label: 'cancelado', dot: 'bg-muted', text: 'text-muted' },
+  default: { label: '—', dot: 'bg-muted', text: 'text-muted' },
 }
 
 function fmtTime(ts) {
@@ -39,29 +69,190 @@ function duration(job) {
   return `${(end - job.started_at).toFixed(0)}s`
 }
 
+// Control segmentado (calidad). role=radiogroup para accesibilidad.
+// disabled: se usa cuando el Estudio esta en contexto de clip — la calidad
+// la fija el proyecto y no se puede cambiar desde aqui.
+function Segmented({ options, value, onChange, ariaLabel, disabled }) {
+  return (
+    <div role="radiogroup" aria-label={ariaLabel} aria-disabled={disabled || undefined}
+      className={cn('flex rounded-md border border-line bg-canvas p-0.5', disabled && 'opacity-60')}>
+      {options.map((o) => {
+        const on = value === o.id
+        return (
+          <button key={o.id} type="button" role="radio" aria-checked={on} title={o.hint}
+            disabled={disabled}
+            onClick={() => onChange(o.id)}
+            className={cn(
+              'rounded-[5px] px-2.5 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+              on ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
+              disabled && 'cursor-not-allowed',
+            )}>
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// Accion secundaria dentro de una ficha (no dispara el onSelect del chip).
+function ChipAction({ onClick, danger, title, children }) {
+  return (
+    <button type="button" title={title}
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      className={cn(
+        'inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-muted transition-colors',
+        danger ? 'hover:bg-err/10 hover:text-err' : 'hover:bg-surface-2 hover:text-ink',
+      )}>
+      {children}
+    </button>
+  )
+}
+
+// Ficha de la tira de renders. Div interactivo (las acciones anidan dentro).
+// queuePos: posicion 1-based entre los encolados (solo status=queued).
+function JobChip({ job, selected, onSelect, onCancel, onRetry, onDelete, queuePos }) {
+  const m = STATUS_META[job.status] || STATUS_META.default
+  const active = ['queued', 'running'].includes(job.status)
+  const [arming, setArming] = useState(false)
+  useEffect(() => {
+    if (!arming) return
+    const t = setTimeout(() => setArming(false), 3500)
+    return () => clearTimeout(t)
+  }, [arming])
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect() } }}
+      className={cn(
+        'flex w-[196px] shrink-0 cursor-pointer flex-col gap-1 rounded-lg border p-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+        selected ? 'border-accent/50 bg-surface-2' : 'border-line bg-surface hover:border-line-strong',
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot, job.status === 'running' && 'animate-pulse')} />
+        <span className="truncate font-mono text-[13px] text-ink">{job.scene}</span>
+        <span className={cn('ml-auto shrink-0 font-mono text-[10px] uppercase tracking-wide', m.text)}>
+          {job.status === 'queued' && queuePos ? `en cola #${queuePos}` : m.label}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5 pl-4 font-mono text-[11px] text-muted">
+        <span>{job.quality}</span>
+        <span className="text-faint">·</span>
+        <span>{fmtTime(job.created_at)}</span>
+        {duration(job) && (<><span className="text-faint">·</span><span>{duration(job)}</span></>)}
+      </div>
+      {active ? (
+        <ChipAction danger onClick={() => onCancel(job.id)}>
+          <X className="h-3 w-3" /> Cancelar
+        </ChipAction>
+      ) : (
+        <div className="mt-0.5 flex items-center gap-1">
+          <ChipAction onClick={() => onRetry(job.id)} title="volver a renderizar con el mismo script">
+            <RotateCcw className="h-3 w-3" /> Reintentar
+          </ChipAction>
+          {arming ? (
+            <ChipAction danger onClick={() => { setArming(false); onDelete(job.id) }}
+              title={job.status === 'done' ? 'borra tambien el video' : 'borrar del historial'}>
+              ¿Confirmar?
+            </ChipAction>
+          ) : (
+            <ChipAction danger onClick={() => setArming(true)}
+              title={job.status === 'done' ? 'borra tambien el video' : 'borrar del historial'}>
+              <Trash2 className="h-3 w-3" /> Borrar
+            </ChipAction>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Vaciar historial en dos toques; borra tambien los videos, y se dice.
+function ClearHistoryButton({ count, onFire }) {
+  const [arming, setArming] = useState(false)
+  useEffect(() => {
+    if (!arming) return
+    const t = setTimeout(() => setArming(false), 4000)
+    return () => clearTimeout(t)
+  }, [arming])
+  return arming ? (
+    <span className="inline-flex items-center gap-1.5">
+      <Button size="xs" variant="danger" onClick={() => { setArming(false); onFire() }}>
+        ¿Borrar {count} (videos incluidos)?
+      </Button>
+      <Button size="xs" variant="ghost" onClick={() => setArming(false)}>No</Button>
+    </span>
+  ) : (
+    <Button size="xs" variant="ghost" onClick={() => setArming(true)}
+      title="borra todos los renders terminados, videos incluidos">
+      <Trash2 className="h-3.5 w-3.5" /> Vaciar historial
+    </Button>
+  )
+}
+
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
-  pendingScript, onConsumePendingScript }) {
-  const [script, setScript] = useState(SAMPLE)
-  const [scenes, setScenes] = useState(['Orbita'])
-  const [scene, setScene] = useState('Orbita')
+  pendingScript, pendingScene, onConsumePendingScript, clipContext, onExitClip }) {
+  const [script, setScript] = useState(() => lsGet(LS.script) ?? SAMPLE)
+  const [scenes, setScenes] = useState(() => [lsGet(LS.scene) || 'Orbita'])
+  const [scene, setScene] = useState(() => lsGet(LS.scene) || 'Orbita')
   const [sceneError, setSceneError] = useState('')
-  const [quality, setQuality] = useState('ql')
-  const [timeoutS, setTimeoutS] = useState(600)
+  const [quality, setQuality] = useState(() => {
+    const q = lsGet(LS.quality)
+    return QUALITIES.some((o) => o.id === q) ? q : 'ql'
+  })
+  const [timeoutS, setTimeoutS] = useState(() => {
+    const t = Number(lsGet(LS.timeout))
+    return t >= 30 && t <= 1800 ? t : 600
+  })
   const [submitError, setSubmitError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [savingClip, setSavingClip] = useState(false)
+  const [clipSaved, setClipSaved] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [selectedLogs, setSelectedLogs] = useState([])
   const [aiOpen, setAiOpen] = useState(false)
   const [aiMode, setAiMode] = useState('explain')
   const [aiAutoRun, setAiAutoRun] = useState(0)
+  const [confirmScript, setConfirmScript] = useState(null) // {script, scene} entrante a confirmar
   const logRef = useRef(null)
   const debounceRef = useRef(null)
 
-  // Una animacion abierta desde la Biblioteca reemplaza el editor una sola vez.
+  // Toda accion que pisa el editor (Abrir en el Estudio, Cargar al editor,
+  // Aplicar de la IA) pasa por aqui: si hay trabajo propio, pide confirmacion.
+  // nextScene es opcional (solo lo trae el flujo "Editar en Estudio" de un
+  // clip, para preseleccionar su escena real).
+  const replaceScript = useCallback((next, nextScene) => {
+    const cur = script.trim()
+    if (!cur || cur === next.trim() || cur === SAMPLE.trim()) {
+      setScript(next)
+      if (nextScene) setScene(nextScene)
+    } else {
+      setConfirmScript({ script: next, scene: nextScene })
+    }
+  }, [script])
+
+  // Una animacion (o un clip de Proyectos) abierto reemplaza el editor una
+  // sola vez; pendingScene solo viaja desde el flujo de clips.
   useEffect(() => {
     if (pendingScript == null) return
-    setScript(pendingScript)
+    replaceScript(pendingScript, pendingScene)
     onConsumePendingScript()
-  }, [pendingScript, onConsumePendingScript])
+  }, [pendingScript, pendingScene, onConsumePendingScript, replaceScript])
+
+  // Guardado local del script con debounce (una escritura por pausa de tipeo).
+  useEffect(() => {
+    const t = setTimeout(() => lsSet(LS.script, script), 400)
+    return () => clearTimeout(t)
+  }, [script])
+
+  useEffect(() => {
+    lsSet(LS.scene, scene)
+    lsSet(LS.quality, quality)
+    lsSet(LS.timeout, String(timeoutS))
+  }, [scene, quality, timeoutS])
 
   // Deteccion de escenas con debounce (el backend usa ast, nunca ejecuta).
   useEffect(() => {
@@ -103,165 +294,337 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
   }, [logs.length])
 
+  // En contexto de clip el render no pasa por /api/jobs: primero se guarda
+  // el script/escena en el clip (mismo endpoint que "Guardar en clip") y
+  // luego se dispara el render propio del clip, que compone el estilo del
+  // proyecto en el backend y hereda su calidad fija.
   const submit = useCallback(async () => {
     setSubmitError('')
+    setSubmitting(true) // evita el doble encolado por doble clic
     try {
-      const job = await api.createJob({ script, scene, quality, timeout: Number(timeoutS) })
+      let job
+      if (clipContext) {
+        await api.patchClip(clipContext.projectId, clipContext.clipId, { script, scene })
+        job = await api.renderClip(clipContext.projectId, clipContext.clipId)
+      } else {
+        job = await api.createJob({ script, scene, quality, timeout: Number(timeoutS) })
+      }
       setSelectedId(job.id)
       onJobsChanged()
     } catch (err) {
       setSubmitError(err.message)
+    } finally {
+      setSubmitting(false)
     }
-  }, [script, scene, quality, timeoutS, onJobsChanged])
+  }, [script, scene, quality, timeoutS, onJobsChanged, clipContext])
+
+  // Boton "Guardar en clip": guarda sin renderizar (patchClip {script, scene}).
+  const saveClip = async () => {
+    if (!clipContext) return
+    setSubmitError('')
+    setSavingClip(true)
+    setClipSaved(false)
+    try {
+      await api.patchClip(clipContext.projectId, clipContext.clipId, { script, scene })
+      setClipSaved(true)
+      setTimeout(() => setClipSaved(false), 2500)
+    } catch (err) {
+      setSubmitError(err.message)
+    } finally {
+      setSavingClip(false)
+    }
+  }
 
   const cancel = async (id) => {
     try { await api.cancelJob(id) } catch { /* ya termino */ }
   }
 
+  const retry = async (id) => {
+    setSubmitError('')
+    try {
+      const job = await api.retryJob(id)
+      setSelectedId(job.id)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
+  }
+
+  const removeJob = async (id) => {
+    setSubmitError('')
+    try {
+      await api.deleteJob(id)
+      if (selectedId === id) setSelectedId(null)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
+  }
+
+  const clearHistory = async () => {
+    setSubmitError('')
+    try {
+      await api.deleteFinishedJobs()
+      setSelectedId(null)
+      onJobsChanged()
+    } catch (err) {
+      setSubmitError(err.message)
+    }
+  }
+
   const loadScript = async (id) => {
     try {
       const d = await api.getScript(id)
-      if (d.script) setScript(d.script)
+      if (d.script) replaceScript(d.script)
     } catch { /* sin script */ }
   }
 
-  const canSubmit = scenes.includes(scene) && !jobs.some((j) => j.status === 'queued')
+  const canSubmit = scenes.includes(scene) && !submitting
+  const submitHint = !scenes.includes(scene)
+    ? 'Define una Scene valida en el script para renderizar'
+    : clipContext
+      ? 'Guarda el clip y encola su render (compone el estilo del proyecto)'
+      : 'Encolar el render (se ejecutan de a uno)'
+  const errorish = selected && ['error', 'timeout'].includes(selected.status)
+  // Nota de desfase de líneas: los errores de escenas/render pueden citar
+  // numeros de linea del script COMPUESTO (estilo + clip), que no coinciden
+  // con los del editor (que solo muestra el script del clip).
+  const styleNote = clipContext && clipContext.styleOffset > 0
+    ? `El estilo del proyecto añade ${clipContext.styleOffset} líneas antes del script; los numeros de linea de arriba pueden estar desplazados.`
+    : ''
+
+  // Tira inferior: cola activa (running + queued en orden de ejecucion) y
+  // historial reciente por separado — antes se mezclaban bajo un solo rotulo.
+  const activeJobs = jobs
+    .filter((j) => ['queued', 'running'].includes(j.status))
+    .sort((a, b) => a.created_at - b.created_at)
+  const queuedIds = activeJobs.filter((j) => j.status === 'queued').map((j) => j.id)
+  const historyJobs = jobs.filter((j) => !['queued', 'running'].includes(j.status))
+  const queueLabel = activeJobs.length === 0
+    ? 'libre'
+    : [
+        activeJobs.some((j) => j.status === 'running') && '1 renderizando',
+        queuedIds.length > 0 && `${queuedIds.length} en espera`,
+      ].filter(Boolean).join(' · ')
 
   return (
-    <main className="studio">
-      <section className="panel panel--editor" aria-label="editor">
-        <div className="panel__bar">
-          <span className="panel__title">ESCENA.PY</span>
-          <div className="controls">
-            <label className="ctl">
-              <span>Escena</span>
-              <select value={scene} onChange={(e) => setScene(e.target.value)}
-                disabled={!scenes.length}>
-                {scenes.map((s) => <option key={s}>{s}</option>)}
-              </select>
-            </label>
-            <div className="seg" role="radiogroup" aria-label="calidad">
-              {QUALITIES.map((q) => (
-                <button key={q.id} title={q.hint}
-                  className={quality === q.id ? 'seg__opt seg__opt--on' : 'seg__opt'}
-                  onClick={() => setQuality(q.id)}>{q.label}</button>
-              ))}
-            </div>
-            <label className="ctl">
-              <span>Timeout</span>
-              <input type="number" min="30" max="1800" step="30" value={timeoutS}
-                onChange={(e) => setTimeoutS(e.target.value)} />
-            </label>
-            <button className="btn btn--primary" onClick={submit} disabled={!canSubmit}>
-              Renderizar
-            </button>
-            {aiEnabled && (
-              <button className="btn" title="asistente IA (Gemini 2.5)"
-                onClick={() => { setAiMode('generate'); setAiOpen(true) }}>
-                ✨ Asistente
-              </button>
-            )}
-          </div>
+    <main className="flex flex-1 flex-col gap-3 p-3 lg:min-h-0">
+      {/* Contexto de clip: se llega aqui desde "Editar en Estudio" de un
+          proyecto. La calidad queda fija a la del proyecto y el render usa
+          el endpoint del clip (compone el estilo) en vez de /api/jobs. */}
+      {clipContext && (
+        <div className="panel flex shrink-0 flex-wrap items-center gap-2 px-3 py-2" aria-label="contexto de clip">
+          <FolderKanban className="h-4 w-4 shrink-0 text-accent" />
+          <span className="text-[13px] text-ink">
+            Proyecto <strong className="font-semibold">{clipContext.projectName}</strong>
+            {' · clip "'}<strong className="font-semibold">{clipContext.clipTitle}</strong>{'"'}
+            {' · calidad '}{QUALITY_LABEL[clipContext.quality] || clipContext.quality}{' (fija)'}
+          </span>
+          <Button size="xs" variant="ghost" className="ml-auto" onClick={onExitClip}
+            title="Vuelve al render libre; no borra el script del editor">
+            <LogOut className="h-3.5 w-3.5" /> Salir del clip
+          </Button>
         </div>
-        {(sceneError || submitError) && (
-          <p className="notice notice--warn" role="alert">{sceneError || submitError}</p>
-        )}
-        <CodeMirror
-          value={script}
-          onChange={setScript}
-          extensions={[python()]}
-          theme="dark"
-          height="100%"
-          className="editor"
-          basicSetup={{ foldGutter: false, highlightActiveLine: true }}
-        />
-      </section>
+      )}
+      {/* En movil cada panel fija su altura (la pagina scrollea); en lg+ el
+          conjunto llena el viewport y cada panel scrollea por dentro. */}
+      <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:flex-row">
+        {/* ── Editor ── */}
+        <section className="panel flex h-[62dvh] min-w-0 flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1" aria-label="editor">
+          <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
+            <div className="flex items-center gap-2">
+              <FileCode className="h-4 w-4 text-muted" />
+              <span className="font-mono text-[13px] text-ink">escena.py</span>
+            </div>
+            <div className="mx-1 hidden h-5 w-px bg-line sm:block" />
+            <label className="flex items-center gap-1.5">
+              <span className="eyebrow">Escena</span>
+              <Select value={scene} onValueChange={setScene} disabled={!scenes.length}>
+                <SelectTrigger className="h-8 w-[150px]">
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  {scenes.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </label>
 
-      <section className="side">
-        <div className="panel panel--queue" aria-label="cola de renders">
-          <div className="panel__bar"><span className="panel__title">COLA DE RENDERS</span></div>
-          {jobs.length === 0 && (
-            <p className="empty">Sin renders todavía. Escribe una escena y pulsa Renderizar.</p>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Segmented options={QUALITIES}
+                value={clipContext ? clipContext.quality : quality}
+                onChange={clipContext ? () => {} : setQuality} ariaLabel="calidad"
+                disabled={!!clipContext} />
+              <label className="flex items-center gap-1.5">
+                <span className="eyebrow">Timeout</span>
+                <input type="number" min="30" max="1800" step="30" value={timeoutS}
+                  onChange={(e) => setTimeoutS(e.target.value)}
+                  className="h-8 w-[68px] rounded-md border border-line bg-canvas px-2 text-sm tabular-nums text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan" />
+                <span className="text-xs text-faint">s</span>
+              </label>
+              {aiEnabled && (
+                <Button variant="accent" size="sm" title="asistente IA (Gemini 2.5)"
+                  onClick={() => { setAiMode('generate'); setAiOpen(true) }}>
+                  <Sparkles className="h-4 w-4" /> Asistente
+                </Button>
+              )}
+              {clipContext && (
+                <Button variant="default" size="sm" onClick={saveClip} disabled={savingClip}
+                  title="Guarda el script y la escena en el clip sin renderizar">
+                  <Save className="h-4 w-4" /> {savingClip ? 'Guardando…' : clipSaved ? 'Guardado ✓' : 'Guardar en clip'}
+                </Button>
+              )}
+              <Button variant="primary" size="sm" onClick={submit} disabled={!canSubmit}
+                title={submitHint}>
+                <Play className="h-4 w-4" /> {submitting ? 'Encolando…' : 'Renderizar'}
+              </Button>
+            </div>
+          </div>
+
+          {(sceneError || submitError) && (
+            <p role="alert" className="border-b border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">
+              {sceneError || submitError}
+              {styleNote && <span className="mt-0.5 block text-[12px] text-warn/80">{styleNote}</span>}
+            </p>
           )}
-          <ul className="jobs">
-            {jobs.slice(0, 12).map((j) => (
-              <li key={j.id}
-                className={`job ${selected?.id === j.id ? 'job--sel' : ''}`}
-                onClick={() => setSelectedId(j.id)}>
-                <span className={`dot dot--${j.status}`} aria-hidden="true" />
-                <span className="job__scene">{j.scene}</span>
-                <span className="job__meta">{j.quality} · {fmtTime(j.created_at)}
-                  {duration(j) ? ` · ${duration(j)}` : ''}</span>
-                <span className={`job__status job__status--${j.status}`}>
-                  {STATUS_LABEL[j.status] || j.status}
-                </span>
-                {['queued', 'running'].includes(j.status) && (
-                  <button className="btn btn--tiny"
-                    onClick={(e) => { e.stopPropagation(); cancel(j.id) }}>
-                    Cancelar
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="panel panel--log" aria-label="registro del render">
-          <div className="panel__bar">
-            <span className="panel__title">
-              REGISTRO {selected ? `· ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
-            </span>
-            {selected && (
-              <span className="panel__actions">
-                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
-                  <button className="btn btn--tiny btn--ai"
-                    onClick={() => {
-                      setAiMode('explain'); setAiOpen(true)
-                      setAiAutoRun((n) => n + 1)
-                    }}>
-                    ✨ Explicar error
-                  </button>
-                )}
-                {aiEnabled && ['error', 'timeout'].includes(selected.status) && (
-                  <button className="btn btn--tiny btn--ai"
-                    onClick={() => { setAiMode('fix'); setAiOpen(true) }}>
-                    🔧 Corregir con IA
-                  </button>
-                )}
-                <button className="btn btn--tiny" onClick={() => loadScript(selected.id)}>
-                  Cargar script al editor
-                </button>
-              </span>
-            )}
-          </div>
-          <pre className="log" ref={logRef}>
-            {logs.length ? logs.join('\n')
-              : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'
-              : selected?.error ? `✕ ${selected.error}`
-              : 'Sin registro.'}
-            {selected?.status !== 'running' && selected?.error && logs.length
-              ? `\n✕ ${selected.error}` : ''}
-          </pre>
-        </div>
+          <CodeMirror
+            value={script}
+            onChange={setScript}
+            extensions={[python()]}
+            theme="dark"
+            height="100%"
+            className="editor min-h-0 flex-1 overflow-auto text-[13px]"
+            basicSetup={{ foldGutter: false, highlightActiveLine: true }}
+          />
+        </section>
 
-        {selected?.status === 'done' && (
-          <div className="panel panel--video" aria-label="previsualizacion">
-            <div className="panel__bar">
-              <span className="panel__title">RESULTADO</span>
-              <a className="btn btn--tiny" href={videoUrl(selected.id)}
-                download={`${selected.scene}.mp4`}>Descargar MP4</a>
+        {/* ── Rail de resultado ── */}
+        <aside className="flex w-full flex-col gap-3 lg:min-h-0 lg:w-[440px] lg:shrink-0" aria-label="resultado">
+          {selected?.status === 'done' && (
+            <div className="panel shrink-0 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
+                <span className="eyebrow truncate">Resultado · {selected.scene}</span>
+                <a href={videoUrl(selected.id)} download={`${selected.scene}.mp4`}
+                  className="inline-flex shrink-0 items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink">
+                  <Download className="h-3.5 w-3.5" /> MP4
+                </a>
+              </div>
+              <video key={selected.id} className="block w-full bg-black" controls preload="metadata"
+                src={videoUrl(selected.id)} />
             </div>
-            <video key={selected.id} className="video" controls preload="metadata"
-              src={videoUrl(selected.id)} />
+          )}
+
+          <div className="panel flex h-[45dvh] flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
+              <span className="eyebrow truncate">
+                Registro{selected ? ` · ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
+              </span>
+              {selected && (
+                <div className="flex items-center gap-1.5">
+                  {aiEnabled && errorish && (
+                    <Button size="xs" variant="accent"
+                      onClick={() => { setAiMode('explain'); setAiOpen(true); setAiAutoRun((n) => n + 1) }}>
+                      <Sparkles className="h-3.5 w-3.5" /> Explicar
+                    </Button>
+                  )}
+                  {aiEnabled && errorish && (
+                    <Button size="xs" variant="accent"
+                      onClick={() => { setAiMode('fix'); setAiOpen(true) }}>
+                      <Wrench className="h-3.5 w-3.5" /> Corregir
+                    </Button>
+                  )}
+                  <Button size="xs" variant="ghost" onClick={() => loadScript(selected.id)}>
+                    Cargar al editor
+                  </Button>
+                </div>
+              )}
+            </div>
+            <pre ref={logRef}
+              className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-b-[13px] bg-canvas px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">
+              {logs.length ? logs.join('\n')
+                : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'
+                : selected?.error ? `✕ ${selected.error}`
+                : 'Sin registro.'}
+              {selected?.status !== 'running' && selected?.error && logs.length
+                ? `\n✕ ${selected.error}` : ''}
+            </pre>
+          </div>
+        </aside>
+      </div>
+
+      {/* ── Tira inferior: cola activa + historial reciente ── */}
+      <div className="panel shrink-0 overflow-hidden">
+        <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-1.5">
+          <span className="eyebrow">Cola</span>
+          <span className="font-mono text-[11px] text-faint">{queueLabel}</span>
+          <span className="mx-1 h-4 w-px bg-line" aria-hidden="true" />
+          <span className="eyebrow">Historial</span>
+          <span className="font-mono text-[11px] text-faint">{historyJobs.length}</span>
+          {historyJobs.length > 0 && (
+            <span className="ml-auto">
+              <ClearHistoryButton count={historyJobs.length} onFire={clearHistory} />
+            </span>
+          )}
+        </div>
+        {jobs.length === 0 ? (
+          <p className="px-3 py-3 text-[13px] text-muted">
+            Sin renders todavía. Escribe una escena y pulsa Renderizar.
+          </p>
+        ) : (
+          <div className="flex items-stretch gap-2 overflow-x-auto px-3 py-2.5">
+            {activeJobs.map((j) => (
+              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+                queuePos={j.status === 'queued' ? queuedIds.indexOf(j.id) + 1 : null}
+                onSelect={() => setSelectedId(j.id)} onCancel={cancel} />
+            ))}
+            {activeJobs.length > 0 && historyJobs.length > 0 && (
+              <span className="mx-1 w-px shrink-0 self-stretch bg-line" aria-hidden="true" />
+            )}
+            {historyJobs.slice(0, 20).map((j) => (
+              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+                onSelect={() => setSelectedId(j.id)}
+                onCancel={cancel} onRetry={retry} onDelete={removeJob} />
+            ))}
           </div>
         )}
-      </section>
+      </div>
 
       {aiEnabled && (
         <Assistant open={aiOpen} mode={aiMode} onMode={setAiMode}
           onClose={() => setAiOpen(false)} job={selected} jobLogs={logs}
-          autoRun={aiAutoRun} onApply={setScript} />
+          autoRun={aiAutoRun} onApply={replaceScript} />
       )}
+
+      {/* Confirmacion antes de pisar trabajo propio en el editor. */}
+      <Dialog open={confirmScript != null} onOpenChange={(o) => !o && setConfirmScript(null)}>
+        <DialogContent className="w-[min(420px,94vw)] p-5" showClose={false}>
+          <DialogTitle className="font-display text-[15px] font-semibold text-ink">
+            ¿Reemplazar el contenido del editor?
+          </DialogTitle>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">
+            El script actual del editor se descartará. Si quieres conservarlo,
+            cancela y cópialo antes.
+          </p>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => {
+              // Si el pendingScript traia un clipContext (viene de "Editar en
+              // Estudio") y el usuario decide conservar su script propio, el
+              // contexto de clip debe apagarse: si no, "Guardar en clip" o
+              // "Renderizar" sobrescribirian el clip ajeno con este script.
+              if (clipContext) onExitClip()
+              setConfirmScript(null)
+            }}>Conservar</Button>
+            <Button variant="primary"
+              onClick={() => {
+                setScript(confirmScript.script)
+                if (confirmScript.scene) setScene(confirmScript.scene)
+                setConfirmScript(null)
+              }}>
+              Reemplazar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

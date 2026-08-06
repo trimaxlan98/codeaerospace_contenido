@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 2.7,
+    "t_fin": 8.6,
+    "momento": "Constelación de satélites se ensambla en órbita.",
+    "texto": "Miles de satélites nos rodean, conectados en una red que envuelve la Tierra."
+  },
+  {
+    "t_inicio": 8.6,
+    "t_fin": 18.6,
+    "momento": "La red cambia de forma constantemente.",
+    "texto": "Pero no se queda quieta. Su forma cambia a cada instante, a una velocidad vertiginosa."
+  },
+  {
+    "t_inicio": 18.6,
+    "t_fin": 27.9,
+    "momento": "Planteamiento del problema y título del curso.",
+    "texto": "Entonces, ¿cómo gobernarla? Exploraremos cómo la inteligencia artificial puede ser la respuesta."
+  }
+]

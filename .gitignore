@@ -31,7 +31,8 @@ Thumbs.db
 
 # ManimStudio
 render_jobs/
-pending_primitives/
+# Guiones de audio: el texto (.md/.txt) se versiona, el audio no
+guiones/**/*.wav
 studio/backend/.env
 studio/backend/manimstudio.db*
 studio/frontend/node_modules/
@@ -44,3 +45,6 @@ studio/backend/gcp-key.json
 
 # Socket del runner en desarrollo local (studio/dev.sh)
 .run/
+
+# Permisos locales de Claude Code (por máquina, puede contener rutas/credenciales)
+.claude/settings.local.json

@@ -1,0 +1,74 @@
+{
+  "94cea826838f4f73": {
+    "hash": "d2fcdc72e7683896d30052f9072bb2ee3f8eb19088eec5ac93848b41ec8f1833",
+    "etiqueta": "01-01-el-universo-en-una-formula",
+    "voz": "Charon",
+    "video_s": 26.2,
+    "audio_s": 27.4,
+    "palabras": 38,
+    "generado": 1785988148.1995075
+  },
+  "bd7fac83347441fd": {
+    "hash": "b371e772b1102c7a81e8e8e5c4fb29ff45d0d6a070d77af903a90db7636d9980",
+    "etiqueta": "02-02-el-mapa-de-los-numeros-complejos",
+    "voz": "Charon",
+    "video_s": 52.7,
+    "audio_s": 48.6,
+    "palabras": 79,
+    "generado": 1785988287.4067314
+  },
+  "f6b2ef20c48e4ffc": {
+    "hash": "5f7f71920944b4688f2d62115c7d94bb95fe1975a03600b1fa956bd0a96476dc",
+    "etiqueta": "03-03-multiplicar-es-girar",
+    "voz": "Charon",
+    "video_s": 57.1,
+    "audio_s": 62.8,
+    "palabras": 96,
+    "generado": 1785988451.6746755
+  },
+  "2fc27d3228d742e8": {
+    "hash": "94d41ba066b868fe7dc1477aa955b3686271b5749ca05d66af94f2ebdc3ac82e",
+    "etiqueta": "04-04-la-maquina-de-iterar",
+    "voz": "Charon",
+    "video_s": 62.6,
+    "audio_s": 59.8,
+    "palabras": 110,
+    "generado": 1785988625.48702
+  },
+  "e296ef06f90c43fb": {
+    "hash": "b7b26dbb9c97933a0279f088b8e8608e82b55d2c6878823d35430aa83b5aaa0c",
+    "etiqueta": "05-05-el-conjunto-de-mandelbrot",
+    "voz": "Charon",
+    "video_s": 29.0,
+    "audio_s": 31.0,
+    "palabras": 50,
+    "generado": 1785988734.1389275
+  },
+  "c5a101a06e7841a4": {
+    "hash": "be139f71f2d14e73e3f2b03a5eb5d3b1c24faf2bc88c0906238b040fd9c92411",
+    "etiqueta": "06-06-zoom-infinito",
+    "voz": "Charon",
+    "video_s": 36.2,
+    "audio_s": 40.2,
+    "palabras": 52,
+    "generado": 1785988838.2157562
+  },
+  "6e44e150b9c6476d": {
+    "hash": "bd31e0157182d420bbe4595cf157328e4436d01119117db36329e797d329dae7",
+    "etiqueta": "07-07-los-mundos-de-julia",
+    "voz": "Charon",
+    "video_s": 28.7,
+    "audio_s": 27.4,
+    "palabras": 35,
+    "generado": 1785988950.2949402
+  },
+  "e4f7290713044eb4": {
+    "hash": "3d526097e4ac8247792024a18c93e9800c1f92f7859af63b759ee23266e9043f",
+    "etiqueta": "08-08-un-mapa-de-infinitos-mundos",
+    "voz": "Charon",
+    "video_s": 64.2,
+    "audio_s": 64.7,
+    "palabras": 109,
+    "generado": 1785989111.9037092
+  }
+}

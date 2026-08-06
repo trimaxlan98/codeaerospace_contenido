@@ -1,0 +1,14 @@
+[
+  {
+    "t_inicio": 1.1,
+    "t_fin": 9.5,
+    "momento": "Ciclo PADA y red de satélites",
+    "texto": "PADA es un ciclo cognitivo para la red. Percibe, analiza y decide cómo actuar, actualizando sus políticas como si fueran software."
+  },
+  {
+    "t_inicio": 10.7,
+    "t_fin": 19.2,
+    "momento": "Gemelo digital y Margen Adaptativo",
+    "texto": "Pero antes, la IA se prueba en un gemelo digital. El Margen Adaptativo asegura que la prueba sea honesta, un desafío real."
+  }
+]

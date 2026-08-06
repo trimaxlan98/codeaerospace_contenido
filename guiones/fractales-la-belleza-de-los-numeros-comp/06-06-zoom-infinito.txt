@@ -1,0 +1,5 @@
+El conjunto de Mandelbrot es un paisaje de complejidad infinita. Al acercarnos, cada detalle revela nuevos mundos.
+
+Y en lo profundo de uno de ellos, encontramos algo familiar: una pequeña copia, casi idéntica al conjunto original.
+
+Y dentro de esa copia hay más. La estructura se repite para siempre. No hay fondo.

@@ -1,0 +1,7 @@
+En una red, un satélite puede fallar o ser malicioso, volviéndose 'bizantino'.
+
+Envía información contradictoria, rompiendo el consenso de la red.
+
+Con suficientes nodos honestos, eligen la verdad por mayoría y aíslan al mentiroso.
+
+Este principio también protege el aprendizaje federado de modelos envenenados.

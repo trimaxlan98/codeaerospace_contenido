@@ -1,0 +1,3 @@
+PADA es un ciclo cognitivo para la red. Percibe, analiza y decide cómo actuar, actualizando sus políticas como si fueran software.
+
+Pero antes, la IA se prueba en un gemelo digital. El Margen Adaptativo asegura que la prueba sea honesta, un desafío real.

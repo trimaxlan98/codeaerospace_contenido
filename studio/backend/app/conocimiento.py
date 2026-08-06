@@ -32,9 +32,25 @@ GUIA DEL PROYECTO (ManimStudio — canal educativo de espacio/telecom/IA):
   (shells LEO), bloques (diagramas con flujo), transiciones (deslizar/
   zoom/persiana), laser (disparos/rafagas), pizarra3d (superficies y
   solidos proyectados en 2D, sin ThreeDScene).
-- Estilo del canal: fondo negro; titulo Text en GOLD 30-36px con
-  to_edge(UP); contenido BLUE_B/TEAL_B; acentos YELLOW; alertas RED_B;
-  texto secundario GREY_B 17-22px. Textos en espanol con tildes.
+- IDENTIDAD CO.DE ACADEMY — es el MINIMO VISUAL, no una opcion. Todo video
+  del canal sale con ella; ManimStudio la anexa al render aunque el script
+  no la pida, pero un script que la usa explicitamente queda mejor:
+    from code_brand import (registrar_fuentes, aplicar_marca, Rotulos,
+                            titulo_marca, etiqueta_hud, CODE_ACCENT,
+                            CODE_INK, CODE_MUTED, CODE_BG)
+    registrar_fuentes()          # una vez, antes de crear cualquier Text
+  - Paleta: fondo CODE_BG #05070a, texto CODE_INK #e8edf3, secundario
+    CODE_MUTED #94a0b0, acento ambar CODE_ACCENT #f59e0b (y #ea580c para el
+    cierre del degradado). NO uses GOLD/BLUE_B/TEAL_B/YELLOW de Manim ni
+    inventes paletas: el ambar sobre casi-negro es la marca.
+  - Tipografia propia: titulos con `titulo_marca(...)` (Rajdhani), etiquetas
+    de telemetria con `etiqueta_hud(...)` (Space Mono, MAYUSCULAS). Nunca
+    Text() con la fuente por defecto para un titulo.
+  - Textos que se relevan: `Rotulos(self).mostrar(mob, zona="abajo")` — asi
+    el nuevo desvanece al anterior de esa zona y NUNCA se enciman.
+  - No dibujes tu propia marca de agua ni cambies el fondo a otro color: la
+    marca de agua y las esquinas HUD las pone `aplicar_marca(self)`.
+  Textos en espanol con tildes.
 - Estructura: titulo (1 s) -> construccion (3-5 s) -> UN fenomeno
   protagonista (5-8 s) -> cierre con self.wait(1). Total 10-20 s.
 - MathTex siempre con raw string (r"..."); LaTeX completo disponible.

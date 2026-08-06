@@ -1,0 +1,5 @@
+Un satélite solo ofrece una ventana de comunicación muy breve con la Tierra.
+
+Con una constelación, la cobertura es global, pero la red de enlaces entre satélites cambia sin parar.
+
+Por eso, la red debe adaptarse continuamente. Una configuración fija no sirve.

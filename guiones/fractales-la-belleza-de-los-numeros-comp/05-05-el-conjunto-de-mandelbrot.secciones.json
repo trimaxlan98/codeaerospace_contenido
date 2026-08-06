@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 1.5,
+    "t_fin": 7.2,
+    "momento": "Malla de puntos coloreados",
+    "texto": "Para cada punto 'c', aplicamos la regla. Si la órbita que genera escapa, coloreamos el punto según su velocidad. Si no, lo dejamos negro."
+  },
+  {
+    "t_inicio": 9.2,
+    "t_fin": 13.2,
+    "momento": "De la malla a la imagen fractal",
+    "texto": "Al refinar la cuadrícula, emerge esta figura. Los puntos negros forman el conjunto de Mandelbrot."
+  },
+  {
+    "t_inicio": 23.5,
+    "t_fin": 27.0,
+    "momento": "Conclusión sobre la frontera",
+    "texto": "Y esa frontera, al ampliarla, revela una complejidad que nunca termina."
+  }
+]

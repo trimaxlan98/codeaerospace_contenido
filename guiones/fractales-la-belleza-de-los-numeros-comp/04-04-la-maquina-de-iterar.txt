@@ -1,0 +1,13 @@
+Esta es la fórmula que vamos a explorar, una sencilla máquina matemática.
+
+Imagina que toma un número, le aplica la fórmula, y el resultado vuelve a entrar en la máquina una y otra vez.
+
+Este proceso repetido se llama iterar. La secuencia de números que genera es su órbita.
+
+Visualicemos estas órbitas en el plano complejo. Siempre partimos del cero.
+
+Con este valor de C, la órbita se queda dando vueltas en una espiral. Nunca escapa.
+
+Pero si elegimos otro C, la órbita se aleja en espiral y sale disparada hacia el infinito.
+
+Aquí está la pregunta clave: para cada punto C del plano, ¿qué le ocurre a su órbita?

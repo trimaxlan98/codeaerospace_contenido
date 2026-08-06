@@ -1,0 +1,9 @@
+Sumar y restar es moverse por el plano. Pero multiplicar... es más interesante.
+
+Tomemos el número uno. Multiplicarlo por i, la unidad imaginaria, lo hace girar noventa grados. Si lo hacemos de nuevo...
+
+...llegamos al menos uno. Esta es la identidad que define a los números complejos.
+
+Y no es solo para i. Al multiplicar un número z por sí mismo, combinamos un giro y un cambio de tamaño. Repetir la operación dibuja una espiral.
+
+Este mecanismo de girar y escalar es la clave. Es la operación que, repetida, generará la complejidad que veremos a continuación.

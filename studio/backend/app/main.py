@@ -8,38 +8,48 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import metrics
 from .ai import AIError, Assistant
 from .animations import AnimationStore
-from .auth import (client_ip, clear_session, create_session, get_rate_limiter,
+from .auth import (change_password as auth_change_password, client_ip,
+                   clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
 from .config import get_settings
 from .conocimiento import Conocimiento
 from .db import Database
-from .fable import FableAssistant
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
-from .primitives import PrimitiveError, PrimitiveManager
+from .narracion import NarracionService
+from .narracion_api import make_router as make_narracion_router
+from .projects import ProjectService
+from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
 from .scenes import detect_scenes
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 
+# Techo del listado de jobs. Con el limite historico de 50, los renders mas
+# viejos desaparecian de la Biblioteca pero seguian contando contra la cuota
+# de disco; 500 cubre con holgura el uso real de un solo usuario.
+JOBS_LIST_LIMIT = 500
+
 cfg = get_settings()
 db = Database(cfg.db_path)
+db.ensure_auth_seed(cfg.admin_password_hash)
 bus = EventBus()
 runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
+service = ProjectService(db)
+manager.on_job_done = service.handle_job_done
+narracion_service = NarracionService(cfg, db)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
 assistant = Assistant(cfg, conocimiento)
-fable_assistant = FableAssistant(cfg)
-primitives_manager = PrimitiveManager(cfg, fable_assistant, manager, bus)
 lessons_store = LessonStore(cfg.lessons_dir)
 animations_store = AnimationStore(cfg.animations_dir, lessons_store)
 
@@ -58,6 +68,29 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
+app.include_router(make_projects_router(cfg, db, manager, service,
+                                        narracion_service))
+app.include_router(make_narracion_router(cfg, db, narracion_service))
+
+# Endpoints que deben seguir accesibles con must_change_password activo: sin
+# ellos el usuario quedaria atrapado sin poder ni cambiar la password ni
+# salir. Todo lo demas bajo /api/ se bloquea con 403 hasta que la cambie.
+_PASSWORD_GATE_EXEMPT = {"/api/login", "/api/logout", "/api/me",
+                        "/api/change-password", "/api/health"}
+
+
+@app.middleware("http")
+async def _enforce_password_change(request: Request, call_next):
+    path = request.url.path
+    if (path.startswith("/api/") and path not in _PASSWORD_GATE_EXEMPT
+            and session_valid(cfg, request)):
+        auth_row = db.get_auth()
+        if auth_row and auth_row["must_change_password"]:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Debes cambiar la contraseña antes de continuar",
+                        "code": "PASSWORD_CHANGE_REQUIRED"})
+    return await call_next(request)
 
 
 async def _metrics_loop() -> None:
@@ -93,6 +126,11 @@ class LoginBody(BaseModel):
     password: str = Field(max_length=256)
 
 
+class ChangePasswordBody(BaseModel):
+    current_password: str = Field(min_length=1, max_length=256)
+    new_password: str = Field(min_length=1, max_length=256)
+
+
 class ScenesBody(BaseModel):
     script: str
 
@@ -114,12 +152,14 @@ async def login(body: LoginBody, request: Request, response: Response):
     if wait > 0:
         raise HTTPException(status_code=429,
                             detail=f"Demasiados intentos. Espera {int(wait)} s.")
-    if not verify_credentials(cfg, body.username, body.password):
+    if not verify_credentials(cfg, db, body.username, body.password):
         limiter.record_failure(ip)
         raise HTTPException(status_code=401, detail="Credenciales invalidas")
     limiter.record_success(ip)
     create_session(cfg, response)
-    return {"ok": True, "user": cfg.admin_user}
+    auth_row = db.get_auth()
+    return {"ok": True, "user": cfg.admin_user,
+            "must_change_password": bool(auth_row and auth_row["must_change_password"])}
 
 
 @app.post("/api/logout")
@@ -131,10 +171,20 @@ async def logout(response: Response, _=Depends(require_auth)):
 @app.get("/api/me")
 async def me(request: Request):
     if session_valid(cfg, request):
+        auth_row = db.get_auth()
         return {"authenticated": True, "user": cfg.admin_user,
                 "ai_enabled": assistant.enabled,
-                "fable_enabled": fable_assistant.enabled}
+                "must_change_password": bool(auth_row and auth_row["must_change_password"])}
     return {"authenticated": False}
+
+
+@app.post("/api/change-password")
+async def change_password(body: ChangePasswordBody, _=Depends(require_auth)):
+    try:
+        auth_change_password(db, body.current_password, body.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"ok": True}
 
 
 # ── escenas y jobs ────────────────────────────────────────────────────────────
@@ -171,6 +221,11 @@ async def create_job(body: JobBody, _=Depends(require_auth)):
     if body.scene not in available:
         raise HTTPException(status_code=422,
                             detail=f"La escena '{body.scene}' no existe en el script")
+    _check_quota()
+    return manager.create_job(body.script, body.scene, body.quality, timeout)
+
+
+def _check_quota() -> None:
     quota = cfg.max_storage_mb * 1024 * 1024
     used = manager.storage_usage()
     if used >= quota:
@@ -179,7 +234,6 @@ async def create_job(body: JobBody, _=Depends(require_auth)):
             detail=(f"Almacenamiento lleno: {used / 2**20:.0f} MB usados de "
                     f"{cfg.max_storage_mb} MB. Borra videos de la Biblioteca "
                     "para liberar espacio."))
-    return manager.create_job(body.script, body.scene, body.quality, timeout)
 
 
 def _storage_public() -> dict:
@@ -190,7 +244,7 @@ def _storage_public() -> dict:
 @app.get("/api/jobs")
 async def list_jobs(_=Depends(require_auth)):
     return {"jobs": [job_public(j) | {"script_len": j.get("script_len")}
-                     for j in db.list_jobs()],
+                     for j in db.list_jobs(limit=JOBS_LIST_LIMIT)],
             "current": manager.current_job_id,
             "storage": _storage_public()}
 
@@ -259,6 +313,26 @@ async def delete_failed_jobs(_=Depends(require_auth)):
     return {"deleted": deleted, "storage": _storage_public()}
 
 
+@app.delete("/api/jobs/finished")
+async def delete_finished_jobs(_=Depends(require_auth)):
+    """Vacia el historial completo (terminados, videos incluidos)."""
+    deleted, freed = manager.delete_finished_jobs()
+    return {"deleted": deleted, "freed_bytes": freed, "storage": _storage_public()}
+
+
+@app.post("/api/jobs/{job_id}/retry", status_code=201)
+async def retry_job(job_id: str, _=Depends(require_auth)):
+    """Reencola un job terminado con su mismo script/escena/calidad/timeout."""
+    job = _get_job_or_404(job_id)
+    if job["status"] in ("queued", "running"):
+        raise HTTPException(status_code=409, detail="El job ya esta activo")
+    _check_quota()
+    return manager.create_job(job["script"], job["scene"], job["quality"],
+                              job["timeout"], project_id=job.get("project_id"),
+                              clip_id=job.get("clip_id"),
+                              content_hash=job.get("content_hash"))
+
+
 @app.delete("/api/jobs/older-than/{days}")
 async def delete_old_jobs(days: int, _=Depends(require_auth)):
     """Purga jobs 'done' con mas de `days` dias de antiguedad."""
@@ -295,9 +369,44 @@ async def lesson_detail(lesson_id: str, _=Depends(require_auth)):
 
 # ── biblioteca de animaciones ─────────────────────────────────────────────────
 
+class AnimationCategoryBody(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+
+
+class AnimationCreateBody(BaseModel):
+    category: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=120)
+    script: str
+
+
 @app.get("/api/animations")
 async def animations_index(_=Depends(require_auth)):
     return animations_store.index()
+
+
+@app.post("/api/animations/categories", status_code=201)
+async def create_animation_category(body: AnimationCategoryBody,
+                                    _=Depends(require_auth)):
+    try:
+        return animations_store.create_category(body.name)
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@app.post("/api/animations", status_code=201)
+async def create_animation(body: AnimationCreateBody, _=Depends(require_auth)):
+    _check_script(body.script)
+    try:
+        return animations_store.create_animation(body.category, body.title,
+                                                 body.script)
+    except LookupError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 
 @app.get("/api/animations/{animation_id:path}")
@@ -340,63 +449,6 @@ async def ai_generate(body: AIGenerateBody, _=Depends(require_auth)):
     try:
         return {"script": await assistant.generate(body.prompt)}
     except AIError as e:
-        raise HTTPException(status_code=e.status, detail=e.detail)
-
-
-# ── biblioteca de primitivas (Fable 5) ────────────────────────────────────────
-
-class PrimitiveProposeBody(BaseModel):
-    slug: str = Field(pattern=r"^[a-z0-9][a-z0-9-]*$", max_length=64)
-    description: str = Field(min_length=3, max_length=4_000)
-
-
-class PrimitiveFeedbackBody(BaseModel):
-    feedback: str = Field(min_length=1, max_length=2_000)
-
-
-@app.get("/api/primitives")
-async def list_primitives(_=Depends(require_auth)):
-    return {"proposals": primitives_manager.list_proposals()}
-
-
-@app.get("/api/primitives/{proposal_id}")
-async def get_primitive(proposal_id: str, _=Depends(require_auth)):
-    proposal = primitives_manager.get_proposal(proposal_id)
-    if not proposal:
-        raise HTTPException(status_code=404, detail="Propuesta no encontrada")
-    return proposal
-
-
-@app.post("/api/primitives", status_code=201)
-async def propose_primitive(body: PrimitiveProposeBody, _=Depends(require_auth)):
-    try:
-        return primitives_manager.propose(body.slug, body.description)
-    except PrimitiveError as e:
-        raise HTTPException(status_code=e.status, detail=e.detail)
-
-
-@app.post("/api/primitives/{proposal_id}/approve")
-async def approve_primitive(proposal_id: str, _=Depends(require_auth)):
-    try:
-        return primitives_manager.approve(proposal_id)
-    except PrimitiveError as e:
-        raise HTTPException(status_code=e.status, detail=e.detail)
-
-
-@app.post("/api/primitives/{proposal_id}/reject")
-async def reject_primitive(proposal_id: str, _=Depends(require_auth)):
-    try:
-        return primitives_manager.reject(proposal_id)
-    except PrimitiveError as e:
-        raise HTTPException(status_code=e.status, detail=e.detail)
-
-
-@app.post("/api/primitives/{proposal_id}/iterate")
-async def iterate_primitive(proposal_id: str, body: PrimitiveFeedbackBody,
-                            _=Depends(require_auth)):
-    try:
-        return primitives_manager.iterate(proposal_id, body.feedback)
-    except PrimitiveError as e:
         raise HTTPException(status_code=e.status, detail=e.detail)
 
 

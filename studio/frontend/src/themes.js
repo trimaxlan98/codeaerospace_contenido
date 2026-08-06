@@ -1,14 +1,12 @@
 // Temas: conjuntos de variables CSS aplicados via data-theme en <html>.
-// El id 'orbital' es el tema por defecto (los valores de :root).
+// Curados a 4 (antes 7) para no diluir la identidad. 'orbital' = :root.
+// swatch = [lienzo, acento, secundario] para la muestra del selector.
 
 export const THEMES = [
-  { id: 'orbital', name: 'Orbital', swatch: ['#070b12', '#e8b84b', '#6fc3df'] },
-  { id: 'aurora', name: 'Aurora', swatch: ['#06120f', '#5ee6a8', '#9d7bff'] },
-  { id: 'deepspace', name: 'Deep Space', swatch: ['#000000', '#ff5fa2', '#7f7cff'] },
-  { id: 'daylight', name: 'Daylight', swatch: ['#f4f1ea', '#a3742c', '#2b7a9e'] },
-  { id: 'nebula', name: 'Nebula', swatch: ['#0d0716', '#b388ff', '#ff8fd4'] },
-  { id: 'ion', name: 'Ion', swatch: ['#04121c', '#2fd4ff', '#45e0c0'] },
-  { id: 'solar', name: 'Solar', swatch: ['#120c06', '#ffb347', '#ff7847'] },
+  { id: 'orbital', name: 'Liquid Glass', swatch: ['#030712', '#00d8f6', '#3b82f6'] },
+  { id: 'ion', name: 'Emerald Glass', swatch: ['#020c08', '#10b981', '#34d399'] },
+  { id: 'nebula', name: 'Nebula Glass', swatch: ['#07020d', '#d946ef', '#a855f7'] },
+  { id: 'daylight', name: 'Ice Glass', swatch: ['#030f1c', '#38bdf8', '#22d3ee'] },
 ]
 
 export function currentTheme() {

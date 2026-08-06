@@ -1,0 +1,5 @@
+Cada satélite es un agente con visión limitada. Juntos forman un equipo que debe aprender a coordinarse.
+
+Hay varias formas de entrenarlos. El mejor equilibrio: aprenden juntos, pero cada uno decide por sí mismo.
+
+La arquitectura QMIX lo consigue, asegurando que la mejora de un agente nunca perjudique al conjunto.

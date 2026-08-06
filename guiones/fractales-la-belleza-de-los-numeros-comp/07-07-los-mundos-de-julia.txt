@@ -1,0 +1,5 @@
+Para cada número complejo c, existe un universo fractal: el conjunto de Julia.
+
+Al mover c, todo el universo fractal se deforma con él.
+
+Cada punto c es la semilla de un mundo completamente nuevo.

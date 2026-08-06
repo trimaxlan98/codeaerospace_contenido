@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 3.0,
+    "t_fin": 10.0,
+    "momento": "Pase de un satélite sobre estación terrestre",
+    "texto": "Un satélite solo ofrece una ventana de comunicación muy breve con la Tierra."
+  },
+  {
+    "t_inicio": 18.5,
+    "t_fin": 27.0,
+    "momento": "Cobertura dinámica de la constelación",
+    "texto": "Con una constelación, la cobertura es global, pero la red de enlaces entre satélites cambia sin parar."
+  },
+  {
+    "t_inicio": 28.0,
+    "t_fin": 31.4,
+    "momento": "Conclusión: la red debe ser adaptable",
+    "texto": "Por eso, la red debe adaptarse continuamente. Una configuración fija no sirve."
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 5.1,
+    "momento": "Título y fórmula z^2+c",
+    "texto": "Esta es la fórmula que vamos a explorar, una sencilla máquina matemática."
+  },
+  {
+    "t_inicio": 5.1,
+    "t_fin": 11.6,
+    "momento": "Diagrama de máquina realimentada",
+    "texto": "Imagina que toma un número, le aplica la fórmula, y el resultado vuelve a entrar en la máquina una y otra vez."
+  },
+  {
+    "t_inicio": 11.6,
+    "t_fin": 18.8,
+    "momento": "Chispa recorriendo el circuito",
+    "texto": "Este proceso repetido se llama iterar. La secuencia de números que genera es su órbita."
+  },
+  {
+    "t_inicio": 18.8,
+    "t_fin": 24.6,
+    "momento": "Plano complejo y círculo de escape",
+    "texto": "Visualicemos estas órbitas en el plano complejo. Siempre partimos del cero."
+  },
+  {
+    "t_inicio": 24.6,
+    "t_fin": 37.7,
+    "momento": "Órbita atrapada para c=-0.5+0.5i",
+    "texto": "Con este valor de C, la órbita se queda dando vueltas en una espiral. Nunca escapa."
+  },
+  {
+    "t_inicio": 37.7,
+    "t_fin": 49.4,
+    "momento": "Órbita de escape para c=0.4+0.4i",
+    "texto": "Pero si elegimos otro C, la órbita se aleja en espiral y sale disparada hacia el infinito."
+  },
+  {
+    "t_inicio": 49.4,
+    "t_fin": 57.8,
+    "momento": "Pregunta clave en pantalla",
+    "texto": "Aquí está la pregunta clave: para cada punto C del plano, ¿qué le ocurre a su órbita?"
+  }
+]

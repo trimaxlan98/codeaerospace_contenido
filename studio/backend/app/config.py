@@ -59,17 +59,20 @@ class Settings:
         self.gemini_model_deep = os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro")
         self.ai_rate_limit_per_min = int(os.environ.get("MS_AI_RATE_LIMIT", "10"))
 
-        # Fable 5 (Anthropic) — genera primitivas nuevas de Manim para la
-        # biblioteca curada de studio/content/manim_extensions/. Feature-flag:
-        # sin API key, el asistente queda deshabilitado y la app funciona igual.
-        self.anthropic_api_key = os.environ.get("MS_ANTHROPIC_API_KEY", "")
-        self.fable_model = os.environ.get("MS_FABLE_MODEL", "claude-fable-5")
-        self.fable_rate_limit_per_min = int(os.environ.get("MS_FABLE_RATE_LIMIT", "5"))
+        # Narracion de proyectos (guion + TTS). Comparte credenciales y
+        # feature-flag con el asistente IA; escribe fuera de render_jobs/
+        # (requiere ReadWritePaths sobre guiones/ en la unidad systemd).
+        self.guiones_dir = Path(os.environ.get(
+            "MS_GUIONES_DIR", str(self.workspace / "guiones")))
+        self.gemini_model_tts = os.environ.get(
+            "MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts")
+        self.tts_voice = os.environ.get("MS_TTS_VOICE", "Charon")
+
+        # Biblioteca curada de primitivas de Manim (solo lectura: la consume
+        # el asistente via conocimiento.py y los demos de Animaciones).
         self.manim_extensions_dir = Path(os.environ.get(
             "MS_MANIM_EXTENSIONS_DIR",
             str(self.workspace / "studio" / "content" / "manim_extensions")))
-        self.pending_primitives_dir = Path(os.environ.get(
-            "MS_PENDING_PRIMITIVES_DIR", str(self.workspace / "pending_primitives")))
 
 
 settings: Settings | None = None

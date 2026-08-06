@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 1.8,
+    "t_fin": 6.1,
+    "momento": "Órbitas LEO, MEO y GEO a escala",
+    "texto": "Los satélites viven en órbitas de distinta altura: baja, media y geoestacionaria."
+  },
+  {
+    "t_inicio": 6.9,
+    "t_fin": 12.6,
+    "momento": "Pulsos de luz y latencia",
+    "texto": "Cuanto más lejos, más tarda la señal en viajar."
+  },
+  {
+    "t_inicio": 15.6,
+    "t_fin": 20.4,
+    "momento": "Cobertura GEO vs LEO en el mapa",
+    "texto": "Pero a cambio, ven una porción mucho mayor del planeta."
+  },
+  {
+    "t_inicio": 20.4,
+    "t_fin": 24.6,
+    "momento": "Texto de cierre: el dilema orbital",
+    "texto": "Este es el gran dilema de las comunicaciones por satélite."
+  }
+]
