@@ -1,0 +1,56 @@
+{
+  "name": "SDR: la radio hecha software",
+  "description": "Curso de divulgación en 8 clips sobre radio definida por software: de la cadena de circuitos al código, el muestreo IQ y el fasor, la ventana de espectro y el aliasing, la FFT y su compromiso tiempo-frecuencia, la lectura del waterfall, la demodulación AM/FM con módulo y fase, la decisión digital con BPSK y su constelación, y el diagrama de ojo. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-radio-programa.py",
+      "title": "1 · Una radio que es un programa",
+      "scene": "Clip1",
+      "final_state": "Cadena ANTENA→ADC→SOFTWARE abajo con la etiqueta HUD «1090 MHz · AVIONES»; título «Una radio que es un programa» arriba y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-i-y-q.py",
+      "title": "2 · I y Q: la señal hecha número",
+      "scene": "Clip2",
+      "final_state": "Plano IQ con círculo unitario y fasor ámbar a la izquierda; dos ondas senoidales apiladas (I cian arriba, Q violeta abajo) con sus etiquetas a la derecha; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-ventana-aliasing.py",
+      "title": "3 · La ventana y el aliasing",
+      "scene": "Clip3",
+      "final_state": "Ventana de espectro centrada con etiquetas -fs/2, sintonía, +fs/2; pico ámbar medio salido por el borde derecho y pico fantasma rojo plegado a la izquierda; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-fft-elegir-n.py",
+      "title": "4 · La FFT: elegir N",
+      "scene": "Clip4",
+      "final_state": "Onda continua cortada en 2 bloques arriba; abajo dos espectros de barras lado a lado (pocas barras anchas «N pequeño», muchas finas «N grande») con sus tags; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-leer-waterfall.py",
+      "title": "5 · Leer el waterfall",
+      "scene": "Clip5",
+      "final_state": "Waterfall raster centrado con la traza Doppler inclinada resaltada con una línea blanca brillante; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-demodular.py",
+      "title": "6 · Demodular en una línea",
+      "scene": "Clip6",
+      "final_state": "Onda AM ámbar con envolvente cian y quiebres rojos arriba; onda FM violeta con dos líneas limitadoras verdes y tag «mensaje a salvo» abajo; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-bits-decidir.py",
+      "title": "7 · Bits en el aire: decidir",
+      "scene": "Clip7",
+      "final_state": "Plano IQ con constelación BPSK ruidosa (nubes cian y violeta, puntos errados rojos) y frontera punteada vertical a la izquierda; curva del acantilado con punto brillante bajo el umbral a la derecha; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-diagrama-ojo.py",
+      "title": "8 · El diagrama de ojo",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («SDR» + «la radio hecha software» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
