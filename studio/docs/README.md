@@ -225,14 +225,23 @@ ManimStudio no hace en el servidor para no sumar otro paso de render):
   (Vertex, misma service account del asistente; sin `gcp-key.json` la función se oculta).
 - El audio se **alinea a las secciones**: cada una se sintetiza aparte, se recorta su
   silencio inicial/final y se coloca en su `t_inicio` (hueco máximo 2.5 s, cascada si la
-  anterior se pasa). Si aún así excede el video +5 %, un reintento con guion más corto.
+  anterior se pasa).
+- **Que quepa en el video** (tolerancia +5 %) se ataca en tres niveles, de menos a más
+  invasivo: 1) los silencios entre secciones se comprimen por búsqueda binaria hasta el
+  máximo que aún cabe (`_ajustar_al_limite`, no toca la voz); 2) hasta
+  `MAX_INTENTOS_GUION` guiones, cada uno con menos palabras en proporción a lo que se
+  pasó, **conservando el intento que mejor encaja** —no el último, que el TTS varía—;
+  3) si aun así se pasa, `mux.sh` lo acelera con `atempo` al montar. Ninguna de las tres
+  recorta la narración.
 - Salida en `guiones/<slug-proyecto>/NN-slug.{md,txt,wav,secciones.json}` + `estado.json`
   (hash de script compuesto+escena+duración+voz → detecta narraciones desactualizadas).
 - API: `GET/POST /api/projects/{pid}/narracion` (estado por clip / corrida en segundo
   plano, una a la vez), `POST .../narracion/cancel`, `GET .../narracion/{cid}/{audio,texto}`.
 - El zip de `GET /api/projects/{pid}/archive` incluye los `.wav`/`.txt` emparejados con
-  cada mp4, `mux.sh` (ffmpeg `apad -shortest`: cada clip conserva su duración exacta y el
-  concat no se desincroniza) y el estado de narración en `manifest.json`.
+  cada mp4, `mux.sh` y el estado de narración en `manifest.json`. `mux.sh` mide con
+  `ffprobe`: si la voz cabe, `apad -shortest` (cada clip conserva su duración exacta y el
+  concat no se desincroniza); si no cabe, `atempo` con el ratio justo (tope 1.15, preserva
+  el tono) para no perder la cola de la narración.
 - CLI equivalente: `studio/tools/guiones.py` (`--solo-guion`, `--solo-audio`, `--voz`,
   `--force`); comparte la lógica de `app/narracion.py`.
 - Operación: la unidad systemd necesita `ReadWritePaths` sobre `guiones/` y el directorio

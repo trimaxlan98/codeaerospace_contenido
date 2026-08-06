@@ -32,17 +32,31 @@ from .scenes import detect_scenes
 # concat) y une el curso completo. Corre fuera de la app (requiere ffmpeg).
 MUX_SH = """#!/bin/sh
 # Une cada clip con su narracion y concatena el curso completo.
-# Requiere ffmpeg. Uso:  sh mux.sh
+# Requiere ffmpeg (ffprobe y awk incluidos). Uso:  sh mux.sh
 set -e
 mkdir -p con_audio
+dur() {
+  ffprobe -v error -show_entries format=duration -of csv=p=0 "$1"
+}
 for v in [0-9][0-9][0-9]-*.mp4; do
   w="${v%.mp4}.wav"
   if [ -f "$w" ]; then
+    # Si la voz es mas larga que el video, se acelera lo justo (atempo
+    # preserva el tono) en vez de dejar que -shortest le corte la cola.
+    r=$(awk -v a="$(dur "$w")" -v b="$(dur "$v")" 'BEGIN{
+      r = (b > 0) ? a / b : 1
+      if (r < 1.005) r = 1        # holgura: no vale la pena tocarlo
+      if (r > 1.15) r = 1.15      # mas alla se nota; el resto se recorta
+      printf "%.4f", r }')
+    if [ "$r" = "1.0000" ]; then af="apad"; else
+      af="atempo=$r,apad"
+      echo "  $v: voz $r x mas rapida para caber en el video"
+    fi
     # apad + -shortest: la voz se rellena con silencio hasta el final del
     # video, asi cada clip conserva su duracion exacta y el concat no se
     # desincroniza.
     ffmpeg -y -i "$v" -i "$w" -c:v copy -c:a aac -b:a 192k \\
-      -af apad -shortest "con_audio/$v"
+      -af "$af" -shortest "con_audio/$v"
   else
     # Sin narracion: pista de silencio para que el concat no mezcle clips
     # con y sin audio.

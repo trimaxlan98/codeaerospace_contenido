@@ -194,7 +194,8 @@ def main() -> None:
             print(f"[{etiqueta}] re-sintetizando audio "
                   + ("alineado a los tiempos del guion…" if con_t
                      else "de corrido (sin tiempos)…"))
-            audio_s = sintetizar(vertex, secciones, voz, wav_path)
+            audio_s = sintetizar(vertex, secciones, voz, wav_path,
+                                 video_s and video_s * TOLERANCIA_AUDIO)
             previo.update({"audio_s": round(audio_s, 1), "voz": voz,
                            "generado": time.time()})
             estado[clip["id"]] = previo

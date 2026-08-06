@@ -207,6 +207,69 @@ def test_recortar_silencio():
     assert abs(dur - 1.24) < 0.01
 
 
+def test_sintetizar_comprime_huecos_para_caber(tmp_path):
+    """Con limite, los silencios entre secciones ceden antes de recortar voz:
+    sin limite el alineado dura 4 s (1 + 2 de hueco + 1) y con 2.5 s de tope
+    se comprime hasta caber sin perder ninguna seccion."""
+    from app.narracion import sintetizar
+
+    fake = FakeVertex()  # 1 s de audio por seccion
+    secciones = [{"t_inicio": 0, "texto": "a"}, {"t_inicio": 3, "texto": "b"}]
+
+    assert sintetizar(fake, secciones, "Charon", tmp_path / "sin.wav") == 4.0
+
+    dur = sintetizar(fake, secciones, "Charon", tmp_path / "con.wav",
+                     limite_s=2.5)
+    assert 2.0 <= dur <= 2.5          # las 2 s de voz siguen completas
+    # Aprovecha el hueco disponible en vez de pegarlas sin aire
+    assert dur > 2.3
+
+    # Ni pegadas caben (2 s de voz > 1.5 s): se entrega el minimo posible y
+    # el ajuste fino queda para el reintento de guion / atempo del mux.
+    dur = sintetizar(fake, secciones, "Charon", tmp_path / "min.wav",
+                     limite_s=1.5)
+    assert dur == 2.0
+
+
+def test_generar_clip_conserva_el_mejor_intento(tmp_path):
+    """Si el reintento sale peor que el guion original, se conserva el
+    original (y no queda basura de intentos en el directorio)."""
+    from app.narracion import generar_clip
+
+    class VertexVariable(FakeVertex):
+        """Cada intento pide una seccion mas: el 2o cabe, el 3o se pasa."""
+
+        def __init__(self):
+            super().__init__()
+            self.duraciones = [3, 1, 4]  # segundos de voz por intento
+
+        def guion(self, system, user):
+            self.llamadas_guion += 1
+            n = self.duraciones[self.llamadas_guion - 1]
+            return {"secciones": [{"t_inicio": i, "t_fin": i + 1,
+                                   "momento": "m", "texto": f"t{i}"}
+                                  for i in range(n)]}
+
+    fake = VertexVariable()
+    clip = {"title": "Clip", "script": VALID_SCRIPT, "scene": "Demo",
+            "notes": "", "position": 1}
+    curso = {"name": "Curso", "description": "d", "total_clips": 1}
+    entry = generar_clip(fake, curso, clip, VALID_SCRIPT, video_s=2.0,
+                         voz="Charon", destino=tmp_path, etiqueta="01-clip",
+                         log=lambda *a: None)
+
+    # 1er intento 3 s (no cabe en 2 s + 5 %), 2o 1 s (cabe) -> para ahi
+    assert fake.llamadas_guion == 2
+    assert entry["audio_s"] == 1.0
+    assert not list(tmp_path.glob("*.intento.wav"))
+    # El wav en disco es el del intento elegido, no el del ultimo
+    import wave
+    with wave.open(str(tmp_path / "01-clip.wav")) as w:
+        assert w.getnframes() / w.getframerate() == 1.0
+    # md/txt/secciones describen ese mismo intento
+    assert (tmp_path / "01-clip.txt").read_text().strip() == "t0"
+
+
 def _make_rendered_clip(authed, db, cfg, pid, title, job_id):
     """Clip con render 'done' vigente y mp4 falso (patron de test_projects_export)."""
     import time as _t

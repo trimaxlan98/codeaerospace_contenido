@@ -677,7 +677,10 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
                   <span className="text-[11px] text-warn">desactualizada</span>
                 )}
                 {narr.aviso_largo && (
-                  <span className="text-[11px] text-warn">⚠ más larga que el video</span>
+                  <span className="text-[11px] text-warn"
+                    title="mux.sh la acelera con atempo al montar; no se corta">
+                    ⚠ más larga que el video
+                  </span>
                 )}
                 <Button size="xs" variant="ghost" onClick={onNarrar} disabled={narrBusy || !narrEnabled}
                   aria-label="regenerar narración" title="regenerar la narración de este clip">

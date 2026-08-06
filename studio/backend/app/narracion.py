@@ -33,6 +33,10 @@ PAUSA_ENTRE_TROZOS_S = 0.35
 # El audio puede exceder el video hasta este factor antes de reintentar con
 # un presupuesto de palabras mas corto.
 TOLERANCIA_AUDIO = 1.05
+# Intentos de guion (el primero + reintentos mas cortos) cuando el audio no
+# cabe. Se conserva el intento que mejor encaja, no el ultimo: el TTS varia
+# entre corridas y un reintento puede salir peor que el original.
+MAX_INTENTOS_GUION = 3
 # Alineado por secciones: silencio maximo insertado entre secciones (los
 # t_inicio del guion son estimados; huecos mas largos son casi siempre un
 # error de estimacion y desincronizan el final).
@@ -293,19 +297,20 @@ def _recortar_silencio(audio: bytes) -> bytes:
     return audio[ini * 2:fin * 2]
 
 
-def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict],
-                  voz: str) -> bytes:
-    """Cada seccion se sintetiza aparte (con su silencio recortado) y se
-    coloca en su t_inicio: la voz cae sobre el momento visual que comenta.
-    El hueco insertado se acota a MAX_HUECO_S (los tiempos del guion son
-    estimados) y si una seccion se pasa de largo, la siguiente cede hacia
-    adelante (con la pausa minima) en cascada."""
-    pausa_min = int(TTS_RATE * PAUSA_ENTRE_TROZOS_S)
-    hueco_max = int(TTS_RATE * MAX_HUECO_S)
+def _ensamblar(secciones: list[dict], audios: list[bytes],
+               holgura: float = 1.0) -> bytes:
+    """Coloca cada seccion en su t_inicio: la voz cae sobre el momento visual
+    que comenta. El hueco insertado se acota a MAX_HUECO_S (los tiempos del
+    guion son estimados) y si una seccion se pasa de largo, la siguiente cede
+    hacia adelante (con la pausa minima) en cascada.
+
+    `holgura` escala los silencios que se insertan (1.0 = tiempos tal cual,
+    0.0 = secciones pegadas una tras otra, el minimo posible)."""
+    pausa_min = int(TTS_RATE * PAUSA_ENTRE_TROZOS_S * holgura)
+    hueco_max = int(TTS_RATE * MAX_HUECO_S * holgura)
     pcm = bytearray()
     cursor = 0  # muestras escritas
-    for i, s in enumerate(secciones):
-        audio = _recortar_silencio(vertex.tts(s["texto"], voz))
+    for i, (s, audio) in enumerate(zip(secciones, audios)):
         offset = int(float(s["t_inicio"]) * TTS_RATE)
         if i:
             offset = max(min(offset, cursor + hueco_max), cursor + pausa_min)
@@ -317,17 +322,65 @@ def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict],
     return bytes(pcm)
 
 
+def _ajustar_al_limite(secciones: list[dict], audios: list[bytes],
+                       limite_s: float) -> bytes:
+    """Mayor holgura entre secciones que aun cabe en `limite_s` (busqueda
+    binaria). Recortar silencio no toca la voz, asi que es lo primero que se
+    sacrifica antes de pedir un guion mas corto."""
+    limite = int(limite_s * TTS_RATE)
+    minimo = _ensamblar(secciones, audios, 0.0)
+    if len(minimo) // 2 > limite:
+        return minimo  # ni pegadas caben: lo resuelve el reintento de guion
+    lo, hi, mejor = 0.0, 1.0, minimo
+    for _ in range(8):
+        mid = (lo + hi) / 2
+        pcm = _ensamblar(secciones, audios, mid)
+        if len(pcm) // 2 <= limite:
+            mejor, lo = pcm, mid
+        else:
+            hi = mid
+    return mejor
+
+
+def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict], voz: str,
+                  limite_s: float | None = None) -> bytes:
+    """Cada seccion se sintetiza aparte (con su silencio recortado) y se
+    ensambla sobre los tiempos del guion, comprimiendo los silencios si hace
+    falta para no pasarse de `limite_s`."""
+    audios = [_recortar_silencio(vertex.tts(s["texto"], voz))
+              for s in secciones]
+    pcm = _ensamblar(secciones, audios)
+    if limite_s and len(pcm) // 2 > limite_s * TTS_RATE:
+        pcm = _ajustar_al_limite(secciones, audios, limite_s)
+    return pcm
+
+
 def sintetizar(vertex: VertexNarrador, secciones: list[dict], voz: str,
-               wav_path: Path) -> float:
+               wav_path: Path, limite_s: float | None = None) -> float:
     """TTS a WAV. Con tiempos por seccion (t_inicio) el audio se alinea a los
     momentos visuales del guion; sin tiempos se narra de corrido. Devuelve la
     duracion del audio en segundos."""
     alineable = (len(secciones) > 1
                  and all(isinstance(s.get("t_inicio"), (int, float))
                          for s in secciones))
-    pcm = (_pcm_alineado(vertex, secciones, voz) if alineable
+    pcm = (_pcm_alineado(vertex, secciones, voz, limite_s) if alineable
            else _pcm_agrupado(vertex, secciones, voz))
     return _escribir_wav(pcm, wav_path)
+
+
+def _mejor_intento(candidato: float, actual: float | None,
+                   limite: float | None) -> bool:
+    """¿El intento `candidato` encaja mejor que `actual`? Caber en el video
+    manda; entre los que caben gana el mas largo (mas contenido narrado) y
+    entre los que no, el que menos se pasa."""
+    if actual is None:
+        return True
+    if limite is None:
+        return False
+    cabe, cabia = candidato <= limite, actual <= limite
+    if cabe != cabia:
+        return cabe
+    return candidato > actual if cabe else candidato < actual
 
 
 def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
@@ -352,21 +405,37 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
 
     audio_s = None
     if not solo_guion:
-        log(f"[{etiqueta}] narrando con {voz}…")
-        audio_s = sintetizar(vertex, secciones, voz, wav_path)
-        if video_s and audio_s > video_s * TOLERANCIA_AUDIO:
+        limite = video_s * TOLERANCIA_AUDIO if video_s else None
+        tmp = destino / f"{etiqueta}.intento.wav"
+        mejor: dict | None = None
+        for intento in range(1, MAX_INTENTOS_GUION + 1):
+            log(f"[{etiqueta}] narrando con {voz}…"
+                + (f" (intento {intento})" if intento > 1 else ""))
+            audio_s = sintetizar(vertex, secciones, voz, tmp, limite)
+            if _mejor_intento(audio_s, mejor and mejor["audio_s"], limite):
+                mejor = {"audio_s": audio_s, "secciones": secciones,
+                         "narracion": narracion}
+                tmp.replace(wav_path)
+            if limite is None or audio_s <= limite \
+                    or intento == MAX_INTENTOS_GUION:
+                break
+            # Aun no cabe: guion mas corto en proporcion a lo que se paso.
             log(f"[{etiqueta}] audio {audio_s:.0f} s > video "
                 f"{video_s:.0f} s: reintento con guion más corto…")
-            system, user = prompt_guion(
-                curso, clip, compuesto, video_s,
-                int(max_palabras * video_s / audio_s * 0.95))
+            max_palabras = max(20, int(max_palabras * video_s / audio_s * .95))
+            system, user = prompt_guion(curso, clip, compuesto, video_s,
+                                        max_palabras)
             data = vertex.guion(system, user)
             secciones = data["secciones"]
             narracion = "\n\n".join(s["texto"].strip() for s in secciones)
-            audio_s = sintetizar(vertex, secciones, voz, wav_path)
-            if audio_s > video_s * TOLERANCIA_AUDIO:
-                log(f"[{etiqueta}] AVISO: el audio ({audio_s:.0f} s) "
-                    "sigue más largo que el video; revisar en montaje.")
+        tmp.unlink(missing_ok=True)
+        # El mejor intento manda: el ultimo puede haber salido peor.
+        audio_s = mejor["audio_s"]
+        secciones, narracion = mejor["secciones"], mejor["narracion"]
+        if limite and audio_s > limite:
+            log(f"[{etiqueta}] AVISO: el audio ({audio_s:.0f} s) sigue más "
+                f"largo que el video ({video_s:.0f} s); mux.sh lo ajusta "
+                "con atempo al montar.")
 
     md_path.write_text(render_md(curso, clip, secciones, narracion,
                                  video_s, voz, vertex.model_tts))
