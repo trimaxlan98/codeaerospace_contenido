@@ -62,7 +62,11 @@ def test_create_job_writes_script_and_lists(authed, tmp_path):
     # verifica igual via /script, respaldado por DB, mas abajo).
     script_file = tmp_path / "render_jobs" / job["id"] / "scene.py"
     try:
-        assert script_file.read_text() == VALID_SCRIPT
+        escrito = script_file.read_text()
+        # El script del autor va intacto al inicio (los numeros de linea de
+        # un error siguen siendo los suyos) y la marca se anexa al final.
+        assert escrito.startswith(VALID_SCRIPT.rstrip())
+        assert "code_brand" in escrito
     except FileNotFoundError:
         assert authed.get(f"/api/jobs/{job['id']}").json()["status"] == "error"
 

@@ -91,15 +91,64 @@ def esquinas_hud(opacidad=0.16, largo=0.42, color=CODE_ACCENT):
     return esquinas
 
 
-def aplicar_marca(escena, esquinas=True, marca=True) -> None:
+def aplicar_marca(escena, esquinas=True, marca=True, fondo=True) -> None:
     """Fondo de marca + marca de agua + esquinas HUD como capa fija de la
     escena. Llamar en `setup()` para que quede debajo de todo lo demas."""
-    config.background_color = CODE_BG
-    escena.camera.background_color = CODE_BG
+    if fondo:
+        config.background_color = CODE_BG
+        escena.camera.background_color = CODE_BG
     if esquinas:
         escena.add(esquinas_hud())
     if marca:
         escena.add(marca_agua())
+
+
+def _fondo_propio() -> bool:
+    """¿El script eligio su propio fondo? (si sigue en el negro por defecto
+    de Manim, manda el de la marca)."""
+    try:
+        return config.background_color.to_hex().lower() not in ("#000000",
+                                                                "#000")
+    except Exception:
+        return False
+
+
+def _marcar_clase(cls, fondo: bool) -> None:
+    setup_original = cls.setup
+
+    def setup(self):
+        setup_original(self)
+        aplicar_marca(self, fondo=fondo)
+
+    cls.setup = setup
+    cls._code_brand = True
+
+
+def marcar_escenas(ns: dict) -> None:
+    """Aplica la identidad a todas las escenas definidas en `ns` (el
+    `globals()` del script). ManimStudio anexa la llamada al FINAL de los
+    scripts que no traen marca propia: la identidad es el minimo visual del
+    canal, no una opcion del autor.
+
+    Va al final a proposito — manim importa el modulo entero antes de
+    instanciar la escena, asi que anexar (en vez de anteponer) deja intactos
+    los numeros de linea que reporta un error.
+
+    Idempotente: una clase ya marcada, o que hereda de una marcada, se salta;
+    un curso con su propia base de marca no la duplica.
+    """
+    from manim import Scene as _Scene
+
+    registrar_fuentes()
+    fondo = not _fondo_propio()
+    if fondo:
+        config.background_color = CODE_BG
+    modulo = ns.get("__name__")
+    for obj in list(ns.values()):
+        if (isinstance(obj, type) and issubclass(obj, _Scene)
+                and obj.__module__ == modulo
+                and not getattr(obj, "_code_brand", False)):
+            _marcar_clase(obj, fondo)
 
 
 def titulo_marca(texto, font_size=34, color=CODE_INK):

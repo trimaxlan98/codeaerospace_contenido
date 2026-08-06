@@ -12,6 +12,7 @@ import uuid
 from collections import deque
 from pathlib import Path
 
+from . import branding
 from .config import Settings
 from .db import Database
 from .events import EventBus
@@ -79,10 +80,14 @@ class JobManager:
             "status": "queued", "script": script, "created_at": now,
             "project_id": project_id, "clip_id": clip_id, "content_hash": content_hash,
         }
-        # El script se escribe en la ruta canonica que el runner espera.
+        # El script se escribe en la ruta canonica que el runner espera, con
+        # la identidad del canal garantizada (branding.aplicar). Lo que se
+        # guarda en la DB es el script del autor, sin tocar: la marca es del
+        # render, no del codigo que el usuario edita.
         job_dir = self.cfg.render_jobs_dir / job_id
         job_dir.mkdir(parents=True, exist_ok=True)
-        (job_dir / "scene.py").write_text(script, encoding="utf-8")
+        (job_dir / "scene.py").write_text(branding.aplicar(script),
+                                          encoding="utf-8")
 
         self.db.insert_job(job)
         self.logs[job_id] = deque(maxlen=LOG_BUFFER_MAX)

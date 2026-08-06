@@ -249,6 +249,28 @@ ManimStudio no hace en el servidor para no sumar otro paso de render):
 
 ### Identidad CO.DE Academy en los videos
 
+**Es el mínimo visual del canal, no una opción.** Todo render sale con la marca:
+`JobManager.create_job` pasa el script por `app/branding.py` antes de escribir
+`scene.py`, así que un clip de curso, un render suelto de la Biblioteca y un
+re-render de código viejo salen los tres marcados sin tocar su código.
+
+- El bloque se **anexa al final** del script, nunca al principio: manim importa el
+  módulo entero antes de instanciar la escena, así que `marcar_escenas(globals())`
+  alcanza a todas las clases ya definidas **y los números de línea de un error
+  siguen siendo los del código del autor** (anteponer los correría).
+- Se salta si el script ya menciona `code_brand`: los cursos con su propia base de
+  marca en el `style_block` se respetan tal cual, sin duplicar la marca de agua.
+  `marcar_escenas` es idempotente por su parte (marca `_code_brand` en la clase, que
+  las subclases heredan).
+- Va en `try/except`: si la extensión no estuviera montada, el render sale sin marca
+  con un aviso en el log, pero sale. La marca no puede tumbar la cola.
+- Lo que se guarda en la DB es el script del autor sin tocar; la marca es del render.
+- El fondo de marca solo se impone si el script no eligió el suyo (si sigue en el
+  negro por defecto de Manim).
+- El asistente Gemini la tiene como regla en `conocimiento.py` (paleta, tipografías,
+  `titulo_marca`/`etiqueta_hud`/`Rotulos`) y en los prompts de generar/corregir de
+  `ai.py`: no puede quitarla al arreglar un script ni inventar otra paleta.
+
 - `studio/content/manim_extensions/code_brand.py`: paleta oficial (fondo `#05070a`,
   ámbar `#f59e0b`), tipografías propias Rajdhani/Space Mono (OFL, en `fonts/`, registradas
   en Pango en runtime dentro del contenedor), `marca_agua()` sutil con z_index alto,
