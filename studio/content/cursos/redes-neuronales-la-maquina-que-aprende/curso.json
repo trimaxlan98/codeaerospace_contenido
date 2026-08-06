@@ -1,0 +1,56 @@
+{
+  "name": "Redes neuronales: la máquina que aprende",
+  "description": "Curso de divulgación en 8 clips que explica cómo aprende una red neuronal: del error y el descenso de gradiente a la regresión, la neurona, el muro de XOR, las capas ocultas, backpropagation y el sobreajuste. Estilo 3Blue1Brown en español para estudiantes de ingeniería.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-puede-una-maquina-aprender.py",
+      "title": "1 · ¿Puede una máquina aprender?",
+      "scene": "Clip1",
+      "final_state": "Ejes de plano centrados con las dos nubes de puntos (cian y violeta) y la recta separadora ámbar en su posición final; título «¿Puede una máquina aprender?» arriba y HUD 'MODULO 01' arriba-izquierda."
+    },
+    {
+      "file": "clips/02-el-error-como-brujula.py",
+      "title": "2 · El error como brújula",
+      "scene": "Clip2",
+      "final_state": "Parábola de pérdida con la trayectoria convergente ámbar dibujada y la bola en el mínimo; la trayectoria divergente roja ya retirada; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-recta-que-aprende.py",
+      "title": "3 · La recta que aprende",
+      "scene": "Clip3",
+      "final_state": "Recta ámbar ajustada sobre los puntos cian a la izquierda; mini-ejes con la curva de pérdida completa abajo a la derecha; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-neurona.py",
+      "title": "4 · La neurona",
+      "scene": "Clip4",
+      "final_state": "Esquema de la neurona (entradas, pesos, suma, sigmoide, salida) arriba; plano con dos nubes y la recta frontera abajo; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-xor-el-muro.py",
+      "title": "5 · XOR: el muro",
+      "scene": "Clip5",
+      "final_state": "Datos XOR (racimos alternos cian/violeta) en el plano centrado, sin recta; contador de errores ya retirado; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-capas-ocultas.py",
+      "title": "6 · Capas ocultas: doblar el espacio",
+      "scene": "Clip6",
+      "final_state": "Red 2-4-1 a la izquierda; plano XOR con la frontera de decisión final curvada a la derecha; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-backpropagation.py",
+      "title": "7 · Backpropagation: el error viaja de vuelta",
+      "scene": "Clip7",
+      "final_state": "Red 2-4-4-1 centrada con varias conexiones engrosadas en ámbar; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-sobreajuste-y-cierre.py",
+      "title": "8 · Aprender de memoria no es aprender",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («Redes neuronales» + «la máquina que aprende» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
