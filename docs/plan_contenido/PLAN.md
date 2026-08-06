@@ -26,7 +26,7 @@ CO.DE Academy (`code_brand.py`).
 |------|--------------------------|----------------------------|----------------|--------|
 | 1 | **Redes neuronales: la maquina que aprende** | IA L2-L6 (gradiente, regresion, logistica, redes, backprop, sobreajuste) | `aprendizaje.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
 | 2 | De la palabra al vector: embeddings y atencion | IA L8-L9 (NLP, embeddings, transformers) | `atencion.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 3 | Agentes de IA: maquinas que operan el mundo | IA L10 + IA Agentica L1, L2, L5-L7 | reusa `bloques.py` | pendiente |
+| 3 | Agentes de IA: maquinas que operan el mundo | IA L10 + IA Agentica L1, L2, L5-L7 | `agentes.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
 | 4 | SDR: la radio hecha software | SDR L3-L6 (IQ, FFT, waterfall, demodulacion) | `radio.py` | pendiente |
 | 5 | Apuntar a un satelite: el arte del seguimiento | APT L1-L4, L6 (Az/El, Doppler, PID) | reusa `satelites.py`, `kepler.py` | pendiente |
 | 6 | El espectro: la guerra invisible por las ondas | Espectro L1-L4, L6 (bandas, lluvia, UIT, NGSO-GSO) | reusa `senal.py`, `bloques.py` | pendiente |
