@@ -1,0 +1,11 @@
+El conjunto de Mandelbrot es un mapa. Cada punto es un número 'c' que podemos usar en nuestra fórmula.
+
+Y para cada 'c', hay un universo: su conjunto de Julia. Si 'c' está dentro del mapa, su mundo es una sola pieza, está conectado.
+
+Incluso en los bulbos o cerca del borde. Pero si elegimos una 'c' fuera del mapa, su universo se desintegra en un polvo de puntos.
+
+Y en la frontera misma, el comportamiento es caótico y fascinante. Esta es la gran división: dentro, conexión; fuera, dispersión.
+
+Infinitos mundos, cada uno generado por un punto del plano complejo.
+
+Toda esta asombrosa variedad surge de una regla increíblemente simple. El universo en un grano de arena matemática.

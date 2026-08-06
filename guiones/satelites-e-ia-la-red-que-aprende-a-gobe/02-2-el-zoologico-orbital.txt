@@ -1,0 +1,5 @@
+Las órbitas de los satélites imponen un peaje. Cuanto más lejos, más tarda la señal en ir y volver.
+
+Pero la altura también da perspectiva. Un satélite lejano ve una porción enorme del planeta.
+
+Este es el dilema: latencia contra cobertura.

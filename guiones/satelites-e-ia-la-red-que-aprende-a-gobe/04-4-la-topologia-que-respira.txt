@@ -1,0 +1,7 @@
+La órbita de un satélite es rápida y predecible.
+
+Pero la conexión con un punto en tierra es muy breve, de apenas unos minutos por pasada.
+
+Una constelación ofrece cobertura global, pero su red de enlaces cambia a cada instante.
+
+La red debe adaptarse continuamente. Una solución estática no es una opción.

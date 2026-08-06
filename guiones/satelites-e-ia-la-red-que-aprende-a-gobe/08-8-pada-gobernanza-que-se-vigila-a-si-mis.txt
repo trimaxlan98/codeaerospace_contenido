@@ -1,0 +1,3 @@
+El lazo PADA gobierna la red. Para que sus decisiones sean fiables, las probamos en un gemelo digital. El Margen Adaptativo asegura que la prueba sea un desafío real, no una victoria fácil.
+
+Así, la red no solo piensa: aprende a desconfiar de sí misma, a poner a prueba sus propias conclusiones.

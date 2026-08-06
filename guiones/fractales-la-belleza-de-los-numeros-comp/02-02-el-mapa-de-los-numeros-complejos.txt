@@ -1,0 +1,7 @@
+Para visualizar los números complejos, usamos un mapa. Es un plano con dos ejes: uno para la parte real y otro para la parte imaginaria.
+
+Cada punto de este plano representa un número complejo. Podemos pensarlo como un punto, o como una flecha que sale desde el centro.
+
+Sus coordenadas nos dicen cuánto tiene de real y cuánto de imaginario. La parte real es su avance horizontal, y la imaginaria, el vertical.
+
+¿Y cómo se suman? Es muy visual: para sumar un número, solo hay que encadenar su flecha a continuación de la otra. El resultado es el nuevo punto alcanzado.

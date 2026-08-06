@@ -1,0 +1,3 @@
+Los estándares que llevan el 5G al espacio ya están aquí, preparando el camino hacia el 6G.
+
+La idea es simple: el satélite ya no es un espejo, es una estación base en la propia red.

@@ -1,0 +1,11 @@
+Partimos de esta sencilla regla. Es una máquina que transforma un número complejo zeta: lo eleva al cuadrado y le suma una constante c.
+
+Lo clave es que el resultado de la máquina vuelve a ser la entrada. Es un proceso que se repite, o itera, una y otra vez.
+
+La secuencia de puntos que genera se llama órbita. Siempre partimos de zeta sub cero igual a cero, y observamos si se aleja más allá de este límite.
+
+Para este valor de c, la órbita se enreda sobre sí misma. Se acerca a un punto de equilibrio y nunca escapará.
+
+Pero con un valor de c distinto, la órbita se descontrola. Cruza el círculo de seguridad y se dispara hacia el infinito.
+
+El destino de la órbita depende solo del valor de c que elijamos. Para algunos, queda confinada; para otros, escapa.

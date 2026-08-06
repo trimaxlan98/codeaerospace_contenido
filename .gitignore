@@ -31,6 +31,8 @@ Thumbs.db
 
 # ManimStudio
 render_jobs/
+# Guiones de audio: el texto (.md/.txt) se versiona, el audio no
+guiones/**/*.wav
 studio/backend/.env
 studio/backend/manimstudio.db*
 studio/frontend/node_modules/

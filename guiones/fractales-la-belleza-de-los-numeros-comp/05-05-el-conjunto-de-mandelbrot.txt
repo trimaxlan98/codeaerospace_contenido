@@ -1,0 +1,5 @@
+Probamos cada punto 'c' del plano. Si su órbita queda atrapada, lo pintamos de negro. Si escapa, le damos un color que indica lo rápido que se aleja.
+
+Al afinar la malla, emerge una figura de complejidad asombrosa: el conjunto de Mandelbrot.
+
+Esa frontera rugosa, que se repite a cualquier escala, es la esencia de un fractal.

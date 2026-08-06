@@ -1,0 +1,7 @@
+¿Qué ocurre si un satélite de la red miente?
+
+Envía información contradictoria para romper el consenso del grupo.
+
+Pero los protocolos de consenso permiten que la mayoría honesta lo aísle y llegue a un acuerdo.
+
+El mismo riesgo existe al compartir modelos de IA. Un modelo envenenado puede corromper el aprendizaje global si no se filtra.

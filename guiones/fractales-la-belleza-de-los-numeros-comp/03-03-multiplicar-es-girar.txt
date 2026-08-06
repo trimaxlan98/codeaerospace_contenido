@@ -1,0 +1,13 @@
+En el plano complejo, las operaciones aritméticas tienen una interpretación geométrica. Sumar es desplazarse. ¿Y multiplicar?
+
+Tomemos el número uno. Es un vector que apunta a la derecha. Ahora, multipliquémoslo por el número i.
+
+El vector gira noventa grados y aterriza en i. Si volvemos a multiplicar por i, damos otro cuarto de vuelta y llegamos a menos uno.
+
+Esto nos da una bonita intuición visual para una fórmula famosa. Multiplicar por i dos veces es como dar media vuelta en el plano.
+
+Esto no solo funciona con el uno. Si tomamos un número complejo cualquiera, zeta, y lo multiplicamos por sí mismo...
+
+El resultado gira y se estira. Si repetimos la operación, el punto traza una espiral que se aleja del centro.
+
+

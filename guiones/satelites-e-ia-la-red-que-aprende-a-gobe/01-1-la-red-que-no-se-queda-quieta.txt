@@ -1,0 +1,5 @@
+Miles de satélites nos rodean, conectados en una red global que se mueve a una velocidad vertiginosa.
+
+La forma de la red cambia a cada instante, y sus conexiones deben reconfigurarse sin parar.
+
+Aquí está el reto. En este curso veremos cómo la inteligencia artificial puede ser la respuesta.
