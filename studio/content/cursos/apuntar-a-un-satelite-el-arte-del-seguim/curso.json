@@ -1,0 +1,56 @@
+{
+  "name": "Apuntar a un satélite: el arte del seguimiento",
+  "description": "Curso de divulgación en 8 clips sobre el apuntamiento y seguimiento de satélites LEO: del cielo que se mueve al TLE y su caducidad, la cadena de marcos de referencia hasta acimut y elevación, la vista polar del pase y la máscara de elevación, el keyhole de las monturas Az/El, la curva S del Doppler, el lazo de control que persigue la referencia y la coreografía completa de un pase AOS→LOS. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-cielo-que-se-mueve.py",
+      "title": "1 · El cielo que no se queda quieto",
+      "scene": "Clip1",
+      "final_state": "Mapa del mundo con traza terrestre ámbar de una órbita LEO, estación cian con su círculo verde de visibilidad y punto satélite al final de la traza; título «El cielo que no se queda quieto» y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-dos-lineas-de-oro.py",
+      "title": "2 · Dos líneas que valen oro",
+      "scene": "Clip2",
+      "final_state": "Tarjeta TLE de la ISS centrada con el campo de la época resaltado en rojo suave; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-del-tle-a-la-antena.py",
+      "title": "3 · Del TLE a la antena",
+      "scene": "Clip3",
+      "final_state": "Cadena de 6 bloques TLE→SGP4→ECI→ECEF→ENU→AZ/EL en dos filas, con la etiqueta HUD «RELOJ +1 S → 0.8° DE ERROR» abajo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-vista-polar.py",
+      "title": "4 · La vista polar del pase",
+      "scene": "Clip4",
+      "final_state": "Vista polar del cielo con máscara de elevación sombreada, traza de pase rasante violeta tenue y traza de pase casi cenital ámbar con su tag; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-keyhole.py",
+      "title": "5 · Keyhole: el agujero del cénit",
+      "scene": "Clip5",
+      "final_state": "Vista polar con traza casi cenital ámbar y cono keyhole rojo en el centro a la izquierda; aguja de velocidad en zona roja a la derecha; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-doppler.py",
+      "title": "6 · Doppler: la S del pase",
+      "scene": "Clip6",
+      "final_state": "Curva S del Doppler completa con línea f0 punteada, punto brillante al final y etiqueta HUD «VHF ±3.4 KHZ · UHF ±10 KHZ»; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-lazo-que-persigue.py",
+      "title": "7 · El lazo que persigue",
+      "scene": "Clip7",
+      "final_state": "Curvas de seguimiento superpuestas: referencia ámbar y antena verde encima (sin rezago, sin flecha de error); HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-una-noche-de-pases.py",
+      "title": "8 · Una noche de pases",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («Apuntar a un satélite» + «el arte del seguimiento» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
