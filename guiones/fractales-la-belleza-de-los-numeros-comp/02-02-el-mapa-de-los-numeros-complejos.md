@@ -4,23 +4,26 @@
 - **Escena:** `Clip02PlanoComplejo`
 - **Duración del video:** 52.7 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 101
+- **Palabras:** 79
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 3–7 s | Aparece el plano complejo con sus ejes | Para visualizar los números complejos, usamos un mapa. Es un plano con dos ejes: uno para la parte real y otro para la parte imaginaria. |
-| 7–17 s | Un número complejo z como punto y vector | Cada punto de este plano representa un número complejo. Podemos pensarlo como un punto, o como una flecha que sale desde el centro. |
-| 17–27 s | Descomposición en parte real e imaginaria | Sus coordenadas nos dicen cuánto tiene de real y cuánto de imaginario. La parte real es su avance horizontal, y la imaginaria, el vertical. |
-| 28–46 s | Suma de dos números complejos | ¿Y cómo se suman? Es muy visual: para sumar un número, solo hay que encadenar su flecha a continuación de la otra. El resultado es el nuevo punto alcanzado. |
+| 0–7 s | Aparece el plano complejo con ejes Re/Im. | Este es el plano de los números complejos. Un mapa donde cada punto es un número. |
+| 7–18 s | Aparece el vector z y su etiqueta 2+1.5i. | Por ejemplo, este de aquí. Para localizarlo, nos fijamos en sus dos coordenadas. |
+| 18–29 s | Descomposición de z en parte real e imaginaria. | Su parte real, en el eje horizontal, y su parte imaginaria, en el vertical. |
+| 29–38 s | Suma de un segundo vector w, que se traslada. | Y sumar números complejos es tan fácil como encadenar sus flechas, una a continuación de la otra. |
+| 38–53 s | Resultado de la suma z+w y resumen final. | El resultado es el punto al que llegamos desde el origen. Geométricamente, sumar es simplemente desplazarse por este mapa. |
 
 ## Narración completa
 
-Para visualizar los números complejos, usamos un mapa. Es un plano con dos ejes: uno para la parte real y otro para la parte imaginaria.
+Este es el plano de los números complejos. Un mapa donde cada punto es un número.
 
-Cada punto de este plano representa un número complejo. Podemos pensarlo como un punto, o como una flecha que sale desde el centro.
+Por ejemplo, este de aquí. Para localizarlo, nos fijamos en sus dos coordenadas.
 
-Sus coordenadas nos dicen cuánto tiene de real y cuánto de imaginario. La parte real es su avance horizontal, y la imaginaria, el vertical.
+Su parte real, en el eje horizontal, y su parte imaginaria, en el vertical.
 
-¿Y cómo se suman? Es muy visual: para sumar un número, solo hay que encadenar su flecha a continuación de la otra. El resultado es el nuevo punto alcanzado.
+Y sumar números complejos es tan fácil como encadenar sus flechas, una a continuación de la otra.
+
+El resultado es el punto al que llegamos desde el origen. Geométricamente, sumar es simplemente desplazarse por este mapa.

@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 1.0,
+    "t_fin": 6.5,
+    "momento": "Agentes con visión parcial",
+    "texto": "Cada satélite es un agente con visión limitada. Juntos forman un equipo que debe aprender a coordinarse."
+  },
+  {
+    "t_inicio": 11.8,
+    "t_fin": 17.0,
+    "momento": "Paradigmas de entrenamiento",
+    "texto": "Hay varias formas de entrenarlos. El mejor equilibrio: aprenden juntos, pero cada uno decide por sí mismo."
+  },
+  {
+    "t_inicio": 17.2,
+    "t_fin": 23.2,
+    "momento": "Arquitectura QMIX",
+    "texto": "La arquitectura QMIX lo consigue, asegurando que la mejora de un agente nunca perjudique al conjunto."
+  }
+]

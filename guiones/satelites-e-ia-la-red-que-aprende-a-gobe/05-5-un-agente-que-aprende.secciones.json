@@ -1,0 +1,14 @@
+[
+  {
+    "t_inicio": 1.0,
+    "t_fin": 8.5,
+    "momento": "Diagrama agente-entorno",
+    "texto": "Un satélite aprende a gestionar la red como un agente autónomo."
+  },
+  {
+    "t_inicio": 8.5,
+    "t_fin": 20.9,
+    "momento": "Curva de aprendizaje y política",
+    "texto": "Prueba acciones, recibe una recompensa y, con el tiempo, mejora su estrategia."
+  }
+]

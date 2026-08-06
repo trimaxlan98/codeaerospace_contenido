@@ -4,23 +4,23 @@
 - **Escena:** `Clip01Formula`
 - **Duración del video:** 26.2 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 46
+- **Palabras:** 38
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–4 s | Aparece la fórmula z_n+1 = z_n^2 + c | Esta es la receta para un universo entero. |
-| 6–12 s | El conjunto de Mandelbrot aparece tras la fórmula | Una imagen que no fue pintada por nadie. Nace de aplicar esa simple regla una y otra vez. |
-| 13–19 s | Zoom profundo en el borde del conjunto | Y al explorar sus bordes, descubrimos un paisaje infinitamente complejo. |
-| 20–24 s | Aparece el título del curso | En los próximos vídeos, vamos a entender cómo es posible. |
+| 0–5 s | Aparece la fórmula z²+c | Esta es la receta de un universo entero. |
+| 5–12 s | Se revela el conjunto de Mandelbrot | Iterada millones de veces, la fórmula dibuja este paisaje. |
+| 12–20 s | Zoom profundo en el borde | Al acercarnos, cada detalle revela una copia del todo. Una complejidad infinita. |
+| 20–26 s | Aparece el título del curso | En los próximos vídeos, aprenderemos a navegar este universo. |
 
 ## Narración completa
 
-Esta es la receta para un universo entero.
+Esta es la receta de un universo entero.
 
-Una imagen que no fue pintada por nadie. Nace de aplicar esa simple regla una y otra vez.
+Iterada millones de veces, la fórmula dibuja este paisaje.
 
-Y al explorar sus bordes, descubrimos un paisaje infinitamente complejo.
+Al acercarnos, cada detalle revela una copia del todo. Una complejidad infinita.
 
-En los próximos vídeos, vamos a entender cómo es posible.
+En los próximos vídeos, aprenderemos a navegar este universo.

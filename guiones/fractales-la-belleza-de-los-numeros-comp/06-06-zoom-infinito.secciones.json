@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 3.1,
+    "t_fin": 15.1,
+    "momento": "Inicio del zoom",
+    "texto": "El conjunto de Mandelbrot es un paisaje de complejidad infinita. Al acercarnos, cada detalle revela nuevos mundos."
+  },
+  {
+    "t_inicio": 17.7,
+    "t_fin": 28.5,
+    "momento": "Aparece un 'minibrot'",
+    "texto": "Y en lo profundo de uno de ellos, encontramos algo familiar: una pequeña copia, casi idéntica al conjunto original."
+  },
+  {
+    "t_inicio": 31.5,
+    "t_fin": 34.3,
+    "momento": "Conclusión final",
+    "texto": "Y dentro de esa copia hay más. La estructura se repite para siempre. No hay fondo."
+  }
+]

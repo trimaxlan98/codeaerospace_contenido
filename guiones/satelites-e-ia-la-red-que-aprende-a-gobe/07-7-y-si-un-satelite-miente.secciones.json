@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 1.0,
+    "t_fin": 4.4,
+    "momento": "Un nodo de la red se vuelve bizantino",
+    "texto": "En una red, un satélite puede fallar o ser malicioso, volviéndose 'bizantino'."
+  },
+  {
+    "t_inicio": 4.4,
+    "t_fin": 8.6,
+    "momento": "El nodo bizantino miente",
+    "texto": "Envía información contradictoria, rompiendo el consenso de la red."
+  },
+  {
+    "t_inicio": 8.6,
+    "t_fin": 15.3,
+    "momento": "El consenso bizantino aísla al mentiroso",
+    "texto": "Con suficientes nodos honestos, eligen la verdad por mayoría y aíslan al mentiroso."
+  },
+  {
+    "t_inicio": 18.8,
+    "t_fin": 24.0,
+    "momento": "El mismo principio en aprendizaje federado",
+    "texto": "Este principio también protege el aprendizaje federado de modelos envenenados."
+  }
+]

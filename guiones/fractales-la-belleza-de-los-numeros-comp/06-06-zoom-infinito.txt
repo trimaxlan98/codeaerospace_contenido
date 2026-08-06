@@ -1,7 +1,5 @@
-El conjunto de Mandelbrot es famoso por la complejidad infinita de su borde. Vamos a explorarlo.
+El conjunto de Mandelbrot es un paisaje de complejidad infinita. Al acercarnos, cada detalle revela nuevos mundos.
 
-Nos sumergimos en uno de sus filamentos. Cuanto más nos acercamos, más detalles intrincados aparecen.
+Y en lo profundo de uno de ellos, encontramos algo familiar: una pequeña copia, casi idéntica al conjunto original.
 
-Y después de un viaje enorme, en medio de la nada, encontramos esto: una copia en miniatura del conjunto original.
-
-Esta es la autosemejanza del fractal. Un universo de complejidad infinita contenido en una simple fórmula.
+Y dentro de esa copia hay más. La estructura se repite para siempre. No hay fondo.

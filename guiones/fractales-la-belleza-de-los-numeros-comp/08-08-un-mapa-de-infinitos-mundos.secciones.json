@@ -1,0 +1,38 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 2.5,
+    "momento": "Título del clip",
+    "texto": "El conjunto de Mandelbrot es más que una imagen bonita."
+  },
+  {
+    "t_inicio": 2.5,
+    "t_fin": 8.4,
+    "momento": "Mandelbrot como mapa",
+    "texto": "Es un mapa. Cada punto ‘c’ que elegimos en él nos abre la puerta a un mundo distinto: su correspondiente conjunto de Julia."
+  },
+  {
+    "t_inicio": 8.4,
+    "t_fin": 35.0,
+    "momento": "Recorrido por puntos 'c'",
+    "texto": "Si ‘c’ está dentro del conjunto, su mundo de Julia es una sola pieza. Si está fuera, el mundo se rompe en un polvo de infinitos puntos."
+  },
+  {
+    "t_inicio": 35.0,
+    "t_fin": 43.6,
+    "momento": "La regla fundamental",
+    "texto": "Esta es la regla. La frontera entre ambos comportamientos es la propia forma del conjunto de Mandelbrot: una línea de complejidad infinita."
+  },
+  {
+    "t_inicio": 43.6,
+    "t_fin": 53.4,
+    "momento": "Mosaico de mundos Julia",
+    "texto": "Infinitos mundos, cada uno con su propia personalidad, nacen de una sola regla."
+  },
+  {
+    "t_inicio": 53.4,
+    "t_fin": 64.2,
+    "momento": "Cierre del curso",
+    "texto": "La increíblemente sencilla zeta al cuadrado más c. Un universo entero en cinco símbolos."
+  }
+]

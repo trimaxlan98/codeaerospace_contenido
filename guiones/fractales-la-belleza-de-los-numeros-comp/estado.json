@@ -1,74 +1,74 @@
 {
   "94cea826838f4f73": {
-    "hash": "aa9f5f055e19b0dcc0737087506aa3b1683e6548466fd846d0eeff882491c1da",
+    "hash": "d2fcdc72e7683896d30052f9072bb2ee3f8eb19088eec5ac93848b41ec8f1833",
     "etiqueta": "01-01-el-universo-en-una-formula",
     "voz": "Charon",
     "video_s": 26.2,
-    "audio_s": 23.8,
-    "palabras": 46,
-    "generado": 1785983333.6847892
+    "audio_s": 27.4,
+    "palabras": 38,
+    "generado": 1785988148.1995075
   },
   "bd7fac83347441fd": {
-    "hash": "572ab3f160cbac0f5f16676370007f2b0f1bb4f6a6a8248d5ff78c1c7797bf8a",
+    "hash": "b371e772b1102c7a81e8e8e5c4fb29ff45d0d6a070d77af903a90db7636d9980",
     "etiqueta": "02-02-el-mapa-de-los-numeros-complejos",
     "voz": "Charon",
     "video_s": 52.7,
-    "audio_s": 44.7,
-    "palabras": 101,
-    "generado": 1785983469.0707676
+    "audio_s": 48.6,
+    "palabras": 79,
+    "generado": 1785988287.4067314
   },
   "f6b2ef20c48e4ffc": {
-    "hash": "90692a149a0b25a54fc9b76b247d945cbf8caf32f39de8115f279f7d7bbd8214",
+    "hash": "5f7f71920944b4688f2d62115c7d94bb95fe1975a03600b1fa956bd0a96476dc",
     "etiqueta": "03-03-multiplicar-es-girar",
     "voz": "Charon",
     "video_s": 57.1,
-    "audio_s": 59.3,
-    "palabras": 123,
-    "generado": 1785983532.6773808
+    "audio_s": 62.8,
+    "palabras": 96,
+    "generado": 1785988451.6746755
   },
   "2fc27d3228d742e8": {
-    "hash": "0e60697a0df05a5aee93289e4d3f978a2ec9638fc7a8681ada795ac410066ae4",
+    "hash": "94d41ba066b868fe7dc1477aa955b3686271b5749ca05d66af94f2ebdc3ac82e",
     "etiqueta": "04-04-la-maquina-de-iterar",
     "voz": "Charon",
     "video_s": 62.6,
-    "audio_s": 61.4,
-    "palabras": 142,
-    "generado": 1785983619.9791355
+    "audio_s": 59.8,
+    "palabras": 110,
+    "generado": 1785988625.48702
   },
   "e296ef06f90c43fb": {
-    "hash": "cd419832ffdada74fdc461d46d8deba5c10a68fdbb79692941a8ceac945d23b6",
+    "hash": "b7b26dbb9c97933a0279f088b8e8608e82b55d2c6878823d35430aa83b5aaa0c",
     "etiqueta": "05-05-el-conjunto-de-mandelbrot",
     "voz": "Charon",
     "video_s": 29.0,
-    "audio_s": 26.8,
-    "palabras": 57,
-    "generado": 1785983672.0503585
+    "audio_s": 31.0,
+    "palabras": 50,
+    "generado": 1785988734.1389275
   },
   "c5a101a06e7841a4": {
-    "hash": "537c4f833e9e2473a972ad9f13dcd118252939f31e066017da5ae1669a349cf3",
+    "hash": "be139f71f2d14e73e3f2b03a5eb5d3b1c24faf2bc88c0906238b040fd9c92411",
     "etiqueta": "06-06-zoom-infinito",
     "voz": "Charon",
     "video_s": 36.2,
-    "audio_s": 34.0,
-    "palabras": 67,
-    "generado": 1785983716.2125475
+    "audio_s": 40.2,
+    "palabras": 52,
+    "generado": 1785988838.2157562
   },
   "6e44e150b9c6476d": {
-    "hash": "958d5bcccc12f49f00f945448ac182809fc9da99e7f93ba62bd974a787813b90",
+    "hash": "bd31e0157182d420bbe4595cf157328e4436d01119117db36329e797d329dae7",
     "etiqueta": "07-07-los-mundos-de-julia",
     "voz": "Charon",
     "video_s": 28.7,
-    "audio_s": 26.5,
-    "palabras": 56,
-    "generado": 1785983782.7803733
+    "audio_s": 27.4,
+    "palabras": 35,
+    "generado": 1785988950.2949402
   },
   "e4f7290713044eb4": {
-    "hash": "807c117b06fa92569e7908d51c6d00ddc9f4d09cc90dc2e733b8cc7b7b4d2145",
+    "hash": "3d526097e4ac8247792024a18c93e9800c1f92f7859af63b759ee23266e9043f",
     "etiqueta": "08-08-un-mapa-de-infinitos-mundos",
     "voz": "Charon",
     "video_s": 64.2,
-    "audio_s": 61.1,
-    "palabras": 118,
-    "generado": 1785983845.4904385
+    "audio_s": 64.7,
+    "palabras": 109,
+    "generado": 1785989111.9037092
   }
 }

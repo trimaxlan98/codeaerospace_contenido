@@ -4,23 +4,20 @@
 - **Escena:** `Clip06Zoom`
 - **Duración del video:** 36.2 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 67
+- **Palabras:** 52
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–3 s | Intro y vista general | El conjunto de Mandelbrot es famoso por la complejidad infinita de su borde. Vamos a explorarlo. |
-| 3–18 s | Primer zoom en filamentos | Nos sumergimos en uno de sus filamentos. Cuanto más nos acercamos, más detalles intrincados aparecen. |
-| 18–32 s | Aparece un 'minibrot' | Y después de un viaje enorme, en medio de la nada, encontramos esto: una copia en miniatura del conjunto original. |
-| 32–36 s | Conclusión: autosemejanza infinita | Esta es la autosemejanza del fractal. Un universo de complejidad infinita contenido en una simple fórmula. |
+| 3–15 s | Inicio del zoom | El conjunto de Mandelbrot es un paisaje de complejidad infinita. Al acercarnos, cada detalle revela nuevos mundos. |
+| 18–28 s | Aparece un 'minibrot' | Y en lo profundo de uno de ellos, encontramos algo familiar: una pequeña copia, casi idéntica al conjunto original. |
+| 32–34 s | Conclusión final | Y dentro de esa copia hay más. La estructura se repite para siempre. No hay fondo. |
 
 ## Narración completa
 
-El conjunto de Mandelbrot es famoso por la complejidad infinita de su borde. Vamos a explorarlo.
+El conjunto de Mandelbrot es un paisaje de complejidad infinita. Al acercarnos, cada detalle revela nuevos mundos.
 
-Nos sumergimos en uno de sus filamentos. Cuanto más nos acercamos, más detalles intrincados aparecen.
+Y en lo profundo de uno de ellos, encontramos algo familiar: una pequeña copia, casi idéntica al conjunto original.
 
-Y después de un viaje enorme, en medio de la nada, encontramos esto: una copia en miniatura del conjunto original.
-
-Esta es la autosemejanza del fractal. Un universo de complejidad infinita contenido en una simple fórmula.
+Y dentro de esa copia hay más. La estructura se repite para siempre. No hay fondo.

@@ -4,20 +4,20 @@
 - **Escena:** `Clip1RedQueNoSeQuedaQuieta`
 - **Duración del video:** 27.9 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 49
+- **Palabras:** 40
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–9 s | Construcción de la constelación | Miles de satélites nos rodean, conectados en una red global que se mueve a una velocidad vertiginosa. |
-| 9–19 s | Animación de la red y sus cambios | La forma de la red cambia a cada instante, y sus conexiones deben reconfigurarse sin parar. |
-| 19–28 s | Planteamiento de la pregunta central | Aquí está el reto. En este curso veremos cómo la inteligencia artificial puede ser la respuesta. |
+| 3–9 s | Constelación de satélites se ensambla en órbita. | Miles de satélites nos rodean, conectados en una red que envuelve la Tierra. |
+| 9–19 s | La red cambia de forma constantemente. | Pero no se queda quieta. Su forma cambia a cada instante, a una velocidad vertiginosa. |
+| 19–28 s | Planteamiento del problema y título del curso. | Entonces, ¿cómo gobernarla? Exploraremos cómo la inteligencia artificial puede ser la respuesta. |
 
 ## Narración completa
 
-Miles de satélites nos rodean, conectados en una red global que se mueve a una velocidad vertiginosa.
+Miles de satélites nos rodean, conectados en una red que envuelve la Tierra.
 
-La forma de la red cambia a cada instante, y sus conexiones deben reconfigurarse sin parar.
+Pero no se queda quieta. Su forma cambia a cada instante, a una velocidad vertiginosa.
 
-Aquí está el reto. En este curso veremos cómo la inteligencia artificial puede ser la respuesta.
+Entonces, ¿cómo gobernarla? Exploraremos cómo la inteligencia artificial puede ser la respuesta.

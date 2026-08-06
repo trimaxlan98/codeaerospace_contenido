@@ -1,3 +1,3 @@
-El satélite es un agente que aprende por prueba y error, buscando maximizar una recompensa.
+Un satélite aprende a gestionar la red como un agente autónomo.
 
-Tras el entrenamiento, su desempeño converge. El resultado es una política: la mejor acción en cada situación.
+Prueba acciones, recibe una recompensa y, con el tiempo, mejora su estrategia.

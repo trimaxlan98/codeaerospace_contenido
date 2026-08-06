@@ -1,0 +1,32 @@
+[
+  {
+    "t_inicio": 3.3,
+    "t_fin": 7.3,
+    "momento": "Introducción al giro",
+    "texto": "Sumar y restar es moverse por el plano. Pero multiplicar... es más interesante."
+  },
+  {
+    "t_inicio": 10.7,
+    "t_fin": 16.6,
+    "momento": "Rotación de 1 a i",
+    "texto": "Tomemos el número uno. Multiplicarlo por i, la unidad imaginaria, lo hace girar noventa grados. Si lo hacemos de nuevo..."
+  },
+  {
+    "t_inicio": 18.2,
+    "t_fin": 24.4,
+    "momento": "Identidad i^2 = -1",
+    "texto": "...llegamos al menos uno. Esta es la identidad que define a los números complejos."
+  },
+  {
+    "t_inicio": 33.4,
+    "t_fin": 47.5,
+    "momento": "Espiral de potencias de z",
+    "texto": "Y no es solo para i. Al multiplicar un número z por sí mismo, combinamos un giro y un cambio de tamaño. Repetir la operación dibuja una espiral."
+  },
+  {
+    "t_inicio": 51.3,
+    "t_fin": 56.8,
+    "momento": "Conclusión y avance",
+    "texto": "Este mecanismo de girar y escalar es la clave. Es la operación que, repetida, generará la complejidad que veremos a continuación."
+  }
+]

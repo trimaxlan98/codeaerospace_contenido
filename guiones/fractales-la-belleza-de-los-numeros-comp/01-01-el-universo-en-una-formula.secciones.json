@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 5.0,
+    "momento": "Aparece la fórmula z²+c",
+    "texto": "Esta es la receta de un universo entero."
+  },
+  {
+    "t_inicio": 5.0,
+    "t_fin": 11.7,
+    "momento": "Se revela el conjunto de Mandelbrot",
+    "texto": "Iterada millones de veces, la fórmula dibuja este paisaje."
+  },
+  {
+    "t_inicio": 11.7,
+    "t_fin": 19.7,
+    "momento": "Zoom profundo en el borde",
+    "texto": "Al acercarnos, cada detalle revela una copia del todo. Una complejidad infinita."
+  },
+  {
+    "t_inicio": 19.7,
+    "t_fin": 26.2,
+    "momento": "Aparece el título del curso",
+    "texto": "En los próximos vídeos, aprenderemos a navegar este universo."
+  }
+]

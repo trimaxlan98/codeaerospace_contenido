@@ -1,5 +1,5 @@
-Probamos cada punto 'c' del plano. Si su órbita queda atrapada, lo pintamos de negro. Si escapa, le damos un color que indica lo rápido que se aleja.
+Para cada punto 'c', aplicamos la regla. Si la órbita que genera escapa, coloreamos el punto según su velocidad. Si no, lo dejamos negro.
 
-Al afinar la malla, emerge una figura de complejidad asombrosa: el conjunto de Mandelbrot.
+Al refinar la cuadrícula, emerge esta figura. Los puntos negros forman el conjunto de Mandelbrot.
 
-Esa frontera rugosa, que se repite a cualquier escala, es la esencia de un fractal.
+Y esa frontera, al ampliarla, revela una complejidad que nunca termina.

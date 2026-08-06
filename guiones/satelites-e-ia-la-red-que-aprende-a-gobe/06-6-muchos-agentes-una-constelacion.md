@@ -4,20 +4,20 @@
 - **Escena:** `Clip6MuchosAgentes`
 - **Duración del video:** 30.5 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 57
+- **Palabras:** 50
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–7 s | Agentes con visión parcial | Cuando cada satélite es un agente que solo ve a sus vecinos, ¿cómo logramos que el equipo se coordine? |
-| 7–16 s | Paradigmas de entrenamiento | Existen varias estrategias. Una muy práctica es entrenarlos a todos juntos, para que después cada uno decida por su cuenta. |
-| 16–30 s | QMIX: garantía de equipo | La técnica QMIX lo hace posible con una garantía: la mejora de un agente nunca perjudica al conjunto. |
+| 1–6 s | Agentes con visión parcial | Cada satélite es un agente con visión limitada. Juntos forman un equipo que debe aprender a coordinarse. |
+| 12–17 s | Paradigmas de entrenamiento | Hay varias formas de entrenarlos. El mejor equilibrio: aprenden juntos, pero cada uno decide por sí mismo. |
+| 17–23 s | Arquitectura QMIX | La arquitectura QMIX lo consigue, asegurando que la mejora de un agente nunca perjudique al conjunto. |
 
 ## Narración completa
 
-Cuando cada satélite es un agente que solo ve a sus vecinos, ¿cómo logramos que el equipo se coordine?
+Cada satélite es un agente con visión limitada. Juntos forman un equipo que debe aprender a coordinarse.
 
-Existen varias estrategias. Una muy práctica es entrenarlos a todos juntos, para que después cada uno decida por su cuenta.
+Hay varias formas de entrenarlos. El mejor equilibrio: aprenden juntos, pero cada uno decide por sí mismo.
 
-La técnica QMIX lo hace posible con una garantía: la mejora de un agente nunca perjudica al conjunto.
+La arquitectura QMIX lo consigue, asegurando que la mejora de un agente nunca perjudique al conjunto.

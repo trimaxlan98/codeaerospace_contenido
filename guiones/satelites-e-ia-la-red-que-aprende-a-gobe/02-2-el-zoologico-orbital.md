@@ -10,14 +10,17 @@
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–12 s | Órbitas y latencia | Las órbitas de los satélites imponen un peaje. Cuanto más lejos, más tarda la señal en ir y volver. |
-| 12–19 s | Cobertura en el mapa | Pero la altura también da perspectiva. Un satélite lejano ve una porción enorme del planeta. |
-| 19–25 s | Dilema orbital | Este es el dilema: latencia contra cobertura. |
+| 2–6 s | Órbitas LEO, MEO y GEO a escala | Los satélites viven en órbitas de distinta altura: baja, media y geoestacionaria. |
+| 7–13 s | Pulsos de luz y latencia | Cuanto más lejos, más tarda la señal en viajar. |
+| 16–20 s | Cobertura GEO vs LEO en el mapa | Pero a cambio, ven una porción mucho mayor del planeta. |
+| 20–25 s | Texto de cierre: el dilema orbital | Este es el gran dilema de las comunicaciones por satélite. |
 
 ## Narración completa
 
-Las órbitas de los satélites imponen un peaje. Cuanto más lejos, más tarda la señal en ir y volver.
+Los satélites viven en órbitas de distinta altura: baja, media y geoestacionaria.
 
-Pero la altura también da perspectiva. Un satélite lejano ve una porción enorme del planeta.
+Cuanto más lejos, más tarda la señal en viajar.
 
-Este es el dilema: latencia contra cobertura.
+Pero a cambio, ven una porción mucho mayor del planeta.
+
+Este es el gran dilema de las comunicaciones por satélite.

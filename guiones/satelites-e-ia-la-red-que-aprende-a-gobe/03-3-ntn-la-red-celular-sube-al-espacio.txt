@@ -1,3 +1,5 @@
-Los estándares que llevan el 5G al espacio ya están aquí, preparando el camino hacia el 6G.
+La red móvil evoluciona. Con el estándar 5G, la cobertura por fin llega al espacio.
 
-La idea es simple: el satélite ya no es un espejo, es una estación base en la propia red.
+El satélite se convierte en una estación base, procesando la señal directamente en órbita.
+
+El futuro es una única red global.

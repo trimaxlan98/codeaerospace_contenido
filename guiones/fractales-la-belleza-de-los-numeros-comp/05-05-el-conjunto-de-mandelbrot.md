@@ -4,20 +4,20 @@
 - **Escena:** `Clip05Mandelbrot`
 - **Duración del video:** 29.0 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 57
+- **Palabras:** 50
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–6 s | Aparece la fórmula y se construye una cuadrícula de puntos. | Probamos cada punto 'c' del plano. Si su órbita queda atrapada, lo pintamos de negro. Si escapa, le damos un color que indica lo rápido que se aleja. |
-| 8–13 s | La cuadrícula se refina hasta mostrar la imagen completa del conjunto. | Al afinar la malla, emerge una figura de complejidad asombrosa: el conjunto de Mandelbrot. |
-| 24–29 s | Aparece el texto final que lo define como fractal. | Esa frontera rugosa, que se repite a cualquier escala, es la esencia de un fractal. |
+| 2–7 s | Malla de puntos coloreados | Para cada punto 'c', aplicamos la regla. Si la órbita que genera escapa, coloreamos el punto según su velocidad. Si no, lo dejamos negro. |
+| 9–13 s | De la malla a la imagen fractal | Al refinar la cuadrícula, emerge esta figura. Los puntos negros forman el conjunto de Mandelbrot. |
+| 24–27 s | Conclusión sobre la frontera | Y esa frontera, al ampliarla, revela una complejidad que nunca termina. |
 
 ## Narración completa
 
-Probamos cada punto 'c' del plano. Si su órbita queda atrapada, lo pintamos de negro. Si escapa, le damos un color que indica lo rápido que se aleja.
+Para cada punto 'c', aplicamos la regla. Si la órbita que genera escapa, coloreamos el punto según su velocidad. Si no, lo dejamos negro.
 
-Al afinar la malla, emerge una figura de complejidad asombrosa: el conjunto de Mandelbrot.
+Al refinar la cuadrícula, emerge esta figura. Los puntos negros forman el conjunto de Mandelbrot.
 
-Esa frontera rugosa, que se repite a cualquier escala, es la esencia de un fractal.
+Y esa frontera, al ampliarla, revela una complejidad que nunca termina.

@@ -4,32 +4,26 @@
 - **Escena:** `Clip03Multiplicar`
 - **Duración del video:** 57.1 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 123
+- **Palabras:** 96
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–7 s | Título e introducción. | En el plano complejo, las operaciones aritméticas tienen una interpretación geométrica. Sumar es desplazarse. ¿Y multiplicar? |
-| 7–13 s | Plano complejo, vector al 1, aparece 'x i'. | Tomemos el número uno. Es un vector que apunta a la derecha. Ahora, multipliquémoslo por el número i. |
-| 13–20 s | El vector gira 90 grados (a 'i') y luego otros 90 (a '-1'). | El vector gira noventa grados y aterriza en i. Si volvemos a multiplicar por i, damos otro cuarto de vuelta y llegamos a menos uno. |
-| 20–28 s | Aparece la fórmula 'i^2 = -1' y una explicación. | Esto nos da una bonita intuición visual para una fórmula famosa. Multiplicar por i dos veces es como dar media vuelta en el plano. |
-| 28–37 s | Nuevo plano, aparece un vector 'z' cualquiera. | Esto no solo funciona con el uno. Si tomamos un número complejo cualquiera, zeta, y lo multiplicamos por sí mismo... |
-| 37–51 s | Se dibuja la espiral de potencias (z^2, z^3, z^4). | El resultado gira y se estira. Si repetimos la operación, el punto traza una espiral que se aleja del centro. |
-| 51–57 s | Mensaje final y fade out. |  |
+| 3–7 s | Introducción al giro | Sumar y restar es moverse por el plano. Pero multiplicar... es más interesante. |
+| 11–17 s | Rotación de 1 a i | Tomemos el número uno. Multiplicarlo por i, la unidad imaginaria, lo hace girar noventa grados. Si lo hacemos de nuevo... |
+| 18–24 s | Identidad i^2 = -1 | ...llegamos al menos uno. Esta es la identidad que define a los números complejos. |
+| 33–48 s | Espiral de potencias de z | Y no es solo para i. Al multiplicar un número z por sí mismo, combinamos un giro y un cambio de tamaño. Repetir la operación dibuja una espiral. |
+| 51–57 s | Conclusión y avance | Este mecanismo de girar y escalar es la clave. Es la operación que, repetida, generará la complejidad que veremos a continuación. |
 
 ## Narración completa
 
-En el plano complejo, las operaciones aritméticas tienen una interpretación geométrica. Sumar es desplazarse. ¿Y multiplicar?
+Sumar y restar es moverse por el plano. Pero multiplicar... es más interesante.
 
-Tomemos el número uno. Es un vector que apunta a la derecha. Ahora, multipliquémoslo por el número i.
+Tomemos el número uno. Multiplicarlo por i, la unidad imaginaria, lo hace girar noventa grados. Si lo hacemos de nuevo...
 
-El vector gira noventa grados y aterriza en i. Si volvemos a multiplicar por i, damos otro cuarto de vuelta y llegamos a menos uno.
+...llegamos al menos uno. Esta es la identidad que define a los números complejos.
 
-Esto nos da una bonita intuición visual para una fórmula famosa. Multiplicar por i dos veces es como dar media vuelta en el plano.
+Y no es solo para i. Al multiplicar un número z por sí mismo, combinamos un giro y un cambio de tamaño. Repetir la operación dibuja una espiral.
 
-Esto no solo funciona con el uno. Si tomamos un número complejo cualquiera, zeta, y lo multiplicamos por sí mismo...
-
-El resultado gira y se estira. Si repetimos la operación, el punto traza una espiral que se aleja del centro.
-
-
+Este mecanismo de girar y escalar es la clave. Es la operación que, repetida, generará la complejidad que veremos a continuación.

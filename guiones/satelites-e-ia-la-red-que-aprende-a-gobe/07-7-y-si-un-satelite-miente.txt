@@ -1,7 +1,7 @@
-¿Qué ocurre si un satélite de la red miente?
+En una red, un satélite puede fallar o ser malicioso, volviéndose 'bizantino'.
 
-Envía información contradictoria para romper el consenso del grupo.
+Envía información contradictoria, rompiendo el consenso de la red.
 
-Pero los protocolos de consenso permiten que la mayoría honesta lo aísle y llegue a un acuerdo.
+Con suficientes nodos honestos, eligen la verdad por mayoría y aíslan al mentiroso.
 
-El mismo riesgo existe al compartir modelos de IA. Un modelo envenenado puede corromper el aprendizaje global si no se filtra.
+Este principio también protege el aprendizaje federado de modelos envenenados.

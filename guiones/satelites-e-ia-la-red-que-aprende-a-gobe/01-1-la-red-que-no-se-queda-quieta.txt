@@ -1,5 +1,5 @@
-Miles de satélites nos rodean, conectados en una red global que se mueve a una velocidad vertiginosa.
+Miles de satélites nos rodean, conectados en una red que envuelve la Tierra.
 
-La forma de la red cambia a cada instante, y sus conexiones deben reconfigurarse sin parar.
+Pero no se queda quieta. Su forma cambia a cada instante, a una velocidad vertiginosa.
 
-Aquí está el reto. En este curso veremos cómo la inteligencia artificial puede ser la respuesta.
+Entonces, ¿cómo gobernarla? Exploraremos cómo la inteligencia artificial puede ser la respuesta.

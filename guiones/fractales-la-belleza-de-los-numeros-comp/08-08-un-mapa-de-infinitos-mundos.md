@@ -4,29 +4,29 @@
 - **Escena:** `Clip08Mapa`
 - **Duración del video:** 64.2 s
 - **Voz:** Charon (gemini-2.5-flash-preview-tts)
-- **Palabras:** 118
+- **Palabras:** 109
 
 ## Guion por secciones
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 2–8 s | Aparece el Mandelbrot como mapa. | El conjunto de Mandelbrot es un mapa. Cada punto es un número 'c' que podemos usar en nuestra fórmula. |
-| 8–19 s | Puntos 'c' de dentro del Mandelbrot y sus Julias conexos. | Y para cada 'c', hay un universo: su conjunto de Julia. Si 'c' está dentro del mapa, su mundo es una sola pieza, está conectado. |
-| 19–30 s | Puntos 'c' de un bulbo y de fuera del Mandelbrot. | Incluso en los bulbos o cerca del borde. Pero si elegimos una 'c' fuera del mapa, su universo se desintegra en un polvo de puntos. |
-| 30–44 s | Punto 'c' en el borde y resumen de la dicotomía. | Y en la frontera misma, el comportamiento es caótico y fascinante. Esta es la gran división: dentro, conexión; fuera, dispersión. |
-| 46–51 s | Mosaico de mundos de Julia. | Infinitos mundos, cada uno generado por un punto del plano complejo. |
-| 51–64 s | Cierre del curso. | Toda esta asombrosa variedad surge de una regla increíblemente simple. El universo en un grano de arena matemática. |
+| 0–2 s | Título del clip | El conjunto de Mandelbrot es más que una imagen bonita. |
+| 2–8 s | Mandelbrot como mapa | Es un mapa. Cada punto ‘c’ que elegimos en él nos abre la puerta a un mundo distinto: su correspondiente conjunto de Julia. |
+| 8–35 s | Recorrido por puntos 'c' | Si ‘c’ está dentro del conjunto, su mundo de Julia es una sola pieza. Si está fuera, el mundo se rompe en un polvo de infinitos puntos. |
+| 35–44 s | La regla fundamental | Esta es la regla. La frontera entre ambos comportamientos es la propia forma del conjunto de Mandelbrot: una línea de complejidad infinita. |
+| 44–53 s | Mosaico de mundos Julia | Infinitos mundos, cada uno con su propia personalidad, nacen de una sola regla. |
+| 53–64 s | Cierre del curso | La increíblemente sencilla zeta al cuadrado más c. Un universo entero en cinco símbolos. |
 
 ## Narración completa
 
-El conjunto de Mandelbrot es un mapa. Cada punto es un número 'c' que podemos usar en nuestra fórmula.
+El conjunto de Mandelbrot es más que una imagen bonita.
 
-Y para cada 'c', hay un universo: su conjunto de Julia. Si 'c' está dentro del mapa, su mundo es una sola pieza, está conectado.
+Es un mapa. Cada punto ‘c’ que elegimos en él nos abre la puerta a un mundo distinto: su correspondiente conjunto de Julia.
 
-Incluso en los bulbos o cerca del borde. Pero si elegimos una 'c' fuera del mapa, su universo se desintegra en un polvo de puntos.
+Si ‘c’ está dentro del conjunto, su mundo de Julia es una sola pieza. Si está fuera, el mundo se rompe en un polvo de infinitos puntos.
 
-Y en la frontera misma, el comportamiento es caótico y fascinante. Esta es la gran división: dentro, conexión; fuera, dispersión.
+Esta es la regla. La frontera entre ambos comportamientos es la propia forma del conjunto de Mandelbrot: una línea de complejidad infinita.
 
-Infinitos mundos, cada uno generado por un punto del plano complejo.
+Infinitos mundos, cada uno con su propia personalidad, nacen de una sola regla.
 
-Toda esta asombrosa variedad surge de una regla increíblemente simple. El universo en un grano de arena matemática.
+La increíblemente sencilla zeta al cuadrado más c. Un universo entero en cinco símbolos.

@@ -10,11 +10,14 @@
 
 | Tiempo | Momento visual | Narración |
 |---|---|---|
-| 0–6 s | Línea de tiempo de estándares 5G y 6G. | Los estándares que llevan el 5G al espacio ya están aquí, preparando el camino hacia el 6G. |
-| 6–14 s | Arquitectura de red y flujo de datos. | La idea es simple: el satélite ya no es un espejo, es una estación base en la propia red. |
+| 1–6 s | Línea de tiempo 5G-6G | La red móvil evoluciona. Con el estándar 5G, la cobertura por fin llega al espacio. |
+| 6–15 s | Arquitectura NTN y flujo de datos | El satélite se convierte en una estación base, procesando la señal directamente en órbita. |
+| 16–21 s | Visión 6G: red unificada | El futuro es una única red global. |
 
 ## Narración completa
 
-Los estándares que llevan el 5G al espacio ya están aquí, preparando el camino hacia el 6G.
+La red móvil evoluciona. Con el estándar 5G, la cobertura por fin llega al espacio.
 
-La idea es simple: el satélite ya no es un espejo, es una estación base en la propia red.
+El satélite se convierte en una estación base, procesando la señal directamente en órbita.
+
+El futuro es una única red global.

@@ -1,5 +1,5 @@
-Cuando cada satélite es un agente que solo ve a sus vecinos, ¿cómo logramos que el equipo se coordine?
+Cada satélite es un agente con visión limitada. Juntos forman un equipo que debe aprender a coordinarse.
 
-Existen varias estrategias. Una muy práctica es entrenarlos a todos juntos, para que después cada uno decida por su cuenta.
+Hay varias formas de entrenarlos. El mejor equilibrio: aprenden juntos, pero cada uno decide por sí mismo.
 
-La técnica QMIX lo hace posible con una garantía: la mejora de un agente nunca perjudica al conjunto.
+La arquitectura QMIX lo consigue, asegurando que la mejora de un agente nunca perjudique al conjunto.

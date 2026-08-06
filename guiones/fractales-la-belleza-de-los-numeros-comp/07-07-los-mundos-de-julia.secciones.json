@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 5.0,
+    "momento": "Aparece el fractal 'conejo de Douady'",
+    "texto": "Para cada número complejo c, existe un universo fractal: el conjunto de Julia."
+  },
+  {
+    "t_inicio": 10.4,
+    "t_fin": 19.1,
+    "momento": "El fractal se transforma al mover el parámetro c",
+    "texto": "Al mover c, todo el universo fractal se deforma con él."
+  },
+  {
+    "t_inicio": 21.3,
+    "t_fin": 28.7,
+    "momento": "Aparece el fractal 'dendrita' y el texto de cierre",
+    "texto": "Cada punto c es la semilla de un mundo completamente nuevo."
+  }
+]

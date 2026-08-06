@@ -1,0 +1,32 @@
+[
+  {
+    "t_inicio": 0,
+    "t_fin": 7.2,
+    "momento": "Aparece el plano complejo con ejes Re/Im.",
+    "texto": "Este es el plano de los números complejos. Un mapa donde cada punto es un número."
+  },
+  {
+    "t_inicio": 7.2,
+    "t_fin": 18.3,
+    "momento": "Aparece el vector z y su etiqueta 2+1.5i.",
+    "texto": "Por ejemplo, este de aquí. Para localizarlo, nos fijamos en sus dos coordenadas."
+  },
+  {
+    "t_inicio": 18.3,
+    "t_fin": 28.7,
+    "momento": "Descomposición de z en parte real e imaginaria.",
+    "texto": "Su parte real, en el eje horizontal, y su parte imaginaria, en el vertical."
+  },
+  {
+    "t_inicio": 28.7,
+    "t_fin": 37.7,
+    "momento": "Suma de un segundo vector w, que se traslada.",
+    "texto": "Y sumar números complejos es tan fácil como encadenar sus flechas, una a continuación de la otra."
+  },
+  {
+    "t_inicio": 37.7,
+    "t_fin": 52.7,
+    "momento": "Resultado de la suma z+w y resumen final.",
+    "texto": "El resultado es el punto al que llegamos desde el origen. Geométricamente, sumar es simplemente desplazarse por este mapa."
+  }
+]
