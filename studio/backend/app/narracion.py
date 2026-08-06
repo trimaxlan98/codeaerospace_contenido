@@ -33,6 +33,13 @@ PAUSA_ENTRE_TROZOS_S = 0.35
 # El audio puede exceder el video hasta este factor antes de reintentar con
 # un presupuesto de palabras mas corto.
 TOLERANCIA_AUDIO = 1.05
+# Alineado por secciones: silencio maximo insertado entre secciones (los
+# t_inicio del guion son estimados; huecos mas largos son casi siempre un
+# error de estimacion y desincronizan el final).
+MAX_HUECO_S = 2.5
+# Recorte de silencio del TTS: umbral de amplitud (int16) y margen conservado.
+UMBRAL_SILENCIO = 300
+MARGEN_SILENCIO_S = 0.12
 
 INSTRUCCION_TTS = (
     "Lee el siguiente guion de un video de divulgación científica en "
@@ -266,24 +273,44 @@ def _pcm_agrupado(vertex: VertexNarrador, secciones: list[dict],
     for i, trozo in enumerate(trozos):
         if i:
             pcm += pausa
-        pcm += vertex.tts(trozo, voz)
+        pcm += _recortar_silencio(vertex.tts(trozo, voz))
     return pcm
+
+
+def _recortar_silencio(audio: bytes) -> bytes:
+    """Quita el silencio inicial/final que mete el TTS en cada llamada
+    (conservando un margen breve): sin esto, narrar por secciones acumula
+    varios segundos muertos y el audio se pasa del video."""
+    n = len(audio) // 2
+    muestras = struct.unpack(f"<{n}h", audio[:n * 2])
+    ini, fin = 0, n
+    while ini < n and abs(muestras[ini]) < UMBRAL_SILENCIO:
+        ini += 1
+    while fin > ini and abs(muestras[fin - 1]) < UMBRAL_SILENCIO:
+        fin -= 1
+    margen = int(TTS_RATE * MARGEN_SILENCIO_S)
+    ini, fin = max(0, ini - margen), min(n, fin + margen)
+    return audio[ini * 2:fin * 2]
 
 
 def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict],
                   voz: str) -> bytes:
-    """Cada seccion se sintetiza aparte y se coloca en su t_inicio, con
-    silencio hasta el offset: la voz cae sobre el momento visual que comenta.
-    Si una seccion se pasa de largo, la siguiente cede hacia adelante (con la
-    pausa minima) en cascada."""
+    """Cada seccion se sintetiza aparte (con su silencio recortado) y se
+    coloca en su t_inicio: la voz cae sobre el momento visual que comenta.
+    El hueco insertado se acota a MAX_HUECO_S (los tiempos del guion son
+    estimados) y si una seccion se pasa de largo, la siguiente cede hacia
+    adelante (con la pausa minima) en cascada."""
     pausa_min = int(TTS_RATE * PAUSA_ENTRE_TROZOS_S)
+    hueco_max = int(TTS_RATE * MAX_HUECO_S)
     pcm = bytearray()
     cursor = 0  # muestras escritas
     for i, s in enumerate(secciones):
-        audio = vertex.tts(s["texto"], voz)
+        audio = _recortar_silencio(vertex.tts(s["texto"], voz))
         offset = int(float(s["t_inicio"]) * TTS_RATE)
-        if i and offset < cursor + pausa_min:
-            offset = cursor + pausa_min
+        if i:
+            offset = max(min(offset, cursor + hueco_max), cursor + pausa_min)
+        else:
+            offset = min(offset, hueco_max)
         pcm.extend(b"\x00\x00" * max(0, offset - cursor))
         pcm.extend(audio)
         cursor = offset + len(audio) // 2

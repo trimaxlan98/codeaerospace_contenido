@@ -44,7 +44,9 @@ class FakeVertex:
     def tts(self, texto, voz):
         if self.tts_delay:
             time.sleep(self.tts_delay)
-        return b"\x00\x00" * 24_000  # 1 s de silencio PCM
+        # 1 s de tono constante (amplitud 1000: por encima del umbral de
+        # recorte de silencio, para que la duracion no cambie al recortar)
+        return b"\xe8\x03" * 24_000
 
 
 def _enable(tmp_path, monkeypatch, fake=None):
@@ -179,11 +181,30 @@ def test_sintetizar_alineado(tmp_path):
                      "Charon", tmp_path / "b.wav")
     assert abs(dur - 2.35) < 0.01
 
+    # Hueco irreal en el guion (30 s): se acota a MAX_HUECO_S para no
+    # desincronizar el final -> 1 + 2.5 + 1
+    dur = sintetizar(fake, [{"t_inicio": 0, "texto": "a"},
+                            {"t_inicio": 30, "texto": "b"}],
+                     "Charon", tmp_path / "d.wav")
+    assert abs(dur - 4.5) < 0.01
+
     # Sin tiempos: narracion de corrido (ambas secciones caben en un solo
     # trozo TTS, asi que es una sola llamada de 1 s)
     dur = sintetizar(fake, [{"texto": "a"}, {"texto": "b"}],
                      "Charon", tmp_path / "c.wav")
     assert dur == 1.0
+
+
+def test_recortar_silencio():
+    from app.narracion import TTS_RATE, _recortar_silencio
+
+    voz = b"\xe8\x03" * TTS_RATE          # 1 s de amplitud 1000
+    silencio = b"\x00\x00" * TTS_RATE     # 1 s de silencio
+    audio = silencio + voz + silencio
+    recortado = _recortar_silencio(audio)
+    dur = len(recortado) / 2 / TTS_RATE
+    # 1 s de voz + 0.12 s de margen a cada lado
+    assert abs(dur - 1.24) < 0.01
 
 
 def _make_rendered_clip(authed, db, cfg, pid, title, job_id):
