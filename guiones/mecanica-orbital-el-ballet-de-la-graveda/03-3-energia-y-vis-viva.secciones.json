@@ -1,0 +1,14 @@
+[
+  {
+    "t_inicio": 1.3,
+    "t_fin": 7.0,
+    "momento": "Aparece el medidor de energía.",
+    "texto": "La energía de una órbita tiene dos formas: potencial, por la altura, y cinética, por la velocidad. Su suma es siempre constante."
+  },
+  {
+    "t_inicio": 7.0,
+    "t_fin": 19.0,
+    "momento": "El satélite orbita y las energías se intercambian.",
+    "texto": "Al caer, la potencial se convierte en cinética y el satélite acelera. Al subir, el proceso se invierte. Es un intercambio perpetuo."
+  }
+]

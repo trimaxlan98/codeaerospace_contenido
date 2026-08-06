@@ -1,0 +1,5 @@
+Para digitalizar una señal, tomamos muestras. Si son frecuentes, podemos reconstruir la onda original.
+
+Pero con pocas muestras, aparece una onda fantasma. Es el fenómeno de 'aliasing'.
+
+Para evitarlo, hay que muestrear al menos al doble de la frecuencia máxima de la señal.

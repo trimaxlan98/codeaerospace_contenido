@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 2.7,
+    "t_fin": 10.5,
+    "momento": "Paso de la nave (marco del planeta)",
+    "texto": "Para entender la asistencia gravitatoria, empecemos desde el planeta. Vemos cómo la nave se acerca, curva su trayectoria y se aleja."
+  },
+  {
+    "t_inicio": 16.0,
+    "t_fin": 24.0,
+    "momento": "Suma de vectores de velocidad",
+    "texto": "Pero el planeta no está quieto. Al sumar su velocidad a la de la nave, el resultado es una ganancia neta de energía."
+  },
+  {
+    "t_inicio": 24.5,
+    "t_fin": 28.0,
+    "momento": "Conclusión y ejemplo Voyager 2",
+    "texto": "Un empujón gratuito que la sonda le \"roba\" a la órbita del planeta."
+  }
+]

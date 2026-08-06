@@ -1,0 +1,5 @@
+Para cambiar la inclinación de una órbita, hay que pasar de un plano a otro. El cruce solo es posible donde se cortan.
+
+En el nodo, un impulso de cohete gira el vector velocidad. Este cambio de dirección es la maniobra.
+
+Y es una maniobra extraordinariamente cara en combustible.

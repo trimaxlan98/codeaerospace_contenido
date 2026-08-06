@@ -1,0 +1,7 @@
+Para viajar entre órbitas circulares, la ruta más barata no es la más corta.
+
+Un primer empujón nos pone en una elipse de transferencia.
+
+Tras media órbita, un segundo empujón nos estabiliza en el destino.
+
+Así funciona la transferencia de Hohmann.

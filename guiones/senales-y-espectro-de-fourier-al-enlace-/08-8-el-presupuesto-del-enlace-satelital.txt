@@ -1,0 +1,7 @@
+En un enlace satelital, el 'canal' es la inmensa distancia hasta la órbita. ¿Cómo sobrevive la señal a este viaje?
+
+La clave está en los decibelios. La potencia cae en picado, pero la ganancia de tu antena recupera una parte vital.
+
+La potencia final es minúscula, pero lo que importa es que supere al ruido. Ese es nuestro margen de seguridad.
+
+Y así, todo se reduce a una cosa: la lucha contra el ruido.

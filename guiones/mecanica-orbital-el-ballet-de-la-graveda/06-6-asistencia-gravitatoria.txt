@@ -1,0 +1,5 @@
+Para entender la asistencia gravitatoria, empecemos desde el planeta. Vemos cómo la nave se acerca, curva su trayectoria y se aleja.
+
+Pero el planeta no está quieto. Al sumar su velocidad a la de la nave, el resultado es una ganancia neta de energía.
+
+Un empujón gratuito que la sonda le "roba" a la órbita del planeta.

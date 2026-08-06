@@ -1,0 +1,26 @@
+[
+  {
+    "t_inicio": 1.1,
+    "t_fin": 7.9,
+    "momento": "Del bloque 'Canal' al enlace real",
+    "texto": "En un enlace satelital, el 'canal' es la inmensa distancia hasta la órbita. ¿Cómo sobrevive la señal a este viaje?"
+  },
+  {
+    "t_inicio": 8.9,
+    "t_fin": 17.4,
+    "momento": "Presupuesto de potencias",
+    "texto": "La clave está en los decibelios. La potencia cae en picado, pero la ganancia de tu antena recupera una parte vital."
+  },
+  {
+    "t_inicio": 17.9,
+    "t_fin": 26.5,
+    "momento": "El margen sobre el ruido",
+    "texto": "La potencia final es minúscula, pero lo que importa es que supere al ruido. Ese es nuestro margen de seguridad."
+  },
+  {
+    "t_inicio": 29.3,
+    "t_fin": 34.0,
+    "momento": "Cierre del curso",
+    "texto": "Y así, todo se reduce a una cosa: la lucha contra el ruido."
+  }
+]

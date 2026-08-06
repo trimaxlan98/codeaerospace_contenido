@@ -1,0 +1,9 @@
+Con Fourier, vemos la señal desde el dominio de la frecuencia.
+
+Cada componente es una raya en el espectro.
+
+El tramo de frecuencias que ocupa es su ancho de banda.
+
+Recortarlo deforma la señal al perder detalle.
+
+Más banda transmite señales más complejas, con más datos.

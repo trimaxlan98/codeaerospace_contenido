@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 0.0,
+    "t_fin": 5.4,
+    "momento": "Aparecen Tierra y cañón.",
+    "texto": "Imaginemos un cañón en la montaña más alta de la Tierra. Dispara un proyectil."
+  },
+  {
+    "t_inicio": 5.4,
+    "t_fin": 13.4,
+    "momento": "Tres disparos suborbitales.",
+    "texto": "Si aumentamos la velocidad, la caída lo lleva cada vez más lejos."
+  },
+  {
+    "t_inicio": 13.4,
+    "t_fin": 27.3,
+    "momento": "Órbita circular y satélite.",
+    "texto": "A la velocidad justa, el proyectil falla el suelo constantemente. Se ha convertido en un satélite."
+  }
+]

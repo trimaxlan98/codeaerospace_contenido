@@ -1,0 +1,5 @@
+Toda senoide nace de un movimiento circular. Su proyección vertical traza la curva en el tiempo, describiendo tres parámetros clave.
+
+Por ejemplo, si sumamos una segunda onda que arranca en el punto opuesto del círculo, sus efectos se anulan por completo.
+
+Esta idea de sumar y restar ondas es la clave de todo lo que sigue en nuestro viaje.

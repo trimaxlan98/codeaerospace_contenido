@@ -1,0 +1,20 @@
+[
+  {
+    "t_inicio": 1.3,
+    "t_fin": 6.9,
+    "momento": "Dos órbitas inclinadas y su línea de nodos.",
+    "texto": "Para cambiar la inclinación de una órbita, hay que pasar de un plano a otro. El cruce solo es posible donde se cortan."
+  },
+  {
+    "t_inicio": 7.0,
+    "t_fin": 17.9,
+    "momento": "Maniobra en el nodo y su diagrama de velocidades.",
+    "texto": "En el nodo, un impulso de cohete gira el vector velocidad. Este cambio de dirección es la maniobra."
+  },
+  {
+    "t_inicio": 19.0,
+    "t_fin": 24.8,
+    "momento": "Coste en delta-v de la maniobra.",
+    "texto": "Y es una maniobra extraordinariamente cara en combustible."
+  }
+]
