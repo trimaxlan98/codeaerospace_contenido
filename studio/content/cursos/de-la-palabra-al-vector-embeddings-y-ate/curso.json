@@ -1,0 +1,56 @@
+{
+  "name": "De la palabra al vector: embeddings y atención",
+  "description": "Curso de divulgación en 8 clips sobre cómo entienden el lenguaje los modelos de IA: de los tokens y los embeddings a la similitud coseno, el problema del contexto, el mecanismo de atención, Q/K/V, el Transformer y la generación palabra a palabra. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-como-lee-una-maquina.py",
+      "title": "1 · ¿Cómo lee una máquina?",
+      "scene": "Clip1",
+      "final_state": "Fila de fichas de tokens cian centrada (la frase «el gato duerme en el parque» + la ficha extra «felino»), sin números debajo; título «¿Cómo lee una máquina?» arriba y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-mapa-del-significado.py",
+      "title": "2 · El mapa del significado",
+      "scene": "Clip2",
+      "final_state": "Plano semántico centrado con ~10 palabras (animales, realeza, cielo) como puntos violeta etiquetados y la flecha ámbar de rey-hombre+mujer apuntando junto a 'reina'; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-medir-parecidos-el-coseno.py",
+      "title": "3 · Medir parecidos: el coseno",
+      "scene": "Clip3",
+      "final_state": "Plano a la izquierda con flechas a gato/felino (violeta) y luna (tenue) y el arco de ángulo gato-luna; a la derecha los dos valores de similitud coseno (0.98 verde, 0.12 rojo); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-problema-del-contexto.py",
+      "title": "4 · El problema del contexto",
+      "scene": "Clip4",
+      "final_state": "Dos filas de tokens («me siento en el banco» arriba, «el banco cobra comisiones» abajo) con el punto rojo 'banco' entre ambas; sin flechas; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-atencion-mirar-todo.py",
+      "title": "5 · Atención: mirar todo a la vez",
+      "scene": "Clip5",
+      "final_state": "Fila de tokens «el banco cobra comisiones al cliente» con el abanico de atención ya apagado y la ficha violeta 'banco (dinero)' arriba; barras de pesos retiradas; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-q-k-v.py",
+      "title": "6 · Q, K, V: preguntar, etiquetar, responder",
+      "scene": "Clip6",
+      "final_state": "Bloques Q (ámbar), K (cian) y V (violeta) en columna a la izquierda; a la derecha la mini fila de tokens con sus barras de pesos y la ficha resultado de la mezcla; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-apilar-capas-transformer.py",
+      "title": "7 · Apilar capas: el Transformer",
+      "scene": "Clip7",
+      "final_state": "Pila de dos bloques Transformer conectados, fila de tokens abajo y ficha de salida arriba; contador de capas ya retirado; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-predecir-la-siguiente.py",
+      "title": "8 · Predecir la siguiente palabra",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («De la palabra al vector» + «embeddings y atención» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
