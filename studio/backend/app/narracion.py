@@ -236,10 +236,19 @@ def render_md(curso: dict, clip: dict, secciones: list[dict], narracion: str,
     return "\n".join(lineas)
 
 
-def sintetizar(vertex: VertexNarrador, secciones: list[dict], voz: str,
-               wav_path: Path) -> float:
-    """TTS por trozos (secciones agrupadas hasta TTS_MAX_CHARS) con una
-    pausa breve entre trozos. Devuelve la duracion del audio en segundos."""
+def _escribir_wav(pcm: bytes, wav_path: Path) -> float:
+    with wave.open(str(wav_path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(TTS_RATE)
+        w.writeframes(pcm)
+    return len(pcm) / 2 / TTS_RATE
+
+
+def _pcm_agrupado(vertex: VertexNarrador, secciones: list[dict],
+                  voz: str) -> bytes:
+    """Secciones agrupadas hasta TTS_MAX_CHARS con una pausa breve entre
+    trozos (sin tiempos: narracion continua)."""
     trozos: list[str] = []
     actual = ""
     for s in secciones:
@@ -258,13 +267,40 @@ def sintetizar(vertex: VertexNarrador, secciones: list[dict], voz: str,
         if i:
             pcm += pausa
         pcm += vertex.tts(trozo, voz)
+    return pcm
 
-    with wave.open(str(wav_path), "wb") as w:
-        w.setnchannels(1)
-        w.setsampwidth(2)
-        w.setframerate(TTS_RATE)
-        w.writeframes(pcm)
-    return len(pcm) / 2 / TTS_RATE
+
+def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict],
+                  voz: str) -> bytes:
+    """Cada seccion se sintetiza aparte y se coloca en su t_inicio, con
+    silencio hasta el offset: la voz cae sobre el momento visual que comenta.
+    Si una seccion se pasa de largo, la siguiente cede hacia adelante (con la
+    pausa minima) en cascada."""
+    pausa_min = int(TTS_RATE * PAUSA_ENTRE_TROZOS_S)
+    pcm = bytearray()
+    cursor = 0  # muestras escritas
+    for i, s in enumerate(secciones):
+        audio = vertex.tts(s["texto"], voz)
+        offset = int(float(s["t_inicio"]) * TTS_RATE)
+        if i and offset < cursor + pausa_min:
+            offset = cursor + pausa_min
+        pcm.extend(b"\x00\x00" * max(0, offset - cursor))
+        pcm.extend(audio)
+        cursor = offset + len(audio) // 2
+    return bytes(pcm)
+
+
+def sintetizar(vertex: VertexNarrador, secciones: list[dict], voz: str,
+               wav_path: Path) -> float:
+    """TTS a WAV. Con tiempos por seccion (t_inicio) el audio se alinea a los
+    momentos visuales del guion; sin tiempos se narra de corrido. Devuelve la
+    duracion del audio en segundos."""
+    alineable = (len(secciones) > 1
+                 and all(isinstance(s.get("t_inicio"), (int, float))
+                         for s in secciones))
+    pcm = (_pcm_alineado(vertex, secciones, voz) if alineable
+           else _pcm_agrupado(vertex, secciones, voz))
+    return _escribir_wav(pcm, wav_path)
 
 
 def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
@@ -308,6 +344,10 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
     md_path.write_text(render_md(curso, clip, secciones, narracion,
                                  video_s, voz, vertex.model_tts))
     txt_path.write_text(narracion + "\n")
+    # Secciones con tiempos: permiten re-sintetizar el audio alineado sin
+    # volver a generar el guion (CLI --solo-audio).
+    (destino / f"{etiqueta}.secciones.json").write_text(
+        json.dumps(secciones, ensure_ascii=False, indent=2))
     return {
         "hash": hash_guion(compuesto, clip["scene"] or "", video_s, voz),
         "etiqueta": etiqueta, "voz": voz,

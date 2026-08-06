@@ -68,7 +68,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
-app.include_router(make_projects_router(cfg, db, manager, service))
+app.include_router(make_projects_router(cfg, db, manager, service,
+                                        narracion_service))
 app.include_router(make_narracion_router(cfg, db, narracion_service))
 
 # Endpoints que deben seguir accesibles con must_change_password activo: sin

@@ -31,6 +31,7 @@ feature-flag: sin credenciales el comando falla con un mensaje claro).
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -58,6 +59,33 @@ def cargar_env() -> None:
             continue
         k, v = line.split("=", 1)
         os.environ.setdefault(k, v)
+
+
+RE_FILA_MD = re.compile(r"^\| (\d+)–\d+ s \| .*? \| (.*) \|$")
+
+
+def cargar_secciones(destino: Path, etiqueta: str) -> list[dict] | None:
+    """Secciones para --solo-audio, de mejor a peor fuente: secciones.json
+    (tiempos exactos) > tabla del .md (tiempos re-parseados) > .txt (sin
+    tiempos: narracion de corrido)."""
+    sj = destino / f"{etiqueta}.secciones.json"
+    if sj.is_file():
+        return json.loads(sj.read_text())
+    md = destino / f"{etiqueta}.md"
+    if md.is_file():
+        secciones = []
+        for line in md.read_text().splitlines():
+            m = RE_FILA_MD.match(line)
+            if m:
+                secciones.append({"t_inicio": float(m.group(1)),
+                                  "texto": m.group(2).replace("\\|", "|")})
+        if len(secciones) > 1:
+            return secciones
+    txt = destino / f"{etiqueta}.txt"
+    if txt.is_file():
+        return [{"texto": p.strip()} for p in txt.read_text().split("\n\n")
+                if p.strip()]
+    return None
 
 
 def parse_clips_arg(spec: str, total: int) -> set[int]:
@@ -157,13 +185,15 @@ def main() -> None:
         previo = estado.get(clip["id"], {})
 
         if args.solo_audio:
-            if not txt_path.is_file():
-                print(f"[{etiqueta}] sin .txt previo, saltado (genera el "
+            secciones = cargar_secciones(destino, etiqueta)
+            if not secciones:
+                print(f"[{etiqueta}] sin guion previo, saltado (genera el "
                       "guion primero)")
                 continue
-            print(f"[{etiqueta}] re-sintetizando audio desde {txt_path.name}…")
-            secciones = [{"texto": p} for p in
-                         txt_path.read_text().split("\n\n") if p.strip()]
+            con_t = all("t_inicio" in s for s in secciones)
+            print(f"[{etiqueta}] re-sintetizando audio "
+                  + ("alineado a los tiempos del guion…" if con_t
+                     else "de corrido (sin tiempos)…"))
             audio_s = sintetizar(vertex, secciones, voz, wav_path)
             previo.update({"audio_s": round(audio_s, 1), "voz": voz,
                            "generado": time.time()})

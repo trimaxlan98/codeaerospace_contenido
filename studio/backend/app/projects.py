@@ -342,6 +342,7 @@ class ProjectService:
                 video_path = job.get("video_path")
 
             clips.append({
+                "clip_id": clip["id"],
                 "position": clip["position"],
                 "title": clip["title"],
                 "scene": clip.get("scene") or "",

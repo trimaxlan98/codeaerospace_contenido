@@ -22,9 +22,51 @@ from starlette.background import BackgroundTask
 from .auth import require_auth
 from .db import Database
 from .jobs import JobManager
+from .narracion import NarracionService
 from .projects import (QUALITIES, ProjectService, clip_public, compose_script,
                        content_hash, project_slug, style_offset)
 from .scenes import detect_scenes
+
+# Script incluido en el zip del curso: pega la narracion a cada clip (silencio
+# donde no la haya, apad hasta el final del video para no desincronizar el
+# concat) y une el curso completo. Corre fuera de la app (requiere ffmpeg).
+MUX_SH = """#!/bin/sh
+# Une cada clip con su narracion y concatena el curso completo.
+# Requiere ffmpeg. Uso:  sh mux.sh
+set -e
+mkdir -p con_audio
+for v in [0-9][0-9][0-9]-*.mp4; do
+  w="${v%.mp4}.wav"
+  if [ -f "$w" ]; then
+    # apad + -shortest: la voz se rellena con silencio hasta el final del
+    # video, asi cada clip conserva su duracion exacta y el concat no se
+    # desincroniza.
+    ffmpeg -y -i "$v" -i "$w" -c:v copy -c:a aac -b:a 192k \\
+      -af apad -shortest "con_audio/$v"
+  else
+    # Sin narracion: pista de silencio para que el concat no mezcle clips
+    # con y sin audio.
+    ffmpeg -y -i "$v" -f lavfi -i anullsrc=r=24000:cl=mono \\
+      -c:v copy -c:a aac -b:a 192k -shortest "con_audio/$v"
+  fi
+done
+cd con_audio && ffmpeg -y -f concat -safe 0 -i ../concat.txt -c copy \\
+  ../curso_narrado.mp4
+echo "Listo: curso_narrado.mp4"
+"""
+
+LEEME_TXT = (
+    "Contenido del zip:\n"
+    "  NNN-*.mp4        clips renderizados en orden\n"
+    "  NNN-*.wav        narracion de cada clip (si existe)\n"
+    "  NNN-*.txt        texto de la narracion\n"
+    "  concat.txt       lista para ffmpeg -f concat\n"
+    "  manifest.json    metadatos del curso (incluye estado de narracion)\n"
+    "  mux.sh           une video + narracion y concatena todo\n\n"
+    "Curso completo CON narracion:\n\n"
+    "  sh mux.sh        (genera curso_narrado.mp4)\n\n"
+    "Curso completo SIN narracion:\n\n"
+    "  ffmpeg -f concat -safe 0 -i concat.txt -c copy curso.mp4\n")
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 
@@ -72,8 +114,22 @@ class MoveBody(BaseModel):
     position: int
 
 
-def make_router(cfg, db: Database, manager: JobManager, service: ProjectService) -> APIRouter:
+def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
+                narracion: NarracionService) -> APIRouter:
     router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+    def _narr_por_clip(project: dict) -> dict[str, dict]:
+        """Estado publico de narracion por clip para manifest/archive."""
+        try:
+            estado = narracion.estado_proyecto(project)
+        except Exception:
+            return {}
+        return {c["clip_id"]: {"estado": c["estado"], "voz": c["voz"],
+                               "audio_s": c["audio_s"],
+                               "has_audio": c["has_audio"],
+                               "aviso_largo": c["aviso_largo"],
+                               "etiqueta": c["etiqueta"]}
+                for c in estado["clips"]}
 
     def _check_style_size(text: str) -> None:
         if len(text.encode("utf-8", errors="replace")) > cfg.max_script_bytes:
@@ -304,8 +360,11 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService)
 
     @router.get("/{pid}/export")
     async def export_project(pid: str, _=Depends(require_auth)):
-        _require_project(pid)
+        project = _require_project(pid)
         manifest = service.export_full_manifest(pid, _jobs_for_project(pid))
+        narr = _narr_por_clip(project)
+        for c in manifest["clips"]:
+            c["narracion"] = narr.get(c["clip_id"])
         return _public_manifest(manifest)
 
     @router.get("/{pid}/archive")
@@ -318,7 +377,11 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService)
                 status_code=404,
                 detail="El proyecto no tiene ningun clip con video vigente")
 
+        narr = _narr_por_clip(project)
+        for c in manifest["clips"]:
+            c["narracion"] = narr.get(c["clip_id"])
         public_manifest = _public_manifest(manifest)
+        guiones_dir = narracion.destino(project)
 
         tmp = tempfile.NamedTemporaryFile(delete=False, dir=tempfile.gettempdir(),
                                           suffix=".zip")
@@ -334,14 +397,23 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService)
                     if not video.is_file() or job_dir not in video.parents:
                         continue  # desaparecio a mitad de la exportacion: se salta
                     zf.write(video, arcname=clip["filename"])
+                    # Narracion del clip (si existe): wav y texto con el mismo
+                    # nombre base que el mp4, para que mux.sh los empareje.
+                    n = clip.get("narracion")
+                    if n and n.get("has_audio"):
+                        stem = clip["filename"][:-len(".mp4")]
+                        wav = guiones_dir / f"{n['etiqueta']}.wav"
+                        txt = guiones_dir / f"{n['etiqueta']}.txt"
+                        if wav.is_file():
+                            zf.write(wav, arcname=f"{stem}.wav")
+                        if txt.is_file():
+                            zf.write(txt, arcname=f"{stem}.txt")
                 zf.writestr("concat.txt",
                             "".join(f"{line}\n" for line in manifest["concat"]))
                 zf.writestr("manifest.json",
                             json.dumps(public_manifest, indent=2, ensure_ascii=False))
-                zf.writestr(
-                    "LEEME.txt",
-                    "Para unir los clips de este curso en un solo video:\n\n"
-                    "  ffmpeg -f concat -safe 0 -i concat.txt -c copy curso.mp4\n")
+                zf.writestr("mux.sh", MUX_SH)
+                zf.writestr("LEEME.txt", LEEME_TXT)
         except BaseException:
             # Si el zip revienta a mitad (disco lleno, fallo leyendo un mp4...),
             # el tempfile queda huerfano porque el BackgroundTask que lo borra
