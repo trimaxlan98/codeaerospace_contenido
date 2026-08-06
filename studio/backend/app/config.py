@@ -59,6 +59,15 @@ class Settings:
         self.gemini_model_deep = os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro")
         self.ai_rate_limit_per_min = int(os.environ.get("MS_AI_RATE_LIMIT", "10"))
 
+        # Narracion de proyectos (guion + TTS). Comparte credenciales y
+        # feature-flag con el asistente IA; escribe fuera de render_jobs/
+        # (requiere ReadWritePaths sobre guiones/ en la unidad systemd).
+        self.guiones_dir = Path(os.environ.get(
+            "MS_GUIONES_DIR", str(self.workspace / "guiones")))
+        self.gemini_model_tts = os.environ.get(
+            "MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts")
+        self.tts_voice = os.environ.get("MS_TTS_VOICE", "Charon")
+
         # Biblioteca curada de primitivas de Manim (solo lectura: la consume
         # el asistente via conocimiento.py y los demos de Animaciones).
         self.manim_extensions_dir = Path(os.environ.get(

@@ -65,6 +65,10 @@ export const api = {
   renderClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/render`),
   renderStale: (pid) => request('POST', `/api/projects/${pid}/render-stale`),
   getClipScript: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/script`),
+  getNarracion: (pid) => request('GET', `/api/projects/${pid}/narracion`),
+  startNarracion: (pid, body = {}) => request('POST', `/api/projects/${pid}/narracion`, body),
+  cancelNarracion: (pid) => request('POST', `/api/projects/${pid}/narracion/cancel`),
+  getNarracionTexto: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/texto`),
 }
 
 export function videoUrl(id) {
@@ -81,4 +85,8 @@ export function projectExportUrl(id) {
 
 export function projectArchiveUrl(id) {
   return `/api/projects/${id}/archive`
+}
+
+export function narracionAudioUrl(pid, cid) {
+  return `/api/projects/${pid}/narracion/${cid}/audio`
 }

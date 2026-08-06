@@ -23,6 +23,8 @@ from .db import Database
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
+from .narracion import NarracionService
+from .narracion_api import make_router as make_narracion_router
 from .projects import ProjectService
 from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
@@ -43,6 +45,7 @@ runner = RunnerClient(cfg.runner_socket)
 manager = JobManager(cfg, db, runner, bus)
 service = ProjectService(db)
 manager.on_job_done = service.handle_job_done
+narracion_service = NarracionService(cfg, db)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
@@ -66,6 +69,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
 app.include_router(make_projects_router(cfg, db, manager, service))
+app.include_router(make_narracion_router(cfg, db, narracion_service))
 
 # Endpoints que deben seguir accesibles con must_change_password activo: sin
 # ellos el usuario quedaria atrapado sin poder ni cambiar la password ni

@@ -5,9 +5,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ChevronDown, ChevronUp, Download, FileJson, FolderKanban, Film,
-  Pencil, Plus, RefreshCw,
+  Mic, Pencil, Plus, RefreshCw, Square,
 } from 'lucide-react'
-import { api, projectArchiveUrl, projectExportUrl, thumbUrl } from './api.js'
+import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl } from './api.js'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -231,6 +231,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
 
 function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
   const [project, setProject] = useState(null)
+  const [narracion, setNarracion] = useState(null)
   const [error, setError] = useState('')
   const [styleOpen, setStyleOpen] = useState(false)
   const [addClipOpen, setAddClipOpen] = useState(false)
@@ -251,6 +252,21 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
 
   useEffect(() => { load() }, [load])
 
+  const loadNarracion = useCallback(() => {
+    api.getNarracion(projectId).then(setNarracion).catch(() => setNarracion(null))
+  }, [projectId])
+
+  useEffect(() => { loadNarracion() }, [loadNarracion])
+
+  // Mientras hay una narracion en curso se sondea el estado cada 3 s; el
+  // resultado durable vive en estado.json del backend, esto es solo progreso.
+  const narrRun = narracion?.run && !narracion.run.finished ? narracion.run : null
+  useEffect(() => {
+    if (!narrRun) return
+    const t = setInterval(loadNarracion, 3000)
+    return () => clearInterval(t)
+  }, [narrRun != null, loadNarracion]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Refresco cuando un job ligado a un clip de este proyecto pasa a estado
   // terminal (p.ej. termina un render disparado desde aqui): se compara con
   // el estado previo de `jobs`, igual que el patron de App.jsx con jobsRef.
@@ -265,7 +281,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
       const terminal = j.status !== 'queued' && j.status !== 'running'
       return terminal && (wasActive === 'queued' || wasActive === 'running')
     })
-    if (becameTerminal) load()
+    if (becameTerminal) { load(); loadNarracion() }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- solo reacciona a cambios de `jobs`
   }, [jobs])
 
@@ -388,6 +404,26 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
     }
   }
 
+  const generarNarracion = async (body = {}) => {
+    setError('')
+    try {
+      await api.startNarracion(project.id, body)
+      loadNarracion()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const cancelarNarracion = async () => {
+    setError('')
+    try {
+      await api.cancelNarracion(project.id)
+      loadNarracion()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   const openInStudio = async (clip) => {
     setError('')
     try {
@@ -423,6 +459,9 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
   // Cuenta solo los stale/no_render sin job en vuelo (M-3): coherente con lo
   // que "Re-renderizar desactualizados" realmente va a encolar.
   const staleCount = staleWithoutActiveJob(clips, jobs).length
+  const narrByClip = Object.fromEntries((narracion?.clips || []).map((c) => [c.clip_id, c]))
+  const narrPending = (narracion?.clips || []).filter((c) => c.estado !== 'al_dia').length
+  const narrErrores = (narracion?.run?.finished && narracion.run.errores) || []
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
@@ -471,12 +510,35 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
               title={staleCount === 0 ? 'no hay clips desactualizados sin un render en curso' : undefined}>
               <RefreshCw className="h-3.5 w-3.5" /> Re-renderizar desactualizados{staleCount > 0 ? ` (${staleCount})` : ''}
             </Button>
+            {narrRun ? (
+              <>
+                <Button size="sm" variant="default" disabled>
+                  <Mic className="h-3.5 w-3.5 animate-pulse" /> Narrando {Math.min(narrRun.done + 1, narrRun.total)}/{narrRun.total}…
+                </Button>
+                <Button size="sm" variant="ghost" onClick={cancelarNarracion}>
+                  <Square className="h-3.5 w-3.5" /> Cancelar narración
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" variant="default" onClick={() => generarNarracion()}
+                disabled={!narracion?.enabled || narrPending === 0}
+                title={!narracion?.enabled
+                  ? 'requiere el asistente IA (Vertex) configurado'
+                  : (narrPending === 0 ? 'la narración de todos los clips está al día' : undefined)}>
+                <Mic className="h-3.5 w-3.5" /> Generar narración{narrPending > 0 ? ` (${narrPending})` : ''}
+              </Button>
+            )}
             <Button size="sm" variant="default" onClick={() => setStyleOpen(true)}>
               <Pencil className="h-3.5 w-3.5" /> Editar estilo
             </Button>
           </div>
         </div>
 
+        {narrErrores.length > 0 && (
+          <p role="alert" className="border-t border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">
+            Narración con errores: {narrErrores.map((e) => e.error).join('; ')}
+          </p>
+        )}
         {error && (
           <p role="alert" className="border-t border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">{error}</p>
         )}
@@ -498,7 +560,11 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
                 prevClip={i > 0 ? clips[i - 1] : null} jobs={jobs}
                 onFieldChange={onFieldChange} onFieldBlur={onFieldBlur}
                 onMove={move} onDelete={removeClip} onRender={renderClip}
-                onOpenInStudio={openInStudio} />
+                onOpenInStudio={openInStudio}
+                projectId={project.id} narr={narrByClip[clip.id]}
+                narrando={narrRun?.current?.clip_id === clip.id}
+                narrBusy={Boolean(narrRun)} narrEnabled={Boolean(narracion?.enabled)}
+                onNarrar={() => generarNarracion({ clips: [clip.id], force: true })} />
             ))
           )}
         </div>
@@ -512,7 +578,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack }) {
   )
 }
 
-function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio }) {
+function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, narr, narrando, narrBusy, narrEnabled, onNarrar }) {
   const activeJob = activeJobFor(jobs, clip.id)
   const renderJob = clip.job_id ? jobs.find((j) => j.id === clip.job_id) : null
   const meta = activeJob ? STATUS_META[activeJob.status] : (STATUS_META[clip.status] || STATUS_META.no_render)
@@ -594,6 +660,33 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
           </Button>
           <span className="ml-auto"><DeleteButton onDelete={() => onDelete(clip.id)} /></span>
         </div>
+
+        {(narr?.has_audio || narrando) && (
+          <div className="mt-1 flex flex-wrap items-center gap-2 rounded-md border border-line/60 bg-canvas/40 px-2.5 py-1.5">
+            <Mic className="h-3.5 w-3.5 shrink-0 text-accent" />
+            {narrando ? (
+              <span className="text-[12px] text-cyan">narrando…</span>
+            ) : (
+              <>
+                <audio controls preload="none" src={narracionAudioUrl(projectId, clip.id)}
+                  aria-label={`narración de ${clip.title}`} className="h-8 min-w-0 max-w-[300px] flex-1" />
+                <span className="font-mono text-[11px] text-muted">
+                  {narr.audio_s ? `${narr.audio_s} s · ` : ''}{narr.voz}
+                </span>
+                {narr.estado === 'desactualizada' && (
+                  <span className="text-[11px] text-warn">desactualizada</span>
+                )}
+                {narr.aviso_largo && (
+                  <span className="text-[11px] text-warn">⚠ más larga que el video</span>
+                )}
+                <Button size="xs" variant="ghost" onClick={onNarrar} disabled={narrBusy || !narrEnabled}
+                  aria-label="regenerar narración" title="regenerar la narración de este clip">
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </article>
   )
