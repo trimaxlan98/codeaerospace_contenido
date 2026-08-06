@@ -218,6 +218,34 @@ ManimStudio no hace en el servidor para no sumar otro paso de render):
 - **Nunca se auto-renderiza** el código de la IA: pasa por el mismo pipeline (validación
   AST → sandbox sin red) que el código escrito a mano.
 
+### Narración de cursos (botón «Generar narración» en Proyectos)
+
+- Guion cronometrado con `gemini-2.5-pro` (secciones con `t_inicio`/`t_fin` leyendo los
+  `run_time`/`wait` del script compuesto) y voz con `gemini-2.5-flash-preview-tts`
+  (Vertex, misma service account del asistente; sin `gcp-key.json` la función se oculta).
+- El audio se **alinea a las secciones**: cada una se sintetiza aparte, se recorta su
+  silencio inicial/final y se coloca en su `t_inicio` (hueco máximo 2.5 s, cascada si la
+  anterior se pasa). Si aún así excede el video +5 %, un reintento con guion más corto.
+- Salida en `guiones/<slug-proyecto>/NN-slug.{md,txt,wav,secciones.json}` + `estado.json`
+  (hash de script compuesto+escena+duración+voz → detecta narraciones desactualizadas).
+- API: `GET/POST /api/projects/{pid}/narracion` (estado por clip / corrida en segundo
+  plano, una a la vez), `POST .../narracion/cancel`, `GET .../narracion/{cid}/{audio,texto}`.
+- El zip de `GET /api/projects/{pid}/archive` incluye los `.wav`/`.txt` emparejados con
+  cada mp4, `mux.sh` (ffmpeg `apad -shortest`: cada clip conserva su duración exacta y el
+  concat no se desincroniza) y el estado de narración en `manifest.json`.
+- CLI equivalente: `studio/tools/guiones.py` (`--solo-guion`, `--solo-audio`, `--voz`,
+  `--force`); comparte la lógica de `app/narracion.py`.
+- Operación: la unidad systemd necesita `ReadWritePaths` sobre `guiones/` y el directorio
+  debe ser del usuario `manimstudio` (mismo patrón que Animaciones).
+
+### Identidad CO.DE Academy en los videos
+
+- `studio/content/manim_extensions/code_brand.py`: paleta oficial (fondo `#05070a`,
+  ámbar `#f59e0b`), tipografías propias Rajdhani/Space Mono (OFL, en `fonts/`, registradas
+  en Pango en runtime dentro del contenedor), `marca_agua()` sutil con z_index alto,
+  `esquinas_hud()`, y `Rotulos` (rótulos por zona que se relevan con fundido, sin
+  encimarse). Los cursos la activan en su `style_block` con una sombra de `Scene`.
+
 ## Operación
 
 ```bash
