@@ -31,7 +31,7 @@ CO.DE Academy (`code_brand.py`).
 | 5 | Apuntar a un satelite: el arte del seguimiento | APT L1-L4, L6 (Az/El, Doppler, PID) | `apuntado.py` (+ reusa `satelites.py`) | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
 | 6 | El espectro: la guerra invisible por las ondas | Espectro L1-L4, L6 (bandas, lluvia, UIT, NGSO-GSO) | `espectro.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
 | 7 | Control: domar sistemas que se resisten | Señales y sistemas L10-L12, L16 + APT L6-L7 | `control.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 8 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | pendiente |
+| 8 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
 
 Criterio de prioridad: (1) riqueza visual con primitivas existentes o
 factibles, (2) tamaño de audiencia, (3) actualidad del tema, (4) no
