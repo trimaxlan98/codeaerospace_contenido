@@ -1,0 +1,56 @@
+{
+  "name": "Materiales que van al espacio",
+  "description": "Curso de divulgación en 8 clips sobre materiales aeroespaciales: del pozo de Lennard-Jones a la rigidez macroscópica, las cuatro familias de materiales, la curva esfuerzo-deformación, la resistencia específica y el mapa de Ashby, la fatiga por ciclos, la degradación en el ambiente espacial y la elección de material de una misión. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-todo-empieza-en-un-enlace.py",
+      "title": "1 · Todo empieza en un enlace",
+      "scene": "Clip1",
+      "final_state": "Par de átomos unidos por resorte arriba y pozo de Lennard-Jones abajo con punto brillante en el fondo; título «Todo empieza en un enlace» y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-del-pozo-a-la-rigidez.py",
+      "title": "2 · Del pozo a la rigidez",
+      "scene": "Clip2",
+      "final_state": "Pozo de Lennard-Jones con parábola verde superpuesta al fondo a la izquierda; red atómica de resortes a la derecha; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuatro-familias.py",
+      "title": "3 · Las cuatro familias",
+      "scene": "Clip3",
+      "final_state": "Grid 2x2 de bloques METALES, CERÁMICOS, POLÍMEROS y COMPUESTOS con COMPUESTOS resaltado en cian; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-fuerte-no-es-rigido.py",
+      "title": "4 · Fuerte no es lo mismo que rígido",
+      "scene": "Clip4",
+      "final_state": "Curva esfuerzo-deformación de un cerámico (recta empinada) con su marca de falla X roja; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-gramo-de-oro.py",
+      "title": "5 · El gramo que cuesta oro",
+      "scene": "Clip5",
+      "final_state": "Mapa de Ashby completo (4 burbujas + diagonales) con la burbuja COMPUESTOS resaltada en cian; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-fatiga.py",
+      "title": "6 · Fatiga: morir de mil ciclos",
+      "scene": "Clip6",
+      "final_state": "Placa con grieta roja y flechas de carga cíclica a la izquierda; curva S-N con su límite de fatiga punteado a la derecha; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-el-espacio-muerde.py",
+      "title": "7 · El espacio muerde",
+      "scene": "Clip7",
+      "final_state": "Placa central rodeada de las cuatro amenazas con sus tags (ciclado térmico, oxígeno atómico, radiación UV, micrometeoritos), la última a opacidad plena; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-elegir-con-que-volar.py",
+      "title": "8 · Elegir con qué volar",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («Materiales» + «que van al espacio» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
