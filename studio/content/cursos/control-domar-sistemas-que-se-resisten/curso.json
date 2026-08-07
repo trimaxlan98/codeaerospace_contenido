@@ -1,0 +1,56 @@
+{
+  "name": "Control: domar sistemas que se resisten",
+  "description": "Curso de divulgación en 8 clips sobre control de sistemas: la respuesta que oscila, el plano s y sus polos, el amortiguamiento ζ, el lazo cerrado y el error, el PID con sus análogos físicos (resorte, amortiguador, memoria), el error de arrastre ante rampas, la saturación con su windup y el arte de sintonizar. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-sistemas-que-se-resisten.py",
+      "title": "1 · Sistemas que se resisten",
+      "scene": "Clip1",
+      "final_state": "Masa-resorte-amortiguador en reposo centrada; título «Sistemas que se resisten» y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-plano-s.py",
+      "title": "2 · El plano s: el mapa del destino",
+      "scene": "Clip2",
+      "final_state": "Plano s con un polo rojo en el semiplano derecho a la izquierda; respuesta exponencial creciente roja a la derecha; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-zeta.py",
+      "title": "3 · ζ: el carácter del sistema",
+      "scene": "Clip3",
+      "final_state": "Respuesta al escalón sobreamortiguada (ζ=1.6) con su línea de referencia ámbar; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-cerrar-el-lazo.py",
+      "title": "4 · Cerrar el lazo",
+      "scene": "Clip4",
+      "final_state": "Diagrama de lazo cerrado completo (sumador, CONTROL, PLANTA, realimentación) con la etiqueta HUD «E = R - Y» abajo; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-pid.py",
+      "title": "5 · PID: resorte, amortiguador y memoria",
+      "scene": "Clip5",
+      "final_state": "Masa-resorte a la izquierda, respuesta amortiguada (ζ=0.7) a la derecha, fórmula PID en la zona del pie; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-rampa.py",
+      "title": "6 · La rampa que nunca alcanzas",
+      "scene": "Clip6",
+      "final_state": "Rampa de referencia ámbar con la curva del sistema superpuesta en verde (rezago cero); HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-windup.py",
+      "title": "7 · Windup: la memoria que se emborracha",
+      "scene": "Clip7",
+      "final_state": "Curva con anti-windup limpia (sin tramo rojo) con su etiqueta HUD «CLAMPING»; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-sintonizar.py",
+      "title": "8 · Sintonizar: el arte",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («Control» + «domar sistemas que se resisten» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
