@@ -1,0 +1,56 @@
+{
+  "name": "El espectro: la guerra invisible por las ondas",
+  "description": "Curso de divulgación en 8 clips sobre el espectro radioeléctrico y su regulación: el recurso finito y su mapa de bandas de UHF a Q/V, el costo de subir en frecuencia (lluvia y absorción atmosférica), las ventanas donde viven las bandas comerciales, la UIT y el trámite de las redes satelitales, el conflicto NGSO-GSO con la regla 22.2, la epfd como métrica del daño y la agenda de la CMR-27. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-recurso-finito.py",
+      "title": "1 · Un recurso que no se fabrica",
+      "scene": "Clip1",
+      "final_state": "Barra de bandas del espectro con mini-etiquetas de usos (TV, 5G, WIFI, SAT, RADAR) apuntando a segmentos distintos; título «Un recurso que no se fabrica» y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-mapa-de-bandas.py",
+      "title": "2 · El mapa de las bandas",
+      "scene": "Clip2",
+      "final_state": "Barra de bandas arriba; abajo dos parábolas de antena con tags «60 cm · Ku» y «35 cm · Ka»; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-impuesto-lluvia.py",
+      "title": "3 · El impuesto de la lluvia",
+      "scene": "Clip3",
+      "final_state": "Dos campos de gotas con onda larga (banda L) y corta (banda Ka) a la izquierda con sus tags; curva de atenuación por lluvia a la derecha con punto en 20 GHz; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-ventanas-atmosfericas.py",
+      "title": "4 · Las ventanas atmosféricas",
+      "scene": "Clip4",
+      "final_state": "Curva de absorción gaseosa con los picos de 22 GHz (H2O) y 60 GHz (O2) marcados y las dos ventanas atmosféricas verdes visibles; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-arbitro-del-cielo.py",
+      "title": "5 · La UIT: el árbitro del cielo",
+      "scene": "Clip5",
+      "final_state": "Cadena de bloques API→COORDINACIÓN→NOTIFICACIÓN arriba y línea de tiempo de 3 hitos abajo; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-anillo-lleno.py",
+      "title": "6 · El anillo lleno",
+      "scene": "Clip6",
+      "final_state": "Tierra con anillo GSO cian y anillo NGSO violeta, haz cian de una estación a un satélite GSO y etiqueta HUD «REGLA 22.2»; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-epfd.py",
+      "title": "7 · Medir el daño donde duele",
+      "scene": "Clip7",
+      "final_state": "Patrón de antena con lóbulos a la izquierda; tierra con anillos a la derecha con un satélite NGSO apagado cerca del haz; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-cmr27.py",
+      "title": "8 · CMR-27: la próxima batalla",
+      "scene": "Clip8",
+      "final_state": "Tarjeta de cierre del curso centrada («El espectro» + «la guerra invisible por las ondas» con subrayado ámbar brillante); pantalla limpia salvo esquinas HUD y marca de agua."
+    }
+  ]
+}
