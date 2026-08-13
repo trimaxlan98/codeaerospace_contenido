@@ -33,10 +33,12 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 10 | El espectro: la guerra invisible por las ondas | Espectro L1-L4, L6 (bandas, lluvia, UIT, NGSO-GSO) | `espectro.py` | publicado (PR #6) |
 | 11 | Control: domar sistemas que se resisten | Señales y sistemas L10-L12, L16 + APT L6-L7 | `control.py` | publicado (PR #7) |
 | 12 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | publicado (PR #8) |
+| 13 | Cerrar el enlace: la cuenta en decibelios | Redes satelitales M2 (FSPL, PIRE, C/N0, G/T) + M7 (Shannon, MODCOD, ACM) | `enlace.py` | publicado (PR #9) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
-esta tabla).
+esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
+(`curso-09-enlace.md` es el curso 13).
 
 ## Cola de cursos nuevos (desmenuzado)
 
