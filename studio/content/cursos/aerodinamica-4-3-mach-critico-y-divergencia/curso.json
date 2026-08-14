@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 4.3 Número de Mach crítico y divergencia del arrastre",
+  "description": "Lección 4.3 del curso Aerodinámica (módulo 4: flujo subsónico compresible, transónico y supersónico linealizado), en 4 clips animados —uno por subtema—: la construcción gráfica del Mach crítico como cruce entre la succión del perfil y la que exige el aire, qué lo adelanta (espesor y ángulo de ataque), la burbuja supersónica que aparece después y el choque que la cierra despegando la capa límite, y el Mach de divergencia del arrastre con la ecuación de Korn. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-cruce-que-define-mcr.py",
+      "title": "1 · El cruce que define Mcr",
+      "scene": "Clip1",
+      "final_state": "Las dos curvas —la del perfil en cian subiendo y la del aire en rojo bajando— con su punto de cruce ámbar marcado y rotulado Mcr = 0.689; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-que-lo-adelanta.py",
+      "title": "2 · Qué lo adelanta",
+      "scene": "Clip2",
+      "final_state": "La misma construcción con el perfil ya engordado: el cruce se ha adelantado y el rótulo marca Mcr = 0.689 en rojo, tras venir de 0.766; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-burbuja-y-su-choque.py",
+      "title": "3 · La burbuja y su choque",
+      "scene": "Clip3",
+      "final_state": "Perfil convencional con la burbuja supersónica roja sombreada sobre el extradós, el choque vertical que la cierra y la traza ámbar de la capa límite despegada detrás; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-mach-que-de-verdad-duele.py",
+      "title": "4 · El Mach que de verdad duele",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El Mach crítico avisa.» sobre «El de divergencia cobra.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}

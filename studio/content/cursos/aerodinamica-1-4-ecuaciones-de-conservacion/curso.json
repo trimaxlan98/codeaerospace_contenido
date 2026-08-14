@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 1.4 Ecuaciones de conservación",
+  "description": "Lección 1.4 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: las tres cuentas integrales (masa, cantidad de movimiento y energía) sobre un volumen de control, las tres hipótesis que las vuelven manejables (permanente, adiabático, unidimensional), la ecuación de la energía leída como una entalpía total que no se mueve, y el volumen de control aplicado a un conducto de área variable. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-tres-cuentas-que-siempre-cuadran.py",
+      "title": "1 · Tres cuentas que siempre cuadran",
+      "scene": "Clip1",
+      "final_state": "Volumen de control punteado arriba con sus flechas 1 y 2 en ámbar, y debajo las tres ecuaciones alineadas por su signo igual: masa en verde, cantidad de movimiento en ámbar y energía en cian; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-las-tres-hipotesis.py",
+      "title": "2 · Las tres hipótesis",
+      "scene": "Clip2",
+      "final_state": "Conducto De Laval con una sección cian marcada en la garganta, y bajo él las tres hipótesis en fila: «permanente» en verde, «adiabático» en ámbar y «unidimensional» en cian; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-entalpia-total-no-se-mueve.py",
+      "title": "3 · La entalpía total no se mueve",
+      "scene": "Clip3",
+      "final_state": "Barra apilada a la izquierda con el tramo ámbar de energía cinética ocupando ya el 56 % y el rótulo «M = 2.5»; a la derecha el conducto divergente con T0 = 300 K, T = 133 K y V = 579 m/s; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-caja-sobre-el-conducto.py",
+      "title": "4 · La caja, sobre el conducto",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Ya sabes qué se conserva.» sobre «Falta saber convertirlo.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

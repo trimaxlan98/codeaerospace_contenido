@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 2.2 Relaciones de la onda de choque normal",
+  "description": "Lección 2.2 del curso Aerodinámica (módulo 2: ondas de choque normales y flujo cuasi-unidimensional), en 4 clips animados —uno por subtema—: el volumen de control puesto a caballo del choque, que resuelve el salto sin mirar dentro de la onda; las ecuaciones de Rankine-Hugoniot y su segunda solución; cuánto salta cada propiedad según el Mach de entrada y por qué la densidad tiene un techo de seis; y la pérdida de presión de estancamiento, que es lo que el choque cuesta de verdad. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-caja-a-caballo-del-choque.py",
+      "title": "1 · La caja a caballo del choque",
+      "scene": "Clip1",
+      "final_state": "Volumen de control punteado atravesado por la línea roja del choque, con las flechas 1 y 2 en ámbar, y debajo las tres ecuaciones de conservación en verde, ámbar y cian; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-rankine-hugoniot.py",
+      "title": "2 · Rankine y Hugoniot",
+      "scene": "Clip2",
+      "final_state": "La expresión de M2² en cian arriba y debajo, en rojo, «M1 = 2 ⇒ M2 = 0.5774»; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-salto-en-numeros.py",
+      "title": "3 · El salto, en números",
+      "scene": "Clip3",
+      "final_state": "Las tres curvas p2/p1, T2/T1 y rho2/rho1 frente a M1, cortadas en Mach 2 con sus valores a la izquierda, y la asíntota verde de la densidad en 6 rotulada; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-lo-que-cuesta-el-choque.py",
+      "title": "4 · Lo que cuesta el choque",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Un choque no destruye energía.» sobre «Destruye la capacidad de usarla.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}

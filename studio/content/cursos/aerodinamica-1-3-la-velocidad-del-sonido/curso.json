@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 1.3 La velocidad del sonido",
+  "description": "Lección 1.3 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: qué es realmente la velocidad del sonido vista como la frontera de una perturbación infinitesimal, de dónde sale a = √(γRT) y por qué solo depende de la temperatura, cómo cambia con la altitud en la atmósfera estándar (el mismo avión, dos regímenes), y el cono de Mach con su ángulo μ = arcsen(1/M). Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-como-se-entera-el-aire.py",
+      "title": "1 · Cómo se entera el aire",
+      "scene": "Clip1",
+      "final_state": "Tubo horizontal casi teñido de cian por completo con el frente vertical junto al extremo derecho, y encima el trazo de presión escalonado que baja justo en el frente; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-formula-del-sonido.py",
+      "title": "2 · De dónde sale la fórmula",
+      "scene": "Clip2",
+      "final_state": "a = √(γRT) arriba en cian y debajo la curva de a frente a la temperatura, con dos puntos rotulados: 340 m/s en ámbar y 295 m/s en cian; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-mas-alto-mas-lento.py",
+      "title": "3 · Más alto, más lento el sonido",
+      "scene": "Clip3",
+      "final_state": "Perfil ISA a la izquierda con la tropopausa marcada en verde, y a la derecha dos tarjetas unidas por guías: abajo «a = 340 m/s, M = 0.73» en verde y arriba «a = 295 m/s, M = 0.85» en ámbar; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-cono-y-su-angulo.py",
+      "title": "4 · El cono y su ángulo",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La velocidad del sonido no es un dato:» sobre «es el termómetro del aire.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

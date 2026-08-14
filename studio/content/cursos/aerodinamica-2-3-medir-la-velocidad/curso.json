@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 2.3 Medición de velocidad en flujo compresible",
+  "description": "Lección 2.3 del curso Aerodinámica (módulo 2: ondas de choque normales y flujo cuasi-unidimensional), en 4 clips animados —uno por subtema—: por qué un tubo de Pitot mide presión y no velocidad, y qué hace falta para traducirla; el choque desprendido que se planta delante de la boca en supersónico y la fórmula de Rayleigh que lo mete en la cuenta; cuánto miente un anemómetro que ignore la compresibilidad; y las cuatro velocidades —indicada, calibrada, equivalente y verdadera— con el salto que impone la altitud. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-pitot-que-si-sabe-de-compresibilidad.py",
+      "title": "1 · El Pitot y la compresibilidad",
+      "scene": "Clip1",
+      "final_state": "Líneas de corriente contra la boca del Pitot a la izquierda con el punto de remanso en rojo, y a la derecha la tarjeta «V = 250 m/s / M = 0.85 / p0/p = 1.606»; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-pitot-supersonico.py",
+      "title": "2 · El Pitot supersónico",
+      "scene": "Clip2",
+      "final_state": "El mismo Pitot con un arco rojo de choque desprendido delante rotulado, y a la derecha la comparación «sin choque 7.824» sobre «de verdad 5.640» en rojo; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuanto-miente-el-anemometro.py",
+      "title": "3 · Cuánto miente el anemómetro",
+      "scene": "Clip3",
+      "final_state": "Curva del error del anemómetro frente al Mach con la línea cian del 5 % y dos puntos rotulados: 2 % en verde a Mach 0.3 y 19 % en ámbar a Mach 0.85; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-cuatro-velocidades-para-una.py",
+      "title": "4 · Cuatro velocidades para una",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El avión vuela con la indicada.» sobre «El plan de vuelo, con la verdadera.» en ámbar; HUD 'MODULO 04'."
+    }
+  ]
+}

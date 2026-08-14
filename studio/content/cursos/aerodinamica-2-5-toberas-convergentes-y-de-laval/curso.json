@@ -1,0 +1,38 @@
+{
+  "name": "Aerodinámica · 2.5 Toberas convergentes y De Laval",
+  "description": "Lección 2.5 del curso Aerodinámica (módulo 2: ondas de choque normales y flujo cuasi-unidimensional), en 5 clips animados —uno por subtema—: el bloqueo sónico de una tobera convergente y por qué a partir de él deja de enterarse de lo que pasa fuera; los cuatro regímenes de una De Laval sobre la misma geometría; el chorro sobreexpandido y subexpandido con sus diamantes de Mach; por qué la primera etapa y la superior de un lanzador no llevan la misma campana; y el túnel de viento supersónico con su choque de arranque. Cierra el módulo 2. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-tobera-que-deja-de-escuchar.py",
+      "title": "1 · La tobera que deja de escuchar",
+      "scene": "Clip1",
+      "final_state": "Arriba la tobera convergente con la garganta marcada en rojo y «M = 1»; abajo la curva de gasto que sube en cian y se planta en la meseta roja a partir de la presión crítica; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-los-regimenes-de-una-de-laval.py",
+      "title": "2 · Los regímenes de una De Laval",
+      "scene": "Clip2",
+      "final_state": "Conducto De Laval arriba con la marca roja del choque interno, y debajo las cuatro curvas de p/p0 (verde, cian, ámbar y roja) con el tramo convergente común resaltado; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-sobreexpandida-y-subexpandida.py",
+      "title": "3 · Sobreexpandida y subexpandida",
+      "scene": "Clip3",
+      "final_state": "Tres plumas apiladas —adaptada recta en verde, sobreexpandida estrangulada en ámbar y subexpandida abierta en violeta— con sus diamantes de Mach en rojo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-por-que-los-cohetes-llevan-campana.py",
+      "title": "4 · Por qué los cohetes llevan campana",
+      "scene": "Clip4",
+      "final_state": "Dos toberas De Laval lado a lado: «primera etapa» con Ae/At = 1.61 y M salida 1.95, y «etapa superior» con Ae/At = 2.38 y M salida 2.39; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-tunel-que-va-al-reves.py",
+      "title": "5 · El túnel que va al revés",
+      "scene": "Clip5",
+      "final_state": "Cierre de la lección y del módulo 2 a pantalla limpia: «Ya sabes romper el aire de frente.» sobre «Ahora, de lado.» en rojo; HUD 'MODULO 05'."
+    }
+  ]
+}

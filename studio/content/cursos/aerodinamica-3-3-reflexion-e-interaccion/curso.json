@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 3.3 Reflexión e interacción de ondas",
+  "description": "Lección 3.3 del curso Aerodinámica (módulo 3: ondas oblicuas, expansiones y perfiles supersónicos), en 4 clips animados —uno por subtema—: la reflexión regular contra una pared sólida y por qué no rebota con el mismo ángulo, la reflexión contra una frontera libre que invierte el tipo de onda, la intersección de dos choques distintos y la línea de deslizamiento que dejan, y los diamantes de Mach de un chorro explicados como ese rebote repetido. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-rebote-contra-la-pared.py",
+      "title": "1 · El rebote contra la pared",
+      "scene": "Clip1",
+      "final_state": "Conducto con el choque incidente bajando y el reflejado subiendo desde el punto de impacto ámbar, y debajo β1 = 31.1, β2 = 35.8 y la cadena M 2.40 → 2.08 → 1.79; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-rebote-que-cambia-de-signo.py",
+      "title": "2 · El rebote que cambia de signo",
+      "scene": "Clip2",
+      "final_state": "El mismo choque llegando a un borde libre punteado en verde y rebotando como abanico cian; debajo, p/p1 = 1.631 tras el choque y 1.001 tras el abanico; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-costura-que-queda.py",
+      "title": "3 · La costura que queda",
+      "scene": "Clip3",
+      "final_state": "Dos choques cruzándose con sus refractados y la línea de deslizamiento ámbar punteada saliendo del cruce, rotulada, con los dos Machs distintos debajo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-los-diamantes-explicados.py",
+      "title": "4 · Los diamantes, explicados",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Una onda no elige cómo rebotar.» sobre «Lo elige el contorno.» en verde; HUD 'MODULO 04'."
+    }
+  ]
+}

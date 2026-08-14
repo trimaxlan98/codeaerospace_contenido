@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 4.4 El régimen transónico y sus soluciones de diseño",
+  "description": "Lección 4.4 del curso Aerodinámica (módulo 4: flujo subsónico compresible, transónico y supersónico linealizado), en 4 clips animados —uno por subtema—: el ala en flecha y el Mach normal efectivo que hace que el perfil crea volar más despacio, el perfil supercrítico de Whitcomb que cambia el pico de succión por una meseta, la regla del área que estrecha el fuselaje justo donde el ala engorda, y la negociación de crucero donde las tres soluciones se suman y cada una cuesta algo. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-barrer-el-ala.py",
+      "title": "1 · Barrer el ala",
+      "scene": "Clip1",
+      "final_state": "A la izquierda el ala recta con su corriente ámbar; a la derecha la barrida 35° con la corriente descompuesta en normal (roja) y paralela (verde); abajo M⊥ = 0.85 · 0.819 = 0.696 en verde; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-perfil-de-whitcomb.py",
+      "title": "2 · El perfil de Whitcomb",
+      "scene": "Clip2",
+      "final_state": "Los dos perfiles con su distribución de succión: arriba el convencional en ámbar con un pico junto al morro, abajo el supercrítico en verde con una meseta y su curvatura trasera; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-regla-del-area.py",
+      "title": "3 · La regla del área",
+      "scene": "Clip3",
+      "final_state": "Distribución de área con las tres curvas: el aporte del ala en ámbar, el total sin corregir en rojo con su bulto, y el corregido en verde, liso; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-lo-que-se-negocia-en-crucero.py",
+      "title": "4 · Lo que se negocia en crucero",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El transónico no se resuelve.» sobre «Se negocia.» en ámbar; HUD 'MODULO 04'."
+    }
+  ]
+}

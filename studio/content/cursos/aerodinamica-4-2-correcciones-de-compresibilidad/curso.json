@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 4.2 Correcciones de compresibilidad subsónica",
+  "description": "Lección 4.2 del curso Aerodinámica (módulo 4: flujo subsónico compresible, transónico y supersónico linealizado), en 4 clips animados —uno por subtema—: la regla de Prandtl-Glauert que convierte un dato de túnel lento en uno de alta velocidad, las tres correcciones y dónde dejan de estar de acuerdo, cuál se parece al dato experimental y por qué pasado el Mach crítico fallan todas, y el efecto sobre la pendiente de la curva de sustentación. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-regla-de-prandtl-glauert.py",
+      "title": "1 · La regla de Prandtl-Glauert",
+      "scene": "Clip1",
+      "final_state": "cp = cp0/√(1−M²) en cian arriba y debajo las tres líneas del caso: cp0 = −0.43, la raíz = 0.714 y cp = −0.602; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-tres-formas-de-corregir.py",
+      "title": "2 · Tres formas de corregir",
+      "scene": "Clip2",
+      "final_state": "Las tres curvas de corrección separándose al subir el Mach, cortadas por una vertical en Mach 0.7 con sus tres valores fuera de la caja (0.602, 0.659, 0.779); HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cual-se-parece-al-dato.py",
+      "title": "3 · ¿Cuál se parece al dato?",
+      "scene": "Clip3",
+      "final_state": "Las tres curvas con los puntos grises del túnel siguiendo a Laitone hasta la vertical roja del Mach crítico y apartándose de las tres después; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-curva-de-sustentacion-se-empina.py",
+      "title": "4 · La curva de sustentación se empina",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La compresibilidad no espera a Mach 1.» sobre «Lleva avisando desde mucho antes.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

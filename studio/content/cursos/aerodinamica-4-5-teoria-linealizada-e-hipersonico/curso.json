@@ -1,0 +1,38 @@
+{
+  "name": "Aerodinámica · 4.5 Teoría supersónica linealizada y panorama hipersónico",
+  "description": "Lección 4.5 del curso Aerodinámica (módulo 4: flujo subsónico compresible, transónico y supersónico linealizado), en 5 clips animados —uno por subtema—: la fórmula de Ackeret y por qué en supersónico solo cuenta el ángulo, los tres arrastres de onda que la linealización separa y suma, cuánto se equivoca frente a la teoría exacta de choque-expansión, el régimen hipersónico donde el gas ideal deja de valer, y el mapa integrador de todo el curso. Cierra el curso. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-formula-de-ackeret.py",
+      "title": "1 · La fórmula de Ackeret",
+      "scene": "Clip1",
+      "final_state": "cl = 4α/√(M²−1) en cian arriba y debajo la tabla de pendientes: M 1.5 → 3.58, M 2 → 2.31, M 3 → 1.41, M 5 → 0.82 /rad; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-tres-arrastres-que-se-suman.py",
+      "title": "2 · Tres arrastres que se suman",
+      "scene": "Clip2",
+      "final_state": "La fórmula del cd de onda en rojo, las tres columnas (ángulo 0.0703, espesor 0.0176, curvatura 0.0000) y abajo la suma cd = 0.0879; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuanto-se-equivoca.py",
+      "title": "3 · Cuánto se equivoca",
+      "scene": "Clip3",
+      "final_state": "Las dos curvas cl(α) a Mach 2 —la exacta en rojo y la recta de Ackeret en cian— con dos puntos rotulados: 0.3 % a 5° en verde y 2.7 % a 15° en rojo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-cuando-el-aire-deja-de-ser-aire.py",
+      "title": "4 · Cuando el aire deja de ser aire",
+      "scene": "Clip4",
+      "final_state": "T0 = 217 · 21 = 4550 K en violeta y debajo la escalera de lo que le pasa al aire: vibración, disociación del oxígeno, del nitrógeno e ionización; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-mapa-completo.py",
+      "title": "5 · El mapa completo",
+      "scene": "Clip5",
+      "final_state": "Cierre del curso a pantalla limpia: «Empezamos preguntando cuándo deja / de valer «incompresible».» sobre «Ya sabes qué hay al otro lado.» en rojo; HUD 'MODULO 05'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 4.1 Ecuación del potencial de perturbación linealizada",
+  "description": "Lección 4.1 del curso Aerodinámica (módulo 4: flujo subsónico compresible, transónico y supersónico linealizado), en 4 clips animados —uno por subtema—: la hipótesis de perturbaciones pequeñas y qué se tira, la ecuación del potencial y su cambio de carácter (elíptica o hiperbólica) según el signo de 1−M², el coeficiente de presión linealizado que ya no necesita la ecuación de la energía, y las dos fronteras donde la teoría deja de valer. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-si-el-perfil-es-delgado.py",
+      "title": "1 · Si el perfil es delgado",
+      "scene": "Clip1",
+      "final_state": "Perfil muy fino con la flecha ámbar de la corriente incidente, y debajo «u'², v'², u'v' ≈ 0» en rojo; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-misma-ecuacion-dos-mundos.py",
+      "title": "2 · La misma ecuación, dos mundos",
+      "scene": "Clip2",
+      "final_state": "Arriba (1−M²)φxx + φyy = 0 con el paréntesis recuadrado en rojo; abajo, a la izquierda los anillos verdes del caso elíptico y a la derecha el cono rojo sombreado del hiperbólico, cada uno rotulado; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-cp-mas-barato-del-curso.py",
+      "title": "3 · El cp más barato del curso",
+      "scene": "Clip3",
+      "final_state": "cp = −2u'/V∞ en cian y debajo «ni energía / ni densidad / ni temperatura» en verde; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-donde-deja-de-valer.py",
+      "title": "4 · Dónde deja de valer",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Una teoría que sabe dónde falla» sobre «vale más que una que no.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

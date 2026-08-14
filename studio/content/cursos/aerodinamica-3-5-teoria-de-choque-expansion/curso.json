@@ -1,0 +1,38 @@
+{
+  "name": "Aerodinámica · 3.5 Teoría de choque-expansión aplicada a perfiles",
+  "description": "Lección 3.5 del curso Aerodinámica (módulo 3: ondas oblicuas, expansiones y perfiles supersónicos), en 5 clips animados —uno por subtema—: la receta (recorrer el contorno cara a cara mirando el signo del giro), la placa plana con su arrastre de onda sin viscosidad, el perfil rómbico y sus cuatro presiones, los dos sumandos del arrastre de onda (sustentación y espesor), y por qué el centro de presiones supersónico está a media cuerda. Cierra el módulo 3. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-receta.py",
+      "title": "1 · La receta",
+      "scene": "Clip1",
+      "final_state": "Las dos herramientas lado a lado: a la izquierda la rampa con su choque rojo bajo «θ > 0, hacia dentro: choque», a la derecha la esquina con su abanico cian bajo «θ < 0, hacia fuera: abanico»; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-placa-plana.py",
+      "title": "2 · La placa plana",
+      "scene": "Clip2",
+      "final_state": "Placa plana a 10° con su choque rojo abajo y su abanico cian arriba, las barras de presión en las dos caras, y a la derecha p/p1 = 0.548 y 1.707 más cl = 0.4075 y cd = 0.0719; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-perfil-rombico.py",
+      "title": "3 · El perfil rómbico",
+      "scene": "Clip3",
+      "final_state": "Perfil rómbico con sus seis ondas y las cuatro barras de presión, y a la derecha las cuatro caras con su p/p1 en rojo o cian según empujen o succionen; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-de-donde-sale-el-arrastre-de-onda.py",
+      "title": "4 · De dónde sale el arrastre de onda",
+      "scene": "Clip4",
+      "final_state": "Tres columnas comparando placa plana y rombo (con y sin ángulo) con sus cl y cd, y debajo cd,onda = cd,sustentación + cd,espesor en rojo; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-centro-de-presiones-se-muda.py",
+      "title": "5 · El centro de presiones se muda",
+      "scene": "Clip5",
+      "final_state": "Cierre de la lección y del módulo 3 a pantalla limpia: «Ya sabes resolver el aire» sobre «cuando va rápido de verdad.» en rojo; HUD 'MODULO 05'."
+    }
+  ]
+}

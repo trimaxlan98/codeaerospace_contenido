@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 1.2 Repaso de termodinámica aplicada",
+  "description": "Lección 1.2 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: el aire como gas ideal y de dónde sale realmente su R, dónde guarda su energía (cv, el trabajo de flujo, cp y el γ que sale del cociente), la primera ley escrita sobre un volumen de control por el que el fluido pasa de largo, y la segunda ley como la flecha que separa el proceso ideal del real. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-aire-como-gas-ideal.py",
+      "title": "1 · El aire, como gas ideal",
+      "scene": "Clip1",
+      "final_state": "Cilindro con el émbolo comprimido a un tercio del volumen, gas cian apretado a la izquierda y barra de presión ámbar alta a la derecha con «p x3.1»; abajo la deducción R = 8314/28.96 = 287 J/(kg K); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-donde-guarda-el-aire-su-energia.py",
+      "title": "2 · Dónde guarda el aire su energía",
+      "scene": "Clip2",
+      "final_state": "Dos filas de barras —arriba cv en cian pegado a R en verde, abajo cp en ámbar de la misma longitud total— y bajo ellas γ = 1005/718 = 1.4 en rojo; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-primera-ley-con-el-fluido-pasando.py",
+      "title": "3 · La primera ley, con el fluido pasando",
+      "scene": "Clip3",
+      "final_state": "Volumen de control punteado con las flechas de entrada 1 y salida 2 en ámbar (las de calor y trabajo ya tachadas), y abajo h1 + V1²/2 = h2 + V2²/2 = h0 en verde; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-flecha-del-tiempo.py",
+      "title": "4 · La segunda ley: la flecha del tiempo",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Casi todo este curso es isentrópico.» sobre «Salvo cuando aparece un choque.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}
