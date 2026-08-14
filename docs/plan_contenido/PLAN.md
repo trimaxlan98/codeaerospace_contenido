@@ -36,13 +36,15 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 13 | Cerrar el enlace: la cuenta en decibelios | Redes satelitales M2 (FSPL, PIRE, C/N0, G/T) + M7 (Shannon, MODCOD, ACM) | `enlace.py` | publicado (PR #9) |
 | 14 | Matematicas en la naturaleza | original (divulgacion pura, heredero visual de Fractales) | `naturaleza.py` | publicado (PR #11) |
 | 15 | Caos: el orden escondido | original (divulgacion pura, tercer titulo de la linea visual) | `caos.py` | publicado (PR #12) |
+| 16 | Relatividad y el GPS | original (divulgacion pura, fisica aplicada a ingenieria) | `relatividad.py` | publicado (PR #13) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
 esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
 (`curso-09-enlace.md` es el curso 13; `curso-11-matematicas-naturaleza.md`
-es el curso 14 y `curso-12-caos.md` el 15 — el `curso-10` lo ocupa la
-familia Aerodinamica, que corre en su propia rama con otro formato).
+es el curso 14, `curso-12-caos.md` el 15 y `curso-13-relatividad-gps.md`
+el 16 — el `curso-10` lo ocupa la familia Aerodinamica, que corre en su
+propia rama con otro formato).
 
 ## Cola de cursos nuevos (desmenuzado)
 
