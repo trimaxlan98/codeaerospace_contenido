@@ -3,7 +3,7 @@ class Clip1(Scene):
 
     La curva del error de densidad crece sola; encima cae el umbral del 5 %
     que la ingenieria tolera, y de ahi sale la banda verde. El 0.3 de los
-    libros no se postula: se lee del corte. (~40 s)"""
+    libros no se postula: se lee del corte. (~44 s)"""
 
     def construct(self):
         rot = Rotulos(self)

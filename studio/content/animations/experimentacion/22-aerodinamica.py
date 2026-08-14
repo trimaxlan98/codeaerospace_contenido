@@ -1,0 +1,140 @@
+import sys
+sys.path.insert(0, "/workspace/studio/content/manim_extensions")
+
+from manim import *
+from aerodinamica import (COLOR_CALCULO, COLOR_EJE, COLOR_SUBSONICO,
+                          COLOR_SUPERSONICO, COLOR_TRANSONICO,
+                          balanza_energias, banda_regimenes, barras_calores,
+                          barras_entalpia, conducto, curva_compresibilidad,
+                          curva_mu, curva_sonido, diagrama_ts,
+                          frentes_moviles, perfil_isa, piston_gas,
+                          pulso_conducto, volumen_control)
+from code_brand import FUENTE_HUD, registrar_fuentes
+
+
+class DemoAerodinamica(Scene):
+    """Demo de aerodinamica.py: el error del modelo incompresible, el Mach
+    como reparto de energias, los cuatro regimenes, los frentes de una fuente
+    movil, el gas ideal con su embolo, cp = cv + R, el volumen de control, el
+    plano T-s, el pulso que define el sonido, a(T) y a(altitud), el cono que
+    se cierra, el conducto de area variable y la entalpia total que no se
+    mueve.
+
+    Todo es geometrico y determinista: mismo script, mismo render. Los
+    localizadores (.punto_de, .fuente, .garganta, .centro_zona) se leen de la
+    posicion actual, y los NUMEROS (.error, .razon, .mu, .a, .valor,
+    .fraccion, .area) salen de la misma fuente que el dibujo.
+    """
+
+    def construct(self):
+        registrar_fuentes()
+        titulo = Text("Aerodinámica", font_size=28, color=COLOR_CALCULO)
+        titulo.to_edge(UP, buff=0.22)
+        self.add(titulo)
+
+        # --- acto 1: el limite del modelo incompresible y el reparto ---
+        curva = curva_compresibilidad(ancho=4.6, alto=2.0)
+        curva.move_to(LEFT * 3.4 + DOWN * 0.6)
+        self.play(FadeIn(curva.ejes), Create(curva.curva), run_time=0.9)
+        self.play(FadeIn(curva.banda), FadeIn(curva.umbral),
+                  FadeIn(curva.etiquetas), run_time=0.5)
+        # Los marcadores que se cuelgan de una pieza se guardan SIEMPRE en un
+        # grupo: al acabar el acto tienen que irse con ella, o la demo va
+        # acumulando puntos sueltos sobre lo que venga despues.
+        marcas = VGroup(Dot(curva.punto_de(0.8), radius=0.06,
+                            color=COLOR_TRANSONICO))
+        self.add(marcas)
+
+        balanza = balanza_energias(0.3, alto=1.8, ancho=0.5, separacion=1.2)
+        balanza.move_to(RIGHT * 3.2 + DOWN * 0.6)
+        self.play(FadeIn(balanza), run_time=0.5)
+        self.play(balanza.a_mach(3.0), run_time=0.7)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(curva, balanza, marcas)), run_time=0.4)
+
+        # --- acto 2: los regimenes y la fuente movil ---
+        banda = banda_regimenes(ancho=8.0, alto=0.55)
+        banda.move_to(DOWN * 2.4)
+        self.play(FadeIn(banda), run_time=0.5)
+        marcas = VGroup(*[Dot(banda.punto_de(m, 0.30), radius=0.055,
+                              color=banda.color_de(m))
+                          for m in (0.2, 0.9, 2.0, 9.0)])
+        self.add(marcas)
+
+        ondas = frentes_moviles(0.0, n_ondas=4, paso=0.34)
+        ondas.shift(RIGHT * 1.6 + UP * 0.4 - ondas.fuente())
+        self.play(FadeIn(ondas), run_time=0.5)
+        for m in (1.0, 2.4):
+            nuevas = ondas.con_mach(m)
+            self.play(ReplacementTransform(ondas, nuevas), run_time=0.6)
+            ondas = nuevas
+        mu = Text(f"mu = {ondas.mu():.1f}", font=FUENTE_HUD, font_size=16,
+                  color=COLOR_SUPERSONICO)
+        mu.move_to(ondas.fuente() + LEFT * 1.3 + UP * 1.35)
+        self.play(FadeIn(mu), run_time=0.3)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(ondas, mu, banda, marcas)), run_time=0.4)
+
+        # --- acto 3: termodinamica ---
+        cilindro = piston_gas(1.0, largo=3.0, alto=1.5, n_particulas=34)
+        cilindro.move_to(LEFT * 3.0 + UP * 0.2)
+        self.play(FadeIn(cilindro), run_time=0.5)
+        self.play(cilindro.a_fraccion(0.4), run_time=0.7)
+
+        calores = barras_calores(ancho=4.4, alto=0.34, separacion=0.46,
+                                 font_size=14)
+        calores.move_to(RIGHT * 3.0 + UP * 0.4)
+        self.play(FadeIn(calores), run_time=0.5)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(cilindro, calores)), run_time=0.4)
+
+        vc = volumen_control(ancho=2.6, alto=1.5, font_size=14)
+        vc.move_to(LEFT * 3.2 + DOWN * 0.2)
+        ts = diagrama_ts(ancho=3.4, alto=2.0, font_size=13)
+        ts.move_to(RIGHT * 3.0 + DOWN * 0.2)
+        self.play(FadeIn(vc), FadeIn(ts.ejes), run_time=0.6)
+        caminos = VGroup(
+            ts.trayecto([(0.2, 0.85), (0.2, 0.3)], color=COLOR_SUBSONICO),
+            ts.trayecto([(0.2, 0.85), (0.5, 0.6), (0.7, 0.45)],
+                        color=COLOR_SUPERSONICO, punteado=True))
+        self.play(*[Create(c) for c in caminos], run_time=0.8)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(vc, ts, caminos)), run_time=0.4)
+
+        # --- acto 4: la velocidad del sonido ---
+        pulso = pulso_conducto(0.2, largo=5.0, alto=0.9, salto=0.34,
+                               color_tubo=COLOR_EJE)
+        pulso.move_to(UP * 1.3)
+        self.play(FadeIn(pulso), run_time=0.5)
+        self.play(pulso.a_avance(0.9), run_time=0.8)
+
+        sonido = curva_sonido(ancho=3.0, alto=1.6, font_size=12)
+        sonido.move_to(LEFT * 3.6 + DOWN * 1.4)
+        isa_perfil = perfil_isa(ancho=2.4, alto=1.8, font_size=12)
+        isa_perfil.move_to(DOWN * 1.4)
+        mus = curva_mu(ancho=2.8, alto=1.6, font_size=12)
+        mus.move_to(RIGHT * 3.6 + DOWN * 1.4)
+        self.play(FadeIn(sonido), FadeIn(isa_perfil), FadeIn(mus),
+                  run_time=0.7)
+        marcas = VGroup(
+            Dot(sonido.punto_de(288.15), radius=0.05, color=COLOR_TRANSONICO),
+            Dot(isa_perfil.punto_de(11000.0), radius=0.05,
+                color=COLOR_TRANSONICO),
+            Dot(mus.punto_de(2.0), radius=0.05, color=COLOR_SUPERSONICO))
+        self.add(marcas)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(pulso, sonido, isa_perfil, mus, marcas)),
+                  run_time=0.4)
+
+        # --- acto 5: el conducto y la entalpia total ---
+        tubo = conducto("delaval", largo=5.0, alto=1.9, color=COLOR_EJE)
+        tubo.move_to(LEFT * 1.6 + DOWN * 0.2)
+        self.play(Create(tubo.paredes), FadeIn(tubo.eje), run_time=0.9)
+        self.add(Line(tubo.punto_de(0.5, -1.0), tubo.punto_de(0.5, 1.0),
+                      stroke_width=2.4, color=COLOR_SUPERSONICO))
+
+        entalpia = barras_entalpia(0.0, alto=2.0, ancho=0.7, font_size=13)
+        entalpia.move_to(RIGHT * 4.4 + DOWN * 0.2)
+        self.play(FadeIn(entalpia), run_time=0.5)
+        self.play(entalpia.a_mach(2.5), run_time=0.8)
+        self.wait(0.6)

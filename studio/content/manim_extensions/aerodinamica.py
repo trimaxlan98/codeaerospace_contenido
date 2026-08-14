@@ -26,12 +26,30 @@ Funciones (los numeros que el clip rotula salen de aqui, nunca a mano):
     mach_de_error           el Mach al que ese error alcanza un porcentaje
     razon_energias          (V^2/2)/e = gamma(gamma-1)/2 M^2
     angulo_mach             mu = arcsen(1/M), en grados
+    razon_temperatura       T0/T = 1 + (gamma-1)/2 M^2
+    fraccion_cinetica       que parte de la entalpia total es V^2/2
 
-Piezas:
+Piezas (leccion 1.1):
     curva_compresibilidad   el error del modelo incompresible frente a M
     balanza_energias        movimiento contra agitacion termica, en reparto
     banda_regimenes         la regla de los cuatro regimenes de vuelo
     frentes_moviles         las ondas que emite una fuente en movimiento
+
+Piezas (leccion 1.2, termodinamica):
+    piston_gas              p V = m R T con un embolo y sus particulas
+    barras_calores          cp = cv + R como una suma de dos trozos
+    volumen_control         la caja imaginaria y lo que cruza sus paredes
+    diagrama_ts             el plano T-s: donde se ve la entropia
+
+Piezas (leccion 1.3, la velocidad del sonido):
+    pulso_conducto          un escalon de presion recorriendo un tubo
+    curva_sonido            a frente a la temperatura
+    perfil_isa              a frente a la altitud, con su tropopausa
+    curva_mu                como se cierra el cono al subir de Mach
+
+Piezas (leccion 1.4, conservacion):
+    conducto                tubo de area variable (recto/conv/div/De Laval)
+    barras_entalpia         h + V^2/2 = h0: una barra de altura fija
 
 Las piezas exponen localizadores (`.punto_de`, `.fuente`, `.centro_zona`)
 que se recalculan sobre la posicion ACTUAL del mobject: siguen siendo validos
@@ -59,8 +77,9 @@ Uso:
 
 import numpy as np
 
-from manim import (AnimationGroup, Circle, DashedLine, Dot, Line, Rectangle,
-                   Text, Transform, VGroup, VMobject, DOWN, LEFT, ORIGIN, UP)
+from manim import (AnimationGroup, Arrow, Circle, DashedLine, DashedVMobject,
+                   Dot, Line, Rectangle, Text, Transform, VGroup, VMobject,
+                   DOWN, LEFT, ORIGIN, UP)
 
 from code_brand import FUENTE_DISPLAY, FUENTE_HUD, registrar_fuentes
 
@@ -143,6 +162,58 @@ def _validar_muestras(nombre, muestras):
         raise ValueError(
             f"{nombre}: muestras={n} supera MUESTRAS_MAX={MUESTRAS_MAX}")
     return max(8, n)
+
+
+def _escalador(origen, rango_x, rango_y, ancho, alto):
+    """Traductor de coordenadas de DATO a coordenadas de escena.
+
+    Se usa DURANTE la construccion, cuando la pieza aun no existe como
+    mobject y por tanto no puede preguntarse por su propio centro. Una vez
+    construida, la pieza usa `_Cartesiano._en`, que ademas suma el
+    desplazamiento acumulado.
+    """
+    o = np.asarray(origen, dtype=np.float64)
+    x0, x1 = float(rango_x[0]), float(rango_x[1])
+    y0, y1 = float(rango_y[0]), float(rango_y[1])
+
+    def en(x, y):
+        fx = (np.asarray(x, dtype=np.float64) - x0) / max(x1 - x0, _EPS)
+        fy = (np.asarray(y, dtype=np.float64) - y0) / max(y1 - y0, _EPS)
+        fx = np.clip(fx, 0.0, 1.0)
+        fy = np.clip(fy, 0.0, 1.0)
+        if np.ndim(fx) == 0 and np.ndim(fy) == 0:
+            return o + np.array([fx * ancho, fy * alto, 0.0])
+        fx, fy = np.broadcast_arrays(fx, fy)
+        return o + np.column_stack([fx * ancho, fy * alto, np.zeros(fx.size)])
+
+    return en
+
+
+class _Cartesiano(VGroup):
+    """Base de las piezas con ejes: recuerda la caja de datos y traduce.
+
+    Las subclases llaman a `_calibrar` DESPUES de haber añadido todos sus
+    submobjects — ahi se congela el centro, y de la diferencia con el centro
+    actual salen los localizadores validos tras un `move_to`.
+    """
+
+    def _calibrar(self, rango_x, rango_y, ancho, alto, origen):
+        self._rx = (float(rango_x[0]), float(rango_x[1]))
+        self._ry = (float(rango_y[0]), float(rango_y[1]))
+        self._ancho = float(ancho)
+        self._alto = float(alto)
+        self._origen = np.asarray(origen, dtype=np.float64)
+        self._centro_original = self.get_center()
+
+    def _en(self, x, y):
+        """Punto de escena del dato (x, y), recortado a la caja."""
+        fx = float(np.clip((float(x) - self._rx[0])
+                           / max(self._rx[1] - self._rx[0], _EPS), 0.0, 1.0))
+        fy = float(np.clip((float(y) - self._ry[0])
+                           / max(self._ry[1] - self._ry[0], _EPS), 0.0, 1.0))
+        return (self._origen
+                + np.array([fx * self._ancho, fy * self._alto, 0.0])
+                + (self.get_center() - self._centro_original))
 
 
 def _ejes_xy(ancho, alto, color=COLOR_EJE):
@@ -262,7 +333,7 @@ def zona_de(mach):
 
 
 # --- 1.1.1 el error del modelo incompresible ---------------------------
-class CurvaCompresibilidad(VGroup):
+class CurvaCompresibilidad(_Cartesiano):
     """Cuanto miente la densidad constante, y hasta donde se le perdona."""
 
     def __init__(self, ejes, curva, banda, umbral, etiquetas, rango_m,
@@ -273,16 +344,7 @@ class CurvaCompresibilidad(VGroup):
         self.banda = banda
         self.umbral = umbral
         self.etiquetas = etiquetas
-        self._m = rango_m
-        self._err = rango_err
-        self._ancho = float(ancho)
-        self._alto = float(alto)
-        self._origen = np.asarray(origen, dtype=np.float64)
-        # Centro al construir: `punto_de` le suma el desplazamiento acumulado
-        # y por eso sigue valiendo tras un move_to. Se congela AQUI y no la
-        # primera vez que se pide, o el primer uso tras mover fijaria el
-        # centro ya desplazado y el localizador quedaria mudo.
-        self._centro_original = self.get_center()
+        self._calibrar(rango_m, rango_err, ancho, alto, origen)
 
     def error(self, mach):
         """El valor que el clip rotula, en fraccion. Misma fuente que el trazo."""
@@ -290,15 +352,7 @@ class CurvaCompresibilidad(VGroup):
 
     def punto_de(self, mach):
         """Punto de escena sobre la curva a ese Mach."""
-        m0, m1 = self._m
-        e0, e1 = self._err
-        x = (float(np.clip(mach, m0, m1)) - m0) / (m1 - m0)
-        y = (self.error(mach) - e0) / (e1 - e0)
-        desplazamiento = self.get_center() - self._centro_original
-        return (self._origen
-                + np.array([x * self._ancho,
-                            float(np.clip(y, 0.0, 1.0)) * self._alto, 0.0])
-                + desplazamiento)
+        return self._en(mach, self.error(mach))
 
 
 def curva_compresibilidad(m_max=1.0, umbral=0.05, ancho=5.8, alto=2.7,
@@ -700,3 +754,765 @@ def frentes_moviles(mach=0.0, n_ondas=5, paso=0.58, color=COLOR_CALCULO,
               "color_cono": color_cono, "color_fuente": color_fuente,
               "grosor": grosor}
     return FrentesMoviles(ondas, cono, punto, estela, m, params)
+
+
+# --- 1.2.1 el gas ideal: p V = m R T -----------------------------------
+class PistonGas(VGroup):
+    """Cilindro con embolo: la mitad de volumen es el doble de presion.
+
+    Las particulas no son azar decorativo — sus posiciones relativas se fijan
+    una sola vez y despues se ESCALAN con el volumen, asi que al comprimir se
+    ve a las MISMAS particulas juntarse. Con posiciones nuevas cada vez, la
+    lectura seria "otro gas" en lugar de "el mismo gas apretado".
+    """
+
+    def __init__(self, cilindro, particulas, embolo, barra, rotulo, fraccion,
+                 unidades, geom, **kwargs):
+        super().__init__(cilindro, particulas, embolo, barra, rotulo,
+                         **kwargs)
+        self.cilindro = cilindro
+        self.particulas = particulas
+        self.embolo = embolo
+        self.barra = barra
+        self.rotulo = rotulo
+        self.fraccion = float(fraccion)
+        self._u = unidades           # posiciones relativas, en [0,1]x[0,1]
+        self._g = geom               # dict con izq, largo, alto, colores...
+        # Ancla para las piezas que se reconstruyen: el CILINDRO, que ni se
+        # mueve ni cambia de tamaño dentro del grupo. No sirve el centro del
+        # grupo (crece y encoge con la barra de presion) ni las coordenadas
+        # de construccion (tras un `move_to` del grupo, las piezas nuevas
+        # apareceran donde el grupo estaba, no donde esta).
+        self._ancla = cilindro.get_center().copy()
+
+    def presion_rel(self):
+        """Presion relativa a la del estado inicial (isotermo: p ~ 1/V)."""
+        return 1.0 / max(self.fraccion, _EPS)
+
+    def _piezas_para(self, fraccion):
+        g = self._g
+        d = self.cilindro.get_center() - self._ancla
+        f = float(np.clip(fraccion, 0.08, 1.0))
+        x_embolo = g["izq"] + f * g["largo"]
+
+        puntos = VGroup(*[
+            Dot(d + np.array([g["izq"] + ux * f * g["largo"],
+                              g["abajo"] + uy * g["alto"], 0.0]),
+                radius=0.036, color=g["color_gas"]).set_opacity(0.85)
+            for ux, uy in self._u])
+
+        embolo = Line(d + np.array([x_embolo, g["abajo"] - 0.06, 0]),
+                      d + np.array([x_embolo, g["abajo"] + g["alto"] + 0.06,
+                                    0]),
+                      stroke_width=6.0, color=g["color_embolo"])
+
+        p = 1.0 / f
+        h = min(p / g["p_max"], 1.0) * g["alto"]
+        barra = Rectangle(width=g["ancho_barra"], height=max(h, 0.03),
+                          stroke_width=0, fill_color=g["color_presion"],
+                          fill_opacity=0.85)
+        barra.move_to(d + np.array([g["x_barra"], g["abajo"] + h / 2, 0]))
+
+        rotulo = _texto_hud(f"p x{p:.1f}", font_size=g["font_size"],
+                            color=g["color_presion"])
+        rotulo.move_to(d + np.array([g["x_barra"], g["abajo"] - 0.30, 0]))
+        return puntos, embolo, barra, rotulo
+
+    def a_fraccion(self, fraccion):
+        """Animacion unica: embolo, gas, barra y cifra se mueven a la vez.
+
+        Van juntas a proposito: separadas, durante medio segundo el numero
+        dice una presion que el dibujo todavia no tiene.
+        """
+        puntos, embolo, barra, rotulo = self._piezas_para(fraccion)
+        self.fraccion = float(np.clip(fraccion, 0.08, 1.0))
+        return AnimationGroup(Transform(self.particulas, puntos),
+                              Transform(self.embolo, embolo),
+                              Transform(self.barra, barra),
+                              Transform(self.rotulo, rotulo))
+
+
+def piston_gas(fraccion=1.0, n_particulas=44, largo=3.6, alto=2.0,
+               p_max=3.2, semilla=17, color_gas=COLOR_CALCULO,
+               color_embolo=COLOR_EJE, color_presion=COLOR_TRANSONICO,
+               font_size=15):
+    """Cilindro de gas con embolo movil y su barra de presion.
+
+    A temperatura constante, apretar el gas a la mitad de volumen dobla su
+    presion: es `p V = m R T` puesta a la vista. `p_max` acota la barra para
+    que una compresion fuerte no se salga del encuadre.
+    """
+    n = int(n_particulas)
+    if n > MUESTRAS_MAX:
+        raise ValueError(f"piston_gas: n_particulas={n} supera "
+                         f"MUESTRAS_MAX={MUESTRAS_MAX}")
+    rng = np.random.default_rng(int(semilla))
+    # Margenes para que ninguna particula nazca pegada a la pared.
+    u = np.column_stack([rng.uniform(0.04, 0.96, n),
+                         rng.uniform(0.06, 0.94, n)])
+
+    izq, abajo = -largo / 2, -alto / 2
+    ancho_barra = 0.34
+    x_barra = izq + largo + 0.72
+
+    cilindro = Rectangle(width=largo, height=alto, stroke_width=2.0,
+                         color=COLOR_EJE)
+    cilindro.move_to((izq + largo / 2, abajo + alto / 2, 0))
+    riel = Line((x_barra - ancho_barra / 2 - 0.16, abajo, 0),
+                (x_barra + ancho_barra / 2 + 0.16, abajo, 0),
+                stroke_width=1.6, color=COLOR_EJE)
+
+    geom = {"izq": izq, "abajo": abajo, "largo": largo, "alto": alto,
+            "p_max": float(p_max), "ancho_barra": ancho_barra,
+            "x_barra": x_barra, "color_gas": color_gas,
+            "color_embolo": color_embolo, "color_presion": color_presion,
+            "font_size": font_size}
+
+    pistola = PistonGas(cilindro, VGroup(), Line(), Rectangle(), VGroup(),
+                        fraccion, u, geom)
+    puntos, embolo, barra, rotulo = pistola._piezas_para(fraccion)
+    # Se reconstruye el grupo con las piezas de verdad: el constructor recibe
+    # placeholders porque `_piezas_para` necesita la geometria ya guardada.
+    pistola.remove(*pistola.submobjects)
+    pistola.particulas, pistola.embolo = puntos, embolo
+    pistola.barra, pistola.rotulo = barra, rotulo
+    pistola.add(cilindro, riel, puntos, embolo, barra, rotulo)
+    return pistola
+
+
+# --- 1.2.2 calores especificos: cp = cv + R ----------------------------
+class BarrasCalores(VGroup):
+    """cp = cv + R dibujado como lo que es: una suma de dos trozos."""
+
+    def __init__(self, barras, etiquetas, valores, **kwargs):
+        super().__init__(barras, etiquetas, **kwargs)
+        self.barras = barras
+        self.etiquetas = etiquetas
+        self._v = dict(valores)
+
+    def valor(self, nombre):
+        """cv, R, cp en J/(kg K), o gamma adimensional. La cifra que rotula
+        el clip sale de aqui, no de la memoria de nadie."""
+        if nombre not in self._v:
+            raise KeyError(f"barras_calores: no hay '{nombre}' "
+                           f"({', '.join(self._v)})")
+        return self._v[nombre]
+
+    def barra(self, i):
+        """0 = cv, 1 = R, 2 = cp (la fila de abajo, que suma las dos)."""
+        return self.barras[i % len(self.barras)]
+
+
+def barras_calores(ancho=6.4, alto=0.46, separacion=0.62, font_size=16,
+                   color_cv=COLOR_CALCULO, color_r=COLOR_SUBSONICO,
+                   color_cp=COLOR_TRANSONICO):
+    """Dos filas: arriba cv y R pegados, abajo cp con la misma longitud total.
+
+    Las longitudes son PROPORCIONALES a los valores reales del aire
+    (cv = 717.6, R = 287.1, cp = 1004.7 J/kg K), asi que la fila de arriba y
+    la de abajo miden lo mismo porque los numeros lo dicen, no porque se haya
+    dibujado asi. De ahi sale gamma = cp/cv = 1.4 sin postularlo.
+    """
+    cv = R_AIRE / (GAMMA - 1)
+    cp = GAMMA * R_AIRE / (GAMMA - 1)
+    escala = ancho / cp
+    x0 = -ancho / 2
+    y_sup = separacion / 2
+    y_inf = -separacion / 2
+
+    def _tramo(x_ini, valor, color, y):
+        largo = valor * escala
+        caja = Rectangle(width=largo, height=alto, stroke_width=0,
+                         fill_color=color, fill_opacity=0.85)
+        caja.move_to((x_ini + largo / 2, y, 0))
+        return caja, x_ini + largo
+
+    caja_cv, x_medio = _tramo(x0, cv, color_cv, y_sup)
+    caja_r, _ = _tramo(x_medio, R_AIRE, color_r, y_sup)
+    caja_cp, _ = _tramo(x0, cp, color_cp, y_inf)
+    barras = VGroup(caja_cv, caja_r, caja_cp)
+
+    etiquetas = VGroup()
+    # Los rotulos van SIEMPRE fuera de su tramo: dentro, un texto del mismo
+    # color que el relleno se pierde (cian sobre cian no se lee), y pintarlo
+    # del color del fondo lo ataria a un tema concreto. Fuera, cada uno cae
+    # sobre negro y se lee igual de bien.
+    for caja, texto, color, lado in ((caja_cv, f"cv = {cv:.0f}", color_cv, UP),
+                                     (caja_r, f"R = {R_AIRE:.0f}", color_r,
+                                      UP),
+                                     (caja_cp, f"cp = {cp:.0f}", color_cp,
+                                      DOWN)):
+        tag = _texto_hud(texto, font_size=font_size, color=color)
+        tag.next_to(caja, lado, buff=0.12)
+        etiquetas.add(tag)
+
+    valores = {"cv": float(cv), "R": float(R_AIRE), "cp": float(cp),
+               "gamma": float(GAMMA)}
+    return BarrasCalores(barras, etiquetas, valores)
+
+
+# --- 1.2.3 / 1.4 el volumen de control ---------------------------------
+class VolumenControl(VGroup):
+    """La caja imaginaria: lo que entra, lo que sale y lo que cruza la pared."""
+
+    def __init__(self, superficie, entrada, salida, calor, trabajo, geom,
+                 **kwargs):
+        super().__init__(superficie, entrada, salida, **kwargs)
+        self.superficie = superficie
+        self.entrada = entrada
+        self.salida = salida
+        self.calor = calor
+        self.trabajo = trabajo
+        self._g = geom
+        for extra in (calor, trabajo):
+            if len(extra):
+                self.add(extra)
+
+    def punto_entrada(self):
+        """Donde el flujo cruza la cara de entrada (para colgar rotulos)."""
+        return self.superficie.get_left() + np.array([0.0, 0.0, 0.0])
+
+    def punto_salida(self):
+        return self.superficie.get_right() + np.array([0.0, 0.0, 0.0])
+
+    def dentro(self, dx=0.0, dy=0.0):
+        """Punto interior de la caja, en unidades de escena desde su centro."""
+        return self.superficie.get_center() + np.array([dx, dy, 0.0])
+
+
+def volumen_control(ancho=3.6, alto=2.2, etiquetas=("1", "2"),
+                    con_calor=True, con_trabajo=True, font_size=17,
+                    color=COLOR_EJE, color_flujo=COLOR_TRANSONICO,
+                    color_calor=COLOR_SUPERSONICO,
+                    color_trabajo=COLOR_SUBSONICO):
+    """Superficie de control punteada con sus flujos de entrada y salida.
+
+    La superficie va PUNTEADA y los flujos en linea continua a proposito: la
+    caja es una eleccion del ingeniero (no existe en el aire), y lo que si
+    existe es lo que la cruza.
+    """
+    caja = Rectangle(width=ancho, height=alto, stroke_width=2.0, color=color)
+    superficie = DashedVMobject(caja, num_dashes=44)
+
+    largo = 1.0
+    entrada = VGroup(Arrow(start=(-ancho / 2 - largo, 0, 0),
+                           end=(-ancho / 2 + 0.06, 0, 0), buff=0,
+                           stroke_width=3.4, color=color_flujo,
+                           max_tip_length_to_length_ratio=0.18))
+    salida = VGroup(Arrow(start=(ancho / 2 - 0.06, 0, 0),
+                          end=(ancho / 2 + largo, 0, 0), buff=0,
+                          stroke_width=3.4, color=color_flujo,
+                          max_tip_length_to_length_ratio=0.18))
+    for grupo, texto, lado in ((entrada, etiquetas[0], UP),
+                               (salida, etiquetas[1], UP)):
+        tag = _texto_hud(texto, font_size=font_size, color=color_flujo)
+        tag.next_to(grupo[0], lado, buff=0.12)
+        grupo.add(tag)
+
+    calor = VGroup()
+    if con_calor:
+        flecha = Arrow(start=(-ancho / 4, -alto / 2 - 0.85, 0),
+                       end=(-ancho / 4, -alto / 2 + 0.06, 0), buff=0,
+                       stroke_width=3.0, color=color_calor,
+                       max_tip_length_to_length_ratio=0.22)
+        tag = _texto_hud("Q", font_size=font_size, color=color_calor)
+        tag.next_to(flecha, DOWN, buff=0.10)
+        calor.add(flecha, tag)
+
+    trabajo = VGroup()
+    if con_trabajo:
+        flecha = Arrow(start=(ancho / 4, alto / 2 - 0.06, 0),
+                       end=(ancho / 4, alto / 2 + 0.85, 0), buff=0,
+                       stroke_width=3.0, color=color_trabajo,
+                       max_tip_length_to_length_ratio=0.22)
+        tag = _texto_hud("W", font_size=font_size, color=color_trabajo)
+        tag.next_to(flecha, UP, buff=0.10)
+        trabajo.add(flecha, tag)
+
+    geom = {"ancho": float(ancho), "alto": float(alto)}
+    return VolumenControl(superficie, entrada, salida, calor, trabajo, geom)
+
+
+# --- 1.2.4 la segunda ley: el plano T-s --------------------------------
+class DiagramaTS(_Cartesiano):
+    """El plano donde se ve lo que la primera ley no distingue: la entropia.
+
+    Las coordenadas son RELATIVAS (0-1 en cada eje) y los ejes van sin
+    numeros. Es deliberado: en este punto del curso la entropia se lee como
+    direccion (a la derecha, nunca a la izquierda), no como cifra.
+    """
+
+    def __init__(self, ejes, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, **kwargs)
+        self.ejes = ejes
+        self._calibrar((0.0, 1.0), (0.0, 1.0), ancho, alto, origen)
+
+    def punto_de(self, s, t):
+        """Punto de escena de un estado (s, T) en coordenadas relativas."""
+        return self._en(s, t)
+
+    def estado(self, s, t, etiqueta=None, color=COLOR_TRANSONICO,
+               font_size=16, direccion=None):
+        """Punto marcado, con su etiqueta si se pide."""
+        punto = Dot(self.punto_de(s, t), radius=0.068, color=color)
+        if etiqueta is None:
+            return VGroup(punto)
+        tag = _texto_hud(etiqueta, font_size=font_size, color=color)
+        tag.next_to(punto, UP if direccion is None else direccion, buff=0.12)
+        return VGroup(punto, tag)
+
+    def trayecto(self, estados, color=COLOR_TRANSONICO, grosor=2.8,
+                 punteado=False):
+        """Camino por una lista de estados (s, T) relativos."""
+        pts = np.array([self.punto_de(s, t) for s, t in estados])
+        if len(pts) < 2:
+            raise ValueError("diagrama_ts: un trayecto necesita 2 estados")
+        linea = VMobject(color=color, stroke_width=grosor)
+        linea.set_points_as_corners(pts) if len(pts) == 2 else \
+            linea.set_points_smoothly(pts)
+        return DashedVMobject(linea, num_dashes=26) if punteado else linea
+
+
+def diagrama_ts(ancho=5.2, alto=3.0, color_ejes=COLOR_EJE, font_size=15):
+    """Ejes (entropia s ->, temperatura T ^) sin numeros, para leer procesos."""
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    tag_x = _texto_hud("ENTROPIA  s", font_size=font_size)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("T", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+    return DiagramaTS(ejes, ancho, alto, origen)
+
+
+# --- 1.3.1 la perturbacion infinitesimal -------------------------------
+class PulsoConducto(VGroup):
+    """Un escalon de presion recorriendo un tubo: eso es el sonido.
+
+    La zona ya alcanzada por el pulso queda teñida y el trazo de presion de
+    arriba sube un escalon: el aire de detras "ya se ha enterado", el de
+    delante no. La velocidad del frente es, por definicion, a.
+    """
+
+    def __init__(self, tubo, tenido, frente, traza, geom, avance, **kwargs):
+        super().__init__(tubo, tenido, traza, frente, **kwargs)
+        self.tubo = tubo
+        self.tenido = tenido
+        self.frente = frente
+        self.traza = traza
+        self.rotulo = VGroup()   # lo rellena `pulso_conducto` al construir
+        self._g = geom
+        self.avance = float(avance)
+        # Ancla de las piezas que se reconstruyen: el TUBO, que no cambia
+        # nunca. Ver la nota de PistonGas — sin esto, tras un `move_to` del
+        # grupo el frente reaparece donde el tubo estaba antes.
+        self._ancla = tubo.get_center().copy()
+
+    def _desfase(self):
+        return self.tubo.get_center() - self._ancla
+
+    def x_frente(self, avance=None):
+        """x de escena del frente para ese avance (0-1)."""
+        g = self._g
+        a = self.avance if avance is None else float(avance)
+        return (g["izq"] + float(np.clip(a, 0.0, 1.0)) * g["largo"]
+                + self._desfase()[0])
+
+    def _piezas_para(self, avance):
+        g = self._g
+        d = self._desfase()
+        a = float(np.clip(avance, 0.0, 1.0))
+        x = g["izq"] + a * g["largo"]
+
+        tenido = Rectangle(width=max(x - g["izq"], 0.02), height=g["alto"],
+                           stroke_width=0, fill_color=g["color_pulso"],
+                           fill_opacity=0.22)
+        tenido.move_to(d + np.array([(g["izq"] + x) / 2, g["y"], 0]))
+
+        frente = Line(d + np.array([x, g["y"] - g["alto"] / 2, 0]),
+                      d + np.array([x, g["y"] + g["alto"] / 2, 0]),
+                      stroke_width=3.0, color=g["color_pulso"])
+
+        # Trazo de presion: escalon alto detras del frente, base delante.
+        y_base = g["y_traza"]
+        y_alto = y_base + g["salto"]
+        traza = VMobject(color=g["color_pulso"], stroke_width=2.4)
+        traza.set_points_as_corners([
+            d + np.array([g["izq"], y_alto, 0]),
+            d + np.array([x, y_alto, 0]),
+            d + np.array([x, y_base, 0]),
+            d + np.array([g["izq"] + g["largo"], y_base, 0])])
+        return tenido, frente, traza
+
+    def a_avance(self, avance):
+        """Animacion unica: teñido, frente y trazo van SIEMPRE juntos."""
+        tenido, frente, traza = self._piezas_para(avance)
+        self.avance = float(np.clip(avance, 0.0, 1.0))
+        return AnimationGroup(Transform(self.tenido, tenido),
+                              Transform(self.frente, frente),
+                              Transform(self.traza, traza))
+
+
+def pulso_conducto(avance=0.15, largo=6.2, alto=1.1, salto=0.42,
+                   color_pulso=COLOR_CALCULO, color_tubo=COLOR_EJE,
+                   font_size=14):
+    """Tubo horizontal con un frente de presion que lo recorre, y su trazo.
+
+    El escalon es pequeño a proposito (`salto` es un delta, no una montaña):
+    la deduccion de a = sqrt(gamma R T) vale para una perturbacion
+    INFINITESIMAL, y un dibujo con una ola gigante contaria otra cosa (esa
+    seria una onda de choque, que llega en el modulo 2).
+    """
+    izq = -largo / 2
+    y = -0.55
+    tubo = Rectangle(width=largo, height=alto, stroke_width=2.0,
+                     color=color_tubo)
+    tubo.move_to((0, y, 0))
+
+    geom = {"izq": izq, "largo": float(largo), "alto": float(alto), "y": y,
+            "y_traza": y + alto / 2 + 0.45, "salto": float(salto),
+            "color_pulso": color_pulso}
+
+    pulso = PulsoConducto(tubo, Rectangle(), Line(), VMobject(), geom, avance)
+    tenido, frente, traza = pulso._piezas_para(avance)
+    pulso.remove(*pulso.submobjects)
+    pulso.tenido, pulso.frente, pulso.traza = tenido, frente, traza
+    # El rotulo comparte color con el tubo: los dos son mobiliario, y quien
+    # aclare el tubo para que se vea la zona aun sin perturbar quiere que el
+    # rotulo se aclare con el.
+    tag = _texto_hud("PRESION", font_size=font_size, color=color_tubo)
+    tag.next_to((izq, geom["y_traza"] + salto, 0), UP, buff=0.10)
+    # Se expone como `.rotulo` y no solo dentro del grupo: los clips encienden
+    # las piezas una a una (`FadeIn(pulso.tubo)`, `FadeIn(pulso.traza)`...) y
+    # una pieza sin nombre propio no llega nunca a la escena.
+    pulso.rotulo = tag
+    pulso.add(tubo, tenido, traza, frente, tag)
+    return pulso
+
+
+# --- 1.3.2 a = sqrt(gamma R T) -----------------------------------------
+class CurvaSonido(_Cartesiano):
+    """La velocidad del sonido solo depende de la temperatura."""
+
+    def __init__(self, ejes, curva, rango_t, rango_a, ancho, alto, origen,
+                 **kwargs):
+        super().__init__(ejes, curva, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self._calibrar(rango_t, rango_a, ancho, alto, origen)
+
+    def a(self, t_kelvin):
+        """m/s a esa temperatura. Misma fuente que el trazo."""
+        return float(velocidad_sonido(t_kelvin))
+
+    def punto_de(self, t_kelvin):
+        return self._en(t_kelvin, self.a(t_kelvin))
+
+
+def curva_sonido(t_rango=(200.0, 320.0), ancho=5.4, alto=2.6,
+                 color=COLOR_CALCULO, color_ejes=COLOR_EJE, font_size=14,
+                 muestras=120):
+    """Ejes (temperatura K ->, velocidad del sonido m/s ^) con a = sqrt(gRT).
+
+    El rango arranca en 200 K y no en 0: entre 0 y 200 K no vuela nadie, y
+    empezar en cero aplastaria en un rincon justo el tramo que importa (la
+    troposfera va de 288 a 217 K).
+    """
+    muestras = _validar_muestras("curva_sonido", muestras)
+    t0, t1 = float(t_rango[0]), float(t_rango[1])
+    ts = np.linspace(t0, t1, muestras)
+    aes = np.asarray(velocidad_sonido(ts), dtype=np.float64)
+    a0, a1 = float(aes.min()) - 6.0, float(aes.max()) + 6.0
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (t0, t1), (a0, a1), ancho, alto)
+    curva = _curva(en(ts, aes), color, grosor=3.0)
+
+    tag_x = _texto_hud("TEMPERATURA  K", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("a   m/s", font_size=font_size)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return CurvaSonido(ejes, curva, (t0, t1), (a0, a1), ancho, alto, origen)
+
+
+# --- 1.3.3 la atmosfera estandar ---------------------------------------
+class PerfilISA(_Cartesiano):
+    """Como cae la velocidad del sonido al subir, y donde deja de caer."""
+
+    def __init__(self, ejes, curva, tropopausa, rango_a, rango_h, ancho, alto,
+                 origen, **kwargs):
+        super().__init__(ejes, tropopausa, curva, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self.tropopausa = tropopausa
+        self._calibrar(rango_a, rango_h, ancho, alto, origen)
+
+    def a(self, altitud_m):
+        """m/s a esa altitud (ISA). La cifra que rotula el clip."""
+        return isa(altitud_m)[3]
+
+    def temperatura(self, altitud_m):
+        return isa(altitud_m)[0]
+
+    def punto_de(self, altitud_m):
+        """Punto sobre el perfil a esa altitud (eje vertical = altitud)."""
+        return self._en(self.a(altitud_m), float(altitud_m))
+
+
+def perfil_isa(h_max=20000.0, ancho=4.6, alto=3.0, color=COLOR_CALCULO,
+               color_ejes=COLOR_EJE, color_tropopausa=COLOR_SUBSONICO,
+               font_size=14, muestras=140):
+    """Perfil de la velocidad del sonido con la altitud (altitud en vertical).
+
+    La altitud va en el eje VERTICAL aunque sea la variable independiente:
+    es un perfil atmosferico, y dibujarlo tumbado obliga al espectador a
+    girar la cabeza para leer "arriba hace mas frio". La linea verde marca la
+    tropopausa, donde la temperatura deja de caer y el sonido se estanca.
+    """
+    muestras = _validar_muestras("perfil_isa", muestras)
+    hs = np.linspace(0.0, float(h_max), muestras)
+    aes = np.array([isa(float(h))[3] for h in hs])
+    a0, a1 = float(aes.min()) - 4.0, float(aes.max()) + 4.0
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (a0, a1), (0.0, float(h_max)), ancho, alto)
+    curva = _curva(en(aes, hs), color, grosor=3.0)
+
+    y_trop = en(a0, H_TROPOPAUSA)[1]
+    tropopausa = VGroup(
+        DashedLine((origen[0], y_trop, 0), (origen[0] + ancho, y_trop, 0),
+                   stroke_width=1.5, color=color_tropopausa, dash_length=0.08))
+    tag = _texto_hud("TROPOPAUSA  11 km", font_size=font_size - 2,
+                     color=color_tropopausa)
+    tag.next_to(tropopausa[0].get_end(), UP, buff=0.08).shift(LEFT * 0.30)
+    tropopausa.add(tag)
+
+    tag_x = _texto_hud("a   m/s", font_size=font_size)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("ALTITUD", font_size=font_size - 1)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return PerfilISA(ejes, curva, tropopausa, (a0, a1), (0.0, float(h_max)),
+                     ancho, alto, origen)
+
+
+# --- 1.3.4 el angulo del cono ------------------------------------------
+class CurvaMu(_Cartesiano):
+    """Como se cierra el cono de Mach al subir la velocidad."""
+
+    def __init__(self, ejes, curva, rango_m, rango_mu, ancho, alto, origen,
+                 **kwargs):
+        super().__init__(ejes, curva, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self._calibrar(rango_m, rango_mu, ancho, alto, origen)
+
+    def mu(self, mach):
+        """Semiangulo en grados. Misma fuente que el trazo."""
+        return angulo_mach(mach)
+
+    def punto_de(self, mach):
+        return self._en(mach, self.mu(mach))
+
+
+def curva_mu(m_rango=(1.0, 6.0), ancho=5.0, alto=2.6, color=COLOR_SUPERSONICO,
+             color_ejes=COLOR_EJE, font_size=14, muestras=140):
+    """Ejes (Mach ->, mu grados ^) con mu = arcsen(1/M), de M = 1 a M = 6."""
+    muestras = _validar_muestras("curva_mu", muestras)
+    m0, m1 = float(m_rango[0]), float(m_rango[1])
+    if m0 < 1.0:
+        raise ValueError("curva_mu: por debajo de M = 1 no hay cono")
+    ms = np.linspace(m0, m1, muestras)
+    mus = np.array([angulo_mach(float(m)) for m in ms])
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (m0, m1), (0.0, 90.0), ancho, alto)
+    curva = _curva(en(ms, mus), color, grosor=3.0)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("mu   grados", font_size=font_size)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return CurvaMu(ejes, curva, (m0, m1), (0.0, 90.0), ancho, alto, origen)
+
+
+# --- 1.4 el conducto de area variable ----------------------------------
+_PERFILES = {
+    "recto": lambda x, ag: np.ones_like(x),
+    "convergente": lambda x, ag: 1.0 - (1.0 - ag) * x,
+    "divergente": lambda x, ag: ag + (1.0 - ag) * x,
+    # De Laval: parabola con el minimo exacto en x = 0.5 y area 1 en los dos
+    # extremos, para que la garganta sea inequivoca sin ajustar nada a ojo.
+    "delaval": lambda x, ag: ag + (1.0 - ag) * (2.0 * x - 1.0) ** 2,
+}
+
+
+class Conducto(VGroup):
+    """Tubo de area variable: la geometria sobre la que se escribe el modulo 2.
+
+    El area se maneja NORMALIZADA (1.0 = area de referencia del perfil) y el
+    dibujo la reparte simetricamente arriba y abajo del eje, que es como se
+    dibuja un conducto cuasi-unidimensional: lo unico que importa es A(x).
+    """
+
+    def __init__(self, paredes, eje, perfil, area_garganta, largo, alto,
+                 izq, y, **kwargs):
+        super().__init__(eje, paredes, **kwargs)
+        self.paredes = paredes
+        self.eje = eje
+        self._perfil = perfil
+        self._ag = float(area_garganta)
+        self._largo = float(largo)
+        self._alto = float(alto)
+        self._izq = float(izq)
+        self._y = float(y)
+        self._centro_original = self.get_center()
+
+    def area(self, x):
+        """Area normalizada en la estacion x (0 = entrada, 1 = salida)."""
+        f = float(np.clip(x, 0.0, 1.0))
+        return float(_PERFILES[self._perfil](np.array([f]), self._ag)[0])
+
+    def punto_de(self, x, y_rel=0.0):
+        """Punto del conducto en la estacion x. `y_rel` va de -1 (pared de
+        abajo) a +1 (pared de arriba); 0 es el eje."""
+        f = float(np.clip(x, 0.0, 1.0))
+        media = self.area(f) * self._alto / 2
+        desplazamiento = self.get_center() - self._centro_original
+        return (np.array([self._izq + f * self._largo,
+                          self._y + float(np.clip(y_rel, -1.0, 1.0)) * media,
+                          0.0]) + desplazamiento)
+
+    def garganta(self):
+        """Punto del eje en la seccion de area minima."""
+        xs = np.linspace(0.0, 1.0, 201)
+        areas = _PERFILES[self._perfil](xs, self._ag)
+        return self.punto_de(float(xs[int(np.argmin(areas))]))
+
+
+def conducto(perfil="delaval", area_garganta=0.42, largo=6.0, alto=2.2,
+             y=0.0, color=COLOR_EJE, muestras=120, grosor=2.6):
+    """Paredes de un conducto de area variable, con su eje punteado.
+
+    `perfil` es 'recto', 'convergente', 'divergente' o 'delaval'.
+    `area_garganta` es el area minima relativa a la de referencia.
+    """
+    if perfil not in _PERFILES:
+        raise ValueError(f"conducto: perfil '{perfil}' desconocido "
+                         f"({', '.join(sorted(_PERFILES))})")
+    muestras = _validar_muestras("conducto", muestras)
+    ag = float(np.clip(area_garganta, 0.06, 1.0))
+    izq = -largo / 2
+
+    xs = np.linspace(0.0, 1.0, muestras)
+    areas = _PERFILES[perfil](xs, ag)
+    x_esc = izq + xs * largo
+    media = areas * alto / 2
+
+    arriba = _curva(np.column_stack([x_esc, y + media, np.zeros_like(xs)]),
+                    color, grosor)
+    abajo = _curva(np.column_stack([x_esc, y - media, np.zeros_like(xs)]),
+                   color, grosor)
+    eje = DashedLine((izq, y, 0), (izq + largo, y, 0), stroke_width=1.2,
+                     color=color, dash_length=0.10)
+    eje.set_opacity(0.6)
+
+    return Conducto(VGroup(arriba, abajo), eje, perfil, ag, largo, alto, izq,
+                    y)
+
+
+# --- 1.4.3 la entalpia total se conserva -------------------------------
+def razon_temperatura(mach):
+    """T0/T = 1 + (gamma-1)/2 M^2. El termometro del flujo compresible."""
+    m = np.asarray(mach, dtype=np.float64)
+    return 1 + (GAMMA - 1) / 2 * m ** 2
+
+
+def fraccion_cinetica(mach):
+    """Que parte de la entalpia TOTAL es energia cinetica: 1 - T/T0.
+
+    Es la lectura de la ecuacion de la energia: h + V^2/2 = h0 constante, asi
+    que acelerar el flujo es gastarse su temperatura. A M = 1 va un 17 %; a
+    M = 3, un 64 %.
+    """
+    return 1.0 - 1.0 / razon_temperatura(mach)
+
+
+class BarrasEntalpia(VGroup):
+    """h + V^2/2 = h0: una barra de altura FIJA que se reparte.
+
+    Que el total no cambie nunca es el mensaje entero del clip — por eso es
+    una barra apilada y no dos barras sueltas: si la suma pudiera crecer, la
+    conservacion dejaria de leerse.
+    """
+
+    def __init__(self, marco, termica, cinetica, rotulo, mach, geom, **kwargs):
+        super().__init__(marco, termica, cinetica, rotulo, **kwargs)
+        self.marco = marco
+        self.termica = termica
+        self.cinetica = cinetica
+        self.rotulo = rotulo
+        self.mach = float(mach)
+        self._g = geom
+
+    def fraccion(self, mach=None):
+        """Fraccion cinetica al Mach actual, o al que se le pase."""
+        return float(fraccion_cinetica(self.mach if mach is None else mach))
+
+    def _piezas_para(self, mach):
+        g = self._g
+        f = self.fraccion(mach)
+        y0 = self.marco.get_bottom()[1]
+        h_term = max(g["alto"] * (1 - f), 0.02)
+        h_cin = max(g["alto"] * f, 0.02)
+        x = self.marco.get_center()[0]
+
+        termica = Rectangle(width=g["ancho"], height=h_term, stroke_width=0,
+                            fill_color=g["color_termica"], fill_opacity=0.85)
+        termica.move_to((x, y0 + h_term / 2, 0))
+        cinetica = Rectangle(width=g["ancho"], height=h_cin, stroke_width=0,
+                             fill_color=g["color_cinetica"], fill_opacity=0.85)
+        cinetica.move_to((x, y0 + h_term + h_cin / 2, 0))
+
+        rotulo = _texto_hud(f"M = {float(mach):g}   {f * 100:.0f} % cinetica",
+                            font_size=g["font_size"],
+                            color=g["color_cinetica"])
+        rotulo.move_to((x, y0 + g["alto"] + 0.34, 0))
+        return termica, cinetica, rotulo
+
+    def a_mach(self, mach):
+        """Animacion unica: los dos tramos y la cifra, siempre a la vez."""
+        termica, cinetica, rotulo = self._piezas_para(mach)
+        self.mach = float(mach)
+        return AnimationGroup(Transform(self.termica, termica),
+                              Transform(self.cinetica, cinetica),
+                              Transform(self.rotulo, rotulo))
+
+
+def barras_entalpia(mach=0.0, alto=2.6, ancho=0.9, font_size=15,
+                    color_termica=COLOR_CALCULO,
+                    color_cinetica=COLOR_TRANSONICO, color_eje=COLOR_EJE):
+    """Barra apilada de altura constante: entalpia estatica + energia cinetica.
+
+    El marco dibuja el TOTAL (h0) y no se mueve nunca; lo unico que cambia es
+    donde esta la frontera entre los dos tramos.
+    """
+    marco = Rectangle(width=ancho, height=alto, stroke_width=1.8,
+                      color=color_eje)
+    geom = {"alto": float(alto), "ancho": float(ancho),
+            "color_termica": color_termica, "color_cinetica": color_cinetica,
+            "font_size": font_size}
+
+    barras = BarrasEntalpia(marco, Rectangle(), Rectangle(), VGroup(), mach,
+                            geom)
+    termica, cinetica, rotulo = barras._piezas_para(mach)
+    barras.remove(*barras.submobjects)
+    barras.termica, barras.cinetica, barras.rotulo = termica, cinetica, rotulo
+    tag = _texto_hud("h0", font_size=font_size, color=color_eje)
+    tag.next_to(marco, LEFT, buff=0.14)
+    barras.add(marco, termica, cinetica, rotulo, tag)
+    return barras

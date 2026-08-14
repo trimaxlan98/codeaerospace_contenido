@@ -4,7 +4,7 @@ class Clip3(Scene):
     Primero POR QUE hay una pared: los frentes que emite una fuente movil se
     apilan delante hasta que, a M = 1, el vehiculo viaja con su propio aviso.
     De ahi sale el cono de Mach y, de ahi, la regla de los cuatro
-    regimenes. (~42 s)"""
+    regimenes. (~44 s)"""
 
     def construct(self):
         rot = Rotulos(self)

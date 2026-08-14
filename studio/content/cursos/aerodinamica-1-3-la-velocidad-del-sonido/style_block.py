@@ -1,6 +1,6 @@
 # =====================================================================
-# CO.DE Academy - "Aerodinámica · 1.1 El número de Mach y los regímenes
-# de vuelo". Bloque de estilo del proyecto. Se antepone al script de CADA
+# CO.DE Academy - "Aerodinámica · 1.3 La velocidad del sonido".
+# Bloque de estilo del proyecto. Se antepone al script de CADA
 # clip; los clips NO repiten imports: solo definen su clase ClipN(Scene).
 #
 # Este bloque es el MOLDE de la familia "Aerodinámica": las 19 lecciones
@@ -109,13 +109,12 @@ MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la curva dibujada y la cifra escrita no pueden discrepar.
-UMBRAL_ERROR = 0.05                    # error de densidad que se tolera
-M_UMBRAL = mach_de_error(UMBRAL_ERROR)  # 0.314 — el "0.3" de los libros
-M_CRUCERO = 0.80                       # donde el error ya es indefendible
-ERR_CRUCERO = float(error_incompresible(M_CRUCERO))   # 0.351
-H_CRUCERO = 11000.0                    # tropopausa ISA, m
-A_CRUCERO = isa(H_CRUCERO)[3]          # 295.1 m/s
-FACTOR_ENERGIAS = GAMMA * (GAMMA - 1) / 2             # 0.28
+T_MAR, A_MAR = isa(0.0)[0], isa(0.0)[3]              # 288.15 K, 340.3 m/s
+T_TROPO, A_TROPO = isa(11000.0)[0], isa(11000.0)[3]  # 216.65 K, 295.1 m/s
+V_EJEMPLO = 250.0              # m/s: el MISMO avion, a dos altitudes
+M_MAR = V_EJEMPLO / A_MAR      # 0.735 — subsonico
+M_TROPO = V_EJEMPLO / A_TROPO  # 0.847 — ya transonico, sin tocar el mando
+MACHS_CONO = (1.2, 2.0, 5.0)   # los tres conos del clip 4
 
 # La flota de la familia: (nombre, Mach de operacion, silueta, altitud m).
 # Mach reales de crucero (o de reentrada, en la capsula); la altitud solo se

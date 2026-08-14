@@ -1,10 +1,17 @@
 # Plan de contenido: de la Academia a los cursos de video
 
-Fecha: 2026-08-06 (ultima actualizacion: 2026-08-13). Responsable de
+Fecha: 2026-08-06 (ultima actualizacion: 2026-08-14). Responsable de
 arquitectura: Fable (guiones, diseño de curso); agentes sonnet/opus escriben
 el codigo de los clips y librerias.
 
 ## Idea central
+
+Hay dos formatos vivos. El original (cursos 1-13) desmenuza la Academy en
+cursos de 8 clips; el nuevo (familia "Aerodinamica", desde 2026-08-14) parte
+de un documento maestro de curso autogestivo y hace **un proyecto por
+leccion**, con un clip por subtema. Lo que NO cambia entre los dos: el tema
+oficial `code_brand`, la libreria por familia, el rango de 28-45 s por clip y
+la validacion visual de frames.
 
 `code-academy-platform` tiene 14 cursos y ~124 lecciones de texto. **No** se
 traduce un curso de la Academia a un curso de video: se **desmenuza** — cada
@@ -38,7 +45,33 @@ Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
 esta tabla).
 
-## Cola de cursos nuevos (desmenuzado)
+## Familia "Aerodinamica" (2026-08-14, formato nuevo)
+
+Encargo distinto a todo lo anterior: la fuente no es la Academy sino un
+**documento maestro de curso autogestivo** (Aerodinamica II, 4 modulos, 20
+lecciones, 83 subtemas), y el cliente pide reciclarlo, asi que la familia se
+titula **Aerodinamica** a secas, sin el "II".
+
+Cambia la granularidad: **un proyecto de ManimStudio = una LECCION**, y cada
+clip = un subtema. Son 4 clips de 33-45 s por proyecto (~2.5-3 min), no los 8
+de los cursos 1-13. Los 20 proyectos comparten una sola libreria
+(`aerodinamica.py`) y un solo `style_block` (el molde: entre dos lecciones
+solo cambia su bloque `# --- Numeros de la leccion ---`).
+
+Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
+
+| Leccion | Proyecto | Clips | Estado |
+|---------|----------|-------|--------|
+| 1.1 | El numero de Mach y los regimenes de vuelo | 4 | versionado, validado en local |
+| 1.2 | Repaso de termodinamica aplicada | 4 | versionado, validado en local |
+| 1.3 | La velocidad del sonido | 4 | versionado, validado en local |
+| 1.4 | Ecuaciones de conservacion | 4 | versionado, validado en local |
+| 1.5 → 4.5 | las 16 restantes | 67 | pendientes |
+
+Pendiente de estas cuatro: `subir_curso.py` contra produccion, renders `qh`,
+narracion TTS y mux. El modulo 1 (1.1-1.5) es la unidad minima publicable.
+
+## Cola de cursos nuevos (desmenuzado de la Academy)
 
 La cola original esta agotada. Los proximos cursos se eligen tema a tema.
 

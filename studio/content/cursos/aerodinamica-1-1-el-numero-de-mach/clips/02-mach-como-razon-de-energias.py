@@ -4,7 +4,7 @@ class Clip2(Scene):
     Arranca con la definicion de manual (M = V/a) y la desmonta: lo que M
     mide es cuanta energia ORDENADA de movimiento lleva el flujo frente a la
     energia DESORDENADA de agitacion termica que el aire ya tenia. La balanza
-    sube de M en M hasta que el movimiento se come al calor. (~43 s)"""
+    sube de M en M hasta que el movimiento se come al calor. (~42 s)"""
 
     def construct(self):
         rot = Rotulos(self)
