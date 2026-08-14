@@ -1,0 +1,56 @@
+{
+  "name": "Relatividad y el GPS",
+  "description": "Curso de divulgación en 8 clips sobre por qué el GPS necesita a Einstein: la posición como medida de tiempo (1 ns = 30 cm), la trilateración y el sesgo del reloj, el reloj de luz y el factor gamma, los muones como prueba experimental, la dilatación especial del satélite (−7.2 µs/día), la gravitatoria (+45.7 µs/día) con la altura de empate a 3186 km, los 38.5 µs/día netos que serían 11.5 km de error diario, y el reloj atómico desafinado de fábrica a 10.22999999544 MHz. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-tu-posicion-es-un-reloj.py",
+      "title": "1 · Tu posición es un reloj",
+      "scene": "Clip1",
+      "final_state": "Satélite cian arriba con el pulso ámbar llegado al pin verde, la cifra '1 ns = 30 cm' en cian y la fórmula d = c·Δt en el pie; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-tres-relojes-te-encuentran.py",
+      "title": "2 · Tres relojes te encuentran",
+      "scene": "Clip2",
+      "final_state": "Los tres círculos verdes inflados por el sesgo con el triángulo de error rojo en el centro y la etiqueta '1 µs = 300 m'; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-reloj-de-luz.py",
+      "title": "3 · El reloj de luz",
+      "scene": "Clip3",
+      "final_state": "Reloj en reposo a la izquierda, zigzag en movimiento a la derecha con la hipotenusa medida, y la curva de gamma con el punto β = 0.5 → 1.1547; γ = 1/√(1−β²) en el pie; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-prueba-que-cae-del-cielo.py",
+      "title": "4 · La prueba que cae del cielo",
+      "scene": "Clip4",
+      "final_state": "Las dos curvas de supervivencia (clásica roja muerta arriba, relativista cian tocando el suelo) con '~10 % llegan' rotulado y γ = 10 arriba; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-reloj-que-vuela.py",
+      "title": "5 · El reloj que vuela",
+      "scene": "Clip5",
+      "final_state": "Órbita GPS a escala con el satélite tras dar la vuelta, v = 3.874 km/s rotulada y la carita de reloj con '−7.21 µs/día' en rojo; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-la-gravedad-tambien-opina.py",
+      "title": "6 · La gravedad también opina",
+      "scene": "Clip6",
+      "final_state": "La curva de deriva contra altura cruzando cero en 3186 km, con la ISS marcada debajo (−24.5) y el GPS encima (+38.5); HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-38-microsegundos.py",
+      "title": "7 · 38 microsegundos",
+      "scene": "Clip7",
+      "final_state": "El mapa con el círculo de error rojo enorme tras 24 h, el contador de horas y '11.5 km/día' rotulado; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-el-reloj-fabricado-lento.py",
+      "title": "8 · El reloj fabricado lento",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «El tiempo no es el mismo para todos.» sobre «Tu teléfono lo corrige a cada segundo.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}

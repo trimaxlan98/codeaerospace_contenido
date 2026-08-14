@@ -1,0 +1,56 @@
+{
+  "name": "Caos: el orden escondido",
+  "description": "Curso de divulgación en 8 clips sobre la teoría del caos: la promesa determinista de Laplace y su ruptura, el mapa logístico y su telaraña, la cascada de duplicaciones con la constante universal de Feigenbaum, el atractor de Lorenz, el efecto mariposa medido con su exponente de Lyapunov, el péndulo doble, por qué caos no es azar (el mapa de retorno y la ventana de periodo 3) y los horizontes de predicción del péndulo, el clima y el sistema solar. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-promesa-rota.py",
+      "title": "1 · La promesa rota",
+      "scene": "Clip1",
+      "final_state": "Atractor de Lorenz ámbar con la trayectoria gemela cian separándose de él y el pie de la traición; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-una-ecuacion-de-nada.py",
+      "title": "2 · Una ecuación de nada",
+      "scene": "Clip2",
+      "final_state": "Telaraña del mapa logístico llenando la caja con r = 3.9 rotulado a la derecha y la fórmula x_{n+1} = r·x_n(1−x_n) arriba a la derecha; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-cascada.py",
+      "title": "3 · La cascada",
+      "scene": "Clip3",
+      "final_state": "Diagrama de bifurcación completo con tres marcadores cian punteados (3.000, 3.449, 3.544) y a la derecha los cocientes convergiendo con flecha a δ = 4.6692…; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-mariposa.py",
+      "title": "4 · La mariposa",
+      "scene": "Clip4",
+      "final_state": "Atractor de Lorenz completo ámbar con el rótulo violeta 'atractor extraño' debajo y las tres ecuaciones arriba a la izquierda; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-el-efecto-mariposa-medido.py",
+      "title": "5 · El efecto mariposa, medido",
+      "scene": "Clip5",
+      "final_state": "Arriba las dos trayectorias gemelas (ámbar/cian); abajo la curva de separación log con su recta de ajuste cian y λ = 0.86 rotulado; fórmula d(t) ≈ d0·e^(λt) en el pie; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-el-pendulo-que-enloquece.py",
+      "title": "6 · El péndulo que enloquece",
+      "scene": "Clip6",
+      "final_state": "Abanico de 25 péndulos dobles (degradado ámbar→cian) abierto en todas direcciones tras la reproducción, con Δθ = 0.01° arriba a la izquierda; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-el-orden-escondido.py",
+      "title": "7 · El orden escondido",
+      "scene": "Clip7",
+      "final_state": "Zoom del diagrama de bifurcación a la ventana de periodo 3 con sus dos líneas verdes punteadas y la etiqueta 'periodo 3'; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-el-horizonte.py",
+      "title": "8 · El horizonte",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «Determinista no significa predecible.» sobre «El caos es orden que no se deja predecir.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}
