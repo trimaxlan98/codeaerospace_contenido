@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 1.1 El número de Mach y los regímenes de vuelo",
+  "description": "Lección 1.1 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: por qué el modelo incompresible caduca y de dónde sale de verdad la regla del M < 0.3, qué mide el número de Mach cuando se lee como una razón de energías, por qué a Mach 1 hay una pared y cómo nace el cono, y quién vuela en cada uno de los cuatro regímenes. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-limite-del-modelo-incompresible.py",
+      "title": "1 · Cuándo deja de valer «incompresible»",
+      "scene": "Clip1",
+      "final_state": "Curva del error de densidad frente a Mach con banda verde hasta M = 0.31, línea cian punteada del 5 % y dos puntos rotulados (el corte en verde y M = 0.80 con «35 %» en ámbar); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-mach-como-razon-de-energias.py",
+      "title": "2 · Mach no es una velocidad",
+      "scene": "Clip2",
+      "final_state": "Balanza de dos columnas al centro —movimiento en ámbar muy alta contra térmica en cian muy baja— con el rótulo «M = 5   ratio 7.00» encima; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-pared-y-los-cuatro-regimenes.py",
+      "title": "3 · La pared del sonido",
+      "scene": "Clip3",
+      "final_state": "Banda horizontal de los cuatro regímenes al centro, cada zona con su nombre y su color (verde, ámbar, rojo, violeta) y las fronteras 0.8, 1.2 y 5 rotuladas debajo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-quien-vuela-en-cada-regimen.py",
+      "title": "4 · Quién vuela en cada régimen",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Un solo número decide» sobre «qué ecuaciones puedes usar.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}
