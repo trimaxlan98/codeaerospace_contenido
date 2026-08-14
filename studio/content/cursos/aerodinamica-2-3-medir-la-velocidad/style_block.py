@@ -1,6 +1,6 @@
 # =====================================================================
-# CO.DE Academy - "Aerodinámica · 1.1 El número de Mach y los regímenes
-# de vuelo". Bloque de estilo del proyecto. Se antepone al script de CADA
+# CO.DE Academy - "Aerodinámica · 2.3 Medición de velocidad en flujo compresible".
+# Bloque de estilo del proyecto. Se antepone al script de CADA
 # clip; los clips NO repiten imports: solo definen su clase ClipN(Scene).
 #
 # Este bloque es el MOLDE de la familia "Aerodinámica": las 19 lecciones
@@ -117,13 +117,13 @@ MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la curva dibujada y la cifra escrita no pueden discrepar.
-UMBRAL_ERROR = 0.05                    # error de densidad que se tolera
-M_UMBRAL = mach_de_error(UMBRAL_ERROR)  # 0.314 — el "0.3" de los libros
-M_CRUCERO = 0.80                       # donde el error ya es indefendible
-ERR_CRUCERO = float(error_incompresible(M_CRUCERO))   # 0.351
-H_CRUCERO = 11000.0                    # tropopausa ISA, m
-A_CRUCERO = isa(H_CRUCERO)[3]          # 295.1 m/s
-FACTOR_ENERGIAS = GAMMA * (GAMMA - 1) / 2             # 0.28
+H_VUELO = 11000.0                    # tropopausa ISA, m
+V_TAS = 250.0                        # velocidad verdadera del ejemplo, m/s
+M_TAS = V_TAS / isa(H_VUELO)[3]      # 0.847 — ya transonico
+ERROR_TAS = float(error_anemometro(M_TAS))     # ~19 % de presion dinamica
+M_SUPER = 2.0                        # el Pitot supersonico del clip 2
+RAYLEIGH = rayleigh_pitot(M_SUPER)   # 5.640 — lo que de verdad lee
+ISENTROPICO = float(razon_presion(M_SUPER))    # 7.824 — lo que leeria sin choque
 
 # La flota de la familia: (nombre, Mach de operacion, silueta, altitud m).
 # Mach reales de crucero (o de reentrada, en la capsula); la altitud solo se

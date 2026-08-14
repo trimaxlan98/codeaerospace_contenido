@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 2.1 Naturaleza física de la onda de choque",
+  "description": "Lección 2.1 del curso Aerodinámica (módulo 2: ondas de choque normales y flujo cuasi-unidimensional), en 4 clips animados —uno por subtema—: cómo un tren de ondas de compresión se alcanza a sí mismo y coalesce en un frente único, cuánto mide de verdad ese frente y por qué vale tratarlo como una discontinuidad, por qué la segunda ley prohíbe los choques de expansión, y cómo se fotografía algo transparente con la técnica Schlieren. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-onda-que-se-alcanza-a-si-misma.py",
+      "title": "1 · La onda que se alcanza a sí misma",
+      "scene": "Clip1",
+      "final_state": "Diagrama x-t con seis características cian cada vez menos inclinadas, el punto de coalescencia marcado en rojo y rotulado «aquí nace el choque», y desde él el frente único en trazo grueso rojo; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-espesor-de-una-discontinuidad.py",
+      "title": "2 · El espesor de una discontinuidad",
+      "scene": "Clip2",
+      "final_state": "Perfil de p/p1 subiendo de 1 a 4.5 en una transición estrechísima, con la barra de escala «200 nm» debajo marcando su anchura real; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-por-que-no-hay-choques-de-expansion.py",
+      "title": "3 · Por qué no hay choques de expansión",
+      "scene": "Clip3",
+      "final_state": "Plano T-s con el trayecto real 1→2 en rojo subiendo a la derecha y el trayecto inverso punteado en verde tachado con una cruz roja; abajo Δs < 0; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-como-se-fotografia-una-onda.py",
+      "title": "4 · Cómo se fotografía una onda",
+      "scene": "Clip4",
+      "final_state": "Banco Schlieren con los rayos paralelos en ámbar, dos desviados en rojo al cruzar la onda, la cuchilla cortándolos y la franja oscura sobre la pantalla; HUD 'MODULO 04'."
+    }
+  ]
+}

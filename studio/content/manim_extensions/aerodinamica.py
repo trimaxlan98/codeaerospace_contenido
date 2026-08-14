@@ -87,10 +87,10 @@ import numpy as np
 
 from manim import (AnimationGroup, Arrow, Circle, DashedLine, DashedVMobject,
                    Dot, Line, Rectangle, Text, Transform, VGroup, VMobject,
-                   DOWN, LEFT, ORIGIN, RIGHT, UP)
+                   DOWN, LEFT, ORIGIN, RIGHT, UP, UR)
 
-from code_brand import (CODE_MUTED, FUENTE_DISPLAY, FUENTE_HUD,
-                        registrar_fuentes)
+from code_brand import (CODE_BG, CODE_MUTED, FUENTE_DISPLAY,
+                        FUENTE_HUD, registrar_fuentes)
 
 # Limites duros: pasarse levanta ValueError (ver docstring del modulo).
 MUESTRAS_MAX = 400      # muestras de una curva parametrica
@@ -1860,3 +1860,859 @@ def tabla_isentropica(machs=(0.5, 1.0, 1.5, 2.0, 3.0), ancho_col=1.42,
         filas.add(fila)
 
     return TablaIsentropica(cabecera, filas, regla, ms)
+
+
+# =======================================================================
+# MODULO 2 — ondas de choque normales y flujo cuasi-unidimensional
+# =======================================================================
+
+# --- 2.2 las relaciones del choque normal ------------------------------
+def choque_normal(mach1):
+    """Salto de propiedades a traves de una onda de choque normal.
+
+    Devuelve un dict con M2, p2/p1, T2/T1, rho2/rho1 y p02/p01, todos en
+    funcion del Mach de entrada. Son las relaciones de Rankine-Hugoniot
+    resueltas para gas ideal calorificamente perfecto — las mismas que
+    tabula NACA 1135.
+
+    Con M1 < 1 levanta ValueError en vez de devolver numeros: un choque de
+    expansion violaria la segunda ley, y ese es justamente el mensaje del
+    clip 3 de la leccion 2.1. Devolver algo aqui lo dejaria pasar callando.
+    """
+    m1 = float(mach1)
+    if m1 < 1.0:
+        raise ValueError(f"choque_normal: M1={m1} < 1; un choque de "
+                         "expansion violaria la segunda ley")
+    g = GAMMA
+    m1c = m1 * m1
+    m2c = (1 + (g - 1) / 2 * m1c) / (g * m1c - (g - 1) / 2)
+    p21 = 1 + 2 * g / (g + 1) * (m1c - 1)
+    r21 = (g + 1) * m1c / (2 + (g - 1) * m1c)
+    t21 = p21 / r21
+    # p02/p01 se escribe con las dos razones y no como exp(-Ds/R) para que
+    # el numero salga de las MISMAS expresiones que se dibujan al lado.
+    p0201 = (r21 ** (g / (g - 1))
+             * ((g + 1) / (2 * g * m1c - (g - 1))) ** (1 / (g - 1)))
+    return {"M2": float(np.sqrt(m2c)), "p2/p1": float(p21),
+            "T2/T1": float(t21), "rho2/rho1": float(r21),
+            "p02/p01": float(p0201)}
+
+
+# Curvas del choque normal, en el orden en que las cuenta el clip:
+# (nombre ASCII, funcion M1 -> valor, color, si crece sin techo).
+SALTOS_CHOQUE = (
+    ("p2/p1", lambda m: choque_normal(m)["p2/p1"], COLOR_SUPERSONICO, True),
+    ("T2/T1", lambda m: choque_normal(m)["T2/T1"], COLOR_TRANSONICO, True),
+    ("rho2/rho1", lambda m: choque_normal(m)["rho2/rho1"], COLOR_SUBSONICO,
+     False),
+    ("M2", lambda m: choque_normal(m)["M2"], COLOR_CALCULO, False),
+)
+
+# Tope asintotico de rho2/rho1 cuando M1 -> infinito: (gamma+1)/(gamma-1).
+COMPRESION_MAXIMA = (GAMMA + 1) / (GAMMA - 1)   # 6.0 para el aire
+
+
+# --- 2.3 medir la velocidad --------------------------------------------
+def rayleigh_pitot(mach1):
+    """p02/p1 de la formula de Rayleigh: Pitot en flujo supersonico.
+
+    Un Pitot supersonico NO mide p0 de la corriente: delante de su boca se
+    forma un choque desprendido, asi que lo que lee es la presion de
+    estancamiento DETRAS del choque. La formula lo tiene en cuenta de una
+    vez, y por eso no es la isentropica.
+    """
+    m1 = float(mach1)
+    if m1 < 1.0:
+        raise ValueError(f"rayleigh_pitot: M1={m1} < 1; en subsonico no hay "
+                         "choque delante del Pitot (usa razon_presion)")
+    g = GAMMA
+    m1c = m1 * m1
+    primero = ((g + 1) ** 2 * m1c / (4 * g * m1c - 2 * (g - 1))) ** (g / (g - 1))
+    segundo = (1 - g + 2 * g * m1c) / (g + 1)
+    return float(primero * segundo)
+
+
+def error_anemometro(mach):
+    """Cuanto se equivoca un anemometro que use la formula incompresible.
+
+    Un tubo de Pitot mide p0 - p. El instrumento incompresible supone que
+    eso vale (1/2) rho V^2; de verdad vale p[(1+0.2M^2)^3.5 - 1]. El
+    cociente menos uno es el error relativo de la presion dinamica, y a
+    M = 0 vale cero por continuidad (el limite del cociente es 1).
+    """
+    m = np.asarray(mach, dtype=np.float64)
+    seguro = np.where(m < 1e-4, 1e-4, m)
+    exacto = razon_presion(seguro) - 1.0
+    incompresible = GAMMA / 2 * seguro ** 2
+    return np.where(m < 1e-4, 0.0, exacto / incompresible - 1.0)
+
+
+# --- 2.4 la relacion area-Mach -----------------------------------------
+def mach_de_area(area_rel, rama="sub"):
+    """Invierte A/A* -> M por biseccion, en la rama que se pida.
+
+    A/A* vale 1 en M = 1 y crece a los dos lados: para un area dada hay DOS
+    Machs posibles, uno subsonico y otro supersonico. Cual de los dos ocurre
+    no lo decide la geometria sino la presion de salida — ese es el asunto de
+    la leccion 2.5. Aqui solo hace falta poder pedir cualquiera de los dos.
+
+    Biseccion y no Newton: la derivada se anula justo en M = 1, que es el
+    borde de los dos intervalos y el caso que mas se pide.
+    """
+    objetivo = float(area_rel)
+    if objetivo < 1.0 - 1e-9:
+        raise ValueError(f"mach_de_area: A/A* = {objetivo} < 1 no existe")
+    if rama not in ("sub", "super"):
+        raise ValueError("mach_de_area: rama debe ser 'sub' o 'super'")
+    if objetivo <= 1.0:
+        return 1.0
+    lo, hi = (1e-6, 1.0) if rama == "sub" else (1.0, 60.0)
+    # 60 bisecciones dejan el intervalo en ~1e-17: de sobra, y el numero
+    # importa porque `perfil_tobera` llama a esto cientos de veces por
+    # render (con 200 el clip tardaba segundos solo en resolver Machs).
+    for _ in range(60):
+        medio = (lo + hi) / 2
+        valor = float(razon_area(medio))
+        # En la rama subsonica A/A* DECRECE con M; en la supersonica crece.
+        if (valor > objetivo) == (rama == "sub"):
+            lo = medio
+        else:
+            hi = medio
+    return float((lo + hi) / 2)
+
+
+# --- 2.1.1 la coalescencia, en el plano x-t ----------------------------
+class DiagramaXT(_Cartesiano):
+    """Ondas de compresion en el plano x-t: la de detras siempre alcanza.
+
+    Cada pulso viaja sobre el gas que ya movio y calento el anterior, asi
+    que va mas rapido. En el plano x-t eso son rectas cada vez MENOS
+    inclinadas, y rectas que se cierran acaban cortandose: ahi nace el
+    choque. La coalescencia no se postula, se ve.
+    """
+
+    def __init__(self, ejes, caracteristicas, choque, corte, t_max, x_max,
+                 ancho, alto, origen, **kwargs):
+        super().__init__(ejes, caracteristicas, choque, **kwargs)
+        self.ejes = ejes
+        self.caracteristicas = caracteristicas
+        self.choque = choque
+        self._corte = corte
+        self._calibrar((0.0, x_max), (0.0, t_max), ancho, alto, origen)
+
+    def caracteristica(self, i):
+        return self.caracteristicas[i % len(self.caracteristicas)]
+
+    def coalescencia(self):
+        """Punto (x, t) donde las dos primeras rectas se cortan: el instante
+        y el sitio en que el frente pasa a ser una discontinuidad."""
+        return self._en(*self._corte)
+
+
+def diagrama_xt(n_ondas=6, c0=1.0, refuerzo=0.16, t_max=1.0, ancho=5.0,
+                alto=2.9, color=COLOR_CALCULO, color_choque=COLOR_SUPERSONICO,
+                color_ejes=COLOR_EJE, font_size=14):
+    """Familia de caracteristicas que convergen, y el choque que forman.
+
+    La onda i sale en t_i y viaja a c0(1 + refuerzo*i): cada una sobre un gas
+    algo mas caliente y ya en movimiento. El corte de las DOS PRIMERAS es el
+    primero en ocurrir, y desde el se dibuja el frente unico.
+    """
+    n = int(n_ondas)
+    if n > ONDAS_MAX:
+        raise ValueError(f"diagrama_xt: n_ondas={n} supera ONDAS_MAX={ONDAS_MAX}")
+    n = max(2, n)
+    t_max = float(t_max)
+    # Instantes de emision y velocidades: la de detras siempre mas rapida.
+    ts = np.linspace(0.0, t_max * 0.42, n)
+    cs = float(c0) * (1 + float(refuerzo) * np.arange(n))
+
+    # Corte de las dos primeras: c0(t-t0) = c1(t-t1)  ->  t y luego x.
+    t_corte = (cs[1] * ts[1] - cs[0] * ts[0]) / (cs[1] - cs[0])
+    x_corte = cs[0] * (t_corte - ts[0])
+    x_max = max(x_corte * 1.9, cs[-1] * (t_max - ts[-1]))
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, x_max), (0.0, t_max), ancho, alto)
+
+    caracteristicas = VGroup()
+    for t0, c in zip(ts, cs):
+        # Cada recta se corta al llegar al frente ya formado, no antes: mas
+        # alla de la coalescencia ya no hay ondas sueltas que dibujar.
+        t_fin = min(t_max, t_corte)
+        pts = np.array([en(0.0, t0), en(c * (t_fin - t0), t_fin)])
+        recta = Line(pts[0], pts[1], stroke_width=2.0, color=color)
+        recta.set_stroke(opacity=0.75)
+        caracteristicas.add(recta)
+
+    # El frente unico, desde la coalescencia hacia arriba y algo mas rapido
+    # que la ultima onda suelta (un choque adelanta al sonido de delante).
+    v_choque = cs[-1] * 1.06
+    choque = Line(en(x_corte, t_corte),
+                  en(x_corte + v_choque * (t_max - t_corte), t_max),
+                  stroke_width=4.0, color=color_choque)
+
+    tag_x = _texto_hud("POSICION  x", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("t", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return DiagramaXT(ejes, caracteristicas, choque, (x_corte, t_corte),
+                      t_max, x_max, ancho, alto, origen)
+
+
+# --- 2.1.2 el espesor real ---------------------------------------------
+class PerfilChoque(VGroup):
+    """El escalon, visto de cerca: ni vertical ni ancho — unas micras."""
+
+    def __init__(self, ejes, curva, escala, salto, ancho, **kwargs):
+        super().__init__(ejes, curva, escala, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self.escala = escala
+        self.salto = float(salto)
+        self._ancho = float(ancho)
+
+
+def perfil_choque(salto=4.5, espesor_rel=0.055, ancho=5.2, alto=2.4,
+                  color=COLOR_SUPERSONICO, color_ejes=COLOR_EJE,
+                  font_size=14, muestras=200, etiqueta="200 nm"):
+    """Perfil real de presion a traves del choque: una tanh muy apretada.
+
+    `espesor_rel` es la fraccion del ancho que ocupa la transicion. Se deja
+    VISIBLE a proposito aunque en la realidad sea invisible: el clip cuenta
+    justamente que el escalon tiene grosor, y un salto pintado vertical
+    diria lo contrario. La barra de escala pone el numero de verdad.
+    """
+    muestras = _validar_muestras("perfil_choque", muestras)
+    s = float(salto)
+    x = np.linspace(-0.5, 0.5, muestras)
+    y = (1 + (s - 1) * (np.tanh(x / max(float(espesor_rel), 1e-3)) + 1) / 2)
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (-0.5, 0.5), (0.0, s * 1.12), ancho, alto)
+    curva = _curva(en(x, y), color, grosor=3.0)
+
+    # Barra de escala bajo la transicion, del ancho real del salto.
+    medio = origen[0] + ancho / 2
+    semi = espesor_rel * ancho * 1.6
+    barra = VGroup(
+        Line((medio - semi, origen[1] - 0.30, 0),
+             (medio + semi, origen[1] - 0.30, 0), stroke_width=2.0,
+             color=color),
+        Line((medio - semi, origen[1] - 0.40, 0),
+             (medio - semi, origen[1] - 0.20, 0), stroke_width=1.6,
+             color=color),
+        Line((medio + semi, origen[1] - 0.40, 0),
+             (medio + semi, origen[1] - 0.20, 0), stroke_width=1.6,
+             color=color))
+    tag = _texto_hud(etiqueta, font_size=font_size, color=color)
+    tag.next_to(barra, DOWN, buff=0.10)
+    escala = VGroup(barra, tag)
+
+    tag_y = _texto_hud("p/p1", font_size=font_size)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_y)
+
+    return PerfilChoque(ejes, curva, escala, s, ancho)
+
+
+# --- 2.1.4 como se fotografia una onda ---------------------------------
+class EsquemaSchlieren(VGroup):
+    """Por que una onda de choque sale en una foto: la luz se dobla.
+
+    Donde la densidad cambia de golpe, el indice de refraccion tambien, y el
+    rayo que la cruza sale desviado. La cuchilla corta justo esos rayos, y
+    en la pantalla queda la sombra de la onda. Es todo el truco.
+    """
+
+    def __init__(self, rayos, seccion, onda, cuchilla, pantalla, banda,
+                 **kwargs):
+        super().__init__(rayos, seccion, onda, cuchilla, pantalla, banda,
+                         **kwargs)
+        self.rayos = rayos
+        self.seccion = seccion
+        self.onda = onda
+        self.cuchilla = cuchilla
+        self.pantalla = pantalla
+        self.banda = banda
+
+
+def esquema_schlieren(n_rayos=9, ancho=8.4, alto=3.0, desviados=(3, 4),
+                      color_luz=COLOR_TRANSONICO, color_onda=COLOR_SUPERSONICO,
+                      color_eje=COLOR_EJE, font_size=13):
+    """Banco Schlieren esquematico: rayos, seccion de ensayo, cuchilla y
+    pantalla. `desviados` son los indices de los rayos que cruzan la onda."""
+    n = max(3, int(n_rayos))
+    if n > ONDAS_MAX * 2:
+        raise ValueError(f"esquema_schlieren: n_rayos={n} es demasiado")
+
+    x0, x_sec, x_cuchilla, x_pant = -ancho / 2, -ancho / 6, ancho / 4, ancho / 2
+    ys = np.linspace(alto / 2, -alto / 2, n)
+    idx = set(int(i) % n for i in desviados)
+
+    rayos = VGroup()
+    for i, y in enumerate(ys):
+        if i in idx:
+            # El rayo que cruza la onda sale con un angulo y se estampa en
+            # la cuchilla: por eso ese trozo de imagen queda oscuro.
+            y_desvio = y - 0.42
+            pts = [(x0, y, 0), (x_sec, y, 0), (x_cuchilla, y_desvio, 0)]
+            color = color_onda
+        else:
+            pts = [(x0, y, 0), (x_pant, y, 0)]
+            color = color_luz
+        rayo = VMobject(color=color, stroke_width=1.8)
+        rayo.set_points_as_corners([np.array(p) for p in pts])
+        rayo.set_stroke(opacity=0.9 if i in idx else 0.55)
+        rayos.add(rayo)
+
+    seccion = VGroup(DashedVMobject(
+        Rectangle(width=ancho / 4, height=alto * 1.12, stroke_width=1.8,
+                  color=color_eje).move_to((x_sec + ancho / 12, 0, 0)),
+        num_dashes=36))
+    onda = Line((x_sec, alto / 2 + 0.2, 0), (x_sec, -alto / 2 - 0.2, 0),
+                stroke_width=3.4, color=color_onda)
+
+    hoja = Rectangle(width=0.22, height=alto / 2 + 0.5, stroke_width=0,
+                     fill_color=color_eje, fill_opacity=1.0)
+    hoja.move_to((x_cuchilla, -alto / 2 - 0.25 + hoja.height / 2, 0))
+    cuchilla = VGroup(hoja)
+    # La pantalla se pinta ILUMINADA (una franja de luz), no como una linea:
+    # la banda de la onda es un HUECO en esa luz, y un hueco solo se ve si
+    # hay algo alrededor de lo que faltar.
+    pantalla = VGroup(Rectangle(width=0.20, height=alto + 0.70,
+                                stroke_width=0, fill_color=color_luz,
+                                fill_opacity=0.55)
+                      .move_to((x_pant, 0, 0)))
+
+    # La franja oscura: donde faltan los rayos que la cuchilla se comio. Se
+    # pinta del color del FONDO —es ausencia de luz, no una marca— con un
+    # filo tenue del color de la onda para que se lea de que es la sombra.
+    y_altos = [ys[i] for i in sorted(idx)]
+    banda = Rectangle(width=0.21,
+                      height=abs(max(y_altos) - min(y_altos)) + 0.34,
+                      stroke_width=1.4, color=color_onda,
+                      fill_color=CODE_BG, fill_opacity=1.0)
+    banda.move_to((x_pant, (max(y_altos) + min(y_altos)) / 2, 0))
+
+    # Cada rotulo se pega a SU pieza para que entre y salga con ella: en un
+    # esquema que se enciende por partes, un rotulo suelto aparece antes que
+    # lo que nombra.
+    for mob, texto, lado in ((seccion, "SECCION", UP),
+                             (cuchilla, "CUCHILLA", DOWN),
+                             (pantalla, "PANTALLA", UP)):
+        tag = _texto_hud(texto, font_size=font_size, color=color_eje)
+        tag.next_to(mob, lado, buff=0.14)
+        mob.add(tag)
+
+    return EsquemaSchlieren(rayos, seccion, onda, cuchilla, pantalla, banda)
+
+
+# --- 2.2 / 2.4 las curvas del choque y del area ------------------------
+# (nombre ASCII, funcion M1 -> valor, color) por grupo. Se separan porque
+# p2/p1 llega a 10 y M2 no pasa de 1: en un mismo eje, el segundo grupo
+# quedaria pegado al suelo y no se leeria nada.
+GRUPOS_CHOQUE = {
+    "saltos": (("p2/p1", lambda m: choque_normal(m)["p2/p1"],
+                COLOR_SUPERSONICO),
+               ("T2/T1", lambda m: choque_normal(m)["T2/T1"],
+                COLOR_TRANSONICO),
+               ("rho2/rho1", lambda m: choque_normal(m)["rho2/rho1"],
+                COLOR_SUBSONICO)),
+    "perdidas": (("M2", lambda m: choque_normal(m)["M2"], COLOR_CALCULO),
+                 ("p02/p01", lambda m: choque_normal(m)["p02/p01"],
+                  COLOR_SUPERSONICO)),
+}
+
+
+class CurvasChoque(_Cartesiano):
+    """Que le hace un choque normal al flujo, en funcion del Mach de entrada."""
+
+    def __init__(self, ejes, curvas, etiquetas, grupo, rango_m, rango_y,
+                 ancho, alto, origen, **kwargs):
+        super().__init__(ejes, curvas, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curvas = curvas
+        self.etiquetas = etiquetas
+        self.grupo = str(grupo)
+        self._calibrar(rango_m, rango_y, ancho, alto, origen)
+
+    def _entradas(self):
+        return GRUPOS_CHOQUE[self.grupo]
+
+    def nombre(self, i):
+        return self._entradas()[i % len(self._entradas())][0]
+
+    def valor(self, i, mach1):
+        """El salto i para ese M1. Misma fuente que la curva dibujada."""
+        return float(self._entradas()[i % len(self._entradas())][1](
+            float(mach1)))
+
+    def color_de(self, i):
+        """Color de la curva i (no `color`: lo sombrearia el del Mobject)."""
+        return self._entradas()[i % len(self._entradas())][2]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+    def punto_de(self, i, mach1):
+        return self._en(mach1, self.valor(i, mach1))
+
+    def vertical_en(self, mach1, color=None, grosor=1.5):
+        """Corte de eje a eje en ese M1, para leer las curvas a la vez."""
+        return DashedLine(self._en(mach1, self._ry[0]),
+                          self._en(mach1, self._ry[1]), stroke_width=grosor,
+                          color=COLOR_EJE if color is None else color,
+                          dash_length=0.08)
+
+
+def curvas_choque(grupo="saltos", m_max=3.0, ancho=5.2, alto=2.8,
+                  color_ejes=COLOR_EJE, font_size=15, muestras=140,
+                  hueco_etiquetas=0.72):
+    """Ejes (M1 ->, salto ^) con las curvas del choque normal.
+
+    `grupo` es 'saltos' (p2/p1, T2/T1, rho2/rho1) o 'perdidas' (M2 y
+    p02/p01). Arranca en M1 = 1 y no en 0: por debajo no hay choque, y
+    dibujar el tramo vacio insinuaria que si.
+    """
+    if grupo not in GRUPOS_CHOQUE:
+        raise ValueError(f"curvas_choque: grupo '{grupo}' desconocido "
+                         f"({', '.join(sorted(GRUPOS_CHOQUE))})")
+    muestras = _validar_muestras("curvas_choque", muestras)
+    m1 = float(m_max)
+    if m1 <= 1.0:
+        raise ValueError("curvas_choque: m_max debe ser mayor que 1")
+    ms = np.linspace(1.0, m1, muestras)
+
+    entradas = GRUPOS_CHOQUE[grupo]
+    series = [np.array([float(f(m)) for m in ms]) for _n, f, _c in entradas]
+    y_lo = 0.0 if grupo == "perdidas" else 1.0
+    y_hi = max(float(s.max()) for s in series) * 1.08
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (1.0, m1), (y_lo, y_hi), ancho, alto)
+
+    curvas = VGroup()
+    etiquetas = VGroup()
+    x_tag = origen[0] + ancho + float(hueco_etiquetas)
+    n = len(entradas)
+    alturas = [0.86 - 0.32 * i for i in range(n)]
+    for i, ((nombre, _f, color), ys) in enumerate(zip(entradas, series)):
+        curvas.add(_curva(en(ms, ys), color, grosor=2.8))
+        fin = en(m1, ys[-1])
+        tag = _texto_hud(nombre, font_size=font_size, color=color)
+        tag.move_to((x_tag + tag.width / 2, origen[1] + alturas[i] * alto, 0))
+        guia = DashedLine(fin + RIGHT * 0.08, tag.get_left() + LEFT * 0.10,
+                          stroke_width=1.2, color=color, dash_length=0.07)
+        guia.set_stroke(opacity=0.55)
+        etiquetas.add(VGroup(guia, tag))
+
+    marcas = VGroup()
+    for valor in (1.0, m1):
+        muesca = Line(en(valor, y_lo) + DOWN * 0.08, en(valor, y_lo),
+                      stroke_width=1.6, color=color_ejes)
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(muesca, DOWN, buff=0.08)
+        marcas.add(muesca, num)
+
+    tag_x = _texto_hud("MACH ANTES DEL CHOQUE", font_size=font_size - 2)
+    tag_x.next_to(ejes[0], DOWN, buff=0.44)
+    ejes.add(marcas, tag_x)
+
+    return CurvasChoque(ejes, curvas, etiquetas, grupo, (1.0, m1),
+                        (y_lo, y_hi), ancho, alto, origen)
+
+
+class CurvaAnemometro(_Cartesiano):
+    """Cuanto miente medir la velocidad con la formula incompresible."""
+
+    def __init__(self, ejes, curva, umbral, etiquetas, m_max, err_max, ancho,
+                 alto, origen, **kwargs):
+        super().__init__(ejes, umbral, curva, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self.umbral = umbral
+        self.etiquetas = etiquetas
+        self._calibrar((0.0, m_max), (0.0, err_max), ancho, alto, origen)
+
+    def error(self, mach):
+        """Error relativo en fraccion. Misma fuente que el trazo."""
+        return float(error_anemometro(mach))
+
+    def punto_de(self, mach):
+        return self._en(mach, self.error(mach))
+
+
+def curva_anemometro(m_max=1.0, umbral=0.05, ancho=5.2, alto=2.6,
+                     color=COLOR_TRANSONICO, color_umbral=COLOR_CALCULO,
+                     color_ejes=COLOR_EJE, font_size=14, muestras=140):
+    """Ejes (Mach ->, error % ^) del anemometro incompresible, con su umbral.
+
+    Es el hermano de `curva_compresibilidad` y cuenta lo mismo desde el otro
+    lado: alli la densidad, aqui el instrumento que la ignora.
+    """
+    muestras = _validar_muestras("curva_anemometro", muestras)
+    m1 = float(m_max)
+    ms = np.linspace(0.0, m1, muestras)
+    errs = np.asarray(error_anemometro(ms), dtype=np.float64)
+    e_hi = float(errs.max()) * 1.10
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, m1), (0.0, e_hi), ancho, alto)
+    curva = _curva(en(ms, errs), color, grosor=3.0)
+
+    y_u = float(np.clip(umbral / e_hi, 0.0, 1.0)) * alto
+    linea = DashedLine(origen + np.array([0.0, y_u, 0.0]),
+                       origen + np.array([ancho, y_u, 0.0]),
+                       stroke_width=1.6, color=color_umbral, dash_length=0.08)
+    tag_u = _texto_hud(f"{umbral * 100:.0f} %", font_size=font_size,
+                       color=color_umbral)
+    tag_u.next_to(linea.get_end(), UP, buff=0.08).shift(LEFT * 0.18)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_display("error del anemómetro", font_size=font_size + 2)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return CurvaAnemometro(ejes, curva, linea, VGroup(tag_u), m1, e_hi, ancho,
+                           alto, origen)
+
+
+class EscaleraVelocidades(VGroup):
+    """IAS, CAS, EAS y TAS: cuatro numeros para la misma velocidad."""
+
+    def __init__(self, barras, valores, nombres, **kwargs):
+        super().__init__(barras, **kwargs)
+        self.barras = barras
+        self._v = list(valores)
+        self._n = list(nombres)
+
+    def barra(self, i):
+        return self.barras[i % len(self.barras)]
+
+    def valor(self, i):
+        """m/s de la lectura i, en el orden IAS, CAS, EAS, TAS."""
+        return self._v[i % len(self._v)]
+
+    def nombre(self, i):
+        return self._n[i % len(self._n)]
+
+
+def escalera_velocidades(tas=250.0, altitud=11000.0, error_posicion=2.0,
+                         ancho=6.0, alto=0.40, separacion=0.30,
+                         font_size=16, color_eje=COLOR_EJE):
+    """Las cuatro velocidades de un anemometro, a escala entre si.
+
+    EAS sale de TAS por la raiz del cociente de densidades — es la unica
+    relacion exacta del grupo y la que explica el salto grande. CAS y IAS se
+    separan de EAS por la compresibilidad y por el error de posicion de la
+    toma, que aqui entra como un dato del avion (`error_posicion`).
+    """
+    tas = float(tas)
+    rho = isa(float(altitud))[2]
+    rho0 = isa(0.0)[2]
+    eas = tas * float(np.sqrt(rho / rho0))
+    # La correccion de compresibilidad va de CAS a EAS y siempre resta:
+    # se estima con el mismo error del anemometro, a mitad de efecto sobre
+    # la velocidad (la presion dinamica va como V^2).
+    mach = tas / isa(float(altitud))[3]
+    cas = eas * (1 + float(error_anemometro(mach)) / 2)
+    ias = cas - float(error_posicion)
+
+    valores = [ias, cas, eas, tas]
+    nombres = ["IAS", "CAS", "EAS", "TAS"]
+    colores = [COLOR_SUBSONICO, COLOR_SUBSONICO, COLOR_CALCULO,
+               COLOR_TRANSONICO]
+    escala = ancho / max(valores)
+
+    barras = VGroup()
+    for i, (v, nombre, color) in enumerate(zip(valores, nombres, colores)):
+        y = -i * (alto + separacion)
+        caja = Rectangle(width=v * escala, height=alto, stroke_width=0,
+                         fill_color=color, fill_opacity=0.85)
+        caja.move_to((-ancho / 2 + v * escala / 2, y, 0))
+        etiqueta = _texto_hud(nombre, font_size=font_size, color=color)
+        etiqueta.next_to(caja, LEFT, buff=0.22)
+        cifra = _texto_hud(f"{v:.0f} m/s", font_size=font_size - 1,
+                           color=color)
+        cifra.next_to(caja, RIGHT, buff=0.18)
+        barras.add(VGroup(caja, etiqueta, cifra))
+
+    return EscaleraVelocidades(barras, valores, nombres)
+
+
+class CurvaAreaMach(_Cartesiano):
+    """A/A* con sus DOS ramas: la misma area, dos Machs posibles."""
+
+    def __init__(self, ejes, rama_sub, rama_super, garganta, etiquetas,
+                 m_max, a_max, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, rama_sub, rama_super, garganta, etiquetas,
+                         **kwargs)
+        self.ejes = ejes
+        self.rama_sub = rama_sub
+        self.rama_super = rama_super
+        self.garganta = garganta
+        self.etiquetas = etiquetas
+        self._calibrar((0.0, m_max), (0.0, a_max), ancho, alto, origen)
+
+    def area(self, mach):
+        return float(razon_area(mach))
+
+    def punto_de(self, mach):
+        return self._en(mach, self.area(mach))
+
+    def mach_de(self, area_rel, rama="sub"):
+        """El Mach que da esa area en la rama pedida (la libreria invierte)."""
+        return mach_de_area(area_rel, rama)
+
+    def horizontal_en(self, area_rel, color=None, grosor=1.5):
+        """Recta de area constante: corta a las DOS ramas, y ese es el punto
+        del clip — una relacion de areas no basta para decidir el Mach."""
+        return DashedLine(self._en(0.0, area_rel), self._en(self._rx[1],
+                                                            area_rel),
+                          stroke_width=grosor,
+                          color=COLOR_EJE if color is None else color,
+                          dash_length=0.08)
+
+
+def curva_area_mach(m_max=3.2, ancho=5.4, alto=2.9, color_sub=COLOR_SUBSONICO,
+                    color_super=COLOR_SUPERSONICO, color_ejes=COLOR_EJE,
+                    font_size=14, muestras=180):
+    """A/A* frente al Mach, con la rama subsonica y la supersonica en
+    colores distintos y la garganta marcada en M = 1.
+
+    Las dos ramas son la MISMA funcion: se pintan distinto porque el clip
+    necesita que se vea que una relacion de areas admite dos soluciones.
+    """
+    muestras = _validar_muestras("curva_area_mach", muestras)
+    m1 = float(m_max)
+    # Se arranca en M = 0.12 y no en 0: A/A* diverge en M -> 0 y el trazo se
+    # iria al infinito arrastrando toda la escala vertical.
+    ms_sub = np.linspace(0.12, 1.0, muestras // 2)
+    ms_sup = np.linspace(1.0, m1, muestras // 2)
+    a_sub = np.array([float(razon_area(m)) for m in ms_sub])
+    a_sup = np.array([float(razon_area(m)) for m in ms_sup])
+    a_hi = max(float(a_sub.max()), float(a_sup.max())) * 1.06
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, m1), (0.0, a_hi), ancho, alto)
+    rama_sub = _curva(en(ms_sub, a_sub), color_sub, grosor=3.0)
+    rama_super = _curva(en(ms_sup, a_sup), color_super, grosor=3.0)
+
+    punto = en(1.0, 1.0)
+    garganta = VGroup(Dot(punto, radius=0.07, color=COLOR_CALCULO),
+                      DashedLine(en(1.0, 0.0), punto, stroke_width=1.3,
+                                 color=COLOR_EJE, dash_length=0.07))
+
+    etiquetas = VGroup()
+    for texto, color, m_ref in (("subsónico", color_sub, 0.30),
+                                ("supersónico", color_super, 2.4)):
+        tag = _texto_display(texto, font_size=font_size + 3, color=color)
+        tag.next_to(en(m_ref, float(razon_area(m_ref))), UR, buff=0.10)
+        etiquetas.add(tag)
+    tag_g = _texto_hud("A/A* = 1", font_size=font_size, color=COLOR_CALCULO)
+    tag_g.next_to(punto, DOWN, buff=0.30)
+    etiquetas.add(tag_g)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_hud("A/A*", font_size=font_size + 1)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    return CurvaAreaMach(ejes, rama_sub, rama_super, garganta, etiquetas, m1,
+                         a_hi, ancho, alto, origen)
+
+
+# --- 2.5 la tobera, regimen a regimen ----------------------------------
+# El orden es el de la subida de presion de salida: de la tobera adaptada a
+# la que ni siquiera se bloquea. (clave, etiqueta, color).
+REGIMENES_TOBERA = (
+    ("diseno", "adaptada", COLOR_SUPERSONICO),
+    ("choque", "choque interno", COLOR_TRANSONICO),
+    ("bloqueo", "bloqueada", COLOR_CALCULO),
+    ("venturi", "sin bloquear", COLOR_SUBSONICO),
+)
+
+
+def _solucion_tobera(xs, areas, regimen, m_garganta, x_choque):
+    """(machs, presiones/p01) a lo largo del conducto para ese regimen.
+
+    `areas` es A(x)/A_garganta. Todo sale de invertir A/A* y de aplicar
+    p/p0 = 1/razon_presion(M); el unico caso con dos tramos es el del
+    choque, y su segundo tramo usa el A* NUEVO que impone la perdida de
+    presion de estancamiento (A*2 = A*1 * p01/p02).
+    """
+    machs = np.empty_like(xs)
+    presiones = np.empty_like(xs)
+
+    if regimen == "choque":
+        salto = choque_normal(mach_de_area(
+            float(np.interp(x_choque, xs, areas)), "super"))
+        factor = salto["p02/p01"]
+    else:
+        salto, factor = None, 1.0
+
+    for k, (x, a) in enumerate(zip(xs, areas)):
+        if regimen == "venturi":
+            m = mach_de_area(a * float(razon_area(m_garganta)), "sub")
+            p0_local = 1.0
+        elif regimen == "bloqueo":
+            m = mach_de_area(a, "sub")
+            p0_local = 1.0
+        elif regimen == "diseno":
+            m = mach_de_area(a, "super" if x > 0.5 else "sub")
+            p0_local = 1.0
+        elif regimen == "choque":
+            if x <= x_choque:
+                m = mach_de_area(a, "super" if x > 0.5 else "sub")
+                p0_local = 1.0
+            else:
+                m = mach_de_area(a * factor, "sub")
+                p0_local = factor
+        else:
+            raise ValueError(f"perfil_tobera: regimen '{regimen}' desconocido")
+        machs[k] = m
+        presiones[k] = p0_local / float(razon_presion(m))
+    return machs, presiones
+
+
+class PerfilTobera(VGroup):
+    """La figura del modulo 2: la tobera arriba, p/p0 abajo, por regimenes.
+
+    Cada curva es una presion de salida distinta sobre la MISMA geometria.
+    Todas comparten el tramo convergente —el bloqueo hace que aguas arriba
+    de la garganta no se entere nadie de lo que pasa detras— y se separan
+    en el divergente. Ese es el mensaje entero de la leccion 2.5.
+    """
+
+    def __init__(self, tubo, ejes, curvas, choques, datos, ancho, alto,
+                 origen, **kwargs):
+        # `choques` es un DICT (clave -> marca) para poder consultarlo por
+        # nombre; al VGroup van sus valores. Y entran AQUI, antes de congelar
+        # el centro: añadir un submobject despues cambiaria el bounding box
+        # y `punto_de` empezaria a mentir.
+        super().__init__(tubo, ejes, curvas, VGroup(*choques.values()),
+                         **kwargs)
+        self.tubo = tubo
+        self.ejes = ejes
+        self.curvas = curvas
+        self.choques = choques
+        self._d = datos           # clave -> (xs, machs, presiones, color)
+        self._ancho = float(ancho)
+        self._alto = float(alto)
+        self._origen = np.asarray(origen, dtype=np.float64)
+        self._centro_original = self.get_center()
+
+    def _clave(self, nombre):
+        if nombre not in self._d:
+            raise KeyError(f"perfil_tobera: no se pidio el regimen "
+                           f"'{nombre}' ({', '.join(self._d)})")
+        return nombre
+
+    def curva(self, nombre):
+        """La traza de p/p0 de ese regimen."""
+        return self.curvas[list(self._d).index(self._clave(nombre))]
+
+    def choque(self, nombre):
+        """La marca vertical del choque interno, o None si ese regimen no
+        tiene ninguno."""
+        return self.choques.get(self._clave(nombre))
+
+    def mach(self, nombre, x):
+        """Mach en la estacion x (0 = entrada, 1 = salida)."""
+        xs, machs, _p, _c = self._d[self._clave(nombre)]
+        return float(np.interp(float(np.clip(x, 0, 1)), xs, machs))
+
+    def presion(self, nombre, x):
+        """p/p0 en la estacion x. Misma fuente que la curva dibujada."""
+        xs, _m, ps, _c = self._d[self._clave(nombre)]
+        return float(np.interp(float(np.clip(x, 0, 1)), xs, ps))
+
+    def salida(self, nombre):
+        """p_salida/p0: el numero que distingue un regimen de otro."""
+        return self.presion(nombre, 1.0)
+
+    def color_de(self, nombre):
+        return self._d[self._clave(nombre)][3]
+
+    def punto_de(self, nombre, x):
+        """Punto de escena sobre la curva de ese regimen."""
+        p = self.presion(nombre, x)
+        desplazamiento = self.get_center() - self._centro_original
+        return (self._origen
+                + np.array([float(np.clip(x, 0, 1)) * self._ancho,
+                            float(np.clip(p, 0.0, 1.0)) * self._alto, 0.0])
+                + desplazamiento)
+
+
+def perfil_tobera(area_garganta=0.42, regimenes=("diseno", "choque",
+                                                 "bloqueo", "venturi"),
+                  m_garganta_venturi=0.55, x_choque=0.74, ancho=6.4,
+                  alto_tubo=1.7, alto_grafico=2.3, hueco=0.55,
+                  color_tubo=CODE_MUTED, color_ejes=COLOR_EJE, font_size=14,
+                  muestras=90):
+    """Tobera De Laval con su grafico de p/p0, una curva por regimen.
+
+    Comparten el eje x con el conducto de arriba, asi que cada punto de la
+    curva cae bajo la seccion que le corresponde. `muestras` se queda corto
+    a proposito (90): cada punto exige invertir A/A* por biseccion.
+    """
+    claves = [str(r) for r in regimenes]
+    validos = {k for k, _e, _c in REGIMENES_TOBERA}
+    for k in claves:
+        if k not in validos:
+            raise ValueError(f"perfil_tobera: regimen '{k}' desconocido "
+                             f"({', '.join(sorted(validos))})")
+    # Impar a la fuerza: con un numero par de muestras la rejilla no cae
+    # nunca en x = 0.5 y la garganta —el punto entero de la leccion— se lee
+    # interpolada, dando M = 0.986 donde tiene que dar 1.
+    muestras = _validar_muestras("perfil_tobera", muestras)
+    muestras = muestras if muestras % 2 else muestras + 1
+
+    tubo = conducto("delaval", area_garganta=area_garganta, largo=ancho,
+                    alto=alto_tubo, color=color_tubo)
+    tubo.shift(UP * (alto_grafico / 2 + hueco + alto_tubo / 2))
+
+    xs = np.linspace(0.0, 1.0, muestras)
+    areas = np.array([tubo.area(x) for x in xs]) / float(area_garganta)
+
+    # El grafico se queda centrado en ORIGIN y es el TUBO el que sube: asi
+    # el origen que devuelve `_ejes_xy` sigue siendo el bueno y `punto_de`
+    # no necesita corregir nada.
+    ejes, origen = _ejes_xy(ancho, alto_grafico, color_ejes)
+    en = _escalador(origen, (0.0, 1.0), (0.0, 1.0), ancho, alto_grafico)
+
+    colores = {k: c for k, _e, c in REGIMENES_TOBERA}
+    curvas = VGroup()
+    choques = {}
+    datos = {}
+    for clave in claves:
+        machs, presiones = _solucion_tobera(xs, areas, clave,
+                                            m_garganta_venturi, x_choque)
+        color = colores[clave]
+        curvas.add(_curva(en(xs, presiones), color, grosor=2.6))
+        datos[clave] = (xs, machs, presiones, color)
+        if clave == "choque":
+            # El choque se marca en el TUBO, no en el grafico: es un sitio
+            # del conducto, y en la curva ya se ve solo como un escalon.
+            marca = Line(tubo.punto_de(x_choque, -1.0),
+                         tubo.punto_de(x_choque, 1.0), stroke_width=3.0,
+                         color=COLOR_SUPERSONICO)
+            choques[clave] = marca
+
+    tag_y = _texto_hud("p/p0", font_size=font_size + 1)
+    tag_y.next_to(ejes[1], UP, buff=0.12)
+    tag_g = _texto_hud("GARGANTA", font_size=font_size - 2)
+    tag_g.move_to((0.0, origen[1] - 0.28, 0))
+    guia = DashedLine(en(0.5, 0.0), en(0.5, 1.0), stroke_width=1.2,
+                      color=color_ejes, dash_length=0.08)
+    guia.set_stroke(opacity=0.6)
+    ejes.add(guia, tag_y, tag_g)
+
+    return PerfilTobera(tubo, ejes, curvas, choques, datos, ancho,
+                        alto_grafico, origen)

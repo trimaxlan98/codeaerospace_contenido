@@ -56,17 +56,23 @@ _bloques.Text = Text
 _code_brand.Text = Text
 
 import aerodinamica as _aero  # noqa: E402  (tras definir la sombra)
-from aerodinamica import (GAMMA, R_AIRE, REGIMENES,  # noqa: E402
-                          angulo_mach, balanza_energias, banda_regimenes,
-                          barras_calores, barras_entalpia, conducto,
-                          criticas, curva_compresibilidad, curva_mu,
-                          curva_sonido, curvas_isentropicas, diagrama_ts,
-                          error_incompresible, fraccion_cinetica,
-                          frentes_moviles, isa, mach_de_error, perfil_isa,
-                          piston_gas, pulso_conducto, razon_area,
-                          razon_densidad, razon_energias, razon_presion,
-                          razon_temperatura, remanso, tabla_isentropica,
-                          velocidad_sonido, volumen_control, zona_de)
+from aerodinamica import (COMPRESION_MAXIMA, GAMMA,  # noqa: E402
+                          REGIMENES, REGIMENES_TOBERA, R_AIRE, angulo_mach,
+                          balanza_energias, banda_regimenes, barras_calores,
+                          barras_entalpia, choque_normal, conducto, criticas,
+                          curva_anemometro, curva_area_mach,
+                          curva_compresibilidad, curva_mu, curva_sonido,
+                          curvas_choque, curvas_isentropicas, diagrama_ts,
+                          diagrama_xt, error_anemometro,
+                          error_incompresible, escalera_velocidades,
+                          esquema_schlieren, fraccion_cinetica,
+                          frentes_moviles, isa, mach_de_area, mach_de_error,
+                          perfil_choque, perfil_isa, perfil_tobera,
+                          piston_gas, pulso_conducto, rayleigh_pitot,
+                          razon_area, razon_densidad, razon_energias,
+                          razon_presion, razon_temperatura, remanso,
+                          tabla_isentropica, velocidad_sonido,
+                          volumen_control, zona_de)
 
 _aero.Text = Text
 
