@@ -1,0 +1,56 @@
+{
+  "name": "Cerrar el enlace: la cuenta en decibelios",
+  "description": "Curso de divulgación en 8 clips sobre el presupuesto de enlace satelital: por qué llegan cuatro billonésimas de vatio y aun así funciona, el decibelio como idioma, la PIRE, la pérdida de espacio libre, el ruido y la figura de mérito G/T, la cascada completa del balance, el techo de Shannon con los MODCOD de DVB-S2X y el margen que se come la lluvia. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-llega-algo.py",
+      "title": "1 · ¿Llega algo?",
+      "scene": "Clip1",
+      "final_state": "Satélite arriba a la derecha y antena parabólica abajo a la izquierda unidos por un haz ámbar rotulado «36 000 km»; al centro la cifra 4.3 × 10⁻¹² W y HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-idioma-numeros-absurdos.py",
+      "title": "2 · Un idioma para números absurdos",
+      "scene": "Clip2",
+      "final_state": "Regla de decibelios al centro con factores lineales arriba en ámbar y decibelios abajo en cian; bajo ella la conversión −113.6 dBW; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-pire-potencia-que-apunta.py",
+      "title": "3 · PIRE: la potencia que apunta",
+      "scene": "Clip3",
+      "final_state": "Lóbulo de radiación ámbar estrecho apuntando a un satélite a la derecha, y la suma 13 dBW + 45 dB = 58 dBW debajo; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-caida-espacio-libre.py",
+      "title": "4 · La caída del espacio libre",
+      "scene": "Clip4",
+      "final_state": "Curva de FSPL con tres curvas rotuladas (2, 12 y 30 GHz) y un punto cian marcado en 205 dB sobre la de 12 GHz; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-ruido-que-nunca-se-apaga.py",
+      "title": "5 · El ruido que nunca se apaga",
+      "scene": "Clip5",
+      "final_state": "Piso de ruido violeta alto con la señal ámbar apenas asomando, termómetro a 400 K a la derecha y el cociente G/T = 13.2 dB/K abajo; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-la-cascada.py",
+      "title": "6 · La cascada",
+      "scene": "Clip6",
+      "final_state": "Cascada de cinco barras (PIRE verde, FSPL y ATM rojas, G/T y −k verdes) con la barra cian del saldo 93.1 dBHz, y encima la conversión a Eb/N0; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-techo-de-shannon.py",
+      "title": "7 · El techo de Shannon",
+      "scene": "Clip7",
+      "final_state": "Curva de Shannon a la derecha con la región prohibida sombreada en rojo y tres MODCOD marcados debajo; constelación 16APSK a la izquierda; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-el-dia-que-llueve.py",
+      "title": "8 · El día que llueve",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «Cerrar el enlace no es tener suerte.» sobre «Es haber hecho la cuenta.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}

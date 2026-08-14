@@ -1,7 +1,8 @@
 # Plan de contenido: de la Academia a los cursos de video
 
-Fecha: 2026-08-06. Responsable de arquitectura: Fable (guiones, diseño de
-curso); agentes sonnet/opus escriben el codigo de los clips y librerias.
+Fecha: 2026-08-06 (ultima actualizacion: 2026-08-13). Responsable de
+arquitectura: Fable (guiones, diseño de curso); agentes sonnet/opus escriben
+el codigo de los clips y librerias.
 
 ## Idea central
 
@@ -13,25 +14,42 @@ CO.DE Academy (`code_brand.py`).
 
 ## Cursos de video existentes (ya en produccion)
 
-| # | Curso | Origen | Estado |
-|---|-------|--------|--------|
-| 1 | Fractales: la belleza de los numeros complejos | original | publicado |
-| 2 | Satelites e IA: la red que aprende a gobernarse | original | publicado |
-| 3 | Mecanica orbital: el ballet de la gravedad | Academy: Mecanica Orbital L1-L9 | publicado |
-| 4 | Señales y espectro: de Fourier al enlace satelital | Academy: Señales y sistemas + SDR | publicado |
+Los cuatro primeros son anteriores al plan (sus scripts solo viven en la DB
+de produccion). Del 5 al 12 son la cola original del desmenuzado, cerrada el
+2026-08-07: los 8 estan versionados en git, renderizados en `qh` en el VPS,
+narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
+
+| # | Curso | Origen | Libreria | Estado |
+|---|-------|--------|----------|--------|
+| 1 | Fractales: la belleza de los numeros complejos | original | — (solo en DB) | publicado |
+| 2 | Satelites e IA: la red que aprende a gobernarse | original | — (solo en DB) | publicado |
+| 3 | Mecanica orbital: el ballet de la gravedad | Academy: Mecanica Orbital L1-L9 | — (solo en DB) | publicado |
+| 4 | Señales y espectro: de Fourier al enlace satelital | Academy: Señales y sistemas + SDR | — (solo en DB) | publicado |
+| 5 | Redes neuronales: la maquina que aprende | IA L2-L6 (gradiente, regresion, logistica, redes, backprop, sobreajuste) | `aprendizaje.py` | publicado (PR #2) |
+| 6 | De la palabra al vector: embeddings y atencion | IA L8-L9 (NLP, embeddings, transformers) | `atencion.py` | publicado (PR #2) |
+| 7 | Agentes de IA: maquinas que operan el mundo | IA L10 + IA Agentica L1, L2, L5-L7 | `agentes.py` | publicado (PR #3) |
+| 8 | SDR: la radio hecha software | SDR L3-L6 (IQ, FFT, waterfall, demodulacion) | `radio.py` | publicado (PR #4) |
+| 9 | Apuntar a un satelite: el arte del seguimiento | APT L1-L4, L6 (Az/El, Doppler, PID) | `apuntado.py` (+ reusa `satelites.py`) | publicado (PR #5) |
+| 10 | El espectro: la guerra invisible por las ondas | Espectro L1-L4, L6 (bandas, lluvia, UIT, NGSO-GSO) | `espectro.py` | publicado (PR #6) |
+| 11 | Control: domar sistemas que se resisten | Señales y sistemas L10-L12, L16 + APT L6-L7 | `control.py` | publicado (PR #7) |
+| 12 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | publicado (PR #8) |
+| 13 | Cerrar el enlace: la cuenta en decibelios | Redes satelitales M2 (FSPL, PIRE, C/N0, G/T) + M7 (Shannon, MODCOD, ACM) | `enlace.py` | publicado (PR #9) |
+| 14 | Matematicas en la naturaleza | original (divulgacion pura, heredero visual de Fractales) | `naturaleza.py` | publicado (PR #11) |
+
+Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
+(la numeracion del archivo es la prioridad en la cola original, no el # de
+esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
+(`curso-09-enlace.md` es el curso 13; `curso-11-matematicas-naturaleza.md`
+es el curso 14 — el `curso-10` lo ocupa la familia Aerodinamica, que corre
+en su propia rama con otro formato).
 
 ## Cola de cursos nuevos (desmenuzado)
 
+La cola original esta agotada. Los proximos cursos se eligen tema a tema.
+
 | Prio | Curso de video (8 clips) | Lecciones fuente (Academy) | Libreria nueva | Estado |
 |------|--------------------------|----------------------------|----------------|--------|
-| 1 | **Redes neuronales: la maquina que aprende** | IA L2-L6 (gradiente, regresion, logistica, redes, backprop, sobreajuste) | `aprendizaje.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 2 | De la palabra al vector: embeddings y atencion | IA L8-L9 (NLP, embeddings, transformers) | `atencion.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 3 | Agentes de IA: maquinas que operan el mundo | IA L10 + IA Agentica L1, L2, L5-L7 | `agentes.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 4 | SDR: la radio hecha software | SDR L3-L6 (IQ, FFT, waterfall, demodulacion) | `radio.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 5 | Apuntar a un satelite: el arte del seguimiento | APT L1-L4, L6 (Az/El, Doppler, PID) | `apuntado.py` (+ reusa `satelites.py`) | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 6 | El espectro: la guerra invisible por las ondas | Espectro L1-L4, L6 (bandas, lluvia, UIT, NGSO-GSO) | `espectro.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 7 | Control: domar sistemas que se resisten | Señales y sistemas L10-L12, L16 + APT L6-L7 | `control.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
-| 8 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | **validado en local** (8 clips ql revisados frame a frame; falta qh + narracion en prod) |
+| — | _(por definir)_ | | | |
 
 Criterio de prioridad: (1) riqueza visual con primitivas existentes o
 factibles, (2) tamaño de audiencia, (3) actualidad del tema, (4) no
@@ -45,13 +63,45 @@ canibalizar cursos de video ya publicados.
    (opus) y clips en `studio/content/cursos/<slug>/clips/` (sonnet), todo
    **versionado en git** — a diferencia de los 4 cursos previos, cuyos
    scripts solo viven en la DB de produccion.
-3. **Validacion local**: render `ql` en Docker + revision visual de frames
-   (regla dura: **nada encimado**; los textos se relevan con `Rotulos`).
+3. **Validacion local**: `studio/tools/render_local.py <curso> --todos`
+   compone el script igual que el runner (style_block + clip + identidad) y
+   lo renderiza en `ql` en Docker, dejando video y frames PNG en
+   `render_jobs/validacion/<slug>/`. Revision visual obligatoria de esos
+   frames (regla dura: **nada encimado**; los textos se relevan con
+   `Rotulos`) y dos revisores de vision por curso antes de dar por bueno.
 4. **Subida**: `studio/tools/subir_curso.py` sincroniza el directorio del
    curso con la DB del backend (proyecto + clips) usando los modulos de
    `app/` — mismas validaciones que la API.
 5. **Produccion (VPS)**: pull, subir_curso, renders `qh` por la cola del
-   Studio, narracion TTS, export + mux.
+   Studio, narracion TTS (`studio/tools/guiones.py`), export + mux.
+
+### Restricciones operativas (aprendidas en los 8 cursos de la cola)
+
+- **Duracion de clip: 28-45 s**, tope duro. `render_local.py` avisa cuando
+  un clip se sale del rango.
+- **Pies de al menos 5 s**, y el pie cambia **antes** del transform que
+  ilustra — nunca despues.
+- **El VPS no tiene `ffmpeg`**: el mux final (clips + voz →
+  `exports/<slug>/curso_narrado.mp4`) se hace en local, con los renders `qh`
+  bajados del VPS.
+- Imagen Docker local: `codeaerospace_contenido-manim` (no
+  `manimstudio-render`, que es otra cosa).
+- Render `qh` ≈ frames/2.5 s (Cairo single-thread); el timeout del VPS es
+  1200 s por job.
+
+## Arrancar un curso nuevo
+
+1. Elegir el hilo conceptual y las lecciones fuente; anotarlo en la cola de
+   arriba con su libreria nueva.
+2. Escribir el storyboard en `docs/plan_contenido/curso-NN-<tema>.md`
+   siguiendo el formato de los ocho existentes (paleta con nombres `C_*`,
+   clip a clip: intencion, visual, rotulos y pies literales, final_state).
+3. Rama `curso/<tema>`, libreria en `manim_extensions/`, curso en
+   `studio/content/cursos/<slug>/` (`curso.json` + `style_block.py` +
+   `clips/NN-*.py`, una clase `ClipN(Scene)` por archivo).
+4. `render_local.py --todos --frames 8` → revision visual → fixes.
+5. `cd studio/backend && venv/bin/pytest -q` (los tests del Studio deben
+   seguir en verde) → PR → merge → deploy y narracion en el VPS.
 
 ## Estructura versionada de un curso
 

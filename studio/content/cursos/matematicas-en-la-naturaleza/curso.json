@@ -1,0 +1,56 @@
+{
+  "name": "Matemáticas en la naturaleza",
+  "description": "Curso de divulgación en 8 clips sobre el código matemático de lo vivo: el girasol que reparte semillas con el ángulo áureo, φ y la espiral logarítmica (con el mito del nautilus corregido), el helecho de Barnsley y el micelio como instrucciones repetidas, los patrones de Turing que pintan el pelaje del gato, la sinuosidad ~π de los ríos, e como ritmo del crecimiento continuo y el hexágono del panal como mínimo material. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-nadie-le-enseno-a-contar.py",
+      "title": "1 · Nadie le enseñó a contar",
+      "scene": "Clip1",
+      "final_state": "Disco de filotaxis completo (ámbar a verde) con dos parásticas marcadas (cian y ámbar) y la sucesión de Fibonacci abajo con 21 y 34 encendidos; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-angulo-que-no-se-repite.py",
+      "title": "2 · El ángulo que no se repite",
+      "scene": "Clip2",
+      "final_state": "Disco de filotaxis lleno y parejo con el rótulo 'giro: 137.5°' en cian a la izquierda y el pie con la moraleja del reparto; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-espiral-que-no-cambia.py",
+      "title": "3 · La espiral que no cambia de forma",
+      "scene": "Clip3",
+      "final_state": "Espiral logarítmica áurea ámbar a la derecha con su tag 'áurea b = 0.31', y a la izquierda el gato enroscado con la espiral verde abrazando el ovillo; φ = 1.618… arriba a la izquierda; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-instrucciones-que-se-repiten.py",
+      "title": "4 · Instrucciones que se repiten",
+      "scene": "Clip4",
+      "final_state": "Tríptico: helecho de Barnsley verde (imagen) a la izquierda, árbol fractal al centro y red de micelio a la derecha, con el pie del genoma; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-las-rayas-del-gato.py",
+      "title": "5 · Las rayas del gato",
+      "scene": "Clip5",
+      "final_state": "Dos gatos sentados frente a frente con pelaje calculado por Gray-Scott — atigrado a la izquierda, moteado a la derecha — con los parámetros F/K de rayas arriba a la derecha; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-pi-baja-por-el-rio.py",
+      "title": "6 · π baja por el río",
+      "scene": "Clip6",
+      "final_state": "Río muy sinuoso ámbar con su cuerda cian punteada, dos circunferencias fantasma abrazando curvas, 'sinuosidad = 3.14' en cian y la fórmula camino/recta ≈ π en el pie; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-el-ritmo-de-lo-vivo.py",
+      "title": "7 · El ritmo de lo vivo",
+      "scene": "Clip7",
+      "final_state": "Curva exponencial ámbar con la escalera compuesta n=52 pegada, e = 2.71828… en cian a la derecha, la mini-curva violeta del decaer abajo a la derecha; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-el-precio-de-la-cera.py",
+      "title": "8 · El precio de la cera",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «La naturaleza no sabe matemáticas.» sobre «Matemáticas es el nombre de lo que no desperdicia.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}
