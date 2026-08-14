@@ -28,6 +28,9 @@ Funciones (los numeros que el clip rotula salen de aqui, nunca a mano):
     angulo_mach             mu = arcsen(1/M), en grados
     razon_temperatura       T0/T = 1 + (gamma-1)/2 M^2
     fraccion_cinetica       que parte de la entalpia total es V^2/2
+    razon_presion           p0/p = (1 + (gamma-1)/2 M^2)^3.5
+    razon_area              A/A*, la cuarta columna de la tabla
+    criticas                T*/T0, p*/p0, rho*/rho0 y a*/a0 (numeros fijos)
 
 Piezas (leccion 1.1):
     curva_compresibilidad   el error del modelo incompresible frente a M
@@ -50,6 +53,11 @@ Piezas (leccion 1.3, la velocidad del sonido):
 Piezas (leccion 1.4, conservacion):
     conducto                tubo de area variable (recto/conv/div/De Laval)
     barras_entalpia         h + V^2/2 = h0: una barra de altura fija
+
+Piezas (leccion 1.5, estancamiento):
+    remanso                 la corriente que se para contra un cuerpo romo
+    curvas_isentropicas     T/T0, rho/rho0 y p/p0 cayendo con el Mach
+    tabla_isentropica       la tabla de NACA 1135, generada y no transcrita
 
 Las piezas exponen localizadores (`.punto_de`, `.fuente`, `.centro_zona`)
 que se recalculan sobre la posicion ACTUAL del mobject: siguen siendo validos
@@ -79,9 +87,10 @@ import numpy as np
 
 from manim import (AnimationGroup, Arrow, Circle, DashedLine, DashedVMobject,
                    Dot, Line, Rectangle, Text, Transform, VGroup, VMobject,
-                   DOWN, LEFT, ORIGIN, UP)
+                   DOWN, LEFT, ORIGIN, RIGHT, UP)
 
-from code_brand import FUENTE_DISPLAY, FUENTE_HUD, registrar_fuentes
+from code_brand import (CODE_MUTED, FUENTE_DISPLAY, FUENTE_HUD,
+                        registrar_fuentes)
 
 # Limites duros: pasarse levanta ValueError (ver docstring del modulo).
 MUESTRAS_MAX = 400      # muestras de una curva parametrica
@@ -1516,3 +1525,338 @@ def barras_entalpia(mach=0.0, alto=2.6, ancho=0.9, font_size=15,
     tag.next_to(marco, LEFT, buff=0.14)
     barras.add(marco, termica, cinetica, rotulo, tag)
     return barras
+
+
+# --- 1.5.1 el punto de remanso -----------------------------------------
+class Remanso(VGroup):
+    """La corriente llega a un cuerpo romo y en la punta se para del todo.
+
+    Las lineas se integran sobre el campo de velocidad del flujo potencial
+    alrededor de un cilindro. Es el patron INCOMPRESIBLE, y aqui solo cumple
+    una funcion: localizar el punto de remanso y hacer ver que la linea
+    central muere en el. A Mach supersonico habria delante una onda de
+    choque desprendida — eso llega en el modulo 3, y por eso el clip que usa
+    esta pieza habla de la definicion de T0, no del campo real.
+    """
+
+    def __init__(self, cuerpo, lineas, radio, **kwargs):
+        super().__init__(lineas, cuerpo, **kwargs)
+        self.cuerpo = cuerpo
+        self.lineas = lineas
+        self._radio = float(radio)
+        self._centro_original = self.get_center()
+
+    def linea(self, i):
+        return self.lineas[i % len(self.lineas)]
+
+    def centro_cuerpo(self):
+        """Centro actual del obstaculo."""
+        return self.cuerpo.get_center()
+
+    def punto(self):
+        """El punto de remanso: el morro del cuerpo, donde muere la linea
+        central. Se lee del cuerpo, asi que sigue valiendo tras un move_to."""
+        return self.centro_cuerpo() + np.array([-self._radio, 0.0, 0.0])
+
+
+def _corriente(y0, radio, x_ini, x_fin, ds, pasos):
+    """Traza una linea de corriente sobre el campo del cilindro.
+
+    Se avanza por LONGITUD DE ARCO y no en x: cerca del cuerpo la linea se
+    pone casi vertical y un paso en x la mandaria al infinito. El campo es
+    tangente a la superficie, asi que las lineas que no son la central
+    rodean el cilindro por si solas; la central se para en el morro, que es
+    justo lo que hay que ver.
+    """
+    pts = []
+    x, y = float(x_ini), float(y0)
+    r2_min = (radio * 1.015) ** 2
+    for _ in range(int(pasos)):
+        pts.append((x, y))
+        r2 = x * x + y * y
+        if r2 < r2_min or x > x_fin:
+            break
+        u = 1.0 - radio ** 2 * (x * x - y * y) / (r2 * r2)
+        v = -2.0 * radio ** 2 * x * y / (r2 * r2)
+        norma = float(np.hypot(u, v))
+        if norma < 1e-7:
+            break
+        x += ds * u / norma
+        y += ds * v / norma
+    return pts
+
+
+def remanso(radio=0.85, n_lineas=7, separacion=0.42, largo=3.4, ds=0.05,
+            color=COLOR_TRANSONICO, color_cuerpo=COLOR_EJE, grosor=2.0,
+            pasos=260):
+    """Lineas de corriente llegando a un cuerpo romo, con su punto de remanso.
+
+    `n_lineas` se fuerza a impar: la linea CENTRAL es la que muere en el
+    punto de remanso y sin ella el dibujo pierde su unico mensaje.
+    """
+    n = int(n_lineas)
+    if n > ONDAS_MAX * 2:
+        raise ValueError(f"remanso: n_lineas={n} es demasiado para un render")
+    n = max(3, n if n % 2 else n + 1)
+    r = float(radio)
+
+    lineas = VGroup()
+    mitad = n // 2
+    for k in range(-mitad, mitad + 1):
+        y0 = k * float(separacion)
+        pts = _corriente(y0, r, -largo, largo, float(ds), pasos)
+        if len(pts) < 3:
+            continue
+        traza = _curva(np.array(pts), color, grosor)
+        # La central es la protagonista: las demas la acompañan.
+        traza.set_stroke(opacity=1.0 if k == 0 else 0.55)
+        lineas.add(traza)
+
+    cuerpo = Circle(radius=r, color=color_cuerpo, stroke_width=2.4)
+    cuerpo.set_fill(COLOR_EJE, opacity=0.35)
+    return Remanso(cuerpo, lineas, r)
+
+
+# --- 1.5.2 / 1.5.3 las relaciones isentropicas -------------------------
+def razon_presion(mach):
+    """p0/p = (1 + (gamma-1)/2 M^2)^(gamma/(gamma-1)).
+
+    El exponente 3.5 no es un numero suelto: sale de exigir que el frenado
+    sea isentropico (p/rho^gamma constante) sobre la razon de temperaturas.
+    """
+    return razon_temperatura(mach) ** (GAMMA / (GAMMA - 1))
+
+
+def razon_area(mach):
+    """A/A* = (1/M) [ (2/(gamma+1)) (1 + (gamma-1)/2 M^2) ]^((gamma+1)/(2(gamma-1))).
+
+    Vive ya aqui, aunque su leccion sea la 2.4, porque es la cuarta columna
+    de la tabla de flujo isentropico y la tabla se presenta en la 1.5.
+    """
+    m = np.maximum(np.asarray(mach, dtype=np.float64), _EPS)
+    base = 2 / (GAMMA + 1) * razon_temperatura(m)
+    return base ** ((GAMMA + 1) / (2 * (GAMMA - 1))) / m
+
+
+# Razones ESTATICA/ESTANCAMIENTO, que es como las dan las tablas: valen 1 en
+# reposo y caen al subir M. (nombre, funcion M -> valor, color).
+RAZONES = (("T/T0", lambda m: 1.0 / razon_temperatura(m), COLOR_CALCULO),
+           ("RHO/RHO0", lambda m: 1.0 / razon_densidad(m), COLOR_SUBSONICO),
+           ("p/p0", lambda m: 1.0 / razon_presion(m), COLOR_TRANSONICO))
+
+
+def criticas():
+    """Las condiciones criticas (M = 1) frente a las de estancamiento.
+
+    Son numeros FIJOS para un gamma dado —0.8333, 0.6339, 0.5283 y 0.9129—
+    y por eso sirven de referencia universal en todo el curso.
+    """
+    return {"T*/T0": float(1.0 / razon_temperatura(1.0)),
+            "RHO*/RHO0": float(1.0 / razon_densidad(1.0)),
+            "p*/p0": float(1.0 / razon_presion(1.0)),
+            "a*/a0": float(np.sqrt(1.0 / razon_temperatura(1.0)))}
+
+
+class CurvasIsentropicas(_Cartesiano):
+    """Las tres razones cayendo con el Mach, cada una a su ritmo."""
+
+    def __init__(self, ejes, curvas, etiquetas, m_max, ancho, alto, origen,
+                 **kwargs):
+        super().__init__(ejes, curvas, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curvas = curvas
+        self.etiquetas = etiquetas
+        self._calibrar((0.0, m_max), (0.0, 1.0), ancho, alto, origen)
+
+    def nombre(self, i):
+        return RAZONES[i % len(RAZONES)][0]
+
+    def valor(self, i, mach):
+        """La razon i a ese Mach. Misma fuente que la curva dibujada."""
+        return float(RAZONES[i % len(RAZONES)][1](float(mach)))
+
+    def color_de(self, i):
+        """El color de la razon i. Se llama `color_de` y no `color` porque
+        `color` ya es un atributo de todo Mobject: definirlo como metodo lo
+        sombrea y el clip acaba llamando a un ManimColor."""
+        return RAZONES[i % len(RAZONES)][2]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+    def punto_de(self, i, mach):
+        """Punto sobre la curva i a ese Mach."""
+        return self._en(mach, self.valor(i, mach))
+
+    def vertical_en(self, mach, color=None, grosor=1.5):
+        """Linea punteada de eje a eje en ese Mach, para leer las tres a la
+        vez. La construye la pieza y no el clip porque las coordenadas de la
+        caja son suyas."""
+        return DashedLine(self._en(mach, 0.0), self._en(mach, 1.0),
+                          stroke_width=grosor,
+                          color=COLOR_EJE if color is None else color,
+                          dash_length=0.08)
+
+
+def curvas_isentropicas(m_max=3.0, ancho=5.4, alto=2.9, color_ejes=COLOR_EJE,
+                        font_size=15, muestras=160, hueco_etiquetas=0.72):
+    """Ejes (Mach ->, razon 0-1 ^) con T/T0, rho/rho0 y p/p0.
+
+    Las etiquetas van en una COLUMNA a la derecha, a alturas repartidas, y
+    cada una se ata al final de su curva con una guia punteada. Colgadas del
+    propio final de curva se encimarian: p/p0 y rho/rho0 solo se diferencian
+    en un exponente y a Mach alto acaban a menos de un renglon la una de la
+    otra.
+    """
+    muestras = _validar_muestras("curvas_isentropicas", muestras)
+    m1 = float(m_max)
+    if m1 <= 0:
+        raise ValueError("curvas_isentropicas: m_max debe ser positivo")
+    ms = np.linspace(0.0, m1, muestras)
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, m1), (0.0, 1.0), ancho, alto)
+
+    curvas = VGroup()
+    etiquetas = VGroup()
+    x_tag = origen[0] + ancho + float(hueco_etiquetas)
+    alturas = (0.86, 0.54, 0.22)   # repartidas, no las de las curvas
+    for i, (nombre, funcion, color) in enumerate(RAZONES):
+        ys = np.asarray([float(funcion(m)) for m in ms], dtype=np.float64)
+        curvas.add(_curva(en(ms, ys), color, grosor=2.8))
+
+        fin = en(m1, ys[-1])
+        tag = _texto_hud(nombre, font_size=font_size, color=color)
+        tag.move_to((x_tag + tag.width / 2, origen[1] + alturas[i] * alto, 0))
+        guia = DashedLine(fin + RIGHT * 0.08, tag.get_left() + LEFT * 0.10,
+                          stroke_width=1.2, color=color, dash_length=0.07)
+        guia.set_stroke(opacity=0.55)
+        etiquetas.add(VGroup(guia, tag))
+
+    # Marcas de Mach en los dos extremos: sin ellas el eje no dice a que
+    # velocidad esta cada cosa, y el clip habla de "a Mach 3" señalando un
+    # sitio que el espectador no puede situar.
+    marcas = VGroup()
+    for valor in (0.0, m1):
+        muesca = Line(en(valor, 0.0) + DOWN * 0.08, en(valor, 0.0),
+                      stroke_width=1.6, color=color_ejes)
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 2,
+                         color=color_ejes)
+        num.next_to(muesca, DOWN, buff=0.08)
+        marcas.add(muesca, num)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.44)
+    tag_y = _texto_hud("1.0", font_size=font_size - 2)
+    tag_y.next_to(ejes[1].get_end(), LEFT, buff=0.12)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return CurvasIsentropicas(ejes, curvas, etiquetas, m1, ancho, alto,
+                              origen)
+
+
+# --- 1.5.4 la tabla de flujo isentropico -------------------------------
+# Columnas de la tabla, en el orden de NACA 1135: (cabecera ASCII, funcion,
+# decimales). La cabecera es ASCII a proposito — Space Mono no trae
+# subindices ni griegas fiables.
+COLUMNAS_ISENTROPICAS = (
+    ("M", lambda m: m, 2),
+    ("T/T0", lambda m: 1.0 / razon_temperatura(m), 4),
+    ("p/p0", lambda m: 1.0 / razon_presion(m), 4),
+    ("RHO/RHO0", lambda m: 1.0 / razon_densidad(m), 4),
+    ("A/A*", lambda m: razon_area(m), 4),
+)
+
+FILAS_MAX = 8   # filas de una tabla; mas no se leen en pantalla
+
+
+class TablaIsentropica(VGroup):
+    """La tabla de siempre, generada — no transcrita.
+
+    Cada celda se evalua con las mismas funciones que dibujan las curvas, asi
+    que la tabla no puede discrepar de la grafica ni traer una errata de
+    copia.
+    """
+
+    def __init__(self, cabecera, filas, regla, machs, **kwargs):
+        super().__init__(cabecera, regla, filas, **kwargs)
+        self.cabecera = cabecera
+        self.filas = filas
+        self.regla = regla
+        self._machs = list(machs)
+
+    def fila(self, i):
+        return self.filas[i % len(self.filas)]
+
+    def celda(self, i, j):
+        return self.fila(i)[j % len(self.fila(i))]
+
+    def columna(self, j):
+        """La columna j entera, cabecera incluida (para Indicate)."""
+        return VGroup(self.cabecera[j % len(self.cabecera)],
+                      *[f[j % len(f)] for f in self.filas])
+
+    def valor(self, i, j):
+        """El numero de la celda (i, j), de la misma funcion que lo escribio."""
+        return float(COLUMNAS_ISENTROPICAS[j % len(COLUMNAS_ISENTROPICAS)][1](
+            self._machs[i % len(self._machs)]))
+
+    def resaltar(self, i, color=COLOR_TRANSONICO, opacidad=0.16, buff=0.10):
+        """Rectangulo detras de la fila i. Se devuelve sin añadir al grupo:
+        el clip decide cuando entra y cuando sale."""
+        objetivo = self.fila(i)
+        caja = Rectangle(width=objetivo.width + 2 * buff,
+                         height=objetivo.height + 2 * buff, stroke_width=0,
+                         fill_color=color, fill_opacity=opacidad)
+        caja.move_to(objetivo.get_center())
+        return caja
+
+
+def tabla_isentropica(machs=(0.5, 1.0, 1.5, 2.0, 3.0), ancho_col=1.42,
+                      alto_fila=0.46, font_size=17, color=CODE_MUTED,
+                      color_cabecera=COLOR_CALCULO, color_eje=COLOR_EJE):
+    """Tabla de flujo isentropico: M, T/T0, p/p0, rho/rho0 y A/A*.
+
+    Las celdas se alinean por columna con una malla de posiciones fija (y no
+    con `arrange`): en Space Mono los numeros son de ancho constante, pero
+    `arrange` centra cada fila por su propio ancho y bastaria una cifra de
+    mas en una celda para desalinear la columna entera.
+    """
+    ms = [float(m) for m in machs]
+    if not ms:
+        raise ValueError("tabla_isentropica: hace falta al menos un Mach")
+    if len(ms) > FILAS_MAX:
+        raise ValueError(f"tabla_isentropica: {len(ms)} filas supera "
+                         f"FILAS_MAX={FILAS_MAX}")
+
+    n_col = len(COLUMNAS_ISENTROPICAS)
+    xs = [(j - (n_col - 1) / 2) * float(ancho_col) for j in range(n_col)]
+    y_cabecera = 0.0
+
+    cabecera = VGroup()
+    for j, (nombre, _f, _d) in enumerate(COLUMNAS_ISENTROPICAS):
+        tag = _texto_hud(nombre, font_size=font_size - 1,
+                         color=color_cabecera)
+        tag.move_to((xs[j], y_cabecera, 0))
+        cabecera.add(tag)
+
+    ancho_total = (n_col - 1) * ancho_col + ancho_col
+    regla = Line((-ancho_total / 2, y_cabecera - alto_fila * 0.52, 0),
+                 (ancho_total / 2, y_cabecera - alto_fila * 0.52, 0),
+                 stroke_width=1.6, color=color_eje)
+
+    filas = VGroup()
+    for i, m in enumerate(ms):
+        y = y_cabecera - (i + 1) * float(alto_fila) - 0.10
+        fila = VGroup()
+        for j, (_n, funcion, decimales) in enumerate(COLUMNAS_ISENTROPICAS):
+            # La columna del Mach en el color de cabecera: es la que se
+            # busca al leer la tabla, no un resultado.
+            col = color_cabecera if j == 0 else color
+            celda = _texto_hud(f"{float(funcion(m)):.{decimales}f}",
+                               font_size=font_size, color=col)
+            celda.move_to((xs[j], y, 0))
+            fila.add(celda)
+        filas.add(fila)
+
+    return TablaIsentropica(cabecera, filas, regla, ms)

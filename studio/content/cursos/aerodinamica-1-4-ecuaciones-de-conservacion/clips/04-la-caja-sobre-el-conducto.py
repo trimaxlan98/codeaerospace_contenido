@@ -3,8 +3,8 @@ class Clip4(Scene):
 
     Se juntan las dos piezas del modulo: la caja del clip 1 se pega al
     conducto del clip 2 y sale la continuidad en la forma con la que se
-    trabaja el resto del curso. Cierre de la leccion y del modulo 1.
-    (~38 s)"""
+    trabaja el resto del curso. Cierre de la leccion; el del modulo 1 es la
+    leccion 1.5, que trae la libreta de conversiones. (~38 s)"""
 
     def construct(self):
         rot = Rotulos(self)
@@ -70,14 +70,17 @@ class Clip4(Scene):
                     run_time=0.5)
         self.wait(4.6)
 
-        # --- cierre de la leccion y del modulo ------------------------------
+        # --- cierre de la leccion ------------------------------------------
+        # El cierre del MODULO no va aqui: la leccion 1.5 (estancamiento y
+        # relaciones isentropicas) todavia falta, y es la que da las tablas
+        # con las que se resuelve todo lo anterior.
         self.play(FadeOut(VGroup(tubo, estaciones, garganta, tag_g)),
                   run_time=0.8)
         cierre = VGroup(
-            titulo_marca("Ya tienes el idioma.", font_size=38,
+            titulo_marca("Ya sabes qué se conserva.", font_size=38,
                          color=C_TITULO),
-            titulo_marca("Ahora toca romper el aire.", font_size=38,
-                         color=C_SUPER)).arrange(DOWN, buff=0.28)
+            titulo_marca("Falta saber convertirlo.", font_size=38,
+                         color=C_CALCULO)).arrange(DOWN, buff=0.28)
         cierre.move_to(DOWN * 0.1)
         rot.limpiar("abajo", run_time=0.3)
         self.play(FadeIn(cierre, shift=0.18 * UP), run_time=1.0)

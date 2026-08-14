@@ -6,9 +6,10 @@ from aerodinamica import (COLOR_CALCULO, COLOR_EJE, COLOR_SUBSONICO,
                           COLOR_SUPERSONICO, COLOR_TRANSONICO,
                           balanza_energias, banda_regimenes, barras_calores,
                           barras_entalpia, conducto, curva_compresibilidad,
-                          curva_mu, curva_sonido, diagrama_ts,
-                          frentes_moviles, perfil_isa, piston_gas,
-                          pulso_conducto, volumen_control)
+                          curva_mu, curva_sonido, curvas_isentropicas,
+                          diagrama_ts, frentes_moviles, perfil_isa,
+                          piston_gas, pulso_conducto, remanso,
+                          tabla_isentropica, volumen_control)
 from code_brand import FUENTE_HUD, registrar_fuentes
 
 
@@ -17,13 +18,14 @@ class DemoAerodinamica(Scene):
     como reparto de energias, los cuatro regimenes, los frentes de una fuente
     movil, el gas ideal con su embolo, cp = cv + R, el volumen de control, el
     plano T-s, el pulso que define el sonido, a(T) y a(altitud), el cono que
-    se cierra, el conducto de area variable y la entalpia total que no se
-    mueve.
+    se cierra, el conducto de area variable, la entalpia total que no se
+    mueve, el punto de remanso, las tres razones isentropicas y la tabla de
+    NACA 1135 generada (no transcrita).
 
     Todo es geometrico y determinista: mismo script, mismo render. Los
-    localizadores (.punto_de, .fuente, .garganta, .centro_zona) se leen de la
-    posicion actual, y los NUMEROS (.error, .razon, .mu, .a, .valor,
-    .fraccion, .area) salen de la misma fuente que el dibujo.
+    localizadores (.punto_de, .fuente, .garganta, .centro_zona, .punto) se
+    leen de la posicion actual, y los NUMEROS (.error, .razon, .mu, .a,
+    .valor, .fraccion, .area) salen de la misma fuente que el dibujo.
     """
 
     def construct(self):
@@ -130,11 +132,35 @@ class DemoAerodinamica(Scene):
         tubo = conducto("delaval", largo=5.0, alto=1.9, color=COLOR_EJE)
         tubo.move_to(LEFT * 1.6 + DOWN * 0.2)
         self.play(Create(tubo.paredes), FadeIn(tubo.eje), run_time=0.9)
-        self.add(Line(tubo.punto_de(0.5, -1.0), tubo.punto_de(0.5, 1.0),
-                      stroke_width=2.4, color=COLOR_SUPERSONICO))
+        garganta = Line(tubo.punto_de(0.5, -1.0), tubo.punto_de(0.5, 1.0),
+                        stroke_width=2.4, color=COLOR_SUPERSONICO)
+        self.add(garganta)
 
         entalpia = barras_entalpia(0.0, alto=2.0, ancho=0.7, font_size=13)
         entalpia.move_to(RIGHT * 4.4 + DOWN * 0.2)
         self.play(FadeIn(entalpia), run_time=0.5)
         self.play(entalpia.a_mach(2.5), run_time=0.8)
+        self.wait(0.3)
+        self.play(FadeOut(VGroup(tubo, garganta, entalpia)), run_time=0.4)
+
+        # --- acto 6: estancamiento, razones isentropicas y la tabla ---
+        flujo = remanso(radio=0.55, n_lineas=5, separacion=0.32, largo=2.0,
+                        color=COLOR_TRANSONICO)
+        flujo.move_to(LEFT * 4.3 + UP * 1.2)
+        curvas = curvas_isentropicas(m_max=3.0, ancho=3.2, alto=1.8,
+                                     font_size=12)
+        curvas.move_to(RIGHT * 2.3 + UP * 1.2)
+        self.play(FadeIn(flujo), FadeIn(curvas), run_time=0.8)
+        marcas = VGroup(Dot(flujo.punto(), radius=0.06,
+                            color=COLOR_SUPERSONICO),
+                        *[Dot(curvas.punto_de(i, 1.0), radius=0.05,
+                              color=curvas.color_de(i)) for i in range(3)],
+                        curvas.vertical_en(1.0))
+        self.add(marcas)
+
+        tabla = tabla_isentropica(machs=(1.0, 2.0, 3.0), ancho_col=1.30,
+                                  alto_fila=0.40, font_size=15)
+        tabla.move_to(DOWN * 1.9)
+        self.play(FadeIn(tabla), run_time=0.6)
+        self.play(FadeIn(tabla.resaltar(1)), run_time=0.4)
         self.wait(0.6)

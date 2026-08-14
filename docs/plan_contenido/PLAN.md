@@ -71,10 +71,12 @@ Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
 | 1.2 | Repaso de termodinamica aplicada | 4 | versionado, validado en local |
 | 1.3 | La velocidad del sonido | 4 | versionado, validado en local |
 | 1.4 | Ecuaciones de conservacion | 4 | versionado, validado en local |
-| 1.5 → 4.5 | las 16 restantes | 67 | pendientes |
+| 1.5 | Propiedades de estancamiento e isentropicas | 4 | versionado, validado en local |
+| 2.1 → 4.5 | las 15 restantes | 63 | pendientes |
 
-Pendiente de estas cuatro: `subir_curso.py` contra produccion, renders `qh`,
-narracion TTS y mux. El modulo 1 (1.1-1.5) es la unidad minima publicable.
+**El modulo 1 esta completo** (1.1-1.5, 20 clips) y es la unidad minima
+publicable. Pendiente: `subir_curso.py` contra produccion, renders `qh`,
+narracion TTS y mux.
 
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 

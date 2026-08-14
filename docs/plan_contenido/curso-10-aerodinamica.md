@@ -46,7 +46,7 @@ clip es un módulo. Consecuencias:
 | 1.2 | Repaso de termodinámica aplicada | 4 | **hecha** |
 | 1.3 | La velocidad del sonido | 4 | **hecha** |
 | 1.4 | Ecuaciones de conservación para flujo compresible | 4 | **hecha** |
-| 1.5 | Propiedades de estancamiento y relaciones isentrópicas | 4 | pendiente |
+| 1.5 | Propiedades de estancamiento y relaciones isentrópicas | 4 | **hecha** |
 | 2.1 | Naturaleza física de la onda de choque | 4 | pendiente |
 | 2.2 | Relaciones de la onda de choque normal | 4 | pendiente |
 | 2.3 | Medición de velocidad en flujo compresible | 4 | pendiente |
@@ -63,8 +63,8 @@ clip es un módulo. Consecuencias:
 | 4.4 | El régimen transónico y sus soluciones de diseño | 4 | pendiente |
 | 4.5 | Teoría supersónica linealizada y panorama hipersónico | 5 | pendiente |
 
-El módulo 1 (lecciones 1.1-1.5) es la unidad mínima publicable: fija el
-idioma con el que se escribe todo lo demás.
+**El módulo 1 está completo** (lecciones 1.1-1.5): es la unidad mínima
+publicable, y fija el idioma con el que se escribe todo lo demás.
 
 ## Paleta de la familia
 
@@ -149,7 +149,21 @@ curva_mu(m_rango, ...)                     # .punto_de(M), .mu(M)
 conducto(perfil, area_garganta, ...)       # .punto_de(x, y_rel), .area(x),
                                            # .garganta(), .paredes, .eje
 barras_entalpia(mach, ...)                 # .a_mach(M), .fraccion()
+
+# leccion 1.5
+remanso(radio, n_lineas, ...)              # .punto(), .linea(i), .cuerpo
+curvas_isentropicas(m_max, ...)            # .punto_de(i, M), .valor(i, M),
+                                           # .color_de(i), .vertical_en(M)
+tabla_isentropica(machs, ...)              # .fila(i), .celda(i,j),
+                                           # .columna(j), .valor(i,j),
+                                           # .resaltar(i)
 ```
+
+La tabla **se genera, no se transcribe**: cada celda se evalúa con las
+mismas funciones que dibujan las curvas, así que no puede traer una errata
+de copia ni discrepar de la gráfica. Sus cinco filas coinciden con NACA
+1135 dentro del redondeo a cuatro decimales que publica el informe (desvío
+máximo 4.8·10⁻⁵).
 
 `conducto` acepta `'recto'`, `'convergente'`, `'divergente'` y
 `'delaval'`; es la geometría sobre la que se escribirá todo el módulo 2,
@@ -219,7 +233,26 @@ volumen de control sobre un conducto. Cierra el módulo 1.
 | 1 (33 s) | 1.4.1 | VC y las tres ecuaciones integrales alineadas por el igual | las tres, en verde / ámbar / cian |
 | 2 (37 s) | 1.4.2 | Conducto De Laval y las tres hipótesis entrando una a una | sección en la garganta y las tres etiquetas |
 | 3 (37 s) | 1.4.3 | Barra apilada de altura FIJA que se reparte al acelerar | M 2.5, 56 % cinética, T0 300 K → T 133 K, V 579 m/s |
-| 4 (38 s) | 1.4.4 | Dos secciones sobre el conducto y la continuidad | cierre: «Ya tienes el idioma. / Ahora toca romper el aire.» |
+| 4 (38 s) | 1.4.4 | Dos secciones sobre el conducto y la continuidad | cierre: «Ya sabes qué se conserva. / Falta saber convertirlo.» |
+
+El cierre del **módulo** no está aquí sino en la 1.5: el idioma no está
+completo hasta tener las relaciones isentrópicas y sus tablas.
+
+## Lección 1.5 — Propiedades de estancamiento y relaciones isentrópicas
+
+Hilo: dónde se para el aire → las tres razones como una sola con tres
+exponentes → los números fijos de Mach 1 → la tabla. Cierra el módulo 1.
+
+| Clip | Subtema | Visual | `final_state` |
+|------|---------|--------|---------------|
+| 1 (40 s) | 1.5.1 | Líneas de corriente contra un cuerpo romo; la central muere en el morro | punto de remanso rotulado, −56 °C fuera y +117 °C en el morro |
+| 2 (42 s) | 1.5.2 | Las tres razones cayendo con el Mach, etiquetas en columna con guías | T/T0, RHO/RHO0 y p/p0 hasta Mach 3 |
+| 3 (38 s) | 1.5.3 | Corte vertical en Mach 1 y los tres valores críticos | 0.8333, 0.6339 y 0.5283 fuera de la caja de ejes |
+| 4 (38 s) | 1.5.4 | La tabla generada; se lee la fila de Mach 2 y se señala A/A* | cierre: «Ya tienes el idioma. / Ahora toca romper el aire.» |
+
+El caso del clip 1 es el mismo de siempre (11 km, Mach 2): fuera hace 56
+bajo cero y el morro va a 117 grados. Es el gancho de la lección y sale
+entero de `isa()` y `razon_temperatura()`.
 
 ## Trampas encontradas (para las 16 lecciones que faltan)
 
@@ -243,6 +276,15 @@ volumen de control sobre un conducto. Cierra el módulo 1.
 - **Una pieza sin nombre propio no llega a la escena** si el clip
   enciende sus partes una a una (`FadeIn(pulso.tubo)`, …). Por eso
   `pulso_conducto` expone `.rotulo`.
+- **Un método no puede llamarse como un atributo de `Mobject`.** Una pieza
+  con `def color(self, i)` lo tiene sombreado por el `color` del propio
+  mobject, y el clip acaba llamando a un `ManimColor`: `TypeError`. De ahí
+  que sea `color_de`, como en `banda_regimenes`.
+- **En un haz de curvas que caen juntas no hay hueco limpio para las
+  cifras.** Ni a izquierda ni a derecha del punto: la propia curva pasa por
+  ahí. La salida es sacarlas FUERA de la caja de ejes a la altura exacta de
+  su punto, y del mismo color — se leen sin guía, y una guía habría cruzado
+  otras curvas.
 - **Los pies necesitan ≥ 5 s legibles.** Con el relevo secuencial de
   `Rotulos` (0.25 s de salida + 0.5 s de entrada), eso es `wait(4.6)` como
   mínimo. Recortar tiempo se hace **quitando beats**, no acortando los que

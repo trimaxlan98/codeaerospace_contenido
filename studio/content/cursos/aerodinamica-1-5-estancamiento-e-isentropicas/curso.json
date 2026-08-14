@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 1.5 Propiedades de estancamiento y relaciones isentrópicas",
+  "description": "Lección 1.5 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: qué es el punto de remanso y por qué el morro de un supersónico se calienta aunque fuera haga 56 bajo cero, las tres razones de estancamiento como una sola elevada a tres exponentes, las condiciones críticas de Mach 1 que solo dependen de γ, y la tabla de flujo isentrópico con la columna A/A* que abrirá el módulo 2. Cierra el módulo 1. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-aire-que-se-para.py",
+      "title": "1 · El aire que se para",
+      "scene": "Clip1",
+      "final_state": "Líneas de corriente ámbar rodeando un cuerpo romo, con el punto de remanso marcado en rojo y rotulado; a la izquierda «−56 °C» en cian y a la derecha «+117 °C» en rojo sobre «M 2 · 11 km»; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-tres-razones-un-solo-numero.py",
+      "title": "2 · Tres razones, un solo número",
+      "scene": "Clip2",
+      "final_state": "Las tres curvas T/T0 (cian), RHO/RHO0 (verde) y p/p0 (ámbar) cayendo con el Mach, con sus etiquetas en columna a la derecha unidas por guías punteadas; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-justo-en-mach-uno.py",
+      "title": "3 · Justo en Mach 1",
+      "scene": "Clip3",
+      "final_state": "Las mismas tres curvas cortadas por una vertical punteada en Mach 1, con los tres valores críticos rotulados a su izquierda (0.8333, 0.6339, 0.5283); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-tabla.py",
+      "title": "4 · La tabla",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección y del módulo 1 a pantalla limpia: «Ya tienes el idioma.» sobre «Ahora toca romper el aire.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}

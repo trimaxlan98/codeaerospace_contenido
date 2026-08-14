@@ -1,6 +1,6 @@
 {
   "name": "Aerodinámica · 1.4 Ecuaciones de conservación",
-  "description": "Lección 1.4 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: las tres cuentas integrales (masa, cantidad de movimiento y energía) sobre un volumen de control, las tres hipótesis que las vuelven manejables (permanente, adiabático, unidimensional), la ecuación de la energía leída como una entalpía total que no se mueve, y el volumen de control aplicado a un conducto de área variable. Cierra el módulo 1. Estilo 3Blue1Brown en español.",
+  "description": "Lección 1.4 del curso Aerodinámica (módulo 1: fundamentos del flujo compresible), en 4 clips animados —uno por subtema—: las tres cuentas integrales (masa, cantidad de movimiento y energía) sobre un volumen de control, las tres hipótesis que las vuelven manejables (permanente, adiabático, unidimensional), la ecuación de la energía leída como una entalpía total que no se mueve, y el volumen de control aplicado a un conducto de área variable. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",
   "clips": [
@@ -26,7 +26,7 @@
       "file": "clips/04-la-caja-sobre-el-conducto.py",
       "title": "4 · La caja, sobre el conducto",
       "scene": "Clip4",
-      "final_state": "Cierre de la lección y del módulo 1 a pantalla limpia: «Ya tienes el idioma.» sobre «Ahora toca romper el aire.» en rojo; HUD 'MODULO 04'."
+      "final_state": "Cierre de la lección a pantalla limpia: «Ya sabes qué se conserva.» sobre «Falta saber convertirlo.» en cian; HUD 'MODULO 04'."
     }
   ]
 }

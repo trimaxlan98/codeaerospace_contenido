@@ -1,6 +1,7 @@
 # =====================================================================
-# CO.DE Academy - "Aerodinámica · 1.1 El número de Mach y los regímenes
-# de vuelo". Bloque de estilo del proyecto. Se antepone al script de CADA
+# CO.DE Academy - "Aerodinámica · 1.5 Propiedades de estancamiento
+# y relaciones isentrópicas".
+# Bloque de estilo del proyecto. Se antepone al script de CADA
 # clip; los clips NO repiten imports: solo definen su clase ClipN(Scene).
 #
 # Este bloque es el MOLDE de la familia "Aerodinámica": las 19 lecciones
@@ -111,13 +112,15 @@ MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la curva dibujada y la cifra escrita no pueden discrepar.
-UMBRAL_ERROR = 0.05                    # error de densidad que se tolera
-M_UMBRAL = mach_de_error(UMBRAL_ERROR)  # 0.314 — el "0.3" de los libros
-M_CRUCERO = 0.80                       # donde el error ya es indefendible
-ERR_CRUCERO = float(error_incompresible(M_CRUCERO))   # 0.351
-H_CRUCERO = 11000.0                    # tropopausa ISA, m
-A_CRUCERO = isa(H_CRUCERO)[3]          # 295.1 m/s
-FACTOR_ENERGIAS = GAMMA * (GAMMA - 1) / 2             # 0.28
+CERO_C = 273.15                          # para pasar kelvin a grados
+H_VUELO = 11000.0                        # tropopausa ISA, m
+T_VUELO = isa(H_VUELO)[0]                # 216.65 K = -56.5 C ahi fuera
+M_VUELO = 2.0                            # el supersonico del clip 1
+T0_MORRO = T_VUELO * float(razon_temperatura(M_VUELO))  # 390.0 K = 116.8 C
+P0_SOBRE_P = float(razon_presion(M_VUELO))              # 7.82
+CRITICAS = criticas()                    # T*/T0, p*/p0, rho*/rho0, a*/a0
+MACHS_TABLA = (0.5, 1.0, 1.5, 2.0, 3.0)  # filas de la tabla del clip 4
+FILA_LECTURA = 3                         # la de M = 2.0, la que se resalta
 
 # La flota de la familia: (nombre, Mach de operacion, silueta, altitud m).
 # Mach reales de crucero (o de reentrada, en la capsula); la altitud solo se

@@ -59,11 +59,13 @@ import aerodinamica as _aero  # noqa: E402  (tras definir la sombra)
 from aerodinamica import (GAMMA, R_AIRE, REGIMENES,  # noqa: E402
                           angulo_mach, balanza_energias, banda_regimenes,
                           barras_calores, barras_entalpia, conducto,
-                          curva_compresibilidad, curva_mu, curva_sonido,
-                          diagrama_ts, error_incompresible, fraccion_cinetica,
+                          criticas, curva_compresibilidad, curva_mu,
+                          curva_sonido, curvas_isentropicas, diagrama_ts,
+                          error_incompresible, fraccion_cinetica,
                           frentes_moviles, isa, mach_de_error, perfil_isa,
-                          piston_gas, pulso_conducto, razon_densidad,
-                          razon_energias, razon_temperatura,
+                          piston_gas, pulso_conducto, razon_area,
+                          razon_densidad, razon_energias, razon_presion,
+                          razon_temperatura, remanso, tabla_isentropica,
                           velocidad_sonido, volumen_control, zona_de)
 
 _aero.Text = Text
