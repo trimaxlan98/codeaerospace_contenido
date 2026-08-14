@@ -1,0 +1,56 @@
+{
+  "name": "Tsiolkovsky: la tiranía del cohete",
+  "description": "Curso de divulgación en 8 clips sobre la ecuación del cohete: por qué un lanzador es 93 % combustible y solo un ~4 % llega a órbita. El empuje como momento conservado (el patinador), Δv = vₑ·ln(m₀/mf), el logaritmo que multiplica la masa por cada km/s, el cañón de Newton (orbitar es caer de lado a 7.79 km/s), por qué una sola etapa da carga útil negativa y las etapas la rescatan, los cohetes reales (Saturn V, Falcon 9, Soyuz) y la negociación con el tirano: motores iónicos. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-tanque-con-alas-de-nada.py",
+      "title": "1 · Un tanque con alas de nada",
+      "scene": "Clip1",
+      "final_state": "La silueta del cohete con sus tres zonas (ámbar 93 %, violeta, franja cian minúscula) y las tres fracciones rotuladas a la derecha con la pregunta en el pie; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-empujar-tirando-masa.py",
+      "title": "2 · Empujar tirando masa",
+      "scene": "Clip2",
+      "final_state": "El patinador desplazado a la derecha con las bolas lanzadas a la izquierda, la cifra 0.769 m/s rotulada y el pie del cohete como patinador que lanza gas; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-ecuacion-del-portero.py",
+      "title": "3 · La ecuación del portero",
+      "scene": "Clip3",
+      "final_state": "Δv = vₑ·ln(m₀/mf) grande al centro con los tres términos etiquetados (lo que quieres, lo que tu química da, lo que te cobra); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-logaritmo-tirano.py",
+      "title": "4 · El logaritmo tirano",
+      "scene": "Clip4",
+      "final_state": "La curva exponencial m₀/mf contra Δv con los marcadores de 7.79 (órbita) y 9.39 km/s (LEO → ×14.6) y las variantes RP-1 (×22.9) e hidrolox (×8.4) mencionadas; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-orbitar-es-caer-de-lado.py",
+      "title": "5 · Orbitar es caer de lado",
+      "scene": "Clip5",
+      "final_state": "La Tierra con el abanico de trayectorias balísticas ámbar cayendo cada vez más lejos y la órbita cian cerrada, con v = 7.79 km/s rotulada; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-etapas-o-nada.py",
+      "title": "6 · Etapas o nada",
+      "scene": "Clip6",
+      "final_state": "Las tres barras del modelo: SSTO roja colgando bajo el eje (−1.3 %, imposible), 2 etapas +3.9 % y 3 etapas +4.6 % en cian, con el rótulo del modelo; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-la-tirania-confirmada.py",
+      "title": "7 · La tiranía, confirmada",
+      "scene": "Clip7",
+      "final_state": "Las barras de los cohetes reales (Saturn V 4.7 %, Falcon 9 4.2 %, Soyuz 2.3 %) con sus cifras y el pie de que nadie le gana al logaritmo; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-negociar-con-el-tirano.py",
+      "title": "8 · Negociar con el tirano",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «La ecuación no se derrota: se negocia.» sobre «Cada gramo en órbita la pagó en logaritmos.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}
