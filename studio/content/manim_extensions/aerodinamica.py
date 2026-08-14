@@ -3580,7 +3580,7 @@ class PerfilSupersonico(VGroup):
         base = self.caras[cara][0]
         return base + (self.get_center() - self._centro_original)
 
-    def barra_presion(self, cara, escala=0.55, grosor=8.0):
+    def barra_presion(self, cara, escala=1.3, grosor=8.0):
         """Barra perpendicular a la cara, hacia FUERA si comprime y hacia
         dentro si expande. Su longitud es |p/p1 - 1|: asi una cara que
         succiona y otra que empuja se distinguen sin leer un numero."""
@@ -3658,10 +3658,12 @@ def perfil_supersonico(tipo="placa", mach1=2.0, alfa=10.0, semiangulo=5.0,
                         False))
 
         normal_sup = girar((0.0, 1.0)) - girar((0.0, 0.0))
+        # Las dos caras de una placa son el MISMO segmento, asi que sus
+        # barras hay que separarlas a mano o salen una encima de la otra.
         caras = {
-            "sup": (girar((0.0, 0.0)) + normal_sup * 0.10,
+            "sup": (girar((0.0, 0.0)) + normal_sup * 0.22,
                     datos["p_sup/p1"], normal_sup),
-            "inf": (girar((0.0, 0.0)) - normal_sup * 0.10,
+            "inf": (girar((0.0, 0.0)) - normal_sup * 0.22,
                     datos["p_inf/p1"], -normal_sup)}
     else:
         datos = perfil_rombico(mach1, alfa, semiangulo)

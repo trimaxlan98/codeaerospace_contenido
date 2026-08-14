@@ -52,20 +52,21 @@ clip es un módulo. Consecuencias:
 | 2.3 | Medición de velocidad en flujo compresible | 4 | **hecha** |
 | 2.4 | Flujo cuasi-unidimensional en conductos | 4 | **hecha** |
 | 2.5 | Toberas convergentes y De Laval | 5 | **hecha** |
-| 3.1 | Ondas de choque oblicuas | 4 | pendiente |
-| 3.2 | La relación θ-β-M | 4 | pendiente |
-| 3.3 | Reflexión e interacción de ondas | 4 | pendiente |
-| 3.4 | Expansión de Prandtl-Meyer | 4 | pendiente |
-| 3.5 | Teoría de choque-expansión aplicada a perfiles | 5 | pendiente |
+| 3.1 | Ondas de choque oblicuas | 4 | **hecha** |
+| 3.2 | La relación θ-β-M | 4 | **hecha** |
+| 3.3 | Reflexión e interacción de ondas | 4 | **hecha** |
+| 3.4 | Expansión de Prandtl-Meyer | 4 | **hecha** |
+| 3.5 | Teoría de choque-expansión aplicada a perfiles | 5 | **hecha** |
 | 4.1 | Ecuación del potencial de perturbación linealizada | 4 | pendiente |
 | 4.2 | Correcciones de compresibilidad subsónica | 4 | pendiente |
 | 4.3 | Número de Mach crítico y divergencia del arrastre | 4 | pendiente |
 | 4.4 | El régimen transónico y sus soluciones de diseño | 4 | pendiente |
 | 4.5 | Teoría supersónica linealizada y panorama hipersónico | 5 | pendiente |
 
-**Los módulos 1 y 2 están completos** (lecciones 1.1-2.5, 41 clips). El 1
-fija el idioma; el 2 lo usa para romper el aire de frente. Quedan los
-módulos 3 (ondas oblicuas) y 4 (transónico y linealizado).
+**Los módulos 1, 2 y 3 están completos** (lecciones 1.1-3.5, 62 clips). El
+1 fija el idioma, el 2 rompe el aire de frente y el 3 lo rompe de lado.
+Queda el módulo 4 (transónico y teoría linealizada), 5 lecciones y 21
+clips.
 
 ## Paleta de la familia
 
@@ -310,6 +311,27 @@ Mach 2 (5.640 frente a los 7.824 de un Pitot que ignorase el choque), la
 presión crítica 0.5283 que bloquea una tobera, y la De Laval de garganta
 0.42 (A_e/A_t = 2.38 → M de salida 2.39).
 
+## Módulo 3 — las cinco lecciones
+
+| Lección | Clips | Duraciones | Hilo |
+|---------|-------|------------|------|
+| 3.1 Ondas de choque oblicuas | 4 | 40.8 / 35.7 / 32.3 / 39.9 s | descomposición → la tangencial no cambia → el truco del seno → la rampa |
+| 3.2 La relación θ-β-M | 4 | 34.1 / 31.9 / 39.7 / 38.0 s | leer el mapa → débil y fuerte → θ_max y desprendido → afilado o romo |
+| 3.3 Reflexión e interacción | 4 | 38.1 / 38.9 / 35.5 / 38.7 s | pared → borde libre → línea de deslizamiento → los diamantes |
+| 3.4 Expansión de Prandtl-Meyer | 4 | 39.1 / 34.2 / 32.1 / 39.3 s | el abanico → ν como contador → resolver una esquina → lo que cuesta |
+| 3.5 Teoría de choque-expansión | 5 | 35.7 / 34.1 / 40.5 / 32.3 / 39.9 s | la receta → placa plana → rombo → los dos arrastres → centro de presiones |
+
+Números del módulo, todos calculados: el choque oblicuo de M1 = 2 con
+rampa de 10° (β = 39.31°, Mn1 = 1.2671, M2 = 1.6405), θ_max = 22.97° a
+Mach 2, ν(2) = 26.380°, ν_max = 130.454°, y por choque-expansión la placa
+plana a 10° (cl = 0.4075, cd = 0.0719) y el rombo (cd = 0.0177 a ángulo
+cero, todo espesor).
+
+Dos comprobaciones que salen solas y no se impusieron: en la placa plana
+**cd/cl = tan α exacto** (la resultante es normal a la placa), y en la
+reflexión contra frontera libre el producto de presiones vuelve a 1.001
+(la condición de contorno cumpliéndose por su cuenta).
+
 ## Trampas encontradas (para las lecciones que faltan)
 
 - **Piezas que se reconstruyen en una animación** (`piston_gas`,
@@ -355,6 +377,15 @@ presión crítica 0.5283 que bloquea una tobera, y la De Laval de garganta
 - **Una `DashedLine` degenerada no se arregla con `put_start_and_end_on`**:
   no tiene guiones que recolocar. La asíntota hay que construirla ya con
   sus extremos, y eso lo hace la pieza, que es quien tiene la caja.
+- **Las flechas de un haz se apilan hacia un lado**, y hay que decidir
+  cuál: el flujo de salida de un abanico, apilado como el de entrada, se
+  mete dentro del propio abanico.
+- **En un diagrama de curvas anidadas (θ-β-M) casi no hay hueco libre.**
+  Los rótulos acaban fuera de la caja o en la única esquina vacía —
+  mucha deflexión y poca β—, y sin guía, porque cualquier línea hasta ahí
+  cruzaría dos curvas.
+- **Las dos caras de una placa plana son el mismo segmento**: sus barras de
+  presión hay que separarlas a mano o salen una encima de la otra.
 - **Los pies necesitan ≥ 5 s legibles.** Con el relevo secuencial de
   `Rotulos` (0.25 s de salida + 0.5 s de entrada), eso es `wait(4.6)` como
   mínimo. Recortar tiempo se hace **quitando beats**, no acortando los que

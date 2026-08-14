@@ -77,9 +77,14 @@ Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
 | 2.3 | Medicion de velocidad en flujo compresible | 4 | versionado, validado en local |
 | 2.4 | Flujo cuasi-unidimensional en conductos | 4 | versionado, validado en local |
 | 2.5 | Toberas convergentes y De Laval | 5 | versionado, validado en local |
-| 3.1 → 4.5 | las 10 restantes | 42 | pendientes |
+| 3.1 | Ondas de choque oblicuas | 4 | versionado, validado en local |
+| 3.2 | La relacion theta-beta-M | 4 | versionado, validado en local |
+| 3.3 | Reflexion e interaccion de ondas | 4 | versionado, validado en local |
+| 3.4 | Expansion de Prandtl-Meyer | 4 | versionado, validado en local |
+| 3.5 | Teoria de choque-expansion | 5 | versionado, validado en local |
+| 4.1 → 4.5 | las 5 restantes | 21 | pendientes |
 
-**Los modulos 1 y 2 estan completos** (1.1-2.5, 41 clips). Pendiente:
+**Los modulos 1, 2 y 3 estan completos** (1.1-3.5, 62 clips). Pendiente:
 `subir_curso.py` contra produccion, renders `qh`, narracion TTS y mux.
 
 ## Cola de cursos nuevos (desmenuzado de la Academy)

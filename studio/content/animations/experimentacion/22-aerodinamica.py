@@ -13,7 +13,9 @@ from aerodinamica import (COLOR_CALCULO, COLOR_EJE, COLOR_SUBSONICO,
                           esquema_schlieren, frentes_moviles, perfil_choque,
                           perfil_isa, perfil_tobera, piston_gas,
                           pulso_conducto, remanso, tabla_isentropica,
-                          volumen_control)
+                          volumen_control, abanico_expansion, curva_nu,
+                          diagrama_theta_beta, interseccion_choques,
+                          onda_oblicua, perfil_supersonico, reflexion_onda)
 from code_brand import FUENTE_HUD, registrar_fuentes
 
 
@@ -27,7 +29,10 @@ class DemoAerodinamica(Scene):
     NACA 1135 generada (no transcrita) y —del modulo 2— la coalescencia en
     el plano x-t, el espesor real del choque, el banco Schlieren, los
     saltos del choque normal, el error del anemometro, las cuatro
-    velocidades, A/A* con sus dos ramas y la tobera regimen a regimen.
+    velocidades, A/A* con sus dos ramas y la tobera regimen a regimen; y
+    —del modulo 3— la onda oblicua con su descomposicion, el diagrama
+    theta-beta-M, el abanico de Prandtl-Meyer, nu(M), las reflexiones, el
+    cruce de choques y los dos perfiles supersonicos con sus presiones.
 
     Todo es geometrico y determinista: mismo script, mismo render. Los
     localizadores (.punto_de, .fuente, .garganta, .centro_zona, .punto) se
@@ -224,4 +229,34 @@ class DemoAerodinamica(Scene):
         self.play(*[Create(tobera.curva(k)) for k, _e, _c in REGIMENES_TOBERA],
                   run_time=1.0)
         self.add(*[m for m in tobera.choques.values()])
+        self.wait(0.8)
+
+        self.play(FadeOut(VGroup(areas, recta, dobles, tobera)),
+                  run_time=0.4)
+
+        # --- acto 9: el aire de lado ---
+        oblicua = onda_oblicua(2.0, 12.0, largo=1.9, entrada=1.4)
+        oblicua.move_to(LEFT * 4.5 + UP * 1.15)
+        mapa = diagrama_theta_beta(machs=(2.0, 3.0), ancho=2.6, alto=1.7,
+                                   font_size=11)
+        mapa.move_to(LEFT * 0.9 + UP * 1.15)
+        fan = abanico_expansion(2.0, 15.0, n_lineas=6, largo=1.6,
+                                entrada=1.2)
+        fan.move_to(RIGHT * 3.8 + UP * 1.15)
+        self.play(FadeIn(oblicua), FadeIn(mapa), FadeIn(fan), run_time=0.9)
+        vertices = VGroup(*[Dot(mapa.punto_maximo(i), radius=0.05,
+                                color=COLOR_SUPERSONICO) for i in range(2)])
+        self.add(vertices)
+        self.wait(0.4)
+
+        rebote = reflexion_onda(tipo="libre", ancho=3.4, alto=1.4)
+        rebote.move_to(LEFT * 4.3 + DOWN * 1.5)
+        cruce = interseccion_choques(ancho=3.4, alto=1.4)
+        cruce.move_to(LEFT * 0.5 + DOWN * 1.5)
+        rombo = perfil_supersonico("rombo", 2.0, 8.0, cuerda=1.9,
+                                   largo_onda=0.9)
+        rombo.move_to(RIGHT * 3.9 + DOWN * 1.5)
+        self.play(FadeIn(rebote), FadeIn(cruce), FadeIn(rombo), run_time=0.9)
+        self.add(VGroup(*[rombo.barra_presion(c, escala=0.5)
+                          for c in rombo.caras]))
         self.wait(0.8)
