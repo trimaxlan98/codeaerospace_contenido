@@ -34,11 +34,14 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 11 | Control: domar sistemas que se resisten | Señales y sistemas L10-L12, L16 + APT L6-L7 | `control.py` | publicado (PR #7) |
 | 12 | Materiales que van al espacio | Materiales M1-M5 + Elasticidad M1 | `materia.py` | publicado (PR #8) |
 | 13 | Cerrar el enlace: la cuenta en decibelios | Redes satelitales M2 (FSPL, PIRE, C/N0, G/T) + M7 (Shannon, MODCOD, ACM) | `enlace.py` | publicado (PR #9) |
+| 14 | Matematicas en la naturaleza | original (divulgacion pura, heredero visual de Fractales) | `naturaleza.py` | publicado (PR #11) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
 esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
-(`curso-09-enlace.md` es el curso 13).
+(`curso-09-enlace.md` es el curso 13; `curso-11-matematicas-naturaleza.md`
+es el curso 14 — el `curso-10` lo ocupa la familia Aerodinamica, que corre
+en su propia rama con otro formato).
 
 ## Cola de cursos nuevos (desmenuzado)
 
