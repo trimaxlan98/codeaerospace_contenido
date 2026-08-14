@@ -3,13 +3,17 @@ sys.path.insert(0, "/workspace/studio/content/manim_extensions")
 
 from manim import *
 from aerodinamica import (COLOR_CALCULO, COLOR_EJE, COLOR_SUBSONICO,
+                          REGIMENES_TOBERA,
                           COLOR_SUPERSONICO, COLOR_TRANSONICO,
                           balanza_energias, banda_regimenes, barras_calores,
                           barras_entalpia, conducto, curva_compresibilidad,
-                          curva_mu, curva_sonido, curvas_isentropicas,
-                          diagrama_ts, frentes_moviles, perfil_isa,
-                          piston_gas, pulso_conducto, remanso,
-                          tabla_isentropica, volumen_control)
+                          curva_anemometro, curva_area_mach, curva_mu,
+                          curva_sonido, curvas_choque, curvas_isentropicas,
+                          diagrama_ts, diagrama_xt, escalera_velocidades,
+                          esquema_schlieren, frentes_moviles, perfil_choque,
+                          perfil_isa, perfil_tobera, piston_gas,
+                          pulso_conducto, remanso, tabla_isentropica,
+                          volumen_control)
 from code_brand import FUENTE_HUD, registrar_fuentes
 
 
@@ -19,8 +23,11 @@ class DemoAerodinamica(Scene):
     movil, el gas ideal con su embolo, cp = cv + R, el volumen de control, el
     plano T-s, el pulso que define el sonido, a(T) y a(altitud), el cono que
     se cierra, el conducto de area variable, la entalpia total que no se
-    mueve, el punto de remanso, las tres razones isentropicas y la tabla de
-    NACA 1135 generada (no transcrita).
+    mueve, el punto de remanso, las tres razones isentropicas, la tabla de
+    NACA 1135 generada (no transcrita) y —del modulo 2— la coalescencia en
+    el plano x-t, el espesor real del choque, el banco Schlieren, los
+    saltos del choque normal, el error del anemometro, las cuatro
+    velocidades, A/A* con sus dos ramas y la tobera regimen a regimen.
 
     Todo es geometrico y determinista: mismo script, mismo render. Los
     localizadores (.punto_de, .fuente, .garganta, .centro_zona, .punto) se
@@ -142,6 +149,7 @@ class DemoAerodinamica(Scene):
         self.play(entalpia.a_mach(2.5), run_time=0.8)
         self.wait(0.3)
         self.play(FadeOut(VGroup(tubo, garganta, entalpia)), run_time=0.4)
+        self.play(FadeOut(VGroup(tubo, garganta, entalpia)), run_time=0.4)
 
         # --- acto 6: estancamiento, razones isentropicas y la tabla ---
         flujo = remanso(radio=0.55, n_lineas=5, separacion=0.32, largo=2.0,
@@ -161,6 +169,59 @@ class DemoAerodinamica(Scene):
         tabla = tabla_isentropica(machs=(1.0, 2.0, 3.0), ancho_col=1.30,
                                   alto_fila=0.40, font_size=15)
         tabla.move_to(DOWN * 1.9)
+        franja = tabla.resaltar(1)
         self.play(FadeIn(tabla), run_time=0.6)
-        self.play(FadeIn(tabla.resaltar(1)), run_time=0.4)
+        self.play(FadeIn(franja), run_time=0.4)
         self.wait(0.6)
+        self.play(FadeOut(VGroup(flujo, curvas, marcas, tabla, franja)),
+                  run_time=0.4)
+
+        # --- acto 7: como nace un choque, y como se mide ---
+        xt = diagrama_xt(n_ondas=5, ancho=3.0, alto=1.8, font_size=11)
+        xt.move_to(LEFT * 4.4 + UP * 1.2)
+        pc = perfil_choque(salto=4.5, ancho=3.0, alto=1.6, font_size=11,
+                           etiqueta="200 nm")
+        pc.move_to(LEFT * 0.6 + UP * 1.2)
+        banco = esquema_schlieren(n_rayos=7, ancho=4.2, alto=1.5,
+                                  font_size=10)
+        banco.move_to(RIGHT * 4.2 + UP * 1.2)
+        self.play(FadeIn(xt), FadeIn(pc), FadeIn(banco), run_time=0.9)
+        marcas = VGroup(Dot(xt.coalescencia(), radius=0.05,
+                            color=COLOR_SUPERSONICO), xt.choque)
+        self.add(marcas)
+        self.wait(0.3)
+
+        saltos = curvas_choque(grupo="saltos", m_max=3.0, ancho=2.6,
+                               alto=1.6, font_size=11, hueco_etiquetas=0.55)
+        saltos.move_to(LEFT * 4.6 + DOWN * 1.6)
+        anemo = curva_anemometro(ancho=2.4, alto=1.5, font_size=10)
+        anemo.move_to(LEFT * 0.9 + DOWN * 1.6)
+        velocidades = escalera_velocidades(ancho=2.4, alto=0.24,
+                                           separacion=0.16, font_size=12)
+        velocidades.move_to(RIGHT * 3.9 + DOWN * 1.5)
+        self.play(FadeIn(saltos), FadeIn(anemo), FadeIn(velocidades),
+                  run_time=0.9)
+        self.wait(0.5)
+        self.play(FadeOut(VGroup(xt, pc, banco, marcas, saltos, anemo,
+                                 velocidades)), run_time=0.4)
+
+        # --- acto 8: el area manda, y la tobera decide ---
+        areas = curva_area_mach(ancho=3.0, alto=1.9, font_size=11)
+        areas.move_to(LEFT * 4.2 + UP * 0.1)
+        recta = areas.horizontal_en(1.6875)
+        dobles = VGroup(*[Dot(areas.punto_de(areas.mach_de(1.6875, rama)),
+                              radius=0.05,
+                              color=COLOR_SUBSONICO if rama == "sub"
+                              else COLOR_SUPERSONICO)
+                          for rama in ("sub", "super")])
+        self.play(FadeIn(areas), Create(recta), run_time=0.7)
+        self.add(dobles)
+
+        tobera = perfil_tobera(ancho=4.6, alto_tubo=1.2, alto_grafico=1.8,
+                               hueco=0.35, font_size=11)
+        tobera.move_to(RIGHT * 2.4)
+        self.play(FadeIn(tobera.tubo), FadeIn(tobera.ejes), run_time=0.6)
+        self.play(*[Create(tobera.curva(k)) for k, _e, _c in REGIMENES_TOBERA],
+                  run_time=1.0)
+        self.add(*[m for m in tobera.choques.values()])
+        self.wait(0.8)

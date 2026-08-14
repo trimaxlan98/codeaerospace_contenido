@@ -47,11 +47,11 @@ clip es un módulo. Consecuencias:
 | 1.3 | La velocidad del sonido | 4 | **hecha** |
 | 1.4 | Ecuaciones de conservación para flujo compresible | 4 | **hecha** |
 | 1.5 | Propiedades de estancamiento y relaciones isentrópicas | 4 | **hecha** |
-| 2.1 | Naturaleza física de la onda de choque | 4 | pendiente |
-| 2.2 | Relaciones de la onda de choque normal | 4 | pendiente |
-| 2.3 | Medición de velocidad en flujo compresible | 4 | pendiente |
-| 2.4 | Flujo cuasi-unidimensional en conductos | 4 | pendiente |
-| 2.5 | Toberas convergentes y De Laval | 5 | pendiente |
+| 2.1 | Naturaleza física de la onda de choque | 4 | **hecha** |
+| 2.2 | Relaciones de la onda de choque normal | 4 | **hecha** |
+| 2.3 | Medición de velocidad en flujo compresible | 4 | **hecha** |
+| 2.4 | Flujo cuasi-unidimensional en conductos | 4 | **hecha** |
+| 2.5 | Toberas convergentes y De Laval | 5 | **hecha** |
 | 3.1 | Ondas de choque oblicuas | 4 | pendiente |
 | 3.2 | La relación θ-β-M | 4 | pendiente |
 | 3.3 | Reflexión e interacción de ondas | 4 | pendiente |
@@ -63,8 +63,9 @@ clip es un módulo. Consecuencias:
 | 4.4 | El régimen transónico y sus soluciones de diseño | 4 | pendiente |
 | 4.5 | Teoría supersónica linealizada y panorama hipersónico | 5 | pendiente |
 
-**El módulo 1 está completo** (lecciones 1.1-1.5): es la unidad mínima
-publicable, y fija el idioma con el que se escribe todo lo demás.
+**Los módulos 1 y 2 están completos** (lecciones 1.1-2.5, 41 clips). El 1
+fija el idioma; el 2 lo usa para romper el aire de frente. Quedan los
+módulos 3 (ondas oblicuas) y 4 (transónico y linealizado).
 
 ## Paleta de la familia
 
@@ -157,7 +158,45 @@ curvas_isentropicas(m_max, ...)            # .punto_de(i, M), .valor(i, M),
 tabla_isentropica(machs, ...)              # .fila(i), .celda(i,j),
                                            # .columna(j), .valor(i,j),
                                            # .resaltar(i)
+
+# modulo 2 — numeros
+choque_normal(M1)                          # -> M2, p2/p1, T2/T1,
+                                           #    rho2/rho1, p02/p01
+rayleigh_pitot(M1)                         # p02/p1 con choque desprendido
+error_anemometro(M)                        # cuanto miente 1/2 rho V^2
+mach_de_area(A/A*, rama)                   # invierte A/A* por biseccion
+
+# modulo 2 — piezas
+diagrama_xt(n_ondas, ...)                  # .caracteristica(i), .choque,
+                                           # .coalescencia()
+perfil_choque(salto, espesor_rel, ...)     # .curva, .escala
+esquema_schlieren(n_rayos, desviados, ...) # .rayos, .onda, .cuchilla,
+                                           # .pantalla, .banda
+curvas_choque(grupo, m_max, ...)           # grupo 'saltos'|'perdidas';
+                                           # .valor(i,M1), .color_de(i),
+                                           # .vertical_en, .horizontal_en
+curva_anemometro(m_max, umbral, ...)       # .punto_de(M), .error(M)
+escalera_velocidades(tas, altitud, ...)    # .barra(i), .valor(i), .nombre(i)
+curva_area_mach(m_max, ...)                # .rama_sub, .rama_super,
+                                           # .mach_de(A,rama), .horizontal_en
+perfil_tobera(area_garganta, regimenes,…)  # .tubo, .curva(k), .choque(k),
+                                           # .mach(k,x), .presion(k,x),
+                                           # .salida(k), .punto_de(k,x)
 ```
+
+`choque_normal` levanta `ValueError` con M1 < 1 en vez de devolver
+números: un choque de expansión viola la segunda ley y es justo el asunto
+del clip 3 de la 2.1. Devolver algo ahí lo dejaría pasar callando.
+
+`perfil_tobera` es la figura grande del módulo: resuelve la tobera régimen
+a régimen invirtiendo A/A* en la rama que toca, y en el caso con choque
+interno aplica el **A\* nuevo** que impone la pérdida de presión de
+estancamiento (A\*₂ = A\*₁·p₀₁/p₀₂). De ahí sale sola la propiedad que el
+clip cuenta: las tres curvas bloqueadas coinciden exactamente en el
+convergente y solo se separan pasada la garganta.
+
+Los cuatro grupos de números cuadran con NACA 1135 dentro del redondeo
+publicado (desvío máximo 5·10⁻⁵).
 
 La tabla **se genera, no se transcribe**: cada celda se evalúa con las
 mismas funciones que dibujan las curvas, así que no puede traer una errata
@@ -254,7 +293,24 @@ El caso del clip 1 es el mismo de siempre (11 km, Mach 2): fuera hace 56
 bajo cero y el morro va a 117 grados. Es el gancho de la lección y sale
 entero de `isa()` y `razon_temperatura()`.
 
-## Trampas encontradas (para las 16 lecciones que faltan)
+## Módulo 2 — las cinco lecciones
+
+| Lección | Clips | Duraciones | Hilo |
+|---------|-------|------------|------|
+| 2.1 Naturaleza de la onda de choque | 4 | 38.5 / 37.4 / 40.1 / 43.5 s | coalescencia → espesor → irreversibilidad → Schlieren |
+| 2.2 Relaciones del choque normal | 4 | 37.9 / 36.8 / 33.8 / 39.7 s | la caja a caballo → Rankine-Hugoniot → los saltos → lo que cuesta |
+| 2.3 Medir la velocidad | 4 | 37.5 / 38.0 / 39.5 / 43.2 s | Pitot compresible → Rayleigh → error del anemómetro → IAS/CAS/EAS/TAS |
+| 2.4 Flujo cuasi-unidimensional | 4 | 39.0 / 36.8 / 36.5 / 39.7 s | la hipótesis → dA/A=(M²−1)dV/V → los cuatro casos → A/A* con dos ramas |
+| 2.5 Toberas convergentes y De Laval | 5 | 40.5 / 43.5 / 36.8 / 33.7 / 44.0 s | bloqueo → regímenes → sobre/subexpandida → campanas → túnel |
+
+Números de referencia del módulo, todos calculados y no transcritos: el
+choque de M1 = 2 (p2/p1 = 4.50, T2/T1 = 1.69, M2 = 0.5774, p02/p01 =
+0.7209), el techo de compresión (γ+1)/(γ−1) = 6, la lectura de Rayleigh a
+Mach 2 (5.640 frente a los 7.824 de un Pitot que ignorase el choque), la
+presión crítica 0.5283 que bloquea una tobera, y la De Laval de garganta
+0.42 (A_e/A_t = 2.38 → M de salida 2.39).
+
+## Trampas encontradas (para las lecciones que faltan)
 
 - **Piezas que se reconstruyen en una animación** (`piston_gas`,
   `pulso_conducto`) no pueden guardar coordenadas absolutas de
@@ -285,6 +341,20 @@ entero de `isa()` y `razon_temperatura()`.
   ahí. La salida es sacarlas FUERA de la caja de ejes a la altura exacta de
   su punto, y del mismo color — se leen sin guía, y una guía habría cruzado
   otras curvas.
+- **`set_opacity` enciende el relleno.** Un `Polygon` de contorno al que se
+  le llama `set_opacity(0.8)` sale macizo: los diamantes de Mach parecían
+  gemas. Es `set_stroke(opacity=…)`.
+- **Un spline a través de una discontinuidad rebota.** La curva de presión
+  con choque interno, dibujada con `set_points_smoothly`, dejaba un pico
+  hacia abajo justo antes del escalón — se leía como si la presión bajara
+  antes de subir. Con 91 muestras, una poligonal se ve igual de suave donde
+  la función lo es y no inventa nada donde no.
+- **Localizar un trozo de fórmula por índices de glifo es frágil.**
+  `SurroundingRectangle(formula[0][8:15])` acabó encerrando «−1) dV/V». Se
+  parte el `MathTex` en argumentos y se recuadra `formula[2]`.
+- **Una `DashedLine` degenerada no se arregla con `put_start_and_end_on`**:
+  no tiene guiones que recolocar. La asíntota hay que construirla ya con
+  sus extremos, y eso lo hace la pieza, que es quien tiene la caja.
 - **Los pies necesitan ≥ 5 s legibles.** Con el relevo secuencial de
   `Rotulos` (0.25 s de salida + 0.5 s de entrada), eso es `wait(4.6)` como
   mínimo. Recortar tiempo se hace **quitando beats**, no acortando los que

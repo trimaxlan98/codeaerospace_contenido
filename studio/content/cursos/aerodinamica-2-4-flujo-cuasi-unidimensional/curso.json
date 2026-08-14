@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 2.4 Flujo cuasi-unidimensional en conductos",
+  "description": "Lección 2.4 del curso Aerodinámica (módulo 2: ondas de choque normales y flujo cuasi-unidimensional), en 4 clips animados —uno por subtema—: la hipótesis de área variable lentamente y qué pasa cuando no se cumple; la ecuación diferencial área-velocidad y el signo de M²−1 del que cuelga todo; los cuatro casos dibujados, incluido el tubo que acelera al ensancharse; y la relación área-Mach con su doble solución, que deja la decisión en manos de la presión de salida. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-tubo-que-cambia-despacio.py",
+      "title": "1 · Un tubo que cambia despacio",
+      "scene": "Clip1",
+      "final_state": "Arriba el conducto De Laval suave; abajo un divergente de pared quebrada con las trazas ámbar del flujo separándose de ella; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-ecuacion-area-velocidad.py",
+      "title": "2 · La ecuación área-velocidad",
+      "scene": "Clip2",
+      "final_state": "dA/A = (M²−1) dV/V en cian con el paréntesis recuadrado en rojo, y debajo los dos casos: «M < 1 el paréntesis es negativo» en verde y «M > 1 el paréntesis es positivo» en rojo; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-tubo-que-hace-lo-contrario.py",
+      "title": "3 · El tubo que hace lo contrario",
+      "scene": "Clip3",
+      "final_state": "Matriz de cuatro tubos (se estrecha / se ensancha × M < 1 / M > 1) con su flecha y su veredicto: acelera, frena, frena, acelera; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-una-area-dos-machs.py",
+      "title": "4 · Un área, dos Machs",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La forma del tubo pone las opciones.» sobre «La presión de salida elige.» en ámbar; HUD 'MODULO 04'."
+    }
+  ]
+}

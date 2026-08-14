@@ -2518,11 +2518,15 @@ def curva_area_mach(m_max=3.2, ancho=5.4, alto=2.9, color_sub=COLOR_SUBSONICO,
                       DashedLine(en(1.0, 0.0), punto, stroke_width=1.3,
                                  color=COLOR_EJE, dash_length=0.07))
 
+    # Los nombres de las ramas van DENTRO del hueco de la U, a media altura
+    # y no pegados a su curva: colgados del trazo caen justo donde el clip
+    # necesita rotular los dos Machs de una misma relacion de areas, que es
+    # el asunto entero de la pieza.
     etiquetas = VGroup()
-    for texto, color, m_ref in (("subsónico", color_sub, 0.30),
-                                ("supersónico", color_super, 2.4)):
+    for texto, color, m_ref in (("subsónico", color_sub, 0.62),
+                                ("supersónico", color_super, 2.35)):
         tag = _texto_display(texto, font_size=font_size + 3, color=color)
-        tag.next_to(en(m_ref, float(razon_area(m_ref))), UR, buff=0.10)
+        tag.move_to(en(m_ref, 0.66 * a_hi))
         etiquetas.add(tag)
     tag_g = _texto_hud("A/A* = 1", font_size=font_size, color=COLOR_CALCULO)
     tag_g.next_to(punto, DOWN, buff=0.30)
@@ -2705,7 +2709,14 @@ def perfil_tobera(area_garganta=0.42, regimenes=("diseno", "choque",
         machs, presiones = _solucion_tobera(xs, areas, clave,
                                             m_garganta_venturi, x_choque)
         color = colores[clave]
-        curvas.add(_curva(en(xs, presiones), color, grosor=2.6))
+        # Poligonal y NO spline: la curva del choque tiene un salto, y un
+        # `set_points_smoothly` a traves de una discontinuidad rebota — deja
+        # un pico hacia abajo justo antes del escalon, que se lee como si la
+        # presion bajara antes de subir. Con 91 muestras la poligonal se ve
+        # igual de suave donde la funcion lo es.
+        traza = VMobject(color=color, stroke_width=2.6)
+        traza.set_points_as_corners(en(xs, presiones))
+        curvas.add(traza)
         datos[clave] = (xs, machs, presiones, color)
         if clave == "choque":
             # El choque se marca en el TUBO, no en el grafico: es un sitio

@@ -72,11 +72,15 @@ Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
 | 1.3 | La velocidad del sonido | 4 | versionado, validado en local |
 | 1.4 | Ecuaciones de conservacion | 4 | versionado, validado en local |
 | 1.5 | Propiedades de estancamiento e isentropicas | 4 | versionado, validado en local |
-| 2.1 → 4.5 | las 15 restantes | 63 | pendientes |
+| 2.1 | Naturaleza fisica de la onda de choque | 4 | versionado, validado en local |
+| 2.2 | Relaciones de la onda de choque normal | 4 | versionado, validado en local |
+| 2.3 | Medicion de velocidad en flujo compresible | 4 | versionado, validado en local |
+| 2.4 | Flujo cuasi-unidimensional en conductos | 4 | versionado, validado en local |
+| 2.5 | Toberas convergentes y De Laval | 5 | versionado, validado en local |
+| 3.1 → 4.5 | las 10 restantes | 42 | pendientes |
 
-**El modulo 1 esta completo** (1.1-1.5, 20 clips) y es la unidad minima
-publicable. Pendiente: `subir_curso.py` contra produccion, renders `qh`,
-narracion TTS y mux.
+**Los modulos 1 y 2 estan completos** (1.1-2.5, 41 clips). Pendiente:
+`subir_curso.py` contra produccion, renders `qh`, narracion TTS y mux.
 
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 
