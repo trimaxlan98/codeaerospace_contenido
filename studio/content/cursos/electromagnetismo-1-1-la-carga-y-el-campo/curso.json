@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 1.1 La carga y el campo eléctrico",
+  "description": "Lección 1.1 del curso Electromagnetismo (módulo 1: los campos quietos), en 4 clips animados —uno por subtema—: la ley de Coulomb y su 1/r², el campo como mapa que existe antes de que llegue nadie, el dipolo como la semilla de toda antena (y por qué su campo estático muere con el cubo), y el potencial como el mapa de la energía. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-fuerza-que-empieza-todo.py",
+      "title": "1 · La fuerza que empieza todo",
+      "scene": "Clip1",
+      "final_state": "Curva de la fuerza entre dos cargas de 1 µC frente a la distancia, con los puntos r = 1 m (9.0 mN) y r = 2 m (2.2 mN) rotulados y el pie del cuarto de fuerza; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-mapa-del-empuje.py",
+      "title": "2 · El campo: el mapa del empuje",
+      "scene": "Clip2",
+      "final_state": "Mapa de líneas de campo de dos cargas positivas iguales con el punto de equilibrio marcado en cian en el centro; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-dipolo-semilla-de-antena.py",
+      "title": "3 · El dipolo: la semilla de la antena",
+      "scene": "Clip3",
+      "final_state": "Curvas comparadas de la caída del campo (carga 1/r² en ámbar, dipolo 1/r³ en violeta) con las cifras 11 % y 3.7 % a 3 m fuera de la caja; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-potencial-mapa-de-energia.py",
+      "title": "4 · El potencial: el mapa de la energía",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El campo empuja.» sobre «El potencial cobra.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}
