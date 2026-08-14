@@ -1,0 +1,56 @@
+{
+  "name": "Sistemas distribuidos: la nube por dentro",
+  "description": "Curso de divulgación en 8 clips sobre cómo miles de máquinas ordinarias fingen ser una sola extraordinaria: la probabilidad de fallas (con 1000 máquinas al 99.9 %, un 63 % de que alguna esté caída ahora), los pisos físicos de latencia (113 ms a Tokio por fibra), los relojes lógicos de Lamport, la disyuntiva CAP durante una partición, los quórums de mayoría (W+R>N), la elección de líder al estilo Raft, el anillo de hash consistente y la disponibilidad por réplicas (nueve nueves). Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-maquina-que-no-existe.py",
+      "title": "1 · La máquina que no existe",
+      "scene": "Clip1",
+      "final_state": "La rejilla de nodos con varios apagados en rojo y la curva 1−p^N con el 63.2 % rotulado en N=1000; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-velocidad-de-la-luz-no-negocia.py",
+      "title": "2 · La velocidad de la luz no negocia",
+      "scene": "Clip2",
+      "final_state": "La línea de ciudades a escala con los tres arcos ámbar y sus pisos rotulados (34, 91 y 113 ms) y el pie de las réplicas cerca de ti; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-no-existe-el-ahora.py",
+      "title": "3 · No existe el «ahora»",
+      "scene": "Clip3",
+      "final_state": "El diagrama espacio-tiempo con los tres procesos, los mensajes ámbar y TODOS los relojes de Lamport rotulados en violeta, con dos eventos marcados como concurrentes; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-partido-en-dos.py",
+      "title": "4 · Partido en dos",
+      "scene": "Clip4",
+      "final_state": "Los dos centros de datos con el enlace cortado en rojo y las dos salidas rotuladas (responder viejo = disponible / esperar = consistente); HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-la-mayoria-manda.py",
+      "title": "5 · La mayoría manda",
+      "scene": "Clip5",
+      "final_state": "Los 5 nodos con el conjunto de escritura (aros verdes) y el de lectura (aros ámbar) solapados en el nodo compartido brillando, con W+R>N en el pie; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-elegir-un-lider.py",
+      "title": "6 · Elegir un líder",
+      "scene": "Clip6",
+      "final_state": "Los 5 nodos con el líder del término 3 coronado en ámbar, el líder viejo apagado en rojo y el término rotulado; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-el-anillo-que-reparte.py",
+      "title": "7 · El anillo que reparte",
+      "scene": "Clip7",
+      "final_state": "El anillo violeta con el nodo nuevo verde, las claves de su arco recoloreadas y la fracción medida (~29 %) rotulada; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-la-nube-es-un-pacto.py",
+      "title": "8 · La nube es un pacto",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «Ninguna máquina es fiable.» sobre «El pacto entre ellas, sí.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}

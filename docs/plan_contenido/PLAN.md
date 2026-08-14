@@ -38,14 +38,16 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 15 | Caos: el orden escondido | original (divulgacion pura, tercer titulo de la linea visual) | `caos.py` | publicado (PR #12) |
 | 16 | Relatividad y el GPS | original (divulgacion pura, fisica aplicada a ingenieria) | `relatividad.py` | publicado (PR #13) |
 | 17 | Tsiolkovsky: la tirania del cohete | original (divulgacion pura, astronautica) | `cohete.py` | publicado (PR #15) |
+| 18 | Sistemas distribuidos: la nube por dentro | original (divulgacion, computo distribuido) | `distribuido.py` | publicado (PR #16) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
 esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
 (`curso-09-enlace.md` es el curso 13; `curso-11-matematicas-naturaleza.md`
 es el curso 14, `curso-12-caos.md` el 15, `curso-13-relatividad-gps.md`
-el 16 y `curso-14-tsiolkovsky.md` el 17 — el `curso-10` lo ocupa la
-familia Aerodinamica, que corre en su propia rama con otro formato).
+el 16, `curso-14-tsiolkovsky.md` el 17 y `curso-15-distribuidos.md` el
+18 — el `curso-10` lo ocupa la familia Aerodinamica, que corre en su
+propia rama con otro formato).
 
 ## Cola de cursos nuevos (desmenuzado)
 
