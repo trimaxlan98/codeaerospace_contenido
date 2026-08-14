@@ -86,8 +86,8 @@ Uso:
 import numpy as np
 
 from manim import (AnimationGroup, Arrow, Circle, DashedLine, DashedVMobject,
-                   Dot, Line, Rectangle, Text, Transform, VGroup, VMobject,
-                   DOWN, LEFT, ORIGIN, RIGHT, UP, UR)
+                   Dot, Line, Polygon, Rectangle, Text, Transform, VGroup,
+                   VMobject, DL, DOWN, DR, LEFT, ORIGIN, RIGHT, UL, UP, UR)
 
 from code_brand import (CODE_BG, CODE_MUTED, FUENTE_DISPLAY,
                         FUENTE_HUD, registrar_fuentes)
@@ -3702,3 +3702,796 @@ def perfil_supersonico(tipo="placa", mach1=2.0, alfa=10.0, semiangulo=5.0,
                          -n_sup_del)}
 
     return PerfilSupersonico(perfil, ondas, caras, datos, tipo, c)
+
+
+# =======================================================================
+# MODULO 4 — subsonico compresible, transonico y supersonico linealizado
+# =======================================================================
+
+# Constantes de la ecuacion de Korn, la correlacion de ingenieria con la que
+# se estima el Mach de divergencia del arrastre: M_dd + cl/10 + t/c = kappa.
+KORN_CONVENCIONAL = 0.87
+KORN_SUPERCRITICO = 0.95
+
+
+def prandtl_glauert(cp_incompresible, mach):
+    """cp corregido por la regla de Prandtl-Glauert: cp0/sqrt(1-M^2).
+
+    Es la correccion mas simple que existe y la unica que sale directamente
+    de la ecuacion linealizada. Su defecto es el que se ve en la grafica: al
+    acercarse a M = 1 el denominador tiende a cero y la correccion se
+    dispara a infinito, que no es lo que hace el aire.
+    """
+    m = np.asarray(mach, dtype=np.float64)
+    beta = np.sqrt(np.maximum(1.0 - m ** 2, 1e-6))
+    return np.asarray(cp_incompresible, dtype=np.float64) / beta
+
+
+def karman_tsien(cp_incompresible, mach):
+    """Correccion de Karman-Tsien: mete parte de la no linealidad que
+    Prandtl-Glauert deja fuera, y por eso se dispara mas tarde."""
+    cp0 = np.asarray(cp_incompresible, dtype=np.float64)
+    m = np.asarray(mach, dtype=np.float64)
+    beta = np.sqrt(np.maximum(1.0 - m ** 2, 1e-6))
+    return cp0 / (beta + (m ** 2 / (1 + beta)) * cp0 / 2)
+
+
+def laitone(cp_incompresible, mach):
+    """Correccion de Laitone: como Karman-Tsien pero evaluando el termino no
+    lineal con las propiedades LOCALES; es la que mejor sigue al dato real
+    cerca del Mach critico, y tambien la que antes se rompe pasado el."""
+    cp0 = np.asarray(cp_incompresible, dtype=np.float64)
+    m = np.asarray(mach, dtype=np.float64)
+    beta = np.sqrt(np.maximum(1.0 - m ** 2, 1e-6))
+    factor = m ** 2 * (1 + (GAMMA - 1) / 2 * m ** 2) / (2 * beta)
+    return cp0 / (beta + factor * cp0)
+
+
+def cp_critico(mach):
+    """El cp que hay que alcanzar en el punto mas rapido del perfil para que
+    ahi el flujo llegue justo a Mach 1.
+
+    No depende del perfil: es una propiedad del aire y del Mach de vuelo. Por
+    eso en el clip se dibuja como una curva fija sobre la que cada perfil
+    proyecta la suya.
+    """
+    m = np.maximum(np.asarray(mach, dtype=np.float64), 1e-6)
+    return (2 / (GAMMA * m ** 2)) * (
+        ((2 + (GAMMA - 1) * m ** 2) / (GAMMA + 1)) ** (GAMMA / (GAMMA - 1))
+        - 1)
+
+
+def mach_critico(cp_minimo_incompresible):
+    """Mach de vuelo al que el perfil alcanza Mach 1 en su punto mas rapido.
+
+    Se resuelve donde la curva corregida por Prandtl-Glauert corta a la de
+    `cp_critico`. Es la construccion grafica clasica, hecha por biseccion en
+    vez de a ojo — y ese cruce ES el clip 1 de la leccion 4.3.
+    """
+    cp0 = float(cp_minimo_incompresible)
+    if cp0 >= 0:
+        raise ValueError("mach_critico: el cp minimo de un perfil que "
+                         "sustenta es negativo (succion)")
+    lo, hi = 0.05, 0.99
+    for _ in range(80):
+        medio = (lo + hi) / 2
+        # Por debajo del critico la curva corregida va POR ENCIMA de la
+        # critica (menos negativa); al cruzarla, el perfil ya tiene una
+        # burbuja supersonica.
+        if float(prandtl_glauert(cp0, medio)) > float(cp_critico(medio)):
+            lo = medio
+        else:
+            hi = medio
+    return float((lo + hi) / 2)
+
+
+def mach_divergencia(espesor_relativo=0.12, cl=0.5, kappa=KORN_CONVENCIONAL):
+    """Mach de divergencia del arrastre por la ecuacion de Korn.
+
+    M_dd = kappa - cl/10 - t/c. Es una correlacion de ingenieria, no una
+    deduccion: `kappa` vale 0.87 para un perfil convencional y 0.95 para uno
+    supercritico, y esa diferencia de 0.08 es exactamente lo que Whitcomb le
+    regalo a la aviacion comercial.
+    """
+    return float(kappa) - float(cl) / 10 - float(espesor_relativo)
+
+
+def mach_normal_flecha(mach, flecha_grados):
+    """El Mach que 've' un ala en flecha: solo la componente perpendicular
+    al borde de ataque cuenta para la compresibilidad."""
+    return float(mach) * float(np.cos(np.deg2rad(float(flecha_grados))))
+
+
+# --- 4.5 la teoria linealizada de Ackeret ------------------------------
+def ackeret(mach, alfa_grados, semiangulo=0.0, curvatura=0.0):
+    """cl y cd de onda por teoria linealizada supersonica.
+
+    cl = 4 alfa / sqrt(M^2-1) y cd = 4(alfa^2 + g_espesor + g_curvatura) /
+    sqrt(M^2-1). Los tres sumandos del arrastre no se mezclan: la
+    sustentacion, el espesor y la curvatura contribuyen por separado, y esa
+    separacion limpia es justo lo que la teoria exacta NO ofrece.
+
+    Para un rombo de semiangulo e, el termino de espesor vale e^2.
+    """
+    m = float(mach)
+    if m <= 1.0:
+        raise ValueError("ackeret: la teoria linealizada supersonica "
+                         "necesita M > 1")
+    a = np.deg2rad(float(alfa_grados))
+    e = np.deg2rad(float(semiangulo))
+    raiz = np.sqrt(m ** 2 - 1)
+    return {"cl": float(4 * a / raiz),
+            "cd": float(4 * (a ** 2 + e ** 2 + float(curvatura) ** 2)
+                        / raiz),
+            "cd_sustentacion": float(4 * a ** 2 / raiz),
+            "cd_espesor": float(4 * e ** 2 / raiz),
+            "pendiente": float(4 / raiz)}
+
+
+# --- 4.2 las tres correcciones de compresibilidad ----------------------
+CORRECCIONES = (("Prandtl-Glauert", prandtl_glauert, COLOR_CALCULO),
+                ("Karman-Tsien", karman_tsien, COLOR_SUBSONICO),
+                ("Laitone", laitone, COLOR_TRANSONICO))
+
+
+class CurvaCorrecciones(_Cartesiano):
+    """Las tres correcciones de compresibilidad sobre el mismo cp0.
+
+    Las tres arrancan juntas y se separan al acercarse a M = 1: esa
+    separacion ES la leccion. Y las tres se disparan a infinito, lo que
+    tambien lo es — ninguna vale pasado el Mach critico.
+    """
+
+    def __init__(self, ejes, curvas, etiquetas, cp0, rango_m, rango_cp,
+                 ancho, alto, origen, **kwargs):
+        super().__init__(ejes, curvas, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curvas = curvas
+        self.etiquetas = etiquetas
+        self.cp0 = float(cp0)
+        self._calibrar(rango_m, rango_cp, ancho, alto, origen)
+
+    def nombre(self, i):
+        return CORRECCIONES[i % len(CORRECCIONES)][0]
+
+    def color_de(self, i):
+        return CORRECCIONES[i % len(CORRECCIONES)][2]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+    def valor(self, i, mach):
+        """cp corregido por el metodo i. Misma fuente que el trazo."""
+        return float(CORRECCIONES[i % len(CORRECCIONES)][1](self.cp0, mach))
+
+    def punto_de(self, i, mach):
+        """Punto SOBRE la curva i. Va con `abs` porque la pieza dibuja
+        |cp| y `valor` devuelve el cp con su signo: sin el, los tres puntos
+        se recortan al suelo del grafico y se apilan."""
+        return self._en(mach, abs(self.valor(i, mach)))
+
+    def vertical_en(self, mach, color=None, grosor=1.5):
+        """Corte de eje a eje en ese Mach, para leer las tres a la vez."""
+        return DashedLine(self._en(mach, self._ry[0]),
+                          self._en(mach, self._ry[1]), stroke_width=grosor,
+                          color=COLOR_EJE if color is None else color,
+                          dash_length=0.08)
+
+
+def curvas_correcciones(cp0=-0.43, m_max=0.85, ancho=5.2, alto=2.8,
+                        color_ejes=COLOR_EJE, font_size=14, muestras=160,
+                        hueco_etiquetas=0.66):
+    """Ejes (Mach ->, |cp| ^) con Prandtl-Glauert, Karman-Tsien y Laitone.
+
+    Se dibuja |cp| y no cp: el cp de succion es negativo y un eje que crece
+    hacia abajo obliga al espectador a leer al reves justo cuando la curva
+    se dispara. El signo lo dice el rotulo del eje.
+    """
+    muestras = _validar_muestras("curvas_correcciones", muestras)
+    m1 = float(m_max)
+    ms = np.linspace(0.0, m1, muestras)
+    series = [np.abs(np.asarray(f(cp0, ms), dtype=np.float64))
+              for _n, f, _c in CORRECCIONES]
+    cp_hi = max(float(s.max()) for s in series) * 1.06
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, m1), (0.0, cp_hi), ancho, alto)
+
+    curvas = VGroup()
+    etiquetas = VGroup()
+    x_tag = origen[0] + ancho + float(hueco_etiquetas)
+    alturas = (0.30, 0.55, 0.86)
+    for i, ((nombre, _f, color), ys) in enumerate(zip(CORRECCIONES, series)):
+        curvas.add(_curva(en(ms, ys), color, grosor=2.8))
+        fin = en(m1, ys[-1])
+        tag = _texto_hud(nombre.upper(), font_size=font_size - 1, color=color)
+        tag.move_to((x_tag + tag.width / 2, origen[1] + alturas[i] * alto, 0))
+        guia = DashedLine(fin + RIGHT * 0.08, tag.get_left() + LEFT * 0.10,
+                          stroke_width=1.2, color=color, dash_length=0.07)
+        guia.set_stroke(opacity=0.55)
+        etiquetas.add(VGroup(guia, tag))
+
+    base = DashedLine(en(0.0, abs(cp0)), en(m1, abs(cp0)), stroke_width=1.4,
+                      color=COLOR_EJE, dash_length=0.08)
+    tag_base = _texto_hud(f"{abs(cp0):.2f}", font_size=font_size - 2,
+                          color=COLOR_EJE)
+    tag_base.next_to(base.get_start(), LEFT, buff=0.12)
+    marcas = VGroup(base, tag_base)
+    for valor in (0.0, m1):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.12)
+        marcas.add(num)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.42)
+    tag_y = _texto_display("succión  |cp|", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return CurvaCorrecciones(ejes, curvas, etiquetas, cp0, (0.0, m1),
+                             (0.0, cp_hi), ancho, alto, origen)
+
+
+# --- 4.3 el Mach critico y la divergencia ------------------------------
+class CurvaMachCritico(_Cartesiano):
+    """El cruce que define el Mach critico, dibujado.
+
+    Dos curvas: la del perfil (su cp minimo corregido, que se hunde al subir
+    M) y la del aire (el cp que hace falta para llegar a Mach 1 local, que
+    sube). Se cortan una sola vez, y ese corte es Mcr.
+    """
+
+    def __init__(self, ejes, perfil, critica, cruce, etiquetas, cp0, rango_m,
+                 rango_cp, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, critica, perfil, cruce, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.perfil = perfil
+        self.critica = critica
+        self.cruce = cruce
+        self.etiquetas = etiquetas
+        self.cp0 = float(cp0)
+        self._calibrar(rango_m, rango_cp, ancho, alto, origen)
+
+    def mcr(self):
+        """El Mach critico. La cifra que rotula el clip."""
+        return mach_critico(self.cp0)
+
+    def punto_cruce(self):
+        return self._en(self.mcr(), abs(float(cp_critico(self.mcr()))))
+
+
+def curva_mach_critico(cp0=-0.43, m_min=0.35, m_max=0.92, ancho=5.2,
+                       alto=2.8, color_perfil=COLOR_CALCULO,
+                       color_critica=COLOR_SUPERSONICO, color_ejes=COLOR_EJE,
+                       font_size=14, muestras=180):
+    """La construccion grafica del Mach critico: dos curvas y su corte.
+
+    El eje vertical vuelve a ser |cp| (ver `curvas_correcciones`). El rango
+    de Mach arranca en 0.35 y no en 0 porque abajo la curva critica se va a
+    valores enormes y aplasta todo lo demas contra el suelo.
+    """
+    muestras = _validar_muestras("curva_mach_critico", muestras)
+    m0, m1 = float(m_min), float(m_max)
+    ms = np.linspace(m0, m1, muestras)
+    cps_perfil = np.abs(np.asarray(prandtl_glauert(cp0, ms), dtype=np.float64))
+    cps_criticos = np.abs(np.asarray(cp_critico(ms), dtype=np.float64))
+    cp_hi = float(max(cps_perfil.max(), cps_criticos[0])) * 1.06
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (m0, m1), (0.0, cp_hi), ancho, alto)
+    perfil = _curva(en(ms, np.clip(cps_perfil, 0, cp_hi)), color_perfil,
+                    grosor=3.0)
+    critica = _curva(en(ms, np.clip(cps_criticos, 0, cp_hi)), color_critica,
+                     grosor=3.0)
+
+    m_cruce = mach_critico(cp0)
+    punto = en(m_cruce, abs(float(cp_critico(m_cruce))))
+    cruce = VGroup(Dot(punto, radius=0.08, color=COLOR_TRANSONICO),
+                   DashedLine(en(m_cruce, 0.0), punto, stroke_width=1.4,
+                              color=COLOR_TRANSONICO, dash_length=0.07))
+    cruce[1].set_stroke(opacity=0.7)
+
+    etiquetas = VGroup()
+    for texto, color, i in (("el perfil", color_perfil, muestras - 1),
+                            ("el aire", color_critica, muestras - 1)):
+        ys = cps_perfil if color == color_perfil else cps_criticos
+        tag = _texto_display(texto, font_size=font_size + 3, color=color)
+        tag.next_to(en(m1, min(ys[i], cp_hi)), UL if color == color_perfil
+                    else DL, buff=0.10)
+        etiquetas.add(tag)
+
+    marcas = VGroup()
+    for valor in (m0, m1):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.12)
+        marcas.add(num)
+
+    tag_x = _texto_hud("MACH DE VUELO", font_size=font_size - 2)
+    tag_x.next_to(ejes[0], DOWN, buff=0.42)
+    tag_y = _texto_display("succión  |cp|", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return CurvaMachCritico(ejes, perfil, critica, cruce, etiquetas, cp0,
+                            (m0, m1), (0.0, cp_hi), ancho, alto, origen)
+
+
+class CurvaArrastreTransonico(_Cartesiano):
+    """cd frente al Mach: la meseta, la subida y donde empieza.
+
+    La subida se modela como cubica desde el Mach CRITICO, con la constante
+    fijada para que la pendiente valga exactamente 0.1 en el Mach de
+    divergencia — que es la definicion de Mdd. Asi los dos Machs del clip no
+    son dos marcas sueltas: uno determina la forma de la curva y el otro se
+    lee sobre ella.
+    """
+
+    def __init__(self, ejes, curvas, marcas, etiquetas, casos, rango_m,
+                 rango_cd, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, curvas, marcas, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curvas = curvas
+        self.marcas = marcas
+        self.etiquetas = etiquetas
+        self._casos = list(casos)      # (nombre, mcr, mdd, cd0, color)
+        self._calibrar(rango_m, rango_cd, ancho, alto, origen)
+
+    def caso(self, i):
+        return self._casos[i % len(self._casos)]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+    def cd(self, i, mach):
+        """cd del caso i a ese Mach. Misma fuente que el trazo."""
+        _n, mcr, mdd, cd0, _c = self.caso(i)
+        m = float(mach)
+        if m <= mcr:
+            return float(cd0)
+        c3 = 0.1 / (3 * max(mdd - mcr, 1e-3) ** 2)
+        return float(cd0 + c3 * (m - mcr) ** 3)
+
+    def punto_de(self, i, mach):
+        return self._en(mach, self.cd(i, mach))
+
+    def mdd(self, i):
+        return self.caso(i)[2]
+
+
+def curva_arrastre_transonico(casos=None, m_min=0.55, m_max=0.95,
+                              cd_tope=0.075, ancho=5.4, alto=2.7,
+                              color_ejes=COLOR_EJE, font_size=14,
+                              muestras=180):
+    """cd(M) para uno o varios perfiles, con su Mdd marcado.
+
+    `casos` es una lista de (nombre, cp0, espesor_relativo, cl, kappa,
+    color). Mcr sale de `mach_critico(cp0)` y Mdd de la ecuacion de Korn:
+    ninguno de los dos se escribe a mano.
+    """
+    muestras = _validar_muestras("curva_arrastre_transonico", muestras)
+    if casos is None:
+        # Los dos casos no comparten datos a proposito, y la comparacion es
+        # mejor asi: el supercritico es MAS GRUESO (12 % contra 10 %) y
+        # carga MAS (cl 0.5 contra 0.4), y aun asi su Mach de divergencia
+        # sale por delante. Ademas su succion es una meseta, no un pico, asi
+        # que su cp0 es menos negativo y su Mach critico mas alto.
+        casos = (("convencional", -0.60, 0.10, 0.4, KORN_CONVENCIONAL,
+                  COLOR_TRANSONICO),
+                 ("supercrítico", -0.50, 0.12, 0.5, KORN_SUPERCRITICO,
+                  COLOR_SUBSONICO))
+    m0, m1 = float(m_min), float(m_max)
+    ms = np.linspace(m0, m1, muestras)
+
+    resueltos = []
+    for nombre, cp0, espesor, cl, kappa, color in casos:
+        mcr = mach_critico(cp0)
+        mdd = mach_divergencia(espesor, cl, kappa)
+        # Si la correlacion deja Mdd por debajo del critico, el modelo cubico
+        # no tiene sentido: se avisa en vez de dibujar una curva imposible.
+        if mdd <= mcr:
+            raise ValueError(f"curva_arrastre_transonico: '{nombre}' da "
+                             f"Mdd={mdd:.3f} <= Mcr={mcr:.3f}")
+        resueltos.append((str(nombre), mcr, mdd, 0.010, color))
+
+    def _cd(mcr, mdd, cd0, m):
+        c3 = 0.1 / (3 * (mdd - mcr) ** 2)
+        return np.where(m <= mcr, cd0, cd0 + c3 * np.maximum(m - mcr, 0) ** 3)
+
+    series = [_cd(mcr, mdd, cd0, ms) for _n, mcr, mdd, cd0, _c in resueltos]
+    # Techo de validez: pasada la subida, el ajuste cubico se dispara a
+    # valores que ningun avion tiene (cd por encima de 1). Cada curva se
+    # corta donde cruza `cd_tope`, y que una acabe mucho antes que la otra ES
+    # parte de la lectura — no un recorte cosmetico.
+    cd_hi = float(cd_tope) * 1.10
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (m0, m1), (0.0, cd_hi), ancho, alto)
+
+    curvas = VGroup()
+    marcas = VGroup()
+    etiquetas = VGroup()
+    for (nombre, mcr, mdd, cd0, color), ys in zip(resueltos, series):
+        dentro = ys <= float(cd_tope)
+        curvas.add(_curva(en(ms[dentro], ys[dentro]), color, grosor=2.8))
+        punto = en(mdd, float(_cd(mcr, mdd, cd0, np.array([mdd]))[0]))
+        marcas.add(Dot(punto, radius=0.07, color=color))
+        tag = _texto_hud(f"Mdd {mdd:.2f}", font_size=font_size - 1,
+                         color=color)
+        tag.next_to(punto, UL, buff=0.10)
+        marcas.add(tag)
+        nombre_tag = _texto_display(nombre, font_size=font_size + 2,
+                                    color=color)
+        # Al final de SU curva, que ya no es el borde derecho del grafico.
+        nombre_tag.next_to(en(ms[dentro][-1], ys[dentro][-1]), UR, buff=0.10)
+        etiquetas.add(nombre_tag)
+
+    tick = VGroup()
+    for valor in (m0, m1):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.12)
+        tick.add(num)
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.42)
+    tag_y = _texto_hud("cd", font_size=font_size + 2)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tick, tag_x, tag_y)
+
+    return CurvaArrastreTransonico(ejes, curvas, marcas, etiquetas, resueltos,
+                                   (m0, m1), (0.0, cd_hi), ancho, alto,
+                                   origen)
+
+
+# --- 4.4 las soluciones transonicas ------------------------------------
+class AlaFlecha(VGroup):
+    """Planta de un ala en flecha y la descomposicion de la corriente.
+
+    La compresibilidad solo la nota la componente PERPENDICULAR al borde de
+    ataque. Por eso barrer un ala treinta grados es, para el aire, volar mas
+    despacio — y por eso todos los aviones de linea la llevan.
+    """
+
+    def __init__(self, planta, corriente, componentes, datos, borde,
+                 **kwargs):
+        super().__init__(planta, corriente, componentes, **kwargs)
+        self.planta = planta
+        self.corriente = corriente
+        self.componentes = componentes
+        self.datos = dict(datos)
+        self._borde = np.asarray(borde, dtype=np.float64)
+        self._centro_original = self.get_center()
+
+    def mach_normal(self):
+        """El Mach que ve el perfil. La cifra que rotula el clip."""
+        return self.datos["M_normal"]
+
+    def sobre_borde(self, fraccion=0.5):
+        return self._borde + (self.get_center() - self._centro_original)
+
+
+def ala_flecha(mach=0.85, flecha=35.0, envergadura=3.0, cuerda=1.5,
+               escala_v=1.9, color_planta=CODE_MUTED,
+               color_corriente=COLOR_TRANSONICO, color_normal=COLOR_SUPERSONICO,
+               color_paralela=COLOR_SUBSONICO):
+    """Semiala en flecha con el vector corriente descompuesto en el borde.
+
+    Las dos componentes se dibujan a escala entre si, asi que el
+    acortamiento de la normal —que es cos(flecha)— se ve, no solo se lee.
+    """
+    lam = np.deg2rad(float(flecha))
+    b, c = float(envergadura), float(cuerda)
+
+    # Planta trapezoidal: raiz abajo, punta arriba y desplazada por la flecha.
+    raiz_del = np.array([0.0, 0.0, 0.0])
+    raiz_tras = np.array([c, 0.0, 0.0])
+    punta_del = np.array([b * np.tan(lam), b, 0.0])
+    punta_tras = punta_del + np.array([c * 0.55, 0.0, 0.0])
+    planta = Polygon(raiz_del, raiz_tras, punta_tras, punta_del,
+                     stroke_width=2.6, color=color_planta,
+                     fill_color=COLOR_EJE, fill_opacity=0.30)
+
+    # El punto donde se descompone: medio borde de ataque.
+    borde = (raiz_del + punta_del) / 2
+    direccion = np.array([1.0, 0.0, 0.0])          # la corriente, en +x
+    # Normal y paralela AL BORDE DE ATAQUE (no a la cuerda).
+    tangente = (punta_del - raiz_del)
+    tangente = tangente / np.linalg.norm(tangente)
+    normal = np.array([tangente[1], -tangente[0], 0.0])
+
+    v = direccion * escala_v
+    vn = float(np.dot(v, normal)) * normal
+    vp = float(np.dot(v, tangente)) * tangente
+
+    def _flecha(desde, vector, color, grosor=3.2):
+        return Arrow(desde, desde + vector, buff=0, stroke_width=grosor,
+                     color=color, max_tip_length_to_length_ratio=0.20)
+
+    corriente = _flecha(borde - v, v, color_corriente)
+    componentes = VGroup(_flecha(borde - v, vn, color_normal, 2.6),
+                         _flecha(borde - v, vp, color_paralela, 2.6))
+
+    datos = {"M": float(mach), "flecha": float(flecha),
+             "M_normal": mach_normal_flecha(mach, flecha),
+             "coseno": float(np.cos(lam))}
+    pieza = AlaFlecha(planta, corriente, componentes, datos, borde)
+    pieza.move_to(ORIGIN)
+    return pieza
+
+
+# Perfiles esquematicos: (nombre, puntos del extrados, puntos del intrados).
+# Son cualitativos a proposito —el clip habla de FORMA, no de coordenadas— y
+# se dibujan con la cuerda de 0 a 1 y despues se escalan.
+_PERFILES_TRANSONICOS = {
+    "convencional": (
+        ((0.0, 0.0), (0.05, 0.055), (0.15, 0.082), (0.30, 0.090),
+         (0.55, 0.072), (0.80, 0.040), (1.0, 0.0)),
+        ((0.0, 0.0), (0.06, -0.038), (0.20, -0.050), (0.45, -0.045),
+         (0.75, -0.026), (1.0, 0.0))),
+    "supercritico": (
+        ((0.0, 0.0), (0.04, 0.048), (0.15, 0.062), (0.40, 0.066),
+         (0.65, 0.062), (0.85, 0.040), (1.0, 0.0)),
+        ((0.0, 0.0), (0.05, -0.044), (0.25, -0.058), (0.55, -0.052),
+         (0.78, -0.010), (0.92, 0.012), (1.0, 0.0))),
+}
+
+# Distribuciones de cp esquematicas: (x, |cp|) sobre el extrados. La
+# convencional tiene un pico de succion pegado al borde; la supercritica, una
+# meseta. Sin numeros en el eje: la comparacion es de FORMA.
+_CP_TRANSONICOS = {
+    "convencional": ((0.0, 0.10), (0.06, 0.95), (0.15, 0.78), (0.35, 0.60),
+                     (0.60, 0.42), (0.85, 0.22), (1.0, 0.10)),
+    "supercritico": ((0.0, 0.10), (0.08, 0.62), (0.25, 0.66), (0.50, 0.66),
+                     (0.68, 0.64), (0.78, 0.22), (1.0, 0.10)),
+}
+
+
+class PerfilesTransonicos(VGroup):
+    """Convencional contra supercritico: la forma y lo que hace con la
+    succion.
+
+    El supercritico no es 'mejor' por magia: aplana el extrados para que la
+    succion sea una MESETA en vez de un pico, y recupera atras la
+    sustentacion que pierde delante. Con la succion repartida, el flujo
+    local llega a Mach 1 mas tarde y el choque, cuando aparece, es mas debil.
+    """
+
+    def __init__(self, perfiles, curvas, etiquetas, cuerda, **kwargs):
+        super().__init__(perfiles, curvas, etiquetas, **kwargs)
+        self.perfiles = perfiles
+        self.curvas = curvas
+        self.etiquetas = etiquetas
+        self._cuerda = float(cuerda)
+
+    def perfil(self, i):
+        return self.perfiles[i % len(self.perfiles)]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+
+def perfiles_transonicos(cuerda=3.0, alto_cp=1.5, separacion=0.85,
+                         escala_perfil=2.4, color_convencional=COLOR_TRANSONICO,
+                         color_supercritico=COLOR_SUBSONICO,
+                         color_ejes=COLOR_EJE, font_size=15):
+    """Los dos perfiles, uno sobre otro, con su distribucion de succion.
+
+    Las formas y las curvas de cp son ESQUEMATICAS: la leccion compara
+    geometrias y repartos, no coordenadas. Por eso el eje de cp va sin
+    numeros — poner cifras inventadas seria peor que no ponerlas.
+    """
+    c = float(cuerda)
+    perfiles = VGroup()
+    curvas = VGroup()
+    etiquetas = VGroup()
+    casos = (("convencional", color_convencional, alto_cp + separacion),
+             ("supercritico", color_supercritico, -alto_cp - separacion))
+
+    for clave, color, y in casos:
+        extra, intra = _PERFILES_TRANSONICOS[clave]
+        contorno = VMobject(color=CODE_MUTED, stroke_width=2.6)
+        pts = [np.array([(x - 0.5) * c, yy * c * escala_perfil / 3.0, 0.0])
+               for x, yy in extra]
+        pts += [np.array([(x - 0.5) * c, yy * c * escala_perfil / 3.0, 0.0])
+                for x, yy in reversed(intra)]
+        contorno.set_points_smoothly(pts)
+        contorno.set_fill(COLOR_EJE, opacity=0.35)
+        contorno.move_to(np.array([0.0, y, 0.0]))
+        perfiles.add(contorno)
+
+        ejes, origen = _ejes_xy(c, alto_cp, color_ejes)
+        en = _escalador(origen, (0.0, 1.0), (0.0, 1.0), c, alto_cp)
+        datos = _CP_TRANSONICOS[clave]
+        traza = _curva(en(np.array([p[0] for p in datos]),
+                          np.array([p[1] for p in datos])), color,
+                       grosor=2.8)
+        grafico = VGroup(ejes, traza)
+        grafico.move_to(np.array([0.0, y - np.sign(y) * (alto_cp + 1.05), 0]))
+        tag = _texto_display(clave.replace("supercritico", "supercrítico"),
+                             font_size=font_size + 3, color=color)
+        tag.next_to(contorno, LEFT, buff=0.40)
+        curvas.add(grafico)
+        etiquetas.add(tag)
+
+    return PerfilesTransonicos(perfiles, curvas, etiquetas, c)
+
+
+class DistribucionArea(_Cartesiano):
+    """La regla del area: lo que importa es la seccion TOTAL, estacion a
+    estacion.
+
+    El ala mete un bulto en la distribucion; estrechar el fuselaje justo ahi
+    lo cancela. Aqui no se dibuja el resultado a mano — se resta de verdad,
+    y por eso la curva corregida sale plana sola.
+    """
+
+    def __init__(self, ejes, sin_regla, con_regla, aporte, etiquetas, xs,
+                 series, rango_x, rango_a, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, aporte, sin_regla, con_regla, etiquetas,
+                         **kwargs)
+        self.ejes = ejes
+        self.sin_regla = sin_regla
+        self.con_regla = con_regla
+        self.aporte = aporte
+        self.etiquetas = etiquetas
+        self._xs = np.asarray(xs, dtype=np.float64)
+        self._series = {k: np.asarray(v, dtype=np.float64)
+                        for k, v in series.items()}
+        self._calibrar(rango_x, rango_a, ancho, alto, origen)
+
+    def area(self, cual, x):
+        """Area en esa estacion: 'sin', 'con' o 'ala'."""
+        if cual not in self._series:
+            raise KeyError(f"distribucion_area: no hay '{cual}' "
+                           f"({', '.join(self._series)})")
+        return float(np.interp(float(x), self._xs, self._series[cual]))
+
+    def punto_de(self, cual, x):
+        return self._en(x, self.area(cual, x))
+
+    def bulto(self):
+        """Cuanto sobresale el pico de la curva sin corregir, en fraccion
+        del fuselaje EN ESA MISMA ESTACION. Es la cifra que el clip rotula.
+
+        Se compara contra el cuerpo local y no contra el area en x = 0: el
+        morro tiene area casi nula y el cociente se iba a millones.
+        """
+        k = int(np.argmax(self._series["sin"]))
+        cuerpo = float(self._series["cuerpo"][k])
+        return float(self._series["sin"][k]) / max(cuerpo, 1e-6) - 1.0
+
+
+def distribucion_area(area_fuselaje=1.0, pico_ala=0.55, centro=0.5,
+                      anchura=0.13, ancho=5.6, alto=2.6, color_sin=COLOR_SUPERSONICO,
+                      color_con=COLOR_SUBSONICO, color_aporte=COLOR_TRANSONICO,
+                      color_ejes=COLOR_EJE, font_size=14, muestras=180):
+    """Area transversal a lo largo del avion, con y sin regla del area.
+
+    El aporte del ala es una campana; la version corregida ESTRECHA el
+    fuselaje exactamente ese aporte, asi que la suma sale constante. No se
+    dibuja plana: sale plana.
+    """
+    muestras = _validar_muestras("distribucion_area", muestras)
+    xs = np.linspace(0.0, 1.0, muestras)
+    # Morro y cola afilados: el fuselaje no empieza ni acaba con area.
+    cuerpo = float(area_fuselaje) * np.sin(np.pi * np.clip(xs, 0, 1)) ** 0.6
+    ala = float(pico_ala) * np.exp(-((xs - float(centro)) / float(anchura))
+                                   ** 2)
+    sin = cuerpo + ala
+    con = np.maximum(cuerpo - ala, 0.04) + ala
+    a_hi = float(sin.max()) * 1.12
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, 1.0), (0.0, a_hi), ancho, alto)
+    curva_sin = _curva(en(xs, sin), color_sin, grosor=3.0)
+    curva_con = _curva(en(xs, con), color_con, grosor=3.0)
+    curva_ala = _curva(en(xs, ala), color_aporte, grosor=2.0)
+    curva_ala.set_stroke(opacity=0.75)
+
+    etiquetas = VGroup()
+    for texto, color, serie in (("sin regla", color_sin, sin),
+                                ("con regla", color_con, con),
+                                ("aporta el ala", color_aporte, ala)):
+        tag = _texto_display(texto, font_size=font_size + 2, color=color)
+        tag.next_to(en(0.90, float(np.interp(0.90, xs, serie))), RIGHT,
+                    buff=0.14)
+        etiquetas.add(tag)
+
+    tag_x = _texto_hud("A LO LARGO DEL AVION", font_size=font_size - 2)
+    tag_x.next_to(ejes[0], DOWN, buff=0.18)
+    tag_y = _texto_display("área transversal", font_size=font_size + 2)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(tag_x, tag_y)
+
+    series = {"sin": sin, "con": con, "ala": ala, "cuerpo": cuerpo}
+    return DistribucionArea(ejes, curva_sin, curva_con, curva_ala, etiquetas,
+                            xs, series, (0.0, 1.0), (0.0, a_hi), ancho, alto,
+                            origen)
+
+
+# --- 4.5 Ackeret contra la teoria exacta -------------------------------
+class ComparacionTeorias(_Cartesiano):
+    """Lo que Ackeret acierta y donde empieza a fallar.
+
+    Las dos curvas son cl frente al angulo de ataque: la exacta por
+    choque-expansion y la linealizada. Coinciden en el origen por
+    construccion, y se separan al crecer alfa — la separacion ES el error de
+    la linealizacion, medida y no supuesta.
+    """
+
+    def __init__(self, ejes, exacta, lineal, etiquetas, mach, rango_a,
+                 rango_cl, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, exacta, lineal, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.exacta = exacta
+        self.lineal = lineal
+        self.etiquetas = etiquetas
+        self.mach = float(mach)
+        self._calibrar(rango_a, rango_cl, ancho, alto, origen)
+
+    def cl_exacto(self, alfa):
+        return placa_plana(self.mach, alfa)["cl"]
+
+    def cl_lineal(self, alfa):
+        return ackeret(self.mach, alfa)["cl"]
+
+    def error(self, alfa):
+        """Error relativo de la linealizada, en fraccion."""
+        exacto = self.cl_exacto(alfa)
+        return abs(self.cl_lineal(alfa) / exacto - 1.0) if exacto else 0.0
+
+    def punto_exacto(self, alfa):
+        return self._en(alfa, self.cl_exacto(alfa))
+
+    def punto_lineal(self, alfa):
+        return self._en(alfa, self.cl_lineal(alfa))
+
+
+def comparacion_teorias(mach=2.0, alfa_max=18.0, ancho=5.2, alto=2.8,
+                        color_exacta=COLOR_SUPERSONICO,
+                        color_lineal=COLOR_CALCULO, color_ejes=COLOR_EJE,
+                        font_size=14, muestras=60):
+    """cl(alfa) de una placa plana: choque-expansion contra Ackeret.
+
+    `muestras` se queda corto (60) a proposito: cada punto de la curva
+    exacta resuelve un choque oblicuo y una expansion por biseccion.
+    """
+    muestras = _validar_muestras("comparacion_teorias", muestras)
+    m = float(mach)
+    # Se corta donde el choque del intrados se desprenderia: mas alla la
+    # teoria exacta no tiene solucion, y dibujarla seria inventar.
+    tope = min(float(alfa_max), theta_maximo(m)[0] - 0.4)
+    alfas = np.linspace(0.0, tope, muestras)
+    exactos = np.array([placa_plana(m, float(a))["cl"] for a in alfas])
+    lineales = np.array([ackeret(m, float(a))["cl"] for a in alfas])
+    cl_hi = float(max(exactos.max(), lineales.max())) * 1.10
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, tope), (0.0, cl_hi), ancho, alto)
+    exacta = _curva(en(alfas, exactos), color_exacta, grosor=3.0)
+    lineal = _curva(en(alfas, lineales), color_lineal, grosor=3.0)
+
+    etiquetas = VGroup()
+    for texto, color, serie, lado in (("exacta", color_exacta, exactos, UL),
+                                      ("Ackeret", color_lineal, lineales,
+                                       DR)):
+        tag = _texto_display(texto, font_size=font_size + 3, color=color)
+        tag.next_to(en(tope, serie[-1]), lado, buff=0.12)
+        etiquetas.add(tag)
+
+    marcas = VGroup()
+    for valor in (0.0, tope):
+        num = _texto_hud(f"{valor:.0f}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.12)
+        marcas.add(num)
+
+    tag_x = _texto_display("ángulo de ataque", font_size=font_size + 2)
+    tag_x.next_to(ejes[0], DOWN, buff=0.42)
+    tag_y = _texto_hud("cl", font_size=font_size + 2)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return ComparacionTeorias(ejes, exacta, lineal, etiquetas, m, (0.0, tope),
+                              (0.0, cl_hi), ancho, alto, origen)

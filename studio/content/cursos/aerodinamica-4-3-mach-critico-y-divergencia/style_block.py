@@ -1,6 +1,6 @@
 # =====================================================================
-# CO.DE Academy - "Aerodinámica · 1.1 El número de Mach y los regímenes
-# de vuelo". Bloque de estilo del proyecto. Se antepone al script de CADA
+# CO.DE Academy - "Aerodinámica · 4.3 Número de Mach crítico y divergencia del arrastre".
+# Bloque de estilo del proyecto. Se antepone al script de CADA
 # clip; los clips NO repiten imports: solo definen su clase ClipN(Scene).
 #
 # Este bloque es el MOLDE de la familia "Aerodinámica": las 19 lecciones
@@ -127,13 +127,12 @@ MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la curva dibujada y la cifra escrita no pueden discrepar.
-UMBRAL_ERROR = 0.05                    # error de densidad que se tolera
-M_UMBRAL = mach_de_error(UMBRAL_ERROR)  # 0.314 — el "0.3" de los libros
-M_CRUCERO = 0.80                       # donde el error ya es indefendible
-ERR_CRUCERO = float(error_incompresible(M_CRUCERO))   # 0.351
-H_CRUCERO = 11000.0                    # tropopausa ISA, m
-A_CRUCERO = isa(H_CRUCERO)[3]          # 295.1 m/s
-FACTOR_ENERGIAS = GAMMA * (GAMMA - 1) / 2             # 0.28
+CP0_GRUESO = -0.60                   # perfil grueso o muy cargado
+CP0_DELGADO = -0.35                  # perfil fino o poco cargado
+MCR_GRUESO = mach_critico(CP0_GRUESO)     # 0.689
+MCR_DELGADO = mach_critico(CP0_DELGADO)   # 0.766
+MDD_CONV = mach_divergencia(0.10, 0.4, KORN_CONVENCIONAL)     # 0.730
+MDD_SUPER = mach_divergencia(0.12, 0.5, KORN_SUPERCRITICO)    # 0.780
 
 # La flota de la familia: (nombre, Mach de operacion, silueta, altitud m).
 # Mach reales de crucero (o de reentrada, en la capsula); la altitud solo se
