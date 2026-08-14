@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 3.1 Ondas de choque oblicuas",
+  "description": "Lección 3.1 del curso Aerodinámica (módulo 3: ondas oblicuas, expansiones y perfiles supersónicos), en 4 clips animados —uno por subtema—: la descomposición de la velocidad en los ejes de la onda, por qué la componente tangencial no cambia (la presión solo empuja perpendicular), cómo eso permite resolver un choque oblicuo con las tablas del choque normal entrando por Mn1 = M1 sen β, y cómo la rampa genera la onda con β creciendo desde el ángulo de Mach. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-mismo-choque-de-lado.py",
+      "title": "1 · El mismo choque, de lado",
+      "scene": "Clip1",
+      "final_state": "Rampa con su choque oblicuo rotulado β = 39.3°, y sobre la onda los seis vectores: la velocidad ámbar con sus componentes normal (cian, que encoge) y tangencial (verde, idéntica a los dos lados); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-que-no-cambia.py",
+      "title": "2 · La que no cambia",
+      "scene": "Clip2",
+      "final_state": "La onda con los vectores y las flechas ámbar de presión empujando perpendiculares a ella por ambos lados; abajo Vt2 = Vt1 en verde; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-truco-del-seno.py",
+      "title": "3 · El truco del seno",
+      "scene": "Clip3",
+      "final_state": "Los cuatro pasos numerados: Mn1 = 2 sen 39.31° = 1.2671, la tabla de choque normal, p2/p1 y T2/T1, y M2 = Mn2/sen(β−θ) = 1.6405; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-de-donde-sale-la-onda.py",
+      "title": "4 · De dónde sale la onda",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La pared decide cuánto gira el aire.» sobre «El aire decide con qué onda.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}

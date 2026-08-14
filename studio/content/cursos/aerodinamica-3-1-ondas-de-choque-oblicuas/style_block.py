@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Aerodinámica · 1.3 La velocidad del sonido".
+# CO.DE Academy - "Aerodinámica · 3.1 Ondas de choque oblicuas".
 # Bloque de estilo del proyecto. Se antepone al script de CADA
 # clip; los clips NO repiten imports: solo definen su clase ClipN(Scene).
 #
@@ -121,12 +121,11 @@ MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la curva dibujada y la cifra escrita no pueden discrepar.
-T_MAR, A_MAR = isa(0.0)[0], isa(0.0)[3]              # 288.15 K, 340.3 m/s
-T_TROPO, A_TROPO = isa(11000.0)[0], isa(11000.0)[3]  # 216.65 K, 295.1 m/s
-V_EJEMPLO = 250.0              # m/s: el MISMO avion, a dos altitudes
-M_MAR = V_EJEMPLO / A_MAR      # 0.735 — subsonico
-M_TROPO = V_EJEMPLO / A_TROPO  # 0.847 — ya transonico, sin tocar el mando
-MACHS_CONO = (1.2, 2.0, 5.0)   # los tres conos del clip 4
+M_RAMPA = 2.0                        # la corriente de referencia del modulo
+THETA_RAMPA = 10.0                   # la rampa que la desvia, en grados
+OBLICUO = choque_oblicuo(M_RAMPA, THETA_RAMPA)   # beta = 39.31 deg
+NORMAL_EQUIV = choque_normal(OBLICUO["Mn1"])     # el choque normal de dentro
+MU_RAMPA = angulo_mach(M_RAMPA)      # 30 deg: el suelo del que parte beta
 
 # La flota de la familia: (nombre, Mach de operacion, silueta, altitud m).
 # Mach reales de crucero (o de reentrada, en la capsula); la altitud solo se

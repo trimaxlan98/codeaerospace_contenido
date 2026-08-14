@@ -57,22 +57,26 @@ _code_brand.Text = Text
 
 import aerodinamica as _aero  # noqa: E402  (tras definir la sombra)
 from aerodinamica import (COMPRESION_MAXIMA, GAMMA,  # noqa: E402
-                          REGIMENES, REGIMENES_TOBERA, R_AIRE, angulo_mach,
-                          balanza_energias, banda_regimenes, barras_calores,
-                          barras_entalpia, choque_normal, conducto, criticas,
-                          curva_anemometro, curva_area_mach,
-                          curva_compresibilidad, curva_mu, curva_sonido,
-                          curvas_choque, curvas_isentropicas, diagrama_ts,
-                          diagrama_xt, error_anemometro,
+                          NU_MAXIMO, REGIMENES, REGIMENES_TOBERA, R_AIRE,
+                          abanico_expansion, angulo_mach, balanza_energias,
+                          banda_regimenes, barras_calores, barras_entalpia,
+                          choque_normal, choque_oblicuo, conducto, criticas,
+                          curva_anemometro, curva_area_mach, curva_mu,
+                          curva_nu, curva_sonido, curvas_choque,
+                          curvas_isentropicas, diagrama_theta_beta,
+                          diagrama_ts, diagrama_xt, error_anemometro,
                           error_incompresible, escalera_velocidades,
-                          esquema_schlieren, fraccion_cinetica,
-                          frentes_moviles, isa, mach_de_area, mach_de_error,
-                          perfil_choque, perfil_isa, perfil_tobera,
-                          piston_gas, pulso_conducto, rayleigh_pitot,
-                          razon_area, razon_densidad, razon_energias,
-                          razon_presion, razon_temperatura, remanso,
-                          tabla_isentropica, velocidad_sonido,
-                          volumen_control, zona_de)
+                          esquema_schlieren, expansion, fraccion_cinetica,
+                          frentes_moviles, interseccion_choques, isa,
+                          mach_de_area, mach_de_error, mach_de_nu,
+                          onda_oblicua, perfil_choque, perfil_isa,
+                          perfil_rombico, perfil_supersonico, perfil_tobera,
+                          piston_gas, placa_plana, prandtl_meyer,
+                          pulso_conducto, rayleigh_pitot, razon_area,
+                          razon_densidad, razon_energias, razon_presion,
+                          razon_temperatura, reflexion_onda, remanso,
+                          tabla_isentropica, theta_de_beta, theta_maximo,
+                          velocidad_sonido, volumen_control, zona_de)
 
 _aero.Text = Text
 

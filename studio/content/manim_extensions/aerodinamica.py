@@ -2737,3 +2737,961 @@ def perfil_tobera(area_garganta=0.42, regimenes=("diseno", "choque",
 
     return PerfilTobera(tubo, ejes, curvas, choques, datos, ancho,
                         alto_grafico, origen)
+
+
+# =======================================================================
+# MODULO 3 — ondas oblicuas, expansiones y perfiles supersonicos
+# =======================================================================
+
+# Deflexion maxima que admite el aire antes de que el choque se desprenda:
+# no hay formula cerrada, se busca sobre theta_de_beta.
+BETA_MIN_GRADOS = 1e-4      # evita la singularidad de cot(beta) en beta = 0
+
+
+def theta_de_beta(mach1, beta_grados):
+    """Deflexion theta (grados) que produce un choque oblicuo de angulo beta.
+
+    Es la relacion theta-beta-M escrita en el sentido FACIL: dado el angulo
+    de la onda sale el de la rampa. El sentido util —dada la rampa, que
+    onda— no tiene forma cerrada y se invierte en `choque_oblicuo`.
+    """
+    m1 = float(mach1)
+    b = np.deg2rad(np.asarray(beta_grados, dtype=np.float64))
+    b = np.clip(b, np.deg2rad(BETA_MIN_GRADOS), np.pi / 2)
+    num = 2 / np.tan(b) * (m1 ** 2 * np.sin(b) ** 2 - 1)
+    den = m1 ** 2 * (GAMMA + np.cos(2 * b)) + 2
+    return np.degrees(np.arctan2(num, den))
+
+
+def theta_maximo(mach1, muestras=900):
+    """(theta_max, beta_en_el_maximo) en grados para ese M1.
+
+    Barrido grueso mas refinado local: la curva theta(beta) es suave y de un
+    solo maximo, asi que basta con encontrar el mejor punto de una rejilla y
+    afinar a su alrededor. Sin derivadas — la de theta-beta-M es fea y no
+    aporta nada aqui.
+    """
+    m1 = float(mach1)
+    if m1 <= 1.0:
+        raise ValueError(f"theta_maximo: M1={m1} <= 1; sin flujo supersonico "
+                         "no hay choque oblicuo")
+    b_min = np.degrees(np.arcsin(1.0 / m1))     # el angulo de Mach
+    betas = np.linspace(b_min, 90.0, int(muestras))
+    thetas = theta_de_beta(m1, betas)
+    k = int(np.argmax(thetas))
+    lo = betas[max(k - 1, 0)]
+    hi = betas[min(k + 1, len(betas) - 1)]
+    finos = np.linspace(lo, hi, 200)
+    valores = theta_de_beta(m1, finos)
+    j = int(np.argmax(valores))
+    return float(valores[j]), float(finos[j])
+
+
+def choque_oblicuo(mach1, theta_grados, rama="debil"):
+    """Choque oblicuo: invierte theta-beta-M y resuelve el salto.
+
+    Devuelve beta, Mn1, Mn2, M2 y las razones de presion, temperatura,
+    densidad y presion de estancamiento. La clave del modulo esta en como se
+    calcula: **con las relaciones del choque NORMAL aplicadas a la
+    componente perpendicular** Mn1 = M1 sen(beta). No hay teoria nueva.
+
+    `rama` es 'debil' (la que ocurre casi siempre) o 'fuerte'. Si theta pasa
+    del maximo levanta ValueError: ahi el choque se desprende y deja de ser
+    oblicuo — es el asunto del clip 3 de la leccion 3.2.
+    """
+    m1 = float(mach1)
+    theta = float(theta_grados)
+    if rama not in ("debil", "fuerte"):
+        raise ValueError("choque_oblicuo: rama debe ser 'debil' o 'fuerte'")
+    t_max, b_max = theta_maximo(m1)
+    if theta > t_max + 1e-9:
+        raise ValueError(f"choque_oblicuo: theta={theta:.2f} deg supera el "
+                         f"maximo {t_max:.2f} deg de M1={m1}; el choque se "
+                         "desprende")
+    if theta < 0:
+        raise ValueError("choque_oblicuo: theta negativo es una expansion, "
+                         "no un choque (usa prandtl_meyer)")
+
+    # Biseccion en el tramo monotono correspondiente: por debajo de b_max la
+    # curva sube y por encima baja, asi que cada rama tiene su intervalo.
+    b_mach = np.degrees(np.arcsin(1.0 / m1))
+    lo, hi = (b_mach, b_max) if rama == "debil" else (b_max, 90.0)
+    for _ in range(80):
+        medio = (lo + hi) / 2
+        if (float(theta_de_beta(m1, medio)) < theta) == (rama == "debil"):
+            lo = medio
+        else:
+            hi = medio
+    beta = (lo + hi) / 2
+
+    mn1 = m1 * float(np.sin(np.deg2rad(beta)))
+    salto = choque_normal(max(mn1, 1.0))
+    mn2 = salto["M2"]
+    m2 = mn2 / float(np.sin(np.deg2rad(beta - theta)))
+    return {"beta": float(beta), "Mn1": float(mn1), "Mn2": float(mn2),
+            "M2": float(m2), "p2/p1": salto["p2/p1"],
+            "T2/T1": salto["T2/T1"], "rho2/rho1": salto["rho2/rho1"],
+            "p02/p01": salto["p02/p01"], "theta": theta}
+
+
+# --- 3.4 la expansion de Prandtl-Meyer ---------------------------------
+# Angulo total que puede girar un flujo antes de expandirse al vacio. Sale
+# del limite M -> infinito de nu(M) y vale 130.45 deg para el aire.
+NU_MAXIMO = (np.sqrt((GAMMA + 1) / (GAMMA - 1)) - 1) * 90.0
+
+
+def prandtl_meyer(mach):
+    """nu(M) en GRADOS: cuanto ha tenido que girar el flujo para llegar a M.
+
+    No es un angulo del dibujo, es un contador: la diferencia de nu entre
+    dos estados ES el giro de la pared que los separa. Por eso una expansion
+    se resuelve sumando y restando nu, sin resolver nada.
+    """
+    m = np.maximum(np.asarray(mach, dtype=np.float64), 1.0)
+    raiz = np.sqrt(np.maximum(m ** 2 - 1.0, 0.0))
+    k = np.sqrt((GAMMA + 1) / (GAMMA - 1))
+    return np.degrees(k * np.arctan(raiz / k) - np.arctan(raiz))
+
+
+def mach_de_nu(nu_grados):
+    """Invierte nu(M) por biseccion. nu es creciente y acotada por NU_MAXIMO."""
+    objetivo = float(nu_grados)
+    if objetivo < 0:
+        raise ValueError("mach_de_nu: nu no puede ser negativo")
+    if objetivo >= NU_MAXIMO:
+        raise ValueError(f"mach_de_nu: nu={objetivo:.2f} deg alcanza el tope "
+                         f"{NU_MAXIMO:.2f} deg; ahi el flujo se expande al "
+                         "vacio")
+    lo, hi = 1.0, 100.0
+    for _ in range(80):
+        medio = (lo + hi) / 2
+        if float(prandtl_meyer(medio)) < objetivo:
+            lo = medio
+        else:
+            hi = medio
+    return float((lo + hi) / 2)
+
+
+def expansion(mach1, theta_grados):
+    """Giro convexo de theta grados: el flujo acelera y la presion cae.
+
+    Todo el calculo es `nu2 = nu1 + theta` y volver a M; las razones salen de
+    que la expansion es ISENTROPICA, asi que p0 no cambia y basta el cociente
+    de las relaciones de estancamiento.
+    """
+    m1 = float(mach1)
+    theta = float(theta_grados)
+    if m1 < 1.0:
+        raise ValueError("expansion: hace falta flujo supersonico")
+    if theta < 0:
+        raise ValueError("expansion: theta negativo es una compresion")
+    nu1 = float(prandtl_meyer(m1))
+    m2 = mach_de_nu(nu1 + theta)
+    p21 = float(razon_presion(m1) / razon_presion(m2))
+    t21 = float(razon_temperatura(m1) / razon_temperatura(m2))
+    return {"M2": m2, "nu1": nu1, "nu2": nu1 + theta, "p2/p1": p21,
+            "T2/T1": t21, "rho2/rho1": float(razon_densidad(m1)
+                                             / razon_densidad(m2)),
+            "mu1": angulo_mach(m1), "mu2": angulo_mach(m2)}
+
+
+# --- 3.5 la teoria de choque-expansion ---------------------------------
+def _cara(mach, deflexion):
+    """Resuelve una cara: compresion si gira contra el flujo, expansion si a
+    favor. Devuelve (p/p_ref, M despues). Es el unico 'if' de toda la teoria
+    de choque-expansion, y es literalmente el signo del giro."""
+    if deflexion > 1e-9:
+        salto = choque_oblicuo(mach, deflexion)
+        return salto["p2/p1"], salto["M2"]
+    if deflexion < -1e-9:
+        exp = expansion(mach, -deflexion)
+        return exp["p2/p1"], exp["M2"]
+    return 1.0, float(mach)
+
+
+def placa_plana(mach1, alfa_grados):
+    """cl y cd de onda de una placa plana supersonica, por choque-expansion.
+
+    Extrados: expansion de alfa. Intrados: choque oblicuo de alfa. No hay
+    nada mas — una placa plana no tiene espesor ni curvatura, asi que su
+    arrastre de onda sale ENTERO de la sustentacion.
+    """
+    m1 = float(mach1)
+    alfa = float(alfa_grados)
+    if alfa < 0:
+        raise ValueError("placa_plana: usa alfa >= 0 (por simetria)")
+    p_sup, m_sup = _cara(m1, -alfa)
+    p_inf, m_inf = _cara(m1, alfa)
+    a = np.deg2rad(alfa)
+    # cn y ca en ejes cuerpo; la placa no tiene area frontal, asi que ca = 0.
+    cn = 2 * (p_inf - p_sup) / (GAMMA * m1 ** 2)
+    cl = float(cn * np.cos(a))
+    cd = float(cn * np.sin(a))
+    return {"cl": cl, "cd": cd, "p_sup/p1": p_sup, "p_inf/p1": p_inf,
+            "M_sup": m_sup, "M_inf": m_inf, "cn": float(cn)}
+
+
+def perfil_rombico(mach1, alfa_grados, semiangulo=5.0):
+    """cl y cd de onda de un perfil rombico (doble cuna), cara a cara.
+
+    Cuatro caras y cuatro deflexiones: (e-alfa) y -2e arriba, (e+alfa) y -2e
+    abajo. El arrastre sale de sumar las presiones proyectadas sobre la
+    cuerda, y por eso un rombo arrastra AUNQUE no sustente: su espesor ya
+    empuja hacia atras.
+    """
+    m1 = float(mach1)
+    e = float(semiangulo)
+    alfa = float(alfa_grados)
+    if e <= 0:
+        raise ValueError("perfil_rombico: el semiangulo debe ser positivo")
+
+    p_ad, m_ad = _cara(m1, e - alfa)          # extrados delantero
+    p_at, _ = _cara(m_ad, -2 * e)             # extrados trasero
+    p_ad_t = p_ad * p_at
+    p_bd, m_bd = _cara(m1, e + alfa)          # intrados delantero
+    p_bt, _ = _cara(m_bd, -2 * e)             # intrados trasero
+    p_bd_t = p_bd * p_bt
+
+    a, er = np.deg2rad(alfa), np.deg2rad(e)
+    # Cada cara mide media cuerda partido por cos(e); la proyeccion normal
+    # devuelve el cos(e) y la axial lo cambia por tan(e).
+    cn = ((p_bd + p_bd_t) - (p_ad + p_ad_t)) / (GAMMA * m1 ** 2)
+    ca = (float(np.tan(er))
+          * ((p_ad + p_bd) - (p_ad_t + p_bd_t)) / (GAMMA * m1 ** 2))
+    cl = float(cn * np.cos(a) - ca * np.sin(a))
+    cd = float(cn * np.sin(a) + ca * np.cos(a))
+    return {"cl": cl, "cd": cd, "cn": float(cn), "ca": float(ca),
+            "p_sup_del/p1": p_ad, "p_sup_tras/p1": p_ad_t,
+            "p_inf_del/p1": p_bd, "p_inf_tras/p1": p_bd_t}
+
+
+# --- 3.1 la onda oblicua sobre una rampa -------------------------------
+class OndaOblicua(VGroup):
+    """Una rampa, su choque pegado y la descomposicion de la velocidad.
+
+    Es la pieza que sostiene la idea central del modulo: un choque oblicuo
+    NO es teoria nueva. Descompuesta la velocidad en normal y tangencial a
+    la onda, la tangencial no cambia y la normal ve un choque normal de
+    Mach Mn1 = M1 sen(beta). Todo lo demas ya estaba en la leccion 2.2.
+    """
+
+    def __init__(self, pared, choque, flujo_entrada, flujo_salida, vectores,
+                 datos, esquina, largo, **kwargs):
+        super().__init__(pared, flujo_entrada, choque, flujo_salida,
+                         **kwargs)
+        self.pared = pared
+        self.choque = choque
+        self.flujo_entrada = flujo_entrada
+        self.flujo_salida = flujo_salida
+        self.vectores = vectores
+        self.datos = dict(datos)
+        self._esquina = np.asarray(esquina, dtype=np.float64)
+        self._largo = float(largo)
+        self._centro_original = self.get_center()
+
+    def beta(self):
+        """Angulo de la onda en grados. El que dibuja y el que rotula."""
+        return self.datos["beta"]
+
+    def theta(self):
+        return self.datos["theta"]
+
+    def esquina(self):
+        """Vertice de la rampa: de ahi sale el choque y ahi gira el flujo."""
+        return self._esquina + (self.get_center() - self._centro_original)
+
+    def sobre_onda(self, fraccion=0.55):
+        """Punto sobre la propia onda, para colgar el rotulo de beta."""
+        b = np.deg2rad(self.beta())
+        return self.esquina() + np.array([np.cos(b), np.sin(b), 0.0]) * (
+            self._largo * float(fraccion))
+
+
+def onda_oblicua(mach1=2.0, theta=10.0, largo=3.6, entrada=2.6,
+                 color_pared=CODE_MUTED, color_choque=COLOR_SUPERSONICO,
+                 color_flujo=COLOR_TRANSONICO, color_normal=COLOR_CALCULO,
+                 color_tangencial=COLOR_SUBSONICO, escala_v=1.5,
+                 font_size=15):
+    """Rampa de compresion con su choque oblicuo y los vectores del salto.
+
+    Los vectores salen en `.vectores` y NO se añaden al grupo: el clip los
+    enciende cuando toca. Son seis —V1 con sus dos componentes y V2 con las
+    suyas— y estan a escala entre si, asi que se ve que la TANGENCIAL es la
+    misma en los dos lados; ese es el mensaje.
+    """
+    datos = choque_oblicuo(mach1, theta)
+    b = np.deg2rad(datos["beta"])
+    t = np.deg2rad(float(theta))
+    esquina = np.array([0.0, 0.0, 0.0])
+
+    pared = VMobject(color=color_pared, stroke_width=3.0)
+    pared.set_points_as_corners([
+        esquina + LEFT * entrada, esquina,
+        esquina + np.array([np.cos(t), np.sin(t), 0.0]) * largo])
+
+    choque = Line(esquina,
+                  esquina + np.array([np.cos(b), np.sin(b), 0.0]) * largo,
+                  stroke_width=3.4, color=color_choque)
+
+    def _haz(direccion, base, n=3, separacion=0.45, largo_f=0.9, color=None):
+        """Flechas paralelas que marcan por donde va el flujo."""
+        d = np.asarray(direccion, dtype=np.float64)
+        d = d / np.linalg.norm(d)
+        perp = np.array([-d[1], d[0], 0.0])
+        haz = VGroup()
+        for k in range(n):
+            centro = base + perp * (k + 1) * separacion
+            haz.add(Arrow(centro - d * largo_f / 2, centro + d * largo_f / 2,
+                          buff=0, stroke_width=2.6,
+                          color=color_flujo if color is None else color,
+                          max_tip_length_to_length_ratio=0.28))
+        return haz
+
+    dir1 = np.array([1.0, 0.0, 0.0])
+    dir2 = np.array([np.cos(t), np.sin(t), 0.0])
+    flujo_entrada = _haz(dir1, esquina + LEFT * (entrada * 0.72))
+    flujo_salida = _haz(dir2, esquina + dir2 * (largo * 0.62)
+                        + np.array([-np.sin(t), np.cos(t), 0.0]) * 0.10)
+
+    # --- los seis vectores, anclados en un punto de la onda ---------------
+    ancla = esquina + np.array([np.cos(b), np.sin(b), 0.0]) * (largo * 0.52)
+    normal = np.array([np.sin(b), -np.cos(b), 0.0])    # perpendicular a la onda
+    tangente = np.array([np.cos(b), np.sin(b), 0.0])   # a lo largo de la onda
+
+    def _flecha(desde, vector, color, grosor=3.0):
+        return Arrow(desde, desde + vector, buff=0, stroke_width=grosor,
+                     color=color, max_tip_length_to_length_ratio=0.22)
+
+    v1 = escala_v * dir1
+    vn1 = float(np.dot(v1, normal)) * normal
+    vt1 = float(np.dot(v1, tangente)) * tangente
+    # V2 conserva la tangencial y encoge la normal en la razon de densidades
+    # (continuidad a traves de la onda): esa es la unica cuenta del dibujo.
+    vn2 = vn1 / datos["rho2/rho1"]
+    v2 = vt1 + vn2
+
+    base1 = ancla - v1
+    vectores = VGroup(
+        VGroup(_flecha(base1, v1, color_flujo),
+               _flecha(base1, vn1, color_normal, 2.4),
+               _flecha(base1, vt1, color_tangencial, 2.4)),
+        VGroup(_flecha(ancla, v2, color_flujo),
+               _flecha(ancla, vn2, color_normal, 2.4),
+               _flecha(ancla, vt1, color_tangencial, 2.4)))
+
+    return OndaOblicua(pared, choque, flujo_entrada, flujo_salida, vectores,
+                       datos, esquina, largo)
+
+
+# --- 3.2 el diagrama theta-beta-M --------------------------------------
+class DiagramaThetaBeta(_Cartesiano):
+    """El mapa del choque oblicuo: dado el giro de la pared, que onda sale.
+
+    Cada M1 es una curva cerrada por arriba: la rama de abajo es el choque
+    DEBIL (el que ocurre) y la de arriba el FUERTE. Se juntan en el maximo, y
+    a la derecha de ese maximo no hay solucion: el choque se desprende.
+    """
+
+    def __init__(self, ejes, curvas, maximos, etiquetas, machs, rango_t,
+                 rango_b, ancho, alto, origen, **kwargs):
+        super().__init__(ejes, curvas, maximos, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curvas = curvas
+        self.maximos = maximos
+        self.etiquetas = etiquetas
+        self._machs = list(machs)
+        self._calibrar(rango_t, rango_b, ancho, alto, origen)
+
+    def mach(self, i):
+        return self._machs[i % len(self._machs)]
+
+    def curva(self, i):
+        return self.curvas[i % len(self.curvas)]
+
+    def punto_de(self, i, theta, rama="debil"):
+        """Punto sobre la curva de M1 = mach(i) a esa deflexion."""
+        m1 = self.mach(i)
+        return self._en(theta, choque_oblicuo(m1, theta, rama)["beta"])
+
+    def punto_maximo(self, i):
+        """Vertice de la curva i: la deflexion maxima y su beta."""
+        t, b = theta_maximo(self.mach(i))
+        return self._en(t, b)
+
+    def maximo(self, i):
+        """(theta_max, beta) en grados. La cifra que rotula el clip."""
+        return theta_maximo(self.mach(i))
+
+
+def diagrama_theta_beta(machs=(1.5, 2.0, 3.0, 5.0), theta_max=48.0,
+                        ancho=5.6, alto=3.0, color_ejes=COLOR_EJE,
+                        font_size=14, muestras=160, colores=None):
+    """Diagrama theta-beta-M clasico: deflexion en x, angulo de onda en y.
+
+    Cada curva se genera BARRIENDO BETA y no theta: en theta la funcion es
+    bivaluada (dos ramas) y habria que invertirla dos veces; en beta es una
+    sola curva continua que sube, dobla en el maximo y baja. La linea
+    punteada une los vertices — a su derecha no hay choque pegado.
+    """
+    muestras = _validar_muestras("diagrama_theta_beta", muestras)
+    lista = [float(m) for m in machs]
+    if not lista:
+        raise ValueError("diagrama_theta_beta: hace falta al menos un Mach")
+    paleta = list(colores) if colores else [COLOR_SUBSONICO, COLOR_CALCULO,
+                                            COLOR_TRANSONICO,
+                                            COLOR_SUPERSONICO,
+                                            COLOR_HIPERSONICO]
+    t_max = float(theta_max)
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (0.0, t_max), (0.0, 90.0), ancho, alto)
+
+    curvas = VGroup()
+    etiquetas = VGroup()
+    vertices = []
+    for i, m1 in enumerate(lista):
+        b_min = np.degrees(np.arcsin(1.0 / m1))
+        betas = np.linspace(b_min, 90.0, muestras)
+        thetas = np.asarray(theta_de_beta(m1, betas), dtype=np.float64)
+        color = paleta[i % len(paleta)]
+        curvas.add(_curva(en(np.clip(thetas, 0.0, t_max), betas), color,
+                          grosor=2.6))
+        vertices.append(theta_maximo(m1))
+
+        tag = _texto_hud(f"M {m1:g}", font_size=font_size, color=color)
+        # Junto al vertice y hacia fuera: es el punto mas a la derecha de su
+        # curva, asi que ahi ninguna otra le pasa por encima.
+        tv, bv = vertices[-1]
+        tag.move_to(en(min(tv + t_max * 0.055, t_max), bv))
+        etiquetas.add(tag)
+
+    maximos = VGroup(
+        _curva(en(np.array([t for t, _b in vertices]),
+                  np.array([b for _t, b in vertices])), COLOR_EJE, grosor=1.6))
+    maximos[0].set_stroke(opacity=0.8)
+    for tv, bv in vertices:
+        maximos.add(Dot(en(tv, bv), radius=0.055, color=COLOR_EJE))
+
+    marcas = VGroup()
+    for valor in (0.0, t_max):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.14)
+        marcas.add(num)
+    for valor in (30.0, 60.0, 90.0):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(0.0, valor), LEFT, buff=0.12)
+        marcas.add(num)
+
+    tag_x = _texto_display("deflexión θ", font_size=font_size + 3)
+    tag_x.next_to(ejes[0], DOWN, buff=0.44)
+    tag_y = _texto_display("onda β", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return DiagramaThetaBeta(ejes, curvas, maximos, etiquetas, lista,
+                             (0.0, t_max), (0.0, 90.0), ancho, alto, origen)
+
+
+# --- 3.4 el abanico de expansion ---------------------------------------
+class AbanicoExpansion(VGroup):
+    """Una esquina convexa y el abanico centrado que sale de ella.
+
+    Las lineas del abanico van del angulo de Mach de ENTRADA al de SALIDA, y
+    entre ellas el flujo gira y acelera poco a poco. Que sean muchas lineas y
+    no una sola es exactamente la diferencia con un choque: aqui no hay
+    salto, hay un continuo, y por eso la expansion es isentropica.
+    """
+
+    def __init__(self, pared, abanico, flujo_entrada, flujo_salida, datos,
+                 esquina, largo, **kwargs):
+        super().__init__(pared, flujo_entrada, abanico, flujo_salida,
+                         **kwargs)
+        self.pared = pared
+        self.abanico = abanico
+        self.flujo_entrada = flujo_entrada
+        self.flujo_salida = flujo_salida
+        self.datos = dict(datos)
+        self._esquina = np.asarray(esquina, dtype=np.float64)
+        self._largo = float(largo)
+        self._centro_original = self.get_center()
+
+    def esquina(self):
+        return self._esquina + (self.get_center() - self._centro_original)
+
+    def linea(self, i):
+        return self.abanico[i % len(self.abanico)]
+
+    def mu(self, cual="entrada"):
+        """Angulo de Mach de la primera o la ultima linea del abanico."""
+        return self.datos["mu1"] if cual == "entrada" else self.datos["mu2"]
+
+
+def abanico_expansion(mach1=2.0, theta=15.0, n_lineas=7, largo=3.2,
+                      entrada=2.4, color_pared=CODE_MUTED,
+                      color=COLOR_CALCULO, color_flujo=COLOR_TRANSONICO):
+    """Esquina convexa con su abanico de Prandtl-Meyer.
+
+    La primera linea sale a mu1 sobre la direccion de entrada y la ultima a
+    mu2 sobre la de SALIDA (que ya esta girada theta): por eso el abanico se
+    abre, y por eso su apertura total no es theta sino mu1 - mu2 + theta.
+    """
+    n = int(n_lineas)
+    if n > ONDAS_MAX * 2:
+        raise ValueError(f"abanico_expansion: n_lineas={n} es demasiado")
+    n = max(3, n)
+    datos = expansion(mach1, theta)
+    t = np.deg2rad(float(theta))
+    esquina = np.array([0.0, 0.0, 0.0])
+
+    # Pared: entra horizontal y en la esquina baja theta grados.
+    pared = VMobject(color=color_pared, stroke_width=3.0)
+    pared.set_points_as_corners([
+        esquina + LEFT * entrada, esquina,
+        esquina + np.array([np.cos(t), -np.sin(t), 0.0]) * largo])
+
+    # Primera y ultima linea del abanico, medidas cada una sobre SU flujo.
+    ang_primera = np.deg2rad(datos["mu1"])
+    ang_ultima = -t + np.deg2rad(datos["mu2"])
+    abanico = VGroup()
+    for k in range(n):
+        a = ang_primera + (ang_ultima - ang_primera) * k / (n - 1)
+        linea = Line(esquina,
+                     esquina + np.array([np.cos(a), np.sin(a), 0.0]) * largo,
+                     stroke_width=1.8, color=color)
+        linea.set_stroke(opacity=0.55 + 0.45 * (k in (0, n - 1)))
+        abanico.add(linea)
+
+    def _haz(direccion, base, n_f=3, separacion=0.42, largo_f=0.85):
+        d = np.asarray(direccion, dtype=np.float64)
+        d = d / np.linalg.norm(d)
+        perp = np.array([-d[1], d[0], 0.0])
+        haz = VGroup()
+        for k in range(n_f):
+            centro = base + perp * (k + 1) * separacion
+            haz.add(Arrow(centro - d * largo_f / 2, centro + d * largo_f / 2,
+                          buff=0, stroke_width=2.6, color=color_flujo,
+                          max_tip_length_to_length_ratio=0.28))
+        return haz
+
+    dir2 = np.array([np.cos(t), -np.sin(t), 0.0])
+    flujo_entrada = _haz(RIGHT, esquina + LEFT * (entrada * 0.70))
+    flujo_salida = _haz(dir2, esquina + dir2 * (largo * 0.70))
+
+    return AbanicoExpansion(pared, abanico, flujo_entrada, flujo_salida,
+                            datos, esquina, largo)
+
+
+class CurvaNu(_Cartesiano):
+    """nu(M): el contador de giro, con su tope en 130.45 grados."""
+
+    def __init__(self, ejes, curva, asintota, etiquetas, m_max, nu_max, ancho,
+                 alto, origen, **kwargs):
+        super().__init__(ejes, asintota, curva, etiquetas, **kwargs)
+        self.ejes = ejes
+        self.curva = curva
+        self.asintota = asintota
+        self.etiquetas = etiquetas
+        self._calibrar((1.0, m_max), (0.0, nu_max), ancho, alto, origen)
+
+    def nu(self, mach):
+        return float(prandtl_meyer(mach))
+
+    def punto_de(self, mach):
+        return self._en(mach, self.nu(mach))
+
+    def mach_de(self, nu_grados):
+        return mach_de_nu(nu_grados)
+
+
+def curva_nu(m_max=6.0, ancho=5.2, alto=2.8, color=COLOR_CALCULO,
+             color_asintota=COLOR_SUPERSONICO, color_ejes=COLOR_EJE,
+             font_size=14, muestras=180):
+    """nu frente al Mach, con la asintota horizontal del giro maximo.
+
+    El tope existe y es finito: por mucho que sigas girando la pared, el aire
+    no puede pasar de NU_MAXIMO grados de giro total — a partir de ahi se
+    expandiria al vacio y se despegaria.
+    """
+    muestras = _validar_muestras("curva_nu", muestras)
+    m1 = float(m_max)
+    ms = np.linspace(1.0, m1, muestras)
+    nus = np.asarray(prandtl_meyer(ms), dtype=np.float64)
+    techo = NU_MAXIMO * 1.06
+
+    ejes, origen = _ejes_xy(ancho, alto, color_ejes)
+    en = _escalador(origen, (1.0, m1), (0.0, techo), ancho, alto)
+    curva = _curva(en(ms, nus), color, grosor=3.0)
+    asintota = DashedLine(en(1.0, NU_MAXIMO), en(m1, NU_MAXIMO),
+                          stroke_width=1.6, color=color_asintota,
+                          dash_length=0.08)
+
+    tag_a = _texto_hud(f"{NU_MAXIMO:.1f}", font_size=font_size,
+                       color=color_asintota)
+    tag_a.next_to(asintota.get_start(), LEFT, buff=0.14)
+    marcas = VGroup()
+    for valor in (1.0, m1):
+        num = _texto_hud(f"{valor:g}", font_size=font_size - 3,
+                         color=color_ejes)
+        num.next_to(en(valor, 0.0), DOWN, buff=0.12)
+        marcas.add(num)
+
+    tag_x = _texto_hud("MACH", font_size=font_size - 1)
+    tag_x.next_to(ejes[0], DOWN, buff=0.42)
+    tag_y = _texto_display("ν  grados", font_size=font_size + 3)
+    tag_y.next_to(ejes[1], UP, buff=0.14)
+    ejes.add(marcas, tag_x, tag_y)
+
+    return CurvaNu(ejes, curva, asintota, VGroup(tag_a), m1, techo, ancho,
+                   alto, origen)
+
+
+# --- 3.3 reflexiones e interacciones -----------------------------------
+class ReflexionOnda(VGroup):
+    """Que le pasa a un choque cuando llega a una pared o a un borde libre.
+
+    Contra una PARED el flujo tiene que seguir siendo paralelo a ella, asi
+    que hace falta otra compresion: rebota como choque. Contra un borde
+    LIBRE lo que tiene que conservarse es la presion, y como el choque la
+    subio, el rebote tiene que bajarla: sale un abanico. Misma onda, dos
+    reflejos opuestos, y la razon es la condicion de contorno.
+    """
+
+    def __init__(self, contorno, incidente, reflejada, datos, impacto,
+                 **kwargs):
+        super().__init__(contorno, incidente, reflejada, **kwargs)
+        self.contorno = contorno
+        self.incidente = incidente
+        self.reflejada = reflejada
+        self.datos = dict(datos)
+        self._impacto = np.asarray(impacto, dtype=np.float64)
+        self._centro_original = self.get_center()
+
+    def impacto(self):
+        """Donde la onda incidente toca el contorno."""
+        return self._impacto + (self.get_center() - self._centro_original)
+
+
+def reflexion_onda(tipo="pared", mach1=2.4, theta=8.0, ancho=6.4, alto=2.4,
+                   n_abanico=6, color_pared=CODE_MUTED,
+                   color_choque=COLOR_SUPERSONICO, color_abanico=COLOR_CALCULO,
+                   color_libre=COLOR_SUBSONICO):
+    """Reflexion regular de un choque oblicuo: `tipo` 'pared' o 'libre'.
+
+    La onda incidente baja desde la pared de arriba y toca la de abajo; lo
+    que sale de ahi depende del contorno. Los angulos son los de verdad: el
+    incidente sale de theta-beta-M con M1, y el reflejado con el M2 que deja
+    el primero — por eso el reflejado va mas tumbado.
+    """
+    if tipo not in ("pared", "libre"):
+        raise ValueError("reflexion_onda: tipo debe ser 'pared' o 'libre'")
+    primero = choque_oblicuo(mach1, theta)
+    b1 = np.deg2rad(primero["beta"])
+
+    y_sup, y_inf = alto / 2, -alto / 2
+    x0 = -ancho / 2
+    # La onda arranca de la pared de arriba y baja hasta la de abajo.
+    origen_onda = np.array([x0 + ancho * 0.18, y_sup, 0.0])
+    recorrido = alto / np.tan(b1)
+    impacto = origen_onda + np.array([recorrido, -alto, 0.0])
+
+    superior = Line((x0, y_sup, 0), (x0 + ancho, y_sup, 0), stroke_width=3.0,
+                    color=color_pared)
+    if tipo == "pared":
+        inferior = Line((x0, y_inf, 0), (x0 + ancho, y_inf, 0),
+                        stroke_width=3.0, color=color_pared)
+    else:
+        inferior = DashedLine((x0, y_inf, 0), (x0 + ancho, y_inf, 0),
+                              stroke_width=2.6, color=color_libre,
+                              dash_length=0.14)
+    contorno = VGroup(superior, inferior)
+
+    incidente = Line(origen_onda, impacto, stroke_width=3.4,
+                     color=color_choque)
+
+    restante = x0 + ancho - impacto[0]
+    if tipo == "pared":
+        # Segundo choque, calculado con el M2 que dejo el primero.
+        segundo = choque_oblicuo(primero["M2"], theta)
+        b2 = np.deg2rad(segundo["beta"])
+        largo = min(restante / np.cos(b2), alto / np.sin(b2))
+        reflejada = Line(impacto,
+                         impacto + np.array([np.cos(b2), np.sin(b2), 0.0])
+                         * largo, stroke_width=3.4, color=color_choque)
+        datos = {"beta1": primero["beta"], "beta2": segundo["beta"],
+                 "M1": float(mach1), "M2": primero["M2"],
+                 "M3": segundo["M2"], "p2/p1": primero["p2/p1"],
+                 "p3/p1": primero["p2/p1"] * segundo["p2/p1"]}
+    else:
+        # Abanico: la presion tiene que volver a la de fuera, asi que el
+        # rebote expande justo lo que el choque comprimio.
+        exp = expansion(primero["M2"], theta)
+        a_ini = np.deg2rad(exp["mu1"]) - np.deg2rad(theta)
+        a_fin = np.deg2rad(exp["mu2"])
+        reflejada = VGroup()
+        for k in range(max(3, int(n_abanico))):
+            a = a_ini + (a_fin - a_ini) * k / (max(3, int(n_abanico)) - 1)
+            largo = min(restante / max(np.cos(a), 1e-3),
+                        alto / max(np.sin(a), 1e-3))
+            linea = Line(impacto,
+                         impacto + np.array([np.cos(a), np.sin(a), 0.0])
+                         * largo, stroke_width=1.8, color=color_abanico)
+            linea.set_stroke(opacity=0.75)
+            reflejada.add(linea)
+        datos = {"beta1": primero["beta"], "M1": float(mach1),
+                 "M2": primero["M2"], "M3": exp["M2"],
+                 "p2/p1": primero["p2/p1"],
+                 "p3/p1": primero["p2/p1"] * exp["p2/p1"]}
+
+    return ReflexionOnda(contorno, incidente, reflejada, datos, impacto)
+
+
+class InterseccionChoques(VGroup):
+    """Dos choques que se cruzan y la linea de deslizamiento que dejan.
+
+    Detras del cruce las dos corrientes tienen la MISMA presion y la MISMA
+    direccion —si no, el cruce no seria estable— pero han pasado por
+    historias distintas, asi que su temperatura, su densidad y su Mach no
+    coinciden. La frontera entre las dos es la linea de deslizamiento: no es
+    una onda, es una costura.
+    """
+
+    def __init__(self, paredes, incidentes, refractados, deslizamiento, datos,
+                 cruce, **kwargs):
+        super().__init__(paredes, incidentes, refractados, deslizamiento,
+                         **kwargs)
+        self.paredes = paredes
+        self.incidentes = incidentes
+        self.refractados = refractados
+        self.deslizamiento = deslizamiento
+        self.datos = dict(datos)
+        self._cruce = np.asarray(cruce, dtype=np.float64)
+        self._centro_original = self.get_center()
+
+    def cruce(self):
+        return self._cruce + (self.get_center() - self._centro_original)
+
+
+def interseccion_choques(mach1=3.0, theta_sup=10.0, theta_inf=16.0,
+                         ancho=6.6, alto=2.6, color_pared=CODE_MUTED,
+                         color_choque=COLOR_SUPERSONICO,
+                         color_deslizamiento=COLOR_TRANSONICO):
+    """Dos choques oblicuos de FUERZA DISTINTA que se cruzan.
+
+    Se eligen deflexiones distintas a proposito: con las dos iguales el
+    dibujo sale simetrico, la linea de deslizamiento es horizontal y el clip
+    pierde justo lo que quiere enseñar.
+    """
+    sup = choque_oblicuo(mach1, theta_sup)
+    inf = choque_oblicuo(mach1, theta_inf)
+    b_sup = np.deg2rad(sup["beta"])
+    b_inf = np.deg2rad(inf["beta"])
+
+    y_sup, y_inf = alto / 2, -alto / 2
+    x0 = -ancho / 2
+    o_sup = np.array([x0 + ancho * 0.10, y_sup, 0.0])
+    o_inf = np.array([x0 + ancho * 0.10, y_inf, 0.0])
+    # Cruce: la de arriba baja con pendiente -tan(b_sup) y la de abajo sube.
+    t = alto / (np.tan(b_sup) + np.tan(b_inf))
+    cruce = o_sup + np.array([t, -t * np.tan(b_sup), 0.0])
+
+    paredes = VGroup(
+        Line((x0, y_sup, 0), (x0 + ancho, y_sup, 0), stroke_width=3.0,
+             color=color_pared),
+        Line((x0, y_inf, 0), (x0 + ancho, y_inf, 0), stroke_width=3.0,
+             color=color_pared))
+    incidentes = VGroup(Line(o_sup, cruce, stroke_width=3.4,
+                             color=color_choque),
+                        Line(o_inf, cruce, stroke_width=3.4,
+                             color=color_choque))
+
+    # Tras el cruce cada onda sigue, mas tumbada, hacia su pared opuesta.
+    restante = x0 + ancho - cruce[0]
+    refractados = VGroup()
+    for signo, beta in ((-1, b_sup * 0.72), (1, b_inf * 0.72)):
+        direccion = np.array([np.cos(beta), signo * np.sin(beta), 0.0])
+        largo = min(restante / np.cos(beta),
+                    (alto / 2 + signo * -cruce[1] * signo) / max(
+                        np.sin(beta), 1e-3))
+        refractados.add(Line(cruce, cruce + direccion * max(largo, 0.6),
+                             stroke_width=3.0, color=color_choque))
+
+    # La costura sale del cruce en la direccion comun de aguas abajo, que es
+    # la que deja la diferencia de deflexiones.
+    inclinacion = np.deg2rad(theta_inf - theta_sup) / 2
+    deslizamiento = DashedLine(
+        cruce, cruce + np.array([np.cos(inclinacion), np.sin(inclinacion), 0.0])
+        * restante, stroke_width=2.4, color=color_deslizamiento,
+        dash_length=0.12)
+
+    datos = {"beta_sup": sup["beta"], "beta_inf": inf["beta"],
+             "M_sup": sup["M2"], "M_inf": inf["M2"],
+             "p_sup/p1": sup["p2/p1"], "p_inf/p1": inf["p2/p1"]}
+    return InterseccionChoques(paredes, incidentes, refractados,
+                               deslizamiento, datos, cruce)
+
+
+# --- 3.5 el perfil supersonico -----------------------------------------
+PERFILES_SUPERSONICOS = ("placa", "rombo")
+
+
+class PerfilSupersonico(VGroup):
+    """Un perfil supersonico con su patron de ondas y sus presiones.
+
+    Los angulos NO son decorativos: cada choque sale a su beta de
+    theta-beta-M y cada abanico se abre entre los angulos de Mach de antes y
+    despues. Por eso el dibujo cambia de verdad al cambiar el Mach o el
+    angulo de ataque, y por eso las barras de presion y las cifras de cl y
+    cd salen de la misma llamada que el trazo.
+    """
+
+    def __init__(self, perfil, ondas, caras, datos, tipo, cuerda, **kwargs):
+        super().__init__(ondas, perfil, **kwargs)
+        self.perfil = perfil
+        self.ondas = ondas
+        self.caras = caras          # clave -> (punto medio, p/p1)
+        self.datos = dict(datos)
+        self.tipo = str(tipo)
+        self._cuerda = float(cuerda)
+        self._centro_original = self.get_center()
+
+    def cl(self):
+        return self.datos["cl"]
+
+    def cd(self):
+        return self.datos["cd"]
+
+    def presion(self, cara):
+        """p/p1 de una cara ('sup', 'inf' en la placa; 'sup_del'... en el
+        rombo). El numero que rotula el clip, de la misma cuenta que dibuja."""
+        if cara not in self.caras:
+            raise KeyError(f"perfil_supersonico: no hay cara '{cara}' "
+                           f"({', '.join(self.caras)})")
+        return self.caras[cara][1]
+
+    def centro_cara(self, cara):
+        """Punto medio de esa cara, para colgarle su barra de presion."""
+        base = self.caras[cara][0]
+        return base + (self.get_center() - self._centro_original)
+
+    def barra_presion(self, cara, escala=0.55, grosor=8.0):
+        """Barra perpendicular a la cara, hacia FUERA si comprime y hacia
+        dentro si expande. Su longitud es |p/p1 - 1|: asi una cara que
+        succiona y otra que empuja se distinguen sin leer un numero."""
+        centro, presion, normal = self.caras[cara]
+        largo = float(abs(presion - 1.0)) * float(escala)
+        signo = -1.0 if presion > 1.0 else 1.0     # empuja hacia dentro
+        color = COLOR_SUPERSONICO if presion > 1.0 else COLOR_CALCULO
+        desplazamiento = self.get_center() - self._centro_original
+        inicio = centro + desplazamiento
+        return Arrow(inicio - normal * signo * largo, inicio, buff=0,
+                     stroke_width=grosor * 0.4, color=color,
+                     max_tip_length_to_length_ratio=0.30)
+
+
+def _tramo(a, b, color, grosor=3.0):
+    return Line(np.asarray(a), np.asarray(b), stroke_width=grosor,
+                color=color)
+
+
+def perfil_supersonico(tipo="placa", mach1=2.0, alfa=10.0, semiangulo=5.0,
+                       cuerda=3.2, color_perfil=CODE_MUTED,
+                       color_choque=COLOR_SUPERSONICO,
+                       color_abanico=COLOR_CALCULO, largo_onda=1.5,
+                       n_abanico=5):
+    """Placa plana o perfil rombico con su patron de choques y abanicos.
+
+    El perfil se dibuja girado -alfa: con el morro arriba, la corriente
+    horizontal ataca el INTRADOS, que es lo que produce sustentacion hacia
+    arriba. Cada vertice emite lo que le toca segun el signo del giro, y de
+    ahi salen los colores: rojo comprime, cian expande.
+    """
+    if tipo not in PERFILES_SUPERSONICOS:
+        raise ValueError(f"perfil_supersonico: tipo '{tipo}' desconocido "
+                         f"({', '.join(PERFILES_SUPERSONICOS)})")
+    a = np.deg2rad(float(alfa))
+    c = float(cuerda)
+
+    def girar(p):
+        """Del sistema del perfil (cuerda horizontal) al de la escena."""
+        x, y = p
+        return np.array([x * np.cos(a) + y * np.sin(a),
+                         -x * np.sin(a) + y * np.cos(a), 0.0])
+
+    ondas = VGroup()
+    caras = {}
+
+    def _onda(vertice, angulo_grados, comprime, largo=None):
+        """Choque (linea gruesa) o abanico (haz fino) desde un vertice."""
+        ang = np.deg2rad(angulo_grados)
+        L = largo_onda if largo is None else largo
+        if comprime:
+            return _tramo(vertice,
+                          vertice + np.array([np.cos(ang), np.sin(ang), 0.0])
+                          * L, color_choque, 3.2)
+        haz = VGroup()
+        for k in range(max(3, int(n_abanico))):
+            paso = ang + np.deg2rad(-8.0) * k / (max(3, int(n_abanico)) - 1)
+            haz.add(_tramo(vertice,
+                           vertice + np.array([np.cos(paso), np.sin(paso), 0])
+                           * L, color_abanico, 1.6))
+        haz.set_stroke(opacity=0.7)
+        return haz
+
+    if tipo == "placa":
+        datos = placa_plana(mach1, alfa)
+        borde_ataque = girar((-c / 2, 0.0))
+        borde_fuga = girar((c / 2, 0.0))
+        perfil = _tramo(borde_ataque, borde_fuga, color_perfil, 4.0)
+
+        b_inf = choque_oblicuo(mach1, alfa)["beta"]
+        ondas.add(_onda(borde_ataque, -b_inf, True))              # choque
+        ondas.add(_onda(borde_ataque, angulo_mach(mach1) + 12.0, False))
+        ondas.add(_onda(borde_fuga, b_inf * 0.75, True))          # cierre
+        ondas.add(_onda(borde_fuga, -angulo_mach(datos["M_inf"]) - 12.0,
+                        False))
+
+        normal_sup = girar((0.0, 1.0)) - girar((0.0, 0.0))
+        caras = {
+            "sup": (girar((0.0, 0.0)) + normal_sup * 0.10,
+                    datos["p_sup/p1"], normal_sup),
+            "inf": (girar((0.0, 0.0)) - normal_sup * 0.10,
+                    datos["p_inf/p1"], -normal_sup)}
+    else:
+        datos = perfil_rombico(mach1, alfa, semiangulo)
+        e = np.deg2rad(float(semiangulo))
+        h = (c / 2) * np.tan(e)
+        v_ataque = girar((-c / 2, 0.0))
+        v_arriba = girar((0.0, h))
+        v_abajo = girar((0.0, -h))
+        v_fuga = girar((c / 2, 0.0))
+        perfil = VGroup(_tramo(v_ataque, v_arriba, color_perfil),
+                        _tramo(v_arriba, v_fuga, color_perfil),
+                        _tramo(v_ataque, v_abajo, color_perfil),
+                        _tramo(v_abajo, v_fuga, color_perfil))
+
+        comprime_arriba = float(semiangulo) > float(alfa)
+        b_inf = choque_oblicuo(mach1, float(semiangulo) + float(alfa))["beta"]
+        ondas.add(_onda(v_ataque, -b_inf, True))
+        ondas.add(_onda(v_ataque, (b_inf * 0.8 if comprime_arriba
+                                   else angulo_mach(mach1) + 10.0),
+                        comprime_arriba))
+        ondas.add(_onda(v_arriba, angulo_mach(mach1) + 16.0, False))
+        ondas.add(_onda(v_abajo, -angulo_mach(mach1) - 16.0, False))
+        ondas.add(_onda(v_fuga, b_inf * 0.7, True))
+        ondas.add(_onda(v_fuga, -b_inf * 0.7, True))
+
+        n_sup_del = girar((np.sin(e), np.cos(e))) - girar((0.0, 0.0))
+        n_sup_tra = girar((-np.sin(e), np.cos(e))) - girar((0.0, 0.0))
+        caras = {
+            "sup_del": ((v_ataque + v_arriba) / 2, datos["p_sup_del/p1"],
+                        n_sup_del),
+            "sup_tras": ((v_arriba + v_fuga) / 2, datos["p_sup_tras/p1"],
+                         n_sup_tra),
+            "inf_del": ((v_ataque + v_abajo) / 2, datos["p_inf_del/p1"],
+                        -n_sup_tra),
+            "inf_tras": ((v_abajo + v_fuga) / 2, datos["p_inf_tras/p1"],
+                         -n_sup_del)}
+
+    return PerfilSupersonico(perfil, ondas, caras, datos, tipo, c)
