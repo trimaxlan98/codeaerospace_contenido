@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 3.2 La relación θ-β-M",
+  "description": "Lección 3.2 del curso Aerodinámica (módulo 3: ondas oblicuas, expansiones y perfiles supersónicos), en 4 clips animados —uno por subtema—: cómo se lee el diagrama θ-β-M y por qué invierte la fórmula, las dos soluciones (choque débil y fuerte) y cuál ocurre de verdad, el ángulo de deflexión máximo y el choque desprendido que aparece al pasarlo, y la decisión de diseño entre un borde de ataque afilado y uno romo. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-mapa-del-choque-oblicuo.py",
+      "title": "1 · El mapa del choque oblicuo",
+      "scene": "Clip1",
+      "final_state": "Diagrama θ-β-M con cuatro curvas rotuladas (M 1.5, 2, 3 y 5) y el punto rojo de la lectura a Mach 2 con rampa de 10°, marcado «β = 39.3°» y su guía punteada; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-dos-soluciones-y-solo-una-ocurre.py",
+      "title": "2 · Dos soluciones, y solo una ocurre",
+      "scene": "Clip2",
+      "final_state": "A la izquierda la curva de Mach 2 cortada por una vertical con dos puntos marcados; a la derecha las dos rampas: arriba el choque débil en verde y abajo el fuerte, casi vertical, en rojo, con su β y su M2; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuando-el-choque-se-suelta.py",
+      "title": "3 · Cuando el choque se suelta",
+      "scene": "Clip3",
+      "final_state": "El diagrama con la línea de vértices marcada y θ_max = 23.0° rotulado, y a la derecha una cuña demasiado abierta con su arco rojo de choque desprendido por delante; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-morro-afilado-o-romo.py",
+      "title": "4 · Morro afilado o romo",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Afilado si quieres empuje.» en verde sobre «Romo si quieres volver.» en rojo; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Aerodinámica · 3.4 Expansión de Prandtl-Meyer",
+  "description": "Lección 3.4 del curso Aerodinámica (módulo 3: ondas oblicuas, expansiones y perfiles supersónicos), en 4 clips animados —uno por subtema—: el abanico centrado de una esquina convexa y por qué un continuo de ondas infinitamente débiles no genera entropía, la función ν(M) leída como un contador de giro con su tope de 130.5°, el cálculo de una esquina en tres líneas, y el contraste en el plano T-s entre comprimir (que deja cicatriz) y expandir (que no). Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-esquina-que-no-hace-ruido.py",
+      "title": "1 · La esquina que no hace ruido",
+      "scene": "Clip1",
+      "final_state": "Esquina convexa con el abanico completo de nueve líneas cian abriéndose desde el vértice, y las flechas ámbar del flujo entrando horizontales y saliendo giradas 15°; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-contador-de-giro.py",
+      "title": "2 · El contador de giro",
+      "scene": "Clip2",
+      "final_state": "Curva ν(M) hasta Mach 6 con cuatro puntos ámbar rotulados y la asíntota roja punteada en 130.5 grados; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-resolver-una-esquina.py",
+      "title": "3 · Resolver una esquina",
+      "scene": "Clip3",
+      "final_state": "El abanico a la izquierda y a la derecha los tres pasos —ν1 = 26.38°, ν2 = 41.38°, M2 = 2.5984— más p2/p1 = 0.3931 en ámbar; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-lo-que-cuesta-y-lo-que-no.py",
+      "title": "4 · Lo que cuesta y lo que no",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Girar hacia dentro deja cicatriz.» en rojo sobre «Hacia fuera, no.» en verde; HUD 'MODULO 04'."
+    }
+  ]
+}

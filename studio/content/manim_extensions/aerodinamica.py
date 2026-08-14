@@ -3263,10 +3263,15 @@ def abanico_expansion(mach1=2.0, theta=15.0, n_lineas=7, largo=3.2,
         linea.set_stroke(opacity=0.55 + 0.45 * (k in (0, n - 1)))
         abanico.add(linea)
 
-    def _haz(direccion, base, n_f=3, separacion=0.42, largo_f=0.85):
+    def _haz(direccion, base, n_f=3, separacion=0.42, largo_f=0.85,
+             hacia=1):
+        """`hacia` = +1 apila las flechas hacia el lado izquierdo del flujo
+        y -1 hacia el derecho. Hace falta porque el haz de SALIDA tiene que
+        quedar entre la ultima linea del abanico y la pared: apilado hacia
+        arriba, como el de entrada, se mete dentro del abanico."""
         d = np.asarray(direccion, dtype=np.float64)
         d = d / np.linalg.norm(d)
-        perp = np.array([-d[1], d[0], 0.0])
+        perp = np.array([-d[1], d[0], 0.0]) * float(hacia)
         haz = VGroup()
         for k in range(n_f):
             centro = base + perp * (k + 1) * separacion
@@ -3277,7 +3282,7 @@ def abanico_expansion(mach1=2.0, theta=15.0, n_lineas=7, largo=3.2,
 
     dir2 = np.array([np.cos(t), -np.sin(t), 0.0])
     flujo_entrada = _haz(RIGHT, esquina + LEFT * (entrada * 0.70))
-    flujo_salida = _haz(dir2, esquina + dir2 * (largo * 0.70))
+    flujo_salida = _haz(dir2, esquina + dir2 * (largo * 0.60), hacia=-1)
 
     return AbanicoExpansion(pared, abanico, flujo_entrada, flujo_salida,
                             datos, esquina, largo)
