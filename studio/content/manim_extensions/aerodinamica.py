@@ -2267,6 +2267,16 @@ class CurvasChoque(_Cartesiano):
                           color=COLOR_EJE if color is None else color,
                           dash_length=0.08)
 
+    def horizontal_en(self, valor, color=None, grosor=1.6):
+        """Recta de valor constante a lo ancho del grafico: la asintota de
+        rho2/rho1 es el uso previsto. La construye la pieza porque las
+        coordenadas de la caja son suyas — armada en el clip a partir de una
+        DashedLine degenerada, no se dibuja nada."""
+        return DashedLine(self._en(self._rx[0], valor),
+                          self._en(self._rx[1], valor), stroke_width=grosor,
+                          color=COLOR_EJE if color is None else color,
+                          dash_length=0.08)
+
 
 def curvas_choque(grupo="saltos", m_max=3.0, ancho=5.2, alto=2.8,
                   color_ejes=COLOR_EJE, font_size=15, muestras=140,
