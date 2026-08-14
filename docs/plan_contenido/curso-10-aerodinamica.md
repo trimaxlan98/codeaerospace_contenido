@@ -57,16 +57,16 @@ clip es un módulo. Consecuencias:
 | 3.3 | Reflexión e interacción de ondas | 4 | **hecha** |
 | 3.4 | Expansión de Prandtl-Meyer | 4 | **hecha** |
 | 3.5 | Teoría de choque-expansión aplicada a perfiles | 5 | **hecha** |
-| 4.1 | Ecuación del potencial de perturbación linealizada | 4 | pendiente |
-| 4.2 | Correcciones de compresibilidad subsónica | 4 | pendiente |
-| 4.3 | Número de Mach crítico y divergencia del arrastre | 4 | pendiente |
-| 4.4 | El régimen transónico y sus soluciones de diseño | 4 | pendiente |
-| 4.5 | Teoría supersónica linealizada y panorama hipersónico | 5 | pendiente |
+| 4.1 | Ecuación del potencial de perturbación linealizada | 4 | **hecha** |
+| 4.2 | Correcciones de compresibilidad subsónica | 4 | **hecha** |
+| 4.3 | Número de Mach crítico y divergencia del arrastre | 4 | **hecha** |
+| 4.4 | El régimen transónico y sus soluciones de diseño | 4 | **hecha** |
+| 4.5 | Teoría supersónica linealizada y panorama hipersónico | 5 | **hecha** |
 
-**Los módulos 1, 2 y 3 están completos** (lecciones 1.1-3.5, 62 clips). El
-1 fija el idioma, el 2 rompe el aire de frente y el 3 lo rompe de lado.
-Queda el módulo 4 (transónico y teoría linealizada), 5 lecciones y 21
-clips.
+**El curso está completo**: las 20 lecciones y los **83 clips**, uno por
+subtema del documento maestro. El módulo 1 fija el idioma, el 2 rompe el
+aire de frente, el 3 lo rompe de lado y el 4 aproxima cuando conviene y
+dice dónde deja de valer.
 
 ## Paleta de la familia
 
@@ -332,7 +332,31 @@ Dos comprobaciones que salen solas y no se impusieron: en la placa plana
 reflexión contra frontera libre el producto de presiones vuelve a 1.001
 (la condición de contorno cumpliéndose por su cuenta).
 
-## Trampas encontradas (para las lecciones que faltan)
+## Módulo 4 — las cinco lecciones
+
+| Lección | Clips | Duraciones | Hilo |
+|---------|-------|------------|------|
+| 4.1 Potencial de perturbación linealizado | 4 | 37.2 / 32.8 / 33.6 / 38.9 s | perturbaciones pequeñas → elíptica o hiperbólica → cp linealizado → dónde no vale |
+| 4.2 Correcciones de compresibilidad | 4 | 41.2 / 32.8 / 33.8 / 34.0 s | Prandtl-Glauert → las tres → contra el dato → la pendiente se empina |
+| 4.3 Mach crítico y divergencia | 4 | 35.5 / 33.7 / 38.7 / 40.3 s | el cruce → qué lo adelanta → la burbuja y su choque → Mdd |
+| 4.4 El régimen transónico | 4 | 38.4 / 39.4 / 43.1 / 37.3 s | flecha → Whitcomb → regla del área → la negociación |
+| 4.5 Linealizada e hipersónico | 5 | 37.1 / 38.5 / 35.1 / 37.4 / 43.9 s | Ackeret → tres arrastres → contra la exacta → gas real → el mapa |
+
+Números del módulo, todos calculados: cp\* frente al Mach (cuadra con los
+valores publicados a 4·10⁻⁴), el Mach crítico como cruce resuelto por
+bisección (0.766 para un perfil fino, 0.689 para uno grueso), la ecuación
+de Korn (0.73 convencional contra 0.78 supercrítico — los 0.08 que
+Whitcomb le regaló a la aviación comercial), el Mach normal de un ala
+barrida 35° (0.85 → 0.696), y Ackeret contra la teoría exacta del módulo
+3: 0.3 % de error a 5° y 2.7 % a 15°.
+
+La regla del área **no se dibuja plana: sale plana.** El aporte del ala se
+resta del fuselaje de verdad, y la curva corregida coincide exactamente con
+la distribución lisa del cuerpo.
+
+## Trampas encontradas
+
+
 
 - **Piezas que se reconstruyen en una animación** (`piston_gas`,
   `pulso_conducto`) no pueden guardar coordenadas absolutas de
@@ -386,6 +410,19 @@ reflexión contra frontera libre el producto de presiones vuelve a 1.001
   cruzaría dos curvas.
 - **Las dos caras de una placa plana son el mismo segmento**: sus barras de
   presión hay que separarlas a mano o salen una encima de la otra.
+- **Un guard que salta puede tener razón.** `curva_arrastre_transonico`
+  rechazó los primeros datos porque Korn daba un Mdd por debajo del Mach
+  crítico — imposible. La salida no era relajar el guard sino elegir dos
+  perfiles coherentes, y la comparación resultante cuenta mejor la
+  historia: el supercrítico es más grueso y más cargado, y aun así llega
+  más lejos.
+- **Un modelo empírico necesita un techo de validez.** El ajuste cúbico del
+  arrastre transónico se dispara a cd por encima de 1 si el hueco Mcr→Mdd
+  es pequeño. Cada curva se corta donde cruza un cd realista, y que una
+  acabe mucho antes que la otra es parte de la lectura.
+- **Un localizador tiene que hablar el idioma de su eje.** `punto_de` de
+  las correcciones devolvía el cp con signo mientras la pieza dibujaba
+  |cp|: los tres puntos se recortaban al suelo y se apilaban.
 - **Los pies necesitan ≥ 5 s legibles.** Con el relevo secuencial de
   `Rotulos` (0.25 s de salida + 0.5 s de entrada), eso es `wait(4.6)` como
   mínimo. Recortar tiempo se hace **quitando beats**, no acortando los que

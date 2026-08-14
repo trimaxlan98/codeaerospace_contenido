@@ -3992,13 +3992,17 @@ def curva_mach_critico(cp0=-0.43, m_min=0.35, m_max=0.92, ancho=5.2,
                               color=COLOR_TRANSONICO, dash_length=0.07))
     cruce[1].set_stroke(opacity=0.7)
 
+    # Los rotulos se cuelgan al 82 % del recorrido y no al final: la curva
+    # critica acaba pegada al eje x y su etiqueta se montaba sobre la marca
+    # de Mach del extremo.
+    k = int(muestras * 0.82)
     etiquetas = VGroup()
-    for texto, color, i in (("el perfil", color_perfil, muestras - 1),
-                            ("el aire", color_critica, muestras - 1)):
-        ys = cps_perfil if color == color_perfil else cps_criticos
+    for texto, color, ys, lado in (("el perfil", color_perfil, cps_perfil,
+                                    UL),
+                                   ("el aire", color_critica, cps_criticos,
+                                    DL)):
         tag = _texto_display(texto, font_size=font_size + 3, color=color)
-        tag.next_to(en(m1, min(ys[i], cp_hi)), UL if color == color_perfil
-                    else DL, buff=0.10)
+        tag.next_to(en(ms[k], min(ys[k], cp_hi)), lado, buff=0.12)
         etiquetas.add(tag)
 
     marcas = VGroup()
@@ -4112,19 +4116,26 @@ def curva_arrastre_transonico(casos=None, m_min=0.55, m_max=0.95,
     curvas = VGroup()
     marcas = VGroup()
     etiquetas = VGroup()
-    for (nombre, mcr, mdd, cd0, color), ys in zip(resueltos, series):
+    # Los dos casos acaban a Machs parecidos y sus Mdd caen casi a la misma
+    # altura, asi que los rotulos se alternan de lado: puestos todos arriba
+    # a la izquierda, se montan unos sobre otros.
+    lados_mdd = (UL, DR)
+    lados_nombre = (UL, UR)
+    for i, ((nombre, mcr, mdd, cd0, color), ys) in enumerate(zip(resueltos,
+                                                                series)):
         dentro = ys <= float(cd_tope)
         curvas.add(_curva(en(ms[dentro], ys[dentro]), color, grosor=2.8))
         punto = en(mdd, float(_cd(mcr, mdd, cd0, np.array([mdd]))[0]))
         marcas.add(Dot(punto, radius=0.07, color=color))
         tag = _texto_hud(f"Mdd {mdd:.2f}", font_size=font_size - 1,
                          color=color)
-        tag.next_to(punto, UL, buff=0.10)
+        tag.next_to(punto, lados_mdd[i % len(lados_mdd)], buff=0.12)
         marcas.add(tag)
         nombre_tag = _texto_display(nombre, font_size=font_size + 2,
                                     color=color)
         # Al final de SU curva, que ya no es el borde derecho del grafico.
-        nombre_tag.next_to(en(ms[dentro][-1], ys[dentro][-1]), UR, buff=0.10)
+        nombre_tag.next_to(en(ms[dentro][-1], ys[dentro][-1]),
+                           lados_nombre[i % len(lados_nombre)], buff=0.10)
         etiquetas.add(nombre_tag)
 
     tick = VGroup()
@@ -4271,8 +4282,8 @@ class PerfilesTransonicos(VGroup):
         return self.curvas[i % len(self.curvas)]
 
 
-def perfiles_transonicos(cuerda=3.0, alto_cp=1.5, separacion=0.85,
-                         escala_perfil=2.4, color_convencional=COLOR_TRANSONICO,
+def perfiles_transonicos(cuerda=3.0, alto_cp=1.0, separacion=1.35,
+                         escala_perfil=3.2, color_convencional=COLOR_TRANSONICO,
                          color_supercritico=COLOR_SUBSONICO,
                          color_ejes=COLOR_EJE, font_size=15):
     """Los dos perfiles, uno sobre otro, con su distribucion de succion.
@@ -4307,7 +4318,11 @@ def perfiles_transonicos(cuerda=3.0, alto_cp=1.5, separacion=0.85,
                           np.array([p[1] for p in datos])), color,
                        grosor=2.8)
         grafico = VGroup(ejes, traza)
-        grafico.move_to(np.array([0.0, y - np.sign(y) * (alto_cp + 1.05), 0]))
+        # Hacia el CENTRO desde su perfil: con el signo al reves, el cp del
+        # convencional acababa debajo del supercritico y la lectura se
+        # cruzaba. Cada grafico queda pegado al perfil que le toca.
+        grafico.move_to(np.array([0.0, y - np.sign(y) * (alto_cp / 2 + 0.62),
+                                  0]))
         tag = _texto_display(clave.replace("supercritico", "supercrítico"),
                              font_size=font_size + 3, color=color)
         tag.next_to(contorno, LEFT, buff=0.40)
@@ -4389,14 +4404,24 @@ def distribucion_area(area_fuselaje=1.0, pico_ala=0.55, centro=0.5,
     curva_ala = _curva(en(xs, ala), color_aporte, grosor=2.0)
     curva_ala.set_stroke(opacity=0.75)
 
-    etiquetas = VGroup()
-    for texto, color, serie in (("sin regla", color_sin, sin),
-                                ("con regla", color_con, con),
-                                ("aporta el ala", color_aporte, ala)):
-        tag = _texto_display(texto, font_size=font_size + 2, color=color)
-        tag.next_to(en(0.90, float(np.interp(0.90, xs, serie))), RIGHT,
-                    buff=0.14)
-        etiquetas.add(tag)
+    # Leyenda en la esquina superior IZQUIERDA del grafico: las tres curvas
+    # convergen en la cola, asi que colgadas de su final se apilan las tres
+    # en el mismo sitio. Ahi arriba, en cambio, todas van todavia por el
+    # suelo y no hay nada.
+    filas = VGroup()
+    for texto, color in (("sin regla", color_sin), ("con regla", color_con),
+                         ("aporta el ala", color_aporte)):
+        fila = VGroup(Line(ORIGIN, RIGHT * 0.34, stroke_width=3.0,
+                           color=color),
+                      _texto_display(texto, font_size=font_size + 1,
+                                     color=color)).arrange(RIGHT, buff=0.14)
+        filas.add(fila)
+    filas.arrange(DOWN, aligned_edge=LEFT, buff=0.16)
+    filas.move_to(en(0.12, 0.86), aligned_edge=LEFT)
+    # `etiquetas` ES la lista de filas y no un grupo que las envuelva: los
+    # clips encienden cada leyenda con su curva (`etiquetas[2]` con el
+    # aporte del ala), y envuelta habria un solo indice valido.
+    etiquetas = filas
 
     tag_x = _texto_hud("A LO LARGO DEL AVION", font_size=font_size - 2)
     tag_x.next_to(ejes[0], DOWN, buff=0.18)

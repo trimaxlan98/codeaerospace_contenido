@@ -15,7 +15,11 @@ from aerodinamica import (COLOR_CALCULO, COLOR_EJE, COLOR_SUBSONICO,
                           pulso_conducto, remanso, tabla_isentropica,
                           volumen_control, abanico_expansion, curva_nu,
                           diagrama_theta_beta, interseccion_choques,
-                          onda_oblicua, perfil_supersonico, reflexion_onda)
+                          onda_oblicua, perfil_supersonico, reflexion_onda,
+                          ala_flecha, comparacion_teorias,
+                          curva_arrastre_transonico, curva_mach_critico,
+                          curvas_correcciones, distribucion_area,
+                          perfiles_transonicos)
 from code_brand import FUENTE_HUD, registrar_fuentes
 
 
@@ -32,7 +36,10 @@ class DemoAerodinamica(Scene):
     velocidades, A/A* con sus dos ramas y la tobera regimen a regimen; y
     —del modulo 3— la onda oblicua con su descomposicion, el diagrama
     theta-beta-M, el abanico de Prandtl-Meyer, nu(M), las reflexiones, el
-    cruce de choques y los dos perfiles supersonicos con sus presiones.
+    cruce de choques y los dos perfiles supersonicos con sus presiones; y
+    —del modulo 4— las tres correcciones de compresibilidad, el cruce que
+    define el Mach critico, la divergencia del arrastre, el ala en flecha,
+    los perfiles transonicos, la regla del area y Ackeret contra la exacta.
 
     Todo es geometrico y determinista: mismo script, mismo render. Los
     localizadores (.punto_de, .fuente, .garganta, .centro_zona, .punto) se
@@ -260,3 +267,39 @@ class DemoAerodinamica(Scene):
         self.add(VGroup(*[rombo.barra_presion(c, escala=0.5)
                           for c in rombo.caras]))
         self.wait(0.8)
+
+        self.play(FadeOut(VGroup(oblicua, mapa, fan, vertices, rebote, cruce,
+                                 rombo)), run_time=0.4)
+
+        # --- acto 10: corregir, y saber donde deja de valer ---
+        correcciones = curvas_correcciones(ancho=2.9, alto=1.7, font_size=10,
+                                           hueco_etiquetas=0.50)
+        correcciones.move_to(LEFT * 4.3 + UP * 1.2)
+        critico = curva_mach_critico(ancho=2.7, alto=1.7, font_size=10)
+        critico.move_to(LEFT * 0.2 + UP * 1.2)
+        arrastre = curva_arrastre_transonico(ancho=2.7, alto=1.7,
+                                             font_size=10)
+        arrastre.move_to(RIGHT * 4.0 + UP * 1.2)
+        self.play(FadeIn(correcciones), FadeIn(critico), FadeIn(arrastre),
+                  run_time=1.0)
+        self.add(Dot(critico.punto_cruce(), radius=0.05,
+                     color=COLOR_TRANSONICO))
+        self.wait(0.4)
+
+        # Cuatro piezas en la fila de abajo, repartidas para que ninguna
+        # invada a su vecina ni se salga por la derecha.
+        ala = ala_flecha(0.85, 35.0, envergadura=1.3, cuerda=0.7,
+                         escala_v=0.9)
+        ala.move_to(LEFT * 5.4 + DOWN * 1.7)
+        perfiles = perfiles_transonicos(cuerda=1.5, alto_cp=0.45,
+                                        separacion=0.60, escala_perfil=2.0,
+                                        font_size=10)
+        perfiles.move_to(LEFT * 2.1 + DOWN * 1.7)
+        area = distribucion_area(ancho=2.0, alto=1.1, font_size=9)
+        area.move_to(RIGHT * 1.6 + DOWN * 1.7)
+        teorias = comparacion_teorias(ancho=1.9, alto=1.2, font_size=9,
+                                      muestras=30)
+        teorias.move_to(RIGHT * 5.2 + DOWN * 1.7)
+        self.play(FadeIn(ala), FadeIn(perfiles), FadeIn(area),
+                  FadeIn(teorias), run_time=1.0)
+        self.wait(0.9)

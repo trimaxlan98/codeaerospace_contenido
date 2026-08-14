@@ -82,10 +82,15 @@ Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
 | 3.3 | Reflexion e interaccion de ondas | 4 | versionado, validado en local |
 | 3.4 | Expansion de Prandtl-Meyer | 4 | versionado, validado en local |
 | 3.5 | Teoria de choque-expansion | 5 | versionado, validado en local |
-| 4.1 → 4.5 | las 5 restantes | 21 | pendientes |
+| 4.1 | Potencial de perturbacion linealizado | 4 | versionado, validado en local |
+| 4.2 | Correcciones de compresibilidad subsonica | 4 | versionado, validado en local |
+| 4.3 | Mach critico y divergencia del arrastre | 4 | versionado, validado en local |
+| 4.4 | El regimen transonico | 4 | versionado, validado en local |
+| 4.5 | Teoria linealizada y panorama hipersonico | 5 | versionado, validado en local |
 
-**Los modulos 1, 2 y 3 estan completos** (1.1-3.5, 62 clips). Pendiente:
-`subir_curso.py` contra produccion, renders `qh`, narracion TTS y mux.
+**EL CURSO ESTA COMPLETO**: 20 lecciones y 83 clips, uno por subtema del
+documento maestro. Pendiente: `subir_curso.py` contra produccion, renders
+`qh`, narracion TTS y mux de los 20 proyectos.
 
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 
