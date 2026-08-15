@@ -38,13 +38,15 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
-**Producción:** sprints 0–4 desplegados el 2026-08-15 (PR #22, #23, #25 y #27
-a `main`, `git pull` + `vite build` en el VPS). El sprint 4 sirve
+**Producción:** sprints 0–5 desplegados el 2026-08-15 (PR #22, #23, #25, #27
+y #29 a `main`, `git pull` + `vite build` en el VPS). El sprint 4 sirve
 `index-D5BP1EWT.js`, el mismo hash que produjo el build local ya sometido a
 QA; comprobado además que el bundle de producción contiene la interfaz nueva
 («Animaciones por dominio», «Curso de Manim», «Con video») y ya no la vieja
 (ni «Biblioteca» ni el `ThemePicker`), con `/api/health` devolviendo
-`runner: true`. Verificado con cargas reales de
+`runner: true`. El sprint 5 sirve `index-TLSc1W7U.js`, otra vez el mismo hash
+que el build local ya sometido a QA, con «Empezar desde», «Curso monográfico»
+y «Modo guiado» presentes en el bundle. Verificado con cargas reales de
 https://coderesearch.space en escritorio y móvil: bundle nuevo servido, título
 e iconos de marca correctos, `/api/health` con runner vivo, sin errores de
 consola. El sprint 3 se comprobó además **con sesión** (cookie firmada con
