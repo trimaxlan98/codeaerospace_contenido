@@ -1,0 +1,20 @@
+{
+  "name": "Marca · Intro y cierre",
+  "description": "Proyecto de identidad CO.DE Academy: dos clips cortos, sin narración, que se unen en posproducción al principio y al final de cada curso nuevo — la intro (encendido de la marca, estética de consola de vuelo) y el cierre (despedida con el punto ámbar parpadeando como cursor). No es una lección; los cursos ya publicados no se re-renderizan.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-intro-encendido.py",
+      "title": "1 · Intro — encendido",
+      "scene": "Clip1",
+      "final_state": "Fundido completo a fondo limpio #05070a tras el wordmark CO.DE ACADEMY estable; el último medio segundo es fondo vacío para empalmar con el primer clip del curso."
+    },
+    {
+      "file": "clips/02-cierre-despedida.py",
+      "title": "2 · Cierre — despedida",
+      "scene": "Clip2",
+      "final_state": "Fundido a negro total tras el parpadeo del punto ámbar como cursor; el último medio segundo es fondo vacío #05070a."
+    }
+  ]
+}
