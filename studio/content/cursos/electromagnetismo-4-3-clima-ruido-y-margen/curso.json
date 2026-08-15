@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 4.3 El clima, el ruido y el margen",
+  "description": "Lección 4.3 del curso Electromagnetismo (módulo 4: el enlace por el espacio) y cierre de la familia entera, en 4 clips animados —uno por subtema—: la lluvia que apaga la banda Ka según la ITU-R P.838, la temperatura de ruido que separa el cielo frío del suelo tibio y su N = kTB, el margen del enlace comido por la tormenta, y el recap completo de la carga de Coulomb al bit que baja del satélite. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-lluvia-que-apaga-la-ka.py",
+      "title": "1 · La lluvia que apaga la Ka",
+      "scene": "Clip1",
+      "final_state": "Las tres curvas de atenuación por lluvia (12 GHz verde, 20 GHz ámbar, 30 GHz rojo) con la vertical de 25 mm/h, sus tres puntos y las cifras 1.1 / 2.8 / 5.1 dB/km en columna fuera de la caja, más la nota «onda de 10 mm»; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-escuchar-el-frio-del-cielo.py",
+      "title": "2 · Escuchar el frío del cielo",
+      "scene": "Clip2",
+      "final_state": "Las dos antenas comparadas —al cenit con su termómetro de 20 K en cian, al horizonte con el de 290 K en rojo— y la cifra −131.3 dBW del suelo de ruido (T = 150 K, B = 36 MHz) sobre ellas; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-margen.py",
+      "title": "3 · El margen",
+      "scene": "Clip3",
+      "final_state": "Curva de SNR cayendo bajo el umbral rojo, la zona del enlace caído sombreada con la cifra 2.0 dB del fondo y la doble flecha de los 6 dB de margen en cielo claro; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-de-la-carga-al-bit.py",
+      "title": "4 · De la carga al bit",
+      "scene": "Clip4",
+      "final_state": "Cierre de la familia entera a pantalla limpia: «De una carga quieta» sobre «al bit que baja del cielo.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

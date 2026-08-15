@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 2.1 La inducción de Faraday",
+  "description": "Lección 2.1 del curso Electromagnetismo (módulo 2: Maxwell casa los campos), en 4 clips animados —uno por subtema—: el flujo que cambia enciende corriente y la fem es la derivada del flujo, la ley de Lenz y el signo que frena (conservación de la energía), el alternador que escribe la primera senoide de la red eléctrica, y el transformador que sube y baja la tensión para viajar y para usarla. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-flujo-que-cambia.py",
+      "title": "1 · El flujo que cambia",
+      "scene": "Clip1",
+      "final_state": "Curvas alineadas Φ(t) arriba y −dΦ/dt abajo con los puntos marcados: fem cero donde Φ es máximo, fem máxima donde Φ cambia más rápido; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-lenz-el-signo-que-frena.py",
+      "title": "2 · Lenz: el signo que frena",
+      "scene": "Clip2",
+      "final_state": "Espira frenando al imán con la fórmula ℰ = −dΦ/dt y el signo menos recuadrado, más el pie «el signo menos es conservación de la energía»; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-alternador-nace-la-senoide.py",
+      "title": "3 · El alternador: nace la senoide",
+      "scene": "Clip3",
+      "final_state": "Senoide completa escrita en la caja junto a la espira girada dos vueltas, con la cifra 31.4 V de pico rotulada; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-transformador.py",
+      "title": "4 · El transformador",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Mover un imán hace corriente.» sobre «¿Y si nada se moviera?» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

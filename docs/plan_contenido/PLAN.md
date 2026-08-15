@@ -98,6 +98,33 @@ Storyboard y contrato de la libreria: `curso-10-aerodinamica.md`.
 documento maestro. Pendiente: `subir_curso.py` contra produccion, renders
 `qh`, narracion TTS y mux de los 20 proyectos.
 
+## Familia "Electromagnetismo" (2026-08-14, mismo formato que Aerodinamica)
+
+Segunda familia con el formato de lecciones: **un proyecto = una leccion de
+4 clips**. Original (no viene de un documento maestro): 4 modulos x 3
+lecciones = 12 proyectos, 48 clips, con TODOS los ejemplos apuntando a
+telecomunicaciones y satelites. El arco: *de la carga de Coulomb al bit que
+baja del satelite*. Una sola libreria (`electromagnetismo.py`, numeros
+validados contra CODATA / ITU-R P.838-3 / WR-90 / orbita de Clarke) y un
+solo style_block molde.
+
+Storyboard y contrato de la libreria: `curso-16-electromagnetismo.md`.
+
+| Leccion | Proyecto | Clips | Estado |
+|---------|----------|-------|--------|
+| 1.1 | La carga y el campo electrico | 4 | versionado, validado en local |
+| 1.2 | La corriente y el campo magnetico | 4 | versionado, validado en local |
+| 1.3 | La fuerza de Lorentz | 4 | versionado, validado en local |
+| 2.1 | La induccion de Faraday | 4 | versionado, validado en local |
+| 2.2 | Las ecuaciones de Maxwell | 4 | versionado, validado en local |
+| 2.3 | La onda electromagnetica | 4 | versionado, validado en local |
+| 3.1 | Las lineas de transmision | 4 | versionado, validado en local |
+| 3.2 | La reflexion y la onda estacionaria | 4 | versionado, validado en local |
+| 3.3 | Las antenas | 4 | versionado, validado en local |
+| 4.1 | La ionosfera | 4 | versionado, validado en local |
+| 4.2 | El enlace con el satelite | 4 | versionado, validado en local |
+| 4.3 | El clima, el ruido y el margen | 4 | versionado, validado en local |
+
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 
 La cola original esta agotada. Los proximos cursos se eligen tema a tema.

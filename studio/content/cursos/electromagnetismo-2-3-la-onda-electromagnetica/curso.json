@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 2.3 La onda electromagnética",
+  "description": "Lección 2.3 del curso Electromagnetismo (módulo 2: Maxwell y el matrimonio de los campos), en 4 clips animados —uno por subtema—: la estructura de la onda plana con E y B perpendiculares y en fase viajando a c, la energía que transporta (la impedancia del vacío y el kilovoltio por metro de la luz solar), la polarización lineal y circular como la moneda con la que un satélite duplica su capacidad, y el mapa logarítmico de bandas de HF a Ka. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-campo-que-viaja-solo.py",
+      "title": "1 · El campo que viaja solo",
+      "scene": "Clip1",
+      "final_state": "Onda plana congelada con E en ámbar y B en verde en fase, la flecha de marcha violeta, una llave cian acotando λ entre dos crestas, la fórmula c = λf y la cifra '12 GHz -> lambda = 25 mm'; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-energia-a-bordo.py",
+      "title": "2 · La energía a bordo",
+      "scene": "Clip2",
+      "final_state": "Esfera de frentes violeta reducida a la izquierda con los dos parches de antena en cian, y a la derecha η₀ = 376.73 Ω, S☉ = 1361 W/m² y E = √(2η₀S) = 1013 V/m; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-polarizacion.py",
+      "title": "3 · La polarización",
+      "scene": "Clip3",
+      "final_state": "Traza de polarización circular a la izquierda con su etiqueta, y a la derecha las dos señales de 12 GHz en V y en H más la lectura 'misma frecuencia, doble capacidad' en cian; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-mapa-de-las-bandas.py",
+      "title": "4 · El mapa de las bandas",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Ya tienes la onda.» sobre «Ahora hay que llevarla a su antena.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}
