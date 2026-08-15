@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 2.1 Medir con el tiempo de vuelo",
+  "description": "Lección 2.1 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): El pulso y el cronómetro, la Luna con retrorreflectores, la telemetría láser a satélites y la ambigüedad de fase. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-pulso-y-un-cronometro.py",
+      "title": "1 · Un pulso y un cronómetro",
+      "scene": "Clip1",
+      "final_state": "pulso_ida_vuelta con d = c·t/2 y 1 mm = 6.67 ps; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/02-la-luna-milimetro-a-milimetro.py",
+      "title": "2 · La Luna, milímetro a milímetro",
+      "scene": "Clip2",
+      "final_state": "tierra_luna_laser con 2.564 s de ida y vuelta; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-satelites-con-laser.py",
+      "title": "3 · Satélites con láser",
+      "scene": "Clip3",
+      "final_state": "satelite_slr con LAGEOS y 39.4 ms; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/04-la-regla-con-vueltas.py",
+      "title": "4 · La regla con vueltas",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «El tiempo mide lejos.» / «La fase mide fino.»; HUD 'MODULO 02'."
+    }
+  ]
+}

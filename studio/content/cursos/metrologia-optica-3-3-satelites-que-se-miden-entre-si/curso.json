@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 3.3 Satélites que se miden entre sí",
+  "description": "Lección 3.3 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): GRACE-FO como balanza, el interferómetro láser a 220 km, el mapa de la gravedad y LISA con picómetros. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-satelites-y-una-balanza.py",
+      "title": "1 · Dos satélites y una balanza",
+      "scene": "Clip1",
+      "final_state": "grace_par con la distancia variando al pasar sobre la masa; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/02-nanometros-en-220-kilometros.py",
+      "title": "2 · Nanómetros en 220 kilómetros",
+      "scene": "Clip2",
+      "final_state": "interferometro_espacial con la señal de fase y 4.5e-15; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/03-el-mapa-del-agua.py",
+      "title": "3 · El mapa del agua",
+      "scene": "Clip3",
+      "final_state": "mapa_gravedad con las regiones rotuladas; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-picometros-entre-tres-naves.py",
+      "title": "4 · Picómetros entre tres naves",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «La luz fue la regla del taller.» / «Ahora es la regla del universo.»; HUD 'MODULO 03'."
+    }
+  ]
+}

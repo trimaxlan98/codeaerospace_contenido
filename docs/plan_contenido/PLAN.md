@@ -1,6 +1,6 @@
 # Plan de contenido: de la Academia a los cursos de video
 
-Fecha: 2026-08-06 (ultima actualizacion: 2026-08-14). Responsable de
+Fecha: 2026-08-06 (ultima actualizacion: 2026-08-15). Responsable de
 arquitectura: Fable (guiones, diseño de curso); agentes sonnet/opus escriben
 el codigo de los clips y librerias.
 
@@ -46,7 +46,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 16 | Relatividad y el GPS | original (divulgacion pura, fisica aplicada a ingenieria) | `relatividad.py` | publicado (PR #13) |
 | 17 | Tsiolkovsky: la tirania del cohete | original (divulgacion pura, astronautica) | `cohete.py` | publicado (PR #15) |
 | 18 | Sistemas distribuidos: la nube por dentro | original (divulgacion, computo distribuido) | `distribuido.py` | publicado (PR #16) |
-| 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | en produccion (rama `curso/criptografia`) |
+| 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | publicado (PR #19); primer curso con intro/cierre de marca en el mux |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -127,6 +127,29 @@ Storyboard y contrato de la libreria: `curso-16-electromagnetismo.md`.
 | 4.2 | El enlace con el satelite | 4 | publicado: qh en prod, narrado y muxeado |
 | 4.3 | El clima, el ruido y el margen | 4 | publicado: qh en prod, narrado y muxeado |
 
+## Familia "Metrologia optica" (2026-08-15, formato de lecciones)
+
+Tercera familia (curso 20 del plan): **un proyecto = una leccion de 4
+clips**, 3 modulos x 3 lecciones = 9 proyectos, 36 clips. Original; el
+angulo es *la luz como regla*: modulo 1 teoria basica (onda, fase,
+interferencia, difraccion), modulo 2 tecnicas de medir con luz (tiempo de
+vuelo, franjas, frente de onda), modulo 3 los **enlaces opticos entre
+satelites (ISL)**: apuntar/adquirir/seguir y satelites que se miden entre
+si (GRACE-FO, LISA). Dos librerias (`optica.py` modulos 1-2, `isl.py`
+modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
+
+| Leccion | Proyecto | Clips | Estado |
+|---------|----------|-------|--------|
+| 1.1 | La luz como regla | 4 | en produccion (rama `curso/metrologia-optica`) |
+| 1.2 | La interferencia: contar franjas | 4 | en produccion |
+| 1.3 | La difraccion: el limite de la regla | 4 | en produccion |
+| 2.1 | Medir con el tiempo de vuelo | 4 | en produccion |
+| 2.2 | Medir la forma con franjas | 4 | en produccion |
+| 2.3 | Medir el frente de onda | 4 | en produccion |
+| 3.1 | El enlace optico entre satelites | 4 | en produccion |
+| 3.2 | Apuntar, adquirir, seguir | 4 | en produccion |
+| 3.3 | Satelites que se miden entre si | 4 | en produccion |
+
 ## Marca: intro y cierre para posproduccion (2026-08-14)
 
 Proyecto especial **`marca-intro-y-cierre`** (no es una leccion): dos clips
@@ -148,7 +171,7 @@ La cola original esta agotada. Los proximos cursos se eligen tema a tema.
 
 | Prio | Curso de video (8 clips) | Lecciones fuente (Academy) | Libreria nueva | Estado |
 |------|--------------------------|----------------------------|----------------|--------|
-| 1 | Criptografia: el arte de guardar secretos (curso 19) | original (divulgacion, seguridad/telecom) | `cripto.py` | en produccion (ver tabla de arriba) |
+| — | Criptografia (curso 19) | — | `cripto.py` | publicado (PR #19) |
 | 2 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente natural con Criptografia y con "Cerrar el enlace") | `informacion.py` | en cola |
 
 Criterio de prioridad: (1) riqueza visual con primitivas existentes o

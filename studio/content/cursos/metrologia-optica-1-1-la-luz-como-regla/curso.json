@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 1.1 La luz como regla",
+  "description": "Lección 1.1 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): La longitud de onda como regla, el metro definido con la luz, la coherencia y la suma de dos ondas. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-una-regla-de-633-nanometros.py",
+      "title": "1 · Una regla de 633 nanómetros",
+      "scene": "Clip1",
+      "final_state": "La onda roja del HeNe con λ = 632.8 nm y f = 473.6 THz rotuladas; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-metro-lo-define-la-luz.py",
+      "title": "2 · El metro lo define la luz",
+      "scene": "Clip2",
+      "final_state": "reloj_luz con la definición «1 m = c · 1/299 792 458 s»; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/03-hasta-donde-sirve-la-regla.py",
+      "title": "3 · Hasta dónde sirve la regla",
+      "scene": "Clip3",
+      "final_state": "Dos trenes de ondas con sus longitudes de coherencia (LED 20 µm, HeNe 0.40 m); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/04-sumar-dos-ondas.py",
+      "title": "4 · Sumar dos ondas",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «La luz no se mide con la luz.» / «Se mide con su fase.»; HUD 'MODULO 01'."
+    }
+  ]
+}

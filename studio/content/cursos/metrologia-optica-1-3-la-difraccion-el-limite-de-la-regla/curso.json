@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 1.3 La difracción: el límite de la regla",
+  "description": "Lección 1.3 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): La rendija, el disco de Airy, el criterio de Rayleigh y la divergencia del haz láser. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-rendija-que-ensancha.py",
+      "title": "1 · La rendija que ensancha",
+      "scene": "Clip1",
+      "final_state": "rendija_patron con dos anchos de rendija y sus patrones; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-disco-de-airy.py",
+      "title": "2 · El disco de Airy",
+      "scene": "Clip2",
+      "final_state": "disco_airy con su perfil y el primer cero 1.22 λ/D; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/03-el-criterio-de-rayleigh.py",
+      "title": "3 · El criterio de Rayleigh",
+      "scene": "Clip3",
+      "final_state": "Dos fuentes justo resueltas con las cifras de Hubble (0.28 µrad) y del ojo (224 µrad); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/04-el-haz-que-se-abre.py",
+      "title": "4 · El haz que se abre",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «Ni el láser es una recta.» / «Todo haz se abre.»; HUD 'MODULO 01'."
+    }
+  ]
+}

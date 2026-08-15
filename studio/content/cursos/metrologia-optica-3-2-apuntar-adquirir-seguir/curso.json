@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 3.2 Apuntar, adquirir, seguir",
+  "description": "Lección 3.2 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): Un microrradián son cinco metros, el ángulo de adelanto 2v/c, la espiral de adquisición y el seguimiento con detector de cuadrantes. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-microradian-son-cinco-metros.py",
+      "title": "1 · Un microradián son cinco metros",
+      "scene": "Clip1",
+      "final_state": "punteria con el error de 1 µrad dentro y el de 10 µrad fuera del satélite; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/02-apuntar-adonde-estara.py",
+      "title": "2 · Apuntar adonde estará",
+      "scene": "Clip2",
+      "final_state": "adelanto_apuntado con el haz ingenuo y el adelantado (50.7 µrad); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/03-la-espiral-y-el-faro.py",
+      "title": "3 · La espiral y el faro",
+      "scene": "Clip3",
+      "final_state": "espiral_adquisicion con el faro encontrado (simulación); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-seguir-sin-temblar.py",
+      "title": "4 · Seguir sin temblar",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «Adquirir es encontrarse.» / «Seguir es no soltarse.»; HUD 'MODULO 03'."
+    }
+  ]
+}
