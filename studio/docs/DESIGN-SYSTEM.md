@@ -90,6 +90,33 @@ Con `z-0` se colocaba por encima de cualquier contenido **no posicionado**
 pero un `<div>` plano no— y ocultó las pestañas de Admin. Cualquier capa de
 fondo nueva va con z negativo.
 
+## Mapa de navegación
+
+Una entrada por **tarea**, no por endpoint (sprint 4). Cinco secciones más
+Configuración:
+
+| Vista | Hash | Tarea |
+|-------|------|-------|
+| Proyectos | `#/proyectos[/<id>]` | construir y vigilar un curso (el hub: ~60 cursos en familias) |
+| Estudio | `#/estudio` | escribir y renderizar una escena o el clip de un curso |
+| Renders | `#/renders` | el archivo de todo lo que salió de la cola, con o sin video |
+| Aprender | `#/aprender[/<id>]` | teoría del curso de Manim **y** animaciones de ejemplo, un solo índice |
+| Admin | `#/admin[/<tab>]` | salud del host, jobs y disco |
+| Configuración | `#/configuracion` | todo lo que el usuario ajusta (encargo 8) |
+
+Reglas al tocar esto:
+
+- **Los hash viejos no se rompen.** `router.js` mantiene alias
+  (`#/animaciones` → Aprender, `#/biblioteca` → Renders) y `prefs.js` traduce
+  las preferencias de *vista al abrir* guardadas con ids antiguos.
+- **Fusionar solo si las dos vistas sirven a la misma tarea.** Aprender y
+  Animaciones sí (mismo índice del backend, ids 1:1, y la búsqueda partida era
+  un fallo). Renders y Proyectos no: Renders incluye renders sueltos sin
+  proyecto. Ahí la respuesta es un **enlace** entre ambas, no una fusión.
+- Las vistas son **keep-alive** (montadas y ocultas con `display:none`), así
+  que un selector de QA sin acotar encuentra controles de otras vistas: usa
+  `main[data-view="…"]` como raíz.
+
 ## Componentes
 
 La base vive en `src/components/ui/` (`button`, `dialog`, `input` +

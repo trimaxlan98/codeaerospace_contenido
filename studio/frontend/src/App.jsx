@@ -9,9 +9,8 @@ import ChangePassword from './ChangePassword.jsx'
 import Header from './Header.jsx'
 import Studio from './Studio.jsx'
 import Admin from './Admin.jsx'
-import Library from './Library.jsx'
-import Lessons from './Lessons.jsx'
-import Animations from './Animations.jsx'
+import Renders from './Renders.jsx'
+import Learn from './Learn.jsx'
 import Projects from './Projects.jsx'
 import Settings from './Settings.jsx'
 import StarfieldBackground from './components/StarfieldBackground.jsx'
@@ -248,23 +247,17 @@ export default function App() {
             }} />
         </div>
       )}
-      {visited.current.has('library') && (
-        <div className={show('library')}>
-          <Library jobs={jobs} storage={storage} onJobsChanged={refreshJobs} />
+      {visited.current.has('renders') && (
+        <div className={show('renders')}>
+          <Renders jobs={jobs} storage={storage} onJobsChanged={refreshJobs}
+            onOpenProject={(id) => navigate('projects', id)} />
         </div>
       )}
-      {visited.current.has('lessons') && (
-        <div className={show('lessons')}>
-          <Lessons active={view === 'lessons'}
-            routeId={view === 'lessons' ? route.param : null}
-            onRoute={(id) => navigate('lessons', id)} />
-        </div>
-      )}
-      {visited.current.has('animations') && (
-        <div className={show('animations')}>
-          <Animations
-            routeId={view === 'animations' ? route.param : null}
-            onRoute={(id) => navigate('animations', id)}
+      {visited.current.has('learn') && (
+        <div className={show('learn')}>
+          <Learn active={view === 'learn'}
+            routeId={view === 'learn' ? route.param : null}
+            onRoute={(id) => navigate('learn', id)}
             onOpenInStudio={(script) => { setPendingScript(script); navigate('studio') }} />
         </div>
       )}

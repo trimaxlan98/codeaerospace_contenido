@@ -1,22 +1,29 @@
 // Router por hash minimo: la vista activa (y un parametro opcional) viven en
-// la URL — #/estudio, #/aprender/<id>, #/animaciones/<id>, #/admin/<tab> —
-// para que F5 conserve la vista, atras/adelante navegue y haya deep-links.
+// la URL — #/estudio, #/aprender/<id>, #/renders, #/admin/<tab> — para que F5
+// conserve la vista, atras/adelante navegue y haya deep-links.
 
 import { useCallback, useEffect, useState } from 'react'
 import { getPrefs } from './prefs.js'
 
-const HASH_TO_VIEW = {
-  estudio: 'studio',
-  proyectos: 'projects',
-  biblioteca: 'library',
-  aprender: 'lessons',
-  animaciones: 'animations',
+// Hash canonico de cada vista (el que se escribe en la URL).
+const VIEW_TO_HASH = {
+  studio: 'estudio',
+  projects: 'proyectos',
+  renders: 'renders',
+  learn: 'aprender',
   admin: 'admin',
-  configuracion: 'settings',
+  settings: 'configuracion',
 }
-const VIEW_TO_HASH = Object.fromEntries(
-  Object.entries(HASH_TO_VIEW).map(([h, v]) => [v, h]),
-)
+
+// Hash -> vista. Incluye los ALIAS de antes del sprint 4, cuando Aprender y
+// Animaciones eran dos secciones y los renders se llamaban Biblioteca: los
+// enlaces guardados (y el hash que el navegador aun tenga en la barra al
+// desplegar) siguen abriendo la vista que toca.
+const HASH_TO_VIEW = {
+  ...Object.fromEntries(Object.entries(VIEW_TO_HASH).map(([v, h]) => [h, v])),
+  animaciones: 'learn',
+  biblioteca: 'renders',
+}
 
 export function parseHash(hash = window.location.hash) {
   const [seg, ...rest] = hash.replace(/^#\/?/, '').split('/')

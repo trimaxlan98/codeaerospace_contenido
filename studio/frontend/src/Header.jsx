@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
-import { FolderKanban, Settings as SettingsIcon, WifiOff } from 'lucide-react'
+import {
+  Activity, FileCode, Film, FolderKanban, GraduationCap,
+  Settings as SettingsIcon, WifiOff,
+} from 'lucide-react'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Wordmark } from './components/Brand.jsx'
 import { usePref } from './prefs.js'
 import { cn } from '@/lib/utils'
 
+// Una entrada por TAREA, no por endpoint (encargo 7). Proyectos va primero
+// porque es donde vive el trabajo real (el catalogo son ~60 cursos); el
+// Estudio es su editor. "Renders" era "Biblioteca", nombre que chocaba con la
+// biblioteca de contenido de Aprender; y Animaciones dejo de ser seccion
+// propia: es la mitad practica de Aprender y comparten indice.
 const NAV = [
-  { id: 'studio', label: 'Estudio' },
   { id: 'projects', label: 'Proyectos', icon: FolderKanban },
-  { id: 'library', label: 'Biblioteca' },
-  { id: 'lessons', label: 'Aprender' },
-  { id: 'animations', label: 'Animaciones' },
-  { id: 'admin', label: 'Admin' },
+  { id: 'studio', label: 'Estudio', icon: FileCode },
+  { id: 'renders', label: 'Renders', icon: Film },
+  { id: 'learn', label: 'Aprender', icon: GraduationCap },
+  { id: 'admin', label: 'Admin', icon: Activity },
 ]
 
 function useUtcClock() {
