@@ -112,18 +112,18 @@ Storyboard y contrato de la libreria: `curso-16-electromagnetismo.md`.
 
 | Leccion | Proyecto | Clips | Estado |
 |---------|----------|-------|--------|
-| 1.1 | La carga y el campo electrico | 4 | versionado, validado en local |
-| 1.2 | La corriente y el campo magnetico | 4 | versionado, validado en local |
-| 1.3 | La fuerza de Lorentz | 4 | versionado, validado en local |
-| 2.1 | La induccion de Faraday | 4 | versionado, validado en local |
-| 2.2 | Las ecuaciones de Maxwell | 4 | versionado, validado en local |
-| 2.3 | La onda electromagnetica | 4 | versionado, validado en local |
-| 3.1 | Las lineas de transmision | 4 | versionado, validado en local |
-| 3.2 | La reflexion y la onda estacionaria | 4 | versionado, validado en local |
-| 3.3 | Las antenas | 4 | versionado, validado en local |
-| 4.1 | La ionosfera | 4 | versionado, validado en local |
-| 4.2 | El enlace con el satelite | 4 | versionado, validado en local |
-| 4.3 | El clima, el ruido y el margen | 4 | versionado, validado en local |
+| 1.1 | La carga y el campo electrico | 4 | publicado: qh en prod, narrado y muxeado |
+| 1.2 | La corriente y el campo magnetico | 4 | publicado: qh en prod, narrado y muxeado |
+| 1.3 | La fuerza de Lorentz | 4 | publicado: qh en prod, narrado y muxeado |
+| 2.1 | La induccion de Faraday | 4 | publicado: qh en prod, narrado y muxeado |
+| 2.2 | Las ecuaciones de Maxwell | 4 | publicado: qh en prod, narrado y muxeado |
+| 2.3 | La onda electromagnetica | 4 | publicado: qh en prod, narrado y muxeado |
+| 3.1 | Las lineas de transmision | 4 | publicado: qh en prod, narrado y muxeado |
+| 3.2 | La reflexion y la onda estacionaria | 4 | publicado: qh en prod, narrado y muxeado |
+| 3.3 | Las antenas | 4 | publicado: qh en prod, narrado y muxeado |
+| 4.1 | La ionosfera | 4 | publicado: qh en prod, narrado y muxeado |
+| 4.2 | El enlace con el satelite | 4 | publicado: qh en prod, narrado y muxeado |
+| 4.3 | El clima, el ruido y el margen | 4 | publicado: qh en prod, narrado y muxeado |
 
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 
