@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
-import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save, FolderKanban, LogOut } from 'lucide-react'
+import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save, FolderKanban, LogOut, ArrowLeft } from 'lucide-react'
 import { api, videoUrl } from './api.js'
 import Assistant from './Assistant.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -194,7 +194,8 @@ function ClearHistoryButton({ count, onFire }) {
 }
 
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
-  pendingScript, pendingScene, onConsumePendingScript, clipContext, onExitClip }) {
+  pendingScript, pendingScene, onConsumePendingScript, clipContext, onExitClip,
+  onOpenProject }) {
   const [script, setScript] = useState(() => lsGet(LS.script) ?? SAMPLE)
   const [scenes, setScenes] = useState(() => [lsGet(LS.scene) || 'Orbita'])
   const [scene, setScene] = useState(() => lsGet(LS.scene) || 'Orbita')
@@ -290,9 +291,19 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     ? [...selectedLogs, ...liveLog.lines].slice(-5000)
     : selectedLogs
 
+  // Autoscroll del registro SOLO si ya estabas al fondo: antes cada linea
+  // nueva te arrastraba abajo y era imposible subir a leer un traceback
+  // mientras el render seguia escribiendo.
+  const atBottomRef = useRef(true)
+  const onLogScroll = () => {
+    const el = logRef.current
+    if (el) atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24
+  }
   useEffect(() => {
-    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
+    if (logRef.current && atBottomRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
   }, [logs.length])
+  // Al cambiar de job se vuelve a seguir el fondo.
+  useEffect(() => { atBottomRef.current = true }, [selected?.id])
 
   // En contexto de clip el render no pasa por /api/jobs: primero se guarda
   // el script/escena en el clip (mismo endpoint que "Guardar en clip") y
@@ -335,8 +346,15 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
     }
   }
 
+  // Cancelar puede fallar de verdad (el runner caido, p.ej.): antes el error
+  // se tragaba en silencio y el chip se quedaba "renderizando" sin explicacion.
   const cancel = async (id) => {
-    try { await api.cancelJob(id) } catch { /* ya termino */ }
+    setSubmitError('')
+    try {
+      await api.cancelJob(id)
+    } catch (err) {
+      if (err.status !== 404 && err.status !== 409) setSubmitError(`No se pudo cancelar: ${err.message}`)
+    }
   }
 
   const retry = async (id) => {
@@ -383,8 +401,8 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const submitHint = !scenes.includes(scene)
     ? 'Define una Scene valida en el script para renderizar'
     : clipContext
-      ? 'Guarda el clip y encola su render (compone el estilo del proyecto)'
-      : 'Encolar el render (se ejecutan de a uno)'
+      ? 'Guarda el clip y encola su render (compone el estilo del proyecto) · Ctrl+Enter'
+      : 'Encolar el render (se ejecutan de a uno) · Ctrl+Enter'
   const errorish = selected && ['error', 'timeout'].includes(selected.status)
   // Nota de desfase de líneas: los errores de escenas/render pueden citar
   // numeros de linea del script COMPUESTO (estilo + clip), que no coinciden
@@ -420,7 +438,15 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             {' · clip "'}<strong className="font-semibold">{clipContext.clipTitle}</strong>{'"'}
             {' · calidad '}{QUALITY_LABEL[clipContext.quality] || clipContext.quality}{' (fija)'}
           </span>
-          <Button size="xs" variant="ghost" className="ml-auto" onClick={onExitClip}
+          {/* Sin esto el viaje de vuelta era: nav Proyectos → volvias a la
+              LISTA (la ruta perdio el id al navegar al Estudio) → buscar el
+              curso entre ~60 → abrirlo. */}
+          <Button size="xs" variant="default" className="ml-auto"
+            onClick={() => onOpenProject?.(clipContext.projectId)}
+            title="Volver al proyecto sin salir del contexto del clip">
+            <ArrowLeft className="h-3.5 w-3.5" /> Volver al proyecto
+          </Button>
+          <Button size="xs" variant="ghost" onClick={onExitClip}
             title="Vuelve al render libre; no borra el script del editor">
             <LogOut className="h-3.5 w-3.5" /> Salir del clip
           </Button>
@@ -430,7 +456,17 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
           conjunto llena el viewport y cada panel scrollea por dentro. */}
       <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* ── Editor ── */}
-        <section className="panel flex h-[62dvh] min-w-0 flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1" aria-label="editor">
+        {/* Ctrl/⌘+Enter renderiza desde el editor: el bucle real es
+            escribir → render → leer log → corregir, y bajar el raton al boton
+            en cada vuelta sobra. El handler va en la seccion (no en window)
+            para que no dispare desde otras vistas, que siguen montadas. */}
+        <section className="panel flex h-[62dvh] min-w-0 flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1" aria-label="editor"
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+              e.preventDefault()
+              if (canSubmit) submit()
+            }
+          }}>
           <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
             <div className="flex items-center gap-2">
               <FileCode className="h-4 w-4 text-muted" />
@@ -456,8 +492,14 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                 disabled={!!clipContext} />
               <label className="flex items-center gap-1.5">
                 <span className="eyebrow">Timeout</span>
+                {/* Se normaliza al salir del campo: vaciarlo mandaba NaN a la
+                    API y el error solo llegaba del servidor tras encolar. */}
                 <input type="number" min="30" max="1800" step="30" value={timeoutS}
                   onChange={(e) => setTimeoutS(e.target.value)}
+                  onBlur={(e) => {
+                    const n = Number(e.target.value)
+                    setTimeoutS(Number.isFinite(n) ? Math.min(1800, Math.max(30, Math.round(n))) : 600)
+                  }}
                   className="h-8 w-[68px] rounded-md border border-line bg-canvas px-2 text-sm tabular-nums text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan" />
                 <span className="text-xs text-faint">s</span>
               </label>
@@ -539,7 +581,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                 </div>
               )}
             </div>
-            <pre ref={logRef}
+            <pre ref={logRef} onScroll={onLogScroll}
               className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-b-[13px] bg-canvas px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">
               {logs.length ? logs.join('\n')
                 : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'

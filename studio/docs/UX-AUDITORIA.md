@@ -177,3 +177,79 @@ Renderizar esté deshabilitado, y añadir "Vaciar historial" + purga con días l
    ante `samples` con forma inesperada; toasts de fin de render (clic → Estudio) y
    `document.title` con "● Renderizando…" mientras corre un job. QA Playwright: 18 checks
    funcionales de los bloques 4+5, más regresión de los 17 del bloque 3.
+
+---
+
+# Segunda auditoría — 2026-08-15
+
+Método: lectura completa de `studio/frontend/src` (~5 600 líneas) y de los
+módulos de backend que la alimentan (`projects.py`, `projects_api.py`,
+`narracion.py`, `jobs.py`), más QA visual con Playwright contra una instancia
+local sembrada con el catálogo real (58 cursos leídos de
+`studio/content/cursos/*/curso.json`).
+
+Contexto: la primera auditoría es de julio, cuando la app renderizaba escenas
+sueltas. Desde entonces el catálogo pasó a **58 proyectos / ~300 clips** en
+familias, y el trabajo real se hace con `studio/tools/`. Los 6 P0 de julio
+siguen resueltos; lo que sigue es nuevo.
+
+## P0 — la base visual estaba anulada
+
+1. **Ni un borde ni anillo de foco en toda la app.** `styles.css` (sin
+   `@layer`, y por tanto ganando a todo `theme.css`) traía
+   `* { border-color: transparent !important; outline-color: transparent
+   !important }`. Todo `border-line` era invisible y `:focus-visible` nunca
+   se pintaba: **fallo de accesibilidad WCAG 2.4.7**. Por lo mismo su `body`
+   ganaba y la tipografía caía a system-ui pese a cargar Inter.
+2. **`--line: transparent` en los 4 temas**, un segundo interruptor del mismo
+   fallo; además dejaba **invisible la barra de scroll**
+   (`scrollbar-color: var(--line-strong)`) en una interfaz llena de paneles
+   con scroll interno.
+3. **Paneles indistinguibles del fondo**: velo de vidrio oscuro sobre lienzo
+   oscuro (`--surface: rgba(23,23,23,.05)` sobre `#030712`).
+4. **Las pestañas Salud / Jobs / Recursos de Admin eran invisibles**:
+   `StarfieldBackground` es una capa opaca `fixed inset-0` con `z-0` que
+   tapaba todo contenido no posicionado posterior en el árbol.
+
+## P0 — comportamiento
+
+5. **Cancelar la narración de otro proyecto.** `run` es global y el detalle no
+   miraba `run.project_id`: un proyecto ajeno mostraba el progreso de otro y
+   su botón *Cancelar narración* **abortaba el trabajo del otro proyecto**.
+
+## P1 — el flujo de cursos
+
+6. **Proyectos era una rejilla plana de 58 tarjetas** sin buscador, orden ni
+   agrupación, con 41 de ellas pertenecientes a 3 familias.
+7. **La duración del clip no se veía en ningún sitio**, siendo el dato del que
+   depende el formato (28–45 s). El backend ya la calculaba y la servía
+   (`video_s` en `GET /api/projects/{id}/narracion`).
+8. **La narración solo se veía si ya había audio**: desde la app no había
+   forma de saber qué faltaba narrar.
+9. **El guion generado no se podía leer** sin bajarse el zip del curso, pese a
+   existir `GET /api/projects/{pid}/narracion/{cid}/texto`.
+10. **Sin vuelta al proyecto desde el Estudio**: editar un clip y volver
+    significaba caer en la lista y buscar el curso entre 58.
+11. **Biblioteca con cientos de tarjetas llamadas `Clip1`…`Clip8`**, sin
+    buscador ni orden, y sin decir a qué curso pertenece cada render.
+12. **Los fallidos no mostraban su error** (vivía solo en el chip del Estudio).
+
+## P2
+
+13. **El registro del Estudio arrastraba al fondo** en cada línea nueva
+    (pendiente desde julio): imposible leer un traceback durante el render.
+14. **Sin atajo de teclado para renderizar** en el bucle editar → render →
+    leer → corregir.
+15. **`Timeout` sin normalizar**: vaciar el campo mandaba `NaN` a la API.
+16. **Cancelar un job se tragaba el error** en silencio.
+17. **`FileManager.jsx`**: 916 líneas de mock sin ninguna llamada a la API y
+    sin importar en ningún sitio desde `c90bee4`.
+18. **La muestra del tema claro `daylight`** enseñaba un lienzo oscuro.
+19. **Coste del fondo animado**: `requestAnimationFrame` sin límite con
+    enlaces O(n²) entre 85 partículas y un `getComputedStyle` por fotograma,
+    sin respetar `prefers-reduced-motion`, en una consola que se deja abierta
+    horas.
+
+**Estado:** 1–19 corregidos en la rama `ui/rediseno-empresarial` (sprints 0 y
+1). El detalle de cada arreglo y lo que queda vivo están en
+`UX-REDISENO.md`; las reglas para no repetirlos, en `DESIGN-SYSTEM.md`.

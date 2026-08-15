@@ -13,6 +13,7 @@ import Lessons from './Lessons.jsx'
 import Animations from './Animations.jsx'
 import Projects from './Projects.jsx'
 import StarfieldBackground from './components/StarfieldBackground.jsx'
+import { BrandMark } from './components/Brand.jsx'
 
 const TOAST_META = {
   done: { label: 'listo', dot: 'bg-ok', text: 'text-ok' },
@@ -147,7 +148,7 @@ export default function App() {
   useEffect(() => {
     document.title = rendering
       ? '● Renderizando… · ManimStudio'
-      : 'ManimStudio · coderesearch.space'
+      : 'ManimStudio · CO.DE Academy'
   }, [rendering])
 
   const logout = async () => {
@@ -155,7 +156,14 @@ export default function App() {
   }
 
   if (auth === null) {
-    return <div className="boot">CONECTANDO…</div>
+    // Arranque: la marca aparece ya en el primer pintado, antes de saber si
+    // hay sesion (encargo 11 — la identidad no es solo del video).
+    return (
+      <div className="boot">
+        <BrandMark size={44} />
+        <span>CONECTANDO…</span>
+      </div>
+    )
   }
   if (auth === false) {
     return <Login onLogin={refreshMe} />
@@ -217,7 +225,8 @@ export default function App() {
             onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
             pendingScript={pendingScript} pendingScene={pendingScene}
             onConsumePendingScript={() => { setPendingScript(null); setPendingScene(null) }}
-            clipContext={clipContext} onExitClip={() => setClipContext(null)} />
+            clipContext={clipContext} onExitClip={() => setClipContext(null)}
+            onOpenProject={(id) => navigate('projects', id)} />
         </div>
       )}
       {visited.current.has('projects') && (

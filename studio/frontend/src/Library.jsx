@@ -1,9 +1,10 @@
 // Biblioteca: videos renderizados (grid de tarjetas) + gestión de disco.
 
-import { useEffect, useState } from 'react'
-import { Play, Download, FolderPlus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Play, Download, FolderPlus, Search } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
 import { Button } from './components/ui/button.jsx'
+import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
 import DeleteButton from './components/DeleteButton.jsx'
@@ -152,13 +153,48 @@ function AddToProjectDialog({ job, onOpenChange }) {
   )
 }
 
+// El listado sube a 500 jobs (JOBS_LIST_LIMIT) y con ~60 cursos en catalogo
+// la rejilla son cientos de tarjetas: sin buscador ni orden es inservible.
+const SORTS = [
+  { id: 'recientes', label: 'Recientes' },
+  { id: 'antiguos', label: 'Antiguos' },
+  { id: 'grandes', label: 'Más pesados' },
+  { id: 'nombre', label: 'Nombre' },
+]
+
 export default function Library({ jobs, storage, onJobsChanged }) {
   const [playing, setPlaying] = useState(null) // job en el visor
   const [addingToProject, setAddingToProject] = useState(null) // job a enlazar
   const [error, setError] = useState('')
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState('recientes')
+  const [projectNames, setProjectNames] = useState({})
 
-  const videos = jobs.filter((j) => j.status === 'done')
+  // Casi todos los renders son clips de un curso y su escena se llama
+  // "Clip1".."Clip8": sin el nombre del proyecto la rejilla son cientos de
+  // tarjetas indistinguibles. Una sola consulta al montar basta.
+  useEffect(() => {
+    api.listProjects()
+      .then((d) => setProjectNames(Object.fromEntries(d.projects.map((p) => [p.id, p.name]))))
+      .catch(() => { /* sin nombres: la tarjeta cae al nombre de escena */ })
+  }, [])
+
+  const allVideos = jobs.filter((j) => j.status === 'done')
   const failed = jobs.filter((j) => ['error', 'timeout', 'cancelled'].includes(j.status))
+
+  const q = query.trim().toLowerCase()
+  const videos = useMemo(() => {
+    const texto = (j) => `${j.scene} ${projectNames[j.project_id] || ''}`.toLowerCase()
+    const list = q ? allVideos.filter((j) => texto(j).includes(q)) : [...allVideos]
+    const cmp = {
+      recientes: (a, b) => b.created_at - a.created_at,
+      antiguos: (a, b) => a.created_at - b.created_at,
+      grandes: (a, b) => (b.size_bytes || 0) - (a.size_bytes || 0),
+      nombre: (a, b) => a.scene.localeCompare(b.scene, 'es'),
+    }[sort]
+    return list.sort(cmp)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobs, q, sort, projectNames])
 
   const remove = async (id) => {
     setError('')
@@ -176,11 +212,25 @@ export default function Library({ jobs, storage, onJobsChanged }) {
       {/* shrink-0: sin el, las secciones se comprimen para caber en el
           viewport y su contenido se pinta encima de la siguiente. */}
       <section className="panel shrink-0" aria-label="uso de disco">
-        <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
           <span className="eyebrow">Biblioteca</span>
-          <span className="font-mono text-[11px] text-faint">
-            {videos.length} video{videos.length === 1 ? '' : 's'}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[11px] text-faint">
+              {q ? `${videos.length}/${allVideos.length}` : videos.length} video{allVideos.length === 1 ? '' : 's'}
+            </span>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint" />
+              <Input type="search" value={query} onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar escena…" aria-label="buscar videos"
+                className="h-8 w-[180px] pl-8 text-[13px]" />
+            </div>
+            <Select value={sort} onValueChange={setSort}>
+              <SelectTrigger className="h-8 w-[140px]" aria-label="ordenar videos"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {SORTS.map((s) => <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="p-4">
           <StorageBar storage={storage} />
@@ -192,7 +242,10 @@ export default function Library({ jobs, storage, onJobsChanged }) {
 
       <section className="panel shrink-0" aria-label="videos renderizados">
         {videos.length === 0 ? (
-          <p className="p-4 text-[13px] text-muted">Sin videos todavía. Los renders exitosos aparecen aquí.</p>
+          <p className="p-4 text-[13px] text-muted">
+            {q ? 'Ningún video coincide con la búsqueda.'
+              : 'Sin videos todavía. Los renders exitosos aparecen aquí.'}
+          </p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5 p-4">
             {videos.map((j) => (
@@ -208,6 +261,11 @@ export default function Library({ jobs, storage, onJobsChanged }) {
                   </span>
                 </button>
                 <div className="flex flex-col gap-1.5 p-3">
+                  {projectNames[j.project_id] && (
+                    <p className="truncate text-[11.5px] text-accent" title={projectNames[j.project_id]}>
+                      {projectNames[j.project_id]}
+                    </p>
+                  )}
                   <h3 className="truncate font-mono text-[13px] font-semibold text-ink" title={j.scene}>{j.scene}</h3>
                   <p className="text-[11.5px] text-muted">
                     {fmtDate(j.created_at)} · {duration(j) || '—'} · {QUALITY_LABEL[j.quality] || j.quality} · {fmtSize(j.size_bytes)}
@@ -244,12 +302,22 @@ export default function Library({ jobs, storage, onJobsChanged }) {
             {failed.map((j) => {
               const m = FAIL_META[j.status] || FAIL_META.error
               return (
-                <li key={j.id} className="flex flex-wrap items-center gap-3 px-3 py-2">
+                <li key={j.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2">
                   <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot)} />
                   <span className="font-mono text-[13px] text-ink">{j.scene}</span>
+                  {projectNames[j.project_id] && (
+                    <span className="truncate text-[11.5px] text-accent">{projectNames[j.project_id]}</span>
+                  )}
                   <span className="text-[11.5px] text-muted">{fmtDate(j.created_at)}</span>
                   <span className={cn('font-mono text-[11px] uppercase tracking-wide', m.text)}>{m.label}</span>
                   <span className="ml-auto"><DeleteButton onDelete={() => remove(j.id)} /></span>
+                  {/* El motivo del fallo vivia solo en el chip del Estudio: aqui
+                      se veia "error" y nada mas. */}
+                  {j.error && (
+                    <span className="w-full break-words font-mono text-[11.5px] text-err/90" title={j.error}>
+                      ✕ {j.error}
+                    </span>
+                  )}
                 </li>
               )
             })}

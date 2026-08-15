@@ -23,6 +23,8 @@
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-err: var(--err);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
 
   --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif;
@@ -38,10 +40,16 @@
   /* ── Liquid Glass — default ── */
   :root {
     --canvas: #030712;
-    --surface: rgba(23, 23, 23, 0.05);
-    --surface-2: rgba(23, 23, 23, 0.1);
-    --line: transparent;                     /* No borders for seamless glassmorphism */
-    --line-strong: transparent;
+    /* Vidrio = velo CLARO sobre el lienzo. Con un velo oscuro (el valor
+       anterior, rgba(23,23,23,.05) sobre #030712) los paneles quedaban
+       indistinguibles del fondo. */
+    --surface: rgba(255, 255, 255, 0.045);
+    --surface-2: rgba(255, 255, 255, 0.075);
+    /* --line NO puede ser transparent: toda la estructura de la app
+       (cabeceras de panel, separadores de fila, bordes de input, tarjetas)
+       se dibuja con `border-line`, y la barra de scroll usa --line-strong. */
+    --line: rgba(255, 255, 255, 0.09);
+    --line-strong: rgba(255, 255, 255, 0.2);
     --ink: #e6eaf2;
     --muted: #8a97ad;
     --faint: #5c6a80;
@@ -51,6 +59,10 @@
     --ok: #10b981;
     --warn: #f59e0b;
     --err: #f43f5e;
+    /* Ambar CO.DE Academy: NO es el acento del tema, es la marca del canal
+       (la misma de code_brand.py). Constante en los tres temas oscuros. */
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #030712;
     --grad-b: #0a122c;
     --grad-c: #111e43;
@@ -62,7 +74,7 @@
     --glow-secondary: rgba(6, 182, 212, 0.12);  /* Cyan glow */
     --glow-tertiary: rgba(99, 102, 241, 0.08);   /* Purple glow */
     
-    --glass-bg: rgba(23, 23, 23, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.045);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.35);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -72,10 +84,10 @@
   /* ── Emerald Glass — ion ── */
   [data-theme="ion"] {
     --canvas: #010c08;
-    --surface: rgba(6, 40, 24, 0.05);
-    --surface-2: rgba(6, 40, 24, 0.1);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(209, 250, 229, 0.05);
+    --surface-2: rgba(209, 250, 229, 0.085);
+    --line: rgba(167, 243, 208, 0.11);
+    --line-strong: rgba(167, 243, 208, 0.22);
     --ink: #dcfce7;
     --muted: #6ebd93;
     --faint: #438e62;
@@ -85,6 +97,8 @@
     --ok: #34d399;
     --warn: #f59e0b;
     --err: #ff6b6b;
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #010c08;
     --grad-b: #042618;
     --grad-c: #063922;
@@ -96,7 +110,7 @@
     --glow-secondary: rgba(52, 211, 153, 0.08);
     --glow-tertiary: rgba(5, 150, 105, 0.06);
 
-    --glass-bg: rgba(6, 40, 24, 0.05);
+    --glass-bg: rgba(209, 250, 229, 0.05);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.4);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -106,10 +120,10 @@
   /* ── Nebula Glass — nebula ── */
   [data-theme="nebula"] {
     --canvas: #06010d;
-    --surface: rgba(21, 13, 36, 0.05);
-    --surface-2: rgba(21, 13, 36, 0.1);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(243, 232, 255, 0.05);
+    --surface-2: rgba(243, 232, 255, 0.085);
+    --line: rgba(233, 213, 255, 0.11);
+    --line-strong: rgba(233, 213, 255, 0.22);
     --ink: #f3e8ff;
     --muted: #a78bfa;
     --faint: #7c3aed;
@@ -119,6 +133,8 @@
     --ok: #10b981;
     --warn: #e8b84b;
     --err: #e86a6a;
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #06010d;
     --grad-b: #190a2c;
     --grad-c: #2a1144;
@@ -130,7 +146,7 @@
     --glow-secondary: rgba(217, 70, 239, 0.1);
     --glow-tertiary: rgba(124, 58, 237, 0.08);
 
-    --glass-bg: rgba(21, 13, 36, 0.05);
+    --glass-bg: rgba(243, 232, 255, 0.05);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.4);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -140,19 +156,29 @@
   /* ── Ice Glass — daylight ── */
   [data-theme="daylight"] {
     --canvas: #f1f5f9;
-    --surface: rgba(255, 255, 255, 0.25);
-    --surface-2: rgba(255, 255, 255, 0.4);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(255, 255, 255, 0.55);
+    --surface-2: rgba(255, 255, 255, 0.78);
+    --line: rgba(15, 23, 42, 0.13);
+    --line-strong: rgba(15, 23, 42, 0.28);
     --ink: #0f172a;
     --muted: #475569;
     --faint: #94a3b8;
-    --accent: #0ea5e9;      /* signature: Frosted Ice Sky */
+    /* Contraste AA en el unico tema claro: los tonos 500 de la paleta (que
+       funcionan sobre lienzo oscuro) fallan sobre #f1f5f9 — blanco sobre
+       #0ea5e9 daba 2,8:1 en el boton primario y `text-ok` 2,3:1. Aqui la
+       misma familia de color, dos escalones mas oscura, para pasar 4,5:1
+       como texto y 3:1 como indicador. */
+    --accent: #0369a1;      /* signature: Frosted Ice Sky */
     --accent-ink: #ffffff;
-    --cyan: #0284c7;
-    --ok: #10b981;
-    --warn: #ca8a04;
-    --err: #ef4444;
+    --cyan: #1d4ed8;
+    --ok: #047857;
+    --warn: #8f6106;
+    --err: #b91c1c;
+    /* El ambar del canal sobre lienzo claro da 1,6:1 — ilegible. En el unico
+       tema claro la marca se oscurece (amber-700 / orange-700) para pasar AA
+       sin dejar de ser la misma marca. */
+    --brand: #b45309;
+    --brand-2: #9a3412;
     --grad-a: #f1f5f9;
     --grad-b: #e2e8f0;
     --grad-c: #cbd5e1;
@@ -164,9 +190,9 @@
     --glow-secondary: rgba(14, 165, 233, 0.15);
     --glow-tertiary: rgba(255, 255, 255, 0.95);
 
-    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-blur: blur(25px) saturate(100%);
-    --glass-shadow-glow: rgba(15, 23, 42, 0.04);
+    --glass-shadow-glow: rgba(15, 23, 42, 0.08);
     --glass-inset: rgba(255, 255, 255, 0.35);
     color-scheme: light;
   }

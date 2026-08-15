@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { FolderKanban, LogOut, WifiOff } from 'lucide-react'
 import ThemePicker from './ThemePicker.jsx'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
+import { Wordmark } from './components/Brand.jsx'
 import { Button } from './components/ui/button.jsx'
 import { cn } from '@/lib/utils'
 
@@ -43,11 +44,14 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
     // En movil el header ocupa dos filas: marca + acciones arriba y la nav a
     // lo ancho debajo (order-last + w-full); en md+ vuelve a una sola fila.
     <header className="sticky top-0 z-40 flex shrink-0 flex-wrap items-center gap-x-3 border-b border-line bg-surface/80 px-3 pt-2 backdrop-blur-md md:h-14 md:flex-nowrap md:gap-4 md:px-4 md:pt-0">
+      {/* Marca: el glifo orbital sigue siendo el estado del render, pero
+          debajo del nombre va el wordmark del canal — la consola pertenece a
+          CO.DE Academy y eso se ve en todas las vistas, no solo en el login. */}
       <div className="flex shrink-0 items-center gap-2.5">
         <OrbitGlyph state={orbitState} size={34} />
         <div className="leading-none">
           <div className="font-display text-[15px] font-semibold tracking-tight text-ink">ManimStudio</div>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-faint">Render console</div>
+          <Wordmark size="sm" className="mt-1 text-[10px]" />
         </div>
       </div>
 
