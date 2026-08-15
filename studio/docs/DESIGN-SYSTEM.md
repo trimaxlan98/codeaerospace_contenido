@@ -46,6 +46,12 @@ script que fija `data-theme` antes del primer pintado): si se añade o retira un
 tema hay que tocar los dos sitios, o un id guardado en `localStorage` acabará
 sin reglas CSS y la app arrancará en `:root` con el selector marcando otra cosa.
 
+Los tokens se declaran **por atributo, no por elemento**: cualquier contenedor
+con `data-theme="…"` tiñe su subárbol. De ahí salen las miniaturas vivas de
+Configuración, sin copiar ni un color. El tema por defecto necesita para eso el
+selector doble `:root, [data-theme="orbital"]` — con solo `:root`, una
+miniatura de `orbital` hereda los tokens del tema activo y miente.
+
 **El tema claro no puede usar los tonos 500 de la paleta.** Sobre `#f1f5f9`,
 `accent #0ea5e9` da 2,8:1 con texto blanco encima y `ok #10b981` da 2,3:1 como
 texto: AA exige 4,5:1 (3:1 para indicadores no textuales). Por eso `daylight`
@@ -87,15 +93,38 @@ fondo nueva va con z negativo.
 ## Componentes
 
 La base vive en `src/components/ui/` (`button`, `dialog`, `input` +
-`PasswordInput`, `select`, `tooltip`), sobre Radix +
+`PasswordInput`, `select`, `switch` + `SettingRow`, `tooltip`), sobre Radix +
 `class-variance-authority` + `tailwind-merge`. **Ampliar esa base, no inventar
 otra.** Variantes de `Button`: `primary` (una por vista), `default`, `outline`,
-`ghost`, `accent`, `danger`.
+`ghost`, `accent`, `danger`. `Switch` está escrito a mano (`role="switch"`):
+un botón de dos estados no justifica otra dependencia de Radix.
 
 Compartidos por varias vistas: `CategoryBrowser` (acordeón + búsqueda global
 de Aprender y Animaciones), `DeleteButton` (destructivo en dos toques),
-`AuthCard` + `Field` (login y cambio de contraseña), `Brand`, `OrbitGlyph`
-(estado del render como ornamento — **no es el logotipo**), `ErrorBoundary`.
+`AuthCard` + `Field` (login y cambio de contraseña), `PasswordChange`
+(`useChangePassword` + campos, usados por la pantalla obligatoria del primer
+login y por Configuración), `Brand`, `OrbitGlyph` (estado del render como
+ornamento — **no es el logotipo**), `ErrorBoundary`.
+
+## Dónde va cada cosa: ajustes, estado y navegación
+
+- La **barra superior** lleva navegación, marca y **estado** (glifo del render,
+  señal del stream, telemetría). **Ningún ajuste**: todo lo que el usuario
+  configura vive en `#/configuracion` (encargo 8). Un control en la barra que
+  abre esa vista es navegación y sí vale.
+- Las **preferencias** viven en `prefs.js` (`useSyncExternalStore` +
+  `localStorage`), no en `useState` de la vista: las lee más de una pieza a la
+  vez. El **tema** es la excepción y tiene su propia clave, porque
+  `index.html` lo aplica antes del primer pintado para evitar el destello.
+- Una preferencia nueva solo entra si **hace algo visible**; si no cambia nada
+  en pantalla, es ruido y no se añade.
+
+## Navegación por hash: los anclajes están prohibidos
+
+Con `router.js` la vista vive en el hash, así que `<a href="#seccion">` **cambia
+de vista** en vez de bajar a una sección. Para navegar dentro de una vista
+larga: `scrollIntoView` sobre refs (así funciona el índice de Configuración).
+Solo son enlaces válidos los que apuntan a una ruta real (`#/admin/salud`).
 
 Se borró `GlowCard`: pintaba un resplandor `hsl()` morado fijo ajeno a los
 temas, dejaba la tarjeta en un velo del 4,5 % sobre el cielo (el "está todo

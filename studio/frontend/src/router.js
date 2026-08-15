@@ -3,6 +3,7 @@
 // para que F5 conserve la vista, atras/adelante navegue y haya deep-links.
 
 import { useCallback, useEffect, useState } from 'react'
+import { getPrefs } from './prefs.js'
 
 const HASH_TO_VIEW = {
   estudio: 'studio',
@@ -11,6 +12,7 @@ const HASH_TO_VIEW = {
   aprender: 'lessons',
   animaciones: 'animations',
   admin: 'admin',
+  configuracion: 'settings',
 }
 const VIEW_TO_HASH = Object.fromEntries(
   Object.entries(HASH_TO_VIEW).map(([h, v]) => [v, h]),
@@ -19,7 +21,10 @@ const VIEW_TO_HASH = Object.fromEntries(
 export function parseHash(hash = window.location.hash) {
   const [seg, ...rest] = hash.replace(/^#\/?/, '').split('/')
   const view = HASH_TO_VIEW[seg]
-  if (!view) return { view: 'studio', param: null }
+  // Sin hash manda la preferencia "vista al abrir" (Configuracion); con un
+  // hash que no existe, el Estudio. Un enlace directo siempre gana: la
+  // preferencia solo decide cuando nadie ha dicho a donde ir.
+  if (!view) return { view: seg ? 'studio' : getPrefs().landing, param: null }
   return { view, param: rest.length ? rest.map(decodeURIComponent).join('/') : null }
 }
 
@@ -36,8 +41,11 @@ export function useRoute() {
   useEffect(() => {
     const onChange = () => setRoute(parseHash())
     window.addEventListener('hashchange', onChange)
-    // Primera carga sin hash: fijar #/estudio sin crear entrada de historial.
-    if (!window.location.hash) window.history.replaceState(null, '', hashFor('studio'))
+    // Primera carga sin hash: fijar la vista de inicio sin crear entrada de
+    // historial (la ruta ya la resolvio parseHash con la preferencia).
+    if (!window.location.hash) {
+      window.history.replaceState(null, '', hashFor(parseHash().view))
+    }
     return () => window.removeEventListener('hashchange', onChange)
   }, [])
 

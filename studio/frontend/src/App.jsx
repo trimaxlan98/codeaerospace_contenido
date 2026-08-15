@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { api, setUnauthorizedHandler } from './api.js'
 import { useRoute } from './router.js'
+import { getPrefs } from './prefs.js'
 import { cn } from '@/lib/utils'
 import Login from './Login.jsx'
 import ChangePassword from './ChangePassword.jsx'
@@ -12,6 +13,7 @@ import Library from './Library.jsx'
 import Lessons from './Lessons.jsx'
 import Animations from './Animations.jsx'
 import Projects from './Projects.jsx'
+import Settings from './Settings.jsx'
 import StarfieldBackground from './components/StarfieldBackground.jsx'
 import { BrandMark } from './components/Brand.jsx'
 
@@ -26,6 +28,7 @@ export default function App() {
   const [auth, setAuth] = useState(null) // null=cargando, false=no, true=si
   const [mustChangePassword, setMustChangePassword] = useState(false)
   const [aiEnabled, setAiEnabled] = useState(false)
+  const [user, setUser] = useState('')
   const [route, navigate] = useRoute()
   const view = route.view
   // Vistas keep-alive: se montan al visitarlas por primera vez y despues solo
@@ -58,6 +61,9 @@ export default function App() {
   useEffect(() => { setUnauthorizedHandler(() => setAuth(false)) }, [])
 
   const pushToast = useCallback((job) => {
+    // Preferencia leida en el momento del aviso (no en el render): apagarla
+    // no debe reconstruir el efecto del SSE.
+    if (!getPrefs().toasts) return
     const key = `${job.id}:${job.status}`
     setToasts((prev) => [...prev.filter((t) => t.key !== key).slice(-2), { key, job }])
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.key !== key)), 8000)
@@ -84,6 +90,7 @@ export default function App() {
       const d = await api.me()
       setAuth(d.authenticated)
       setAiEnabled(Boolean(d.ai_enabled))
+      setUser(d.user || '')
       setMustChangePassword(Boolean(d.must_change_password))
     } catch {
       setAuth(false)
@@ -194,7 +201,6 @@ export default function App() {
         metrics={metrics}
         orbitState={orbitState}
         staleSince={staleSince}
-        onLogout={logout}
       />
       {/* Avisos de fin de render: visibles desde cualquier vista interna. */}
       <div aria-live="polite" className="fixed bottom-4 right-4 z-50 flex w-[290px] flex-col gap-2">
@@ -268,6 +274,11 @@ export default function App() {
             storage={storage} onJobsChanged={refreshJobs}
             routeTab={view === 'admin' ? route.param : null}
             onRoute={(tab) => navigate('admin', tab)} />
+        </div>
+      )}
+      {visited.current.has('settings') && (
+        <div className={show('settings')}>
+          <Settings user={user} aiEnabled={aiEnabled} onLogout={logout} />
         </div>
       )}
     </div>

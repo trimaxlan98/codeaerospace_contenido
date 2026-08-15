@@ -37,8 +37,13 @@
 }
 
 @layer base {
-  /* ── Liquid Glass — default ── */
-  :root {
+  /* ── Liquid Glass — default ──
+     El selector duplicado no es adorno: los tokens estan definidos por
+     `[data-theme]`, asi que un contenedor con ese atributo tiñe su subarbol
+     y las miniaturas de tema de Configuracion se pintan con los colores
+     reales. Sin `[data-theme="orbital"]`, la miniatura de este tema heredaba
+     los tokens del tema activo y mentia. */
+  :root, [data-theme="orbital"] {
     --canvas: #030712;
     /* Vidrio = velo CLARO sobre el lienzo. Con un velo oscuro (el valor
        anterior, rgba(23,23,23,.05) sobre #030712) los paneles quedaban
