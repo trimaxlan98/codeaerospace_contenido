@@ -236,7 +236,7 @@ export default function App() {
       )}
       {visited.current.has('projects') && (
         <div className={show('projects')}>
-          <Projects jobs={jobs}
+          <Projects jobs={jobs} aiEnabled={aiEnabled}
             routeId={view === 'projects' ? route.param : null}
             onRoute={(id) => navigate('projects', id)}
             onEditClip={(ctx, script, scene) => {

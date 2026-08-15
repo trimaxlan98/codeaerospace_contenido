@@ -426,7 +426,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
       ].filter(Boolean).join(' · ')
 
   return (
-    <main className="flex flex-1 flex-col gap-3 p-3 lg:min-h-0">
+    <main data-view="studio" className="flex flex-1 flex-col gap-3 p-3 lg:min-h-0">
       {/* Contexto de clip: se llega aqui desde "Editar en Estudio" de un
           proyecto. La calidad queda fija a la del proyecto y el render usa
           el endpoint del clip (compone el estilo) en vez de /api/jobs. */}

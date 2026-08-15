@@ -223,6 +223,7 @@ export default function Settings({ user, aiEnabled, onLogout }) {
   const motion = usePref('motion')
   const toasts = usePref('toasts')
   const telemetry = usePref('telemetry')
+  const guided = usePref('guided')
   const refs = useRef({})
   const [systemReduces] = useState(() =>
     Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches))
@@ -318,6 +319,13 @@ export default function Settings({ user, aiEnabled, onLogout }) {
             >
               <Switch checked={telemetry} onCheckedChange={(v) => setPref('telemetry', v)}
                 aria-label="telemetría en la barra superior" />
+            </SettingRow>
+            <SettingRow
+              label="Modo guiado"
+              hint="Añade un asistente que escribe el script de un clip a partir de un formulario, para quien no escribe Manim a mano. Apagado, la consola no muestra ni un botón de más y el editor se usa igual que siempre. Las plantillas de curso no dependen de esto: están siempre en «Nuevo proyecto» con «En blanco» por defecto."
+            >
+              <Switch checked={guided} onCheckedChange={(v) => setPref('guided', v)}
+                aria-label="modo guiado" />
             </SettingRow>
           </Section>
 

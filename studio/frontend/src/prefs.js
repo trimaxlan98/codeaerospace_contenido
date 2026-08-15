@@ -19,6 +19,11 @@ export const DEFAULTS = {
   motion: 'auto',      // auto (respeta prefers-reduced-motion) | off
   toasts: true,        // avisos de fin de render
   telemetry: true,     // CPU/RAM/reloj UTC en la cabecera
+  // Ayudas para quien no escribe Manim a mano (asistente de clip). APAGADO
+  // por defecto y sin excepciones: con `guided: false` la app no enseña ni un
+  // boton de mas que antes de existir esta preferencia. Quien programa no
+  // tiene que apagar nada; quien lo necesita lo enciende aqui.
+  guided: false,
 }
 
 // Ids de vista validos como pantalla de inicio (el mismo orden de la nav).
