@@ -17,8 +17,16 @@ const StarfieldBackground = () => {
     let animId;
     let mouse = { x: -9999, y: -9999 };
 
+    // Esta consola se deja abierta horas vigilando renders: el fondo no puede
+    // costar un frame de 60 fps con O(n^2) enlaces + un getComputedStyle cada
+    // vez. Se limita a ~30 fps, el acento se relee solo al cambiar de tema, y
+    // con `prefers-reduced-motion` se pinta un unico fotograma estatico.
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const FRAME_MS = 1000 / 30;
+    let lastFrame = 0;
+
     // Dynamically extract RGB representation of theme's --accent color
-    const getAccentRgb = () => {
+    const readAccentRgb = () => {
       try {
         const raw = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
         if (raw.startsWith('#')) {
@@ -32,6 +40,11 @@ const StarfieldBackground = () => {
       }
       return '0, 216, 246';
     };
+    let accentRgb = readAccentRgb();
+    // El tema se aplica como data-theme en <html> (themes.js): observarlo es
+    // mas barato que releer el color en cada fotograma.
+    const themeObserver = new MutationObserver(() => { accentRgb = readAccentRgb(); });
+    themeObserver.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 
     const resize = () => {
       canvas.width  = window.innerWidth;
@@ -49,16 +62,18 @@ const StarfieldBackground = () => {
       }));
     };
 
-    const draw = () => {
+    const paint = (advance) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const activeAccent = getAccentRgb();
+      const activeAccent = accentRgb;
 
       // 1. Update positions
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      if (advance) {
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        }
       }
 
       // 2. Draw Links (Batching strokes for better performance)
@@ -108,22 +123,32 @@ const StarfieldBackground = () => {
         ctx.fill();
       }
 
-      animId = requestAnimationFrame(draw);
+    };
+
+    const loop = (ts) => {
+      animId = requestAnimationFrame(loop);
+      if (ts - lastFrame < FRAME_MS) return;
+      lastFrame = ts;
+      paint(true);
     };
 
     const onMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
     const onMouseLeave = () => { mouse.x = -9999; mouse.y = -9999; };
-    const handleResize = () => { resize(); init(); };
+    const handleResize = () => { resize(); init(); paint(false); };
 
     init();
-    draw();
+    paint(false);
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseleave', onMouseLeave);
+    if (!reduceMotion) {
+      animId = requestAnimationFrame(loop);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseleave', onMouseLeave);
+    }
 
     return () => {
       cancelAnimationFrame(animId);
+      themeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
@@ -131,8 +156,14 @@ const StarfieldBackground = () => {
   }, []);
 
   return (
-    <div 
-      className="fixed inset-0 pointer-events-none z-0 transition-colors duration-300" 
+    // -z-10, no z-0: esta capa es OPACA (pinta var(--canvas)) y esta
+    // posicionada, asi que con z-0 tapaba cualquier contenido NO posicionado
+    // que viniera despues en el arbol — por eso las pestañas
+    // Salud/Jobs/Recursos de Admin (un <div> plano, sin .panel) eran
+    // invisibles. Con z negativo queda debajo de todo el contenido y encima
+    // del fondo del documento.
+    <div
+      className="pointer-events-none fixed inset-0 -z-10 transition-colors duration-300"
       style={{ background: 'var(--canvas)' }}
     >
       <canvas

@@ -38,10 +38,16 @@
   /* ── Liquid Glass — default ── */
   :root {
     --canvas: #030712;
-    --surface: rgba(23, 23, 23, 0.05);
-    --surface-2: rgba(23, 23, 23, 0.1);
-    --line: transparent;                     /* No borders for seamless glassmorphism */
-    --line-strong: transparent;
+    /* Vidrio = velo CLARO sobre el lienzo. Con un velo oscuro (el valor
+       anterior, rgba(23,23,23,.05) sobre #030712) los paneles quedaban
+       indistinguibles del fondo. */
+    --surface: rgba(255, 255, 255, 0.045);
+    --surface-2: rgba(255, 255, 255, 0.075);
+    /* --line NO puede ser transparent: toda la estructura de la app
+       (cabeceras de panel, separadores de fila, bordes de input, tarjetas)
+       se dibuja con `border-line`, y la barra de scroll usa --line-strong. */
+    --line: rgba(255, 255, 255, 0.09);
+    --line-strong: rgba(255, 255, 255, 0.2);
     --ink: #e6eaf2;
     --muted: #8a97ad;
     --faint: #5c6a80;
@@ -62,7 +68,7 @@
     --glow-secondary: rgba(6, 182, 212, 0.12);  /* Cyan glow */
     --glow-tertiary: rgba(99, 102, 241, 0.08);   /* Purple glow */
     
-    --glass-bg: rgba(23, 23, 23, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.045);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.35);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -72,10 +78,10 @@
   /* ── Emerald Glass — ion ── */
   [data-theme="ion"] {
     --canvas: #010c08;
-    --surface: rgba(6, 40, 24, 0.05);
-    --surface-2: rgba(6, 40, 24, 0.1);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(209, 250, 229, 0.05);
+    --surface-2: rgba(209, 250, 229, 0.085);
+    --line: rgba(167, 243, 208, 0.11);
+    --line-strong: rgba(167, 243, 208, 0.22);
     --ink: #dcfce7;
     --muted: #6ebd93;
     --faint: #438e62;
@@ -96,7 +102,7 @@
     --glow-secondary: rgba(52, 211, 153, 0.08);
     --glow-tertiary: rgba(5, 150, 105, 0.06);
 
-    --glass-bg: rgba(6, 40, 24, 0.05);
+    --glass-bg: rgba(209, 250, 229, 0.05);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.4);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -106,10 +112,10 @@
   /* ── Nebula Glass — nebula ── */
   [data-theme="nebula"] {
     --canvas: #06010d;
-    --surface: rgba(21, 13, 36, 0.05);
-    --surface-2: rgba(21, 13, 36, 0.1);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(243, 232, 255, 0.05);
+    --surface-2: rgba(243, 232, 255, 0.085);
+    --line: rgba(233, 213, 255, 0.11);
+    --line-strong: rgba(233, 213, 255, 0.22);
     --ink: #f3e8ff;
     --muted: #a78bfa;
     --faint: #7c3aed;
@@ -130,7 +136,7 @@
     --glow-secondary: rgba(217, 70, 239, 0.1);
     --glow-tertiary: rgba(124, 58, 237, 0.08);
 
-    --glass-bg: rgba(21, 13, 36, 0.05);
+    --glass-bg: rgba(243, 232, 255, 0.05);
     --glass-blur: blur(25px) saturate(100%);
     --glass-shadow-glow: rgba(0, 0, 0, 0.4);
     --glass-inset: rgba(255, 255, 255, 0.06);
@@ -140,10 +146,10 @@
   /* ── Ice Glass — daylight ── */
   [data-theme="daylight"] {
     --canvas: #f1f5f9;
-    --surface: rgba(255, 255, 255, 0.25);
-    --surface-2: rgba(255, 255, 255, 0.4);
-    --line: transparent;
-    --line-strong: transparent;
+    --surface: rgba(255, 255, 255, 0.55);
+    --surface-2: rgba(255, 255, 255, 0.78);
+    --line: rgba(15, 23, 42, 0.13);
+    --line-strong: rgba(15, 23, 42, 0.28);
     --ink: #0f172a;
     --muted: #475569;
     --faint: #94a3b8;
@@ -164,9 +170,9 @@
     --glow-secondary: rgba(14, 165, 233, 0.15);
     --glow-tertiary: rgba(255, 255, 255, 0.95);
 
-    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-blur: blur(25px) saturate(100%);
-    --glass-shadow-glow: rgba(15, 23, 42, 0.04);
+    --glass-shadow-glow: rgba(15, 23, 42, 0.08);
     --glass-inset: rgba(255, 255, 255, 0.35);
     color-scheme: light;
   }

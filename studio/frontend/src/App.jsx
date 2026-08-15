@@ -217,7 +217,8 @@ export default function App() {
             onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
             pendingScript={pendingScript} pendingScene={pendingScene}
             onConsumePendingScript={() => { setPendingScript(null); setPendingScene(null) }}
-            clipContext={clipContext} onExitClip={() => setClipContext(null)} />
+            clipContext={clipContext} onExitClip={() => setClipContext(null)}
+            onOpenProject={(id) => navigate('projects', id)} />
         </div>
       )}
       {visited.current.has('projects') && (
