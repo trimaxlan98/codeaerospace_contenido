@@ -33,7 +33,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ✅ hecho 2026-08-15 | ver abajo |
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ✅ hecho 2026-08-15 | ver abajo |
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ✅ hecho 2026-08-15 | ver abajo |
-| 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
+| 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ✅ hecho 2026-08-15 | ver abajo |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | ✅ hecho 2026-08-15 | ver `UX-AUDITORIA.md` |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
@@ -602,3 +602,50 @@ El criterio 4 («sin menús que se sobrepongan») se cumple por construcción
 desde el sprint 3: el único popover hecho a mano —el selector de temas de la
 barra— se sustituyó por tarjetas dentro de Configuración; los que quedan son
 de Radix con portal.
+
+---
+
+## Sprint 7 — la marca, auditada y visible (hecho 2026-08-15)
+
+Criterio 11: *el tema global CO.DE Academy debe renderizarse **siempre***. El
+brief pedía comprobar que ningún camino se salta `branding.aplicar` y que la
+UI lo comunique.
+
+### Auditoría: está garantizada por construcción
+
+Se rastrearon todos los caminos que producen un video:
+
+| Camino | Entrada | ¿Marca? |
+|--------|---------|---------|
+| Render libre del Estudio | `POST /api/jobs` → `main.py:225` | sí |
+| Reintentar un job | `POST /api/jobs/{id}/retry` → `main.py:330` | sí |
+| Render de un clip | `projects_api.py:319` | sí |
+| Re-renderizar desactualizados | `projects_api.py:364` | sí |
+| Demos de Animaciones | cargan el script en el Estudio → `POST /api/jobs` | sí |
+| Miniaturas | `ffmpeg` extrae un frame del **video ya renderizado** | sí (heredada) |
+
+Los cuatro primeros son las **únicas** llamadas a `JobManager.create_job`, y
+ese método es **el único sitio de todo el backend donde se escribe
+`scene.py`** — siempre a través de `branding.aplicar`. No hay ruta que se lo
+salte: no es una convención que haya que recordar, es un cuello de botella.
+Las miniaturas no re-renderizan nada, sacan un frame del mp4 final.
+
+Lo que se guarda en la base de datos es el script del autor sin tocar: la
+marca es del render, no del código que se edita. Y va en `try/except`, así que
+si algún día la extensión no estuviera montada el render saldría sin marca con
+un aviso en el log, en vez de tumbar la cola.
+
+### Lo que faltaba: que se vea
+
+La garantía existía y no se comunicaba por ninguna parte. La barra del editor
+lleva ahora un distintivo en ámbar de marca que dice cuál de los dos casos
+aplica, con la misma regla que usa el backend (`branding.ya_marcado`):
+
+- **marca automática** — el servidor anexará la identidad al renderizar.
+- **marca propia** — el script ya menciona `code_brand` (los cursos con
+  `style_block` propio) y el servidor no añade nada, para no duplicar la marca
+  de agua.
+
+**Verificación:** `vite build` verde, `pytest -q` 149/149 (incluye
+`test_branding.py`), QA Playwright 2/2 — el distintivo cambia de «automática»
+a «propia» al escribir `code_brand` en el editor.

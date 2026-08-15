@@ -95,6 +95,29 @@ function Segmented({ options, value, onChange, ariaLabel, disabled }) {
   )
 }
 
+// La identidad CO.DE Academy no es opcional ni configurable: el backend anexa
+// el bloque de marca al final de TODO script antes de renderizar
+// (`app/branding.py`, en el unico sitio donde se escribe scene.py), salvo que
+// el script ya mencione `code_brand` — misma regla que `branding.ya_marcado`.
+// Este distintivo solo lo cuenta: hasta ahora la garantia existia y no se veia
+// por ninguna parte (encargo 11).
+const MARCA_PROPIA = /code_brand/
+
+function MarcaChip({ script }) {
+  const propia = MARCA_PROPIA.test(script)
+  return (
+    <span
+      className="hidden items-center gap-1.5 rounded-md border border-brand/35 px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wide text-brand sm:inline-flex"
+      title={propia
+        ? 'El script ya aplica la identidad CO.DE Academy por su cuenta (menciona code_brand): el servidor no añade nada.'
+        : 'El servidor anexa la identidad CO.DE Academy al final del script antes de renderizar. No hace falta pedirlo y no se puede desactivar.'}
+    >
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
+      marca {propia ? 'propia' : 'automática'}
+    </span>
+  )
+}
+
 // Accion secundaria dentro de una ficha (no dispara el onSelect del chip).
 function ChipAction({ onClick, danger, title, children }) {
   return (
@@ -471,6 +494,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             <div className="flex items-center gap-2">
               <FileCode className="h-4 w-4 text-muted" />
               <span className="font-mono text-[13px] text-ink">escena.py</span>
+              <MarcaChip script={script} />
             </div>
             <div className="mx-1 hidden h-5 w-px bg-line sm:block" />
             <label className="flex items-center gap-1.5">
