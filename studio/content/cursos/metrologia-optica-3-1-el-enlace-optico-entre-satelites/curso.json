@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 3.1 El enlace óptico entre satélites",
+  "description": "Lección 3.1 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): Por qué láser (ganancia de apertura), el cono de microrradianes, el presupuesto en fotones por bit y radio contra luz. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-por-que-laser.py",
+      "title": "1 · Por qué láser",
+      "scene": "Clip1",
+      "final_state": "comparador_rf_optico con 50.0 dBi (antena 1 m a 30 GHz) y 106.1 dBi (telescopio 10 cm a 1550 nm); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/02-un-cono-de-microradianes.py",
+      "title": "2 · Un cono de microradianes",
+      "scene": "Clip2",
+      "final_state": "cono_haz con 9.9 µrad y la huella de 99 m a 5000 km; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/03-fotones-por-bit.py",
+      "title": "3 · Fotones por bit",
+      "scene": "Clip3",
+      "final_state": "barra_enlace hasta −30 dBm y ~800 fotones por bit a 10 Gbps; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-radio-o-luz.py",
+      "title": "4 · Radio o luz",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «El láser regala ganancia.» / «La cobra en puntería.»; HUD 'MODULO 03'."
+    }
+  ]
+}

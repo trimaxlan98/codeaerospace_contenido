@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 1.2 La interferencia: contar franjas",
+  "description": "Lección 1.2 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): El interferómetro de Michelson, media longitud de onda por franja, medir el índice del aire y la visibilidad. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-interferometro-de-michelson.py",
+      "title": "1 · El interferómetro de Michelson",
+      "scene": "Clip1",
+      "final_state": "El esquema de Michelson con las franjas en el detector; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-cada-franja-vale-media-longitud-de-onda.py",
+      "title": "2 · Cada franja vale media longitud de onda",
+      "scene": "Clip2",
+      "final_state": "contador_franjas en 3 franjas ↔ 949 nm; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/03-medir-el-aire.py",
+      "title": "3 · Medir el aire",
+      "scene": "Clip3",
+      "final_state": "La celda llena y el contador en 85.3 franjas; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/04-la-visibilidad.py",
+      "title": "4 · La visibilidad",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «Contar franjas es medir.» / «Y se cuentan de una en una.»; HUD 'MODULO 01'."
+    }
+  ]
+}

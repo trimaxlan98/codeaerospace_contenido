@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 2.3 Medir el frente de onda",
+  "description": "Lección 2.3 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): El frente de onda y sus aberraciones, el sensor Shack-Hartmann, los polinomios de Zernike y el espejo deformable. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-frente-de-onda.py",
+      "title": "1 · El frente de onda",
+      "scene": "Clip1",
+      "final_state": "frente_onda con desenfoque y coma y su rms en ondas; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/02-shack-hartmann.py",
+      "title": "2 · Shack-Hartmann",
+      "scene": "Clip2",
+      "final_state": "shack_hartmann con las manchas desplazadas por las pendientes locales; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-los-nombres-de-zernike.py",
+      "title": "3 · Los nombres de Zernike",
+      "scene": "Clip3",
+      "final_state": "tarjetas_zernike: desenfoque, astigmatismo, coma, esférica; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/04-corregir-el-frente.py",
+      "title": "4 · Corregir el frente",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «Medir el frente es el primer paso.» / «Corregirlo, el segundo.»; HUD 'MODULO 02'."
+    }
+  ]
+}

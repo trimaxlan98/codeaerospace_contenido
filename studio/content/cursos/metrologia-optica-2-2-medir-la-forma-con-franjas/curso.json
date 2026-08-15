@@ -1,0 +1,32 @@
+{
+  "name": "Metrología óptica · 2.2 Medir la forma con franjas",
+  "description": "Lección 2.2 de la familia Metrología óptica (la luz como regla, del taller a los enlaces ópticos entre satélites): Franjas proyectadas, la fase por cuatro pasos, el desenvolvimiento y un espejo medido a λ/20. 4 clips, estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-franjas-sobre-el-objeto.py",
+      "title": "1 · Franjas sobre el objeto",
+      "scene": "Clip1",
+      "final_state": "objeto_franjas con las franjas curvadas por el relieve; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/02-cuatro-pasos.py",
+      "title": "2 · Cuatro pasos",
+      "scene": "Clip2",
+      "final_state": "cuatro_pasos: las cuatro imágenes desfasadas y la fase envuelta calculada; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-desenvolver-la-fase.py",
+      "title": "3 · Desenvolver la fase",
+      "scene": "Clip3",
+      "final_state": "mapa_fase con la fase envuelta y la desenvuelta; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/04-un-espejo-a-20.py",
+      "title": "4 · Un espejo a λ/20",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «La forma no se toca.» / «Se lee en las franjas.»; HUD 'MODULO 02'."
+    }
+  ]
+}
