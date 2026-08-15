@@ -29,12 +29,12 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 0 | Base visual: bordes, foco, temas, coste del fondo | ✅ hecho 2026-08-15 | ver abajo |
 | 1 | Flujo de cursos: índice por familias, duración de clip, narración | ✅ hecho 2026-08-15 | ver abajo |
 | 2 | Login legible con marca CO.DE Academy + favicon propio (encargos 1 y 2) | ✅ hecho 2026-08-15 | ver abajo |
-| 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ⏳ pendiente | — |
+| 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ✅ hecho 2026-08-15 | ver abajo |
 | 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ⏳ pendiente | — |
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ⏳ pendiente | — |
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ⏳ pendiente | — |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
-| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; falta la pasada vista por vista y los solapes) | — |
+| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; el popover de temas de la barra desaparece en el sprint 3; falta la pasada vista por vista y el resto de solapes) | — |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -258,6 +258,92 @@ la parada más clara del cielo, más el velo de la columna de marca): mínimo
 {1440×900, 390×844}, estado de error, cambio obligatorio de contraseña
 (levantando `must_change_password` en la base de QA), pantalla de arranque y
 las 6 vistas internas en tema claro y oscuro. Sin errores de consola.
+
+---
+
+## Sprint 3 — Configuración, y la barra deja de ser un panel de control (hecho 2026-08-15)
+
+Encargo 8: *"todas las configuraciones de usuario a un menú de Configuración"*.
+
+### Lo que había
+
+La barra superior mezclaba tres cosas distintas en la misma fila: navegación
+(6 pestañas), estado del sistema (CPU, RAM, reloj, señal del stream) y
+**ajustes** (selector de tema y *Salir*). Dos problemas concretos:
+
+1. **El selector de tema era un popover propio**, con su `mousedown` global,
+   su `Escape` y su `z-[70]` a mano — justo el patrón que el encargo 4 quiere
+   erradicar. Además solo daba una lista de nombres: los cuatro temas se
+   elegían a ciegas salvo por tres puntos de color.
+2. **`Salir` estaba a 40 px de `Admin`**, sin confirmación. Cerrar la sesión
+   por error mientras se vigila un render es barato de provocar y caro de
+   sufrir (vuelves al login con el render corriendo a ciegas).
+
+Y no había ningún sitio donde vivieran las preferencias: lo que no cupo en la
+barra simplemente no existía.
+
+### Lo que hay ahora
+
+Vista nueva **`#/configuracion`** (`Settings.jsx`), con índice lateral en
+escritorio y una sola columna en móvil, en cinco secciones:
+
+- **Apariencia.** Los cuatro temas como tarjetas con **miniatura viva**: el
+  contenedor de la miniatura lleva `data-theme` y por tanto **se pinta con los
+  tokens reales** de ese tema (`theme.css` define los tokens por atributo, no
+  por elemento). Cero valores copiados a un tercer sitio. Para que funcionara
+  también con el tema por defecto hubo que abrir el selector a
+  `:root, [data-theme="orbital"]`: antes la miniatura de `orbital` heredaba los
+  tokens del tema activo y mentía. Debajo, **fondo animado** (automático /
+  desactivado) con el resultado — `animado` / `estático` — junto al control,
+  porque en «automático» decide el sistema operativo.
+- **Interfaz.** *Vista al abrir* (la app entraba siempre en el Estudio aunque
+  el trabajo real empiece en Proyectos), *avisos de fin de render* y
+  *telemetría en la barra* (CPU/RAM/reloj) — este último es el encargo 5
+  aplicado a la barra: quien no quiere instrumentos los apaga y la barra queda
+  en navegación + marca + señal del stream.
+- **Cuenta y sesión.** Usuario (fijo, del servidor), cambio de contraseña
+  desplegable en la propia vista y cierre de sesión **en dos toques**.
+- **Datos locales.** Qué guarda la app en este navegador, clave a clave y con
+  su tamaño, y un borrado que restablece tema y preferencias **conservando el
+  script del editor** (es lo único irrecuperable de la lista) y sin tocar nada
+  del servidor.
+- **Acerca de.** Marca CO.DE Academy, estado del asistente IA y enlace a
+  Admin → Salud.
+
+La barra superior se queda con navegación, estado y **un solo botón que es
+navegación, no ajuste**: *Configuración*. `ThemePicker.jsx` se borra.
+
+### Piezas nuevas del sistema
+
+- **`prefs.js`** — store de preferencias sobre `useSyncExternalStore`: la misma
+  preferencia la leen la cabecera, el fondo y los avisos, así que un `useState`
+  local no valía. El tema **no** vive aquí: lo lee `index.html` antes del primer
+  pintado para evitar el destello.
+- **`ui/switch.jsx`** — `Switch` (`role="switch"` a mano, sin dependencia nueva)
+  y `SettingRow`, la fila rótulo + explicación + control que arma toda la vista.
+- **`components/PasswordChange.jsx`** — el cambio de contraseña se usa ahora en
+  dos marcos (la pantalla obligatoria del primer login y esta vista); la
+  validación y el manejo de errores viven en un sitio.
+
+### Trampa encontrada
+
+**Los anclajes de toda la vida no se pueden usar aquí.** La navegación es por
+hash, así que un `<a href="#cuenta">` cambiaría de vista en vez de bajar a la
+sección. El índice lateral navega con `scrollIntoView` sobre refs, sin tocar la
+URL.
+
+### Verificación
+
+`npm run build` verde · `venv/bin/pytest -q` 149/149 (el backend no se tocó) ·
+QA Playwright contra una instancia local real (backend uvicorn + vite):
+**35/35 checks** — barra sin ajustes, las 5 secciones, 4 miniaturas con lienzos
+distintos (`#030712` / `#010c08` / `#06010d` / `#f1f5f9`), tema aplicado y
+persistido, telemetría que vacía la barra y vuelve, fondo a estático, vista al
+abrir (y un enlace directo ganándole), borrado local que conserva el script,
+error real de contraseña actual (422 del backend) y no-coincidencia en cliente,
+cierre de sesión en dos toques hasta volver al login, y **cero solapes** entre
+secciones en 1440×900 y 390×844, tema oscuro y claro. Sin errores de consola
+(salvo el 422 provocado a propósito).
 
 ---
 

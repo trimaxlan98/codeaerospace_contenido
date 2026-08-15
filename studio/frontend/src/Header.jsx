@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { FolderKanban, LogOut, WifiOff } from 'lucide-react'
-import ThemePicker from './ThemePicker.jsx'
+import { FolderKanban, Settings as SettingsIcon, WifiOff } from 'lucide-react'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Wordmark } from './components/Brand.jsx'
-import { Button } from './components/ui/button.jsx'
+import { usePref } from './prefs.js'
 import { cn } from '@/lib/utils'
 
 const NAV = [
@@ -38,8 +37,9 @@ function MeterChip({ label, pct }) {
   )
 }
 
-export default function Header({ view, onView, metrics, orbitState, staleSince, onLogout }) {
+export default function Header({ view, onView, metrics, orbitState, staleSince }) {
   const clock = useUtcClock() // ademas re-renderiza cada segundo: el contador de "sin señal" avanza solo
+  const telemetry = usePref('telemetry')
   return (
     // En movil el header ocupa dos filas: marca + acciones arriba y la nav a
     // lo ancho debajo (order-last + w-full); en md+ vuelve a una sola fila.
@@ -87,20 +87,35 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
             {Math.max(0, Math.floor((Date.now() - staleSince) / 1000))}s
           </span>
         )}
-        {metrics && (
+        {/* Telemetria: informativa, no un ajuste — se puede apagar desde
+            Configuracion cuando estorba (encargo 5). */}
+        {telemetry && metrics && (
           <>
             <MeterChip label="CPU" pct={metrics.cpu_pct} />
             <MeterChip label="RAM" pct={metrics.mem.pct} />
           </>
         )}
-        <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted md:inline">
-          {clock} <span className="text-faint">UTC</span>
-        </span>
-        <ThemePicker />
-        <Button variant="ghost" size="sm" onClick={onLogout} title="Cerrar sesión">
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Salir</span>
-        </Button>
+        {telemetry && (
+          <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted md:inline">
+            {clock} <span className="text-faint">UTC</span>
+          </span>
+        )}
+        {/* La barra ya no lleva ajustes (encargo 8): ni selector de tema ni
+            "Salir". Solo la puerta a Configuracion, que es navegacion. */}
+        <button
+          onClick={() => onView('settings')}
+          aria-current={view === 'settings' ? 'page' : undefined}
+          title="Configuración"
+          className={cn(
+            'flex h-9 items-center gap-2 rounded-md border px-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+            view === 'settings'
+              ? 'border-accent/50 bg-surface-2 text-accent'
+              : 'border-line text-muted hover:border-line-strong hover:text-ink',
+          )}
+        >
+          <SettingsIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden sm:inline">Configuración</span>
+        </button>
       </div>
     </header>
   )

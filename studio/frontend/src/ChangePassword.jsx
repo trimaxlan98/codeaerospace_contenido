@@ -2,96 +2,42 @@
 // cuando /api/me devuelve must_change_password=true (primer login del
 // usuario recien creado). No es un dialogo cerrable — el backend bloquea el
 // resto de la API con 403 hasta que la contraseña cambie.
+//
+// La logica y los campos son los mismos que usa Configuracion → Cuenta; aqui
+// solo cambia el marco (AuthCard, sin sesion) y el pie con "Cerrar sesión".
 
-import { useState } from 'react'
-import { api } from './api.js'
-import { PasswordInput } from './components/ui/input.jsx'
 import { Button } from './components/ui/button.jsx'
-import { AuthCard, Field } from './components/AuthCard.jsx'
+import { AuthCard } from './components/AuthCard.jsx'
+import { PasswordChangeFields, useChangePassword } from './components/PasswordChange.jsx'
 
 const FACTS = [
   'Se guarda cifrada · nunca en el repo',
   'Minimo 8 caracteres',
-  'La cambias cuando quieras',
+  'La cambias cuando quieras desde Configuracion',
 ]
 
 export default function ChangePassword({ onChanged, onLogout }) {
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  const submit = async (e) => {
-    e.preventDefault()
-    if (newPassword !== confirmPassword) {
-      setError('Las contraseñas nuevas no coinciden')
-      return
-    }
-    setBusy(true)
-    setError('')
-    try {
-      await api.changePassword(currentPassword, newPassword)
-      onChanged()
-    } catch (err) {
-      if (!err.status) setError('No se pudo conectar con el servidor')
-      else if (err.status === 422) setError(err.message)
-      else setError(`Error del servidor (${err.status})`)
-    } finally {
-      setBusy(false)
-    }
-  }
+  const state = useChangePassword(onChanged)
 
   return (
     <AuthCard
-      onSubmit={submit}
-      shake={Boolean(error)}
+      onSubmit={state.submit}
+      shake={Boolean(state.error)}
       title="Cambia tu contraseña"
       subtitle="Es tu primer inicio de sesión: elige una contraseña nueva antes de entrar a la consola."
       facts={FACTS}
       heading="Contraseña nueva"
     >
-      <Field label="Contraseña actual">
-        <PasswordInput
-          label="la contraseña actual"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          autoComplete="current-password"
-          autoFocus
-          required
-        />
-      </Field>
+      <PasswordChangeFields state={state} autoFocus />
 
-      <Field label="Contraseña nueva" hint="Al menos 8 caracteres.">
-        <PasswordInput
-          label="la contraseña nueva"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          autoComplete="new-password"
-          minLength={8}
-          required
-        />
-      </Field>
-
-      <Field label="Repite la contraseña nueva">
-        <PasswordInput
-          label="la repetición de la contraseña"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          autoComplete="new-password"
-          minLength={8}
-          required
-        />
-      </Field>
-
-      {error && (
+      {state.error && (
         <p role="alert" className="rounded-md border border-err/40 bg-err/10 px-3 py-2 text-[13px] text-err">
-          {error}
+          {state.error}
         </p>
       )}
 
-      <Button variant="primary" size="lg" disabled={busy} className="w-full">
-        {busy ? 'Guardando…' : 'Cambiar contraseña'}
+      <Button variant="primary" size="lg" disabled={state.busy} className="w-full">
+        {state.busy ? 'Guardando…' : 'Cambiar contraseña'}
       </Button>
 
       <button

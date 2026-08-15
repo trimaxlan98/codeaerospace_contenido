@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
+import { motionAllowed, usePref } from '../prefs.js';
 
 const StarfieldBackground = () => {
   const canvasRef = useRef(null);
+  // La preferencia de Configuracion re-monta el efecto: al desactivarla el
+  // bucle se cancela de verdad (no basta con dejar de pintar).
+  const motion = usePref('motion');
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,8 +24,9 @@ const StarfieldBackground = () => {
     // Esta consola se deja abierta horas vigilando renders: el fondo no puede
     // costar un frame de 60 fps con O(n^2) enlaces + un getComputedStyle cada
     // vez. Se limita a ~30 fps, el acento se relee solo al cambiar de tema, y
-    // con `prefers-reduced-motion` se pinta un unico fotograma estatico.
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    // se pinta un unico fotograma estatico si el sistema pide reducir el
+    // movimiento o si se ha apagado el fondo en Configuracion.
+    const reduceMotion = !motionAllowed(motion);
     const FRAME_MS = 1000 / 30;
     let lastFrame = 0;
 
@@ -153,7 +158,7 @@ const StarfieldBackground = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
     };
-  }, []);
+  }, [motion]);
 
   return (
     // -z-10, no z-0: esta capa es OPACA (pinta var(--canvas)) y esta
