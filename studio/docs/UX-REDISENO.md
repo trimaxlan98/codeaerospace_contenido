@@ -38,12 +38,18 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
-**Producción:** sprints 0–2 desplegados el 2026-08-15 (PR #22 y #23 a `main`,
-`git pull` + `vite build` en el VPS). Verificado con una carga real de
+**Producción:** sprints 0–3 desplegados el 2026-08-15 (PR #22, #23 y #25 a
+`main`, `git pull` + `vite build` en el VPS). Verificado con cargas reales de
 https://coderesearch.space en escritorio y móvil: bundle nuevo servido, título
 e iconos de marca correctos, `/api/health` con runner vivo, sin errores de
-consola. Los sprints 0 y 1 llevaban desde la mañana sin llegar a producción
-porque su PR seguía abierto.
+consola. El sprint 3 se comprobó además **con sesión** (cookie firmada con
+`MS_SECRET_KEY`, el método E2E de la skill): `#/configuracion` con sus cinco
+secciones, las cuatro miniaturas de tema con lienzos distintos y la barra sin
+*Salir*, en 1440×900 y 390×844.
+
+**Trampa del despliegue:** en el VPS `node` solo existe bajo nvm. `vite build`
+falla con `/usr/bin/env: 'node': No such file or directory` si no se antepone
+`export PATH=/root/.nvm/versions/node/v24.15.0/bin:$PATH`.
 
 ---
 
