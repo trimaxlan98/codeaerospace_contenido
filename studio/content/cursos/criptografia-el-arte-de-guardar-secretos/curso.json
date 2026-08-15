@@ -1,0 +1,56 @@
+{
+  "name": "Criptografía: el arte de guardar secretos",
+  "description": "Curso de divulgación en 8 clips sobre cómo un secreto no se esconde sino que se calcula: la rueda de César y sus 25 llaves, la estadística del idioma que delata el cifrado, la llave perfecta de un solo uso (XOR, Shannon), el acuerdo de Diffie–Hellman gritado en público (p=23, g=5, secreto 2), RSA con números de juguete (61×53=3233, e=17, d=2753) y por qué factorizar es difícil, la huella SHA-256 y su avalancha medida (~128 de 256 bits), la firma digital como RSA al revés y el candado del navegador con su relevo post-cuántico. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-rueda-de-cesar.py",
+      "title": "1 · La rueda de César",
+      "scene": "Clip1",
+      "final_state": "La rueda de César girada 3 posiciones, el mensaje claro ámbar y su cifrado cian alineados, y el tag '25 llaves · fuerza bruta' con el intento correcto resaltado en verde; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-idioma-delata.py",
+      "title": "2 · El idioma delata",
+      "scene": "Clip2",
+      "final_state": "Los dos histogramas de frecuencias (español medido arriba, cifrado abajo) encajados tras deslizar el cifrado, con 'desplazamiento = 3' rotulado; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-llave-perfecta.py",
+      "title": "3 · La llave perfecta",
+      "scene": "Clip3",
+      "final_state": "Las tres tiras de bits (mensaje ámbar, llave verde, cifrado cian) con la segunda llave que produce el otro mensaje y el rótulo '2^24 llaves = 2^24 mensajes'; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-gritar-en-publico.py",
+      "title": "4 · Gritar en público",
+      "scene": "Clip4",
+      "final_state": "El esquema de Diffie–Hellman con el secreto ámbar '2' a cada lado, el canal cian con 8 y 19 (p=23, g=5) y Eva roja en medio con '?'; HUD 'MODULO 04'."
+    },
+    {
+      "file": "clips/05-multiplicar-es-facil.py",
+      "title": "5 · Multiplicar es fácil, factorizar no",
+      "scene": "Clip5",
+      "final_state": "La caja n=3233 con la llave pública (n, e) en cian y la privada d en ámbar, el contador '16 primos probados' medido y la curva de divisiones con 10^308 en 617 dígitos; HUD 'MODULO 05'."
+    },
+    {
+      "file": "clips/06-la-huella-digital.py",
+      "title": "6 · La huella digital",
+      "scene": "Clip6",
+      "final_state": "Las dos rejillas de 256 bits de SHA-256('hola') y SHA-256('Hola') con los bits distintos marcados en rojo y la cifra medida de bits que cambian; HUD 'MODULO 06'."
+    },
+    {
+      "file": "clips/07-firmar-sin-pluma.py",
+      "title": "7 · Firmar sin pluma",
+      "scene": "Clip7",
+      "final_state": "La cadena mensaje → huella → firma con la verificación en verde y, debajo, el mensaje alterado con la verificación fallida en rojo; HUD 'MODULO 07'."
+    },
+    {
+      "file": "clips/08-el-candado-del-navegador.py",
+      "title": "8 · El candado del navegador",
+      "scene": "Clip8",
+      "final_state": "Cierre del curso a pantalla limpia: «Un secreto no se esconde.» sobre «Se calcula.» en cian; HUD 'MODULO 08'."
+    }
+  ]
+}
