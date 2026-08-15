@@ -47,8 +47,8 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 17 | Tsiolkovsky: la tirania del cohete | original (divulgacion pura, astronautica) | `cohete.py` | publicado (PR #15) |
 | 18 | Sistemas distribuidos: la nube por dentro | original (divulgacion, computo distribuido) | `distribuido.py` | publicado (PR #16) |
 | 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | publicado (PR #19); primer curso con intro/cierre de marca en el mux |
-| 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | merged (PR #21); ver seccion de la familia |
-| 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | merged (PR #20); pendiente deploy + narracion |
+| 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | publicado (PR #21): 9 lecciones narradas y muxeadas con intro/cierre |
+| 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -143,15 +143,15 @@ modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
 
 | Leccion | Proyecto | Clips | Estado |
 |---------|----------|-------|--------|
-| 1.1 | La luz como regla | 4 | en produccion (rama `curso/metrologia-optica`) |
-| 1.2 | La interferencia: contar franjas | 4 | en produccion |
-| 1.3 | La difraccion: el limite de la regla | 4 | en produccion |
-| 2.1 | Medir con el tiempo de vuelo | 4 | en produccion |
-| 2.2 | Medir la forma con franjas | 4 | en produccion |
-| 2.3 | Medir el frente de onda | 4 | en produccion |
-| 3.1 | El enlace optico entre satelites | 4 | en produccion |
-| 3.2 | Apuntar, adquirir, seguir | 4 | en produccion |
-| 3.3 | Satelites que se miden entre si | 4 | en produccion |
+| 1.1 | La luz como regla | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 1.2 | La interferencia: contar franjas | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 1.3 | La difraccion: el limite de la regla | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 2.1 | Medir con el tiempo de vuelo | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 2.2 | Medir la forma con franjas | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 2.3 | Medir el frente de onda | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 3.1 | El enlace optico entre satelites | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 3.2 | Apuntar, adquirir, seguir | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+| 3.3 | Satelites que se miden entre si | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 
 ## Marca: intro y cierre para posproduccion (2026-08-14)
 
@@ -175,7 +175,7 @@ La cola original esta agotada. Los proximos cursos se eligen tema a tema.
 | Prio | Curso de video (8 clips) | Lecciones fuente (Academy) | Libreria nueva | Estado |
 |------|--------------------------|----------------------------|----------------|--------|
 | — | Criptografia (curso 19) | — | `cripto.py` | publicado (PR #19) |
-| — | Teoria de la informacion: los bits de Shannon (curso 21) | original (divulgacion, telecom; puente natural con Criptografia y con "Cerrar el enlace") | `informacion.py` | merged (PR #20; storyboard `curso-19-teoria-informacion.md`) |
+| — | Teoria de la informacion: los bits de Shannon (curso 21) | original (divulgacion, telecom; puente natural con Criptografia y con "Cerrar el enlace") | `informacion.py` | publicado (PR #20; storyboard `curso-19-teoria-informacion.md`) |
 
 Criterio de prioridad: (1) riqueza visual con primitivas existentes o
 factibles, (2) tamaño de audiencia, (3) actualidad del tema, (4) no
