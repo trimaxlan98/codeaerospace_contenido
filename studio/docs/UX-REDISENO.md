@@ -38,6 +38,13 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
+**Producción:** sprints 0–2 desplegados el 2026-08-15 (PR #22 y #23 a `main`,
+`git pull` + `vite build` en el VPS). Verificado con una carga real de
+https://coderesearch.space en escritorio y móvil: bundle nuevo servido, título
+e iconos de marca correctos, `/api/health` con runner vivo, sin errores de
+consola. Los sprints 0 y 1 llevaban desde la mañana sin llegar a producción
+porque su PR seguía abierto.
+
 ---
 
 ## Sprint 0 — la base visual estaba rota (hecho 2026-08-15)
