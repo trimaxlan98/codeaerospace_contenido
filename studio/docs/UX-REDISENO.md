@@ -31,7 +31,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 2 | Login legible con marca CO.DE Academy + favicon propio (encargos 1 y 2) | ✅ hecho 2026-08-15 | ver abajo |
 | 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ✅ hecho 2026-08-15 | ver abajo |
 | 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ✅ hecho 2026-08-15 | ver abajo |
-| 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ⏳ pendiente | — |
+| 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ✅ hecho 2026-08-15 | ver abajo |
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | 🟡 parcial (la continuidad la resuelve la fusión del sprint 4; falta la parte de lectura y progreso) | — |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; el popover de temas de la barra desaparece en el sprint 3; falta la pasada vista por vista y el resto de solapes) | — |
@@ -439,3 +439,80 @@ Aprender, búsqueda global cruzando ambos, lector de lección y de animación,
 los dos alias de ruta, filtro de estado de Renders, error visible en la
 tarjeta fallida, salto de tarjeta a proyecto, sin scroll horizontal en móvil),
 sin errores de consola.
+
+---
+
+## Sprint 5 — plantillas de curso y asistente de clip (hecho 2026-08-15)
+
+Criterio 9 del brief: *fácil de usar sin saber programar, **sin perder
+potencia***. El dueño añadió la condición dura al asignarlo: «cuida que para
+quien sabe programar no sea molesto, esto solo se debe habilitar cuando se
+requiera». De ahí sale el reparto de este sprint en dos piezas con reglas
+distintas.
+
+### Plantillas de curso — siempre disponibles, sin coste para nadie
+
+Crear un proyecto «en blanco» deja el estilo compartido vacío, y sin él los
+clips no heredan la identidad CO.DE Academy, la tipografía de marca ni los
+helpers de rótulo. Ese bloque son ~90 líneas que **todos** los cursos del repo
+repiten palabra por palabra (compárese cualquier
+`studio/content/cursos/*/style_block.py`), incluida la sombra de `Text` que
+arregla una trampa real de Manim 0.20. No es conocimiento de novato: es
+copiar-pegar que hasta ahora tocaba hacer a mano.
+
+`Nuevo proyecto` gana un selector *Empezar desde* con tres opciones:
+
+- **En blanco** (seleccionada por defecto) — el diálogo se comporta
+  exactamente igual que antes de que esto existiera. Quien sabe lo que hace no
+  paga ni un clic.
+- **Curso monográfico** — 8 clips a 1080p, el estilo con el tema oficial y un
+  clip de arranque que ya renderiza.
+- **Lección de una familia** — 4 clips a 1080p; deduce la constante `LECCION`
+  del propio nombre `Familia · N.M Título`.
+
+El textarea de estilo sigue mandando: si escribes algo, reemplaza al de la
+plantilla.
+
+**Validado renderizando de verdad**, no solo leyendo: la plantilla se
+materializó como curso real y se pasó por `studio/tools/render_local.py` en el
+contenedor. Sale un mp4 con escuadras HUD, marca de agua CO.DE Academy y la
+tipografía de marca, y el propio validador lo marca `<-- CORTO (minimo 28 s)`
+porque el clip de arranque dura 3,4 s — que es justo lo que el distintivo de
+duración de Proyectos enseñará en ámbar hasta que el clip crezca.
+
+### Asistente de clip — detrás de una preferencia, apagada por defecto
+
+Esta es la parte que **sí** estorbaría a quien escribe Manim a mano, así que
+va tras `prefs.guided`, **`false` por defecto**: con el modo guiado apagado,
+Proyectos no monta ni el botón. El camino de siempre —*Añadir clip* y *Editar
+en Estudio*— no cambia un pixel. Se enciende en Configuración → Interfaz.
+
+Con él encendido, *Asistente* abre un formulario con tres orígenes:
+
+1. **Descríbelo y lo escribe la IA** (solo si Vertex está configurado; si no,
+   la opción aparece deshabilitada y dice por qué). El prompt lleva el
+   contexto real: nombre y descripción del curso, número de clip, **dónde
+   terminó el clip anterior** (`final_state`), los helpers del estilo y el
+   tope de 28–45 s del formato.
+2. **Partir de una animación de ejemplo** — copia el script de cualquiera de
+   las 89 animaciones de Aprender.
+3. **Esqueleto en blanco**.
+
+Dos decisiones que importan:
+
+- **Nunca guarda a ciegas.** Genera, **enseña** el script y la escena que
+  detectó (con `POST /api/scenes`, el AST del backend, no una suposición) y
+  solo entonces ofrece *Guardar como clip*.
+- **Quita los imports de cabecera** cuando el proyecto tiene estilo, y lo
+  avisa. Es obligatorio: el estilo hace `from manim import *` y después
+  instala la sombra de `Text`; si el clip vuelve a importar, ese `import *`
+  **repone el `Text` de manim y se pierde la corrección**. Es la trampa que
+  los cursos del repo documentan como «los clips NO repiten imports».
+
+**Verificación:** `vite build` verde, `pytest -q` 149/149, QA Playwright
+**21/21** en 1440×900 — 18 del recorrido principal (empezando por comprobar
+que sin modo guiado no aparece ni un botón nuevo, que la plantilla crea sus 8
+clips con escena `Clip1`…`Clip8` y que el estilo llega con `code_brand` y la
+sombra de `Text`, que al apagar el modo guiado el asistente desaparece) y 3 de
+la rama de copiar una animación (avisa de las 3 líneas de import quitadas y
+conserva el cuerpo). Sin errores de consola. Y el render real descrito arriba.

@@ -128,7 +128,7 @@ export default function Admin({ metrics, containers, jobs, storage, onJobsChange
     (r) => `${r.deleted} render(s) purgados · ${fmtSize(r.freed_bytes)} liberados.`)
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
+    <main data-view="admin" className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3">
       {/* shrink-0 en tabs y secciones: sin el, se comprimen para caber en el
           viewport y su contenido se pinta encima de la siguiente. */}
       <div role="tablist" aria-label="secciones de administración"
