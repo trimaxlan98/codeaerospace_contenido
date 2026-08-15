@@ -32,7 +32,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ✅ hecho 2026-08-15 | ver abajo |
 | 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ✅ hecho 2026-08-15 | ver abajo |
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ✅ hecho 2026-08-15 | ver abajo |
-| 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | 🟡 parcial (la continuidad la resuelve la fusión del sprint 4; falta la parte de lectura y progreso) | — |
+| 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ✅ hecho 2026-08-15 | ver abajo |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; el popover de temas de la barra desaparece en el sprint 3; falta la pasada vista por vista y el resto de solapes) | — |
 
@@ -518,3 +518,68 @@ clips con escena `Clip1`…`Clip8` y que el estilo llega con `code_brand` y la
 sombra de `Text`, que al apagar el modo guiado el asistente desaparece) y 3 de
 la rama de copiar una animación (avisa de las 3 líneas de import quitadas y
 conserva el cuerpo). Sin errores de consola. Y el render real descrito arriba.
+
+---
+
+## Sprint 6 — Aprender: lectura y progreso (hecho 2026-08-15)
+
+Criterio 10: *lectura cómoda, progreso, búsqueda, continuidad con
+Animaciones/Estudio*. La búsqueda y la continuidad con Animaciones ya las
+resolvió la fusión del sprint 4; quedaban la lectura y el progreso.
+
+**Lo que NO se hizo, y por qué.** La auditoría de julio pedía «tabla de
+contenidos en lecciones largas». No hay lecciones largas: las 18 miden 47–66
+líneas con 4–5 encabezados. Un índice flotante ahí sería adorno que estorba,
+así que se descartó tras medirlo.
+
+### Los ejemplos de código ahora se pueden ejecutar
+
+Este era el agujero real. Las lecciones enseñan Manim con **42 bloques de
+código** y no se podía hacer nada con ellos: ni copiarlos cómodamente ni
+probarlos. En un producto cuyo objetivo es aprender Manim, leer un ejemplo sin
+poder ejecutarlo es el fallo, no un detalle.
+
+Cada bloque gana una barra (visible al pasar por encima o al tabular hasta
+ella, para no competir con la lectura) con **Copiar** y, cuando el bloque
+define una `Scene` completa, **Probar en el Estudio**.
+
+El botón aparece **solo donde va a funcionar**: 4 de las 18 lecciones traen un
+bloque ejecutable; el resto son fragmentos (`self.play(...)`) que sueltos solo
+darían «el script no define ninguna Scene» en el Estudio. Envolverlos en un
+andamio se descartó: muchos referencian variables de bloques anteriores y el
+resultado sería un `NameError` presentado como si fuera a funcionar.
+
+La barra se inyecta en el DOM tras pintar el markdown en vez de tocar
+`markdown.js`: lo que se añade son nodos propios sobre HTML ya saneado por
+DOMPurify, y el efecto limpia lo suyo antes de que React reemplace el
+contenido.
+
+### Progreso que sobrevive al navegador
+
+- La **posición de lectura se guarda por lección** (`ms_lessons_progress`) y se
+  retoma al volver — antes el scroll solo vivía mientras la vista siguiera
+  montada. Solo se retoma entre el 5 % y el 95 %: al principio no hay nada que
+  retomar y al final desorienta más de lo que ahorra.
+  **Trampa que costó una iteración:** restaurar el scroll justo después de
+  `setItem` no funciona; el markdown aún no está en el DOM y el contenedor mide
+  0, así que el cálculo siempre acababa arriba. Ahora lo aplica un efecto que
+  reintenta unos fotogramas hasta que el contenido tiene altura (KaTeX y las
+  fuentes la cambian después del primer pintado).
+- El índice muestra una **barra fina** bajo las lecciones empezadas y sin
+  terminar, y el grupo lleva su **contador** (`Curso de Manim 8/18`).
+- El estado vacío ofrece **Empezar el curso / Continuar** con la primera
+  lección sin leer, y felicita cuando están las 18.
+
+### El curso es una secuencia, no cuatro islas
+
+*Anterior/siguiente* recorre ahora **las 18 lecciones seguidas** en vez de
+pararse al final de cada categoría; cuando el salto cruza de categoría, el
+botón lo dice en su `title`. Antes, terminar «Fundamentos 05» te dejaba sin
+salida.
+
+**Verificación:** `vite build` verde, `pytest -q` 149/149, QA Playwright
+**14/14** en 1440×900 y 390×844 (contador del grupo, *Empezar el curso*, barra
+por bloque, *Copiar* dejando el código en el portapapeles, avance guardado al
+50 % y **retomado tras recargar**, marcado como leída al terminar, salto de
+categoría, y *Probar* llevando el código real al Estudio). Sin errores de
+consola.

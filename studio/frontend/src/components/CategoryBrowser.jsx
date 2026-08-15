@@ -111,11 +111,17 @@ export default function CategoryBrowser({ title, groups, itemsOf, searchText,
           groups.map((g) => (
             g.categories.length === 0 ? null : (
               <section key={g.id} aria-label={g.label} className="pb-1">
-                <div className="flex items-center justify-between gap-2 px-2 pb-1 pt-2.5">
+                <div className="flex items-center gap-2 px-2 pb-1 pt-2.5">
                   <span className="eyebrow">{g.label}</span>
+                  {/* Progreso del grupo (p. ej. 8/18 lecciones leidas). */}
+                  {g.badge && (
+                    <span className="font-mono text-[11px] text-muted" title="lecciones leídas">
+                      {g.badge}
+                    </span>
+                  )}
                   {g.onAddCategory && (
                     <button onClick={g.onAddCategory} title="Nueva sección"
-                      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] text-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+                      className="ml-auto flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] text-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
                       <Plus className="h-3.5 w-3.5" /> Sección
                     </button>
                   )}

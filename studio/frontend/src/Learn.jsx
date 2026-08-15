@@ -29,6 +29,10 @@ import { cn } from '@/lib/utils'
 import 'katex/dist/katex.min.css'
 
 const READ_KEY = 'ms_lessons_read'
+// Posicion de lectura por leccion (0-100). Hasta el sprint 6 el scroll solo
+// sobrevivia mientras la vista siguiera montada: cerrar el navegador y volver
+// te devolvia al principio de una leccion a medias.
+const PROG_KEY = 'ms_lessons_progress'
 const LEVEL_LABEL = { intro: 'intro', medio: 'medio', avanzado: 'avanzado' }
 
 const SCRIPT_TEMPLATE = `from manim import *
@@ -46,6 +50,11 @@ function readSet() {
   catch { return new Set() }
 }
 
+function readProgress() {
+  try { return JSON.parse(localStorage.getItem(PROG_KEY)) || {} }
+  catch { return {} }
+}
+
 export default function Learn({ routeId, onRoute, onOpenInStudio, active = true }) {
   const [lessonIndex, setLessonIndex] = useState(null)
   const [animIndex, setAnimIndex] = useState(null)
@@ -53,11 +62,13 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
   const [item, setItem] = useState(null) // {kind:'lesson'|'animation', ...}
   const [read, setRead] = useState(readSet)
   const [progress, setProgress] = useState(0)
+  const [saved, setSaved] = useState(readProgress)
   const [newSectionOpen, setNewSectionOpen] = useState(false)
   const [addTarget, setAddTarget] = useState(null)
   const readerRef = useRef(null)
   const endRef = useRef(null)   // pie de la leccion: al verlo se marca leida
   const scrollRef = useRef(0)   // scroll del lector, para restaurarlo al volver
+  const restaurarRef = useRef(null) // % pendiente de retomar en la leccion recien abierta
   const requestedRef = useRef(null)
 
   const loadIndexes = useCallback(() => {
@@ -97,13 +108,22 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
       ])
       if (!lesson && !animation) throw Object.assign(new Error('No encontrado'), { status: 404 })
       setItem({ id, lesson, animation, kind: lesson ? 'lesson' : 'animation' })
-      setProgress(0)
+      // Retoma donde se dejo, salvo al principio (nada que retomar) o casi al
+      // final (empezar por el pie desorienta mas de lo que ahorra).
+      const pct = lesson ? (saved[id] || 0) : 0
+      const retomar = pct > 5 && pct < 95
+      setProgress(retomar ? pct : 0)
       scrollRef.current = 0
       readerRef.current?.scrollTo(0, 0)
+      // La restauracion NO puede hacerse aqui: el markdown todavia no esta en
+      // el DOM y el contenedor mide 0. Se deja pedida y la aplica el efecto de
+      // abajo, que espera a que el contenido tenga altura (KaTeX y las fuentes
+      // la cambian despues del primer pintado).
+      restaurarRef.current = retomar ? pct : null
     } catch (err) {
       setError(err.status === 404 ? 'No se encontró ese contenido' : err.message)
     }
-  }, [lessonIndex, animIndex])
+  }, [lessonIndex, animIndex, saved])
 
   const openAndRoute = (id) => { open(id); onRoute?.(id) }
 
@@ -112,6 +132,30 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
     if (!lessonIndex || !animIndex || !routeId || routeId === requestedRef.current) return
     open(routeId)
   }, [lessonIndex, animIndex, routeId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Retomar la lectura: se aplica cuando el markdown ya esta pintado Y tiene
+  // altura. Reintenta unos fotogramas porque KaTeX y las fuentes cambian el
+  // alto despues del primer pintado; sin esa espera el scroll se calculaba
+  // sobre un contenedor de altura 0 y siempre acababa arriba.
+  useEffect(() => {
+    const pct = restaurarRef.current
+    restaurarRef.current = null
+    if (pct == null || item?.kind !== 'lesson') return
+    let cancelado = false
+    let intentos = 0
+    const aplicar = () => {
+      if (cancelado) return
+      const el = readerRef.current
+      if (!el) return
+      const max = el.scrollHeight - el.clientHeight
+      if (max <= 0 && intentos++ < 30) { requestAnimationFrame(aplicar); return }
+      if (max <= 0) return
+      el.scrollTop = (pct / 100) * max
+      scrollRef.current = el.scrollTop
+    }
+    requestAnimationFrame(aplicar)
+    return () => { cancelado = true }
+  }, [item?.id, item?.kind])
 
   // Leida al TERMINARLA (no al abrirla): cuando el pie entra en pantalla.
   useEffect(() => {
@@ -128,17 +172,43 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
     if (active && readerRef.current) readerRef.current.scrollTop = scrollRef.current
   }, [active])
 
+  // El avance se guarda con debounce: una escritura por pausa del scroll, no
+  // una por fotograma.
+  const guardarRef = useRef(null)
   const onScroll = (e) => {
     const el = e.target
     const max = el.scrollHeight - el.clientHeight
     scrollRef.current = el.scrollTop
-    setProgress(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100)
+    const pct = max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100
+    setProgress(pct)
+    if (item?.kind !== 'lesson') return
+    const id = item.id
+    clearTimeout(guardarRef.current)
+    guardarRef.current = setTimeout(() => {
+      setSaved((prev) => {
+        const next = { ...prev, [id]: Math.round(pct) }
+        try { localStorage.setItem(PROG_KEY, JSON.stringify(next)) } catch { /* no critico */ }
+        return next
+      })
+    }, 400)
   }
+
+  // El curso de Manim es una SECUENCIA de 18 lecciones repartidas en 4
+  // categorias. Aplanarla sirve para dos cosas: el contador de progreso del
+  // grupo y que "siguiente" cruce de categoria al terminar la ultima de una
+  // (antes el recorrido se cortaba en seco al acabar Fundamentos 05).
+  const curso = useMemo(
+    () => (lessonIndex || []).flatMap((c) => c.lessons.map((l) => ({ ...l, cat: c }))),
+    [lessonIndex])
+  const leidas = curso.filter((l) => read.has(l.id)).length
+  // Primera sin leer: lo que ofrece "Continuar" en el estado vacio.
+  const siguienteSinLeer = curso.find((l) => !read.has(l.id))
 
   const groups = useMemo(() => ([
     {
       id: 'curso',
       label: 'Curso de Manim',
+      badge: curso.length ? `${leidas}/${curso.length}` : null,
       categories: lessonIndex || [],
     },
     {
@@ -148,7 +218,7 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
       onAddCategory: () => setNewSectionOpen(true),
       addItemLabel: 'Añadir animación',
     },
-  ]), [lessonIndex, animIndex])
+  ]), [lessonIndex, animIndex, curso.length, leidas])
 
   const itemsOf = useCallback((c) => (
     // La misma categoria nunca esta en los dos grupos hoy, pero si lo
@@ -193,6 +263,15 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
                 <span className="col-start-2 font-mono text-[11px] text-muted">
                   {LEVEL_LABEL[it.level] || it.level} · {it.minutes} min
                 </span>
+                {/* Empezada pero sin terminar: barra fina con lo leido. Solo
+                    aporta cuando hay algo que retomar. */}
+                {!read.has(it.id) && saved[it.id] > 5 && (
+                  <span className="col-start-2 mt-1 block h-[3px] overflow-hidden rounded-full bg-canvas"
+                    title={`${Math.round(saved[it.id])}% leído`}>
+                    <span className="block h-full rounded-full bg-accent"
+                      style={{ width: `${Math.min(100, saved[it.id])}%` }} />
+                  </span>
+                )}
               </span>
             ) : (
               <>
@@ -205,17 +284,34 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
 
       <section className="panel relative flex min-h-[50dvh] flex-col overflow-hidden lg:min-h-0" aria-label="lector">
         {item ? (
-          <Reader item={item} index={{ lessons: lessonIndex, anims: animIndex }}
+          <Reader item={item} index={{ lessons: lessonIndex, anims: animIndex }} curso={curso}
             progress={progress} onScroll={onScroll} readerRef={readerRef} endRef={endRef}
             onOpenItem={openAndRoute} onOpenInStudio={onOpenInStudio}
             onKind={(kind) => setItem((p) => ({ ...p, kind }))} />
         ) : (
           <div className="grid flex-1 place-items-center p-6 text-center">
-            <p className="max-w-[46ch] text-[13px] text-muted">
-              Elige una lección o una animación. {totalLessons} lecciones del curso de
-              Manim y {totalAnims} animaciones por dominio, con una sola búsqueda
-              para las dos cosas.
-            </p>
+            <div className="flex max-w-[46ch] flex-col items-center gap-3">
+              <p className="text-[13px] text-muted">
+                Elige una lección o una animación. {totalLessons} lecciones del curso de
+                Manim y {totalAnims} animaciones por dominio, con una sola búsqueda
+                para las dos cosas.
+              </p>
+              {siguienteSinLeer && (
+                <>
+                  <Button variant="primary" size="sm" onClick={() => openAndRoute(siguienteSinLeer.id)}>
+                    {leidas === 0 ? 'Empezar el curso' : 'Continuar'}: {siguienteSinLeer.title} →
+                  </Button>
+                  <span className="font-mono text-[11px] text-faint">
+                    {leidas}/{curso.length} lecciones leídas
+                  </span>
+                </>
+              )}
+              {!siguienteSinLeer && curso.length > 0 && (
+                <span className="font-mono text-[11px] text-ok">
+                  Curso de Manim completo · {curso.length}/{curso.length}
+                </span>
+              )}
+            </div>
           </div>
         )}
         {error && (
@@ -233,7 +329,7 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
 
 // ── lector ──────────────────────────────────────────────────────────────────
 
-function Reader({ item, index, progress, onScroll, readerRef, endRef, onOpenItem,
+function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onOpenItem,
   onOpenInStudio, onKind }) {
   const { lesson, animation, kind } = item
   const both = Boolean(lesson && animation)
@@ -272,10 +368,11 @@ function Reader({ item, index, progress, onScroll, readerRef, endRef, onOpenItem
     )
   }
 
-  const list = cat?.lessons || []
-  const i = list.findIndex((l) => l.id === lesson.id)
-  const prev = i > 0 ? list[i - 1] : null
-  const next = i >= 0 && i < list.length - 1 ? list[i + 1] : null
+  // Anterior/siguiente sobre el curso ENTERO, no sobre la categoria: son 18
+  // lecciones en 4 categorias y el recorrido se cortaba al acabar cada una.
+  const i = curso.findIndex((l) => l.id === lesson.id)
+  const prev = i > 0 ? curso[i - 1] : null
+  const next = i >= 0 && i < curso.length - 1 ? curso[i + 1] : null
 
   return (
     <>
@@ -294,13 +391,19 @@ function Reader({ item, index, progress, onScroll, readerRef, endRef, onOpenItem
             {lesson.tags.length > 0 && <> · {lesson.tags.join(' · ')}</>}
           </p>
         </header>
-        <LessonBody markdown={lesson.markdown} />
-        <footer ref={endRef} className="mx-auto mt-8 flex max-w-[70ch] justify-between gap-2.5">
+        <LessonBody markdown={lesson.markdown} onProbar={onOpenInStudio} />
+        <footer ref={endRef} className="mx-auto mt-8 flex max-w-[70ch] flex-wrap justify-between gap-2.5">
           {prev ? (
-            <Button variant="default" onClick={() => onOpenItem(prev.id)}>← {prev.title}</Button>
+            <Button variant="default" onClick={() => onOpenItem(prev.id)}
+              title={prev.cat?.name !== cat?.name ? prev.cat?.name : undefined}>
+              ← {prev.title}
+            </Button>
           ) : <span />}
           {next && (
-            <Button variant="primary" onClick={() => onOpenItem(next.id)}>{next.title} →</Button>
+            <Button variant="primary" onClick={() => onOpenItem(next.id)}
+              title={next.cat?.name !== cat?.name ? `Sigue en ${next.cat?.name}` : undefined}>
+              {next.title} →
+            </Button>
           )}
         </footer>
       </div>
@@ -327,9 +430,84 @@ function KindToggle({ kind, onKind }) {
   )
 }
 
-function LessonBody({ markdown }) {
+// Un bloque es "ejecutable" si define una Scene: solo entonces tiene sentido
+// mandarlo al Estudio (un fragmento suelto solo daria "no define ninguna
+// Scene" alli, que es peor que no ofrecerlo).
+const RE_ESCENA = /class\s+\w+\s*\(\s*\w*Scene\w*\s*\)/
+
+/** Cuerpo de la leccion + barra de acciones por bloque de codigo.
+ *
+ *  Las lecciones enseñan Manim con ~42 bloques de codigo y hasta ahora no se
+ *  podia hacer NADA con ellos: ni copiarlos comodamente ni probarlos. Esa era
+ *  la "continuidad con el Estudio" que pedia el encargo 10.
+ *
+ *  La barra se inyecta en el DOM tras pintar el markdown en vez de tocar
+ *  `markdown.js`: el HTML ya viene saneado por DOMPurify y lo que se añade son
+ *  nodos propios, no contenido del documento. React no reconcilia el interior
+ *  de un `dangerouslySetInnerHTML`, asi que el efecto limpia lo suyo antes de
+ *  que cambie el html. */
+function LessonBody({ markdown, onProbar }) {
   const html = useMemo(() => renderMarkdown(markdown), [markdown])
-  return <article className="reader" dangerouslySetInnerHTML={{ __html: html }} />
+  const ref = useRef(null)
+  const [copiado, setCopiado] = useState('')
+
+  useEffect(() => {
+    const root = ref.current
+    if (!root) return
+    const añadidos = []
+    root.querySelectorAll('pre').forEach((pre, i) => {
+      const code = pre.querySelector('code')
+      if (!code) return
+      const texto = code.textContent || ''
+      const bar = document.createElement('div')
+      bar.className = 'reader__codebar'
+
+      const copiar = document.createElement('button')
+      copiar.type = 'button'
+      copiar.textContent = 'Copiar'
+      copiar.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(texto)
+          copiar.textContent = 'Copiado'
+          setCopiado(`c${i}`)
+          setTimeout(() => {
+            // El nodo puede haberse ido si la leccion cambio mientras tanto.
+            if (copiar.isConnected) copiar.textContent = 'Copiar'
+            setCopiado('')
+          }, 1800)
+        } catch {
+          copiar.textContent = 'No se pudo copiar'
+          setTimeout(() => { if (copiar.isConnected) copiar.textContent = 'Copiar' }, 1800)
+        }
+      }
+      bar.appendChild(copiar)
+
+      if (onProbar && RE_ESCENA.test(texto)) {
+        const probar = document.createElement('button')
+        probar.type = 'button'
+        probar.textContent = 'Probar en el Estudio'
+        probar.className = 'is-primary'
+        // El Estudio pide confirmacion antes de pisar trabajo propio.
+        probar.onclick = () => onProbar(texto)
+        bar.appendChild(probar)
+      }
+
+      pre.appendChild(bar)
+      añadidos.push(bar)
+    })
+    return () => añadidos.forEach((b) => b.remove())
+  }, [html, onProbar])
+
+  return (
+    <>
+      <article ref={ref} className="reader" dangerouslySetInnerHTML={{ __html: html }} />
+      {/* aria-live fuera del HTML inyectado: el aviso de copiado no puede
+          vivir en un nodo que React no controla. */}
+      <span role="status" aria-live="polite" className="sr-only">
+        {copiado ? 'Código copiado al portapapeles' : ''}
+      </span>
+    </>
+  )
 }
 
 // ── alta de seccion / animacion (se conservan del antiguo Animaciones) ───────

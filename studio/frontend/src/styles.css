@@ -63,9 +63,31 @@
   border-radius: 3px; padding: 1px 5px;
 }
 .reader pre {
+  position: relative;   /* ancla de .reader__codebar */
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px;
   padding: 12px 14px; overflow-x: auto; margin: 0 0 1em;
 }
+
+/* Acciones por bloque de codigo (Copiar / Probar en el Estudio). Las inyecta
+   Learn.jsx tras pintar el markdown; aparecen al pasar por encima del bloque o
+   al tabular hasta ellas, para no competir con la lectura. */
+.reader__codebar {
+  position: absolute; top: 6px; right: 6px;
+  display: flex; gap: 6px;
+  opacity: 0; transition: opacity .15s ease;
+}
+.reader pre:hover .reader__codebar,
+.reader__codebar:focus-within { opacity: 1; }
+.reader__codebar button {
+  font-family: var(--font-sans); font-size: 11.5px; line-height: 1;
+  padding: 5px 8px; border-radius: 6px; cursor: pointer;
+  color: var(--muted); background: var(--canvas);
+  border: 1px solid var(--line);
+  transition: color .15s ease, border-color .15s ease;
+}
+.reader__codebar button:hover { color: var(--ink); border-color: var(--line-strong); }
+.reader__codebar button.is-primary { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.reader__codebar button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
 .reader pre code { background: none; border: 0; padding: 0; }
 .reader table { border-collapse: collapse; margin: 0 0 1em; width: 100%; }
 .reader th, .reader td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
