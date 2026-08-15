@@ -167,7 +167,11 @@
     --line-strong: rgba(15, 23, 42, 0.28);
     --ink: #0f172a;
     --muted: #475569;
-    --faint: #94a3b8;
+    /* slate-500, no slate-400: sobre #f1f5f9 el 400 daba 2,34:1 y `faint`
+       lleva texto real (fechas, unidades, contadores), no adorno. 4,34:1
+       cumple AA incluso como texto normal. Lo encontro la auditoria de los
+       4 temas x 12 pares de tokens. */
+    --faint: #64748b;
     /* Contraste AA en el unico tema claro: los tonos 500 de la paleta (que
        funcionan sobre lienzo oscuro) fallan sobre #f1f5f9 — blanco sobre
        #0ea5e9 daba 2,8:1 en el boton primario y `text-ok` 2,3:1. Aqui la
