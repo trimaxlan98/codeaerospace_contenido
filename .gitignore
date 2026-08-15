@@ -16,6 +16,10 @@ media/
 *.gif
 *.bmp
 *.tiff
+# Excepcion: los iconos de marca del frontend SI se versionan (los
+# genera studio/frontend/tools/brand_icons.mjs y nginx los sirve desde
+# dist/; sin ellos produccion se queda sin favicon en silencio).
+!studio/frontend/public/*.png
 
 # Python
 __pycache__/

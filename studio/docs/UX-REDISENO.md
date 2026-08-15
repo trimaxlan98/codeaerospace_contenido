@@ -28,13 +28,13 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 |---|--------|--------|--------|
 | 0 | Base visual: bordes, foco, temas, coste del fondo | ✅ hecho 2026-08-15 | ver abajo |
 | 1 | Flujo de cursos: índice por familias, duración de clip, narración | ✅ hecho 2026-08-15 | ver abajo |
-| 2 | Login legible con marca CO.DE Academy + favicon propio (encargos 1 y 2) | ⏳ pendiente | — |
+| 2 | Login legible con marca CO.DE Academy + favicon propio (encargos 1 y 2) | ✅ hecho 2026-08-15 | ver abajo |
 | 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ⏳ pendiente | — |
 | 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ⏳ pendiente | — |
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ⏳ pendiente | — |
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ⏳ pendiente | — |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
-| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; falta la pasada vista por vista) | — |
+| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; falta la pasada vista por vista y los solapes) | — |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -177,6 +177,83 @@ temas oscuro y claro, sin errores de consola.
 
 ---
 
+## Sprint 2 — la puerta de entrada y la marca (hecho 2026-08-15)
+
+Encargos 1 y 2. Diagnóstico del dueño: *"el login está todo oscuro y ni se ve
+el logo"*, y el favicon seguía siendo el de Vite.
+
+### Por qué el login estaba "todo oscuro"
+
+La tarjeta era un `GlowCard`: un panel con `--backdrop: var(--glass-bg)` —un
+velo del **4,5 %**— sobre el cielo animado, y encima una viñeta que oscurecía
+hasta `--canvas`. Resultado: un rectángulo apenas más claro que el fondo, sin
+borde perceptible. Su resplandor era además un `hsl()` **morado fijo**
+(`glowColor="purple"`), ajeno a los cuatro temas, seguía el puntero con un
+listener global de `pointermove` e inyectaba un `<style>` con reglas
+`[data-glow]` por cada instancia montada.
+
+Y de marca no había nada: el único símbolo era `OrbitGlyph`, que es el
+**indicador de estado del render**, no un logotipo. En la puerta de entrada de
+la consola de un canal, la marca del canal no aparecía.
+
+### Lo que hay ahora
+
+- **Marca en la interfaz** (`components/Brand.jsx`): `BrandMark` (glifo),
+  `Wordmark` (`CO.DE ACADEMY` con el punto en ámbar) y `HudCorners` (las
+  cuatro escuadras que ya enmarcan cada escena renderizada). Es
+  deliberadamente la misma familia visual que
+  `manim_extensions/code_brand.py` estampa en el video: consola y render se
+  reconocen como lo mismo.
+- **`AuthCard`** sustituye a `GlowCard` (borrado; no lo usaba nadie más):
+  columna de marca + formulario en escritorio, apilados en móvil, con fondo
+  `bg-canvas/88` y `border-line-strong`. La tarjeta se lee como tarjeta en los
+  cuatro temas y ya no depende de `backdrop-filter`.
+- **`PasswordInput`** en el sistema (`ui/input.jsx`): el conmutador de
+  visibilidad estaba copiado en Login y ChangePassword, y lo volverá a
+  necesitar Configuración (sprint 3).
+- **La marca aparece en todo el recorrido**, no solo en el login: glifo +
+  `CONECTANDO…` en la pantalla de arranque y wordmark bajo *ManimStudio* en la
+  cabecera de todas las vistas.
+- **Iconos propios** en `frontend/public/`: `favicon.svg` (el que usan los
+  navegadores modernos), `favicon-32.png`, `apple-touch-icon.png`,
+  `icon-192/512.png` y `site.webmanifest`. Los genera
+  `frontend/tools/brand_icons.mjs` desde una sola definición de la geometría,
+  rasterizando con el Chromium de Playwright (la máquina no tiene
+  rsvg/inkscape/magick y no hacía falta una dependencia nueva).
+  `index.html` estrena título, descripción, `theme-color` y manifest.
+
+### Dos hallazgos de paso
+
+1. **La lista de temas del arranque en `index.html` estaba desfasada**: seguía
+   validando siete ids (`aurora`, `deepspace`, `solar` ya no existen). Un tema
+   retirado guardado en `localStorage` se escribía tal cual en `data-theme`, no
+   casaba con ninguna regla CSS y la app arrancaba con los tokens de `:root`
+   mientras el selector marcaba otra cosa. Ahora valida los cuatro reales.
+2. **El tema claro no cumplía AA** (medido, no estimado): blanco sobre
+   `--accent: #0ea5e9` daba **2,8:1** en el botón primario, `text-ok` **2,3:1**
+   y `text-warn` **2,6:1** sobre el lienzo. Los cinco tokens de color del tema
+   `daylight` bajan dos escalones de la misma familia
+   (`accent #0369a1`, `cyan #1d4ed8`, `ok #047857`, `warn #8f6106`,
+   `err #b91c1c`) y ahora todo el texto pasa 4,5:1. Es parte del sprint 8, pero
+   el botón *Entrar* del login es texto sobre acento: no se podía cerrar el
+   encargo 1 ("contraste AA") sin arreglarlo.
+
+El ámbar de la marca tiene el mismo problema al revés: `#f59e0b` sobre lienzo
+claro da 1,6:1. Por eso `--brand` es un token por tema (ámbar del canal en los
+tres oscuros, `#b45309` en `daylight`) en vez de un literal.
+
+### Verificación
+
+`npm run build` verde · `venv/bin/pytest -q` 149/149 (el backend no se tocó) ·
+contraste calculado sobre el peor caso real de la tarjeta (lienzo al 88 % sobre
+la parada más clara del cielo, más el velo de la columna de marca): mínimo
+**4,70:1** en los cuatro temas · QA visual con Playwright: login en 4 temas ×
+{1440×900, 390×844}, estado de error, cambio obligatorio de contraseña
+(levantando `must_change_password` en la base de QA), pantalla de arranque y
+las 6 vistas internas en tema claro y oscuro. Sin errores de consola.
+
+---
+
 ## Pendiente conocido (entra en sprints siguientes)
 
 - La tira de cola/historial del Estudio y los avisos de fin de render siguen
@@ -186,5 +263,9 @@ temas oscuro y claro, sin errores de consola.
 - El resumen de `GET /api/projects` no trae estado de narración, así que el
   índice de familias no puede mostrar progreso de narración sin abrir cada
   curso.
-- Los 4 temas están saneados pero falta la pasada formal vista por vista que
-  pide el criterio 3 del brief.
+- Los 4 temas están saneados y el claro ya cumple AA en sus tokens, pero falta
+  la pasada formal vista por vista que pide el criterio 3 del brief (y la
+  revisión de solapes de menús del criterio 4).
+- La web usa Space Grotesk donde el video usa Rajdhani: el wordmark de la
+  consola no es tipográficamente idéntico al del render. Traer la TTF del repo
+  a `public/` es viable si algún día se quiere fidelidad exacta.

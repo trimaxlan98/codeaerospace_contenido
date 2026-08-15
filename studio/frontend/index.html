@@ -1,20 +1,39 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>ManimStudio · CO.DE Academy</title>
+    <meta name="description" content="Consola privada de renderizado Manim de CO.DE Academy." />
+    <meta name="application-name" content="ManimStudio" />
+    <meta name="apple-mobile-web-app-title" content="ManimStudio" />
+
+    <!-- Identidad CO.DE Academy: el SVG manda en escritorio, el PNG de 32 es
+         el respaldo, y apple-touch-icon el que usa iOS al anclar en pantalla
+         de inicio. Se generan con `node tools/brand_icons.mjs`. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#05070a" />
+
     <script>
-      (function () {
+      // Tema antes del primer pintado: sin esto la app arranca en el tema por
+      // defecto y salta al del usuario al montar React (flash de lienzo).
+      // La lista debe seguir a THEMES de src/themes.js — un id que ya no
+      // existe (los 3 temas retirados) no tiene reglas CSS y caeria en :root
+      // mientras el selector marcaria otro; por eso se valida aqui tambien.
+      ;(function () {
         try {
           var t = localStorage.getItem('ms_theme')
-          var valid = ['orbital','aurora','deepspace','daylight','nebula','ion','solar']
-          document.documentElement.dataset.theme =
-            valid.indexOf(t) >= 0 ? t : 'orbital'
-        } catch (e) { document.documentElement.dataset.theme = 'orbital' }
+          var valid = ['orbital', 'ion', 'nebula', 'daylight']
+          document.documentElement.dataset.theme = valid.indexOf(t) >= 0 ? t : 'orbital'
+        } catch (e) {
+          document.documentElement.dataset.theme = 'orbital'
+        }
       })()
     </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>ManimStudio · coderesearch.space</title>
   </head>
   <body>
     <div id="root"></div>

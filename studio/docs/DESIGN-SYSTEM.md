@@ -34,13 +34,39 @@ runtime funcione (los utilitarios referencian `var()`, no el valor).
 | `--line` / `--line-strong` | bordes, separadores, **barra de scroll** | **nunca `transparent`**: toda la estructura de la app se dibuja con `border-line` y el scrollbar usa `--line-strong` |
 | `--ink` / `--muted` / `--faint` | texto principal / secundario / terciario | |
 | `--accent` / `--accent-ink` | firma del tema y su texto encima | |
+| `--brand` / `--brand-2` | ámbar CO.DE Academy (punto del wordmark, escuadras HUD, viñetas) | **no es el acento del tema**: es la marca del canal. Ámbar `#f59e0b` en los tres temas oscuros; `#b45309` en `daylight` (el ámbar del canal sobre lienzo claro da 1,6:1) |
 | `--cyan` | anillo de foco y estado "en cola" | |
 | `--ok` / `--warn` / `--err` | semáforo de estado | verde vigente · ámbar desactualizado/fuera de rango · rojo fallo |
 | `--glass-*`, `--glow-*`, `--grad-*`, `--star-*` | vidrio, resplandores del fondo y cielo del login | |
 
 Los cuatro temas (`orbital`, `ion`, `nebula`, `daylight`) deben definir **todos**
 los tokens. La muestra de `themes.js` tiene que enseñar el lienzo real del
-tema, no uno inventado.
+tema, no uno inventado. La **lista de ids también vive en `index.html`** (el
+script que fija `data-theme` antes del primer pintado): si se añade o retira un
+tema hay que tocar los dos sitios, o un id guardado en `localStorage` acabará
+sin reglas CSS y la app arrancará en `:root` con el selector marcando otra cosa.
+
+**El tema claro no puede usar los tonos 500 de la paleta.** Sobre `#f1f5f9`,
+`accent #0ea5e9` da 2,8:1 con texto blanco encima y `ok #10b981` da 2,3:1 como
+texto: AA exige 4,5:1 (3:1 para indicadores no textuales). Por eso `daylight`
+usa la misma familia dos escalones más oscura. Cualquier token de color nuevo
+se mide antes de darlo por bueno.
+
+## Marca CO.DE Academy en la interfaz
+
+`components/Brand.jsx`: `BrandMark` (glifo), `Wordmark` (`CO.DE ACADEMY`, punto
+en `--brand`) y `HudCorners` (las cuatro escuadras). Es la misma identidad que
+`studio/content/manim_extensions/code_brand.py` estampa en cada video —
+wordmark con el punto ámbar, escuadras HUD, ámbar → naranja— para que consola y
+render se lean como una sola cosa. Divergencia consciente: el video usa
+Rajdhani; la web, la display que ya carga (Space Grotesk).
+
+Los iconos (`public/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`,
+`icon-192/512.png`) los genera `frontend/tools/brand_icons.mjs`, que es la
+fuente única de la geometría; el JSX de `BrandMark` la repite y debe seguirla.
+**Trampa:** `*.png` está ignorado en todo el repo y `public/*.png` vive de una
+excepción explícita en `.gitignore`. Si esa línea desaparece, los iconos no
+llegan al VPS y producción se queda sin favicon sin que nada falle.
 
 ## Capas de apilamiento (z-index)
 
@@ -60,15 +86,21 @@ fondo nueva va con z negativo.
 
 ## Componentes
 
-La base vive en `src/components/ui/` (`button`, `dialog`, `input`, `select`,
-`tooltip`), sobre Radix + `class-variance-authority` + `tailwind-merge`.
-**Ampliar esa base, no inventar otra.** Variantes de `Button`: `primary`
-(una por vista), `default`, `outline`, `ghost`, `accent`, `danger`.
+La base vive en `src/components/ui/` (`button`, `dialog`, `input` +
+`PasswordInput`, `select`, `tooltip`), sobre Radix +
+`class-variance-authority` + `tailwind-merge`. **Ampliar esa base, no inventar
+otra.** Variantes de `Button`: `primary` (una por vista), `default`, `outline`,
+`ghost`, `accent`, `danger`.
 
 Compartidos por varias vistas: `CategoryBrowser` (acordeón + búsqueda global
 de Aprender y Animaciones), `DeleteButton` (destructivo en dos toques),
-`GlowCard` (login y cambio de contraseña), `OrbitGlyph` (estado del sistema
-como ornamento), `ErrorBoundary`.
+`AuthCard` + `Field` (login y cambio de contraseña), `Brand`, `OrbitGlyph`
+(estado del render como ornamento — **no es el logotipo**), `ErrorBoundary`.
+
+Se borró `GlowCard`: pintaba un resplandor `hsl()` morado fijo ajeno a los
+temas, dejaba la tarjeta en un velo del 4,5 % sobre el cielo (el "está todo
+oscuro" del encargo 1) y montaba un `pointermove` global más un `<style>`
+inyectado por instancia.
 
 ## Accesibilidad — mínimos que se verifican
 

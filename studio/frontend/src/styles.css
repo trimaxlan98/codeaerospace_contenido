@@ -13,10 +13,15 @@
    vez de Inter. Todo eso se elimino el 2026-08-15; los tokens de borde
    viven ahora en theme.css con valores reales. */
 
-/* Pantalla de arranque (antes de saber si hay sesion). */
+/* Pantalla de arranque (antes de saber si hay sesion): marca + rotulo como un
+   solo bloque centrado. Con `display:grid; place-items:center` cada hijo caia
+   en su propia fila y el glifo quedaba muy por encima del texto. */
 .boot {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   height: 100%;
   font-family: var(--font-mono);
   letter-spacing: 0.3em;

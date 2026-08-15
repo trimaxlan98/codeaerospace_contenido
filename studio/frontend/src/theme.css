@@ -23,6 +23,8 @@
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-err: var(--err);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
 
   --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif;
@@ -57,6 +59,10 @@
     --ok: #10b981;
     --warn: #f59e0b;
     --err: #f43f5e;
+    /* Ambar CO.DE Academy: NO es el acento del tema, es la marca del canal
+       (la misma de code_brand.py). Constante en los tres temas oscuros. */
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #030712;
     --grad-b: #0a122c;
     --grad-c: #111e43;
@@ -91,6 +97,8 @@
     --ok: #34d399;
     --warn: #f59e0b;
     --err: #ff6b6b;
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #010c08;
     --grad-b: #042618;
     --grad-c: #063922;
@@ -125,6 +133,8 @@
     --ok: #10b981;
     --warn: #e8b84b;
     --err: #e86a6a;
+    --brand: #f59e0b;
+    --brand-2: #ea580c;
     --grad-a: #06010d;
     --grad-b: #190a2c;
     --grad-c: #2a1144;
@@ -153,12 +163,22 @@
     --ink: #0f172a;
     --muted: #475569;
     --faint: #94a3b8;
-    --accent: #0ea5e9;      /* signature: Frosted Ice Sky */
+    /* Contraste AA en el unico tema claro: los tonos 500 de la paleta (que
+       funcionan sobre lienzo oscuro) fallan sobre #f1f5f9 — blanco sobre
+       #0ea5e9 daba 2,8:1 en el boton primario y `text-ok` 2,3:1. Aqui la
+       misma familia de color, dos escalones mas oscura, para pasar 4,5:1
+       como texto y 3:1 como indicador. */
+    --accent: #0369a1;      /* signature: Frosted Ice Sky */
     --accent-ink: #ffffff;
-    --cyan: #0284c7;
-    --ok: #10b981;
-    --warn: #ca8a04;
-    --err: #ef4444;
+    --cyan: #1d4ed8;
+    --ok: #047857;
+    --warn: #8f6106;
+    --err: #b91c1c;
+    /* El ambar del canal sobre lienzo claro da 1,6:1 — ilegible. En el unico
+       tema claro la marca se oscurece (amber-700 / orange-700) para pasar AA
+       sin dejar de ser la misma marca. */
+    --brand: #b45309;
+    --brand-2: #9a3412;
     --grad-a: #f1f5f9;
     --grad-b: #e2e8f0;
     --grad-c: #cbd5e1;

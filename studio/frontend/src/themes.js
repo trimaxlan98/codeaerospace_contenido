@@ -8,7 +8,7 @@ export const THEMES = [
   { id: 'nebula', name: 'Nebula Glass', swatch: ['#07020d', '#d946ef', '#a855f7'] },
   // Unico tema claro: la muestra debe enseñar su lienzo real (#f1f5f9), no
   // uno oscuro — con el swatch anterior parecia otro tema oscuro mas.
-  { id: 'daylight', name: 'Ice Glass', swatch: ['#f1f5f9', '#0ea5e9', '#0284c7'] },
+  { id: 'daylight', name: 'Ice Glass', swatch: ['#f1f5f9', '#0369a1', '#1d4ed8'] },
 ]
 
 export function currentTheme() {
