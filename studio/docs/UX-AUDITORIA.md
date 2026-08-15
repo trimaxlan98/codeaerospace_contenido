@@ -253,3 +253,56 @@ siguen resueltos; lo que sigue es nuevo.
 **Estado:** 1–19 corregidos en la rama `ui/rediseno-empresarial` (sprints 0 y
 1). El detalle de cada arreglo y lo que queda vivo están en
 `UX-REDISENO.md`; las reglas para no repetirlos, en `DESIGN-SYSTEM.md`.
+
+---
+
+# Tercera auditoría — 2026-08-15 (tras los sprints 0–6)
+
+Automatizada con Playwright sobre la app real: **6 vistas × 4 temas = 24
+combinaciones**, más una medición de contraste de **12 pares de tokens en cada
+tema (48 comprobaciones)**, el recorrido de foco por teclado y el
+comportamiento de los popovers. El arnés vive en el scratchpad de la sesión;
+lo que mide está descrito aquí para poder repetirlo.
+
+## Qué se midió y con qué criterio
+
+| Dimensión | Criterio |
+|-----------|----------|
+| Contraste texto/fondo | AA: 4,5:1 texto normal · 3:1 indicadores no textuales. Los velos translúcidos se componen sobre el lienzo antes de medir |
+| Foco | Todo elemento alcanzable con Tab debe tener `outline` o `box-shadow` visible |
+| Desborde | `scrollWidth − clientWidth ≤ 1 px` en el documento, escritorio y móvil |
+| Consola | Cero `pageerror` y cero `console.error` en las 24 combinaciones |
+| Popovers | Dentro del viewport, recibiendo el clic (nada encima) y cerrando con Escape |
+
+## Resultado
+
+- **Contraste: 48/48** tras corregir un hallazgo (abajo). El resto de los
+  temas iba sobrado: el mínimo del tema oscuro por defecto es 3,67:1
+  (`faint`) y el máximo 16,7:1 (`ink`).
+- **Foco: 18/18** elementos con indicador visible al tabular. Confirma que el
+  `border-color/outline-color: transparent !important` que mató el foco (P0-1
+  de la auditoría anterior) sigue enterrado.
+- **Desborde: 0** en las 24 combinaciones, escritorio y móvil.
+- **Consola: 0 errores** en las 24 combinaciones.
+- **Popovers: correctos** — dentro del viewport, por encima del contenido y
+  cerrando con Escape. El criterio 4 del brief («sin menús que se sobrepongan»)
+  se da por cumplido: el único popover hecho a mano, el selector de temas de la
+  barra, desapareció en el sprint 3; los que quedan son de Radix con portal.
+
+## Hallazgo corregido
+
+**`daylight · faint / canvas = 2,34:1`** (mínimo 3:1). El único tema claro
+usaba slate-400 (`#94a3b8`) sobre `#f1f5f9` para el texto terciario — fechas,
+unidades, contadores —, que es texto real y no adorno. Corregido a slate-500
+(`#64748b`): **4,34:1**, AA incluso como texto normal.
+
+Es el mismo patrón que ya obligó a oscurecer `accent`, `ok` y `brand` en el
+sprint 2: **en el tema claro los tonos 400–500 de la paleta no valen**. La
+regla está en `DESIGN-SYSTEM.md`.
+
+## Restos benignos que se dejan a propósito
+
+- `api.metrics` no lo llama nadie: las métricas llegan por el stream SSE. Se
+  conserva porque el endpoint existe y es la vía de consulta puntual.
+- `components/ui/tooltip.jsx` no se usa todavía. Es parte de la base del
+  sistema de diseño que `DESIGN-SYSTEM.md` manda ampliar, no código muerto.

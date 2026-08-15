@@ -34,7 +34,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ✅ hecho 2026-08-15 | ver abajo |
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ✅ hecho 2026-08-15 | ver abajo |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
-| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; el popover de temas de la barra desaparece en el sprint 3; falta la pasada vista por vista y el resto de solapes) | — |
+| 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | ✅ hecho 2026-08-15 | ver `UX-AUDITORIA.md` |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -583,3 +583,22 @@ por bloque, *Copiar* dejando el código en el portapapeles, avance guardado al
 50 % y **retomado tras recargar**, marcado como leída al terminar, salto de
 categoría, y *Probar* llevando el código real al Estudio). Sin errores de
 consola.
+
+---
+
+## Sprint 8 — auditoría de temas y solapes (hecho 2026-08-15)
+
+Criterios 3 y 4 del brief. Se ejecutó como **auditoría automatizada**, no como
+revisión a ojo: 6 vistas × 4 temas, 12 pares de tokens por tema, recorrido de
+foco por teclado y comportamiento de popovers. Método, criterios y resultado
+completo en `UX-AUDITORIA.md` (tercera auditoría).
+
+Resumen: **48/48** pares de contraste tras corregir uno (`faint` del tema
+claro, 2,34:1 → 4,34:1), **18/18** elementos con foco visible, **0** desbordes
+horizontales y **0** errores de consola en las 24 combinaciones, y popovers
+dentro del viewport, por encima del contenido y cerrando con Escape.
+
+El criterio 4 («sin menús que se sobrepongan») se cumple por construcción
+desde el sprint 3: el único popover hecho a mano —el selector de temas de la
+barra— se sustituyó por tarjetas dentro de Configuración; los que quedan son
+de Radix con portal.
