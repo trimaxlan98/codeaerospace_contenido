@@ -1,5 +1,5 @@
 // Borrado en dos toques: el primero arma, el segundo confirma (se desarma
-// solo tras un rato). Compartido por Library y Projects.
+// solo tras un rato). Compartido por Renders y Proyectos.
 
 import { useEffect, useState } from 'react'
 import { Button } from './ui/button.jsx'

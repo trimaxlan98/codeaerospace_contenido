@@ -23,13 +23,17 @@ export const DEFAULTS = {
 
 // Ids de vista validos como pantalla de inicio (el mismo orden de la nav).
 export const LANDING_VIEWS = [
-  { id: 'studio', label: 'Estudio' },
   { id: 'projects', label: 'Proyectos' },
-  { id: 'library', label: 'Biblioteca' },
-  { id: 'lessons', label: 'Aprender' },
-  { id: 'animations', label: 'Animaciones' },
+  { id: 'studio', label: 'Estudio' },
+  { id: 'renders', label: 'Renders' },
+  { id: 'learn', label: 'Aprender' },
   { id: 'admin', label: 'Admin' },
 ]
+
+// El sprint 4 fusiono Animaciones en Aprender y renombro Biblioteca a
+// Renders. Una preferencia guardada con el id viejo se traduce en vez de
+// caer al valor por defecto sin explicacion.
+const LANDING_ALIAS = { library: 'renders', lessons: 'learn', animations: 'learn' }
 
 function read() {
   try {
@@ -38,6 +42,7 @@ function read() {
     for (const k of Object.keys(DEFAULTS)) {
       if (raw[k] !== undefined && typeof raw[k] === typeof DEFAULTS[k]) out[k] = raw[k]
     }
+    out.landing = LANDING_ALIAS[out.landing] || out.landing
     if (!LANDING_VIEWS.some((v) => v.id === out.landing)) out.landing = DEFAULTS.landing
     if (!['auto', 'off'].includes(out.motion)) out.motion = DEFAULTS.motion
     return out

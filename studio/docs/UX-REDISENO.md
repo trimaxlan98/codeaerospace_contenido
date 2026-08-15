@@ -30,9 +30,9 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 1 | Flujo de cursos: índice por familias, duración de clip, narración | ✅ hecho 2026-08-15 | ver abajo |
 | 2 | Login legible con marca CO.DE Academy + favicon propio (encargos 1 y 2) | ✅ hecho 2026-08-15 | ver abajo |
 | 3 | Vista `#/configuracion`: tema, contraseña, sesión, preferencias fuera de la barra (encargo 8) | ✅ hecho 2026-08-15 | ver abajo |
-| 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ⏳ pendiente | — |
+| 4 | Mapa de navegación: fusionar secciones que no se justifican por tarea (encargo 7) | ✅ hecho 2026-08-15 | ver abajo |
 | 5 | Rutas guiadas para no-programadores sin perder el editor (encargo 9) | ⏳ pendiente | — |
-| 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ⏳ pendiente | — |
+| 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | 🟡 parcial (la continuidad la resuelve la fusión del sprint 4; falta la parte de lectura y progreso) | — |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ⏳ pendiente | — |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | 🟡 parcial (temas saneados en el sprint 0; contraste AA del tema claro corregido en el sprint 2; el popover de temas de la barra desaparece en el sprint 3; falta la pasada vista por vista y el resto de solapes) | — |
 
@@ -368,3 +368,69 @@ secciones en 1440×900 y 390×844, tema oscuro y claro. Sin errores de consola
 - La web usa Space Grotesk donde el video usa Rajdhani: el wordmark de la
   consola no es tipográficamente idéntico al del render. Traer la TTF del repo
   a `public/` es viable si algún día se quiere fidelidad exacta.
+
+---
+
+## Sprint 4 — el mapa de navegación (hecho 2026-08-15)
+
+Criterio 7 del brief: *que las secciones tengan sentido; fusionar si hace
+falta*. La barra tenía seis entradas y dos de ellas no se sostenían.
+
+### Aprender + Animaciones eran la misma sección partida en dos
+
+El hallazgo que decide el sprint está en el backend, no en la interfaz:
+`animations.py` dice que **el id de una animación es 1:1 el de su lección**
+(misma categoría, mismo `NN-slug`) y las dos vistas leían el **mismo**
+`studio/content/lessons/categories.yaml`. Eran dos proyecciones de un solo
+índice. En la práctica hoy no se solapan —18 lecciones en las 4 categorías
+`manim-*` (la teoría) y 89 animaciones en 13 categorías de dominio (los
+ejemplos)— pero eso empeoraba las cosas, no las mejoraba: **buscar "órbita" en
+Aprender no encontraba la animación de órbita**, porque cada pestaña buscaba
+solo en su mitad del índice.
+
+Ahora hay una sola sección **Aprender** (`Learn.jsx`) con:
+
+- un índice con dos grupos, *Curso de Manim* y *Animaciones por dominio*;
+- **una sola búsqueda** que recorre los dos;
+- un lector que enseña lo que el item tenga: markdown con progreso de lectura
+  y navegación anterior/siguiente, o el script con *Abrir en el Estudio*. Si
+  algún día un id trae las dos cosas —lo que el backend contempla— aparece un
+  conmutador Lección/Animación en la cabecera del lector.
+
+`CategoryBrowser` pasa de `categories` a `groups`; el alta de secciones y
+animaciones vive en el grupo que le corresponde.
+
+### Biblioteca era un nombre prestado y una lista partida
+
+*Biblioteca* chocaba con la biblioteca de contenido de Aprender, y la vista
+partía la misma lista en dos bloques: una rejilla de videos y, debajo, una
+lista de "fallidos / cancelados". Son **el mismo objeto (un job) en distinto
+estado**. Ahora es **Renders** (`Renders.jsx`): una rejilla con filtro de
+estado (Con video / Fallidos / Todos), la cuota de disco reducida a una línea
+de contexto —la versión con historia sigue en Admin → Recursos— y el error del
+job visible en su propia tarjeta.
+
+### La unión con Proyectos es un enlace, no una fusión
+
+El brief permitía fusionar Biblioteca ↔ Proyectos. No se hizo, y la razón es
+que responden a tareas distintas: Proyectos es *construir un curso*, Renders
+es *el archivo de todo lo que ha salido de la cola*, incluidos los renders
+sueltos que no pertenecen a ningún proyecto. Lo que sí faltaba era el camino
+entre ambas: cada tarjeta de Renders dice de qué curso es y **lleva a él**.
+
+### Nav resultante
+
+`Proyectos · Estudio · Renders · Aprender · Admin` (+ Configuración), de seis
+entradas a cinco, con Proyectos primero porque es donde vive el trabajo real.
+
+**Enlaces antiguos:** `#/animaciones/<id>` y `#/biblioteca` siguen funcionando
+(alias en `router.js`), y una preferencia de *vista al abrir* guardada con un
+id viejo (`library`, `lessons`, `animations`) se traduce en vez de caer al
+valor por defecto sin explicación.
+
+**Verificación:** `vite build` verde, `pytest -q` 149/149, QA Playwright 17/17
+checks en 1440×900 y 390×844 (nav de 5 entradas y en orden, los dos grupos de
+Aprender, búsqueda global cruzando ambos, lector de lección y de animación,
+los dos alias de ruta, filtro de estado de Renders, error visible en la
+tarjeta fallida, salto de tarjeta a proyecto, sin scroll horizontal en móvil),
+sin errores de consola.
