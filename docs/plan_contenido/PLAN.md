@@ -46,15 +46,17 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 16 | Relatividad y el GPS | original (divulgacion pura, fisica aplicada a ingenieria) | `relatividad.py` | publicado (PR #13) |
 | 17 | Tsiolkovsky: la tirania del cohete | original (divulgacion pura, astronautica) | `cohete.py` | publicado (PR #15) |
 | 18 | Sistemas distribuidos: la nube por dentro | original (divulgacion, computo distribuido) | `distribuido.py` | publicado (PR #16) |
+| 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | en produccion (rama `curso/criptografia`) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
 esta tabla); del 13 en adelante, el numero de archivo ya es correlativo
 (`curso-09-enlace.md` es el curso 13; `curso-11-matematicas-naturaleza.md`
 es el curso 14, `curso-12-caos.md` el 15, `curso-13-relatividad-gps.md`
-el 16, `curso-14-tsiolkovsky.md` el 17 y `curso-15-distribuidos.md` el
-18 — el `curso-10` lo ocupa la familia Aerodinamica, que corre en su
-propia rama con otro formato).
+el 16, `curso-14-tsiolkovsky.md` el 17, `curso-15-distribuidos.md` el
+18 y `curso-17-criptografia.md` el 19 — el `curso-10` lo ocupa la
+familia Aerodinamica y el `curso-16` la familia Electromagnetismo, que
+tienen otro formato).
 
 ## Familia "Aerodinamica" (2026-08-14, formato nuevo)
 
@@ -146,7 +148,8 @@ La cola original esta agotada. Los proximos cursos se eligen tema a tema.
 
 | Prio | Curso de video (8 clips) | Lecciones fuente (Academy) | Libreria nueva | Estado |
 |------|--------------------------|----------------------------|----------------|--------|
-| — | _(por definir)_ | | | |
+| 1 | Criptografia: el arte de guardar secretos (curso 19) | original (divulgacion, seguridad/telecom) | `cripto.py` | en produccion (ver tabla de arriba) |
+| 2 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente natural con Criptografia y con "Cerrar el enlace") | `informacion.py` | en cola |
 
 Criterio de prioridad: (1) riqueza visual con primitivas existentes o
 factibles, (2) tamaño de audiencia, (3) actualidad del tema, (4) no
