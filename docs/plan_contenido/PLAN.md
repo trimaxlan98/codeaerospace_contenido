@@ -125,6 +125,21 @@ Storyboard y contrato de la libreria: `curso-16-electromagnetismo.md`.
 | 4.2 | El enlace con el satelite | 4 | publicado: qh en prod, narrado y muxeado |
 | 4.3 | El clima, el ruido y el margen | 4 | publicado: qh en prod, narrado y muxeado |
 
+## Marca: intro y cierre para posproduccion (2026-08-14)
+
+Proyecto especial **`marca-intro-y-cierre`** (no es una leccion): dos clips
+de identidad que se unen en POSPRODUCCION al inicio y al final de cada
+curso NUEVO. Los cursos ya publicados no se re-renderizan. Sin narracion;
+ambos clips arrancan y terminan con >=0.5 s de fondo limpio `#05070a`
+para que el empalme (`intro.mp4 + clips narrados + cierre.mp4`) sea un
+concat invisible. El aviso de duracion 28-45 s de `render_local.py` NO
+aplica a este proyecto. Diseño: `marca-intro-y-cierre.md`.
+
+| Clip | Pieza | Duracion | Estado |
+|------|-------|----------|--------|
+| 1 | Intro "Encendido" | 10.5 s | publicado: qh en prod; `exports/marca-intro-y-cierre/intro.mp4` |
+| 2 | Cierre "Despedida" | 9.0 s | publicado: qh en prod; `exports/marca-intro-y-cierre/cierre.mp4` |
+
 ## Cola de cursos nuevos (desmenuzado de la Academy)
 
 La cola original esta agotada. Los proximos cursos se eligen tema a tema.
