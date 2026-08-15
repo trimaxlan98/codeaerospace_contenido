@@ -1,0 +1,24 @@
+{
+  "name": "Teoría de la información: los bits de Shannon",
+  "description": "Curso de divulgación en 8 clips sobre cómo se mide la información: el bit como sorpresa (moneda, dado, baraja, 20 preguntas), la entropía de Shannon medida sobre un texto real en español (3.96 bits/símbolo medidos frente a 4.75 uniforme), el código de Huffman construido en vivo (23 bits frente a 33), la redundancia y por qué comprime un zip (RLE medido) y un jpg (cuantización 8→2 bits), el canal con ruido y su capacidad 1−h(p), Shannon–Hartley con un transpondedor de 36 MHz (124.5 Mb/s a 10 dB), Hamming(7,4) corrigiendo un error en el diagrama de tres círculos y el techo de Shannon con los puntos reales de DVB-S2. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-un-bit-es-una-sorpresa.py", "title": "1 · Un bit es una sorpresa", "scene": "Clip1",
+     "final_state": "La curva de sorpresa −log2 p con los tres puntos (moneda 1 bit, dado 2.58, baraja 5.70) y el árbol de preguntas con el tag '2^20 = 1 048 576 objetos'; HUD 'MODULO 01'."},
+    {"file": "clips/02-la-entropia.py", "title": "2 · La entropía: cuánto hay que decir", "scene": "Clip2",
+     "final_state": "El histograma de los 27 símbolos del texto de muestra con 'H = 3.96 bits/símbolo' medido y la línea punteada del uniforme (4.75) arriba; HUD 'MODULO 02'."},
+    {"file": "clips/03-huffman.py", "title": "3 · Huffman: decir lo justo", "scene": "Clip3",
+     "final_state": "El árbol de Huffman de ABRACADABRA con los códigos en las hojas y la comparación '23 bits frente a 33' con la longitud media 2.09 frente a H = 2.04; HUD 'MODULO 03'."},
+    {"file": "clips/04-redundancia-y-compresion.py", "title": "4 · Redundancia: por qué comprime un zip", "scene": "Clip4",
+     "final_state": "El icono binario con sus bits crudos frente a RLE y la esfera en 8 bits frente a 4 niveles lado a lado con sus bits y el tag '÷4'; HUD 'MODULO 04'."},
+    {"file": "clips/05-el-canal-con-ruido.py", "title": "5 · El canal con ruido", "scene": "Clip5",
+     "final_state": "La tira de 64 bits con los volteados en rojo y contados, el esquema del BSC y la curva de capacidad con 'C(0.1) = 0.531 bits/uso'; HUD 'MODULO 05'."},
+    {"file": "clips/06-shannon-hartley.py", "title": "6 · Shannon–Hartley: el techo del enlace", "scene": "Clip6",
+     "final_state": "La curva C = B·log2(1+S/N) del transpondedor de 36 MHz con los puntos 10 dB → 124.5 Mb/s y 20 dB → 239.7 Mb/s y la fórmula; HUD 'MODULO 06'."},
+    {"file": "clips/07-hamming.py", "title": "7 · Corregir sin volver a preguntar: Hamming", "scene": "Clip7",
+     "final_state": "El diagrama de tres círculos de Hamming(7,4) con el error corregido (círculos verdes) y la tabla de tasas y BER medidas (sin código, repetición ×3, Hamming); HUD 'MODULO 07'."},
+    {"file": "clips/08-el-techo-de-shannon.py", "title": "8 · El techo de Shannon", "scene": "Clip8",
+     "final_state": "Cierre del curso a pantalla limpia: «La información no se adivina.» sobre «Se mide.» en violeta; HUD 'MODULO 08'."}
+  ]
+}
