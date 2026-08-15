@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 1.2 La corriente y el campo magnético",
+  "description": "Lección 1.2 del curso Electromagnetismo (módulo 1: los campos quietos), en 4 clips animados —uno por subtema—: la brújula de Oersted y el campo que rodea a la corriente, Ampère y el solenoide como fábrica de campo de laboratorio, la Tierra como imán de dipolo que muere con el cubo de la distancia, y el magnetorquer que gira un satélite sin gastar combustible. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-brujula-que-se-tuerce.py",
+      "title": "1 · La brújula que se tuerce",
+      "scene": "Clip1",
+      "final_state": "Hilo de Oersted visto de frente (corriente en rojo saliendo del papel) rodeado de sus círculos de campo en verde, cada vez más finos, con las seis brújulas tangentes; cifra '2e-7 T con 1 A a 1 m' en cian arriba a la derecha y el pie del 1/r; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-ampere-y-el-solenoide.py",
+      "title": "2 · Ampère y el solenoide",
+      "scene": "Clip2",
+      "final_state": "Corte del solenoide con cruces arriba (corriente entrando), puntos abajo (saliendo), etiquetas 'entra'/'sale' en rojo y el campo uniforme en verde solo por dentro; cifra '12.6 mT con 1000 esp/m y 10 A' en cian y el pie del campo de laboratorio; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-tierra-es-un-iman.py",
+      "title": "3 · La Tierra es un imán",
+      "scene": "Clip3",
+      "final_state": "Curva B(r) del dipolo terrestre cayendo con el cubo entre 1 y 7 radios terrestres, con el punto de 31.2 uT en superficie (verde), la guía vertical de GEO a 6.6 radios y la cifra '0.11 uT en GEO' (cian); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-girar-un-satelite-sin-combustible.py",
+      "title": "4 · Girar un satélite sin combustible",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La Tierra empuja gratis.» sobre «Solo hay que saber pedirle.» en cian, con el pie del gancho hacia la fuerza de Lorentz; HUD 'MODULO 04'."
+    }
+  ]
+}

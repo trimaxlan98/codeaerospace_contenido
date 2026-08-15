@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 3.2 La reflexión y la onda estacionaria",
+  "description": "Lección 3.2 del curso Electromagnetismo (módulo 3: guiar y soltar la onda), en 4 clips animados —uno por subtema—: el coeficiente Γ que mide lo que devuelve una frontera de impedancias, la onda estacionaria que hierve sin viajar y el SWR que mide el instalador, el transformador de λ/4 que apaga el reflejo poniendo dos reflejos en contrafase, y la guía de onda como pasillo con paredes y su frecuencia de corte. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-gamma-lo-que-devuelve-la-frontera.py",
+      "title": "1 · Γ: lo que devuelve la frontera",
+      "scene": "Clip1",
+      "final_state": "A la izquierda, la frontera 50 Ω → circuito abierto: la flecha reflejada roja tan gruesa como la incidente violeta, con el rótulo cian «100 %», y nada al otro lado; a la derecha, la tabla de los cuatro casos con su Γ en cian (adaptada 0.00, salto a 75 +0.20, cortocircuito −1.00, abierto +1.00); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-onda-que-no-viaja.py",
+      "title": "2 · La onda que no viaja",
+      "scene": "Clip2",
+      "final_state": "Onda estacionaria de Γ = 0.2: la onda violeta dentro de su envolvente cian, dos niveles punteados con los puntos «max» y «min» marcados, y a la derecha la fórmula cian SWR = V_max/V_min = 1.50; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-transformador-de-lambda-cuartos.py",
+      "title": "3 · El transformador de λ/4",
+      "scene": "Clip3",
+      "final_state": "Los tres tramos de línea escalonados y rotulados 50 / 61.2 / 75, el tramo central recuadrado en cian con su llave de λ/4 debajo, y arriba las cifras cian «reflejo: 4 % -> 0 %» y SWR = 1.00; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-guia-de-onda.py",
+      "title": "4 · La guía de onda",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Guiar ya sabes.» sobre «Falta soltar.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 1.3 La fuerza de Lorentz",
+  "description": "Lección 1.3 del curso Electromagnetismo (módulo 1: los campos quietos), en 4 clips animados —uno por subtema—: la fuerza q·v×B que no trabaja y el giro de Larmor, el espejo magnético que atrapa partículas en una botella, los cinturones de Van Allen frente a las órbitas LEO/GPS/GEO, y el tubo de ondas progresivas que amplifica la señal a bordo del satélite. Cierra el módulo 1 con el gancho hacia los campos en movimiento. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-fuerza-que-no-empuja.py",
+      "title": "1 · La fuerza que no empuja: desvía",
+      "scene": "Clip1",
+      "final_state": "Círculo de Larmor sobre el fondo de puntos verdes (B saliendo del papel) con las parejas v tangente / F al centro en tres posiciones y la columna de cifras a la derecha: v = 10000 km/s, B = 50 uT, radio = 1.14 m, giro a 1.4 MHz; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-atrapados-en-el-campo.py",
+      "title": "2 · Atrapados en el campo",
+      "scene": "Clip2",
+      "final_state": "Botella magnética completa: líneas verdes apretadas en los extremos, bobinas, la espiral tenue y la partícula roja en reposo en el centro tras dos recorridos con rebote; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-los-cinturones-y-las-orbitas.py",
+      "title": "3 · Los cinturones y las órbitas",
+      "scene": "Clip3",
+      "final_state": "Mapa a escala con la Tierra, los dos cinturones de Van Allen en rojo tenue y las tres órbitas cian punteadas, con la leyenda a la derecha: LEO 550 km, GPS 20200 km, GEO 35786 km y '1 vuelta = 23.9 h'; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-amplificador-del-satelite.py",
+      "title": "4 · El amplificador del satélite",
+      "scene": "Clip4",
+      "final_state": "Cierre del módulo 1 a pantalla limpia: «Los campos quietos ya son tuyos.» sobre «Ahora vamos a moverlos.» en cian, con el pie del gancho hacia el módulo 2; HUD 'MODULO 04'."
+    }
+  ]
+}

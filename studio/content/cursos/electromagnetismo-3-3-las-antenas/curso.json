@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 3.3 Las antenas",
+  "description": "Lección 3.3 del curso Electromagnetismo (módulo 3: guiar y soltar la onda), en 4 clips animados —uno por subtema—: el dipolo de media onda que por fin oscila y suelta frentes separados λ, el patrón de radiación y la ganancia como robo de direcciones (2.15 dBi integrados del propio patrón), la parabólica que manda todos los rayos al foco con la ley de la reflexión de verdad, y el array en fase cuyo haz gira sin que nada se mueva. Cierra el módulo 3 con el gancho hacia el espacio. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-carga-que-oscila-radia.py",
+      "title": "1 · La carga que oscila radia",
+      "scene": "Clip1",
+      "final_state": "Dipolo de media onda radiando tres frentes violetas, con la llave λ entre los dos primeros frentes, la llave λ/4 sobre el brazo superior y la cifra '100 MHz -> dipolo de 1.5 m' en la esquina superior derecha; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-patron-concentrar-no-crear.py",
+      "title": "2 · El patrón: concentrar, no crear",
+      "scene": "Clip2",
+      "final_state": "Patrón polar del dipolo de media onda (lóbulos horizontales, antena roja vertical al centro) con dos flechas violetas hacia los máximos y la cifra 'D = 1.64 = 2.15 dBi' junto al lóbulo derecho; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-parabolica.py",
+      "title": "3 · La parabólica",
+      "scene": "Clip3",
+      "final_state": "Parábola con los seis rayos violetas reflejados al foco, el punto rojo del foco etiquetado 'LNB' y la cifra '60 cm a 12 GHz -> 35.3 dBi' en la esquina superior derecha; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-array-en-fase.py",
+      "title": "4 · El array en fase",
+      "scene": "Clip4",
+      "final_state": "Cierre del módulo a pantalla limpia: «Miles de antenas quietas» sobre «apuntando a un satélite que corre.» en cian, con el pie del gancho hacia la ionosfera; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 4.1 La ionosfera",
+  "description": "Lección 4.1 del curso Electromagnetismo (módulo 4: el enlace por el espacio), en 4 clips animados —uno por subtema—: el techo eléctrico que el Sol enciende sobre la atmósfera con sus capas D/E/F, el espejo de la onda corta que da la vuelta al mundo a saltos, la ventana que se abre al subir la frecuencia y que hace posible el satcom, y el peaje en metros que la ionosfera le cobra al GPS —y que dos frecuencias permiten cancelar—. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-techo-electrico.py",
+      "title": "1 · El techo eléctrico",
+      "scene": "Clip1",
+      "final_state": "Perfil Ne(h) con la curva de día en ámbar, las franjas D/E/F rotuladas a la derecha y la curva de noche fantasma superpuesta, con la capa D visiblemente vacía de noche; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-espejo-de-la-onda-corta.py",
+      "title": "2 · El espejo de la onda corta",
+      "scene": "Clip2",
+      "final_state": "La Tierra curva con la capa F punteada y tres saltos violeta techo-suelo-techo completos sobre ella, con la cifra '7339 km en 3 saltos' rotulada debajo; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-ventana-al-espacio.py",
+      "title": "3 · La ventana al espacio",
+      "scene": "Clip3",
+      "final_state": "Tres rayos desde el mismo punto del suelo al mismo ángulo: el de 5 MHz rebotando en la capa, los de 15 y 300 MHz cruzándola, cada uno rotulado con su frecuencia y su comportamiento; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-peaje-del-gps.py",
+      "title": "4 · El peaje del GPS",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La ionosfera cobra peaje.» sobre «El GPS paga con dos monedas.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -279,7 +279,12 @@ class _Anclada(VGroup):
         self._centro_original = self.get_center()
 
     def _desde(self, dx, dy):
-        return (self._centro_original + np.array([dx, dy, 0.0])
+        # (dx, dy) son coordenadas de CONSTRUCCION; se les suma solo el
+        # desplazamiento acumulado. Sumar el centro del bounding box (el
+        # error original) solo salia bien en piezas construidas centradas
+        # en ORIGIN; una pieza asimetrica (media cupula de pase_leo, la
+        # flecha k de onda_em) desplazaba todos sus localizadores.
+        return (np.array([dx, dy, 0.0])
                 + (self.get_center() - self._centro_original))
 
 
@@ -764,7 +769,7 @@ def atenuacion_lluvia(f_ghz, r_mm_h):
 
     gamma = k R^alpha, con k y alpha de la tabla embebida (10-40 GHz) e
     interpolados en log-log entre puntos. A 25 mm/h (chaparron fuerte):
-    1.1 dB/km en Ku bajo (12), 2.7 en el downlink Ka de 20 y 5.1 a 30 GHz
+    1.1 dB/km en Ku bajo (12), 2.8 en el downlink Ka de 20 y 5.1 a 30 GHz
     — la razon fisica de que la C aguante tormentas que tumban a la Ka.
     """
     f = float(f_ghz)
@@ -2629,7 +2634,11 @@ def onda_estacionaria(gamma=0.2, fase=0.0, n_ondas=2.0, ancho=6.4,
                                    np.zeros(muestras)])
     onda = _curva(pts, color_onda, grosor=2.6)
 
-    env = np.sqrt(1.0 + g * g + 2.0 * g * np.cos(2.0 * k * xs))
+    # Amplitud REAL de sin(kx-t) + g sin(kx+t): el termino cruzado va con
+    # signo MENOS (sin(a-b)+g sin(a+b) = (1+g) sin a cos b - (1-g) cos a
+    # sin b, y el modulo maximo en t es sqrt(1+g^2-2g cos 2kx)). Con el
+    # signo mas, la envolvente salia corrida lambda/4 de su propia onda.
+    env = np.sqrt(1.0 + g * g - 2.0 * g * np.cos(2.0 * k * xs))
     env = env / amplitud_max
     envolventes = VGroup()
     for s in (+1, -1):

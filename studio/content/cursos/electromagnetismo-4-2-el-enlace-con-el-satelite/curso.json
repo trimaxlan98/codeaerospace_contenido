@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 4.2 El enlace con el satélite",
+  "description": "Lección 4.2 del curso Electromagnetismo (módulo 4: el enlace por el espacio), en 4 clips animados —uno por subtema—: la órbita de Clarke, donde pedir que la vuelta dure un día sideral fija el radio en 42 164 km; la esfera que se reparte, con los 100 W de a bordo convertidos en femtovatios por metro cuadrado; GEO contra LEO, 65 veces la distancia en 36 dB y 239 ms contra 3.7; y el pase de un LEO, siete minutos útiles y una rampa de Doppler de +50 a −50 kHz que hay que corregir en vivo. El enlace contado como geometría física, no como contabilidad en decibelios. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-orbita-quieta.py",
+      "title": "1 · La órbita quieta",
+      "scene": "Clip1",
+      "final_state": "Mapa de órbitas a escala (Tierra con LEO, GPS y GEO punteadas en cian) con un satélite rojo aparcado en GEO unido a la Tierra por una línea violeta, y la leyenda cian a la derecha: LEO 550 km, GPS 20 200 km, GEO 35 786 km, radio 42 164 km y vuelta 23.9 h; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-esfera-que-se-reparte.py",
+      "title": "2 · La esfera que se reparte",
+      "scene": "Clip2",
+      "final_state": "Emisor rojo con cuatro frentes esféricos violetas (grosor cayendo con 1/r²), dos parches cian de igual arco sobre el primer y el último frente con sus cuñas punteadas al emisor, rotulados 100 % y 8 %, y las cifras a la derecha: 100 W a 35 786 km, 6.2 fW por m2 y reparto 205.1 dB; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-geo-contra-leo.py",
+      "title": "3 · GEO contra LEO",
+      "scene": "Clip3",
+      "final_state": "Mapa a escala con las órbitas LEO y GEO y sus satélites rojos a la izquierda, y a la derecha la tabla de dos columnas GEO/LEO: 35 786 km contra 550 km, 205.1 dB contra 168.8 dB, 239 ms contra 3.7 ms, con las dos líneas cian '65 x mas lejos' y '36.3 dB = 4 234 x mas potencia'; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-pase-siete-minutos.py",
+      "title": "4 · El pase: siete minutos",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «GEO espera quieto.» sobre «A LEO hay que cazarlo.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

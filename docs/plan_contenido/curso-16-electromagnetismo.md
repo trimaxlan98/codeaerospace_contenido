@@ -370,6 +370,45 @@ margen del enlace → el cierre de la familia.
 | 3 | El margen | SNR contra umbral; entra la tormenta y se lo come | curva de SNR cruzando el umbral y volviendo |
 | 4 | De la carga al bit | el recap de la familia entera, pieza a pieza | cadena carga→campo→onda→línea→antena→espacio→bit + cierre de familia |
 
+## Trampas propias (cosecha de las 12 lecciones)
+
+- **Un localizador debe anclar en coordenadas de CONSTRUCCIÓN, no en el
+  centro del bounding box.** `_Anclada._desde` sumaba el centro del grupo:
+  correcto solo si la pieza nace centrada en ORIGIN. Una pieza asimétrica
+  (la media cúpula de `pase_leo`, la flecha de marcha de `onda_em`)
+  desplazaba TODOS sus localizadores. Corregido en la librería; los
+  `punto_en` de `lineas_campo`/`tierra_iman` ya usaban la forma buena.
+- **La envolvente de `onda_estacionaria` llevaba el signo del término
+  cruzado invertido** (+2γcos2kx en vez de −2γcos2kx): quedaba corrida
+  λ/4 de su propia onda y la suma se le salía por arriba. La detectó el
+  clip 3.2.2 al ver que los localizadores de máximo/mínimo (correctos)
+  caían fuera de la envolvente pintada.
+- Un punto rotulado en el EXTREMO IZQUIERDO de un `haz_curvas` choca con
+  la etiqueta del eje Y (que vive sobre el origen): anclar el tag en
+  `DR`/`DOWN`, no en `UR`/`UP`.
+- `tag_junto` (Rajdhani fs 18) come los espacios en frases multi-palabra
+  («lazodeAmpère»): las etiquetas técnicas multi-palabra van en `tag_hud`
+  (Space Mono, ASCII).
+- Rajdhani no trae λ ni ²: un pie con «(D/λ)²» sale con glifos de
+  fallback. Reescribir con palabras o pasar a MathTex.
+- `to_corner(UR)` para cifras choca con el título y el corchete del HUD:
+  la convención de la familia es `to_corner(UR, buff=0.55).shift(DOWN*0.5)`.
+- Piezas con partes que se añaden a escena por separado no se apagan con
+  un `FadeOut` del padre (quedan en `scene.mobjects` a opacidad 0): se
+  apagan por partes.
+- `arcsin(-0.0)` con formato `:+.1f` imprime «-0.0 deg»: normalizar con
+  `+ 0.0` antes de formatear.
+- Asperezas documentadas y rodeadas SIN tocar la librería (candidatas a
+  limpieza futura): las líneas de `caja_gauss("magnetica")` no escalan
+  con `radio_superficie`; `condensador_ampere` trae unas `flechas_e`
+  estáticas que compiten con `e_a()`; las cargas de `dipolo_radiante` no
+  escalan con `largo_brazo` y van en ámbar sobre brazos rojos; el
+  termómetro de `cielo_ruido("suelo")` cruza el cono; `margen_enlace` no
+  acepta etiquetas de eje; el trayecto de `pase_leo` es elevación-vs-
+  tiempo (un pase cenital dibuja un pico, no una cúpula — fiel a la
+  física); las barras de `array_fases` saturan en 1.35 e invaden la
+  franja del pie con rampas grandes.
+
 ## Trampas heredadas (de Aerodinámica, aplican tal cual)
 
 - Piezas que se reconstruyen en animación se anclan a un submobject

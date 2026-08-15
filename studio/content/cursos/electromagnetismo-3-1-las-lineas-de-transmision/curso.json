@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 3.1 Las líneas de transmisión",
+  "description": "Lección 3.1 del curso Electromagnetismo (módulo 3: guiar y soltar la onda), en 4 clips animados —uno por subtema—: cuándo un cable deja de ser un cable y se vuelve línea de transmisión, el modelo del telegrafista y su impedancia característica Z₀ = √(L/C), los cortes del coaxial y la microstrip con el campo dentro, y la atenuación en decibelios que explica por qué el LNB vive en el foco del plato. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-cuando-el-cable-despierta.py",
+      "title": "1 · Cuando el cable despierta",
+      "scene": "Clip1",
+      "final_state": "El mismo cable con la señal de 1 GHz dentro, mostrando varias ondas completas y la etiqueta con su número, junto a la fórmula ℓ > λ/10; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-telegrafista.py",
+      "title": "2 · El telegrafista: Z0 = raíz(L/C)",
+      "scene": "Clip2",
+      "final_state": "Escalera LC con las bobinas y condensadores rotulados por rol, la fórmula Z0 = √(L/C) y las dos cifras 50 Ω (radiofrecuencia) y 75 Ω (televisión/satélite); HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-coaxial-y-microstrip.py",
+      "title": "3 · Coaxial y microstrip",
+      "scene": "Clip3",
+      "final_state": "Corte del coaxial (E radial ámbar, B circular verde, Z0 = 75 Ω calculado) junto al corte de la microstrip del LNB con su etiqueta; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-los-decibelios-que-cobra-el-cable.py",
+      "title": "4 · Los decibelios que cobra el cable",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Amplifica primero.» sobre «Cablea después.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

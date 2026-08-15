@@ -1,0 +1,32 @@
+{
+  "name": "Electromagnetismo · 2.2 Las ecuaciones de Maxwell",
+  "description": "Lección 2.2 del curso Electromagnetismo (módulo 2: el matrimonio de los campos), en 4 clips animados —uno por subtema—: las dos leyes de Gauss (la eléctrica tiene fuente, la magnética no), el término de corriente de desplazamiento que Maxwell añadió para tapar el agujero del condensador, los cuatro renglones juntos con la simetría dΦ_B/dt ↔ dΦ_E/dt resaltada, y la cuenta 1/√(μ₀ε₀) = 299 792 458 m/s que identificó la luz con el campo. Ejemplos apuntando a telecomunicaciones y satélites. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-las-dos-de-gauss.py",
+      "title": "1 · Las dos de Gauss",
+      "scene": "Clip1",
+      "final_state": "Los dos paneles de Gauss lado a lado: a la izquierda la carga con todas las flechas ámbar saliendo de la superficie y ∮E·dA = q/ε₀; a la derecha el imán con sus líneas verdes que salen y vuelven a entrar y ∮B·dA = 0, cada panel rotulado en cian ('flujo neto' / 'flujo cero'); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-termino-que-faltaba.py",
+      "title": "2 · El término que faltaba",
+      "scene": "Clip2",
+      "final_state": "El condensador con la corriente roja llegando a las placas, el lazo de Ampère verde a caballo del hueco y las flechas ámbar del campo E ya crecidas entre placas; abajo la ley completa con el sumando μ₀ε₀ dΦ_E/dt recuadrado en ámbar; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuatro-renglones.py",
+      "title": "3 · Cuatro renglones",
+      "scene": "Clip3",
+      "final_state": "Las cuatro ecuaciones en columna con su nombre a la izquierda, los dos términos de la simetría (−dΦ_B/dt de Faraday y μ₀ε₀ dΦ_E/dt de Maxwell) en cian y recuadrados; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-sorpresa-una-velocidad.py",
+      "title": "4 · La sorpresa: una velocidad",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «La luz no viaja por el campo.» sobre «La luz ES el campo.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}
