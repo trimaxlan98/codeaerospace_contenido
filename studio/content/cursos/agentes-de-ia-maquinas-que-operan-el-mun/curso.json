@@ -1,5 +1,5 @@
 {
-  "name": "Agentes de IA: máquinas que operan el mundo",
+  "name": "Inteligencia artificial · 3 Agentes de IA: máquinas que operan el mundo",
   "description": "Curso de divulgación en 8 clips sobre agentes de IA: del LLM que solo escribe al lazo percibir-razonar-actuar, las herramientas y sus contratos JSON, el patrón ReAct, los sistemas multi-agente, la prompt injection y los niveles de autonomía con sus frenos. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

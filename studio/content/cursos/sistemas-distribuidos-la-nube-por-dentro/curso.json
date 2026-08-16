@@ -1,5 +1,5 @@
 {
-  "name": "Sistemas distribuidos: la nube por dentro",
+  "name": "Información y cómputo · 3 Sistemas distribuidos: la nube por dentro",
   "description": "Curso de divulgación en 8 clips sobre cómo miles de máquinas ordinarias fingen ser una sola extraordinaria: la probabilidad de fallas (con 1000 máquinas al 99.9 %, un 63 % de que alguna esté caída ahora), los pisos físicos de latencia (113 ms a Tokio por fibra), los relojes lógicos de Lamport, la disyuntiva CAP durante una partición, los quórums de mayoría (W+R>N), la elección de líder al estilo Raft, el anillo de hash consistente y la disponibilidad por réplicas (nueve nueves). Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

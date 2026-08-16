@@ -1,5 +1,5 @@
 {
-  "name": "Teoría de la información: los bits de Shannon",
+  "name": "Información y cómputo · 1 Teoría de la información: los bits de Shannon",
   "description": "Curso de divulgación en 8 clips sobre cómo se mide la información: el bit como sorpresa (moneda, dado, baraja, 20 preguntas), la entropía de Shannon medida sobre un texto real en español (3.96 bits/símbolo medidos frente a 4.75 uniforme), el código de Huffman construido en vivo (23 bits frente a 33), la redundancia y por qué comprime un zip (RLE medido) y un jpg (cuantización 8→2 bits), el canal con ruido y su capacidad 1−h(p), Shannon–Hartley con un transpondedor de 36 MHz (124.5 Mb/s a 10 dB), Hamming(7,4) corrigiendo un error en el diagrama de tres círculos y el techo de Shannon con los puntos reales de DVB-S2. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

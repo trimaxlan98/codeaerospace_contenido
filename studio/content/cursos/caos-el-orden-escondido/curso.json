@@ -1,5 +1,5 @@
 {
-  "name": "Caos: el orden escondido",
+  "name": "Sistemas dinámicos · 2 Caos: el orden escondido",
   "description": "Curso de divulgación en 8 clips sobre la teoría del caos: la promesa determinista de Laplace y su ruptura, el mapa logístico y su telaraña, la cascada de duplicaciones con la constante universal de Feigenbaum, el atractor de Lorenz, el efecto mariposa medido con su exponente de Lyapunov, el péndulo doble, por qué caos no es azar (el mapa de retorno y la ventana de periodo 3) y los horizontes de predicción del péndulo, el clima y el sistema solar. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

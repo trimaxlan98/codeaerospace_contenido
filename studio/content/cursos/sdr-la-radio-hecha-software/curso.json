@@ -1,5 +1,5 @@
 {
-  "name": "SDR: la radio hecha software",
+  "name": "Comunicaciones · 2 SDR: la radio hecha software",
   "description": "Curso de divulgación en 8 clips sobre radio definida por software: de la cadena de circuitos al código, el muestreo IQ y el fasor, la ventana de espectro y el aliasing, la FFT y su compromiso tiempo-frecuencia, la lectura del waterfall, la demodulación AM/FM con módulo y fase, la decisión digital con BPSK y su constelación, y el diagrama de ojo. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

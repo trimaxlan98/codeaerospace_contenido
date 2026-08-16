@@ -1,5 +1,5 @@
 {
-  "name": "Tsiolkovsky: la tiranía del cohete",
+  "name": "Astronáutica · 1 Tsiolkovsky: la tiranía del cohete",
   "description": "Curso de divulgación en 8 clips sobre la ecuación del cohete: por qué un lanzador es 93 % combustible y solo un ~4 % llega a órbita. El empuje como momento conservado (el patinador), Δv = vₑ·ln(m₀/mf), el logaritmo que multiplica la masa por cada km/s, el cañón de Newton (orbitar es caer de lado a 7.79 km/s), por qué una sola etapa da carga útil negativa y las etapas la rescatan, los cohetes reales (Saturn V, Falcon 9, Soyuz) y la negociación con el tirano: motores iónicos. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

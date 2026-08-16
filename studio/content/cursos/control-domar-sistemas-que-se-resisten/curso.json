@@ -1,5 +1,5 @@
 {
-  "name": "Control: domar sistemas que se resisten",
+  "name": "Sistemas dinámicos · 3 Control: domar sistemas que se resisten",
   "description": "Curso de divulgación en 8 clips sobre control de sistemas: la respuesta que oscila, el plano s y sus polos, el amortiguamiento ζ, el lazo cerrado y el error, el PID con sus análogos físicos (resorte, amortiguador, memoria), el error de arrastre ante rampas, la saturación con su windup y el arte de sintonizar. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

@@ -1,5 +1,5 @@
 {
-  "name": "Apuntar a un satélite: el arte del seguimiento",
+  "name": "Comunicaciones · 4 Apuntar a un satélite: el arte del seguimiento",
   "description": "Curso de divulgación en 8 clips sobre el apuntamiento y seguimiento de satélites LEO: del cielo que se mueve al TLE y su caducidad, la cadena de marcos de referencia hasta acimut y elevación, la vista polar del pase y la máscara de elevación, el keyhole de las monturas Az/El, la curva S del Doppler, el lazo de control que persigue la referencia y la coreografía completa de un pase AOS→LOS. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",
