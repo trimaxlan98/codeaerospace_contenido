@@ -1,5 +1,5 @@
 {
-  "name": "Redes neuronales: la máquina que aprende",
+  "name": "Inteligencia artificial · 1 Redes neuronales: la máquina que aprende",
   "description": "Curso de divulgación en 8 clips que explica cómo aprende una red neuronal: del error y el descenso de gradiente a la regresión, la neurona, el muro de XOR, las capas ocultas, backpropagation y el sobreajuste. Estilo 3Blue1Brown en español para estudiantes de ingeniería.",
   "quality": "qh",
   "style_block": "style_block.py",

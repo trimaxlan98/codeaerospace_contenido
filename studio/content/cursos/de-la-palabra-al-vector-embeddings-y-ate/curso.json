@@ -1,5 +1,5 @@
 {
-  "name": "De la palabra al vector: embeddings y atención",
+  "name": "Inteligencia artificial · 2 De la palabra al vector: embeddings y atención",
   "description": "Curso de divulgación en 8 clips sobre cómo entienden el lenguaje los modelos de IA: de los tokens y los embeddings a la similitud coseno, el problema del contexto, el mecanismo de atención, Q/K/V, el Transformer y la generación palabra a palabra. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

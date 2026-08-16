@@ -1,5 +1,5 @@
 {
-  "name": "Relatividad y el GPS",
+  "name": "Astronáutica · 3 Relatividad y el GPS",
   "description": "Curso de divulgación en 8 clips sobre por qué el GPS necesita a Einstein: la posición como medida de tiempo (1 ns = 30 cm), la trilateración y el sesgo del reloj, el reloj de luz y el factor gamma, los muones como prueba experimental, la dilatación especial del satélite (−7.2 µs/día), la gravitatoria (+45.7 µs/día) con la altura de empate a 3186 km, los 38.5 µs/día netos que serían 11.5 km de error diario, y el reloj atómico desafinado de fábrica a 10.22999999544 MHz. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

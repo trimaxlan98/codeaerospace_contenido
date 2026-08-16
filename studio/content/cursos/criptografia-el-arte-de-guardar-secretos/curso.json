@@ -1,5 +1,5 @@
 {
-  "name": "Criptografía: el arte de guardar secretos",
+  "name": "Información y cómputo · 2 Criptografía: el arte de guardar secretos",
   "description": "Curso de divulgación en 8 clips sobre cómo un secreto no se esconde sino que se calcula: la rueda de César y sus 25 llaves, la estadística del idioma que delata el cifrado, la llave perfecta de un solo uso (XOR, Shannon), el acuerdo de Diffie–Hellman gritado en público (p=23, g=5, secreto 2), RSA con números de juguete (61×53=3233, e=17, d=2753) y por qué factorizar es difícil, la huella SHA-256 y su avalancha medida (~128 de 256 bits), la firma digital como RSA al revés y el candado del navegador con su relevo post-cuántico. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",

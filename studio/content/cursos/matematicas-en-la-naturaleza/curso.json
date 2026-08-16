@@ -1,5 +1,5 @@
 {
-  "name": "Matemáticas en la naturaleza",
+  "name": "Sistemas dinámicos · 1 Matemáticas en la naturaleza",
   "description": "Curso de divulgación en 8 clips sobre el código matemático de lo vivo: el girasol que reparte semillas con el ángulo áureo, φ y la espiral logarítmica (con el mito del nautilus corregido), el helecho de Barnsley y el micelio como instrucciones repetidas, los patrones de Turing que pintan el pelaje del gato, la sinuosidad ~π de los ríos, e como ritmo del crecimiento continuo y el hexágono del panal como mínimo material. Estilo 3Blue1Brown en español.",
   "quality": "qh",
   "style_block": "style_block.py",
