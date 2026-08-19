@@ -49,7 +49,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | publicado (PR #19); primer curso con intro/cierre de marca en el mux |
 | 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | publicado (PR #21): 9 lecciones narradas y muxeadas con intro/cierre |
 | 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
-| 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + ampliacion): 72 clips validados frame a frame, qh en prod, narracion y mux en marcha |
+| 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + #36): 18 lecciones, 72 qh en prod, narradas y muxeadas con intro/cierre (2026-08-19) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -170,24 +170,24 @@ validada frame a frame. Storyboard: `curso-20-algebra-lineal.md`.
 
 | Leccion | Proyecto | Clips | Estado |
 |---------|----------|-------|--------|
-| 1.1 | El vector: flecha, lista y movimiento | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 1.2 | Combinaciones lineales y span | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 1.3 | Dependencia lineal, base y dimension | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 2.1 | La matriz es un movimiento | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 2.2 | Componer movimientos: el producto | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 2.3 | El determinante: area y orientacion | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 3.1 | Sistemas Ax = b y la inversa | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 3.2 | Rango, nucleo e imagen | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 3.3 | Cambio de base: el mismo vector, otro idioma | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 4.1 | Vectores propios: los que no giran | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 4.2 | Diagonalizar y las potencias | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 4.3 | Proyeccion, minimos cuadrados y ejes principales | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 5.1 | Ortogonalidad: bases que no se estorban | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 5.2 | La SVD: todo movimiento es girar, estirar, girar | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 5.3 | Cadenas de Markov: el equilibrio que la matriz esconde | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 6.1 | Rotaciones en 3D: toda rotacion tiene un eje | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 6.2 | Las funciones tambien son vectores | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
-| 6.3 | Sistemas dinamicos: la matriz que mueve el tiempo | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 1.1 | El vector: flecha, lista y movimiento | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 1.2 | Combinaciones lineales y span | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 1.3 | Dependencia lineal, base y dimension | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 2.1 | La matriz es un movimiento | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 2.2 | Componer movimientos: el producto | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 2.3 | El determinante: area y orientacion | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 3.1 | Sistemas Ax = b y la inversa | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 3.2 | Rango, nucleo e imagen | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 3.3 | Cambio de base: el mismo vector, otro idioma | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 4.1 | Vectores propios: los que no giran | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 4.2 | Diagonalizar y las potencias | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 4.3 | Proyeccion, minimos cuadrados y ejes principales | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 5.1 | Ortogonalidad: bases que no se estorban | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 5.2 | La SVD: todo movimiento es girar, estirar, girar | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 5.3 | Cadenas de Markov: el equilibrio que la matriz esconde | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 6.1 | Rotaciones en 3D: toda rotacion tiene un eje | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 6.2 | Las funciones tambien son vectores | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
+| 6.3 | Sistemas dinamicos: la matriz que mueve el tiempo | 4 | publicado: qh en prod, narrado y muxeado (PR #35/#36) |
 
 ## Marca: intro y cierre para posproduccion (2026-08-14)
 
