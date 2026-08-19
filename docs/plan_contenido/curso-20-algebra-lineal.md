@@ -172,11 +172,11 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 | 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
-| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
-| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
+| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 
-Hitos globales: librería ✔ (commit 97384dd) · molde 1.1 ✔ · corridas nocturnas 01:00/05:00 murieron por cuota (la 01:00 dejó plan+librería+1.1, la 05:00 dejó 47/48 clips escritos sin validar) · 2026-08-19 11:00 sesión interactiva de Fable: validación ql de las 12 lecciones + 11 agentes (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) revisaron frame a frame y corrigieron; 4.3 clip 4 escrito por Opus · PR en curso · qh local en marcha · VPS pull+subir – · narración – · mux – · PLAN.md/CATALOGO ✔ · memoria –.
+Hitos globales (2026-08-19 15:30): **FAMILIA PUBLICADA DE PUNTA A PUNTA, 18 lecciones / 72 clips** — librería ✔ · PR #35 (módulos 1–4) y PR #36 (ampliación 5–6) mergeados · 18 proyectos en prod con 72 qh vigentes · narración Charon ×18 (serial) · 18 `exports/algebra-lineal-*/curso_narrado.mp4` (2:22–2:59, picos ≤ −0.5 dB, intro/cierre de marca) · PLAN.md/CATALOGO ✔ · memoria ✔. Las corridas nocturnas del cron murieron por cuota; el grueso se hizo en sesión interactiva con 17 subagentes.
 
 ## Módulo 1 — El espacio y sus vectores
 
@@ -413,12 +413,12 @@ familia: el eje propio explica el tiempo.
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 5.1 | ✔ | ✔ | ✔ 33.5/33.8/40.3/35.4 s | commit cd6f1e6 | en marcha | – | – | – |
-| 5.2 | ✔ | ✔ | ✔ 37.9/37.7/43.5/41.1 s | commit cd6f1e6 | en marcha | – | – | – |
-| 5.3 | ✔ | ✔ | ✔ 30.3/31.2/31.7/30.9 s | commit cd6f1e6 | en marcha | – | – | – |
-| 6.1 | ✔ | ✔ | ✔ 37.3/36.6/40.2/42.5 s | commit cd6f1e6 | en marcha | – | – | – |
-| 6.2 | ✔ | ✔ | ✔ 33.3/33.4/33.0/40.3 s | commit cd6f1e6 | en marcha | – | – | – |
-| 6.3 | ✔ | ✔ | ✔ 33.7/38.5/38.1/40.5 s | commit cd6f1e6 | en marcha | – | – | – |
+| 5.1 | ✔ | ✔ | ✔ 33.5/33.8/40.3/35.4 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.2 | ✔ | ✔ | ✔ 37.9/37.7/43.5/41.1 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.3 | ✔ | ✔ | ✔ 30.3/31.2/31.7/30.9 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.1 | ✔ | ✔ | ✔ 37.3/36.6/40.2/42.5 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.2 | ✔ | ✔ | ✔ 33.3/33.4/33.0/40.3 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.3 | ✔ | ✔ | ✔ 33.7/38.5/38.1/40.5 s | PR #36 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 
 ## Cosecha de trampas (se llena durante la producción)
 
