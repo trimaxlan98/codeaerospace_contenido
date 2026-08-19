@@ -80,7 +80,11 @@ class Clip2(Scene):
         cap2 = Text("Base B", font_size=18, color=C_TENUE)
         grupo2 = VGroup(cap2, columna2).arrange(DOWN, buff=0.12)
         panel2 = panel_derecha(grupo1, grupo2)
-        self.play(Transform(panel, panel2), run_time=0.7)
+        # Transform(panel, panel2) morfaba glifos entre estructuras muy
+        # distintas (una columna -> dos columnas) y se veian caracteres
+        # rotos a medio camino; un cruce de opacidad es limpio.
+        self.play(FadeOut(panel, run_time=0.3))
+        self.play(FadeIn(panel2, shift=0.15 * LEFT), run_time=0.6)
         self.play(Indicate(p.flecha, color=C_VEC, scale_factor=1.05),
                   run_time=0.8)
         self.wait(4.0)

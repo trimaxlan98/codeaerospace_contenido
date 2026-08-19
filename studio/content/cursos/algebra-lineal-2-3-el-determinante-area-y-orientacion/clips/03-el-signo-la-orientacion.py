@@ -31,7 +31,9 @@ class Clip3(Scene):
         # El giro de i a j, dibujado: el mismo arco cambiara de sentido.
         curva = self._giro(pl, ida=True)
         tag_giro = tag_hud("i -> j", font_size=18, color=C_TENUE)
-        tag_giro.move_to(pl.p(1.4, 1.4))
+        # Pegado a la esquina lejana del cuadrado (no flotando en el vacio ni
+        # encima del arco): el rotulo nombra la curva sin taparla.
+        tag_giro.next_to(cuadrado, UR, buff=0.14)
         self.play(Create(curva), FadeIn(tag_giro), run_time=0.7)
         self.wait(3.6)
 
@@ -67,7 +69,10 @@ class Clip3(Scene):
                   Transform(cuadrado, volteado, run_time=2.6),
                   Transform(curva, self._giro(pl, ida=False), run_time=2.6),
                   FadeOut(cifra, run_time=0.6))
-        cifra = self._cifra("area = " + fmt(volteado.area), 0)
+        # El AREA es el tamaño (siempre positivo); el SIGNO vive en el det.
+        # Si aqui se pintara volteado.area (que trae signo) el HUD diria
+        # "area = -1.0" y contradiria el pie "misma area que antes".
+        cifra = self._cifra("area = " + fmt(abs(volteado.area)), 0)
         cifra_det = self._cifra("det = " + fmt(DET_REFLEJA), 1)
         self.play(FadeIn(cifra), FadeIn(cifra_det), run_time=0.6)
         self.wait(3.4)

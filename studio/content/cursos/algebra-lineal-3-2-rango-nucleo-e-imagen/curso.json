@@ -20,13 +20,13 @@
       "file": "clips/03-el-nucleo-lo-que-va-a-cero.py",
       "title": "3 · El núcleo: lo que va a cero",
       "scene": "Clip3",
-      "final_state": "La recta fucsia del núcleo con varias flechas cayendo al origen; HUD 'MODULO 03'."
+      "final_state": "La recta fucsia del núcleo con las flechas fantasma sobre ella y el punto en el origen, la recta imagen azul aplastada, y el panel con la matriz, el vector [1; -2] y 'nucleo: dim 1'; HUD 'MODULO 03'."
     },
     {
       "file": "clips/04-lo-que-se-pierde-y-lo-que-queda.py",
       "title": "4 · Lo que se pierde y lo que queda",
       "scene": "Clip4",
-      "final_state": "Tríptico rango + nulidad = n; cierre «Imagen: lo que queda.» / «Núcleo: lo que se pierde.»; HUD 'MODULO 04'."
+      "final_state": "Pantalla limpia con el cierre a dos líneas «Imagen: lo que queda.» (blanca) / «Núcleo: lo que se pierde.» (cian) y el pie de enlace a la lección 3.3; HUD 'MODULO 04'."
     }
   ]
 }

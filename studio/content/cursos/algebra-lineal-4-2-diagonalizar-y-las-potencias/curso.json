@@ -20,7 +20,7 @@
       "file": "clips/03-potencias-sin-sudar.py",
       "title": "3 · Potencias sin sudar",
       "scene": "Clip3",
-      "final_state": "A¹⁰ calculada por diagonalización y la matriz de Fibonacci con φ = 1.618; HUD 'MODULO 03'."
+      "final_state": "La matriz de Fibonacci Q¹⁰ con F10 = 55 en su esquina y φ = 1.618 debajo; HUD 'MODULO 03'."
     },
     {
       "file": "clips/04-iterar-y-converger.py",

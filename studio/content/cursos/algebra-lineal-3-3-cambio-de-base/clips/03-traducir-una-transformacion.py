@@ -12,6 +12,7 @@ class Clip3(Scene):
 
         # --- momento: A en el idioma de siempre ----------------------------
         pl = plano_leccion(unidad=UNIDAD_3, centro=LEFT * 0.6 + DOWN * 0.15)
+        pl.fijo.set_stroke(opacity=0.95)   # la canonica, visible de fondo
         i_hat = vector(pl, (1, 0), color=C_I, nombre=r"\hat{\imath}",
                        etiqueta_dir=DOWN)
         j_hat = vector(pl, (0, 1), color=C_J, nombre=r"\hat{\jmath}",
@@ -58,9 +59,11 @@ class Clip3(Scene):
         b1_img = vector(pl, A_MOV @ B1, color=C_I,
                         nombre=fmt(D_B[0, 0], 0) + r"\,\vec b_1",
                         etiqueta_dir=DOWN)
+        # La etiqueta va ARRIBA-IZQUIERDA: 0.5*b2 es corto y, con la
+        # etiqueta a la izquierda a secas, el subindice se come la punta.
         b2_img = vector(pl, A_MOV @ B2, color=C_J,
                         nombre=fmt(D_B[1, 1], 1) + r"\,\vec b_2",
-                        etiqueta_dir=LEFT)
+                        etiqueta_dir=UP + LEFT)
         self.play(Transform(i_hat, b1_img), Transform(j_hat, b2_img),
                   *pl.anim_matriz(A_MOV @ P_BASE), run_time=2.2)
         self.wait(3.4)

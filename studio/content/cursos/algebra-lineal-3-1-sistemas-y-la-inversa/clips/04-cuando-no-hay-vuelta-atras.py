@@ -27,8 +27,15 @@ class Clip4(Scene):
                               "dos x distintos."), zona="abajo",
                     run_time=0.5)
         self.play(*pl.anim_matriz(np.eye(2)), run_time=1.6)
-        x1 = vector(pl, X1_SING, color=C_VEC, nombre=r"\vec x_1")
-        x2 = vector(pl, X2_SING, color=C_VEC_2, nombre=r"\vec x_2")
+        # etiqueta_dir fijo en ambos (no perpendicular recalculado): x1 y x2
+        # aterrizan en el MISMO punto tras aplicar A_SING (ese es el punto
+        # del clip), asi que sin direcciones fijas y distintas las dos
+        # etiquetas -y la propia flecha roja, tapada por la violeta- se
+        # superpondrian exactamente al final.
+        x1 = vector(pl, X1_SING, color=C_VEC, nombre=r"\vec x_1",
+                    etiqueta_dir=LEFT)
+        x2 = vector(pl, X2_SING, color=C_VEC_2, nombre=r"\vec x_2",
+                    etiqueta_dir=RIGHT)
         self.play(GrowArrow(x1.flecha), FadeIn(x1.etiqueta), run_time=0.8)
         self.play(GrowArrow(x2.flecha), FadeIn(x2.etiqueta), run_time=0.8)
         self.wait(2.2)

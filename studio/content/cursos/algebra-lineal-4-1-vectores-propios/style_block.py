@@ -163,7 +163,12 @@ ALCANCE_MINI = 4
 CENTRO_IZQ = LEFT * 3.6
 CENTRO_DER = RIGHT * 3.6
 RADIO_MINI = 2.2
-ANGULOS_MINI = (0.0, 30.0, 60.0, 90.0, 120.0, 150.0)
+# 36 grados de paso, NO 30: con 30 el conjunto de RECTAS del abanico (los
+# angulos modulo 180) es invariante bajo el giro de 90 grados, asi que el
+# fotograma final del giro sale identico al inicial y cada recta que se
+# queda vacia la ocupa otra flecha — justo lo contrario de lo que dice el
+# pie. Con 36 los cinco rumbos van a parar a cinco rectas nuevas.
+ANGULOS_MINI = (0.0, 36.0, 72.0, 108.0, 144.0)
 ABANICO_MINI = tuple(RADIO_MINI * np.array([math.cos(math.radians(a)),
                                             math.sin(math.radians(a))])
                      for a in ANGULOS_MINI)

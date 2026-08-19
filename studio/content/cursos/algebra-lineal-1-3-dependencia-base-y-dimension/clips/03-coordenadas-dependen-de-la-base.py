@@ -57,7 +57,11 @@ class Clip3(Scene):
         cap2 = Text("Base B", font_size=18, color=C_TENUE)
         grupo2 = VGroup(cap2, col_b).arrange(DOWN, buff=0.12)
         panel_lecturas = panel_derecha(grupo1, grupo2)
-        self.play(Transform(panel_mat, panel_lecturas), run_time=0.8)
+        # Transform(panel_mat, panel_lecturas) morfaba una matriz 2x2 en dos
+        # columnas etiquetadas (estructuras muy distintas): se veian
+        # caracteres rotos a medio camino. Cruce de opacidad en su lugar.
+        self.play(FadeOut(panel_mat, run_time=0.3))
+        self.play(FadeIn(panel_lecturas, shift=0.15 * LEFT), run_time=0.6)
         self.play(Indicate(p.flecha, color=C_VEC, scale_factor=1.05),
                   run_time=0.8)
         self.wait(4.2)

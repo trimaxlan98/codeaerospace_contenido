@@ -180,6 +180,12 @@ R_PCA = BASE_PCA.T                       # lleva el eje mayor sobre las x
 EJES_2SD = [2.0 * float(np.sqrt(VAL_PCA[j])) * BASE_PCA[:, j] for j in (0, 1)]
 PESO_PCA = 100.0 * VAL_PCA / float(VAL_PCA.sum())   # 94 % y 6 %
 NUBE_GIRADA = NUBE_PCA @ R_PCA.T         # la nube ya enderezada
+# Recap de la familia: ya enderezado el mundo, estirar a lo largo de los ejes
+# propios. Como `anim_matriz` toma el estado TOTAL (desde la identidad), el
+# estado del recap es el estirado COMPUESTO con el giro; sobre la pantalla ya
+# girada los dos ejes solo se estiran, no giran.
+D_RECAP = escala(1.5, 0.55)              # los factores a lo largo de e1 y e2
+M_RECAP = D_RECAP @ R_PCA                # estado total de la rejilla en el recap
 
 
 # --- El plano de la leccion ------------------------------------------

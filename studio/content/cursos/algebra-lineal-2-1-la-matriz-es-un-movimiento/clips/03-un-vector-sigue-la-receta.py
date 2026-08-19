@@ -36,7 +36,9 @@ class Clip3(Scene):
         receta = combinacion(pl, a, (1, 0), b, (0, 1), mostrar_res=False)
         self.play(GrowArrow(receta.au), run_time=0.5)
         self.play(GrowArrow(receta.bv), run_time=0.5)
-        self.wait(3.0)
+        # 3.7 y no 3.0: este pie solo vive lo que dure la espera (las dos
+        # flechas tardan 1 s) y ningun pie del curso baja de 5 s en pantalla.
+        self.wait(3.7)
 
         # --- momento: mover el plano ---------------------------------------
         rot.mostrar(pie_curso("Movemos el plano. v se va con él, como todo "

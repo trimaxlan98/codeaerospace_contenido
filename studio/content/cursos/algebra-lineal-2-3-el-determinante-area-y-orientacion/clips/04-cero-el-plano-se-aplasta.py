@@ -52,6 +52,9 @@ class Clip4(Scene):
                   Transform(j_hat, j_fin, run_time=2.2),
                   Transform(cuadrado, aplastado, run_time=2.2),
                   FadeOut(cifra, run_time=0.6))
+        # Las dos columnas acaban sobre el MISMO rayo: la mas larga (ĵ) tapa
+        # a la corta (î). La corta manda al frente para que se vea su ambar.
+        self.bring_to_front(j_hat, i_hat)
         cifra = self._cifra("area = " + fmt(aplastado.area), 0)
         cifra_det = self._cifra("det = " + fmt(DET_SINGULAR), 1)
         self.play(FadeIn(cifra), FadeIn(cifra_det), run_time=0.6)
@@ -64,6 +67,9 @@ class Clip4(Scene):
         linea = span_recta(pl, DIR_APLASTE, color=C_IMG, grosor=5.0,
                            opacidad=0.9)
         self.play(Create(linea), run_time=0.8)
+        # La recta verde se dibuja ENCIMA de las dos flechas y les roba el
+        # color: las columnas vuelven al frente.
+        self.bring_to_front(j_hat, i_hat)
         self.wait(4.0)
 
         # --- momento: en tres dimensiones es un volumen ---------------------
@@ -77,6 +83,10 @@ class Clip4(Scene):
         esp.move_to(DOWN * 0.3)
         cubo = caja3(esp, np.eye(3))
         k_hat = vector3(esp, (0, 0, 1), color=C_K, nombre=r"\hat k")
+        # La etiqueta por defecto cae SOBRE el eje z (violeta sobre violeta):
+        # se aparta a la izquierda. El gemelo del aplaste se construye solo,
+        # con la colocacion por defecto (alli el eje ya no estorba).
+        k_hat.etiqueta.shift(0.34 * LEFT)
         panel3 = panel_derecha(matriz_columnas(M3_APLASTA, font_size=32))
         self.play(FadeIn(esp), FadeIn(cubo), FadeIn(k_hat),
                   FadeIn(panel3, shift=0.15 * LEFT), run_time=1.1)

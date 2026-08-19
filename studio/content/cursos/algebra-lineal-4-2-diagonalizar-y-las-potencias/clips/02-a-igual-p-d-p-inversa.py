@@ -7,7 +7,7 @@ class Clip2(Scene):
         rot = Rotulos(self)
         self.add(hud_modulo("Modulo 02"))
 
-        titulo = titulo_curso("A = P D P⁻¹")
+        titulo = titulo_curso("A = P D P^-1")
         rot.mostrar(titulo, zona="arriba", run_time=0.6)
         self.wait(0.3)
 
@@ -20,7 +20,7 @@ class Clip2(Scene):
         self.play(GrowArrow(v.flecha), FadeIn(v.etiqueta), run_time=0.8)
         self.wait(3.0)
 
-        rot.mostrar(pie_curso("Paso 1, P⁻¹: traduce al idioma de los "
+        rot.mostrar(pie_curso("Paso 1, P^-1: traduce al idioma de los "
                               "vectores propios."), zona="abajo",
                     run_time=0.5)
         self.play(*pl.anim_matriz(PINV_MAT, v), run_time=2.0)

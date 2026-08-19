@@ -12,6 +12,9 @@ class Clip1(Scene):
 
         # --- momento: la rejilla de siempre --------------------------------
         pl = plano_leccion()
+        # La rejilla canonica (gris) sube de opacidad: cuando la viva se
+        # vuelva oblicua tiene que verse CONTRA que se ha torcido.
+        pl.fijo.set_stroke(opacity=0.95)
         self.play(FadeIn(pl), run_time=0.9)
         rot.mostrar(pie_curso("Medimos el plano con dos flechas: î a la "
                               "derecha, ĵ hacia arriba."), zona="abajo",
@@ -27,8 +30,9 @@ class Clip1(Scene):
         self.wait(3.2)
 
         # --- momento: la lectura canonica ----------------------------------
+        lista_can = "(" + fmt(V_DEMO[0], 0) + ", " + fmt(V_DEMO[1], 0) + ")"
         rot.mostrar(pie_curso("Un vector v. Cuatro pasos de î y tres de ĵ: "
-                              "la lista es (4, 3)."), zona="abajo",
+                              "la lista es " + lista_can + "."), zona="abajo",
                     run_time=0.5)
         v = vector(pl, V_DEMO, color=C_VEC, nombre=r"\vec v")
         self.play(GrowArrow(v.flecha), run_time=0.9)

@@ -36,7 +36,7 @@ class Clip3(Scene):
         linea_cae = span_recta(pl, DIR_NUC, color=C_PROPIO, grosor=3.0,
                                opacidad=0.9)
         self.play(Create(linea_nuc), Create(linea_cae), run_time=0.8)
-        self.wait(2.9)
+        self.wait(3.3)
 
         # --- momento: la caida ----------------------------------------------
         rot.mostrar(pie_curso("Mira lo que les pasa cuando aplico A."),
@@ -44,7 +44,7 @@ class Clip3(Scene):
         cero = Dot(pl.p(0, 0), radius=0.11, color=C_PROPIO)
         self.play(*pl.anim_matriz(A_PLANA, v, *nucs),
                   Transform(linea_cae, cero), run_time=2.2)
-        self.wait(2.6)
+        self.wait(2.8)
 
         # --- momento: no eran ellas tres, era la recta entera ---------------
         rot.mostrar(pie_curso("Las tres han caído al origen; la recta "
@@ -56,7 +56,7 @@ class Clip3(Scene):
         et_nuc = tag_hud("nucleo de A", font_size=17, color=C_PROPIO)
         et_nuc.next_to(pl.p(-1.55 * DIR_NUC), LEFT, buff=0.14)
         self.play(FadeIn(fantasmas), FadeIn(et_nuc), run_time=0.7)
-        self.wait(3.9)
+        self.wait(4.3)
 
         # --- momento: la cuenta ---------------------------------------------
         rot.mostrar(pie_curso("Ese es el núcleo de A: lo que la matriz "
@@ -71,4 +71,4 @@ class Clip3(Scene):
 
         rot.mostrar(pie_curso("Imagen y núcleo: lo que queda y lo que se "
                               "pierde."), zona="abajo", run_time=0.5)
-        self.wait(4.2)
+        self.wait(5.0)

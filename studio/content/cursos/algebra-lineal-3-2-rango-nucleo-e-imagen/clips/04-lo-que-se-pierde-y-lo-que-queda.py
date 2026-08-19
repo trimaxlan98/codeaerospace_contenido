@@ -27,7 +27,7 @@ class Clip4(Scene):
         self.play(FadeIn(pl), run_time=0.8)
         self.play(Create(linea_img), Create(linea_nuc), Create(linea_cae),
                   run_time=0.9)
-        self.wait(2.9)
+        self.wait(3.3)
 
         # --- momento: la que sobrevive y la que cae -------------------------
         rot.mostrar(pie_curso("La verde sobrevive, la fucsia cae al origen: "
@@ -62,7 +62,7 @@ class Clip4(Scene):
         k3 = vector3(esp, K_ESPACIO, color=C_PROPIO)
         self.play(FadeIn(esp), run_time=0.8)
         self.play(GrowArrow(k3.flecha), run_time=0.6)
-        self.wait(2.6)
+        self.wait(3.0)
 
         rot.mostrar(pie_curso("La vertical se pierde y queda un plano: dos "
                               "más una, tres."), zona="abajo", run_time=0.5)
@@ -82,7 +82,7 @@ class Clip4(Scene):
         rot.mostrar(pie_curso("Lo que queda más lo que se pierde es todo lo "
                               "que había."), zona="abajo", run_time=0.5)
         self.play(FadeOut(esp), FadeOut(k3), FadeOut(parche),
-                  FadeOut(panel_b), run_time=0.6)
+                  FadeOut(panel_b), run_time=0.4)
 
         def fila(etiqueta, r, k, n):
             cuenta = MathTex(fmt(r, 0), "+", fmt(k, 0), "=", fmt(n, 0),
@@ -102,8 +102,8 @@ class Clip4(Scene):
                                                       aligned_edge=RIGHT)
         bloque = VGroup(cabecera, triptico).arrange(DOWN, buff=0.6)
         bloque.move_to(DOWN * 0.15)
-        self.play(FadeIn(bloque, shift=0.2 * UP), run_time=0.9)
-        self.wait(3.7)
+        self.play(FadeIn(bloque, shift=0.2 * UP), run_time=0.5)
+        self.wait(4.9)
 
         # --- cierre de la leccion -------------------------------------------
         cierre_leccion(self, rot, "Imagen: lo que queda.",

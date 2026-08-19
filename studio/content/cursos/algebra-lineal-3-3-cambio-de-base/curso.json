@@ -26,7 +26,7 @@
       "file": "clips/04-el-marco-del-satelite.py",
       "title": "4 · El marco del satélite",
       "scene": "Clip4",
-      "final_state": "Cubesat en 3D con el vector Sol y sus dos listas (marco inercial y marco cuerpo); cierre «El vector no cambia.» / «Cambian sus números.»; HUD 'MODULO 04'."
+      "final_state": "Pantalla limpia con el cierre de la lección: «El vector no cambia.» en blanco sobre «Cambian sus números.» en cian, y el pie que abre el módulo 4; HUD 'MODULO 04'."
     }
   ]
 }

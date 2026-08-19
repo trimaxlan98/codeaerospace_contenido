@@ -23,7 +23,7 @@ class Clip2(Scene):
         self.play(GrowArrow(i_hat.flecha), FadeIn(i_hat.etiqueta),
                   GrowArrow(j_hat.flecha), FadeIn(j_hat.etiqueta),
                   run_time=0.8)
-        self.wait(3.0)
+        self.wait(3.4)
 
         # --- caso rango 1 ----------------------------------------------------
         rot.mostrar(pie_curso("Con A las dos llegan a la misma recta: una "
@@ -55,7 +55,7 @@ class Clip2(Scene):
                   FadeOut(panel_b), run_time=0.6)
         esp = espacio3(unidad=0.8, alcance=3)
         self.play(FadeIn(esp), run_time=0.9)
-        self.wait(2.8)
+        self.wait(3.5)
 
         rot.mostrar(pie_curso("Esta matriz deja dos: la imagen es un plano "
                               "dentro del espacio."), zona="abajo",
@@ -87,8 +87,8 @@ class Clip2(Scene):
         resumen.shift(DOWN * 0.4)
         self.play(FadeOut(panel_c), run_time=0.3)
         self.play(FadeIn(resumen, shift=0.15 * LEFT), run_time=0.6)
-        self.wait(3.2)
+        self.wait(4.1)
 
         rot.mostrar(pie_curso("¿Y las direcciones que no sobreviven? Ese es "
                               "el núcleo."), zona="abajo", run_time=0.5)
-        self.wait(4.0)
+        self.wait(5.0)

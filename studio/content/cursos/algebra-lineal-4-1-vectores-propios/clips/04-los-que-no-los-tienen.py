@@ -47,7 +47,21 @@ class Clip4(Scene):
         veredicto_i.move_to(CENTRO_IZQ + DOWN * 2.35)
         rot.mostrar(pie_curso("Ninguna flecha se quedó en su recta. No se "
                               "salva ni una."), zona="abajo", run_time=0.5)
-        self.play(FadeIn(veredicto_i), run_time=0.6)
+        # Un giro de 90 grados manda la rejilla cuadrada sobre si misma: en
+        # un fotograma quieto el final se ve igual que el principio. El
+        # carril a trazos (mismo idioma que el clip 1) marca por donde iba
+        # una flecha y la deja sin nadie encima. El indice 1 (30 grados)
+        # acaba en 120: su carril queda en una zona vacia y se lee de golpe.
+        carril_i = DashedVMobject(
+            span_recta(izq, ABANICO_MINI[1], color=C_VEC, opacidad=0.65,
+                       grosor=2.6, largo=ALCANCE_MINI),
+            num_dashes=24)
+        fantasma_i = vector(izq, ABANICO_MINI[1], color=C_VEC, grosor=3.2,
+                            punta_len=0.15)
+        fantasma_i.flecha.set_stroke(opacity=0.45)
+        fantasma_i.flecha.set_fill(opacity=0.45)
+        self.play(FadeIn(veredicto_i), Create(carril_i), FadeIn(fantasma_i),
+                  run_time=0.7)
         self.wait(3.4)
 
         # --- momento: el caso de la derecha, la cizalla ---------------------
@@ -89,7 +103,7 @@ class Clip4(Scene):
 
         # --- cierre de la leccion -------------------------------------------
         piezas = [izq, der, mat_i, mat_d, veredicto_i, veredicto_d, recta_d,
-                  *abanico_i, *abanico_d]
+                  carril_i, fantasma_i, *abanico_i, *abanico_d]
         cierre_leccion(self, rot, "Los ejes propios",
                        "son los que la transformación respeta.",
                        "Con ellos como base, la matriz se vuelve casi "

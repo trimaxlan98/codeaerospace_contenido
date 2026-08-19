@@ -19,7 +19,7 @@ class Clip3(Scene):
         self.play(*pl.anim_matriz(potencia(A, 2)), run_time=2.0)
         self.wait(3.0)
 
-        rot.mostrar(pie_curso("Pero A = P D P⁻¹, y D es diagonal: D a la "
+        rot.mostrar(pie_curso("Pero A = P D P^-1, y D es diagonal: D a la "
                               "n es solo elevar cada número."),
                     zona="abajo", run_time=0.5)
         self.play(*pl.anim_matriz(np.eye(2)), run_time=1.2)
@@ -30,7 +30,7 @@ class Clip3(Scene):
         self.play(FadeIn(panel1, shift=0.15 * LEFT), run_time=0.7)
         self.wait(3.4)
 
-        rot.mostrar(pie_curso("Multiplicamos por P y P⁻¹ una sola vez: "
+        rot.mostrar(pie_curso("Multiplicamos por P y P^-1 una sola vez: "
                               "sale A a la diez, exacta."), zona="abajo",
                     run_time=0.5)
         mat_a10 = matriz_columnas(A_N, dec=0, font_size=28)
@@ -64,7 +64,7 @@ class Clip3(Scene):
         self.wait(3.2)
 
         rot.mostrar(pie_curso("El autovalor que domina esa sucesión tiene "
-                              "nombre: φ, el número áureo."), zona="abajo",
+                              "nombre: el número áureo."), zona="abajo",
                     run_time=0.5)
         phi_tex = MathTex(r"\varphi = " + fmt(PHI, 3), font_size=30,
                           color=C_CALCULO)

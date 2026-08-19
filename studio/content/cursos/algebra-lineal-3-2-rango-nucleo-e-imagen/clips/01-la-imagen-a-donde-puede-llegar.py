@@ -20,7 +20,7 @@ class Clip1(Scene):
                    etiqueta_dir=RIGHT)
         self.play(FadeIn(pl), run_time=0.9)
         self.play(GrowArrow(v.flecha), FadeIn(v.etiqueta), run_time=0.8)
-        self.wait(1.8)
+        self.wait(1.5)
         panel_a = panel_derecha(matriz_columnas(A_PLANA),
                                 tag_hud("det = " + fmt(DET_PLANA)))
         self.play(FadeIn(panel_a, shift=0.15 * LEFT), run_time=0.6)
@@ -31,7 +31,7 @@ class Clip1(Scene):
                               "rejilla se aplasta."), zona="abajo",
                     run_time=0.5)
         self.play(*pl.anim_matriz(A_PLANA, v), run_time=2.0)
-        self.wait(2.8)
+        self.wait(3.0)
 
         rot.mostrar(pie_curso("Ahí está todo destino posible: esa recta es "
                               "la imagen de A."), zona="abajo", run_time=0.5)
@@ -44,7 +44,7 @@ class Clip1(Scene):
         et_img.next_to(pl.p(-2.6 * DIR_IMG), UP + LEFT, buff=0.10)
         self.play(Create(recta_img), FadeIn(et_img), run_time=0.9)
         self.bring_to_front(v)
-        self.wait(3.4)
+        self.wait(4.1)
 
         # --- momento: B no pierde nada --------------------------------------
         rot.mostrar(pie_curso("Cambiemos la segunda columna: ahora se sale "
@@ -54,13 +54,13 @@ class Clip1(Scene):
         self.play(FadeOut(panel_a), FadeOut(recta_img), FadeOut(et_img),
                   run_time=0.4)
         self.play(FadeIn(panel_b, shift=0.15 * LEFT), run_time=0.6)
-        self.wait(3.2)
+        self.wait(4.0)
 
         rot.mostrar(pie_curso("La rejilla se deforma, pero no se aplasta: "
                               "sigue llenando el plano."), zona="abajo",
                     run_time=0.5)
         self.play(*pl.anim_matriz(A_LLENA, v), run_time=2.0)
-        self.wait(2.8)
+        self.wait(3.0)
 
         # --- momento: las dos imagenes, lado a lado -------------------------
         rot.mostrar(pie_curso("Las dos imágenes, lado a lado: una recta, o "
@@ -84,4 +84,4 @@ class Clip1(Scene):
         rot.mostrar(pie_curso("¿Y cómo se mide esa diferencia? Con un "
                               "número: el rango."), zona="abajo",
                     run_time=0.5)
-        self.wait(3.6)
+        self.wait(5.0)

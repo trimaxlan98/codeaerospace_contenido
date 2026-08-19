@@ -46,13 +46,23 @@ class Clip2(Scene):
         rot.mostrar(pie_curso("La primera es " + fmt(LAMBDAS[0], 0)
                               + " veces más larga. La segunda ni se movió."),
                     zona="abajo", run_time=0.5)
-        f1 = MathTex(r"A\vec v_1 = " + fmt(LAMBDAS[0], 0) + r"\,\vec v_1",
+        # La ecuacion va en el fucsia de las direcciones propias y la CIFRA
+        # en cian (regla de la familia: las cifras calculadas son cianas).
+        # Los dos lambda salen de autos(A_PROPIA), nunca escritos a mano; la
+        # tercera linea los nombra para que "lambda" deje de ser una letra
+        # suelta cuando aparezca la ecuacion general en el pie.
+        f1 = MathTex(r"A\vec v_1 =", fmt(LAMBDAS[0], 0), r"\,\vec v_1",
                      font_size=30, color=C_PROPIO)
-        f2 = MathTex(r"A\vec v_2 = " + fmt(LAMBDAS[1], 0) + r"\,\vec v_2",
+        f1[1].set_color(C_CALCULO)
+        f2 = MathTex(r"A\vec v_2 =", fmt(LAMBDAS[1], 0), r"\,\vec v_2",
                      font_size=30, color=C_PROPIO)
+        f2[1].set_color(C_CALCULO)
+        f3 = MathTex(r"\lambda_1 = " + fmt(LAMBDAS[0], 0)
+                     + r"\qquad \lambda_2 = " + fmt(LAMBDAS[1], 0),
+                     font_size=28, color=C_CALCULO)
         # Segunda caja DEBAJO del panel (un Transform del panel a otro con
         # mas piezas deja medio segundo de glifos a medio morphar).
-        caja = _con_fondo(VGroup(f1, f2).arrange(DOWN, buff=0.26),
+        caja = _con_fondo(VGroup(f1, f2, f3).arrange(DOWN, buff=0.24),
                           buff=0.18, opacidad=0.78)
         caja.next_to(panel, DOWN, buff=0.28).align_to(panel, RIGHT)
         self.play(FadeIn(caja, shift=0.15 * LEFT), run_time=0.8)

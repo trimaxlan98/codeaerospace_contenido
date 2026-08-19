@@ -12,6 +12,7 @@ class Clip2(Scene):
 
         # --- momento: la rejilla oblicua otra vez --------------------------
         pl = plano_leccion(centro=LEFT * 0.8 + DOWN * 0.15)
+        pl.fijo.set_stroke(opacity=0.95)   # la canonica, visible de fondo
         i_hat = vector(pl, (1, 0), color=C_I, nombre=r"\hat{\imath}",
                        etiqueta_dir=DOWN)
         j_hat = vector(pl, (0, 1), color=C_J, nombre=r"\hat{\jmath}",
@@ -45,9 +46,10 @@ class Clip2(Scene):
         self.wait(2.6)
 
         # --- momento: la ida (coordenadas nuevas -> canonicas) -------------
-        rot.mostrar(pie_curso("v es (1, 1) en el idioma nuevo. ¿Cómo se dice "
-                              "eso en el de siempre?"), zona="abajo",
-                    run_time=0.5)
+        lista_b = "(" + fmt(V_B[0], 0) + ", " + fmt(V_B[1], 0) + ")"
+        rot.mostrar(pie_curso("v es " + lista_b + " en el idioma nuevo. "
+                              "¿Cómo se dice eso en el de siempre?"),
+                    zona="abajo", run_time=0.5)
         v = vector(pl, V_DEMO, color=C_VEC, nombre=r"\vec v")
         self.play(GrowArrow(v.flecha), FadeIn(v.etiqueta), run_time=0.9)
         self.wait(3.4)

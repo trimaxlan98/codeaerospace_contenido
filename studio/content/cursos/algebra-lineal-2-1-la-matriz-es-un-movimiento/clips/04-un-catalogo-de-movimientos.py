@@ -25,7 +25,9 @@ class Clip4(Scene):
         self.play(GrowArrow(i_hat.flecha), FadeIn(i_hat.etiqueta),
                   GrowArrow(j_hat.flecha), FadeIn(j_hat.etiqueta),
                   run_time=0.7)
-        self.wait(3.0)
+        # 4.0 y no 3.0: con 3.0 este pie de entrada no llegaba a los 5 s en
+        # pantalla que pide el formato.
+        self.wait(4.0)
 
         panel = None
 
@@ -60,7 +62,7 @@ class Clip4(Scene):
                    "inclinan.")
         movimiento(M_ESC, "ESCALA " + fmt(ESC_XY[0]) + " x " + fmt(ESC_XY[1]),
                    "Escalar: estira en x, encoge en y. Nada gira.")
-        movimiento(M_REF, "REFLEXION EN EL EJE Y",
+        movimiento(M_REF, "REFLEXION EN EL EJE " + EJE_REFLEXION.upper(),
                    "Reflejar: î cruza al otro lado y el plano queda del "
                    "revés.", volver=False)
 

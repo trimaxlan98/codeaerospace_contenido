@@ -14,7 +14,7 @@
       "file": "clips/02-el-factor-de-area.py",
       "title": "2 · El factor de área",
       "scene": "Clip2",
-      "final_state": "Varias celdas de la rejilla sombreadas tras la transformación, todas multiplicadas por det; HUD 'MODULO 02'."
+      "final_state": "Las tres celdas sombreadas, ya comprimidas a la mitad por la segunda matriz: 'area celda = 0.5' y 'factor = x 0.5' bajo el HUD 'MODULO 02'."
     },
     {
       "file": "clips/03-el-signo-la-orientacion.py",
