@@ -1139,3 +1139,343 @@ def satelite3(esp, R=np.eye(3), tam=0.8, color=CODE_MUTED, color_panel=C_J,
     grupo.cuerpo, grupo.paneles, grupo.eje_z = cuerpo, paneles, eje_z
     grupo.R = R
     return grupo
+
+
+# =====================================================================
+# Modulos 5 y 6 (ampliacion 2026-08-19): ortogonalidad, SVD, Markov,
+# rotaciones 3D con eje, funciones como vectores, sistemas dinamicos.
+# Misma regla: numpy puro y determinista; las piezas son VGroup cuyos
+# localizadores leen el plano (siguen move_to, no scale).
+# =====================================================================
+from manim import Rectangle, Square  # noqa: E402
+
+
+# --- numeros ----------------------------------------------------------
+def gram_schmidt(vectores):
+    """Ortonormaliza una lista de vectores (columnas, en orden). Devuelve
+    (Q, pasos): Q con los vectores ortonormales como columnas y `pasos`
+    = lista de dicts {"v": original, "sombras": [proy sobre cada q previo],
+    "resto": v - sum(sombras), "q": resto normalizado}. Lo que se DIBUJA
+    (restar sombras) y lo que se calcula salen del mismo bucle."""
+    vs = [_vec(v) for v in vectores]
+    qs, pasos = [], []
+    for v in vs:
+        sombras = [float(v @ q) * q for q in qs]
+        resto = v - (np.sum(sombras, axis=0) if sombras else 0.0)
+        n = float(np.linalg.norm(resto))
+        if n < 1e-12:
+            raise ValueError("vectores dependientes: Gram-Schmidt se anula")
+        q = resto / n
+        qs.append(q)
+        pasos.append({"v": v, "sombras": sombras, "resto": resto, "q": q})
+    return np.column_stack(qs), pasos
+
+
+def qr(m):
+    """Q, R de numpy con la convencion diag(R) >= 0 (misma Q que
+    gram_schmidt sobre las columnas de M)."""
+    q, r = np.linalg.qr(_mat(m))
+    s = np.sign(np.diag(r))
+    s[s == 0] = 1.0
+    return q * s, (r.T * s).T
+
+
+def es_ortogonal(m, tol=1e-9):
+    m = _mat(m)
+    return bool(np.allclose(m.T @ m, np.eye(m.shape[0]), atol=tol))
+
+
+def svd(m):
+    """U, s, Vt (np.linalg.svd, full_matrices=False) con la convencion de
+    que la primera componente no nula de cada columna de U es positiva.
+    Acepta matrices de cualquier tamano (una imagen, p. ej.)."""
+    u, s, vt = np.linalg.svd(np.asarray(m, dtype=float), full_matrices=False)
+    for j in range(u.shape[1]):
+        col = u[:, j]
+        k = np.flatnonzero(np.abs(col) > 1e-12)
+        if k.size and col[k[0]] < 0:
+            u[:, j] = -col
+            vt[j, :] = -vt[j, :]
+    return u, s, vt
+
+
+def aproximacion_rango(m, k):
+    """La mejor aproximacion de rango k (SVD truncada) y el error relativo
+    en norma de Frobenius: (M_k, error)."""
+    u, s, vt = svd(m)
+    k = int(k)
+    mk = (u[:, :k] * s[:k]) @ vt[:k, :]
+    m = np.asarray(m, dtype=float)
+    err = float(np.linalg.norm(m - mk) / max(np.linalg.norm(m), 1e-12))
+    return mk, err
+
+
+def numero_condicion(m):
+    s = np.linalg.svd(np.asarray(m, dtype=float), compute_uv=False)
+    return float(s[0] / s[-1]) if s[-1] > 1e-15 else float("inf")
+
+
+def elipse_de(m, n=96, radio=1.0):
+    """Puntos (n x 2) de la imagen del circulo de radio `radio` bajo M."""
+    t = np.linspace(0.0, 2.0 * np.pi, int(n), endpoint=False)
+    c = np.column_stack([np.cos(t), np.sin(t)]) * float(radio)
+    return c @ _mat(m).T
+
+
+def imagen_sintetica(lado=12):
+    """Matriz lado x lado de grises en [0, 1], determinista: un disco
+    claro sobre fondo oscuro con una barra diagonal y una franja. Rango
+    numerico alto (sirve para ver como la SVD truncada la reconstruye)."""
+    n = int(lado)
+    y, x = np.mgrid[0:n, 0:n]
+    cx = cy = (n - 1) / 2.0
+    img = 0.12 * np.ones((n, n))
+    img[(x - cx) ** 2 + (y - cy) ** 2 <= (0.36 * n) ** 2] = 0.75
+    img[np.abs(x - y) <= max(1, n // 12)] = 0.95
+    img[(y >= int(0.72 * n)) & (y < int(0.72 * n) + max(1, n // 8))] = 0.45
+    return img
+
+
+def markov_estacionario(t):
+    """Vector estacionario (suma 1) de una matriz de transicion T cuyas
+    COLUMNAS suman 1 (T @ p lleva la distribucion de hoy a la de
+    manana): el autovector de autovalor 1, normalizado."""
+    t = _mat(t)
+    if not np.allclose(t.sum(axis=0), 1.0, atol=1e-9):
+        raise ValueError("las columnas de la matriz de transicion deben "
+                         "sumar 1")
+    val, vec = np.linalg.eig(t)
+    k = int(np.argmin(np.abs(val - 1.0)))
+    p = np.real(vec[:, k])
+    p = p / p.sum()
+    return p
+
+
+def iterar(m, x0, n):
+    """[x0, M x0, M^2 x0, ..., M^n x0] como array (n+1) x dim."""
+    m, x = _mat(m), _vec(x0)
+    out = [x]
+    for _ in range(int(n)):
+        x = m @ x
+        out.append(x)
+    return np.array(out)
+
+
+def autos_complejos(m):
+    """Autovalores (complejos, ordenados por modulo decreciente) y el
+    modulo y angulo (grados) del primero: (valores, modulo, grados).
+    Para clasificar un sistema x_{k+1} = A x_k: |lambda| < 1 encoge,
+    > 1 estira, angulo != 0 gira."""
+    val = np.linalg.eigvals(_mat(m))
+    val = val[np.argsort(-np.abs(val))]
+    return val, float(np.abs(val[0])), float(np.degrees(np.angle(val[0])))
+
+
+def eje_rotacion(r):
+    """Eje unitario y angulo (grados) de una rotacion 3D R: el autovector
+    de autovalor 1 (teorema de Euler) y el angulo por la traza."""
+    r = _mat(r)
+    val, vec = np.linalg.eig(r)
+    k = int(np.argmin(np.abs(val - 1.0)))
+    eje = np.real(vec[:, k])
+    eje = eje / np.linalg.norm(eje)
+    kk = np.flatnonzero(np.abs(eje) > 1e-12)
+    if kk.size and eje[kk[0]] < 0:
+        eje = -eje
+    ang = float(np.degrees(np.arccos(np.clip((np.trace(r) - 1.0) / 2.0,
+                                             -1.0, 1.0))))
+    return eje, ang
+
+
+def rot3_eje(eje, grados):
+    """Rotacion 3D de `grados` alrededor del eje unitario dado
+    (Rodrigues)."""
+    k = _vec(eje, 3)
+    k = k / np.linalg.norm(k)
+    th = np.radians(float(grados))
+    kx = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    return np.eye(3) + np.sin(th) * kx + (1 - np.cos(th)) * (kx @ kx)
+
+
+def muestrear(f, n=12, a=0.0, b=1.0):
+    """Una funcion como vector: sus n valores en puntos equiespaciados de
+    [a, b). Devuelve (xs, valores)."""
+    xs = a + (b - a) * (np.arange(int(n)) + 0.5) / int(n)
+    return xs, np.array([float(f(x)) for x in xs])
+
+
+def base_fourier(n=12, k_max=3):
+    """Columnas: [1, cos(2pi x), sin(2pi x), cos(4pi x), ...] muestreadas
+    en n puntos de [0,1) y NORMALIZADAS (ortonormales para n > 2 k_max).
+    Devuelve (xs, B, etiquetas)."""
+    xs = (np.arange(int(n)) + 0.5) / int(n)
+    cols, tags = [np.ones(int(n))], ["1"]
+    for k in range(1, int(k_max) + 1):
+        cols.append(np.cos(2 * np.pi * k * xs))
+        tags.append(f"cos {k}")
+        cols.append(np.sin(2 * np.pi * k * xs))
+        tags.append(f"sin {k}")
+    b = np.column_stack(cols)
+    b = b / np.linalg.norm(b, axis=0)
+    return xs, b, tags
+
+
+def coeficientes(v, base):
+    """Coordenadas de v en una base ORTONORMAL (columnas): producto punto
+    con cada columna. Devuelve (coefs, reconstruccion)."""
+    b = np.asarray(base, dtype=float)
+    c = b.T @ np.asarray(v, dtype=float)
+    return c, b @ c
+
+
+# --- piezas 2D ----------------------------------------------------------
+class Elipse(VGroup):
+    """La imagen del circulo unidad bajo M: un poligono cerrado. .m
+    .con_matriz(M2) gemela; .semiejes() -> (s, U) de la SVD."""
+
+    def __init__(self, pl, m, color, grosor, opacidad, radio, n, **kwargs):
+        super().__init__(**kwargs)
+        self.plano, self.m, self.radio = pl, _mat(m), float(radio)
+        self.color_rol, self.grosor, self.opacidad, self.n = (color, grosor,
+                                                              opacidad, n)
+        pts = [pl.p(q) for q in elipse_de(self.m, n, radio)]
+        self.curva = Polygon(*pts, color=color, stroke_width=grosor,
+                             fill_color=color, fill_opacity=opacidad)
+        self.add(self.curva)
+
+    def con_matriz(self, m):
+        return Elipse(self.plano, m, self.color_rol, self.grosor,
+                      self.opacidad, self.radio, self.n)
+
+    def semiejes(self):
+        u, s, _ = svd(self.m)
+        return s * self.radio, u
+
+
+def circulo_unidad(pl, m=np.eye(2), color=C_VEC, grosor=3.0, opacidad=0.08,
+                   radio=1.0, n=96):
+    """El circulo unidad (o su imagen bajo M). `Transform(c, c.con_matriz(M))`
+    lo convierte en la elipse de M; los semiejes son sigma_1 u_1, sigma_2 u_2."""
+    return Elipse(pl, m, color, grosor, opacidad, radio, n)
+
+
+class Pixeles(VGroup):
+    """Una matriz de grises como cuadricula de cuadrados. .valores
+    .con_valores(V) gemela del mismo tamano/posicion (para Transform)."""
+
+    def __init__(self, valores, lado, color, **kwargs):
+        super().__init__(**kwargs)
+        v = np.clip(np.asarray(valores, dtype=float), 0.0, 1.0)
+        self.valores, self.lado, self.color_rol = v, float(lado), color
+        n, m = v.shape
+        for i in range(n):
+            for j in range(m):
+                c = Square(side_length=self.lado, stroke_width=0.4,
+                           stroke_color=C_REJILLA, fill_color=color,
+                           fill_opacity=float(v[i, j]))
+                c.move_to(np.array([(j - (m - 1) / 2) * self.lado,
+                                    ((n - 1) / 2 - i) * self.lado, 0.0]))
+                self.add(c)
+
+    def con_valores(self, valores):
+        g = Pixeles(valores, self.lado, self.color_rol)
+        g.move_to(self.get_center())
+        return g
+
+
+def pixeles(valores, lado=0.22, color="#e8edf3"):
+    """Imagen de grises (matriz en [0,1]) como cuadricula; la SVD truncada
+    se ve con `Transform(img, img.con_valores(aproximacion_rango(M, k)[0]))`."""
+    return Pixeles(valores, lado, color)
+
+
+class Barras(VGroup):
+    """Valores como barras verticales (una distribucion, unos coeficientes,
+    una funcion muestreada). .valores .barras (lista) .con_valores(V)
+    gemela (mismo ancho/escala/posicion, para Transform). Los negativos
+    cuelgan hacia abajo de la linea base."""
+
+    def __init__(self, valores, colores, ancho, alto, escala, etiquetas,
+                 font_size, **kwargs):
+        super().__init__(**kwargs)
+        v = np.asarray(valores, dtype=float)
+        self.valores, self.ancho, self.alto = v, float(ancho), float(alto)
+        self.escala = (float(escala) if escala is not None
+                       else (self.alto / max(float(np.max(np.abs(v))), 1e-9)))
+        self.colores, self.etiquetas, self.font_size = (colores, etiquetas,
+                                                        font_size)
+        n = len(v)
+        self.base = Line(np.array([-n * ancho / 2, 0, 0]),
+                         np.array([n * ancho / 2, 0, 0]), color=C_EJE,
+                         stroke_width=1.4)
+        self.add(self.base)
+        self.barras = []
+        for i, x in enumerate(v):
+            h = float(x) * self.escala
+            col = colores[i % len(colores)] if isinstance(colores, (list, tuple)) else colores
+            r = Rectangle(width=ancho * 0.72, height=max(abs(h), 0.01),
+                          color=col, fill_color=col, fill_opacity=0.8,
+                          stroke_width=0.8)
+            cx = (i - (n - 1) / 2) * ancho
+            r.move_to(np.array([cx, h / 2, 0.0]))
+            self.barras.append(r)
+            self.add(r)
+        if etiquetas is not None:
+            for i, t in enumerate(etiquetas):
+                e = _texto_hud(str(t), font_size=font_size)
+                e.next_to(self.base, DOWN, buff=0.1)
+                e.set_x((i - (n - 1) / 2) * ancho)
+                self.add(e)
+
+    def con_valores(self, valores):
+        g = Barras(valores, self.colores, self.ancho, self.alto, self.escala,
+                   self.etiquetas, self.font_size)
+        g.shift(self.base.get_center() - g.base.get_center())
+        return g
+
+
+def barras(valores, colores=C_J, ancho=0.32, alto=1.6, escala=None,
+           etiquetas=None, font_size=14):
+    """Barras de un vector de valores; `escala` fija unidades->pantalla
+    (si no, la barra mayor mide `alto`). Gemelas con .con_valores(V)."""
+    return Barras(valores, colores, ancho, alto, escala, etiquetas, font_size)
+
+
+class Trayectoria(VGroup):
+    """Una sucesion de estados (n x 2) sobre el plano: puntos unidos por
+    segmentos a trazos, el primero marcado. .estados .puntos .segmentos"""
+
+    def __init__(self, pl, estados, color, radio, grosor, **kwargs):
+        super().__init__(**kwargs)
+        e = np.asarray(estados, dtype=float)
+        self.estados = e
+        self.segmentos = VGroup(*[
+            DashedLine(pl.p(e[i]), pl.p(e[i + 1]), color=color,
+                       stroke_width=grosor, stroke_opacity=0.7,
+                       dash_length=0.08)
+            for i in range(len(e) - 1)])
+        self.puntos = VGroup(*[Dot(pl.p(q), radius=radio, color=color)
+                               for q in e])
+        self.puntos[0].scale(1.5)
+        self.add(self.segmentos, self.puntos)
+
+
+def trayectoria(pl, estados, color=C_VEC, radio=0.05, grosor=2.0):
+    """Los estados de `iterar(M, x0, n)` dibujados sobre el plano."""
+    return Trayectoria(pl, estados, color, radio, grosor)
+
+
+def triada3(esp, R=np.eye(3), largo=2.0, colores=(C_I, C_J, C_K), grosor=4.0):
+    """Los tres ejes de un cuerpo con actitud R como `vector3`
+    (ambar x, cian y, violeta z). .ejes (lista) ; .con_matriz(R2) gemela.
+    Sirve para LEER una actitud (satelite3 solo trae .eje_z)."""
+    R = _mat(R)
+    ejes = [vector3(esp, R[:, k] * float(largo), color=colores[k],
+                    grosor=grosor) for k in range(3)]
+    g = VGroup(*ejes)
+    g.ejes, g.R = ejes, R
+
+    def con_matriz(R2, _esp=esp, _largo=largo, _col=colores, _gr=grosor):
+        return triada3(_esp, R2, _largo, _col, _gr)
+    g.con_matriz = con_matriz
+    return g

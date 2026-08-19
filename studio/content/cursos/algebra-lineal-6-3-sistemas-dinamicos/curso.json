@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 6.3 Sistemas dinámicos: la matriz que mueve el tiempo",
+  "description": "Lección 6.3 del curso Álgebra lineal (módulo 6, cierre de la familia), en 4 clips animados: el estado como vector y el paso de tiempo como matriz, los autovalores que deciden si encoge, estira o gira, las direcciones propias que mandan en el retrato de fase, y el recap de la familia. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-estado-es-un-vector.py",
+      "title": "1 · El estado es un vector",
+      "scene": "Clip1",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/02-encoge-estira-o-gira.py",
+      "title": "2 · Encoge, estira o gira",
+      "scene": "Clip2",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/03-las-direcciones-propias-mandan.py",
+      "title": "3 · Las direcciones propias mandan",
+      "scene": "Clip3",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/04-repetir-mil-veces.py",
+      "title": "4 · Repetir mil veces",
+      "scene": "Clip4",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    }
+  ]
+}

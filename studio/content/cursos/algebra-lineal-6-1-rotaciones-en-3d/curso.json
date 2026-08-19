@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 6.1 Rotaciones en 3D: toda rotación tiene un eje",
+  "description": "Lección 6.1 del curso Álgebra lineal (módulo 6: del plano al mundo), en 4 clips animados: la rotación 3D como matriz ortogonal, componer giros, el eje que no se mueve (teorema de Euler: autovector de autovalor 1) y la actitud de un satélite como eje y ángulo. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-girar-en-3d-es-una-matriz.py",
+      "title": "1 · Girar en 3D es una matriz",
+      "scene": "Clip1",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/02-dos-giros-hacen-un-giro.py",
+      "title": "2 · Dos giros hacen un giro",
+      "scene": "Clip2",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/03-el-eje-que-no-se-mueve.py",
+      "title": "3 · El eje que no se mueve",
+      "scene": "Clip3",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/04-la-actitud-del-satelite.py",
+      "title": "4 · La actitud del satélite",
+      "scene": "Clip4",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    }
+  ]
+}

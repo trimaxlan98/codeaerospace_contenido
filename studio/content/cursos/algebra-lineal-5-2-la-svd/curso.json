@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 5.2 La SVD: todo movimiento es girar, estirar, girar",
+  "description": "Lección 5.2 del curso Álgebra lineal (módulo 5), en 4 clips animados: el círculo unidad se vuelve elipse bajo cualquier matriz, la SVD como girar-estirar-girar, el número de condición, y la compresión de una imagen quedándose con los valores singulares grandes. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-circulo-se-vuelve-elipse.py",
+      "title": "1 · El círculo se vuelve elipse",
+      "scene": "Clip1",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/02-girar-estirar-girar.py",
+      "title": "2 · Girar, estirar, girar",
+      "scene": "Clip2",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/03-cuanto-estira-el-numero-de-condicion.py",
+      "title": "3 · Cuánto estira: el número de condición",
+      "scene": "Clip3",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/04-una-imagen-es-una-matriz.py",
+      "title": "4 · Una imagen es una matriz",
+      "scene": "Clip4",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    }
+  ]
+}

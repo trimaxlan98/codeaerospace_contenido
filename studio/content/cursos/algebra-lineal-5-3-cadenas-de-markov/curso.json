@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 5.3 Cadenas de Markov: el equilibrio que la matriz esconde",
+  "description": "Lección 5.3 del curso Álgebra lineal (módulo 5), en 4 clips animados: estados y probabilidades de transición, la matriz que mueve la distribución de hoy a la de mañana, la convergencia desde cualquier inicio, y el equilibrio como vector propio de autovalor 1. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-estados-y-probabilidades.py",
+      "title": "1 · Estados y probabilidades",
+      "scene": "Clip1",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/02-la-matriz-mueve-la-distribucion.py",
+      "title": "2 · La matriz mueve la distribución",
+      "scene": "Clip2",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/03-todo-camino-lleva-al-mismo-sitio.py",
+      "title": "3 · Todo camino lleva al mismo sitio",
+      "scene": "Clip3",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/04-el-equilibrio-es-un-vector-propio.py",
+      "title": "4 · El equilibrio es un vector propio",
+      "scene": "Clip4",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    }
+  ]
+}

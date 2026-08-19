@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 6.2 Las funciones también son vectores",
+  "description": "Lección 6.2 del curso Álgebra lineal (módulo 6), en 4 clips animados: una función muestreada es un vector, se suman y escalan como vectores, senos y cosenos son ortogonales, y Fourier es proyectar una señal sobre esa base. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-una-funcion-es-una-lista.py",
+      "title": "1 · Una función es una lista",
+      "scene": "Clip1",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/02-sumar-y-escalar-funciones.py",
+      "title": "2 · Sumar y escalar funciones",
+      "scene": "Clip2",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/03-senos-que-no-se-estorban.py",
+      "title": "3 · Senos que no se estorban",
+      "scene": "Clip3",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    },
+    {
+      "file": "clips/04-fourier-es-un-cambio-de-base.py",
+      "title": "4 · Fourier es un cambio de base",
+      "scene": "Clip4",
+      "final_state": "(RELLENAR: describir el ultimo frame real)"
+    }
+  ]
+}
