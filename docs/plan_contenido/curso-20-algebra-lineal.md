@@ -163,18 +163,18 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 1.2 | ✔ | ✔ | ✔ 29.8/32.5/30.9/30.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 1.3 | ✔ | ✔ | ✔ 35.1/33.7/32.3/41.1 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.1 | ✔ | ✔ | ✔ 40.8/36.3/38.0/36.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.2 | ✔ | ✔ | ✔ 33.5/35.2/30.3/40.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.3 | ✔ | ✔ | ✔ 34.6/36.3/38.3/41.8 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.2 | ✔ | ✔ | ✔ 29.8/32.5/30.9/30.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.3 | ✔ | ✔ | ✔ 35.1/33.7/32.3/41.1 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.1 | ✔ | ✔ | ✔ 40.8/36.3/38.0/36.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.2 | ✔ | ✔ | ✔ 33.5/35.2/30.3/40.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.3 | ✔ | ✔ | ✔ 34.6/36.3/38.3/41.8 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
+| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
+| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
 
 Hitos globales: librería ✔ (commit 97384dd) · molde 1.1 ✔ · corridas nocturnas 01:00/05:00 murieron por cuota (la 01:00 dejó plan+librería+1.1, la 05:00 dejó 47/48 clips escritos sin validar) · 2026-08-19 11:00 sesión interactiva de Fable: validación ql de las 12 lecciones + 11 agentes (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) revisaron frame a frame y corrigieron; 4.3 clip 4 escrito por Opus · PR en curso · qh local en marcha · VPS pull+subir – · narración – · mux – · PLAN.md/CATALOGO ✔ · memoria –.
 
@@ -413,12 +413,12 @@ familia: el eje propio explica el tiempo.
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 5.1 | ✔ | – | – | – | – | – | – | – |
-| 5.2 | ✔ | – | – | – | – | – | – | – |
-| 5.3 | ✔ | – | – | – | – | – | – | – |
-| 6.1 | ✔ | – | – | – | – | – | – | – |
-| 6.2 | ✔ | – | – | – | – | – | – | – |
-| 6.3 | ✔ | – | – | – | – | – | – | – |
+| 5.1 | ✔ | ✔ | ✔ 33.5/33.8/40.3/35.4 s | commit cd6f1e6 | en marcha | – | – | – |
+| 5.2 | ✔ | ✔ | ✔ 37.9/37.7/43.5/41.1 s | commit cd6f1e6 | en marcha | – | – | – |
+| 5.3 | ✔ | ✔ | ✔ 30.3/31.2/31.7/30.9 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.1 | ✔ | ✔ | ✔ 37.3/36.6/40.2/42.5 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.2 | ✔ | ✔ | ✔ 33.3/33.4/33.0/40.3 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.3 | ✔ | ✔ | ✔ 33.7/38.5/38.1/40.5 s | commit cd6f1e6 | en marcha | – | – | – |
 
 ## Cosecha de trampas (se llena durante la producción)
 
@@ -432,4 +432,5 @@ familia: el eje propio explica el tiempo.
 - La rejilla fija de `plano()`/`espacio3()` a 0.5–0.55 de opacidad es casi invisible en ql: donde la comparación viva/fija es el mensaje, subirla a ~0.95 desde el clip (3.3).
 - `anim_matriz` toma el estado TOTAL desde la identidad: para encadenar movimientos se pasa el producto (D @ R), no el incremento (4.3).
 - `satelite3()` solo trae `.eje_z`: para leer una actitud hace falta una tríada de `vector3` (3.3). Sugerencias de librería pendientes: `segmento(pl,a,b)` transformable, `opacidad_fija` en Plano, `.ejes` en satelite3, `span_recta(trazos=True)`.
+- Ampliación (módulos 5–6): `svd()` devuelve reflexiones (det U = −1) la mitad de las veces y entonces el "girar" de `anim_matriz` pasa por un aplaste: elegir M con det U = det V = +1 (5.2 usa [[2,-0.5],[-1,1.5]]); `eje_rotacion` ya elige el signo del eje para que `rot3_eje` reproduzca R (corregido en la librería tras 6.1); la proyección oblicua de `espacio3` decide qué ángulos se leen: medir las direcciones proyectadas antes de escribir (6.1); una silla mal arrancada se lee como contracción: dar peso a la componente que crece y pasos suficientes (6.3); `Barras` se coloca por `.base`, no por `move_to`, y sus etiquetas chocan con barras negativas (6.2, 5.3); `Grafica` no expone su origen (alinear por `_ancla`) (6.2); el pie mostrado antes del plano queda DEBAJO de la rejilla: `bring_to_front(pie, titulo, hud)` tras `FadeIn(pl)` (6.2); `cierre_leccion(pie=None)` deja el pie anterior pegado (5.3); `Create` sobre un VGroup de rectas las escalona: dos `Create` en el mismo play (6.3).
 - El muestreo equiespaciado de `--frames 8` cae fácil en relevos de pies o en el hueco del cierre: antes de declarar un hueco, extraer el frame exacto con ffmpeg (2.1, 3.2).
