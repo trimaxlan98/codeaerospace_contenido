@@ -119,7 +119,76 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: la barra dibujada y la cifra escrita no pueden
+# discrepar. Las funciones se muestrean SIEMPRE con `muestrear` (12 puntos
+# equiespaciados de [0, 1)) y la base de Fourier sale de `base_fourier`.
+N_MUESTRAS = 12                          # una funcion muestreada vive en R^12
+
+
+def f_pulso(x):                          # clip 1: un pulso de telemetria
+    return math.exp(-((float(x) - 0.42) ** 2) / (2 * 0.16 ** 2))
+
+
+def f_campana(x):                        # clip 2: la funcion f
+    return math.exp(-((float(x) - 0.35) ** 2) / (2 * 0.25 ** 2))
+
+
+def f_onda(x):                           # clip 2: la funcion g
+    return 0.7 * math.sin(2 * math.pi * float(x))
+
+
+def f_suma(x):                           # clip 2: f + g
+    return f_campana(x) + f_onda(x)
+
+
+def f_media(x):                          # clip 2: 0.5 f (la escalada)
+    return K_ESCALA * f_campana(x)
+
+
+def f_senal(x):                          # clip 4: la senal periodica
+    x = float(x)
+    return (math.sin(2 * math.pi * x) + 0.5 * math.cos(4 * math.pi * x)
+            + 0.3 * math.sin(6 * math.pi * x))
+
+
+# clip 1 - la funcion como lista
+XS, V_PULSO = muestrear(f_pulso, N_MUESTRAS)
+PAR_R12 = (4, 5)                         # las dos coordenadas que se dibujan
+V_PAR = V_PULSO[list(PAR_R12)]           # (0.96, 0.97): un vector del plano
+
+# clip 2 - suma y escala
+_, V_F = muestrear(f_campana, N_MUESTRAS)
+_, V_G = muestrear(f_onda, N_MUESTRAS)
+V_MAS = V_F + V_G                        # barra a barra
+K_ESCALA = 0.5
+V_MEDIA = K_ESCALA * V_F
+ESC_2 = 0.62                             # unidades de pantalla por unidad de f
+
+# clip 3 - ortogonalidad
+U_PERP = np.array([2.0, 1.0])            # el caso 2D conocido
+W_PERP = np.array([-1.0, 2.0])
+DOT_PERP = float(U_PERP @ W_PERP)        # 0.0
+XS_B, B_F, TAGS_B = base_fourier(N_MUESTRAS, 3)   # 12 x 7, ortonormal
+COS_1, SIN_1 = B_F[:, 1], B_F[:, 2]
+PROD_CS = COS_1 * SIN_1                  # termino a termino: se cancela
+PROD_CC = COS_1 * COS_1                  # termino a termino: todo positivo
+DOT_CS = float(COS_1 @ SIN_1)            # 0.00
+DOT_CC = float(COS_1 @ COS_1)            # 1.00
+GRAM = B_F.T @ B_F                       # la identidad 7x7
+ESC_3 = 1.35                             # escala de las filas cos 1 / sin 1
+ESC_3P = 0.50 / float(np.max(PROD_CC))   # escala de la fila del producto
+
+# clip 4 - Fourier
+GIRO_BASE = rot2(35.0)                   # el cambio de base del plano (simbolico)
+V_PLANO = np.array([3.0, 2.0])           # el vector que NO se mueve
+_, V_SENAL = muestrear(f_senal, N_MUESTRAS)
+COEFS, V_RECON = coeficientes(V_SENAL, B_F)       # coordenadas en la base
+ARMONICOS = (1, 2, 3)
+RECONS = [B_F[:, :1 + 2 * k] @ COEFS[:1 + 2 * k] for k in ARMONICOS]
+ERRORES = [float(np.linalg.norm(V_SENAL - r) / np.linalg.norm(V_SENAL))
+           for r in RECONS]              # 0.50, 0.26, 0.00
+ESC_4 = 0.42                             # escala de las filas de 12 muestras
+ESC_4C = 0.90 / float(np.max(np.abs(COEFS)))      # escala de los coeficientes
 
 
 # --- El plano de la leccion ------------------------------------------

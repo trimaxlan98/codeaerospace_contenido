@@ -119,7 +119,93 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: la trayectoria que se dibuja y la cifra que se lee salen
+# del MISMO array.
+#
+# El sistema: la desviacion respecto al nominal de la temperatura de los dos
+# modulos de un satelite. El estado es un vector de dos numeros y un paso de
+# tiempo es una matriz:  x_{k+1} = A x_k.
+
+# --- Clips 1 y 4: el paso ESTABLE -------------------------------------
+# Encoge un 10 % y gira 25 grados: el estado cae en espiral hacia el cero
+# (el satelite vuelve al nominal).
+A_CONTRAE = 0.9 * rot2(25.0)
+VAL_CONTRAE, MOD_CONTRAE, ANG_CONTRAE = autos_complejos(A_CONTRAE)  # 0.90, 25.0
+X0 = np.array([2.6, 1.4])                # el estado de hoy (modulo A, modulo B)
+X1 = A_CONTRAE @ X0                      # el estado de manana
+PASOS_1 = 8
+TRAY_1 = iterar(A_CONTRAE, X0, PASOS_1)  # 9 estados: el rastro del clip 1
+
+# --- La SILLA (clips 2 y 3) -------------------------------------------
+# diag(1.15, 0.80) escrita en una base girada 30 grados. Los autovalores son
+# los del guion (1.15 estira, 0.80 encoge) pero sus ejes propios NO caen
+# encima de los ejes grises del dibujo, donde el fucsia se confundiria con
+# el mobiliario (cosecha de trampas: C_TENUE == C_EJE).
+GIRO_SILLA = rot2(30.0)
+D_SILLA = np.diag([1.15, 0.80])
+A_SILLA = GIRO_SILLA @ D_SILLA @ GIRO_SILLA.T      # [[1.06, 0.15], [0.15, 0.89]]
+LAM_SILLA, EJES_SILLA = autos(A_SILLA)             # [1.15, 0.80]
+DIR_ESTIRA = EJES_SILLA[:, 0]                      # 30 grados:  lambda = 1.15
+DIR_ENCOGE = EJES_SILLA[:, 1]                      # -60 grados: lambda = 0.80
+VAL_SILLA, MOD_SILLA, ANG_SILLA = autos_complejos(A_SILLA)   # 1.15, 0.0
+
+# --- La ROTACION pura (clip 2) ----------------------------------------
+A_GIRA = rot2(40.0)
+VAL_GIRA, MOD_GIRA, ANG_GIRA = autos_complejos(A_GIRA)       # 1.00, 40.0
+
+
+def en_ejes(a, b):
+    """El estado que tiene `a` sobre el eje que estira y `b` sobre el que
+    encoge. Iterar la silla multiplica a por 1.15 y b por 0.80: por eso las
+    trayectorias se pegan al primero y huyen por el."""
+    return a * DIR_ESTIRA + b * DIR_ENCOGE
+
+
+# --- Clip 2: tres mini-planos -----------------------------------------
+# plano_leccion() usa el alcance de la familia (12 unidades) y tres rejillas
+# asi se cruzarian en el centro del cuadro: aqui se llama a plano() directo.
+UNIDAD_MINI = 0.40
+ALCANCE_MINI = 3
+CENTROS_MINI = (LEFT * 4.6 + CENTRO_PLANO, CENTRO_PLANO,
+                RIGHT * 4.6 + CENTRO_PLANO)
+ALTO_MATRIZ_MINI = UP * 2.45          # la matriz, encima de cada mini-plano
+ALTO_CIFRA_MINI = DOWN * 2.20         # las cifras |lambda| y angulo, debajo
+X0_CONTRAE_MINI = np.array([2.4, 0.0])
+X0_GIRA_MINI = np.array([2.2, 0.0])
+# El arranque de la silla se elige con mas peso del que se apaga que del
+# que crece: asi la trayectoria ENTRA acercandose al eje que encoge, dobla,
+# y SALE mas lejos de donde empezo (r: 1.71 -> 1.23 -> 2.12). Con un
+# arranque muy pegado al eje que encoge la iteracion solo acorta y la silla
+# se leeria como una contraccion.
+X0_SILLA_MINI = (en_ejes(0.60, 1.60), en_ejes(-0.60, -1.60))
+PASOS_MINI = 10
+PASOS_SILLA_MINI = 9
+PASOS_GIRA_MINI = 9                   # 9 x 40 grados = una vuelta entera
+TRAY_CONTRAE_MINI = iterar(A_CONTRAE, X0_CONTRAE_MINI, PASOS_MINI)
+TRAY_SILLA_MINI = tuple(iterar(A_SILLA, x, PASOS_SILLA_MINI)
+                        for x in X0_SILLA_MINI)
+TRAY_GIRA_MINI = iterar(A_GIRA, X0_GIRA_MINI, PASOS_GIRA_MINI)
+
+# --- Clip 3: la silla a tamano completo -------------------------------
+V_ESTIRA = 2.2 * DIR_ESTIRA           # las dos flechas propias (fucsia)
+V_ENCOGE = 2.4 * DIR_ENCOGE
+PASOS_3 = 12
+# Mismo criterio que la silla mini: r pasa de 2.66 a 1.44 y vuelve a 2.95.
+ARRANQUES_3 = ((0.55, 2.6), (-0.55, 2.6), (0.55, -2.6), (-0.55, -2.6))
+TRAYS_3 = tuple(iterar(A_SILLA, en_ejes(a, b), PASOS_3)
+                for a, b in ARRANQUES_3)
+
+# --- Clip 4: converger, y el recap de la familia ----------------------
+PASOS_4 = 20
+TRAY_4 = iterar(A_CONTRAE, X0, PASOS_4)
+A_POTENCIA = potencia(A_CONTRAE, PASOS_4)     # A^20: la rejilla al 12 %
+MOD_POTENCIA = MOD_CONTRAE ** PASOS_4         # 0.90^20 = 0.12
+# La matriz del recap: simetrica, area x2 y ejes propios a 45 y 135 grados.
+M_RECAP = np.array([[1.5, 0.5], [0.5, 1.5]])
+DET_RECAP = determinante(M_RECAP)             # 2.0
+LAM_RECAP, EJES_RECAP = autos(M_RECAP)        # [2.0, 1.0]
+V_RECAP_1 = 1.6 * EJES_RECAP[:, 0]            # 45 grados:  se duplica
+V_RECAP_2 = 1.9 * EJES_RECAP[:, 1]            # 135 grados: no se mueve
 
 
 # --- El plano de la leccion ------------------------------------------

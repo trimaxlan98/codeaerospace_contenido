@@ -119,7 +119,52 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: la flecha dibujada y la cifra escrita no pueden
+# discrepar.
+
+# --- Clip 1: perpendicular es producto punto cero ---------------------
+U_PERP = np.array([3.0, 1.0])            # eje fijo, rojo (protagonista)
+V_PERP_INICIAL = np.array([1.0, 3.0])    # v arranca oblicuo (violeta)
+V_PERP_FINAL = np.array([-1.0, 3.0])     # mismo largo que V_PERP_INICIAL, ya perpendicular a U_PERP
+ANGULO_GIRO_PERP = angulo_entre(V_PERP_INICIAL, V_PERP_FINAL)   # 36.87 grados que gira v
+V_PERP_PASO1 = rot2(ANGULO_GIRO_PERP / 3.0) @ V_PERP_INICIAL     # (0.3, 3.1)
+V_PERP_PASO2 = rot2(2.0 * ANGULO_GIRO_PERP / 3.0) @ V_PERP_INICIAL  # (-0.3, 3.1)
+DOT_PERP_INICIAL = float(U_PERP @ V_PERP_INICIAL)   # 6.0
+DOT_PERP_PASO1 = float(U_PERP @ V_PERP_PASO1)        # 4.2
+DOT_PERP_PASO2 = float(U_PERP @ V_PERP_PASO2)        # 2.1
+DOT_PERP_FINAL = float(U_PERP @ V_PERP_FINAL)        # 0.0
+
+# --- Clip 2: coordenadas sin resolver nada -----------------------------
+ANGULO_BASE = 30.0                        # la base ortonormal, girada respecto a la canonica
+Q1_COORD = rot2(ANGULO_BASE) @ np.array([1.0, 0.0])   # (0.9, 0.5)
+Q2_COORD = rot2(ANGULO_BASE) @ np.array([0.0, 1.0])   # (-0.5, 0.9)
+V_COORD = np.array([1.0, 2.8])            # el vector protagonista (rojo)
+COEF_V_Q1 = float(V_COORD @ Q1_COORD)     # 2.3 = sombra sobre q1
+COEF_V_Q2 = float(V_COORD @ Q2_COORD)     # 1.9 = sombra sobre q2
+COORD_V_BASE = np.array([COEF_V_Q1, COEF_V_Q2])   # panel [v.q1; v.q2]
+
+# --- Clip 3: Gram-Schmidt, restar sombras -------------------------------
+V1_GS = np.array([2.0, 1.0])              # primer vector oblicuo
+V2_GS = np.array([1.0, 2.0])              # segundo vector oblicuo
+Q_GS, PASOS_GS = gram_schmidt([V1_GS, V2_GS])   # Q por columnas + los pasos
+Q1_GS = PASOS_GS[0]["q"]                  # (0.9, 0.4) = v1 normalizado
+SOMBRA_V2_Q1 = PASOS_GS[1]["sombras"][0]  # (1.6, 0.8) = sombra de v2 sobre q1
+RESTO_V2 = PASOS_GS[1]["resto"]           # (-0.6, 1.2) = lo que queda
+Q2_GS = PASOS_GS[1]["q"]                  # (-0.4, 0.9) = resto normalizado
+
+# --- Clip 4: mover sin deformar ------------------------------------------
+V_MOVER = np.array([2.0, 1.0])            # el vector que acompaña a la rejilla
+ANGULO_ROT_MOVER = 50.0
+ROT_MOVER = rot2(ANGULO_ROT_MOVER)                    # det 1.0, ortogonal
+REFLEX_MOVER = reflexion("diagonal")                  # det -1.0, ortogonal
+K_CIZALLA_MOVER = 1.2
+CIZALLA_MOVER = cizalla(K_CIZALLA_MOVER)              # det 1.0, NO ortogonal
+DET_ROT_MOVER = determinante(ROT_MOVER)               # 1.0
+DET_REFLEX_MOVER = determinante(REFLEX_MOVER)         # -1.0
+DET_CIZALLA_MOVER = determinante(CIZALLA_MOVER)       # 1.0
+ORTOG_ROT_MOVER = es_ortogonal(ROT_MOVER)             # True
+ORTOG_REFLEX_MOVER = es_ortogonal(REFLEX_MOVER)       # True
+ORTOG_CIZALLA_MOVER = es_ortogonal(CIZALLA_MOVER)     # False
 
 
 # --- El plano de la leccion ------------------------------------------

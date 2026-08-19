@@ -119,7 +119,54 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: la elipse dibujada y las cifras escritas no pueden
+# discrepar.
+#
+# M_LECCION: la matriz de la leccion. NO es simetrica (si lo fuera, la SVD
+# se confundiria con la diagonalizacion de la leccion 4.1) y esta elegida
+# para que la convencion de signos de `svd()` (primera componente no nula
+# de cada columna de U positiva) devuelva U y V^T con determinante +1: son
+# GIROS de verdad. Con det -1 serian reflexiones, y el Transform de
+# `anim_matriz` -- que interpola (1-t) I + t M -- pasaria por una rejilla
+# aplastada a mitad de camino: el "girar" del titulo seria mentira.
+M_LECCION = np.array([[2.0, -0.5], [-1.0, 1.5]])
+U_M, S_M, VT_M = svd(M_LECCION)          # M = U diag(S) V^T
+SIGMA_M = np.diag(S_M)                   # sigma1 = 2.56, sigma2 = 0.98
+V1_M, V2_M = VT_M[0], VT_M[1]            # las direcciones de ENTRADA (V)
+U1_M, U2_M = U_M[:, 0], U_M[:, 1]        # las direcciones de SALIDA (U)
+SEMIEJE_1 = S_M[0] * U1_M                # semieje mayor de la elipse
+SEMIEJE_2 = S_M[1] * U2_M                # semieje menor
+COND_M = numero_condicion(M_LECCION)     # 2.62
+DET_M = determinante(M_LECCION)          # 2.5 = sigma1 * sigma2
+
+# Los tres pasos del clip 2. `anim_matriz` quiere la matriz TOTAL desde la
+# identidad, asi que se encadenan PRODUCTOS PARCIALES, no incrementos.
+PASO_GIRO = VT_M                         # girar
+PASO_ESTIRA = SIGMA_M @ VT_M             # girar + estirar
+PASO_GIRO_2 = U_M @ SIGMA_M @ VT_M       # girar + estirar + girar = M
+
+# Clip 3: bien condicionada frente a casi singular. Las dos tambien tienen
+# U y V^T de determinante +1 y det > 0 en todo el camino desde la identidad.
+A_BUENA = np.array([[1.5, 0.5], [-1.0, 1.5]])
+A_MALA = np.array([[2.0, 1.0], [-1.0, -0.38]])
+S_BUENA = svd(A_BUENA)[1]                # 1.93 y 1.43
+S_MALA = svd(A_MALA)[1]                  # 2.48 y 0.10
+COND_BUENA = numero_condicion(A_BUENA)   # 1.35
+COND_MALA = numero_condicion(A_MALA)     # 25.56
+V2_MALA = svd(A_MALA)[2][1]              # la direccion que casi se aplasta
+X_ERR = np.array([1.6, -0.8])            # dos entradas MUY distintas...
+E_ERR = 1.5 * V2_MALA                    # separadas justo por v2
+X_ERR_2 = X_ERR + E_ERR
+D_ANTES = float(np.linalg.norm(E_ERR))                # 1.50
+D_DESPUES = float(np.linalg.norm(A_MALA @ E_ERR))     # 0.15 = 1.50 * sigma2
+
+# Clip 4: la imagen sintetica de 12x12 y sus aproximaciones de rango k.
+LADO_IMG = 12
+IMG = imagen_sintetica(LADO_IMG)
+S_IMG = svd(IMG)[1]                      # 12 valores singulares
+RANGOS = (1, 2, 3, 5)
+APROX = [aproximacion_rango(IMG, k) for k in RANGOS]  # [(M_k, error), ...]
+RANGO1_M, ERR_RANGO1_M = aproximacion_rango(M_LECCION, 1)   # error 0.36
 
 
 # --- El plano de la leccion ------------------------------------------

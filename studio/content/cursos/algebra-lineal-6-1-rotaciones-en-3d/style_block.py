@@ -119,7 +119,93 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: la triada que se dibuja y la matriz que se escribe salen
+# del MISMO array.
+DEC_R = 2                       # decimales de las matrices 3x3 en pantalla
+
+# --- Clip 1: una guiñada alrededor del eje z ---------------------------
+# Los angulos NO son libres: la proyeccion oblicua de espacio3 (azimut -38,
+# elevacion 24) aplasta unas direcciones y no otras, y dos flechas de la
+# triada que caen a menos de ~20 grados en pantalla se leen como una sola.
+# 50 y 40 grados separan las tres flechas en las tres actitudes del clip 2
+# y dejan el eje de Euler lejos de todas ellas (comprobado direccion a
+# direccion sobre la proyeccion antes de escribir los clips).
+ANG_Z = 50.0
+R_Z = rot3("z", ANG_Z)          # [[0.64, -0.77, 0], [0.77, 0.64, 0], [0, 0, 1]]
+DET_RZ = determinante(R_Z)      # 1.0: girar no crea ni destruye volumen
+
+# --- Clip 2: alabeo (eje x) y luego guiñada (eje z) --------------------
+# `anim_matriz` toma el estado TOTAL desde la identidad: el segundo paso se
+# anima con R_Z @ R_X (el producto), no con el incremento.
+ANG_X = 40.0
+R_X = rot3("x", ANG_X)
+R_COMP = R_Z @ R_X              # primero alabeo, despues guiñada
+DET_COMP = determinante(R_COMP)              # 1.0
+ORTO_COMP = es_ortogonal(R_COMP)             # True: R^T R = I
+LONG_COLS = np.linalg.norm(R_COMP, axis=0)   # (1.0, 1.0, 1.0)
+LARGO_TRIADA = 2.0
+
+
+def eje_y_angulo(R):
+    """El par (eje, angulo) de un giro 3D que REPRODUCE R con `rot3_eje`.
+
+    `eje_rotacion` normaliza el signo del eje (primera componente > 0), asi
+    que el angulo positivo que sale de la traza puede corresponder al giro
+    contrario. Aqui se elige el signo del eje que cumple
+    `rot3_eje(eje, angulo) == R`: la cifra rotulada y el giro dibujado
+    salen del mismo par.
+    """
+    eje, ang = eje_rotacion(R)
+    if not np.allclose(rot3_eje(eje, ang), np.asarray(R, dtype=float),
+                       atol=1e-8):
+        eje = -eje
+    return eje, float(ang)
+
+
+# --- Clip 3: el eje de Euler del giro compuesto -----------------------
+EJE_COMP, ANG_COMP = eje_y_angulo(R_COMP)   # (0.59, 0.28, 0.76) y 63.2 grados
+FIJO_COMP = R_COMP @ EJE_COMP               # el MISMO vector: R e = e
+DESVIO_EJE = float(np.linalg.norm(FIJO_COMP - EJE_COMP))   # 0.0
+DEC_EJE = 2
+LARGO_EJE = 2.6                 # largo en pantalla de la flecha fucsia
+
+
+def abanico(eje, largos=(2.2, 1.8, 2.0), fase=80.0):
+    """Tres flechas a 120 grados en el plano PERPENDICULAR al eje.
+
+    Tres y no cuatro: cuatro a 90 grados caen en pantalla por pares
+    opuestos y se leen como dos rectas cruzadas, no como cuatro flechas.
+    Los largos son distintos para que parezcan flechas cualesquiera y no
+    una figura. La fase (80 grados) esta elegida para que las tres, sus
+    imagenes tras uno y dos giros, y el propio eje no se solapen en la
+    proyeccion oblicua (separacion minima 39 grados).
+    """
+    e = np.asarray(eje, dtype=float)
+    e = e / np.linalg.norm(e)
+    aux = np.array([0.0, 0.0, 1.0]) if abs(e[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
+    u = np.cross(e, aux)
+    u = u / np.linalg.norm(u)
+    n = len(largos)
+    return [largos[k] * (rot3_eje(e, fase + 360.0 * k / n) @ u)
+            for k in range(n)]
+
+
+ABANICO = abanico(EJE_COMP)     # 3 flechas rojas en el plano del giro
+
+# --- Clip 4: la actitud del satelite ----------------------------------
+# Dos actitudes reales (guiñada y alabeo). Elegidas, como los angulos de
+# arriba, para que las tres flechas del cuerpo se separen en pantalla en A,
+# en B y durante todo el giro, y para que el eje de Euler no caiga sobre
+# ninguna de ellas.
+GUINADA_A, ALABEO_A = -30.0, -20.0
+GUINADA_B, ALABEO_B = 20.0, 35.0
+R_A = rot3("z", GUINADA_A) @ rot3("x", ALABEO_A)
+R_B = rot3("z", GUINADA_B) @ rot3("x", ALABEO_B)
+R_AB = R_B @ inversa(R_A)                   # el giro que lleva A hasta B
+EJE_AB, ANG_AB = eje_y_angulo(R_AB)         # (0.77, -0.07, 0.63) y 73.0 grados
+DESVIO_AB = float(np.linalg.norm(rot3_eje(EJE_AB, ANG_AB) @ R_A - R_B))  # 0.0
+PASOS_AB = 12                   # pasos del giro interpolado A -> B
+LARGO_EJE_AB = 2.8
 
 
 # --- El plano de la leccion ------------------------------------------

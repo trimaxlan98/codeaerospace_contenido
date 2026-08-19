@@ -119,7 +119,53 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
-# mano en el clip. (RELLENAR: tabla de numeros de esta leccion.)
+# mano en el clip: el diagrama, las barras y la cifra no pueden discrepar.
+#
+# El satelite vive en tres estados; T es la matriz de transicion por
+# COLUMNAS (columna j = a donde va la probabilidad si HOY estas en el
+# estado j). markov_estacionario(T) exige que cada columna sume 1: el
+# assert de abajo es la primera validacion, no decorativa.
+ESTADOS = ("N", "S", "E")
+NOMBRES_ESTADOS = ("Nominal", "Modo seguro", "Eclipse")
+COLORES_ESTADOS = (C_I, C_J, C_K)
+T = np.array([
+    [0.80, 0.30, 0.40],   # a Nominal: desde N, desde S, desde E
+    [0.05, 0.60, 0.10],   # a Modo seguro
+    [0.15, 0.10, 0.50],   # a Eclipse
+])
+assert np.allclose(T.sum(axis=0), 1.0), "las columnas de T deben sumar 1"
+
+# Diagrama del clip 1: posiciones de los tres nodos (desplazado a la
+# izquierda para dejar sitio al panel de la matriz).
+R_NODO = 0.5
+CENTRO_GRAFO = LEFT * 1.1 + DOWN * 0.25
+POSICIONES = (CENTRO_GRAFO + UP * 1.55,
+             CENTRO_GRAFO + LEFT * 1.95 + DOWN * 1.05,
+             CENTRO_GRAFO + RIGHT * 1.95 + DOWN * 1.05)
+
+# Clip 2: la distribucion arranca 100% en Nominal; T, T^2, ..., T^5.
+P0_N = np.array([1.0, 0.0, 0.0])
+PASOS_CLIP2 = 5
+ITERADOS_N = iterar(T, P0_N, PASOS_CLIP2)          # fila k = T^k P0_N
+
+# Clip 3: dos arranques distintos que convergen a lo mismo; y una version
+# de dos estados (Nominal / no-Nominal) para dibujar la trayectoria en el
+# plano, con la misma matriz "de familia" de columnas ambar/cian.
+P0_E = np.array([0.0, 0.0, 1.0])
+PASOS_CONVERGE = 8
+ITERADOS_N8 = iterar(T, P0_N, PASOS_CONVERGE)
+ITERADOS_E8 = iterar(T, P0_E, PASOS_CONVERGE)
+
+T2 = np.array([[0.7, 0.4],
+              [0.3, 0.6]])                          # columnas: N, no-N
+assert np.allclose(T2.sum(axis=0), 1.0), "las columnas de T2 deben sumar 1"
+COLORES_2 = (C_I, C_J)
+P0_N2 = np.array([1.0, 0.0])
+TRAYECTORIA_N2 = iterar(T2, P0_N2, PASOS_CONVERGE)  # fila k = T2^k P0_N2
+
+# Clip 4: el equilibrio es el autovector de autovalor 1.
+P_ESTACIONARIO = markov_estacionario(T)              # (0.644, 0.136, 0.220)
+P_ESTACIONARIO_2 = markov_estacionario(T2)            # (0.571, 0.429)
 
 
 # --- El plano de la leccion ------------------------------------------

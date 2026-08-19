@@ -1284,6 +1284,10 @@ def eje_rotacion(r):
         eje = -eje
     ang = float(np.degrees(np.arccos(np.clip((np.trace(r) - 1.0) / 2.0,
                                              -1.0, 1.0))))
+    # El angulo de la traza es siempre positivo: el signo del eje se elige
+    # para que rot3_eje(eje, ang) reproduzca R (y no el giro contrario).
+    if not np.allclose(rot3_eje(eje, ang), r, atol=1e-6):
+        eje = -eje
     return eje, ang
 
 

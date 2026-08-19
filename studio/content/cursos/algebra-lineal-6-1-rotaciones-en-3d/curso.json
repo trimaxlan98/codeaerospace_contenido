@@ -8,25 +8,25 @@
       "file": "clips/01-girar-en-3d-es-una-matriz.py",
       "title": "1 · Girar en 3D es una matriz",
       "scene": "Clip1",
-      "final_state": "(RELLENAR: describir el ultimo frame real)"
+      "final_state": "El espacio 3D con la rejilla fija gris y la viva azul girada 50 grados; la triada del cuerpo (x ambar, y cian, z violeta) tambien girada, con la z quieta sobre el eje del giro; a la derecha la matriz 3x3 por columnas de colores (0.64 -0.77 0.00 / 0.77 0.64 0.00 / 0.00 0.00 1.00) y debajo 'det R = 1.0'; pie: 'Y el determinante vale uno: girar no estira ni encoge nada.'"
     },
     {
       "file": "clips/02-dos-giros-hacen-un-giro.py",
       "title": "2 · Dos giros hacen un giro",
       "scene": "Clip2",
-      "final_state": "(RELLENAR: describir el ultimo frame real)"
+      "final_state": "El suelo vivo azul bajo R = Rz Rx (casi vertical) contra el suelo fijo gris, y la triada girada por el producto; a la derecha el rotulo 'R = Rz Rx', la matriz por columnas (0.64 -0.59 0.49 / 0.77 0.49 -0.41 / 0.00 0.64 0.77) y las tres comprobaciones 'det R = 1.0', 'R^T R = I : si', '|columnas| = 1.0, 1.0, 1.0'; pie: 'Y sigue siendo una rotacion: las columnas miden uno y siguen siendo perpendiculares.'"
     },
     {
       "file": "clips/03-el-eje-que-no-se-mueve.py",
       "title": "3 · El eje que no se mueve",
       "scene": "Clip3",
-      "final_state": "(RELLENAR: describir el ultimo frame real)"
+      "final_state": "El suelo vivo azul tras aplicar DOS veces el giro compuesto (rombo inclinado) sobre el suelo fijo gris; las tres flechas rojas del abanico ya giradas dos veces y la flecha fucsia del eje, etiquetada e, exactamente donde estaba; a la derecha 'eje de giro', la columna fucsia (0.59 / 0.28 / 0.76), '|R e - e| = 0.00' y 'angulo = 63.2 grados'; pie: 'Euler lo demostro para todas: toda rotacion en 3D tiene un eje y un angulo.'"
     },
     {
       "file": "clips/04-la-actitud-del-satelite.py",
       "title": "4 · La actitud del satélite",
       "scene": "Clip4",
-      "final_state": "(RELLENAR: describir el ultimo frame real)"
+      "final_state": "Pantalla limpia con el cierre de la leccion en dos lineas centradas, 'Toda rotacion tiene un eje.' en blanco y 'La actitud es un eje y un angulo.' en cian, y el pie de enlace '¿Y si el vector no fuera una flecha, sino una funcion entera? Siguiente leccion.'"
     }
   ]
 }
