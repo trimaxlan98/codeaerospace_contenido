@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 1.2 Combinaciones lineales y span",
+  "description": "Lección 1.2 del curso Álgebra lineal (módulo 1: el espacio y sus vectores), en 4 clips animados: mezclar dos vectores con escalares, el span como todo lo que se alcanza (el plano entero), qué pasa cuando los dos se alinean (una recta) y el span en tres dimensiones (un plano, o el espacio si el tercero no se esconde). Cada idea se ve moverse sobre la rejilla.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-mezclar-dos-vectores.py",
+      "title": "1 · Mezclar dos vectores",
+      "scene": "Clip1",
+      "final_state": "Varias combinaciones a·u + b·v con sus puntas marcadas y los coeficientes en el panel; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-span-todo-lo-que-alcanzas.py",
+      "title": "2 · El span: todo lo que alcanzas",
+      "scene": "Clip2",
+      "final_state": "El plano entero sombreado como span de u y v, con la nube de puntas que lo llenó; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cuando-se-alinean.py",
+      "title": "3 · Cuando se alinean",
+      "scene": "Clip3",
+      "final_state": "v colineal con u: la recta del span con las dos flechas encima y el plano perdido; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-span-en-tres-dimensiones.py",
+      "title": "4 · Span en tres dimensiones",
+      "scene": "Clip4",
+      "final_state": "Espacio 3D con el plano generado por dos vectores y el tercero saliéndose de él; cierre «Dos flechas: un plano.» / «Tres, si no se esconden: el espacio.»; HUD 'MODULO 04'."
+    }
+  ]
+}

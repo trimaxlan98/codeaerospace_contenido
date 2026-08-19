@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 1.3 Dependencia lineal, base y dimensión",
+  "description": "Lección 1.3 del curso Álgebra lineal (módulo 1), en 4 clips animados: el vector que sobra (dependencia lineal, construido como combinación de los otros), la base como lo mínimo que lo genera todo, las coordenadas como números que dependen de la base (la rejilla oblicua) y la dimensión como cuántos hacen falta. Todo se ve sobre la rejilla.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-vector-que-sobra.py",
+      "title": "1 · El vector que sobra",
+      "scene": "Clip1",
+      "final_state": "Tres vectores en el plano: w construido como a·u + b·v cerrando el triángulo, con los coeficientes calculados; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-base-lo-minimo-que-genera-todo.py",
+      "title": "2 · Base: lo mínimo que lo genera todo",
+      "scene": "Clip2",
+      "final_state": "El mismo punto alcanzado con la base canónica y con otra base, dos parejas de coeficientes en el panel; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-coordenadas-dependen-de-la-base.py",
+      "title": "3 · Coordenadas: números que dependen de la base",
+      "scene": "Clip3",
+      "final_state": "La rejilla oblicua de otra base sobre la canónica y el vector rojo con sus dos lecturas; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-dimension-cuantos-hacen-falta.py",
+      "title": "4 · Dimensión: cuántos hacen falta",
+      "scene": "Clip4",
+      "final_state": "Tríptico recta/plano/espacio con 1, 2 y 3 vectores; cierre «Base: los justos.» / «Dimensión: cuántos son.»; HUD 'MODULO 04'."
+    }
+  ]
+}

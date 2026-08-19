@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 1.1 El vector: flecha, lista y movimiento",
+  "description": "Lección 1.1 del curso Álgebra lineal (módulo 1: el espacio y sus vectores), en 4 clips animados —una idea por clip—: el vector como flecha desde el origen Y como lista de números, sumar como encadenar flechas, escalar como estirar (o invertir) y la revelación de que todo vector es una mezcla de î y ĵ. Cada idea se ve moverse sobre la rejilla del plano. Estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-una-flecha-y-una-lista.py",
+      "title": "1 · Una flecha y una lista",
+      "scene": "Clip1",
+      "final_state": "Plano con el vector rojo (3, 2) desde el origen, sus proyecciones punteadas sobre los ejes y la columna [3; 2] en el panel derecho; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-sumar-es-caminar.py",
+      "title": "2 · Sumar es caminar",
+      "scene": "Clip2",
+      "final_state": "u (rojo) y v (violeta) puestos cola-punta, la resultante verde (3, 3), el paralelogramo tenue y la suma por componentes en el panel; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-escalar-es-estirar.py",
+      "title": "3 · Escalar es estirar",
+      "scene": "Clip3",
+      "final_state": "La recta del span de u con las flechas 2u, u/2 y -1.5u encima y sus cifras; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-todo-vector-es-i-y-j.py",
+      "title": "4 · Todo vector es î y ĵ",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Una flecha es una lista.» sobre «Una lista es una flecha.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 2.3 El determinante: área y orientación",
+  "description": "Lección 2.3 del curso Álgebra lineal (módulo 2), en 4 clips animados: el cuadrado unidad se estira hasta un paralelogramo cuya área es el determinante, cualquier figura escala su área por ese factor, el signo dice si el plano se volteó (orientación) y el cero: el plano se aplasta a una recta (y en 3D, el volumen).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-cuadrado-unidad-se-estira.py",
+      "title": "1 · El cuadrado unidad se estira",
+      "scene": "Clip1",
+      "final_state": "El paralelogramo naranja de las columnas con su área medida igual al determinante; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-factor-de-area.py",
+      "title": "2 · El factor de área",
+      "scene": "Clip2",
+      "final_state": "Varias celdas de la rejilla sombreadas tras la transformación, todas multiplicadas por det; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-signo-la-orientacion.py",
+      "title": "3 · El signo: la orientación",
+      "scene": "Clip3",
+      "final_state": "Reflexión: paralelogramo volteado, î y ĵ intercambiaron lado y det = -1; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-cero-el-plano-se-aplasta.py",
+      "title": "4 · Cero: el plano se aplasta",
+      "scene": "Clip4",
+      "final_state": "La rejilla aplastada a una recta y el cubo unidad aplastado en 3D; cierre «El determinante es cuánto crece el área.» / «Cero: algo se perdió.»; HUD 'MODULO 04'."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 2.1 La matriz es un movimiento",
+  "description": "Lección 2.1 del curso Álgebra lineal (módulo 2: la transformación lineal), en 4 clips animados: mover el plano entero (la rejilla se deforma, las rectas siguen rectas y el origen quieto), basta saber a dónde van î y ĵ (las columnas de la matriz), un vector cualquiera sigue la receta (el producto matriz-vector) y un catálogo de movimientos: rotación, cizalla, escala, reflexión.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-mover-el-plano-entero.py",
+      "title": "1 · Mover el plano entero",
+      "scene": "Clip1",
+      "final_state": "La rejilla viva deformada por la matriz sobre la fija, con el origen marcado quieto; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-a-donde-van-i-y-j.py",
+      "title": "2 · Basta saber a dónde van î y ĵ",
+      "scene": "Clip2",
+      "final_state": "î y ĵ transformados con la matriz por columnas coloreadas en el panel; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-un-vector-sigue-la-receta.py",
+      "title": "3 · Un vector cualquiera sigue la receta",
+      "scene": "Clip3",
+      "final_state": "Mv construido como 3·î' + 2·ĵ' en verde con la cuenta matriz-vector en el panel; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-un-catalogo-de-movimientos.py",
+      "title": "4 · Un catálogo de movimientos",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «La matriz no es una tabla.» / «Es a dónde van î y ĵ.»; HUD 'MODULO 04'."
+    }
+  ]
+}

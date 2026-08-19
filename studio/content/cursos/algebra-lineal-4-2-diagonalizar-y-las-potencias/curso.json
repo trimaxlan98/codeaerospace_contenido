@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 4.2 Diagonalizar y las potencias",
+  "description": "Lección 4.2 del curso Álgebra lineal (módulo 4), en 4 clips animados: en la base propia todo es estirar (la rejilla propia oblicua y la matriz diagonal D), A = P D P⁻¹ (traducir, estirar, destraducir), potencias sin sudar (A¹⁰ en un paso; Fibonacci y φ) e iterar y converger (todo vector se acuesta sobre el propio dominante).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-en-la-base-propia-todo-es-estirar.py",
+      "title": "1 · En la base propia todo es estirar",
+      "scene": "Clip1",
+      "final_state": "La rejilla propia oblicua bajo A: solo se estira a lo largo de sus ejes; D en el panel; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-a-igual-p-d-p-inversa.py",
+      "title": "2 · A = P D P⁻¹",
+      "scene": "Clip2",
+      "final_state": "Las tres matrices P, D y P⁻¹ calculadas y su producto igual a A; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-potencias-sin-sudar.py",
+      "title": "3 · Potencias sin sudar",
+      "scene": "Clip3",
+      "final_state": "A¹⁰ calculada por diagonalización y la matriz de Fibonacci con φ = 1.618; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-iterar-y-converger.py",
+      "title": "4 · Iterar y converger",
+      "scene": "Clip4",
+      "final_state": "La secuencia de vectores A^n v acostándose sobre la dirección propia dominante; cierre «Repite un movimiento mil veces» / «y verás su eje.»; HUD 'MODULO 04'."
+    }
+  ]
+}

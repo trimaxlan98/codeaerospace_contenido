@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 4.3 Proyección, mínimos cuadrados y ejes principales",
+  "description": "Lección 4.3 del curso Álgebra lineal (módulo 4, cierre de la familia), en 4 clips animados: el producto punto como una sombra (v·u = |v||u| cos θ, ortogonal = 0), proyectar sobre una recta (el punto más cercano y el error perpendicular), la recta que mejor ajusta una telemetría con deriva (mínimos cuadrados) y los ejes de una nube de datos (PCA: autovectores de la covarianza), con el recap de la familia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-producto-punto-es-una-sombra.py",
+      "title": "1 · El producto punto es una sombra",
+      "scene": "Clip1",
+      "final_state": "La proyección de v sobre u con la cifra del producto punto y el ángulo; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-proyectar-sobre-una-recta.py",
+      "title": "2 · Proyectar sobre una recta",
+      "scene": "Clip2",
+      "final_state": "El punto más cercano sobre la recta y el residuo perpendicular punteado; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-la-recta-que-mejor-ajusta.py",
+      "title": "3 · La recta que mejor ajusta",
+      "scene": "Clip3",
+      "final_state": "La nube de telemetría con la recta de mínimos cuadrados y su pendiente calculada; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-los-ejes-de-una-nube.py",
+      "title": "4 · Los ejes de una nube",
+      "scene": "Clip4",
+      "final_state": "Nube de datos con sus dos ejes principales fucsia; cierre «Encuentra los ejes» / «y el problema se endereza.»; HUD 'MODULO 04'."
+    }
+  ]
+}
