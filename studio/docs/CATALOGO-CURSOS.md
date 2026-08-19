@@ -20,7 +20,7 @@ El nombre es, además, la **clave de emparejamiento** de `subir_curso.py:86`. Ve
 ## Antes
 
 58 proyectos: tres familias numeradas (Aerodinámica 1.1–4.5, Electromagnetismo
-1.1–4.3, Metrología óptica 1.1–3.3) y **16 cursos monográficos de 8 clips en un
+1.1–4.3, Metrología óptica 1.1–3.3; desde 2026-08-19 también Álgebra lineal 1.1–4.3) y **16 cursos monográficos de 8 clips en un
 montón plano**, ordenados por actividad — es decir, por el azar de qué se tocó
 la última vez.
 

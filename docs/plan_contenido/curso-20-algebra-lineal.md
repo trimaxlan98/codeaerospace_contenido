@@ -163,21 +163,20 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | commit 97384dd (rama) | – | – | – | – |
-| 1.2 | ✔ | – | – | – | – | – | – | – |
-| 1.3 | ✔ | – | – | – | – | – | – | – |
-| 2.1 | ✔ | – | – | – | – | – | – | – |
-| 2.2 | ✔ | – | – | – | – | – | – | – |
-| 2.3 | ✔ | – | – | – | – | – | – | – |
-| 3.1 | ✔ | – | – | – | – | – | – | – |
-| 3.2 | ✔ | – | – | – | – | – | – | – |
-| 3.3 | ✔ | – | – | – | – | – | – | – |
-| 4.1 | ✔ | – | – | – | – | – | – | – |
-| 4.2 | ✔ | – | – | – | – | – | – | – |
-| 4.3 | ✔ | – | – | – | – | – | – | – |
+| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 1.2 | ✔ | ✔ | ✔ 29.8/32.5/30.9/30.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 1.3 | ✔ | ✔ | ✔ 35.1/33.7/32.3/41.1 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 2.1 | ✔ | ✔ | ✔ 40.8/36.3/38.0/36.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 2.2 | ✔ | ✔ | ✔ 33.5/35.2/30.3/40.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 2.3 | ✔ | ✔ | ✔ 34.6/36.3/38.3/41.8 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
 
-Hitos globales: librería ✔ (validada en contenedor, commit 97384dd) · molde 1.1 ✔ · contratos scratchpad ✔ · corrida 01:00 murió por cuota a la 01:30 con la ola 1 a medias (1.2 y 3.1 con 4 clips, 1.3 con 3, 2.1 y 2.3 con 2, sin validar) · corrida 05:00: relanzados los 11 agentes a la vez (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) con el estado heredado en el prompt · PR – · merge – · VPS pull+subir – ·
-PLAN.md/CATALOGO – · memoria –.
+Hitos globales: librería ✔ (commit 97384dd) · molde 1.1 ✔ · corridas nocturnas 01:00/05:00 murieron por cuota (la 01:00 dejó plan+librería+1.1, la 05:00 dejó 47/48 clips escritos sin validar) · 2026-08-19 11:00 sesión interactiva de Fable: validación ql de las 12 lecciones + 11 agentes (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) revisaron frame a frame y corrigieron; 4.3 clip 4 escrito por Opus · PR en curso · qh local en marcha · VPS pull+subir – · narración – · mux – · PLAN.md/CATALOGO ✔ · memoria –.
 
 ## Módulo 1 — El espacio y sus vectores
 
@@ -300,4 +299,14 @@ es encadenar → escalar es estirar → todo vector es a·î + b·ĵ.
 
 ## Cosecha de trampas (se llena durante la producción)
 
-- (pendiente)
+- `Transform` entre dos VGroup de distinta estructura (panel de 1 columna → 2 columnas, matriz → columnas, dos `tag_hud`) morphea glifos rotos durante la transición: usar FadeOut + FadeIn(shift) o el relevo secuencial de `Rotulos` (1.3, 4.3).
+- Dos `Vector` que convergen al mismo punto bajo `anim_matriz` (singular, núcleo) necesitan `etiqueta_dir` distinto desde su creación y `bring_to_front` para el z-order; la librería no lo hace (3.1, 2.3).
+- `Paralelogramo.area` y `Caja3.volumen` llevan SIGNO (son el det): si el pie habla de tamaño, pintar `abs()` (2.3).
+- Rajdhani no tiene ⁻¹, φ ni λ; Space Mono no tiene superíndices: en `Text` escribir `P^-1` y dejar los símbolos a MathTex (4.2).
+- Un `Vector` que va a cero se vuelve un Dot invisible: marcar el cero a mano (fantasma + punto + Flash) (4.1).
+- Abanicos equiespaciados frente a giros de simetría alta (90°): el paso no debe dividir al ángulo o la imagen coincide con el original (4.1).
+- `C_TENUE` == `C_EJE` (#94a0b0): una recta auxiliar gris se lee como un eje; usar trazos rojos/fantasma para "carriles" (4.1).
+- La rejilla fija de `plano()`/`espacio3()` a 0.5–0.55 de opacidad es casi invisible en ql: donde la comparación viva/fija es el mensaje, subirla a ~0.95 desde el clip (3.3).
+- `anim_matriz` toma el estado TOTAL desde la identidad: para encadenar movimientos se pasa el producto (D @ R), no el incremento (4.3).
+- `satelite3()` solo trae `.eje_z`: para leer una actitud hace falta una tríada de `vector3` (3.3). Sugerencias de librería pendientes: `segmento(pl,a,b)` transformable, `opacidad_fija` en Plano, `.ejes` en satelite3, `span_recta(trazos=True)`.
+- El muestreo equiespaciado de `--frames 8` cae fácil en relevos de pies o en el hueco del cierre: antes de declarar un hueco, extraer el frame exacto con ffmpeg (2.1, 3.2).

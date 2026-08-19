@@ -49,6 +49,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | publicado (PR #19); primer curso con intro/cierre de marca en el mux |
 | 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | publicado (PR #21): 9 lecciones narradas y muxeadas con intro/cierre |
 | 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
+| 22 | Algebra lineal (familia, 12 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | en curso (2026-08-19): 48 clips validados frame a frame, PR abierto; qh/narracion/mux en marcha |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -152,6 +153,34 @@ modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
 | 3.1 | El enlace optico entre satelites | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.2 | Apuntar, adquirir, seguir | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.3 | Satelites que se miden entre si | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+
+## Familia "Algebra lineal" (2026-08-19, formato de lecciones)
+
+Cuarta familia (curso 22 del plan): **un proyecto = una leccion de 4
+clips**, 4 modulos x 3 lecciones = 12 proyectos, 48 clips. Original; el
+angulo es *cada idea se VE moverse*: rejilla viva azul que se deforma sobre
+la fija gris, la matriz por columnas de colores (a donde van i y j), el
+paralelogramo del determinante, la nube que se endereza con sus ejes
+principales. Ejemplos aeroespaciales donde salen solos (actitud del
+satelite, marco cuerpo/inercial, telemetria con deriva). Libreria
+`algebra_lineal.py` y style_block molde (leccion 1.1). Planeada por Fable,
+producida por 11 subagentes Sonnet/Opus (una leccion por agente) y
+validada frame a frame. Storyboard: `curso-20-algebra-lineal.md`.
+
+| Leccion | Proyecto | Clips | Estado |
+|---------|----------|-------|--------|
+| 1.1 | El vector: flecha, lista y movimiento | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 1.2 | Combinaciones lineales y span | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 1.3 | Dependencia lineal, base y dimension | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 2.1 | La matriz es un movimiento | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 2.2 | Componer movimientos: el producto | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 2.3 | El determinante: area y orientacion | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 3.1 | Sistemas Ax = b y la inversa | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 3.2 | Rango, nucleo e imagen | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 3.3 | Cambio de base: el mismo vector, otro idioma | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 4.1 | Vectores propios: los que no giran | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 4.2 | Diagonalizar y las potencias | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 4.3 | Proyeccion, minimos cuadrados y ejes principales | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
 
 ## Marca: intro y cierre para posproduccion (2026-08-14)
 
