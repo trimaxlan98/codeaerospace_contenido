@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 3.2 Rango, núcleo e imagen",
+  "description": "Lección 3.2 del curso Álgebra lineal (módulo 3), en 4 clips animados: la imagen como a dónde puede llegar la transformación (una recta o el plano), el rango como la dimensión de la imagen (también en 3D), el núcleo como lo que va a cero (una recta de vectores que caen al origen) y rango + nulidad = n.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-imagen-a-donde-puede-llegar.py",
+      "title": "1 · La imagen: a dónde puede llegar",
+      "scene": "Clip1",
+      "final_state": "Las dos imágenes lado a lado: una rejilla aplastada a recta y otra que sigue siendo plano; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-rango-dimension-de-la-imagen.py",
+      "title": "2 · El rango es la dimensión de la imagen",
+      "scene": "Clip2",
+      "final_state": "Casos con rango 1 y 2 en el plano y rango 2 en el espacio (un plano), rotulados; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-nucleo-lo-que-va-a-cero.py",
+      "title": "3 · El núcleo: lo que va a cero",
+      "scene": "Clip3",
+      "final_state": "La recta fucsia del núcleo con las flechas fantasma sobre ella y el punto en el origen, la recta imagen azul aplastada, y el panel con la matriz, el vector [1; -2] y 'nucleo: dim 1'; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-lo-que-se-pierde-y-lo-que-queda.py",
+      "title": "4 · Lo que se pierde y lo que queda",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre a dos líneas «Imagen: lo que queda.» (blanca) / «Núcleo: lo que se pierde.» (cian) y el pie de enlace a la lección 3.3; HUD 'MODULO 04'."
+    }
+  ]
+}

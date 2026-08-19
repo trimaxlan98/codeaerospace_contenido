@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 3.1 Sistemas Ax = b y la inversa",
+  "description": "Lección 3.1 del curso Álgebra lineal (módulo 3: preguntar al revés), en 4 clips animados: el sistema Ax = b como pregunta geométrica (¿qué x aterriza en b?), la inversa como deshacer el movimiento (la rejilla vuelve a su sitio), resolver es aplicar la inversa (x = A⁻¹b calculado) y cuando no hay vuelta atrás (det 0).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-sistema-es-una-pregunta.py",
+      "title": "1 · El sistema es una pregunta geométrica",
+      "scene": "Clip1",
+      "final_state": "Rejilla transformada, b verde y el x rojo que aterriza en b; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-deshacer-el-movimiento-la-inversa.py",
+      "title": "2 · Deshacer el movimiento: la inversa",
+      "scene": "Clip2",
+      "final_state": "La rejilla devuelta a su sitio por A⁻¹ y la matriz inversa calculada en el panel; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-resolver-es-aplicar-la-inversa.py",
+      "title": "3 · Resolver es aplicar la inversa",
+      "scene": "Clip3",
+      "final_state": "x = A⁻¹b con los números y la comprobación Ax = b; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-cuando-no-hay-vuelta-atras.py",
+      "title": "4 · Cuando no hay vuelta atrás",
+      "scene": "Clip4",
+      "final_state": "Rejilla aplastada: dos x van al mismo b y otros b no se alcanzan; cierre «Si el área sobrevive, hay inversa.» / «Si se aplasta, no.»; HUD 'MODULO 04'."
+    }
+  ]
+}

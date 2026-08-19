@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 3.3 Cambio de base: el mismo vector, otro idioma",
+  "description": "Lección 3.3 del curso Álgebra lineal (módulo 3), en 4 clips animados: dos rejillas y un vector (dos lecturas del mismo v), la matriz de cambio de base P y su inversa, traducir una transformación (P⁻¹AP: el mismo movimiento contado en otro idioma) y el marco del satélite: cuerpo frente a inercial, el mismo vector Sol con dos listas.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-rejillas-un-vector.py",
+      "title": "1 · Dos rejillas, un vector",
+      "scene": "Clip1",
+      "final_state": "La rejilla oblicua sobre la canónica y el vector rojo con sus dos coordenadas en el panel; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-matriz-de-cambio-de-base.py",
+      "title": "2 · La matriz de cambio de base",
+      "scene": "Clip2",
+      "final_state": "P y P⁻¹ calculadas por columnas coloreadas, con las flechas de ida y vuelta; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-traducir-una-transformacion.py",
+      "title": "3 · Traducir una transformación",
+      "scene": "Clip3",
+      "final_state": "A y P⁻¹AP en el panel con la misma rejilla deformada vista en las dos bases; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-marco-del-satelite.py",
+      "title": "4 · El marco del satélite",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: «El vector no cambia.» en blanco sobre «Cambian sus números.» en cian, y el pie que abre el módulo 4; HUD 'MODULO 04'."
+    }
+  ]
+}

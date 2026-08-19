@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 4.1 Vectores propios: los que no giran",
+  "description": "Lección 4.1 del curso Álgebra lineal (módulo 4: los ejes que la transformación respeta), en 4 clips animados: casi todo gira bajo la transformación menos dos direcciones, los que solo se estiran (Av = λv con λ = 3 y 1), encontrarlos con det(A − λI) = 0 (la rejilla se aplasta justo en esos λ) y los que no los tienen (rotación) o tienen uno solo (cizalla).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-casi-todo-gira.py",
+      "title": "1 · Casi todo gira",
+      "scene": "Clip1",
+      "final_state": "Rejilla transformada con muchas flechas giradas y las dos direcciones fucsia que no giraron; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-los-que-solo-se-estiran.py",
+      "title": "2 · Los que solo se estiran",
+      "scene": "Clip2",
+      "final_state": "Los dos autovectores fucsia con sus λ = 3 y λ = 1 y la ecuación Av = λv; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-encontrarlos-det-a-menos-lambda-i.py",
+      "title": "3 · Encontrarlos: det(A − λI) = 0",
+      "scene": "Clip3",
+      "final_state": "La curva det(A − λI) frente a λ con los ceros en 1 y 3 marcados; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-los-que-no-los-tienen.py",
+      "title": "4 · Los que no los tienen",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Los ejes propios» sobre «son los que la transformación respeta.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

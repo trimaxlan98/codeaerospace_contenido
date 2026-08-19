@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 2.2 Componer movimientos: el producto",
+  "description": "Lección 2.2 del curso Álgebra lineal (módulo 2), en 4 clips animados: primero un movimiento y luego otro (rotación y cizalla) dan una sola matriz, multiplicar es componer (las columnas de BA son B aplicada a las columnas de A), el orden importa (AB ≠ BA lado a lado) y girar un satélite: alabeo y cabeceo no conmutan, en 3D.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-primero-uno-luego-otro.py",
+      "title": "1 · Primero uno, luego otro",
+      "scene": "Clip1",
+      "final_state": "Rejilla tras rotación y luego cizalla, con la matriz producto en el panel; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-multiplicar-es-componer.py",
+      "title": "2 · Multiplicar es componer",
+      "scene": "Clip2",
+      "final_state": "El producto BA calculado por columnas coloreadas: B aplicada a cada columna de A; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-orden-importa.py",
+      "title": "3 · El orden importa",
+      "scene": "Clip3",
+      "final_state": "Dos rejillas lado a lado, AB y BA, con las dos matrices distintas; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-girar-un-satelite.py",
+      "title": "4 · Girar un satélite",
+      "scene": "Clip4",
+      "final_state": "Dos actitudes distintas del cubesat (alabeo→cabeceo vs cabeceo→alabeo) en 3D; cierre «Componer es multiplicar.» / «Y el orden se nota.»; HUD 'MODULO 04'."
+    }
+  ]
+}
