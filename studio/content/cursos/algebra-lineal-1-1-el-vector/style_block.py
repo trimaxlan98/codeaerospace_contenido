@@ -147,8 +147,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

@@ -114,7 +114,43 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+#
+# La matriz PROTAGONISTA de la leccion (clips 1, 2 y 3). Elegida a mano con
+# tres condiciones: no simetrica (para que el movimiento no se lea como un
+# simple estiramiento), det = 1.5 > 1 (el area crece: se nota que la rejilla
+# se abre) y entradas de un decimal (caben en la matriz por columnas sin
+# apretar). i-sombrero gira 26.6 grados y crece; j-sombrero gira 45 y crece:
+# el angulo entre ellos pasa de 90 a 108 grados, asi que la deformacion se ve
+# ademas del giro.
+M_LECCION = np.array([[1.0, -1.0],
+                      [0.5, 1.0]])
+I_IMG = M_LECCION[:, 0]                  # a donde va i-sombrero: 1.a columna
+J_IMG = M_LECCION[:, 1]                  # a donde va j-sombrero: 2.a columna
+
+# El vector cualquiera del clip 3 y su imagen (se calculan, no se escriben).
+V_DEMO = np.array([3.0, 2.0])            # v = 3 i + 2 j
+COMPONENTES = (V_DEMO[0], V_DEMO[1])     # los pesos de la receta: 3 y 2
+MV_DEMO = M_LECCION @ V_DEMO             # M v = 3 i' + 2 j'
+
+# Las dos rectas paralelas que se vigilan en el clip 1: mismo vector
+# director, dos puntos de paso distintos. Los extremos (centro +- director)
+# y sus imagenes caben en el cuadro con el titulo y el pie puestos.
+RECTA_DIR = np.array([1.5, 1.0])
+RECTA_C1 = np.array([-0.8, 0.9])
+RECTA_C2 = np.array([0.8, -0.9])
+
+# El catalogo del clip 4: los cuatro movimientos con nombre. Las matrices
+# salen de la libreria (rot2, cizalla, escala, reflexion), nunca a mano.
+ANG_ROT = 35.0                           # grados de la rotacion
+K_CIZALLA = 1.0                          # cuanto desliza la cizalla
+ESC_XY = (1.5, 0.6)                      # estira en x, encoge en y
+EJE_REFLEXION = "y"                      # el espejo del clip 4
+M_ROT = rot2(ANG_ROT)
+M_CIZ = cizalla(K_CIZALLA)
+M_ESC = escala(*ESC_XY)
+M_REF = reflexion(EJE_REFLEXION)
+IDENTIDAD = np.eye(2)
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +175,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

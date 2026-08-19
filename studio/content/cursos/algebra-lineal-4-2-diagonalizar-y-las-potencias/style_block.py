@@ -115,6 +115,26 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
 # discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+A = np.array([[2.0, 1.0], [1.0, 2.0]])        # la matriz de la leccion
+                                                # (simetrica: autos reales y P ortogonal)
+VAL_A, VEC_A = autos(A)                        # autovalores (3, 1) y autovectores unitarios
+P_MAT, D_MAT, PINV_MAT = diagonalizar(A)       # A = P D P^-1
+U1 = VEC_A[:, 0]                               # autovector de lambda_1 = 3: (1,1)/rt2
+U2 = VEC_A[:, 1]                               # autovector de lambda_2 = 1: (1,-1)/rt2
+A_RECOMPUESTA = P_MAT @ D_MAT @ PINV_MAT       # P D P^-1 recompuesto (debe coincidir con A)
+
+V_GEN = np.array([1.0, -0.3])                  # vector generico (no propio): hilo conductor
+
+N_POTENCIA = 10
+A_N = potencia(A, N_POTENCIA)                  # A^10 por producto repetido (referencia)
+D_N = potencia(D_MAT, N_POTENCIA)              # D^10 = diag(3^10, 1^10): trivial por diagonal
+A_N_DIAG = P_MAT @ D_N @ PINV_MAT              # A^10 via diagonalizacion (coincide con A_N)
+
+Q_BASE = np.array([[1.0, 1.0], [1.0, 0.0]])    # la matriz de Fibonacci
+Q10_MAT, FIB_10 = fibonacci_matriz(N_POTENCIA)  # Q^10 y F_10 = 55
+
+PASOS_ITERA = (1, 2, 3, 4, 6, 8, 10)           # exponentes que se muestran iterando A^n V_GEN
+V_FINAL = potencia(A, N_POTENCIA) @ V_GEN      # A^10 v, ya casi sobre el eje propio dominante
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +159,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

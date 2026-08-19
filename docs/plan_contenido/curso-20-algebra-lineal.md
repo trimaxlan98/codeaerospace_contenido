@@ -163,7 +163,7 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 1.1 | ✔ | – | – | – | – | – | – | – |
+| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | commit 97384dd (rama) | – | – | – | – |
 | 1.2 | ✔ | – | – | – | – | – | – | – |
 | 1.3 | ✔ | – | – | – | – | – | – | – |
 | 2.1 | ✔ | – | – | – | – | – | – | – |
@@ -176,7 +176,7 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 | 4.2 | ✔ | – | – | – | – | – | – | – |
 | 4.3 | ✔ | – | – | – | – | – | – | – |
 
-Hitos globales: librería – · molde 1.1 – · PR – · merge – · VPS pull+subir – ·
+Hitos globales: librería ✔ (validada en contenedor, commit 97384dd) · molde 1.1 ✔ · contratos scratchpad ✔ · corrida 01:00 murió por cuota a la 01:30 con la ola 1 a medias (1.2 y 3.1 con 4 clips, 1.3 con 3, 2.1 y 2.3 con 2, sin validar) · corrida 05:00: relanzados los 11 agentes a la vez (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) con el estado heredado en el prompt · PR – · merge – · VPS pull+subir – ·
 PLAN.md/CATALOGO – · memoria –.
 
 ## Módulo 1 — El espacio y sus vectores

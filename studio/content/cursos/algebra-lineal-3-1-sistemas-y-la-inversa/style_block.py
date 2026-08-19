@@ -114,7 +114,21 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+A = np.array([[2.0, 1.0], [1.0, 2.0]])       # det 3: invertible
+_X_SEMILLA = np.array([2.0, -1.0])           # el x elegido para fabricar b
+B_VEC = A @ _X_SEMILLA                       # (3.0, 0.0), calculado
+X_SOL = resolver(A, B_VEC)                   # (2.0, -1.0), por otro camino
+A_INV = inversa(A)                           # [[2/3, -1/3], [-1/3, 2/3]]
+CHEQUEO = A @ X_SOL                          # confirma A x = b
+
+A_SING = np.array([[1.0, 2.0], [2.0, 4.0]])  # det 0: aplasta a una recta
+DET_SING = determinante(A_SING)              # 0.0
+DIR_NUCLEO = np.array([2.0, -1.0])           # nucleo de A_SING
+X1_SING = np.array([0.5, 0.5])               # primer x (su imagen cabe en pantalla)
+X2_SING = X1_SING + DIR_NUCLEO               # (2.5, -0.5), mismo destino
+B_SING = A_SING @ X1_SING                    # (1.5, 3.0): donde caen ambos
+B_FUERA = np.array([1.0, 0.0])               # fuera de la recta imagen
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +153,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

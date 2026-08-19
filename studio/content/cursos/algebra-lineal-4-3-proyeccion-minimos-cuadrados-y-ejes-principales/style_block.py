@@ -114,7 +114,72 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+
+# --- Clip 1: el producto punto es una sombra -------------------------
+V_PP = np.array([1.0, 3.0])              # el vector del que se habla (rojo)
+U_PP = np.array([3.0, 1.0])              # la direccion sobre la que cae (violeta)
+W_PP = np.array([-1.0, 3.0])             # el perpendicular a U_PP
+DOT_VU = float(V_PP @ U_PP)              # 6.0
+NORM_V = float(np.linalg.norm(V_PP))     # 3.16
+NORM_U = float(np.linalg.norm(U_PP))     # 3.16
+ESC_VU, PROY_VU = proyeccion(V_PP, U_PP)  # 1.90 ; (1.8, 0.6)
+ANG_VU = angulo_entre(V_PP, U_PP)        # 53 grados
+DOT_WU = float(W_PP @ U_PP)              # 0.0: ortogonales
+ANG_WU = angulo_entre(W_PP, U_PP)        # 90 grados
+
+# --- Clip 2: proyectar sobre una recta -------------------------------
+U_REC = np.array([2.0, 1.0])             # la direccion de la recta (violeta)
+D_REC = np.array([3.0, 3.0])             # el dato que hay que aproximar (rojo)
+ESC_D, PROY_D = proyeccion(D_REC, U_REC)  # (3.6, 1.8): el punto mas cercano
+RES_D = D_REC - PROY_D                   # (-0.6, 1.2): el residuo
+NORM_RES = float(np.linalg.norm(RES_D))  # 1.34
+DOT_RES = float(RES_D @ U_REC)           # 0.0: el residuo es perpendicular
+T_PROY = float(D_REC @ U_REC) / float(U_REC @ U_REC)   # 1.8: donde cae
+T_CAND = (2.2, 1.2, T_PROY)              # el punto que recorre la recta:
+CAND_REC = [t * U_REC for t in T_CAND]   # pasado, corto y justo (3.6, 1.8)
+DIST_CAND = [float(np.linalg.norm(D_REC - c)) for c in CAND_REC]  # 1.61 1.90 1.34
+P_PROY = proyeccion_matriz(U_REC)        # [[0.8, 0.4], [0.4, 0.2]]
+DET_P = determinante(P_PROY)             # 0.0: aplasta el plano en la recta
+
+# --- Clip 3: la recta que mejor ajusta -------------------------------
+SEMILLA_TELE = 3                         # semilla FIJA de la telemetria
+M_REAL, B_REAL = 0.6, 0.2                # la deriva que genero los datos
+XS_TELE, YS_TELE = telemetria(semilla=SEMILLA_TELE, n=14, pendiente=M_REAL,
+                              ordenada=B_REAL, ruido=0.45, x0=-3.0, x1=3.0)
+PTS_TELE = np.column_stack([XS_TELE, YS_TELE])
+M_FIT, B_FIT = minimos_cuadrados(XS_TELE, YS_TELE)   # 0.62 y 0.13
+
+
+def error_recta(m, b):
+    """Suma de los cuadrados de los residuos verticales de la telemetria."""
+    return float(np.sum((YS_TELE - (m * XS_TELE + b)) ** 2))
+
+
+CAND_RECTAS = ((0.15, 0.9),                      # casi plana y por encima
+               (1.0, 0.0),                       # inclinada de mas
+               (M_FIT, B_FIT))                   # la de minimos cuadrados
+ERRORES = [error_recta(m, b) for (m, b) in CAND_RECTAS]   # 24.4, 13.0, 5.6
+
+# --- Clip 4: los ejes de una nube (PCA) ------------------------------
+SEMILLA_NUBE = 7                         # semilla FIJA de la nube
+COV_GEN = ((2.2, 1.3), (1.3, 1.0))       # covarianza que genera la nube
+_NUBE_CRUDA = nube(semilla=SEMILLA_NUBE, n=60, cov=COV_GEN)
+MEDIA_N = _NUBE_CRUDA.mean(axis=0)       # (0.30, 0.14)
+NUBE_PCA = _NUBE_CRUDA - MEDIA_N         # el PCA empieza por centrar
+COV_N = np.cov(NUBE_PCA.T)               # [[1.66, 0.90], [0.90, 0.66]]
+VAL_PCA, VEC_PCA, _ = ejes_principales(NUBE_PCA)   # [2.19, 0.13]
+_BASE = VEC_PCA.copy()
+if determinante(_BASE) < 0:
+    # `autos` orienta cada columna con su primera componente positiva, y eso
+    # deja det = -1: interpolar hacia un reflejo aplastaria la rejilla a la
+    # mitad del giro. Con la segunda columna volteada es un GIRO puro.
+    _BASE[:, 1] = -_BASE[:, 1]
+BASE_PCA = _BASE                         # columnas = ejes principales
+R_PCA = BASE_PCA.T                       # lleva el eje mayor sobre las x
+EJES_2SD = [2.0 * float(np.sqrt(VAL_PCA[j])) * BASE_PCA[:, j] for j in (0, 1)]
+PESO_PCA = 100.0 * VAL_PCA / float(VAL_PCA.sum())   # 94 % y 6 %
+NUBE_GIRADA = NUBE_PCA @ R_PCA.T         # la nube ya enderezada
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +204,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

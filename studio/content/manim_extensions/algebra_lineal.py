@@ -735,6 +735,11 @@ class MatrizColumnas(VGroup):
         self.valores = m
         dec = _decimales(m) if dec is None else dec
         celdas_txt = [[fmt(x, dec) for x in fila] for fila in m]
+        # h_buff es distancia centro a centro entre columnas: con entradas
+        # anchas ("-0.33") 0.9 las pega. Se abre lo justo para dejar aire.
+        mas_ancha = max((MathTex(t, font_size=font_size).width
+                         for fila in celdas_txt for t in fila), default=0.0)
+        h_buff = max(h_buff, mas_ancha + 0.32)
         self.matriz = Matrix(celdas_txt, h_buff=h_buff, v_buff=v_buff,
                              bracket_h_buff=0.18,
                              element_to_mobject_config={"font_size": font_size})
@@ -982,12 +987,13 @@ class Vector3(VGroup):
     """Flecha 3D proyectada desde el origen. .coords .con_matriz(M)"""
 
     def __init__(self, esp, coords, color, nombre, font_size, grosor,
-                 **kwargs):
+                 etiqueta_dir=None, **kwargs):
         super().__init__(**kwargs)
         self.espacio = esp
         self.coords = _vec(coords, 3)
         self.color_rol, self.nombre = color, nombre
         self.font_size, self.grosor = font_size, grosor
+        self.etiqueta_dir = etiqueta_dir
         a, b = esp.p(0, 0, 0), esp.p(self.coords)
         largo = float(np.linalg.norm(b - a))
         if largo < 1e-6:
@@ -1001,30 +1007,39 @@ class Vector3(VGroup):
         self.etiqueta = None
         if nombre is not None:
             self.etiqueta = MathTex(nombre, font_size=font_size, color=color)
-            d = b - a
-            n = np.linalg.norm(d)
-            d = d / n if n > 1e-9 else UP
-            self.etiqueta.move_to(b + 0.3 * d + 0.15 * UP)
+            if etiqueta_dir is not None:
+                # desplazamiento de PANTALLA desde la punta (como en 2D)
+                self.etiqueta.move_to(b + np.asarray(etiqueta_dir, float))
+            else:
+                d = b - a
+                n = np.linalg.norm(d)
+                d = d / n if n > 1e-9 else UP
+                self.etiqueta.move_to(b + 0.3 * d + 0.15 * UP)
             self.add(self.etiqueta)
 
     def punta(self):
         return self.espacio.p(self.coords)
 
-    def con_matriz(self, m, color=None, nombre="__mismo__"):
+    def con_matriz(self, m, color=None, nombre="__mismo__", etiqueta_dir=None):
         return Vector3(self.espacio, _mat(m) @ self.coords,
                        self.color_rol if color is None else color,
                        self.nombre if nombre == "__mismo__" else nombre,
-                       self.font_size, self.grosor)
+                       self.font_size, self.grosor,
+                       self.etiqueta_dir if etiqueta_dir is None else etiqueta_dir)
 
-    def con_coords(self, coords, color=None, nombre="__mismo__"):
+    def con_coords(self, coords, color=None, nombre="__mismo__", etiqueta_dir=None):
         return Vector3(self.espacio, coords,
                        self.color_rol if color is None else color,
                        self.nombre if nombre == "__mismo__" else nombre,
-                       self.font_size, self.grosor)
+                       self.font_size, self.grosor,
+                       self.etiqueta_dir if etiqueta_dir is None else etiqueta_dir)
 
 
-def vector3(esp, coords, color=C_VEC, nombre=None, font_size=28, grosor=4.5):
-    return Vector3(esp, coords, color, nombre, font_size, grosor)
+def vector3(esp, coords, color=C_VEC, nombre=None, font_size=28, grosor=4.5,
+            etiqueta_dir=None):
+    """Flecha 3D proyectada. `etiqueta_dir`: desplazamiento de pantalla de la
+    etiqueta respecto a la punta (p. ej. 0.34*DOWN), como en `vector` 2D."""
+    return Vector3(esp, coords, color, nombre, font_size, grosor, etiqueta_dir)
 
 
 def _aristas_caja(m, dims, origen):

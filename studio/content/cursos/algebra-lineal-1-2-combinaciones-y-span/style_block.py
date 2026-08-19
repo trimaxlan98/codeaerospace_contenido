@@ -114,7 +114,25 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+U_COMB = np.array([2.0, 1.0])              # u (rojo), protagonista de 1.2
+V_COMB = np.array([-1.0, 1.0])             # v (violeta), no alineado con u
+PAREJAS = ((1.0, 1.0), (2.0, -1.0), (-1.0, 2.0), (0.5, 1.5))  # (a, b) clip 1
+
+# clip 2: barrido de (a, b) semienteros -> rejilla de puntas que llena el
+# plano (recorrida por bucle en el clip, sin azar).
+BARRIDO_AB = tuple(float(x) for x in np.arange(-1.5, 1.51, 0.5))
+
+# clip 3: v se vuelve multiplo de u (colineal) -> el span se aplasta a una
+# recta; tres parejas (a, b) que, con v colineal, caen todas en esa recta.
+V_COLINEAL = -1.5 * U_COMB
+PAREJAS_COLINEAL = ((1.0, 0.5), (-1.0, 0.5), (0.5, -1.0))
+
+# clip 4: espacio3, dos vectores generan un plano
+U3 = np.array([1.0, 0.2, 0.3])
+V3 = np.array([0.2, 1.0, 0.4])
+W3 = np.array([0.3, 0.2, 1.0])             # fuera del plano de u3, v3
+W3_DENTRO = U3 + V3                        # combinacion: vive en el plano
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +157,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

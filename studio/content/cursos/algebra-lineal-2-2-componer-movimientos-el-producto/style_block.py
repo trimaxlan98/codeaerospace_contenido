@@ -114,7 +114,32 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+#
+# Las dos matrices PROTAGONISTAS (clips 1, 2 y 3): A una rotacion, B una
+# cizalla. Elegidas con det(A) = det(B) = 1 (el area no cambia: lo que se
+# nota es el GIRO relativo, no un achicamiento que distraiga) y con
+# entradas que no coinciden por casualidad, para que A B y B A se lean
+# claramente distintas en pantalla.
+ANG_ROT = 30.0                     # grados de la rotacion A
+K_CIZALLA = 0.8                    # cuanto desliza la cizalla B
+A = rot2(ANG_ROT)
+B = cizalla(K_CIZALLA)
+BA = B @ A                         # primero A, LUEGO B (clips 1 y 2)
+AB = A @ B                         # el otro orden (clip 3): AB != BA
+
+# El vector protagonista del clip 1 (cualquier vector sirve: el punto es
+# que viaja por las DOS matrices, una tras otra).
+V_DEMO = np.array([2.0, 1.0])
+
+# El satelite del clip 4: dos rotaciones 3D que tampoco conmutan. Angulos
+# distintos entre si (40 y 50) para que ningun eje quede casualmente fijo.
+ALABEO = 40.0                      # grados de alabeo (roll, eje x)
+CABECEO = 50.0                     # grados de cabeceo (pitch, eje y)
+R_ALABEO = rot3("x", ALABEO)
+R_CABECEO = rot3("y", CABECEO)
+R_AC = R_CABECEO @ R_ALABEO        # alabeo, LUEGO cabeceo
+R_CA = R_ALABEO @ R_CABECEO        # cabeceo, LUEGO alabeo
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +164,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

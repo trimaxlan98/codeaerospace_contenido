@@ -114,7 +114,56 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+
+
+def direccion_entera(u):
+    """Reescala una direccion (las de nucleo() e imagen_base() salen
+    unitarias) para que su componente no nula mas pequeña valga 1:
+    (0.45, -0.89) -> (1, -2). Asi la recta se rotula con enteros sin
+    escribir ni un numero a mano."""
+    u = np.asarray(u, dtype=float)
+    menor = np.min(np.abs(u[np.abs(u) > 1e-9]))
+    w = u / menor
+    return np.round(w) if np.allclose(w, np.round(w), atol=1e-6) else w
+
+
+# A: rango 1. La segunda columna es la MITAD de la primera, asi que las dos
+# caen en la misma recta y con ellas todo el plano: la imagen es esa recta.
+A_PLANA = np.array([[1.0, 0.5],
+                    [1.0, 0.5]])
+# B: rango 2. Misma primera columna; la segunda se sale de la recta, asi
+# que la rejilla se deforma pero sigue llenando el plano.
+A_LLENA = np.array([[1.0, -1.0],
+                    [1.0, 1.0]])
+# C (3x3): rango 2. El espacio entero cae sobre un plano inclinado; la
+# direccion vertical es justo la que se pierde.
+A_ESPACIO = np.array([[1.0, 0.0, 0.0],
+                      [0.0, 1.0, 0.0],
+                      [0.5, 0.5, 0.0]])
+
+N_PLANO, N_ESPACIO = 2, 3                     # dimension de la ENTRADA
+RANGO_PLANA = rango(A_PLANA)                  # 1
+RANGO_LLENA = rango(A_LLENA)                  # 2
+RANGO_ESPACIO = rango(A_ESPACIO)              # 2
+NUL_PLANA = nucleo(A_PLANA).shape[1]          # 1
+NUL_LLENA = nucleo(A_LLENA).shape[1]          # 0
+NUL_ESPACIO = nucleo(A_ESPACIO).shape[1]      # 1
+DET_PLANA = determinante(A_PLANA)             # 0.0
+DET_LLENA = determinante(A_LLENA)             # 2.0
+
+DIR_IMG = direccion_entera(imagen_base(A_PLANA)[:, 0])   # (1, 1)  la imagen
+DIR_NUC = direccion_entera(nucleo(A_PLANA)[:, 0])        # (1, -2) el nucleo
+COL_ESP_1 = A_ESPACIO[:, 0]                   # las dos columnas que generan
+COL_ESP_2 = A_ESPACIO[:, 1]                   # el plano imagen en 3D
+NUC_ESPACIO = direccion_entera(nucleo(A_ESPACIO)[:, 0])  # (0, 0, 1)
+
+V_STAR = np.array([2.0, 1.0])                 # el vector protagonista
+ESCALAS_NUC = (1.0, -1.4, 0.5)                # tres vectores del nucleo
+K_ESPACIO = 1.8 * NUC_ESPACIO                 # el vector vertical que cae
+
+MINI_UNIDAD, MINI_ALCANCE = 0.34, 3           # los dos planos "lado a lado"
+MINI_CENTROS = (LEFT * 3.4 + DOWN * 0.35, RIGHT * 3.4 + DOWN * 0.35)
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +188,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

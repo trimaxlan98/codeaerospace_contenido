@@ -114,7 +114,59 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+#
+# Los autovalores y los autovectores SIEMPRE salen de autos(M) (numpy),
+# nunca de la cabeza: la rejilla que se deforma, la flecha que se estira y
+# la cifra que se lee salen del MISMO array.
+A_PROPIA = np.array([[2.0, 1.0], [1.0, 2.0]])    # clips 1-3: i -> (2,1), j -> (1,2)
+LAMBDAS, EJES = autos(A_PROPIA)                  # [3.0, 1.0]
+DIR_ESTIRA = EJES[:, 0]                          # (1,1)/raiz(2): lambda = 3
+DIR_QUIETA = EJES[:, 1]                          # (1,-1)/raiz(2): lambda = 1
+
+# Clip 1: un abanico de direcciones; 45 y 135 grados caen justo sobre las
+# dos rectas propias (indices 2 y 6), por eso esas dos no giran.
+RADIO_ABANICO = 1.3
+ANGULOS_ABANICO = (0.0, 20.0, 45.0, 70.0, 90.0, 110.0, 135.0, 160.0)
+ABANICO = tuple(RADIO_ABANICO * np.array([math.cos(math.radians(a)),
+                                          math.sin(math.radians(a))])
+                for a in ANGULOS_ABANICO)
+INDICES_PROPIOS = (2, 6)
+
+# Clip 2: una flecha sobre cada recta propia (largo elegido para que la
+# estirada x3 quepa bajo el titulo).
+V_ESTIRA = 0.9 * math.sqrt(2.0) * DIR_ESTIRA     # (0.9, 0.9) -> (2.7, 2.7)
+V_QUIETA = 2.0 * math.sqrt(2.0) * DIR_QUIETA     # (2, -2) -> igual
+
+# Clip 3: se resta lambda a la diagonal y se BARRE lambda. El Transform de
+# la rejilla interpola linealmente las dos matrices, y como
+# (1-t)(A - aI) + t(A - bI) = A - ((1-t)a + tb) I, ese barrido ES el de
+# lambda: la rejilla se aplasta exactamente al pasar por 1 y por 3.
+PARADAS = (0.0, LAMBDAS[1], LAMBDAS[0])          # lambda = 0, 1, 3
+A_MENOS = tuple(A_PROPIA - lam * np.eye(2) for lam in PARADAS)
+DETS = tuple(determinante(m) for m in A_MENOS)   # 3.0, 0.0, 0.0
+V_CAE_3 = 0.9 * math.sqrt(2.0) * DIR_ESTIRA      # (0.9, 0.9): cae al cero en 3
+V_CAE_1 = 1.2 * math.sqrt(2.0) * DIR_QUIETA      # (1.2, -1.2): cae al cero en 1
+POLI_CARAC = np.poly(A_PROPIA)                   # [1, -4, 3]: lambda^2 -4l +3
+RANGO_LAMBDA = (0.0, 4.0)                        # eje horizontal de la curva
+RANGO_DET = (-1.6, 3.4)                          # eje vertical de la curva
+
+# Clip 4: dos contraejemplos, lado a lado. El giro no deja ninguna
+# direccion en su sitio (autos levanta ValueError: autovalores complejos);
+# la cizalla deja una sola, la horizontal (autovalor doble 1).
+R_GIRO = rot2(90.0)
+S_CIZALLA = cizalla(1.0)
+LAMBDAS_CIZALLA, EJES_CIZALLA = autos(S_CIZALLA)  # [1, 1], un unico eje
+DIR_CIZALLA = EJES_CIZALLA[:, 0]                  # (1, 0)
+UNIDAD_MINI = 0.45           # dos planos pequeños que no se pisan
+ALCANCE_MINI = 4
+CENTRO_IZQ = LEFT * 3.6
+CENTRO_DER = RIGHT * 3.6
+RADIO_MINI = 2.2
+ANGULOS_MINI = (0.0, 30.0, 60.0, 90.0, 120.0, 150.0)
+ABANICO_MINI = tuple(RADIO_MINI * np.array([math.cos(math.radians(a)),
+                                            math.sin(math.radians(a))])
+                     for a in ANGULOS_MINI)
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +191,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

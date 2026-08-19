@@ -114,7 +114,30 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+
+# -- Clip 1: el vector que sobra --
+U1 = np.array([2.0, 1.0])                 # u (rojo)
+V1 = np.array([-1.0, 1.0])                # v (violeta)
+A_W, B_W = 1.0, 1.5                       # coeficientes DECLARADOS de w
+W1 = A_W * U1 + B_W * V1                  # w (verde) = (0.5, 2.5)
+
+# -- Clip 2: base canonica y otra base --
+B1 = np.array([2.0, 1.0])                 # b1, primera columna de B
+B2 = np.array([-1.0, 1.0])                # b2, segunda columna de B
+MATRIZ_B = np.column_stack([B1, B2])      # la base B como matriz de columnas
+P2 = np.array([3.0, 2.0])                 # el punto comun a las dos lecturas
+COEF_CANONICA = (P2[0], P2[1])            # P en la base canonica: el mismo P
+
+# -- Clip 3: la rejilla de la otra base --
+# (reusa B1, B2, MATRIZ_B, P2; se calcula dentro del clip con resolver)
+
+# -- Clip 4: dimension --
+W1_D = np.array([2.0, 1.0])               # 1 vector: genera una recta
+W2_D = np.array([-1.0, 1.5])              # 2 vector: no alineado, genera un plano
+A3 = np.array([1.4, 0.4, 0.3])            # 3 vectores en 3D: generan el espacio
+B3 = np.array([0.2, 1.3, 0.5])
+C3 = np.array([0.3, 0.4, 1.5])
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +162,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 

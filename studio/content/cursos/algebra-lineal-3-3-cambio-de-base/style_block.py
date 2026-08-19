@@ -114,7 +114,40 @@ CENTRO_PLANO = DOWN * 0.15   # el plano baja un pelo: el titulo respira
 # --- Numeros de la leccion --------------------------------------------
 # Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
 # mano en el clip: la flecha dibujada y la cifra escrita no pueden
-# discrepar. (Rellenar con las matrices y vectores de esta leccion.)
+# discrepar.
+#
+# La base nueva de la leccion: b1 y b2 (no ortogonales: la rejilla que
+# generan es OBLICUA, que es de lo que va el cambio de base).
+B1 = np.array([3.0, 1.0])                # b1: ambar (primera columna de P)
+B2 = np.array([1.0, 2.0])                # b2: cian  (segunda columna de P)
+P_BASE = np.column_stack([B1, B2])       # [[3, 1], [1, 2]]: P = [b1 | b2]
+DET_P = determinante(P_BASE)             # 5.0: b1 y b2 no estan alineados
+P_INV = inversa(P_BASE)                  # [[0.4, -0.2], [-0.2, 0.6]]
+
+# El vector protagonista: el MISMO en los dos idiomas.
+V_DEMO = np.array([4.0, 3.0])            # (4, 3) leido en la rejilla canonica
+V_B = P_INV @ V_DEMO                     # (1, 1) leido en la rejilla oblicua
+
+# La transformacion del clip 3: estira x2 a lo largo de b1 y encoge a la
+# mitad a lo largo de b2. En el idioma canonico sus columnas no dicen nada;
+# en el de b1 y b2 es diagonal (P^-1 A P = D_B).
+D_B = escala(2.0, 0.5)                   # diag(2, 0.5)
+A_MOV = P_BASE @ D_B @ P_INV             # [[2.3, -0.9], [0.6, 0.2]], det = 1
+DET_A = determinante(A_MOV)              # 1.0: el area sobrevive
+UNIDAD_3 = 0.70                          # clip 3: 2*b1 = (6, 2) tiene que caber
+
+# El satelite del clip 4: actitud (guiñada 70 grados, alabeo -35) y el Sol.
+# La direccion del Sol se elige fuera del plano del eje y: si no, la punta
+# de la flecha aterriza sobre la etiqueta "y" que espacio3 clava al final
+# del eje (y que no se puede mover ni apagar desde fuera). El alabeo es
+# NEGATIVO a proposito: con alabeo positivo grande el eje z del cuerpo
+# apunta hacia la camara y la proyeccion oblicua lo deja en un muñon.
+GUINADA, ALABEO = 70.0, -35.0
+R_SAT = rot3("z", GUINADA) @ rot3("x", ALABEO)  # ejes del cuerpo en el inercial
+S_INERCIAL = np.array([1.5, 0.5, 2.5])      # la direccion del Sol, marco inercial
+S_CUERPO = inversa(R_SAT) @ S_INERCIAL      # (0.98, -2.45, 1.34): la MISMA
+                                            # direccion, en el marco cuerpo
+DEC_SOL = 2                                 # decimales de las dos listas del Sol
 
 
 # --- El plano de la leccion ------------------------------------------
@@ -139,8 +172,10 @@ def titulo_curso(texto, font_size=34, color=None):
     """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
     t = titulo_marca(texto, font_size=font_size,
                      color=C_TITULO if color is None else color)
-    if t.width > config.frame_width - 2.0:
-        t.scale_to_fit_width(config.frame_width - 2.0)
+    # Tope por el HUD "MODULO 0K" de la esquina: el titulo centrado no debe
+    # pasar de ~7.6 u de ancho o pisa la etiqueta (titulos de >40 caracteres).
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
     t.to_edge(UP, buff=0.52)
     return _con_fondo(t)
 
