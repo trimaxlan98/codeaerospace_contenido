@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 5.2 La SVD: todo movimiento es girar, estirar, girar",
+  "description": "Lección 5.2 del curso Álgebra lineal (módulo 5), en 4 clips animados: el círculo unidad se vuelve elipse bajo cualquier matriz, la SVD como girar-estirar-girar, el número de condición, y la compresión de una imagen quedándose con los valores singulares grandes. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-circulo-se-vuelve-elipse.py",
+      "title": "1 · El círculo se vuelve elipse",
+      "scene": "Clip1",
+      "final_state": "Rejilla azul deformada por M sobre la fija; la elipse roja con sus dos semiejes fucsia y las cifras sigma1 = 2.56 y sigma2 = 0.98 junto a cada punta; en el panel derecho la matriz [2.0 -0.5 / -1.0 1.5] por columnas (ambar y cian); pie: «Círculo dentro, elipse fuera. Siempre. ¿Y cómo lo consigue?»."
+    },
+    {
+      "file": "clips/02-girar-estirar-girar.py",
+      "title": "2 · Girar, estirar, girar",
+      "scene": "Clip2",
+      "final_state": "Rejilla en el estado final U Sigma V^T = M y la misma elipse roja del clip 1, con v1 y v2 fucsia apuntando a sus dos ejes; panel derecho con las tres matrices por columnas, rotuladas V^T, Sigma y U; pie: «Toda matriz es eso: un giro, un estiramiento y otro giro. Sin excepciones.»."
+    },
+    {
+      "file": "clips/03-cuanto-estira-el-numero-de-condicion.py",
+      "title": "3 · Cuánto estira: el número de condición",
+      "scene": "Clip3",
+      "final_state": "Rejilla casi aplastada sobre una recta por la matriz casi singular; el círculo convertido en una aguja roja con x1 (rojo) y x2 (violeta) encimados en su punta; arriba a la izquierda las dos distancias, 1.50 antes y 0.15 después; panel derecho con la matriz, sigma1 = 2.48, sigma2 = 0.10 y cond = 25.56; pie: «Cuánto lo amplifica es el número de condición: sigma uno entre sigma dos.»."
+    },
+    {
+      "file": "clips/04-una-imagen-es-una-matriz.py",
+      "title": "4 · Una imagen es una matriz",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: «Toda matriz es girar, estirar, girar.» en blanco sobre «Quédate con lo que más estira.» en cian, y el pie «Y si esa matriz se aplica una y otra vez, ¿a dónde acaba llevando? Siguiente lección.»."
+    }
+  ]
+}

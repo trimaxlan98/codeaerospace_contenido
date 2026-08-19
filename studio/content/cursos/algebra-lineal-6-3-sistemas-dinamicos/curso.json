@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 6.3 Sistemas dinámicos: la matriz que mueve el tiempo",
+  "description": "Lección 6.3 del curso Álgebra lineal (módulo 6, cierre de la familia), en 4 clips animados: el estado como vector y el paso de tiempo como matriz, los autovalores que deciden si encoge, estira o gira, las direcciones propias que mandan en el retrato de fase, y el recap de la familia. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-estado-es-un-vector.py",
+      "title": "1 · El estado es un vector",
+      "scene": "Clip1",
+      "final_state": "Rejilla azul sin deformar sobre la gris fija; el rastro de 8 pasos (9 puntos rojos unidos por trazos) baja en espiral alrededor del origen, con un punto verde marcando el cero. Etiquetas grises 'módulo A' y 'módulo B' junto a los ejes, panel derecho 'A: un paso' con la matriz por columnas (0.82 y 0.38 en ámbar, -0.38 y 0.82 en cian) y el pie 'Dónde acabará no lo decide el punto de partida: lo decide esa matriz.'"
+    },
+    {
+      "file": "clips/02-encoge-estira-o-gira.py",
+      "title": "2 · Encoge, estira o gira",
+      "scene": "Clip2",
+      "final_state": "Los tres mini-planos alineados, cada uno con su matriz por columnas encima y sus cifras cian debajo: a la izquierda la espiral roja hacia dentro con |lambda| = 0.90 y 25 grados, en el centro las dos ramas de silla con |lambda| = 1.15 y 0 grados, a la derecha el círculo cerrado de puntos con |lambda| = 1.00 y 40 grados. Pie: 'Y el ángulo dice si además da vueltas por el camino. Con módulo uno exacto, solo gira.'"
+    },
+    {
+      "file": "clips/03-las-direcciones-propias-mandan.py",
+      "title": "3 · Las direcciones propias mandan",
+      "scene": "Clip3",
+      "final_state": "Retrato de fase de la silla a tamaño completo: rejilla identidad, las dos rectas propias fucsia (una a 30 grados, otra a -60) y cuatro trayectorias rojas que entran acercándose a la que encoge, doblan y huyen pegadas a la que estira. Panel derecho con la matriz por columnas y, debajo, la caja fucsia con A v1 = 1.15 v1 y A v2 = 0.80 v2 (las cifras en cian). Pie: 'Todas acaban pegadas al eje que estira, y huyen por él. El destino lo ponen los ejes.'"
+    },
+    {
+      "file": "clips/04-repetir-mil-veces.py",
+      "title": "4 · Repetir mil veces",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia del cierre: 'El tiempo es una matriz aplicada mil veces.' en blanco sobre 'Sus ejes propios dicen el final.' en cian, con el pie 'Aquí se cierra el curso: una flecha, un movimiento, un área y un eje.' y el HUD 'MODULO 04' en la esquina."
+    }
+  ]
+}

@@ -163,18 +163,18 @@ Columnas: storyboard · clips escritos · validada ql · en repo/PR · qh local
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 1.2 | ✔ | ✔ | ✔ 29.8/32.5/30.9/30.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 1.3 | ✔ | ✔ | ✔ 35.1/33.7/32.3/41.1 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.1 | ✔ | ✔ | ✔ 40.8/36.3/38.0/36.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.2 | ✔ | ✔ | ✔ 33.5/35.2/30.3/40.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 2.3 | ✔ | ✔ | ✔ 34.6/36.3/38.3/41.8 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | commit bdfa6ff (rama) | en marcha | – | – | – |
-| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | commit bdfa6ff (rama) | en marcha | – | – | – |
+| 1.1 | ✔ | ✔ | ✔ 31.9/36.5/36.2/33.6 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.2 | ✔ | ✔ | ✔ 29.8/32.5/30.9/30.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.3 | ✔ | ✔ | ✔ 35.1/33.7/32.3/41.1 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.1 | ✔ | ✔ | ✔ 40.8/36.3/38.0/36.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.2 | ✔ | ✔ | ✔ 33.5/35.2/30.3/40.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.3 | ✔ | ✔ | ✔ 34.6/36.3/38.3/41.8 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.1 | ✔ | ✔ | ✔ 34.3/31.9/30.9/33.0 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ 42.1/41.7/36.0/41.3 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ 36.3/35.2/39.7/35.9 s | PR #35 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ 38.5/35.4/39.2/39.7 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
+| 4.2 | ✔ | ✔ | ✔ 36.1/30.1/33.7/32.4 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
+| 4.3 | ✔ | ✔ | ✔ 38.0/40.3/37.0/39.0 s | PR #35 (main) | ✔ | ✔ adoptado | en marcha | – |
 
 Hitos globales: librería ✔ (commit 97384dd) · molde 1.1 ✔ · corridas nocturnas 01:00/05:00 murieron por cuota (la 01:00 dejó plan+librería+1.1, la 05:00 dejó 47/48 clips escritos sin validar) · 2026-08-19 11:00 sesión interactiva de Fable: validación ql de las 12 lecciones + 11 agentes (Sonnet 1.2/1.3/2.2/3.1/4.2, Opus 2.1/2.3/3.2/3.3/4.1/4.3) revisaron frame a frame y corrigieron; 4.3 clip 4 escrito por Opus · PR en curso · qh local en marcha · VPS pull+subir – · narración – · mux – · PLAN.md/CATALOGO ✔ · memoria –.
 
@@ -297,6 +297,129 @@ es encadenar → escalar es estirar → todo vector es a·î + b·ĵ.
 | 3 | La recta que mejor ajusta | telemetría con deriva: la recta de mínimos cuadrados (calculada) | nube + recta + pendiente |
 | 4 | Los ejes de una nube | PCA: autovectores de la covarianza; el eje mayor de una nube de datos; recap de familia | ejes principales + cierre «Encuentra los ejes / y el problema se endereza.» |
 
+
+## Ampliación (2026-08-19, pedida por el dueño): módulos 5 y 6
+
+Seis lecciones más (24 clips) con el mismo formato y molde. El módulo 5 encuentra
+**los movimientos que respetan la geometría** (ortogonalidad, la SVD, el equilibrio de
+Markov); el módulo 6 saca el álgebra lineal **del plano al mundo** (rotaciones 3D con
+eje, funciones como vectores, sistemas dinámicos). Piezas nuevas de la librería
+(sección "Modulos 5 y 6" de `algebra_lineal.py`): `gram_schmidt`, `qr`,
+`es_ortogonal`, `svd`, `aproximacion_rango`, `numero_condicion`, `elipse_de`,
+`imagen_sintetica`, `markov_estacionario`, `iterar`, `autos_complejos`,
+`eje_rotacion`, `rot3_eje`, `muestrear`, `base_fourier`, `coeficientes`;
+piezas `circulo_unidad` (→ elipse con `.con_matriz`, `.semiejes()`), `pixeles`
+(matriz de grises, `.con_valores`), `barras` (`.con_valores`), `trayectoria`,
+`triada3` (`.con_matriz`). Validadas en el contenedor (frame en
+`render_jobs/validacion/_lib/`).
+
+| Lección | Proyecto | Modelo | Clips |
+|---------|----------|--------|-------|
+| 5.1 | Ortogonalidad: bases que no se estorban | Sonnet | 4 |
+| 5.2 | La SVD: todo movimiento es girar, estirar, girar | Opus | 4 |
+| 5.3 | Cadenas de Markov: el equilibrio que la matriz esconde | Sonnet | 4 |
+| 6.1 | Rotaciones en 3D: toda rotación tiene un eje | Opus | 4 |
+| 6.2 | Las funciones también son vectores | Opus | 4 |
+| 6.3 | Sistemas dinámicos: la matriz que mueve el tiempo | Opus | 4 |
+
+### 5.1 Ortogonalidad: bases que no se estorban
+
+Hilo: dos vectores perpendiculares (producto punto 0) → en una base ortonormal las
+coordenadas son simples sombras (productos punto) → Gram-Schmidt: restar sombras hasta
+que nadie se estorbe → las matrices ortogonales (Q^T Q = I) son rotaciones y
+reflexiones: mueven sin deformar (det ±1, longitudes intactas).
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | Perpendicular es producto punto cero | u y v con `marca_angulo`; v gira hasta 90° y la cifra u·v baja a 0.0 | u ⟂ v con el ángulo recto marcado y u·v = 0.0 |
+| 2 | Coordenadas sin resolver nada | base ortonormal q1, q2 (oblicua respecto a la canónica); el vector rojo; sus coordenadas = sombras sobre q1 y q2 (`proyeccion_dibujo`), cifras = v·q1, v·q2 | las dos sombras con sus cifras y el panel [v·q1; v·q2] |
+| 3 | Gram-Schmidt: restar sombras | v1, v2, v3 en 3D? No: en 2D con dos vectores oblicuos: a v2 se le resta su sombra sobre q1 (flecha fantasma), queda el resto, se normaliza; `gram_schmidt` da los pasos | q1, q2 ortonormales sobre v1, v2 tenues; panel Q |
+| 4 | Mover sin deformar | rejilla viva bajo una rotación y luego una reflexión: celdas siguen cuadradas; `es_ortogonal` ✓, det = 1.0 y −1.0; contra-ejemplo: cizalla deforma; cierre | cierre «Ortogonal: se mueve todo / y no se deforma nada.» |
+
+### 5.2 La SVD: todo movimiento es girar, estirar, girar
+
+Hilo: el círculo unidad bajo M es siempre una elipse → sus semiejes son σ1 u1, σ2 u2 →
+M = U Σ V^T se ve: girar (V^T), estirar (Σ), girar (U) → los valores singulares miden
+cuánto estira la matriz y su cociente (condición) cuánto amplifica errores → una imagen
+es una matriz: quedarse con k valores singulares la comprime (`pixeles` +
+`aproximacion_rango`).
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | El círculo se vuelve elipse | `circulo_unidad` + rejilla; `anim_matriz(M)` con Transform del círculo en elipse; los semiejes fucsia con σ1, σ2 calculados | elipse con semiejes y cifras σ1 = …, σ2 = … |
+| 2 | Girar, estirar, girar | la misma rejilla hace V^T, luego Σ, luego U en tres pasos (anim_matriz con productos parciales); las tres matrices en panel | rejilla final = M, panel U Σ V^T |
+| 3 | Cuánto estira: el número de condición | dos matrices: una bien condicionada (σ1/σ2 ≈ 1.3) y otra casi singular (≈ 25): el círculo se hace una aguja; un vector de error pequeño se amplifica | elipse aguja + cond = … |
+| 4 | Una imagen es una matriz | `pixeles(imagen_sintetica(12))`; a su lado la aproximación rango 1, 2, 3, 5 con `Transform`; el error relativo baja (0.45 → 0.10); cierre | cierre «Toda matriz es girar, estirar, girar. / Quédate con lo que más estira.» |
+
+### 5.3 Cadenas de Markov: el equilibrio que la matriz esconde
+
+Hilo: un sistema con estados (un satélite: nominal / modo seguro / eclipse, o el clima)
+y probabilidades de pasar de uno a otro → la matriz de transición (columnas suman 1)
+lleva la distribución de hoy a la de mañana → iterar (`iterar`) converge al mismo
+vector desde cualquier inicio → ese vector es el autovector de λ = 1
+(`markov_estacionario`): el equilibrio estaba en la matriz (enlace con 4.2).
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | Estados y probabilidades | 3 estados como nodos (`bloques`/círculos) con flechas rotuladas con probabilidades; la matriz T por columnas (columna = desde dónde) | diagrama + T con columnas coloreadas que suman 1 |
+| 2 | La matriz mueve la distribución | `barras` de la distribución p0 = (1,0,0); T p0, T² p0… con Transform de barras; cifras | barras tras 1, 2, 5 pasos |
+| 3 | Todo camino lleva al mismo sitio | dos inicios distintos (barras lado a lado) convergen a las mismas barras; en el plano 2D (dos estados) la trayectoria de p_k cae a un punto | barras iguales + trayectoria que converge |
+| 4 | El equilibrio es un vector propio | T p* = p*: autovalor 1; `markov_estacionario` en panel; comparación con la iteración; cierre | cierre «El mañana es la matriz por el hoy. / El equilibrio, su vector propio.» |
+
+### 6.1 Rotaciones en 3D: toda rotación tiene un eje
+
+Hilo: en 3D una rotación es una matriz 3×3 ortogonal (det 1) → componer dos giros (alabeo,
+cabeceo) da OTRO giro → Euler: todo giro tiene un eje que no se mueve = autovector de
+λ = 1 (`eje_rotacion`) → ese eje y ese ángulo describen la actitud del satélite
+(`satelite3` + `triada3`; `rot3_eje` para reconstruir).
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | Girar en 3D es una matriz | `espacio3` + `triada3` bajo `rot3("z", 40)`: la tríada gira y el suelo también; matriz 3×3 por columnas | tríada girada + R por columnas |
+| 2 | Dos giros hacen un giro | Rx luego Rz: tríada final; la matriz producto; sigue siendo ortogonal (det 1.0, longitudes 1) | tríada + R = Rz Rx |
+| 3 | El eje que no se mueve | sobre la tríada girada, el eje fucsia (autovector λ = 1) quieto mientras un abanico de vectores gira alrededor; ángulo calculado | eje fucsia + «eje: (…), ángulo: … °» |
+| 4 | La actitud del satélite | `satelite3` con `triada3` pasa de la actitud A a la B por UN giro alrededor del eje calculado (`rot3_eje` interpolado por ángulo); cierre | cierre «Toda rotación tiene un eje. / La actitud es un eje y un ángulo.» |
+
+### 6.2 Las funciones también son vectores
+
+Hilo: una función muestreada en n puntos es una lista = un vector (`muestrear` +
+`barras`) → se suman y se escalan como vectores → producto punto de funciones = sumar
+productos (área) → senos y cosenos son ORTOGONALES (`base_fourier`) → descomponer una
+señal en esa base es proyectar: Fourier es un cambio de base (`coeficientes`).
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | Una función es una lista | curva `grafica` → 12 barras (sus muestras) → el vector columna de 12 números (abreviado) | barras + «12 números = un vector de R^12» |
+| 2 | Sumar y escalar funciones | dos curvas/barras se suman barra a barra; 0.5·f encoge cada barra | barras de f + g y de 0.5 f |
+| 3 | Senos que no se estorban | barras de cos 1 y sin 1; su producto punto → 0.00; cos 1 consigo mismo → 1.00 (normalizado); panel con la base ortonormal | cifras ⟂ y panel |
+| 4 | Fourier es un cambio de base | una señal (telemetría periódica) → sus coeficientes (barras por armónico) → reconstrucción con 1, 2, 3 armónicos (Transform); cierre | cierre «Una señal es un vector. / Fourier, una base que la entiende.» |
+
+### 6.3 Sistemas dinámicos: la matriz que mueve el tiempo
+
+Hilo: el estado de un sistema (posición, velocidad; o dos poblaciones; o temperatura de
+dos módulos de un satélite) es un vector → un paso de tiempo es una matriz x_{k+1} = A x_k
+(`iterar`, `trayectoria`) → los autovalores deciden el destino: |λ| < 1 encoge (estable),
+> 1 estira (inestable), complejos giran (espiral) (`autos_complejos`) → recap de la
+familia: el eje propio explica el tiempo.
+
+| Clip | Título | Visual | `final_state` |
+|------|--------|--------|---------------|
+| 1 | El estado es un vector | plano (posición, velocidad); un punto rojo; la matriz A lo mueve un paso; varios pasos: trayectoria | trayectoria de 8 pasos + A |
+| 2 | Encoge, estira o gira | tres matrices en tres mini-planos: contractiva (espiral hacia dentro), expansiva (silla: una dirección estira), rotación pura (círculo); autovalores en cifra | los tres retratos con |λ| y ángulo |
+| 3 | Las direcciones propias mandan | silla: rejilla viva bajo A con las dos direcciones fucsia; trayectorias que se acercan a una y huyen por la otra | retrato de fase con ejes propios |
+| 4 | Repetir mil veces (recap de familia) | el sistema estable converge; fundido a la rejilla que se deforma, el paralelogramo, los ejes propios: la familia en 10 s; cierre | cierre «El tiempo es una matriz aplicada mil veces. / Sus ejes propios dicen el final.» |
+
+### Tablero de la ampliación
+
+| Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
+|---------|-----------|-------|----|---------|----|------|---------|-----|
+| 5.1 | ✔ | ✔ | ✔ 33.5/33.8/40.3/35.4 s | commit cd6f1e6 | en marcha | – | – | – |
+| 5.2 | ✔ | ✔ | ✔ 37.9/37.7/43.5/41.1 s | commit cd6f1e6 | en marcha | – | – | – |
+| 5.3 | ✔ | ✔ | ✔ 30.3/31.2/31.7/30.9 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.1 | ✔ | ✔ | ✔ 37.3/36.6/40.2/42.5 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.2 | ✔ | ✔ | ✔ 33.3/33.4/33.0/40.3 s | commit cd6f1e6 | en marcha | – | – | – |
+| 6.3 | ✔ | ✔ | ✔ 33.7/38.5/38.1/40.5 s | commit cd6f1e6 | en marcha | – | – | – |
+
 ## Cosecha de trampas (se llena durante la producción)
 
 - `Transform` entre dos VGroup de distinta estructura (panel de 1 columna → 2 columnas, matriz → columnas, dos `tag_hud`) morphea glifos rotos durante la transición: usar FadeOut + FadeIn(shift) o el relevo secuencial de `Rotulos` (1.3, 4.3).
@@ -309,4 +432,5 @@ es encadenar → escalar es estirar → todo vector es a·î + b·ĵ.
 - La rejilla fija de `plano()`/`espacio3()` a 0.5–0.55 de opacidad es casi invisible en ql: donde la comparación viva/fija es el mensaje, subirla a ~0.95 desde el clip (3.3).
 - `anim_matriz` toma el estado TOTAL desde la identidad: para encadenar movimientos se pasa el producto (D @ R), no el incremento (4.3).
 - `satelite3()` solo trae `.eje_z`: para leer una actitud hace falta una tríada de `vector3` (3.3). Sugerencias de librería pendientes: `segmento(pl,a,b)` transformable, `opacidad_fija` en Plano, `.ejes` en satelite3, `span_recta(trazos=True)`.
+- Ampliación (módulos 5–6): `svd()` devuelve reflexiones (det U = −1) la mitad de las veces y entonces el "girar" de `anim_matriz` pasa por un aplaste: elegir M con det U = det V = +1 (5.2 usa [[2,-0.5],[-1,1.5]]); `eje_rotacion` ya elige el signo del eje para que `rot3_eje` reproduzca R (corregido en la librería tras 6.1); la proyección oblicua de `espacio3` decide qué ángulos se leen: medir las direcciones proyectadas antes de escribir (6.1); una silla mal arrancada se lee como contracción: dar peso a la componente que crece y pasos suficientes (6.3); `Barras` se coloca por `.base`, no por `move_to`, y sus etiquetas chocan con barras negativas (6.2, 5.3); `Grafica` no expone su origen (alinear por `_ancla`) (6.2); el pie mostrado antes del plano queda DEBAJO de la rejilla: `bring_to_front(pie, titulo, hud)` tras `FadeIn(pl)` (6.2); `cierre_leccion(pie=None)` deja el pie anterior pegado (5.3); `Create` sobre un VGroup de rectas las escalona: dos `Create` en el mismo play (6.3).
 - El muestreo equiespaciado de `--frames 8` cae fácil en relevos de pies o en el hueco del cierre: antes de declarar un hueco, extraer el frame exacto con ffmpeg (2.1, 3.2).

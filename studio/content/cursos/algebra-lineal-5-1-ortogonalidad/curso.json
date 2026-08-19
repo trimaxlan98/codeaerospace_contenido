@@ -1,0 +1,32 @@
+{
+  "name": "Álgebra lineal · 5.1 Ortogonalidad: bases que no se estorban",
+  "description": "Lección 5.1 del curso Álgebra lineal (módulo 5: los movimientos que respetan la geometría), en 4 clips animados: producto punto cero = perpendicular, coordenadas en una base ortonormal como sombras, Gram-Schmidt restando sombras, y las matrices ortogonales que mueven sin deformar. Estilo 3Blue1Brown en español.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-perpendicular-es-producto-punto-cero.py",
+      "title": "1 · Perpendicular es producto punto cero",
+      "scene": "Clip1",
+      "final_state": "u fijo y v ya perpendicular (ambos desde el origen), el arco marca_angulo leyendo 90 deg, y el panel superior derecho con u . v = 0.0; pie: 'Perpendicular no es una forma de hablar: es que u . v = 0.0, ni mas ni menos.'"
+    },
+    {
+      "file": "clips/02-coordenadas-sin-resolver-nada.py",
+      "title": "2 · Coordenadas sin resolver nada",
+      "scene": "Clip2",
+      "final_state": "la base oblicua q1 (ambar) y q2 (cian) con v (rojo) y sus dos sombras dibujadas (flechas + guias punteadas) rotuladas 'v . q1 = 2.3' y 'v . q2 = 1.9', y el panel superior derecho con el vector columna [2.3; 1.9]; pie: 'En una base ortonormal, coordenada es sombra: el producto punto y ya.'"
+    },
+    {
+      "file": "clips/03-gram-schmidt-restar-sombras.py",
+      "title": "3 · Gram-Schmidt: restar sombras",
+      "scene": "Clip3",
+      "final_state": "q1 (ambar) y q2 (cian) ortonormales sobre v1 y v2 atenuados de fondo, con el panel superior derecho mostrando Q por columnas de colores; pie: 'Ortonormalizar es solo esto: normalizar, y restar sombras antes de seguir.'"
+    },
+    {
+      "file": "clips/04-mover-sin-deformar.py",
+      "title": "4 · Mover sin deformar",
+      "scene": "Clip4",
+      "final_state": "cierre a pantalla limpia de la leccion: 'Ortogonal: se mueve todo' en blanco y 'y no se deforma nada.' en cian, con el pie 'La proxima leccion generaliza esto: la SVD encuentra ejes para cualquier matriz.'"
+    }
+  ]
+}

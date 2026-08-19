@@ -49,7 +49,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 19 | Criptografia: el arte de guardar secretos | original (divulgacion, seguridad/telecom) | `cripto.py` | publicado (PR #19); primer curso con intro/cierre de marca en el mux |
 | 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | publicado (PR #21): 9 lecciones narradas y muxeadas con intro/cierre |
 | 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
-| 22 | Algebra lineal (familia, 12 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | en curso (2026-08-19): 48 clips validados frame a frame, PR abierto; qh/narracion/mux en marcha |
+| 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + ampliacion): 72 clips validados frame a frame, qh en prod, narracion y mux en marcha |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -157,7 +157,8 @@ modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
 ## Familia "Algebra lineal" (2026-08-19, formato de lecciones)
 
 Cuarta familia (curso 22 del plan): **un proyecto = una leccion de 4
-clips**, 4 modulos x 3 lecciones = 12 proyectos, 48 clips. Original; el
+clips**, 6 modulos x 3 lecciones = 18 proyectos, 72 clips (la tarde del
+2026-08-19 el dueno pidio ampliar: modulos 5 y 6). Original; el
 angulo es *cada idea se VE moverse*: rejilla viva azul que se deforma sobre
 la fija gris, la matriz por columnas de colores (a donde van i y j), el
 paralelogramo del determinante, la nube que se endereza con sus ejes
@@ -181,6 +182,12 @@ validada frame a frame. Storyboard: `curso-20-algebra-lineal.md`.
 | 4.1 | Vectores propios: los que no giran | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
 | 4.2 | Diagonalizar y las potencias | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
 | 4.3 | Proyeccion, minimos cuadrados y ejes principales | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 5.1 | Ortogonalidad: bases que no se estorban | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 5.2 | La SVD: todo movimiento es girar, estirar, girar | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 5.3 | Cadenas de Markov: el equilibrio que la matriz esconde | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 6.1 | Rotaciones en 3D: toda rotacion tiene un eje | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 6.2 | Las funciones tambien son vectores | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
+| 6.3 | Sistemas dinamicos: la matriz que mueve el tiempo | 4 | validado ql frame a frame; qh/prod/narracion en marcha |
 
 ## Marca: intro y cierre para posproduccion (2026-08-14)
 
