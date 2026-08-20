@@ -22,6 +22,16 @@ Uso:
                           sfx.py mezclar fx.wav 32 barrido@0.5:-8 tick@4:-12
   sfx.py aplicar video.mp4 audio.wav [out.mp4]
                           pega un wav a un mp4 (aac 24k mono, -shortest)
+
+OJO: ejecutar DENTRO del contenedor manim (numpy 2.x + ffmpeg confiables):
+
+  docker run --rm --user $(id -u):$(id -g) -v "$PWD":/workspace \
+    -w /workspace codeaerospace_contenido-manim python3 studio/tools/sfx.py marca
+
+El numpy del sistema (pip --user 1.26.4 sobre Python 3.14, combo que numpy
+no soporta) corrompe arrays de forma silenciosa y NO determinista: np.log2
+devolvia basura dentro de _filtra y los filtros dejaban pasar todo. Un
+canario en main() lo detecta y aborta.
 """
 import subprocess
 import sys
@@ -65,6 +75,21 @@ def _filtra(x, lo, hi, suav=0.35):
 def _norm(x, pico=1.0):
     m = float(np.max(np.abs(x))) or 1.0
     return x * (pico / m)
+
+
+def _reverbera(x, dec=1.6, mezcla=0.3):
+    """Cola de reverberacion sintetica (IR de ruido decayente, oscura)."""
+    n_ir = int(dec * 2 * SR)
+    t = np.arange(n_ir) / SR
+    ir = np.random.default_rng(21).standard_normal(n_ir) * np.exp(-3 * t / dec)
+    ir = _filtra(ir, 120, 3200)
+    # IR con energia unitaria: la cola conserva la energia de la senal seca
+    # (normalizarla al pico inflaba la reverb de los transitorios brillantes
+    # como los ticks y devolvia los agudos a la mezcla)
+    ir /= np.sqrt(float((ir ** 2).sum()))
+    N = len(x) + n_ir - 1
+    hum = np.fft.irfft(np.fft.rfft(x, N) * np.fft.rfft(ir, N), N)[: len(x)]
+    return x + mezcla * hum
 
 
 def escribe_wav(ruta, x):
@@ -172,6 +197,24 @@ def pulso(f0=196.0, dur=1.4):
     return _norm(x * _env(len(t), 0.05, dur * 0.75))
 
 
+def nebulosa(dur=7.0, f0=110.0):
+    """Colchon espacial y tranquilo: capas desafinadas que laten despacio
+    (batido de ~0.4 Hz), un viento oscuro muy tenue y reverberacion larga.
+    Todo por debajo de ~950 Hz: espacial, no estridente."""
+    t = _t(dur)
+    x = np.zeros(len(t))
+    for f, a, fase in [(f0 * 0.5, 0.6, 0.0), (f0, 1.0, 1.0),
+                       (f0 * 1.004, 0.9, 2.0), (f0 * 1.5, 0.25, 3.0)]:
+        x += a * np.sin(2 * np.pi * f * t + fase)
+    x *= 1 + 0.25 * np.sin(2 * np.pi * 0.13 * t + 1)  # respira muy despacio
+    viento = _filtra(np.random.default_rng(9).standard_normal(len(t)),
+                     150, 900)
+    x += 0.15 * _norm(viento) * (1 + np.sin(2 * np.pi * 0.09 * t)) / 2
+    x = _filtra(x, 45, 950)
+    x = _reverbera(x, 1.8, 0.35)
+    return _norm(x * _env(len(t), dur * 0.35, dur * 0.4))
+
+
 PALETA = {
     "barrido": barrido,
     "aire": aire,
@@ -185,6 +228,9 @@ PALETA = {
     "cuerda_la2": lambda: cuerda(110.0),
     "cuerda_mi3": lambda: cuerda(164.81),
     "cuerda_la3": lambda: cuerda(220.0, 3.0),
+    "nebulosa": nebulosa,
+    "nebulosa_intro": lambda: nebulosa(7.4, 110),
+    "nebulosa_cierre": lambda: nebulosa(6.2, 110),
     "subrayado": subrayado,
     "sting": sting,
     "pulso": pulso,
@@ -202,6 +248,7 @@ def mezclar(total, eventos, fade_in=0.3, fade_out=(None, None)):
         j = min(n, i + len(x))
         if i < n:
             m[i:j] += x[: j - i]
+    m = _reverbera(m, 1.4, 0.18)  # todos los eventos comparten el espacio
     m = _filtra(m, 40, 11000)  # sin retumbe ni siseo extremo
     if fade_in:
         k = int(fade_in * SR)
@@ -220,9 +267,7 @@ def mezcla_intro(total):
     return mezclar(total, [
         ("barrido", 0.45, -8),      # linea de escaneo 0.5-2.3 s
         ("aire_largo", 0.60, -16),  # la reticula se enciende a su paso
-        ("cuerda_la2", 2.00, -12),  # arpegio acustico bajo el ensamblado
-        ("cuerda_mi3", 3.20, -14),
-        ("cuerda_la3", 4.40, -15),
+        ("nebulosa_intro", 1.80, -13),  # colchon espacial del ensamblado
         ("blip_grave", 2.70, -14),  # CO
         ("blip_medio", 3.20, -13),  # DE
         ("blip_agudo", 3.70, -12),  # el punto llega
@@ -230,24 +275,19 @@ def mezcla_intro(total):
         ("tick", 4.95, -10),
         ("aire", 5.20, -15),        # ACADEMY aparece
         ("blip_hud", 5.75, -16),    # etiqueta HUD
-        ("cuerda_la2", 5.60, -16),  # resuena y puentea hasta el respiro
         ("pulso", 7.70, -12),       # respiro: pulso del punto ambar
     ], fade_in=0.3, fade_out=(9.2, 10.1))
 
 
 def mezcla_cierre(total):
     return mezclar(total, [
-        ("cuerda_la2", 0.50, -11),  # rasgueo calido: el wordmark entra
-        ("cuerda_mi3", 0.58, -13),
-        ("cuerda_la3", 0.66, -14),
+        ("nebulosa_cierre", 0.50, -12),  # colchon espacial: entra el wordmark
         ("aire_largo", 0.70, -16),
         ("subrayado", 2.20, -10),   # el degradado ambar->naranja se dibuja
         ("blip_grave", 3.40, -18),  # pie "Sigue explorando."
-        ("cuerda_la2", 3.40, -14),  # resuena bajo la quietud del parpadeo
         ("tick", 5.10, -9),         # doble parpadeo firma
         ("tick", 5.90, -9),
-        ("sting", 6.30, -11),       # resolucion llamativa hacia el negro
-        ("cuerda_la3", 6.30, -13),  # y ataque acustico que la ancla
+        ("sting", 6.30, -10),       # resolucion llamativa hacia el negro
     ], fade_in=0.4, fade_out=(7.2, 8.5))
 
 
@@ -281,8 +321,23 @@ def marca():
         aplicar(mudo, wav, mp4)
 
 
+def _numpy_sano():
+    """Canario contra el numpy roto del sistema (ver docstring de cabecera):
+    un seno de 5 kHz tiene que salir aplastado de un pasabanda 150-900."""
+    t = np.arange(177600) / SR
+    y = _filtra(np.sin(2 * np.pi * 5000 * t), 150, 900)
+    return float(np.sqrt((y ** 2).mean())) < 0.01
+
+
 def main(argv):
     orden = argv[1] if len(argv) > 1 else "marca"
+    if orden in ("marca", "paleta", "mezclar") and not _numpy_sano():
+        print("ERROR: este numpy corrompe la sintesis (combo numpy/python no"
+              " soportado).\nEjecuta dentro del contenedor manim:\n"
+              '  docker run --rm --user $(id -u):$(id -g) -v "$PWD":/workspace'
+              " \\\n    -w /workspace codeaerospace_contenido-manim"
+              f" python3 studio/tools/sfx.py {orden}")
+        return 2
     if orden == "marca":
         marca()
     elif orden == "paleta":
