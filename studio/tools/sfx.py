@@ -82,9 +82,9 @@ def barrido(dur=1.8):
     n = int(dur * SR)
     ruido = np.random.default_rng(7).standard_normal(n)
     bajo = _norm(_filtra(ruido, 80, 500))
-    alto = _norm(_filtra(ruido, 800, 6000))
+    alto = _norm(_filtra(ruido, 700, 3500))
     t = np.linspace(0, 1, n)
-    x = bajo * (1 - t) + alto * t * 0.8
+    x = bajo * (1 - t) + alto * t * 0.6
     return _norm(x * _env(n, dur * 0.45, dur * 0.35))
 
 
@@ -112,14 +112,36 @@ def tick(dur=0.035):
 
 
 def pad(dur=6.0, f0=110.0):
-    """Colchon armonico calido que respira debajo de todo."""
+    """Colchon armonico calido y oscuro que respira debajo de todo.
+
+    El vibrato va sumado a la FASE (desviacion fija ~2 Hz): multiplicarlo
+    por t hacia crecer la desviacion con los segundos y llenaba el colchon
+    de laterales asperos (sono estridente; feedback del dueno 2026-08-20).
+    """
     t = _t(dur)
-    vib = 1 + 0.003 * np.sin(2 * np.pi * 4.5 * t)
+    vib = 0.4 * np.sin(2 * np.pi * 4.5 * t)
     x = np.zeros(len(t))
-    for k, a in [(1, 1.0), (1.5, 0.5), (2, 0.35), (3, 0.12)]:
-        x += a * np.sin(2 * np.pi * f0 * k * t * vib + k)
-    x = _filtra(x, 50, 1800)
+    for k, a in [(1, 1.0), (1.5, 0.35), (2, 0.18)]:
+        x += a * np.sin(2 * np.pi * f0 * k * t + vib * k + k)
+    x = _filtra(x, 50, 900)
     return _norm(x * _env(len(t), dur * 0.4, dur * 0.45))
+
+
+def cuerda(f0=110.0, dur=3.5):
+    """Cuerda pulsada (Karplus-Strong): acustica, calida, se apaga sola."""
+    N = int(round(SR / f0))
+    buf = np.random.default_rng(int(f0 * 10)).uniform(-1, 1, N)
+    for _ in range(4):  # pua de fieltro: sin ataque metalico
+        buf = np.convolve(buf, [0.25, 0.5, 0.25], mode="same")
+    n = int(dur * SR)
+    out = np.empty(n)
+    j = 0
+    for i in range(n):
+        out[i] = buf[j]
+        buf[j] = 0.9965 * 0.5 * (buf[j] + buf[(j + 1) % N])
+        j = (j + 1) % N
+    out = _filtra(out, 60, 2200)
+    return _norm(out * _env(n, 0.004, dur * 0.45))
 
 
 def subrayado(f0=280.0, f1=1100.0, dur=1.0):
@@ -160,8 +182,9 @@ PALETA = {
     "blip_hud": lambda: blip(1320, 0.07),
     "tick": tick,
     "pad": pad,
-    "pad_intro": lambda: pad(7.0, 110),
-    "pad_cierre": lambda: pad(6.5, 110),
+    "cuerda_la2": lambda: cuerda(110.0),
+    "cuerda_mi3": lambda: cuerda(164.81),
+    "cuerda_la3": lambda: cuerda(220.0, 3.0),
     "subrayado": subrayado,
     "sting": sting,
     "pulso": pulso,
@@ -195,9 +218,11 @@ def mezclar(total, eventos, fade_in=0.3, fade_out=(None, None)):
 # los tiempos de cada evento estan alineados con esas fases.
 def mezcla_intro(total):
     return mezclar(total, [
-        ("barrido", 0.45, -6),      # linea de escaneo 0.5-2.3 s
+        ("barrido", 0.45, -8),      # linea de escaneo 0.5-2.3 s
         ("aire_largo", 0.60, -16),  # la reticula se enciende a su paso
-        ("pad_intro", 2.00, -13),   # colchon bajo el ensamblado del wordmark
+        ("cuerda_la2", 2.00, -12),  # arpegio acustico bajo el ensamblado
+        ("cuerda_mi3", 3.20, -14),
+        ("cuerda_la3", 4.40, -15),
         ("blip_grave", 2.70, -14),  # CO
         ("blip_medio", 3.20, -13),  # DE
         ("blip_agudo", 3.70, -12),  # el punto llega
@@ -205,19 +230,24 @@ def mezcla_intro(total):
         ("tick", 4.95, -10),
         ("aire", 5.20, -15),        # ACADEMY aparece
         ("blip_hud", 5.75, -16),    # etiqueta HUD
-        ("pulso", 7.70, -10),       # respiro: pulso del punto ambar
+        ("cuerda_la2", 5.60, -16),  # resuena y puentea hasta el respiro
+        ("pulso", 7.70, -12),       # respiro: pulso del punto ambar
     ], fade_in=0.3, fade_out=(9.2, 10.1))
 
 
 def mezcla_cierre(total):
     return mezclar(total, [
-        ("pad_cierre", 0.50, -12),  # colchon: el wordmark entra
+        ("cuerda_la2", 0.50, -11),  # rasgueo calido: el wordmark entra
+        ("cuerda_mi3", 0.58, -13),
+        ("cuerda_la3", 0.66, -14),
         ("aire_largo", 0.70, -16),
         ("subrayado", 2.20, -10),   # el degradado ambar->naranja se dibuja
         ("blip_grave", 3.40, -18),  # pie "Sigue explorando."
+        ("cuerda_la2", 3.40, -14),  # resuena bajo la quietud del parpadeo
         ("tick", 5.10, -9),         # doble parpadeo firma
         ("tick", 5.90, -9),
-        ("sting", 6.30, -11),       # resolucion hacia el negro
+        ("sting", 6.30, -11),       # resolucion llamativa hacia el negro
+        ("cuerda_la3", 6.30, -13),  # y ataque acustico que la ancla
     ], fade_in=0.4, fade_out=(7.2, 8.5))
 
 
