@@ -53,3 +53,32 @@ Sobrio y quieto; despide y suelta al espectador:
   agente y revisión final de frames por el orquestador.
 - En post: `intro.mp4 + clips narrados + cierre.mp4` con el `concat` del
   `mux.sh` (mismo códec/parámetros al salir del mismo pipeline qh).
+
+## Sonido (2026-08-20)
+
+Los dos clips llevan **efectos de sonido sintetizados**. Los cursos ya
+exportados no se re-muxean (decision del usuario); los SFX entran solos en
+todo curso nuevo al pasar por `exports/mux.sh`.
+
+- Herramienta: `studio/tools/sfx.py` (numpy del sistema + ffmpeg, sin assets
+  externos, semillas fijas: reproducible). `sfx.py marca` regenera los wav y
+  los pega a los mp4; `paleta` / `mezclar out.wav DUR evento@t[:dB] ...` /
+  `aplicar video.mp4 audio.wav` sirven para sonorizar videos futuros.
+- Formato: AAC 24000 Hz mono 192k — identico a la narracion TTS, para que el
+  `concat -c copy` de mux.sh no se rompa. Picos del master a -6 dBFS (la voz
+  pica en -1.5..-0.5 dB); ambos extremos en silencio, se conserva la regla
+  del empalme invisible.
+- Mezclas sincronizadas con la coreografia de arriba:
+  - intro: barrido de escaneo (0.5-2.3 s) -> colchon armonico + blips del
+    ensamblado CO / DE / punto -> doble tick del cursor -> aire de ACADEMY +
+    blip HUD -> pulso grave del respiro; silencio desde ~9.2 s.
+  - cierre: colchon calido -> glissando del subrayado (2.2 s) -> blip del
+    pie -> doble tick de la firma -> sting de resolucion; silencio desde
+    ~8.4 s.
+- `exports/marca-intro-y-cierre/`: `intro.mp4` y `cierre.mp4` YA llevan la
+  pista (son los que copia el mux de cada curso); respaldo mudo en
+  `*_mudo.mp4` y wavs al lado. Re-ejecutar `sfx.py marca` es idempotente
+  (parte del `*_mudo`).
+- `exports/mux.sh` (no versionado): un clip sin narracion pero CON audio
+  propio conserva su pista, re-encodeada a los parametros comunes; solo los
+  clips mudos reciben la pista de silencio.
