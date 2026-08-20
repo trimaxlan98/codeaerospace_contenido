@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 3.2 El rotacional: el remolino local",
+  "description": "Lección 3.2 del curso Cálculo vectorial (módulo 3: fuentes y remolinos), en 4 clips: la ruedecita de paletas, el engaño del flujo recto (la cizalla también gira), la fórmula del giro y el mapa del rotacional.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-ruedecita.py",
+      "title": "1 · La ruedecita",
+      "scene": "Clip1",
+      "final_state": "Plano con el campo rotor y la ruedecita girando en (1.6,-0.8); panel arriba-derecha con \"rot F = 2.0\" y \"giro = rot/2 = 1.0 rad/s\"; pie \"A esta ruedecita la llamamos el rotacional: mide el remolino local.\""
+    },
+    {
+      "file": "clips/02-el-engano-del-flujo-recto.py",
+      "title": "2 · El engaño del flujo recto",
+      "scene": "Clip2",
+      "final_state": "Plano con el campo cizalla (todo horizontal), la ruedecita en (-1.5,0.7) con las dos flechitas Fx=1.3 (arriba) y Fx=0.1 (abajo), y el panel \"rot F = -1.0\"; pie \"Sí que gira, aunque el flujo vaya recto: el rotacional también existe aquí.\""
+    },
+    {
+      "file": "clips/03-la-formula-del-giro.py",
+      "title": "3 · La fórmula del giro",
+      "scene": "Clip3",
+      "final_state": "Plano con el campo radial (todo hacia afuera) y la ruedecita quieta en (1.0,0.6); panel arriba-derecha con la fórmula ∇×F = ∂Fy/∂x − ∂Fx/∂y y \"rot F = 0.0\" en verde; pie \"Y en el radial, la ruedecita ni se inmuta: la fórmula da cero, tal cual.\""
+    },
+    {
+      "file": "clips/04-el-mapa-del-giro.py",
+      "title": "4 · El mapa del giro",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: \"El rotacional es la ruedecita.\" (blanco) / \"Gira aunque el río vaya recto.\" (cian); pie \"Siguiente lección: campos conservativos, el camino no importa.\""
+    }
+  ]
+}
