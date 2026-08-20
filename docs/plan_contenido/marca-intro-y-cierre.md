@@ -68,13 +68,21 @@ todo curso nuevo al pasar por `exports/mux.sh`.
   `concat -c copy` de mux.sh no se rompa. Picos del master a -6 dBFS (la voz
   pica en -1.5..-0.5 dB); ambos extremos en silencio, se conserva la regla
   del empalme invisible.
+- Caracter (ajustado 2026-08-20 con feedback del dueno: nada estridente ni
+  con agudos que cansen; la apertura debe relajar): la cama son **cuerdas
+  pulsadas** sintetizadas (Karplus-Strong, timbre acustico que se apaga
+  solo), el barrido es oscuro y discreto, y el cierre conserva un sting
+  llamativo de conclusion anclado por una cuerda. El `pad` de la paleta
+  queda arreglado (vibrato en fase, espectro < 900 Hz) por si un video
+  futuro lo pide.
 - Mezclas sincronizadas con la coreografia de arriba:
-  - intro: barrido de escaneo (0.5-2.3 s) -> colchon armonico + blips del
-    ensamblado CO / DE / punto -> doble tick del cursor -> aire de ACADEMY +
-    blip HUD -> pulso grave del respiro; silencio desde ~9.2 s.
-  - cierre: colchon calido -> glissando del subrayado (2.2 s) -> blip del
-    pie -> doble tick de la firma -> sting de resolucion; silencio desde
-    ~8.4 s.
+  - intro: barrido de escaneo (0.5-2.3 s) -> arpegio acustico La2-Mi3-La3 +
+    blips del ensamblado CO / DE / punto -> doble tick del cursor -> aire de
+    ACADEMY + blip HUD -> cuerda que resuena -> pulso grave del respiro;
+    silencio desde ~9.2 s.
+  - cierre: rasgueo calido La2-Mi3-La3 -> glissando del subrayado (2.2 s) ->
+    blip del pie + cuerda que resuena bajo la quietud -> doble tick de la
+    firma -> sting de resolucion; silencio desde ~8.4 s.
 - `exports/marca-intro-y-cierre/`: `intro.mp4` y `cierre.mp4` YA llevan la
   pista (son los que copia el mux de cada curso); respaldo mudo en
   `*_mudo.mp4` y wavs al lado. Re-ejecutar `sfx.py marca` es idempotente
