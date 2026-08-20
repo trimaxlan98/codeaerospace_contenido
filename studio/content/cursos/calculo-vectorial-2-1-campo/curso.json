@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 2.1 El campo vectorial: flechas por todas partes",
+  "description": "Lección 2.1 del curso Cálculo vectorial (módulo 2: campos y caminos), en 4 clips: un campo asigna una flecha a cada punto, el catálogo de caracteres (radial, rotor, silla, cizalla), el campo gradiente de un paisaje y campos con sabor real (viento, gravedad).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-una-flecha-en-cada-punto.py",
+      "title": "1 · Una flecha en cada punto",
+      "scene": "Clip1",
+      "final_state": "Plano con la malla completa del campo viento (color por magnitud) y un panel arriba a la derecha con las tres lecturas F(x,y) medidas; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-el-catalogo.py",
+      "title": "2 · El catálogo",
+      "scene": "Clip2",
+      "final_state": "Plano con el campo cizalla (flechas horizontales, más largas arriba que abajo); pie de cierre de idea; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-campo-gradiente.py",
+      "title": "3 · El campo gradiente",
+      "scene": "Clip3",
+      "final_state": "Mapa de curvas de nivel tenue del paisaje de dos colinas con el campo gradiente encima (flechas cuesta arriba, grandes en la ladera, mínimas en lo llano) y el panel F = ∇f; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-campos-de-verdad.py",
+      "title": "4 · Campos de verdad",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Un campo es una flecha en cada punto.» sobre «El espacio entero, hablando.» en cian, con el pie de siguiente lección; HUD 'MODULO 04'."
+    }
+  ]
+}

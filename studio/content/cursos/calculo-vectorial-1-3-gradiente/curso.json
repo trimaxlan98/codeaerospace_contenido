@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 1.3 El gradiente: la flecha que sube",
+  "description": "Lección 1.3 del curso Cálculo vectorial (módulo 1: el paisaje escalar), en 4 clips: las dos parciales se ensamblan en un vector, el gradiente gana a todas las direcciones, es perpendicular a las curvas de nivel y sirve de brújula para escalar el paisaje.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-numeros-una-flecha.py",
+      "title": "1 · Dos números, una flecha",
+      "scene": "Clip1",
+      "final_state": "Mapa de curvas de nivel tenue con el punto (0.2, -0.1) en rojo, sus dos parciales como flechas cian encadenadas (0.51 horizontal y 0.58 vertical) y la hipotenusa ámbar del gradiente rotulada «largo = 0.77»; panel derecho con ∂f/∂x = 0.51 y ∂f/∂y = 0.58; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-maxima-subida.py",
+      "title": "2 · La máxima subida",
+      "scene": "Clip2",
+      "final_state": "Abanico de 8 direcciones desde el punto, atenuadas en cian con su derivada direccional medida (0.77, 0.55, 0.00, -0.55, -0.77, -0.55, 0.00, 0.55) y la ganadora en ámbar sobre la flecha del gradiente; panel |∇f| = 0.77 y en el pie la fórmula D_û f = ∇f · û = |∇f| cos θ; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-perpendicular-al-nivel.py",
+      "title": "3 · Perpendicular al nivel",
+      "scene": "Clip3",
+      "final_state": "Mapa completo de curvas de nivel con cinco puntos rojos, su gradiente ámbar y la escuadra de ángulo recto contra el nivel en cada uno; panel derecho con ∇f · t̂ = 0.00 y «peor desvio = 0.00» en verde; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-la-brujula-del-paisaje.py",
+      "title": "4 · La brújula del paisaje",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El gradiente apunta a la subida.» sobre «Seguirlo es escalar.» en cian, con el pie «Siguiente lección: el campo, una flecha en cada punto.»; HUD 'MODULO 04'."
+    }
+  ]
+}

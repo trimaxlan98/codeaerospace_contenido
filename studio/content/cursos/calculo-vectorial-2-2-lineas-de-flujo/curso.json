@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 2.2 Líneas de flujo: seguir la corriente",
+  "description": "Lección 2.2 del curso Cálculo vectorial (módulo 2: campos y caminos), en 4 clips: soltar una partícula y dejar que el campo la lleve, integrar paso a paso (RK4), la familia de líneas de flujo y los retratos con carácter de cada campo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-suelta-una-particula.py",
+      "title": "1 · Suelta una partícula",
+      "scene": "Clip1",
+      "final_state": "Campo viento con su malla de flechas; la línea de flujo fucsia completa desde la semilla hasta el borde, con la partícula roja en su punta; pie «Su velocidad, en todo momento, ES el campo.»"
+    },
+    {
+      "file": "clips/02-paso-a-paso.py",
+      "title": "2 · Paso a paso",
+      "scene": "Clip2",
+      "final_state": "Sobre el campo viento: la poligonal de Euler cian (dt=0.7, angulosa) y la línea RK4 fucsia (misma semilla, mismo tiempo total) claramente separadas donde el campo curva; pie «Pasos pequeños y mejores: la curva fucsia es la de verdad.»"
+    },
+    {
+      "file": "clips/03-la-familia-entera.py",
+      "title": "3 · La familia entera",
+      "scene": "Clip3",
+      "final_state": "Diez líneas de flujo fucsia en espiral sobre el campo remolino, todas convergiendo en un punto verde en el centro; pie «La familia de líneas retrata el campo mejor que las flechas solas.»"
+    },
+    {
+      "file": "clips/04-retratos-con-caracter.py",
+      "title": "4 · Retratos con carácter",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «El campo es un mapa de corrientes.» en blanco y «Las líneas de flujo son sus ríos.» en cian, con «Siguiente lección: el trabajo de un camino.» de pie."
+    }
+  ]
+}
