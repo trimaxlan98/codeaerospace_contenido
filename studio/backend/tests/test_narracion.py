@@ -462,3 +462,54 @@ def test_audio_404_sin_narracion(authed):
     assert r.status_code == 404
     r = authed.get(f"/api/projects/{project['id']}/narracion/ajeno/audio")
     assert r.status_code == 404
+
+
+def test_indice_de_cursos_dice_cuantos_clips_estan_narrados(authed, tmp_path,
+                                                            monkeypatch):
+    """`GET /api/projects` trae `narrated_count` y NO abre ningun mp4.
+
+    El indice tiene que poder responder "que falta narrar" con ~60 cursos en
+    catalogo; `estado_proyecto` no vale ahi porque necesita la duracion del
+    video y `duracion_mp4` lee el archivo entero.
+    """
+    _enable(tmp_path, monkeypatch)
+    project = _create_project(authed)
+    pid = project["id"]
+    clip = _add_clip(authed, pid, title="Clip uno")
+    _add_clip(authed, pid, title="Clip dos")
+
+    resumen = next(p for p in authed.get("/api/projects").json()["projects"]
+                   if p["id"] == pid)
+    assert resumen["clip_count"] == 2
+    assert resumen["narrated_count"] == 0
+
+    r = authed.post(f"/api/projects/{pid}/narracion",
+                    json={"clips": [clip["id"]]})
+    assert r.status_code == 202
+    _wait_run(authed, pid)
+
+    import app.main as main_mod
+    llamadas = []
+    monkeypatch.setattr(main_mod.narracion_service, "_video_s",
+                        lambda clip: llamadas.append(clip) or None)
+
+    resumen = next(p for p in authed.get("/api/projects").json()["projects"]
+                   if p["id"] == pid)
+    assert resumen["narrated_count"] == 1
+    assert llamadas == [], "el indice no debe medir la duracion de los videos"
+
+
+def test_el_indice_sobrevive_a_un_fallo_del_resumen_de_narracion(authed,
+                                                                 monkeypatch):
+    """Un error leyendo los guiones deja el indice sin el dato, no en 500."""
+    project = _create_project(authed)
+    import app.main as main_mod
+
+    def explota(*_args, **_kwargs):
+        raise OSError("disco de guiones no montado")
+
+    monkeypatch.setattr(main_mod.narracion_service, "resumen_audio", explota)
+    r = authed.get("/api/projects")
+    assert r.status_code == 200
+    resumen = next(p for p in r.json()["projects"] if p["id"] == project["id"])
+    assert "narrated_count" not in resumen

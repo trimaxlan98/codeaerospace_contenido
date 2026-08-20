@@ -3,6 +3,7 @@ import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save, FolderKanban, LogOut, ArrowLeft } from 'lucide-react'
 import { api, videoUrl } from './api.js'
+import { cursoDeJob, useCatalogo } from './catalogo.js'
 import Assistant from './Assistant.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -134,7 +135,10 @@ function ChipAction({ onClick, danger, title, children }) {
 
 // Ficha de la tira de renders. Div interactivo (las acciones anidan dentro).
 // queuePos: posicion 1-based entre los encolados (solo status=queued).
-function JobChip({ job, selected, onSelect, onCancel, onRetry, onDelete, queuePos }) {
+// curso: de que proyecto es el clip. Casi todo render del catalogo se llama
+// `Clip3`, asi que sin esta linea la tira no permite distinguir un clip de
+// otro entre ~300.
+function JobChip({ job, curso, selected, onSelect, onCancel, onRetry, onDelete, queuePos }) {
   const m = STATUS_META[job.status] || STATUS_META.default
   const active = ['queued', 'running'].includes(job.status)
   const [arming, setArming] = useState(false)
@@ -161,6 +165,11 @@ function JobChip({ job, selected, onSelect, onCancel, onRetry, onDelete, queuePo
           {job.status === 'queued' && queuePos ? `en cola #${queuePos}` : m.label}
         </span>
       </div>
+      {curso && (
+        <span className="truncate pl-4 text-[11px] text-muted" title={curso.name}>
+          {curso.label}
+        </span>
+      )}
       <div className="flex items-center gap-1.5 pl-4 font-mono text-[11px] text-muted">
         <span>{job.quality}</span>
         <span className="text-faint">·</span>
@@ -243,6 +252,8 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const [confirmScript, setConfirmScript] = useState(null) // {script, scene} entrante a confirmar
   const logRef = useRef(null)
   const debounceRef = useRef(null)
+  // Nombres de curso para la tira de renders (una sola copia para toda la app).
+  const catalogo = useCatalogo()
 
   // Toda accion que pisa el editor (Abrir en el Estudio, Cargar al editor,
   // Aplicar de la IA) pasa por aqui: si hay trabajo propio, pide confirmacion.
@@ -427,6 +438,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
       ? 'Guarda el clip y encola su render (compone el estilo del proyecto) · Ctrl+Enter'
       : 'Encolar el render (se ejecutan de a uno) · Ctrl+Enter'
   const errorish = selected && ['error', 'timeout'].includes(selected.status)
+  const cursoSel = selected && cursoDeJob(selected, catalogo)
   // Nota de desfase de líneas: los errores de escenas/render pueden citar
   // numeros de linea del script COMPUESTO (estilo + clip), que no coinciden
   // con los del editor (que solo muestra el script del clip).
@@ -569,7 +581,9 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
           {selected?.status === 'done' && (
             <div className="panel shrink-0 overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
-                <span className="eyebrow truncate">Resultado · {selected.scene}</span>
+                <span className="eyebrow truncate" title={cursoSel?.name}>
+                  Resultado · {cursoSel ? `${cursoSel.label} · ` : ''}{selected.scene}
+                </span>
                 <a href={videoUrl(selected.id)} download={`${selected.scene}.mp4`}
                   className="inline-flex shrink-0 items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink">
                   <Download className="h-3.5 w-3.5" /> MP4
@@ -582,8 +596,8 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
 
           <div className="panel flex h-[45dvh] flex-col overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
-              <span className="eyebrow truncate">
-                Registro{selected ? ` · ${selected.scene} (${selected.id.slice(0, 8)})` : ''}
+              <span className="eyebrow truncate" title={cursoSel?.name}>
+                Registro{selected ? ` · ${cursoSel ? `${cursoSel.label} · ` : ''}${selected.scene} (${selected.id.slice(0, 8)})` : ''}
               </span>
               {selected && (
                 <div className="flex items-center gap-1.5">
@@ -639,7 +653,8 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
         ) : (
           <div className="flex items-stretch gap-2 overflow-x-auto px-3 py-2.5">
             {activeJobs.map((j) => (
-              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+              <JobChip key={j.id} job={j} curso={cursoDeJob(j, catalogo)}
+                selected={selected?.id === j.id}
                 queuePos={j.status === 'queued' ? queuedIds.indexOf(j.id) + 1 : null}
                 onSelect={() => setSelectedId(j.id)} onCancel={cancel} />
             ))}
@@ -647,7 +662,8 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
               <span className="mx-1 w-px shrink-0 self-stretch bg-line" aria-hidden="true" />
             )}
             {historyJobs.slice(0, 20).map((j) => (
-              <JobChip key={j.id} job={j} selected={selected?.id === j.id}
+              <JobChip key={j.id} job={j} curso={cursoDeJob(j, catalogo)}
+                selected={selected?.id === j.id}
                 onSelect={() => setSelectedId(j.id)}
                 onCancel={cancel} onRetry={retry} onDelete={removeJob} />
             ))}

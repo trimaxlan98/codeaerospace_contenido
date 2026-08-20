@@ -496,6 +496,27 @@ class NarracionService:
         except (OSError, ValueError):
             return {}
 
+    def resumen_audio(self, project: dict, clips: list[dict]) -> dict:
+        """Cuantos clips ya tienen audio, sin abrir un solo mp4.
+
+        `estado_proyecto` no sirve para el indice de cursos: para decidir si
+        una narracion esta *desactualizada* necesita la duracion del video, y
+        `duracion_mp4` lee el archivo entero. Con ~60 cursos y ~300 clips eso
+        seria cargar cientos de MB en cada `GET /api/projects`. Aqui solo se
+        hace un `stat` por clip, que es lo justo para responder "que falta
+        narrar" desde la lista.
+        """
+        destino = self.destino(project)
+        estado = self._leer_estado(destino)
+        con_audio = 0
+        for clip in clips:
+            previo = estado.get(clip["id"]) or {}
+            etiqueta = previo.get("etiqueta") or etiqueta_clip(
+                clip["position"], clip["title"])
+            if (destino / f"{etiqueta}.wav").is_file():
+                con_audio += 1
+        return {"narrated_count": con_audio}
+
     def _video_s(self, clip: dict) -> float | None:
         job = self.db.get_job(clip["job_id"]) if clip.get("job_id") else None
         if not job or job.get("status") != "done" or not job.get("video_path"):

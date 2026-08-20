@@ -122,7 +122,13 @@ class ProjectService:
             clips.append({**clip_public(clip), "stale": stale, "status": status})
         return {**project, "clips": clips}
 
-    def list_projects_summary(self) -> list[dict]:
+    def list_projects_summary(self, extra=None) -> list[dict]:
+        """Resumen por proyecto para el indice de cursos.
+
+        `extra(project, clips) -> dict` inyecta campos calculados fuera de
+        este servicio (hoy: el estado de narracion, que vive en
+        NarracionService) sin volver a recorrer los clips de los ~60 cursos.
+        """
         summaries = []
         for project in self.db.list_projects():
             clips = self.db.list_clips(project["id"])
@@ -142,6 +148,7 @@ class ProjectService:
                 "clip_count": len(clips),
                 "rendered_count": rendered_count,
                 "stale_count": stale_count,
+                **(extra(project, clips) if extra else {}),
             })
         return summaries
 

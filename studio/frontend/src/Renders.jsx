@@ -11,6 +11,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Play, Download, FolderPlus, Search, ArrowUpRight } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
+import { refreshCatalogo, useCatalogo } from './catalogo.js'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -91,20 +92,24 @@ function StorageBar({ storage }) {
 // no tiene estilo compuesto que difiera del script del job; en cualquier
 // caso el clip queda creado con el script/escena del render.
 function AddToProjectDialog({ job, onOpenChange, onOpenProject }) {
-  const [projects, setProjects] = useState(null)
+  const catalogo = useCatalogo()
+  const projects = catalogo.loaded ? catalogo.list : null
   const [pid, setPid] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [createdIn, setCreatedIn] = useState(null)
 
+  // Abrir el dialogo con otro render lo reinicia. Ojo: esto NO puede depender
+  // de `projects` — crear el clip refresca el catalogo, y con esa dependencia
+  // el efecto borraria el "Clip creado" justo despues de mostrarlo.
   useEffect(() => {
     if (!job) return
-    setProjects(null); setPid(''); setError(''); setCreatedIn(null)
-    api.listProjects().then((d) => {
-      setProjects(d.projects)
-      if (d.projects.length) setPid(d.projects[0].id)
-    }).catch((err) => setError(err.message))
+    setPid(''); setError(''); setCreatedIn(null)
   }, [job])
+
+  useEffect(() => {
+    if (!pid && projects?.length) setPid(projects[0].id)
+  }, [pid, projects])
 
   const submit = async (e) => {
     e.preventDefault()
@@ -113,6 +118,9 @@ function AddToProjectDialog({ job, onOpenChange, onOpenProject }) {
     setError('')
     try {
       await api.createClip(pid, { title: job.scene, from_job_id: job.id })
+      // El curso acaba de ganar un clip: el indice compartido (y con el los
+      // contadores de Proyectos) tiene que enterarse.
+      refreshCatalogo()
       setCreatedIn(pid)
     } catch (err) {
       setError(err.message)
@@ -182,16 +190,13 @@ export default function Renders({ jobs, storage, onJobsChanged, onOpenProject })
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('recientes')
   const [filter, setFilter] = useState('listos')
-  const [projectNames, setProjectNames] = useState({})
-
   // Casi todos los renders son clips de un curso y su escena se llama
   // "Clip1".."Clip8": sin el nombre del proyecto la rejilla son cientos de
-  // tarjetas indistinguibles. Una sola consulta al montar basta.
-  useEffect(() => {
-    api.listProjects()
-      .then((d) => setProjectNames(Object.fromEntries(d.projects.map((p) => [p.id, p.name]))))
-      .catch(() => { /* sin nombres: la tarjeta cae al nombre de escena */ })
-  }, [])
+  // tarjetas indistinguibles. El indice se comparte con el resto de la app
+  // (`catalogo.js`), asi que entrar aqui ya no lo vuelve a bajar.
+  const catalogo = useCatalogo()
+  const projectNames = useMemo(
+    () => Object.fromEntries(catalogo.list.map((p) => [p.id, p.name])), [catalogo.list])
 
   const terminados = useMemo(
     () => jobs.filter((j) => ['done', 'error', 'timeout', 'cancelled'].includes(j.status)),
