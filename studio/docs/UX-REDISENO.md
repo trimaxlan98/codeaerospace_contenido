@@ -35,6 +35,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 6 | Aprender: lectura, progreso, continuidad con Animaciones/Estudio (encargo 10) | ✅ hecho 2026-08-15 | ver abajo |
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ✅ hecho 2026-08-15 | ver abajo |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | ✅ hecho 2026-08-15 | ver `UX-AUDITORIA.md` |
+| 9 | Densidad y flujo: un render se identifica por su curso, narración visible en el índice, saltar al contenido (encargos 5 y 6) | ✅ hecho 2026-08-20 | ver abajo |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -360,21 +361,20 @@ secciones en 1440×900 y 390×844, tema oscuro y claro. Sin errores de consola
 
 ---
 
-## Pendiente conocido (entra en sprints siguientes)
+## Pendiente conocido
 
-- La tira de cola/historial del Estudio y los avisos de fin de render siguen
-  identificando los jobs solo por escena (`Clip3`), igual que hacía la
-  Biblioteca antes del sprint 1.
-- `Projects.jsx` (≈900 líneas) y `Studio.jsx` (≈650) piden descomponerse.
-- El resumen de `GET /api/projects` no trae estado de narración, así que el
-  índice de familias no puede mostrar progreso de narración sin abrir cada
-  curso.
-- Los 4 temas están saneados y el claro ya cumple AA en sus tokens, pero falta
-  la pasada formal vista por vista que pide el criterio 3 del brief (y la
-  revisión de solapes de menús del criterio 4).
+- `Projects.jsx` (≈1 250 líneas) y `Studio.jsx` (≈700) piden descomponerse.
+  Es deuda de mantenimiento, no un defecto visible para quien usa la app.
 - La web usa Space Grotesk donde el video usa Rajdhani: el wordmark de la
   consola no es tipográficamente idéntico al del render. Traer la TTF del repo
   a `public/` es viable si algún día se quiere fidelidad exacta.
+- El bundle principal pasa de 900 kB (CodeMirror + Radix + la app). Sin
+  `manualChunks` extra ni carga diferida del editor; en una consola de un solo
+  usuario tras login no duele, pero es el siguiente ahorro obvio.
+
+Cerrados en el sprint 9: la identificación de los jobs por escena, la
+narración ausente del índice de cursos y la pasada de temas (esta última en el
+sprint 8, `UX-AUDITORIA.md`).
 
 ---
 
@@ -649,3 +649,97 @@ aplica, con la misma regla que usa el backend (`branding.ya_marcado`):
 **Verificación:** `vite build` verde, `pytest -q` 149/149 (incluye
 `test_branding.py`), QA Playwright 2/2 — el distintivo cambia de «automática»
 a «propia» al escribir `code_brand` en el editor.
+
+---
+
+## Sprint 9 — densidad y flujo (hecho 2026-08-20)
+
+Criterios 5 (*sin interfaces saturadas de información o componentes*) y 6
+(*mejor flujo de trabajo y fluidez excepcional*). Los criterios 1–4 y 7–11
+tenían sprint propio; estos dos no, y lo que quedaba de ellos estaba en la
+lista de *Pendiente conocido* de los sprints anteriores.
+
+### 1. Un render se identifica por su curso, no por su escena
+
+Las escenas del catálogo se llaman `Clip1`…`Clip8`. La tira de la cola del
+Estudio, la cabecera del registro, el panel de resultado y los avisos de fin
+de render enseñaban **solo eso**: con ~300 clips en catálogo, «Clip3 · listo»
+no dice qué acaba de terminar. Renders sí resolvía el nombre del curso, pero
+con **su propia** consulta a `GET /api/projects`.
+
+Ahora hay un store compartido, `src/catalogo.js` (mismo patrón que
+`prefs.js`: `useSyncExternalStore` + suscripción):
+
+- Una sola copia del índice para el índice de Proyectos, Renders, el diálogo
+  *A un proyecto…*, la tira de la cola y los avisos. Antes eran tres
+  peticiones distintas y dos piezas sin el dato; entrar en Renders volvía a
+  bajar los ~60 cursos.
+- `cursoDeJob(job, catalogo)` resuelve `job.project_id` y devuelve la
+  **etiqueta corta** dentro de la familia (`1.1 La luz como regla`): repetir
+  «Metrología óptica ·» en cada ficha de 196 px sería ruido.
+- El aviso de fin de render ahora **lleva al curso** (`#/proyectos/<id>`) en
+  vez de al Estudio, que es donde se sigue trabajando cuando lo que terminó
+  es un clip. Si el render es libre, sigue llevando al Estudio.
+- Invalidación explícita: `refreshCatalogo()` tras crear o borrar. El índice
+  además revalida al montarse (*stale-while-revalidate*), porque volviendo del
+  detalle de un curso los contadores pueden haber cambiado.
+
+**Trampa encontrada al hacerlo:** el diálogo *A un proyecto…* reiniciaba su
+estado con un efecto que dependía de la lista de proyectos. Al pasar a store
+compartido, crear el clip refresca el catálogo → nueva referencia de la lista
+→ el efecto borraba el «Clip creado» justo después de mostrarlo. El efecto de
+reinicio depende ahora solo del job; la selección por defecto vive en un
+efecto aparte. Hay un check de QA dedicado a esto.
+
+### 2. La narración se ve desde el índice, sin abrir 60 cursos
+
+`GET /api/projects` no traía nada de narración: para saber qué faltaba narrar
+había que entrar curso por curso.
+
+- **Backend:** `NarracionService.resumen_audio(project, clips)` cuenta los
+  clips con audio haciendo **solo un `stat` por clip**.
+  `ProjectService.list_projects_summary(extra)` acepta un inyector de campos
+  para no recorrer dos veces los clips de los ~60 cursos.
+- **Por qué no se reutilizó `estado_proyecto`:** para decidir si una narración
+  está *desactualizada* necesita la duración del vídeo, y `duracion_mp4` lee
+  el archivo entero (`mvhd`). En el índice serían cientos de MB por petición.
+  El estado fino se queda en el detalle, donde se mira un curso a la vez.
+- **Nunca tumba el listado:** el resumen va en `try/except`; si el directorio
+  de guiones no se puede leer, el índice sale sin el dato en vez de con un 500.
+- **Frontend:** distintivo `N/M` con micrófono en la cabecera global, en cada
+  familia y en cada tarjeta, más el filtro *Sin narrar*.
+
+**Aplicando el criterio 5 al propio dato nuevo:** un valor que sale igual en
+todas las filas no informa, decora. Toda esta dimensión se pinta **solo si
+algún curso del catálogo tiene audio** (`showNarr`), y el filtro solo se
+ofrece en ese caso. En una instalación que no usa voz, la interfaz es
+exactamente la de antes.
+
+### 3. Saltar al contenido
+
+Primer tabulador del documento. No puede ser un `<a href="#contenido">` —el
+hash es la ruta, ver `DESIGN-SYSTEM.md`—, así que es un botón que mueve el
+foco al `<main>` de la vista visible. El `id="contenido"` viaja con la vista
+mostrada: las demás siguen montadas y ocultas, y solo una lo lleva a la vez.
+
+### Verificación
+
+`npm run build` verde · `venv/bin/pytest -q` **151/151** (dos tests nuevos:
+que el índice trae `narrated_count` **sin medir la duración de ningún vídeo**,
+y que un fallo del resumen deja el índice sin el dato en vez de en 500).
+
+QA Playwright contra una instancia local real (uvicorn + `dist/` servido con
+proxy) sembrada con 6 cursos en 2 familias, 21 clips, narración parcial en
+disco y un render terminado: **42/42 checks** en 1440×900 **y** 390×844 —
+narración agregada, por familia y por curso contra los números de la propia
+API, filtro *Sin narrar*, la tira de la cola nombrando el curso, el aviso de
+fin de render nombrando el curso y llevando a él, Renders nombrando el curso
+del vídeo, el «Clip creado» sobreviviendo al refresco, el salto al contenido
+como primer Tab (y sin romper la ruta hash), cero desborde horizontal y cero
+errores de consola.
+
+**Contraste del distintivo nuevo en los 4 temas**, compuesto sobre el fondo
+real de su tarjeta: mínimo **4,94:1** (`daylight`), máximo 11,19:1
+(`nebula`) — AA como texto normal en los tres estados. El caso «sin narrar»
+usa `text-muted` y no `text-faint`: `faint` es token de adorno (3,67:1 en el
+tema oscuro) y esto es un contador que se lee.

@@ -17,6 +17,7 @@ import {
   FolderKanban, Film, Layers, Mic, Pencil, Plus, RefreshCw, Search, Square, Wand2,
 } from 'lucide-react'
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl } from './api.js'
+import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
@@ -96,32 +97,31 @@ export default function Projects({ jobs, onEditClip, routeId, onRoute, aiEnabled
 
 // ── indice de cursos ─────────────────────────────────────────────────────
 
-const FAMILY_SEP = ' · '
-
-// "Metrología óptica · 1.1 La luz como regla" → familia + etiqueta corta.
-function splitName(name) {
-  const i = name.indexOf(FAMILY_SEP)
-  if (i < 0) return { family: null, label: name }
-  return { family: name.slice(0, i), label: name.slice(i + FAMILY_SEP.length) }
-}
+// `splitName` vive en catalogo.js: la misma etiqueta corta la usan la tira de
+// la cola del Estudio y los avisos de fin de render.
 
 function totals(items) {
   return items.reduce((a, p) => ({
     clips: a.clips + p.clip_count,
     rendered: a.rendered + p.rendered_count,
     stale: a.stale + p.stale_count,
-  }), { clips: 0, rendered: 0, stale: 0 })
+    narrated: a.narrated + (p.narrated_count || 0),
+  }), { clips: 0, rendered: 0, stale: 0, narrated: 0 })
 }
 
 const FILTERS = [
   { id: 'todos', label: 'Todos' },
   { id: 'pendientes', label: 'Con pendientes' },
   { id: 'completos', label: 'Completos' },
+  // Solo aparece si el catalogo tiene narracion (ver `showNarr`): sin ella
+  // seria un filtro que siempre devuelve todo.
+  { id: 'sin_narrar', label: 'Sin narrar', narr: true },
 ]
 
 function matchesFilter(p, filter) {
   if (filter === 'completos') return p.clip_count > 0 && p.rendered_count === p.clip_count
   if (filter === 'pendientes') return p.clip_count === 0 || p.rendered_count < p.clip_count
+  if (filter === 'sin_narrar') return p.clip_count > 0 && (p.narrated_count || 0) < p.clip_count
   return true
 }
 
@@ -183,6 +183,27 @@ function CountsLine({ t }) {
   )
 }
 
+// Narracion agregada. Se pinta SOLO si el catalogo tiene alguna narracion
+// (`showNarr`): con 60 cursos, un "0/5 narrados" repetido en cada tarjeta de
+// una instalacion que no usa voz es ruido puro, justo lo que el encargo 5
+// prohibe. Antes este dato no existia en la lista: habia que abrir curso por
+// curso para saber que faltaba narrar.
+function NarrBadge({ narrated, clips, className }) {
+  if (!clips) return null
+  const completo = narrated >= clips
+  return (
+    <span className={cn('inline-flex shrink-0 items-center gap-1 font-mono text-[11px]',
+      // `faint` es el token de adorno (3,67:1 en el tema oscuro): esto es un
+      // contador que se lee, asi que el caso «sin narrar» usa `muted`, que si
+      // cumple AA como texto normal en los cuatro temas.
+      completo ? 'text-ok' : narrated > 0 ? 'text-warn' : 'text-muted', className)}
+      title={`${narrated} de ${clips} clips con narracion generada`}>
+      <Mic className="h-3 w-3" aria-hidden="true" />
+      {narrated}/{clips}
+    </span>
+  )
+}
+
 const OPEN_KEY = 'ms_projects_open'
 
 function readOpen() {
@@ -191,20 +212,25 @@ function readOpen() {
 }
 
 function ProjectsList({ onOpen }) {
-  const [projects, setProjects] = useState(null)
-  const [error, setError] = useState('')
+  // El indice se comparte con Renders y con la tira de la cola del Estudio
+  // (`catalogo.js`): volver a esta vista ya no vuelve a bajar los ~60 cursos.
+  const catalogo = useCatalogo()
+  const projects = catalogo.loaded ? catalogo.list : null
+  const [deleteError, setDeleteError] = useState('')
+  const error = deleteError || catalogo.error
   const [newOpen, setNewOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('todos')
   const [order, setOrder] = useState('actividad')
   const [openFamilies, setOpenFamilies] = useState(readOpen)
 
-  const load = useCallback(() => {
-    setError('')
-    api.listProjects().then((d) => setProjects(d.projects)).catch((err) => setError(err.message))
-  }, [])
+  const load = useCallback(() => refreshCatalogo(), [])
 
-  useEffect(() => { load() }, [load])
+  // Stale-while-revalidate: al volver del detalle de un curso la lista se
+  // pinta al instante con lo cacheado y se refresca por detras, porque en el
+  // detalle se pudo renderizar, narrar o borrar clips y los contadores del
+  // indice habrian quedado viejos.
+  useEffect(() => { refreshCatalogo() }, [])
 
   const toggleFamily = (key) => {
     setOpenFamilies((prev) => {
@@ -216,12 +242,12 @@ function ProjectsList({ onOpen }) {
   }
 
   const remove = async (id) => {
-    setError('')
+    setDeleteError('')
     try {
       await api.deleteProject(id)
       load()
     } catch (err) {
-      setError(err.message)
+      setDeleteError(err.message)
     }
   }
 
@@ -232,6 +258,8 @@ function ProjectsList({ onOpen }) {
   )), [projects, filter, q])
   const { families, loose } = useMemo(() => groupProjects(visible, order), [visible, order])
   const all = totals(visible)
+  // La dimension "narracion" solo entra en la interfaz si el catalogo la usa.
+  const showNarr = useMemo(() => (projects || []).some((p) => (p.narrated_count || 0) > 0), [projects])
   // Buscando o filtrando, plegar esconderia justo lo que se busca.
   const forceOpen = Boolean(q) || filter !== 'todos'
 
@@ -250,7 +278,8 @@ function ProjectsList({ onOpen }) {
             <Select value={filter} onValueChange={setFilter}>
               <SelectTrigger className="h-8 w-[150px]" aria-label="filtrar por estado"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {FILTERS.map((f) => <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>)}
+                {FILTERS.filter((f) => showNarr || !f.narr)
+                  .map((f) => <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={order} onValueChange={setOrder}>
@@ -274,6 +303,7 @@ function ProjectsList({ onOpen }) {
             </span>
             <span className="text-faint">·</span>
             <span><CountsLine t={all} /></span>
+            {showNarr && <NarrBadge narrated={all.narrated} clips={all.clips} />}
             <ProgressBar rendered={all.rendered} stale={all.stale} total={all.clips}
               className="ml-auto w-full max-w-[220px]" />
           </div>
@@ -292,16 +322,16 @@ function ProjectsList({ onOpen }) {
         ) : (
           <div className="flex flex-col">
             {families.map((f) => (
-              <FamilyGroup key={f.key} name={f.key} items={f.items}
+              <FamilyGroup key={f.key} name={f.key} items={f.items} showNarr={showNarr}
                 open={forceOpen || openFamilies.has(f.key)}
                 onToggle={() => toggleFamily(f.key)}
                 onOpen={onOpen} onDelete={remove} />
             ))}
             {loose.length > 0 && (
               families.length === 0 ? (
-                <ProjectGrid items={loose} onOpen={onOpen} onDelete={remove} />
+                <ProjectGrid items={loose} showNarr={showNarr} onOpen={onOpen} onDelete={remove} />
               ) : (
-                <FamilyGroup name="Cursos sueltos" items={loose} loose
+                <FamilyGroup name="Cursos sueltos" items={loose} loose showNarr={showNarr}
                   open={forceOpen || openFamilies.has('__sueltos__')}
                   onToggle={() => toggleFamily('__sueltos__')}
                   onOpen={onOpen} onDelete={remove} />
@@ -321,7 +351,7 @@ function ProjectsList({ onOpen }) {
   )
 }
 
-function FamilyGroup({ name, items, loose, open, onToggle, onOpen, onDelete }) {
+function FamilyGroup({ name, items, loose, showNarr, open, onToggle, onOpen, onDelete }) {
   const t = totals(items)
   return (
     <section aria-label={name} className="border-b border-line last:border-b-0">
@@ -341,24 +371,26 @@ function FamilyGroup({ name, items, loose, open, onToggle, onOpen, onDelete }) {
             : (items.length === 1 ? 'lección' : 'lecciones')}
         </span>
         <span className="ml-auto hidden shrink-0 text-[12px] text-muted sm:block"><CountsLine t={t} /></span>
+        {showNarr && <NarrBadge narrated={t.narrated} clips={t.clips} className="hidden sm:inline-flex" />}
         <ProgressBar rendered={t.rendered} stale={t.stale} total={t.clips} className="w-20 shrink-0" />
       </button>
-      {open && <ProjectGrid items={items} onOpen={onOpen} onDelete={onDelete} />}
+      {open && <ProjectGrid items={items} showNarr={showNarr} onOpen={onOpen} onDelete={onDelete} />}
     </section>
   )
 }
 
-function ProjectGrid({ items, onOpen, onDelete }) {
+function ProjectGrid({ items, showNarr, onOpen, onDelete }) {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3 p-3.5 pt-1">
       {items.map((p) => (
-        <ProjectCard key={p.id} project={p} onOpen={() => onOpen(p.id)} onDelete={() => onDelete(p.id)} />
+        <ProjectCard key={p.id} project={p} showNarr={showNarr}
+          onOpen={() => onOpen(p.id)} onDelete={() => onDelete(p.id)} />
       ))}
     </div>
   )
 }
 
-function ProjectCard({ project, onOpen, onDelete }) {
+function ProjectCard({ project, showNarr, onOpen, onDelete }) {
   const t = { clips: project.clip_count, rendered: project.rendered_count, stale: project.stale_count }
   return (
     <article className="group flex flex-col gap-2 overflow-hidden rounded-lg border border-line bg-surface-2 p-3 transition-colors hover:border-accent/50">
@@ -372,8 +404,11 @@ function ProjectCard({ project, onOpen, onDelete }) {
         )}
         <p className="text-[11.5px] text-muted"><CountsLine t={t} /></p>
         <ProgressBar rendered={t.rendered} stale={t.stale} total={t.clips} />
-        <p className="font-mono text-[11px] text-faint">
-          {QUALITY_LABEL[project.quality] || project.quality} · {fmtDate(project.updated_at)}
+        <p className="flex items-center gap-2 font-mono text-[11px] text-faint">
+          <span>{QUALITY_LABEL[project.quality] || project.quality} · {fmtDate(project.updated_at)}</span>
+          {showNarr && (
+            <NarrBadge narrated={project.narrated_count || 0} clips={t.clips} className="ml-auto" />
+          )}
         </p>
       </button>
       {/* Borrar solo al pasar por encima (o con foco de teclado): con ~60

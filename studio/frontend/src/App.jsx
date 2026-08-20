@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { api, setUnauthorizedHandler } from './api.js'
 import { useRoute } from './router.js'
 import { getPrefs } from './prefs.js'
+import { cursoDeJob, useCatalogo } from './catalogo.js'
 import { cn } from '@/lib/utils'
 import Login from './Login.jsx'
 import ChangePassword from './ChangePassword.jsx'
@@ -30,6 +31,9 @@ export default function App() {
   const [user, setUser] = useState('')
   const [route, navigate] = useRoute()
   const view = route.view
+  // Nombres de curso: los avisos de fin de render decian solo la escena
+  // (`Clip3`), que con ~300 clips en catalogo no identifica nada.
+  const catalogo = useCatalogo(auth === true)
   // Vistas keep-alive: se montan al visitarlas por primera vez y despues solo
   // se ocultan, para que su estado (editor, leccion abierta, tab de Admin…)
   // sobreviva a los cambios de pestana.
@@ -187,13 +191,31 @@ export default function App() {
 
   // display:contents mantiene al <main> de cada vista como hijo directo del
   // flex del shell; hidden (display:none) lo saca de layout sin desmontarlo.
-  const show = (id) => (view === id ? 'contents' : 'hidden')
+  // El id viaja con la vista visible: es el destino del "saltar al contenido"
+  // y solo una vista lo lleva a la vez (las otras siguen montadas y ocultas).
+  const pane = (id) => ({
+    className: view === id ? 'contents' : 'hidden',
+    id: view === id ? 'contenido' : undefined,
+  })
 
   return (
     // Shell responsive: en movil la pagina scrollea (min-h) y cada vista fija
     // alturas minimas por panel; en lg+ vuelve el layout de viewport fijo.
     <div className="flex min-h-dvh flex-col lg:h-dvh relative">
       <StarfieldBackground />
+      {/* Primer tabulador del documento. No puede ser un <a href="#..."> :
+          la navegacion es por hash y el ancla cambiaria de vista. */}
+      <button
+        onClick={() => {
+          const el = document.querySelector('#contenido main')
+          if (!el) return
+          el.tabIndex = -1
+          el.focus({ preventScroll: true })
+          el.scrollIntoView({ block: 'start' })
+        }}
+        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:border focus:border-accent focus:bg-surface focus:px-3 focus:py-2 focus:text-[13px] focus:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+        Saltar al contenido
+      </button>
       <Header
         view={view}
         onView={navigate}
@@ -205,13 +227,22 @@ export default function App() {
       <div aria-live="polite" className="fixed bottom-4 right-4 z-50 flex w-[290px] flex-col gap-2">
         {toasts.map(({ key, job }) => {
           const m = TOAST_META[job.status] || TOAST_META.cancelled
+          const curso = cursoDeJob(job, catalogo)
           return (
             <div key={key} className="panel flex items-center gap-2.5 px-3 py-2.5 shadow-xl">
               <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot)} />
-              <button onClick={() => { navigate('studio'); dismissToast(key) }}
+              {/* El aviso lleva al sitio donde se sigue trabajando: al curso
+                  si el render es un clip, al Estudio si es un render libre. */}
+              <button onClick={() => {
+                if (curso) navigate('projects', curso.id); else navigate('studio')
+                dismissToast(key)
+              }}
                 className="flex min-w-0 flex-1 flex-col text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-                title="ver en el Estudio">
+                title={curso ? `ver ${curso.name}` : 'ver en el Estudio'}>
                 <span className="truncate font-mono text-[13px] text-ink">{job.scene}</span>
+                {curso && (
+                  <span className="truncate text-[11.5px] text-muted">{curso.label}</span>
+                )}
                 <span className={cn('font-mono text-[11px] uppercase tracking-wide', m.text)}>
                   render {m.label}
                 </span>
@@ -225,7 +256,7 @@ export default function App() {
         })}
       </div>
       {visited.current.has('studio') && (
-        <div className={show('studio')}>
+        <div {...pane('studio')}>
           <Studio jobs={jobs} liveLog={liveLog} resetLiveLog={resetLiveLog}
             onJobsChanged={refreshJobs} aiEnabled={aiEnabled}
             pendingScript={pendingScript} pendingScene={pendingScene}
@@ -235,7 +266,7 @@ export default function App() {
         </div>
       )}
       {visited.current.has('projects') && (
-        <div className={show('projects')}>
+        <div {...pane('projects')}>
           <Projects jobs={jobs} aiEnabled={aiEnabled}
             routeId={view === 'projects' ? route.param : null}
             onRoute={(id) => navigate('projects', id)}
@@ -248,13 +279,13 @@ export default function App() {
         </div>
       )}
       {visited.current.has('renders') && (
-        <div className={show('renders')}>
+        <div {...pane('renders')}>
           <Renders jobs={jobs} storage={storage} onJobsChanged={refreshJobs}
             onOpenProject={(id) => navigate('projects', id)} />
         </div>
       )}
       {visited.current.has('learn') && (
-        <div className={show('learn')}>
+        <div {...pane('learn')}>
           <Learn active={view === 'learn'}
             routeId={view === 'learn' ? route.param : null}
             onRoute={(id) => navigate('learn', id)}
@@ -262,7 +293,7 @@ export default function App() {
         </div>
       )}
       {visited.current.has('admin') && (
-        <div className={show('admin')}>
+        <div {...pane('admin')}>
           <Admin metrics={metrics} containers={containers} jobs={jobs}
             storage={storage} onJobsChanged={refreshJobs}
             routeTab={view === 'admin' ? route.param : null}
@@ -270,7 +301,7 @@ export default function App() {
         </div>
       )}
       {visited.current.has('settings') && (
-        <div className={show('settings')}>
+        <div {...pane('settings')}>
           <Settings user={user} aiEnabled={aiEnabled} onLogout={logout} />
         </div>
       )}

@@ -145,6 +145,35 @@ ornamento — **no es el logotipo**), `ErrorBoundary`.
   `index.html` lo aplica antes del primer pintado para evitar el destello.
 - Una preferencia nueva solo entra si **hace algo visible**; si no cambia nada
   en pantalla, es ruido y no se añade.
+- El **catálogo de cursos** (`GET /api/projects`) vive en `catalogo.js`, mismo
+  patrón de store: una sola copia para el índice de Proyectos, la lista de
+  Renders, el diálogo *A un proyecto…*, la tira de la cola del Estudio y los
+  avisos de fin de render. Quien muta proyectos o clips llama a
+  `refreshCatalogo()`; el índice además revalida al montarse
+  (*stale-while-revalidate*), porque en el detalle de un curso se pudo
+  renderizar, narrar o borrar.
+- **Un render se identifica por su curso, no por su escena.** Las escenas del
+  catálogo se llaman `Clip1`…`Clip8`: cualquier sitio que enseñe un job
+  (fichas de la cola, cabecera del registro, resultado, avisos, tarjetas de
+  Renders) tiene que resolver `job.project_id` contra el catálogo y enseñar la
+  etiqueta corta del curso. `cursoDeJob(job, catalogo)` hace justo eso.
+
+## Una dimensión solo entra en la interfaz si el catálogo la usa
+
+El encargo 5 (*sin interfaces saturadas*) tiene una regla operativa: un dato
+que sale **igual en todas las filas** no informa, decora. La narración del
+índice de Proyectos se pinta solo si algún curso tiene audio (`showNarr`), y
+el filtro *Sin narrar* solo se ofrece en ese caso; en una instalación que no
+usa voz, la interfaz es exactamente la de antes de que existiera el dato.
+
+## Coste de un dato en una lista de ~60 cursos
+
+Antes de añadir una columna al índice, mira lo que cuesta calcularla para
+**todo** el catálogo. `narracion.estado_proyecto` no servía para la lista:
+para decidir si una narración está *desactualizada* necesita la duración del
+vídeo y `duracion_mp4` lee el archivo entero — cientos de MB por petición.
+Por eso el índice usa `resumen_audio`, que solo hace un `stat` por clip, y el
+estado fino se queda en el detalle del curso, donde se mira un curso a la vez.
 
 ## Navegación por hash: los anclajes están prohibidos
 
@@ -168,6 +197,12 @@ inyectado por instancia.
 - `aria-label` en los controles que solo llevan icono; `role="alert"` en los
   mensajes de error y `role="status"` en los informativos.
 - `prefers-reduced-motion` respetado por el fondo animado y el cielo del login.
+- **Saltar al contenido** es el primer tabulador del documento (`App.jsx`).
+  No puede ser un `<a href="#...">` — ver la regla del hash — así que es un
+  botón que mueve el foco al `<main>` de la vista visible (`#contenido main`).
+- Un contador que **se lee** usa `text-muted` como mínimo; `text-faint` es
+  token de adorno (3,67:1 en el tema oscuro) y no llega a AA como texto
+  normal.
 
 ## Convenciones de contenido
 

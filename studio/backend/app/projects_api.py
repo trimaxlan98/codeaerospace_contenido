@@ -191,9 +191,19 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
 
     # ── proyectos ────────────────────────────────────────────────────────────
 
+    def _narr_resumen(project: dict, clips: list[dict]) -> dict:
+        # El indice de cursos tiene que poder decir que falta narrar sin
+        # abrir los ~60 cursos uno a uno. Nunca puede tumbar el listado: si
+        # el directorio de guiones no existe o no se puede leer, el indice
+        # sale sin ese dato.
+        try:
+            return narracion.resumen_audio(project, clips)
+        except Exception:
+            return {}
+
     @router.get("")
     async def list_projects(_=Depends(require_auth)):
-        return {"projects": service.list_projects_summary()}
+        return {"projects": service.list_projects_summary(_narr_resumen)}
 
     @router.post("", status_code=201)
     async def create_project(body: ProjectCreateBody, _=Depends(require_auth)):
