@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 1.1 El paisaje: funciones de dos variables",
+  "description": "Lección 1.1 del curso Cálculo vectorial (módulo 1: el paisaje escalar), en 4 clips animados —una idea por clip—: una función de dos variables asigna un número a cada punto, verla como superficie 3D, leerla como mapa de curvas de nivel y caminarla con altímetro. El espacio que fluye, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-numero-para-cada-punto.py",
+      "title": "1 · Un número para cada punto",
+      "scene": "Clip1",
+      "final_state": "Plano con puntos de muestra coloreados frío→cálido y su altura f(x,y) medida junto a cada uno; panel f: R²→R a la derecha; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-la-superficie.py",
+      "title": "2 · La superficie",
+      "scene": "Clip2",
+      "final_state": "Espacio 3D con la superficie de alambre z=f(x,y) coloreada por altura, las dos cimas rotuladas con sus cifras (2.2 y 1.4); panel z=f(x,y); HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-el-mapa-curvas-de-nivel.py",
+      "title": "3 · El mapa: curvas de nivel",
+      "scene": "Clip3",
+      "final_state": "Plano 2D con el mapa de curvas de nivel completo (frío→cálido) y la leyenda de alturas a la derecha; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-caminar-el-paisaje.py",
+      "title": "4 · Caminar el paisaje",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Una función de dos variables es un paisaje.» sobre «Las curvas de nivel son su mapa.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}
