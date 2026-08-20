@@ -84,14 +84,14 @@ todo curso nuevo al pasar por `exports/mux.sh`.
   - cierre: nebulosa creciendo con el wordmark -> glissando del subrayado
     (2.2 s) -> blip del pie -> doble tick de la firma -> sting de
     resolucion; silencio desde ~8.4 s.
-- **TRAMPA (maquina local): el numpy del sistema esta ROTO** — pip --user
-  1.26.4 sobre Python 3.14, combo no soportado que corrompe arrays de forma
-  silenciosa y no determinista (np.log2 devolvia basura dentro de _filtra y
-  los pasabanda dejaban pasar ruido blanco). `sfx.py` se ejecuta SIEMPRE
-  dentro del contenedor manim (numpy 2.5 + ffmpeg):
-  `docker run --rm --user $(id -u):$(id -g) -v "$PWD":/workspace -w
-  /workspace codeaerospace_contenido-manim python3 studio/tools/sfx.py
-  marca` — y un canario en main() aborta si detecta el numpy corrupto.
+- **Trampa (resuelta 2026-08-20): el numpy del sistema estaba ROTO** — era
+  un 1.26.4 compilado del sdist sobre Python 3.14 (combo no soportado) que
+  corrompia arrays de forma silenciosa y no determinista (np.log2 devolvia
+  basura dentro de _filtra y los pasabanda dejaban pasar ruido blanco). Se
+  arreglo instalando numpy 2.5 (`pip --user --break-system-packages`);
+  `sfx.py` ya corre en el host, el canario de main() lo re-verifica en cada
+  ejecucion, y el contenedor manim queda como via alternativa (el comando
+  esta en el docstring de sfx.py).
 - `exports/marca-intro-y-cierre/`: `intro.mp4` y `cierre.mp4` YA llevan la
   pista (son los que copia el mux de cada curso); respaldo mudo en
   `*_mudo.mp4` y wavs al lado. Re-ejecutar `sfx.py marca` es idempotente

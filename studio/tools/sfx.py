@@ -23,15 +23,15 @@ Uso:
   sfx.py aplicar video.mp4 audio.wav [out.mp4]
                           pega un wav a un mp4 (aac 24k mono, -shortest)
 
-OJO: ejecutar DENTRO del contenedor manim (numpy 2.x + ffmpeg confiables):
+Corre en el host o dentro del contenedor manim; en ambos casos el canario
+de main() verifica el numpy antes de sintetizar. Historia: el numpy del
+sistema fue un 1.26.4 compilado del sdist sobre Python 3.14 (combo no
+soportado) que corrompia arrays de forma silenciosa y no determinista;
+arreglado el 2026-08-20 con numpy 2.5 (pip --user --break-system-packages).
+Si el canario vuelve a abortar, usar el contenedor:
 
   docker run --rm --user $(id -u):$(id -g) -v "$PWD":/workspace \
     -w /workspace codeaerospace_contenido-manim python3 studio/tools/sfx.py marca
-
-El numpy del sistema (pip --user 1.26.4 sobre Python 3.14, combo que numpy
-no soporta) corrompe arrays de forma silenciosa y NO determinista: np.log2
-devolvia basura dentro de _filtra y los filtros dejaban pasar todo. Un
-canario en main() lo detecta y aborta.
 """
 import subprocess
 import sys
