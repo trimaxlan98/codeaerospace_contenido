@@ -50,6 +50,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 20 | Metrologia optica (familia, 9 lecciones) | original (divulgacion, optica y enlaces opticos entre satelites) | `optica.py` + `isl.py` | publicado (PR #21): 9 lecciones narradas y muxeadas con intro/cierre |
 | 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
 | 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + #36): 18 lecciones, 72 qh en prod, narradas y muxeadas con intro/cierre (2026-08-19) |
+| 23 | Calculo vectorial (familia, 12 lecciones) | original (divulgacion, muy visual: el espacio que fluye; secuela de Algebra lineal, cierra en Maxwell) | `calculo_vectorial.py` (sobre `algebra_lineal.py`) | publicado (PR #43): 12 lecciones, 48 qh en prod, narradas y muxeadas — PRIMER curso con el intro/cierre SONOROS (2026-08-20) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -153,6 +154,19 @@ modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
 | 3.1 | El enlace optico entre satelites | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.2 | Apuntar, adquirir, seguir | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.3 | Satelites que se miden entre si | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+
+## Familia "Calculo vectorial" (2026-08-20, formato de lecciones)
+
+Secuela natural de Algebra lineal: *el espacio que fluye*. 4 modulos x 3
+lecciones = 12 proyectos / 48 clips. Los operadores se presentan primero
+como movimiento (la ruedecita, la cajita contable, la particula que sigue
+la corriente) y los teoremas se COMPRUEBAN midiendo los dos lados en
+pantalla (Green 8.00 = 8.00, Stokes 4.0 = 4.0, divergencia 12.29 = 12.29,
+Gauss 6.28/0.00, c = 299 792 458 m/s de mu0 y eps0). Libreria
+`calculo_vectorial.py` sobre el sustrato de `algebra_lineal.py`.
+Storyboard, contrato y tablero: `curso-21-calculo-vectorial.md`.
+Es el PRIMER curso muxeado con el intro/cierre sonoros de la marca
+(picos -6 dBFS medidos en el curso_narrado.mp4 final).
 
 ## Familia "Algebra lineal" (2026-08-19, formato de lecciones)
 

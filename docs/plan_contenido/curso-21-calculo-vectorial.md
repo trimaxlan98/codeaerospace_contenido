@@ -171,18 +171,18 @@ local · adoptada en prod · narrada · muxeada.
 
 | Lección | storyboard | clips | ql | repo/PR | qh | prod | narrada | mux |
 |---------|-----------|-------|----|---------|----|------|---------|-----|
-| 1.1 | ✔ | ✔ | ✔ 30.3/30.5/29.9/29.9 s | — | — | — | — | — |
-| 1.2 | ✔ | ✔ | ✔ 31.0/29.7/35.3/32.9 s | — | — | — | — | — |
-| 1.3 | ✔ | ✔ | ✔ 31.5/37.1/32.1/39.9 s | — | — | — | — | — |
-| 2.1 | ✔ | ✔ | ✔ 31.7/39.7/30.9/30.1 s | — | — | — | — | — |
-| 2.2 | ✔ | ✔ | ✔ 33.9/30.8/29.5/35.7 s | — | — | — | — | — |
-| 2.3 | ✔ | ✔ | ✔ 36.9/36.9/39.0/42.7 s | — | — | — | — | — |
-| 3.1 | ✔ | ✔ | ✔ 30.4/28.1/28.3/33.7 s | — | — | — | — | — |
-| 3.2 | ✔ | ✔ | ✔ 30.3/32.0/38.9/31.7 s | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ✔ 40.7/39.2/37.7/43.2 s | — | — | — | — | — |
-| 4.1 | ✔ | ✔ | ✔ 38.7/38.6/32.5/41.4 s | — | — | — | — | — |
-| 4.2 | ✔ | ✔ | ✔ 38.6/39.4/33.1/41.3 s | — | — | — | — | — |
-| 4.3 | ✔ | ✔ | ✔ 34.6/41.7/33.2/39.7 s | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ 30.3/30.5/29.9/29.9 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.2 | ✔ | ✔ | ✔ 31.0/29.7/35.3/32.9 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.3 | ✔ | ✔ | ✔ 31.5/37.1/32.1/39.9 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.1 | ✔ | ✔ | ✔ 31.7/39.7/30.9/30.1 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.2 | ✔ | ✔ | ✔ 33.9/30.8/29.5/35.7 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.3 | ✔ | ✔ | ✔ 36.9/36.9/39.0/42.7 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.1 | ✔ | ✔ | ✔ 30.4/28.1/28.3/33.7 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ 30.3/32.0/38.9/31.7 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ 40.7/39.2/37.7/43.2 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ 38.7/38.6/32.5/41.4 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.2 | ✔ | ✔ | ✔ 38.6/39.4/33.1/41.3 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.3 | ✔ | ✔ | ✔ 34.6/41.7/33.2/39.7 s | PR #43 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 
 ## Módulo 1 — El paisaje escalar
 
@@ -348,3 +348,66 @@ del satélite. Cierre de familia.
 | 2 | Leer a Maxwell I | ∇·E = ρ/ε0 y ∇·B = 0 LEÍDAS: cargas como fuentes (radial), B sin fuentes (dipolo cerrado) | las dos leyes de divergencia con sus dibujos |
 | 3 | Leer a Maxwell II | ∇×E = −∂B/∂t y ∇×B = μ0ε0 ∂E/∂t: el remolino de E abraza al B que cambia, y al revés | las dos leyes de rotacional encadenadas |
 | 4 | La onda | E y B perpendiculares avanzando (c calculada de μ0ε0); la señal llega a la antena; cierre de familia | cierre «Cuatro renglones de ∇. / Toda la luz, toda la radio.» |
+
+## Hitos globales
+
+2026-08-20 19:45: **FAMILIA PUBLICADA DE PUNTA A PUNTA, 12 lecciones / 48
+clips** — librería ✔ (29/29 cifras en contenedor) · PR #43 mergeado · 12
+proyectos en prod con 48 qh vigentes · narración Charon ×12 (serial; 2.1
+necesitó una segunda pasada idempotente por un wav caído) · 12
+`exports/calculo-vectorial-*/curso_narrado.mp4` (2:19–2:58, picos ≤ −0.5
+dB) · **primer curso con el intro/cierre SONOROS: picos −6.0 dB medidos en
+el tramo de marca del mux final, AAC 24 kHz mono continuo** · producido
+con 12 subagentes (Sonnet mecánicas / Opus delicadas) + molde de Fable.
+
+## Cosecha de trampas (para la siguiente familia)
+
+- `interpolate_color` exige `ManimColor`, no hex crudos (la paleta
+  `_CALOR` de la librería ya los convierte).
+- `marca_angulo` de algebra_lineal dibuja SIEMPRE en el origen del plano:
+  fuera de él hay que `shift(pl.p(p) - pl.p(0,0))`, recolocar la cifra
+  contando su ancho, y con ángulos <38° mandarla más allá de las puntas
+  (encapsulado en `par_F_dr` del style_block de 2.3).
+- `Indicate` sobre un grupo `_con_fondo` tiñe también el rectángulo de
+  fondo (~1 s ilegible): apuntar el Indicate solo al contenido.
+- `algo.animate` sobre un `campo_flechas` cuyas flechas entraron una a
+  una re-mete el VGroup entero AL FRENTE: retirar los rótulos antes de
+  tocar el campo con `.animate` (o tocar el campo primero).
+- `set_opacity` enciende el fill: para atenuar piezas con relleno usar
+  `set_stroke(opacity=…)` + `set_fill(opacity=…)` por separado.
+- `campo_flechas`: normaliza color/tamaño con el percentil 90 de SU
+  malla — el mismo campo en dos clips con mallas distintas cambia de
+  color; fijar `magnitud_max` en el style_block. Un nodo en el origen
+  (|F|=0) dibuja un muñón: elegir la malla esquivándolo. Con
+  `panel_derecha` ancho, acotar la malla (~±4.05) para no pisarla.
+- `caja_conteo` en paredes compartidas: cada caja dibuja su flecha y se
+  superponen; para enseñar esa pared, apagar las de la librería
+  (`cajas[i].flechas[j]`) y dibujar las normales a mano.
+- `normales_borde` sobre `region_rect.curva`: t=0 cae en una esquina y
+  la normal sale a 45°; desplazar el muestreo (a=0.02, b=1.02).
+- `\oiint` NO compila en la imagen (falta esint); `\oint_S` sí.
+- `onda_em` + Transform: si `sin(kx−fase)` se anula en un nodo, `_flecha`
+  devuelve un Dot y los gemelos pierden la estructura; elegir fases con
+  `min|v| ≥ 0.02` (las del style_block de 4.3 están verificadas).
+- `espacio3` con alcance=3 no admite unidad>1 (el eje z pisa el pie):
+  4.3 usa alcance=2, unidad=1.4.
+- `MoveAlongPath` sobre una `LineaFlujo` larga recalcula longitudes por
+  frame: reparametrizar `.puntos` por longitud de arco una vez y mover
+  con ValueTracker (de paso, velocidad constante en pantalla).
+- `integral_linea` con n=200 dentro de updaters = n=2000 a 2 decimales y
+  10× más barata; en caminos con esquinas (escalera) usar sumas parciales
+  por puntos medios (r' no existe en la esquina).
+- `campo_silla`: sembrar líneas de flujo LEJOS de los ejes (xy = cte);
+  cerca del eje colapsan y no se ve la hipérbola.
+- Líneas de flujo cerradas (dipolo): MEDIR el T de cierre por semilla;
+  al ojo el lazo queda a medias.
+- Cifras `tag_hud` sobre curvas/flechas: envolver en `_con_fondo`
+  (opacidad 1.0 si debajo hay flechas brillantes).
+- `render_local` muestrea 8 frames equiespaciados: si uno cae en un
+  relevo de pie (pantalla sin pie) extraer el instante con ffmpeg antes
+  de declarar bug.
+- `Grafica._en(x, y)` se usa directo para construir tangentes (precedente
+  aerodinámica); candidata a helper público `tangente_en`.
+- El mux de esta familia NO puede usar el glob `${slug:0:18}` de álgebra
+  ("calculo-vectorial-" mide justo 18): se empareja por el `N-M`
+  (`guiones/calculo-vectorial-N-M-*/`), ver `mux-cv.sh`.
