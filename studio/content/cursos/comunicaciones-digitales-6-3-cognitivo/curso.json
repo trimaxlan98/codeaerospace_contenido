@@ -8,25 +8,25 @@
       "file": "clips/01-decidir-bajo-el-clima.py",
       "title": "1 · Decidir bajo el clima",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Tabla 3x3 vacía centrada: filas 'cielo claro' (azul), 'nubes' (gris) y 'lluvia' (rojo); columnas QPSK 1/2 (ámbar), 8PSK 3/4 (verde) y 16APSK 5/6 (violeta); las nueve celdas con un '?' y el rótulo 'cuanto paga cada eleccion' debajo; pie: nadie entrega la tabla; HUD 'MODULO 01'."
     },
     {
       "file": "clips/02-explorar-y-explotar.py",
       "title": "2 · Explorar y explotar",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Curva gris de recompensa por episodio (400 episodios) con la media móvil de 20 en fucsia encima, bandas del primer quinto (gris) y del último (cian) con sus medias 67.5 y 93.6 rotuladas, '+39 % por episodio' en cian y el panel derecho de épsilon (90 % → 4.5 %, piso en el episodio 280); leyenda de las dos curvas bajo el eje."
     },
     {
       "file": "clips/03-el-agente-contra-las-reglas.py",
       "title": "3 · El agente contra las reglas fijas",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Tres recompensas acumuladas sobre las mismas 16000 decisiones: agente fucsia 33541, optimista naranja 30446 y conservador azul 14422, cada cifra en el extremo de su curva; arriba a la derecha 'x2.3 sobre el conservador' y '+10 % sobre el optimista'; debajo la política aprendida (cielo claro→16APSK 5/6, nubes→8PSK 3/4, lluvia→QPSK 1/2); pie sobre DVB-S2X y la DSN."
     },
     {
       "file": "clips/04-la-mision-completa.py",
       "title": "4 · La misión completa",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre de FAMILIA en dos líneas: 'El vacio sigue sin tener nada que decir.' (blanca) y 'Nosotros ya sabemos cruzarlo hablando.' (cian); pie: 'Fin del curso: Comunicaciones digitales.'"
     }
   ]
 }

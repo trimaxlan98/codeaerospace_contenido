@@ -119,9 +119,89 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la curva dibujada y la cifra rotulada salen del MISMO
+# array. El Q-learning (~1 s) vive AQUI, a nivel de modulo: se ejecuta
+# UNA vez por render y jamas dentro de un updater.
+EPISODIOS = 400
+SEMILLA = 6
+PASOS_EP = 40                    # decisiones por episodio (defecto de la lib)
+BD = bandido_acm(EPISODIOS, semilla=SEMILLA)   # Q-learning tabular, UNA vez
+
+# -- clip 2: la curva de aprendizaje ------------------------------------
+REC = BD["recompensa_episodio"]                # bits-simbolo por episodio
+EP = np.arange(len(REC), dtype=float)
+VENTANA_MM = 20                                # media movil DECLARADA en el pie
+MM = np.convolve(REC, np.ones(VENTANA_MM) / VENTANA_MM, mode="valid")
+EP_MM = np.arange(len(MM), dtype=float) + (VENTANA_MM - 1) / 2.0
+Q5 = len(REC) // 5                             # un quinto = 80 episodios
+REC_INI = float(REC[:Q5].mean())               # 67.5 : el agente torpe
+REC_FIN = float(REC[-Q5:].mean())              # 93.6 : el agente hecho
+SUBIDA_PCT = 100.0 * (REC_FIN / REC_INI - 1.0)      # +38.6 %
+REC_Y0, REC_Y1 = 20.0, 145.0                   # rango vertical del eje
+
+# epsilon-greedy: los parametros por defecto de `bandido_acm` (epsilon0,
+# el piso 0.05 y el 0.7 del decaimiento). Se rotulan como porcentaje.
+EPS0, EPS_PISO, FRAC_DECAY = 0.9, 0.05, 0.7
+EPS_INI_PCT = 100.0 * EPS0                     # 90 % al azar al empezar
+EPS_FIN_PCT = 100.0 * EPS0 * EPS_PISO          # 4.5 % al final
+EP_CONGELA = FRAC_DECAY * EPISODIOS            # episodio 280: epsilon al piso
+
+# -- clip 3: el agente contra las reglas fijas ---------------------------
+ACUM_A = BD["acumulada_agente"]
+ACUM_C = BD["acumulada_conservador"]
+ACUM_O = BD["acumulada_optimista"]
+N_DEC = len(ACUM_A)                            # 16000 decisiones
+PASOS = np.arange(1, N_DEC + 1, dtype=float)
+_SALTO = 8                                     # resolucion del trazo (el
+_IDX = np.unique(np.append(np.arange(0, N_DEC, _SALTO), N_DEC - 1))
+PASOS_DIB = PASOS[_IDX]                        #  ultimo punto SIEMPRE dentro:
+ACUM_A_DIB = ACUM_A[_IDX]                      #  el extremo dibujado ES la
+ACUM_C_DIB = ACUM_C[_IDX]                      #  cifra rotulada)
+ACUM_O_DIB = ACUM_O[_IDX]
+FIN_A = float(ACUM_A[-1])                      # 33541
+FIN_C = float(ACUM_C[-1])                      # 14422
+FIN_O = float(ACUM_O[-1])                      # 30446
+FACTOR_CONS = FIN_A / FIN_C                    # x2.3 sobre el conservador
+GANA_OPT_PCT = 100.0 * (FIN_A / FIN_O - 1.0)   # +10.2 % sobre el optimista
+ACUM_Y1 = 36000.0                              # techo visual del eje
+
+# -- la mesa de juego: estados, acciones y recompensa ---------------------
+POLITICA = BD["politica"]                      # [2 1 0] : la tabla sensata
+ESTADOS = ("cielo claro", "nubes", "lluvia")
+# el color dice el papel: azul el canal sano, gris la nube que lo enturbia,
+# rojo el canal roto. (Un degradado azul->rojo daba un magenta que se
+# confundia con el violeta del modcod mas denso.)
+C_ESTADO = [C_SENAL, C_TENUE, C_RUIDO]
+MODCOD_NOMBRES = [m[0] for m in MODCODS]
+MODCOD_UMBRALES = [m[1] for m in MODCODS]      # 1.0 / 7.9 / 11.0 dB
+MODCOD_TASAS = [m[2] for m in MODCODS]         # 1.00 / 2.25 / 3.33 bits/simb
+MODCOD_COLORES = [C_BIT, C_COD, C_TECHO]       # como en la leccion 5.2
+
+# El entorno de `bandido_acm`: SNR de cielo despejado y atenuacion MEDIA de
+# cada estado (las constantes ATT del entorno, que la libreria no exporta).
+SNR_CLARO = 13.0
+ATT_ESTADO = np.array([0.0, 4.0, 12.0])
+SNR_ESTADO = SNR_CLARO - ATT_ESTADO            # 13.0 / 9.0 / 1.0 dB
+# recompensa = los bits que LLEGAN: la tasa del modcod si cierra, 0 si no.
+RECOMPENSA = np.array(
+    [[MODCOD_TASAS[a] if SNR_ESTADO[s] >= MODCOD_UMBRALES[a] else 0.0
+      for a in range(len(MODCODS))] for s in range(len(ESTADOS))])
+MEJOR_ACCION = [int(np.argmax(RECOMPENSA[s])) for s in range(len(ESTADOS))]
+
+# -- clip 4: la mision completa ------------------------------------------
+MODULOS = ("M1 - muestreo", "M2 - constelacion", "M3 - el vacio",
+           "M4 - el codigo", "M5 - ACM", "M6 - el agente")
+BITS_MISION = [1, 0, 1, 1, 0, 1]               # la palabra que cruza
+MODCOD_MISION = MODCOD_NOMBRES[int(POLITICA[0])]   # lo que eligio el agente
+TASA_MISION = MODCOD_TASAS[int(POLITICA[0])]       # 3.33 bits/simbolo
+P_QPSK, _B_QPSK = constelacion_qpsk()          # el icono del modulo 2
+# camino LEGAL del trellis K=3 para el icono del modulo 4: se siguen las
+# transiciones reales de la libreria (RAMAS_CONV) con los bits de la mision.
+_TRANS_CONV = {(s, b): s2 for s, b, s2, _sal in RAMAS_CONV}
+CAMINO_TRELLIS = [0]
+for _b in BITS_MISION[:4]:
+    CAMINO_TRELLIS.append(_TRANS_CONV[(CAMINO_TRELLIS[-1], int(_b))])
 
 
 # --- Rotulos ----------------------------------------------------------
