@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 4.3 Stokes y Maxwell: los campos que nos comunican",
+  "description": "Lección 4.3 del curso Cálculo vectorial (módulo 4: los grandes teoremas), cierre de la familia en 4 clips: Green se levanta en Stokes, las cuatro ecuaciones de Maxwell leídas con divergencias y rotacionales, y la onda electromagnética con c calculada de mu0 y eps0.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-green-se-levanta.py",
+      "title": "1 · Green se levanta: Stokes",
+      "scene": "Clip1",
+      "final_state": "Espacio 3D en proyeccion oblicua: el circuito naranja del borde tapado por un parche abombado (malla naranja) con sus normales ambar saliendo hacia arriba; arriba a la izquierda el MathTex nabla x F = (0,0,2) en cian, a la derecha las dos cifras verdes medidas -- borde (circulacion) 4.0 y tapa abombada (flujo) 4.0 -- y en el pie la formula de Stokes, la circulacion del borde igual a la integral del rotacional por la tapa."
+    },
+    {
+      "file": "clips/02-leer-a-maxwell-i.py",
+      "title": "2 · Leer a Maxwell (divergencias)",
+      "scene": "Clip2",
+      "final_state": "El plano partido por la vertical: a la izquierda la carga roja con su campo radial azul, la curva naranja de Gauss con sus normales ambar y el panel 'flujo por la curva 6.28'; a la derecha el iman rojo con su campo, las cuatro lineas de flujo fucsia CERRADAS, dos sondas verdes con 'div en dos sondas 0.0 y 0.0', su propia curva naranja y el panel 'flujo por la curva 0.00'. Arriba de cada mitad, nabla punto E = rho/eps0 y nabla punto B = 0."
+    },
+    {
+      "file": "clips/03-leer-a-maxwell-ii.py",
+      "title": "3 · Leer a Maxwell (rotacionales)",
+      "scene": "Clip3",
+      "final_state": "El plano con las dos ruedecitas enfrentadas: la ambar (remolino de E, 'giro = -1.0 rad/s') y la cian (remolino de B, 'giro = 1.0 rad/s'); arriba la ley nabla x B = mu0 eps0 dE/dt en cian y a la derecha los dos rotacionales medidos, -2.0 para E y 2.0 para B."
+    },
+    {
+      "file": "clips/04-la-onda.py",
+      "title": "4 · La onda",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion y de la familia: la linea blanca «Cuatro renglones de nabla.», la cian «Toda la luz, toda la radio.» y el pie «Fin de la familia Calculo vectorial.»"
+    }
+  ]
+}
