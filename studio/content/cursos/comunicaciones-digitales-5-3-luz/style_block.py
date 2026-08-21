@@ -119,9 +119,46 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip.
+
+# -- clip 1: subir de banda hasta el laser ------------------------------
+F_S_GHZ, F_X_GHZ, F_KA_GHZ = 2.3, 8.4, 32.0    # DSN, igual que en 1.3
+F_LASER_THZ = 193.0                             # ~1550 nm, C-band optica
+F_LASER_GHZ = F_LASER_THZ * 1000.0              # 193 000 GHz, para banda_espacio
+
+# -- clip 2: PPM, el foton que llega tarde -------------------------------
+M_PPM = 16                                      # ranuras por simbolo
+BITS_POR_SIMBOLO_PPM = int(math.log2(M_PPM))    # 4 bits/simbolo (log2 16)
+
+SIMBOLO_PPM_1, SEMILLA_PPM_1 = 5, 9
+CUENTAS_PPM_1 = ppm_fotones(M_PPM, SIMBOLO_PPM_1, semilla=SEMILLA_PPM_1)
+GANADOR_PPM_1 = int(np.argmax(CUENTAS_PPM_1))   # MEDIDO: la ranura con mas fotones
+BITS_PPM_1 = [int(b) for b in
+             format(GANADOR_PPM_1, f"0{BITS_POR_SIMBOLO_PPM}b")]
+
+SIMBOLO_PPM_2, SEMILLA_PPM_2 = 11, 17
+CUENTAS_PPM_2 = ppm_fotones(M_PPM, SIMBOLO_PPM_2, semilla=SEMILLA_PPM_2)
+GANADOR_PPM_2 = int(np.argmax(CUENTAS_PPM_2))   # MEDIDO
+BITS_PPM_2 = [int(b) for b in
+             format(GANADOR_PPM_2, f"0{BITS_POR_SIMBOLO_PPM}b")]
+
+# cifras historicas declaradas como referencia (no medidas en el clip):
+LCRD_GBPS = 1.2                 # Gb/s, record LCRD desde la Luna
+LCRD_DIST_MKM = 0.384           # millones de km, Tierra-Luna
+DSOC_DIST_MKM = 300.0           # millones de km, DSOC (3 x 10^8 km)
+
+# -- clip 3: la fibra, la excepcion terrestre ----------------------------
+WDM_CANALES = 80                # colores por fibra (declarado, referencia)
+WDM_GBPS_CANAL = 100.0          # Gb/s por color (declarado, referencia)
+WDM_GBPS_TOTAL = WDM_CANALES * WDM_GBPS_CANAL   # 8000 Gb/s, MEDIDO
+ATEN_FIBRA_DB_KM = 0.2          # dB/km, atenuacion tipica (declarado)
+TRAMO_AMPLI_KM = 80.0           # km entre amplificadores (declarado)
+GANANCIA_AMPLI_DB = ATEN_FIBRA_DB_KM * TRAMO_AMPLI_KM   # 16.0 dB, MEDIDO
+PORC_BITS_SUBMARINOS = 99       # % del trafico intercontinental (declarado)
+
+# -- clip 4: tabla comparada ---------------------------------------------
+# reutiliza ATEN_FIBRA_DB_KM, TRAMO_AMPLI_KM y DSOC_DIST_MKM ya definidos.
 
 
 # --- Rotulos ----------------------------------------------------------
