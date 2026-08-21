@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 6.3 El enlace cognitivo",
+  "description": "Lección 6.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: operar el enlace como problema de decisión, explorar y explotar con la curva de aprendizaje medida, el agente contra las reglas fijas y la misión completa que cierra la familia. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-decidir-bajo-el-clima.py",
+      "title": "1 · Decidir bajo el clima",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-explorar-y-explotar.py",
+      "title": "2 · Explorar y explotar",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-el-agente-contra-las-reglas.py",
+      "title": "3 · El agente contra las reglas fijas",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-la-mision-completa.py",
+      "title": "4 · La misión completa",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 1.2 El pulso y su eco: ISI y Nyquist",
+  "description": "Lección 1.2 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: el rectángulo imposible, el eco sobre el vecino (ISI medida), el coseno alzado de ceros exactos y el diagrama de ojo abriéndose. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-rectangulo-imposible.py",
+      "title": "1 · El rectángulo imposible",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-el-eco-sobre-el-vecino.py",
+      "title": "2 · El eco sobre el vecino",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-el-pulso-de-nyquist.py",
+      "title": "3 · El pulso de Nyquist",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-el-diagrama-de-ojo.py",
+      "title": "4 · El diagrama de ojo",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

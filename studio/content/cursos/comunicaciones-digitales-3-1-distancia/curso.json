@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 3.1 El precio de la distancia",
+  "description": "Lección 3.1 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la esfera que se reparte (FSPL), la escalera LEO→GEO→Marte→Voyager medida en dB, la lluvia que cobra en Ka y la fibra como canal terrestre. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-esfera-que-se-reparte.py",
+      "title": "1 · La esfera que se reparte",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-la-escalera-de-los-enlaces.py",
+      "title": "2 · La escalera de los enlaces",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-la-lluvia-cobra-en-ka.py",
+      "title": "3 · La lluvia cobra en Ka",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-la-fibra-el-canal-terrestre.py",
+      "title": "4 · La fibra: el canal terrestre",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

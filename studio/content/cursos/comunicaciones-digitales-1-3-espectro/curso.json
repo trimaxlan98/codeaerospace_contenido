@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 1.3 El espectro: el precio en hercios",
+  "description": "Lección 1.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la señal vista en frecuencia, más símbolos = más ancho (medido), el conformado que ahorra espectro y las bandas S/X/Ka del espacio profundo. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-senal-en-frecuencia.py",
+      "title": "1 · La señal vista en frecuencia",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-mas-rapido-mas-ancho.py",
+      "title": "2 · Más rápido = más ancho",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-el-conformado-ahorra.py",
+      "title": "3 · El conformado ahorra espectro",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-las-bandas-del-espacio.py",
+      "title": "4 · Las bandas del espacio",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

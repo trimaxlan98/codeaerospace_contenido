@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 4.3 LDPC: el murmullo que corrige",
+  "description": "Lección 4.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: el grafo bipartito de H, el síndrome que acusa, el bit-flipping con síndrome 6→3→0 medido y la BER con código a un paso del techo de Shannon. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-grafo.py",
+      "title": "1 · El grafo",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-el-sindrome-acusa.py",
+      "title": "2 · El síndrome acusa",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-el-murmullo.py",
+      "title": "3 · El murmullo (bit-flipping)",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-a-un-paso-del-techo.py",
+      "title": "4 · A un paso del techo",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 1.1 El mensaje digital: muestrear y cuantizar",
+  "description": "Lección 1.1 del curso Comunicaciones digitales (módulo 1: del dato al símbolo), en 4 clips animados —una idea por clip—: la telemetría continua de una sonda, muestrear y el alias medido, cuantizar con la SNR contada, y PCM: la curva hecha bits rumbo a la Tierra. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-curva-de-la-sonda.py",
+      "title": "1 · La curva que nadie puede enviar",
+      "scene": "Clip1",
+      "final_state": "Onda de telemetría azul con cuatro guías verticales ámbar en los instantes de pregunta; sonda ámbar arriba a la izquierda; pie sobre preguntar de vez en cuando; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-muestrear.py",
+      "title": "2 · Muestrear: cada cuánto preguntar",
+      "scene": "Clip2",
+      "final_state": "Seno de 7 Hz azul con muestras ámbar a 10 Hz y el alias de 3 Hz en rojo pasando por los mismos puntos; fórmula fs > 2 f_max en el pie."
+    },
+    {
+      "file": "clips/03-cuantizar.py",
+      "title": "3 · Cuantizar: cuántos escalones",
+      "scene": "Clip3",
+      "final_state": "Telemetría con la copia cuantizada de 8 bits ámbar encima, cifras 'b = 8 bits -> 256 niveles', 'SNR medida = 46.7 dB' y la regla medida '(46.7 - 16.4) / 5 bits = 6.1 dB por bit'; pie: cada bit extra regala unos 6 dB."
+    },
+    {
+      "file": "clips/04-pcm.py",
+      "title": "4 · PCM: la curva hecha bits",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'La voz de la sonda no es la curva.' (blanca) y 'Son los bits que la cuentan.' (cian); pie anuncia la siguiente lección."
+    }
+  ]
+}

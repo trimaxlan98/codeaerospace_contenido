@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 2.1 La fase que habla: BPSK y QPSK",
+  "description": "Lección 2.1 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la portadora vacía, BPSK con la fase que vuelca, QPSK con el mapa de Gray y el plano IQ como idioma del curso. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-portadora-vacia.py",
+      "title": "1 · La portadora vacía",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-bpsk-un-bit-por-vuelco.py",
+      "title": "2 · BPSK: un bit por vuelco",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-qpsk-dos-bits-por-fase.py",
+      "title": "3 · QPSK: dos bits por fase",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-el-mapa-iq.py",
+      "title": "4 · El mapa IQ es el idioma",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

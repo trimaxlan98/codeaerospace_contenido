@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 5.3 Luz: láser espacial y fibra",
+  "description": "Lección 5.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: subir de banda hasta el láser, PPM con fotones contados, la fibra WDM como excepción terrestre y cada canal a lo suyo. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-subir-de-banda.py",
+      "title": "1 · Subir de banda una última vez",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-ppm-el-foton-que-llega-tarde.py",
+      "title": "2 · PPM: el fotón que llega tarde",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-la-fibra-la-excepcion.py",
+      "title": "3 · La fibra: la excepción terrestre",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-cada-canal-a-lo-suyo.py",
+      "title": "4 · Cada canal a lo suyo",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 6.2 La constelación inventada",
+  "description": "Lección 6.2 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: el enlace entero como red, el gradiente que mueve los puntos por época, la constelación que nadie dibujó y el SER medido contra 8-PSK. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-enlace-como-red.py",
+      "title": "1 · El enlace como red",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-el-gradiente-mueve-los-puntos.py",
+      "title": "2 · El gradiente mueve los puntos",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-la-constelacion-que-nadie-dibujo.py",
+      "title": "3 · La constelación que nadie dibujó",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-mejor-medido.py",
+      "title": "4 · ¿Mejor? Medido",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}

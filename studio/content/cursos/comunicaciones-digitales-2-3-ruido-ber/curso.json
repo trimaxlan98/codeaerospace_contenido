@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 2.3 El ruido decide: la curva BER",
+  "description": "Lección 2.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la nube AWGN sobre la constelación, los símbolos que cruzan la frontera contados, la curva BER Monte Carlo sobre la teórica y la cascada QPSK vs 16-QAM. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-nube-awgn.py",
+      "title": "1 · La nube AWGN",
+      "scene": "Clip1",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/02-cruzar-la-frontera.py",
+      "title": "2 · Cuando la nube cruza la frontera",
+      "scene": "Clip2",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/03-la-curva-ber-medida.py",
+      "title": "3 · La curva BER medida",
+      "scene": "Clip3",
+      "final_state": "RELLENAR"
+    },
+    {
+      "file": "clips/04-la-cascada-compara.py",
+      "title": "4 · La cascada compara familias",
+      "scene": "Clip4",
+      "final_state": "RELLENAR"
+    }
+  ]
+}
