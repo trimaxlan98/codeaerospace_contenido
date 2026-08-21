@@ -8,25 +8,25 @@
       "file": "clips/01-el-canal-que-respira.py",
       "title": "1 · El canal que respira",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "La serie SNR completa (azul) cruzando tres umbrales punteados por modcod: ambar QPSK 1/2 >= 1.0 dB, verde 8PSK 3/4 >= 7.9 dB, violeta 16APSK 5/6 >= 11.0 dB, cada uno con su etiqueta arriba de la linea; pie: el canal respira, sube, baja y vuelve a subir; HUD 'MODULO 01'."
     },
     {
       "file": "clips/02-la-ley-del-margen-fijo.py",
       "title": "2 · La ley del margen fijo",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Escalon ambar plano (QPSK 1/2 = 1.00 bit/simb, sin cambiar de plan, rotulado arriba de la caja) contra la escalera violeta de lo que el canal permite, con el area entre ambas sombreada en naranja (el desperdicio) y el panel 'desperdicio = 58 %' arriba a la derecha; pie: medido en el propio array, el diseno fijo desperdicia mas de la mitad; HUD 'MODULO 02'."
     },
     {
       "file": "clips/03-conmutar-el-modcod.py",
       "title": "3 · Conmutar el modcod",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Escalera completa de TASA_ELEGIDA coloreada por modcod (ambar/verde/violeta) con un unico tramo rojo de corte marcado 'corte = 20 min' bajo el eje; panel arriba a la derecha con la leyenda de los tres modcods y 'sin enlace'; pie: el enlace escala y baja solo, siempre el mejor plan que el clima permite; HUD 'MODULO 03'."
     },
     {
       "file": "clips/04-la-cuenta-final.py",
       "title": "4 · La cuenta final",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre de la leccion en dos lineas: 'El enlace de antes aguantaba el clima.' (blanca) y 'El de ahora lo aprovecha.' (cian); pie anuncia la siguiente leccion, la luz que cruza el vacio; HUD 'MODULO 04'."
     }
   ]
 }

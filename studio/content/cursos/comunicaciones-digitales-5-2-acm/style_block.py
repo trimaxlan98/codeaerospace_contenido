@@ -119,9 +119,50 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la serie dibujada y la cifra rotulada salen del MISMO
+# array (lluvia_serie / acm_conmutar).
+SNR_CLARO = 13.0                          # dB, Eb/N0 de un dia despejado
+T_LLUVIA, ATT_KA = lluvia_serie(240, semilla=5)   # serie Ka, semilla fija
+MIN_TOTAL = len(T_LLUVIA)                 # 240 minutos en pantalla
+ATT_MAX = float(ATT_KA.max())             # ~14.9 dB, MEDIDO en la serie
+
+RES_ACM = acm_conmutar(ATT_KA, snr_claro=SNR_CLARO)   # el mismo array, UNA vez
+SNR_DISPONIBLE = RES_ACM["snr"]           # snr_claro - ATT_KA, minuto a minuto
+SNR_MIN = float(SNR_DISPONIBLE.min())     # ~-1.9 dB: el peor instante
+T_SNR_MIN = float(T_LLUVIA[int(np.argmin(SNR_DISPONIBLE))])   # minuto del minimo
+ELECCION = RES_ACM["eleccion"]            # indice de modcod por minuto, -1 = corte
+
+# color por modcod (indice 0..2 de MODCODS): ambar el piso, verde el medio,
+# violeta el mas denso -- coherente con la paleta por ROL de la familia.
+MODCOD_COLORES = [C_BIT, C_COD, C_TECHO]
+MODCOD_NOMBRES = [m[0] for m in MODCODS]
+MODCOD_UMBRALES = [m[1] for m in MODCODS]
+
+# la tasa (bits/simbolo) que cada minuto ELIGIO realmente el enlace ACM
+TASA_ELEGIDA = np.array([MODCODS[i][2] if i >= 0 else 0.0 for i in ELECCION])
+TASA_FIJA = MODCODS[0][2]                 # 1.00 bit/simb: QPSK 1/2, SIEMPRE
+# el margen fijo tambien se cae (0) cuando el clima ni siquiera deja
+# cerrar QPSK 1/2 -- el MISMO tramo de corte, sin margen adicional que
+# pagar: la suma de esta serie es, por construccion, BITS_FIJO.
+TASA_FIJA_SERIE = np.where(SNR_DISPONIBLE >= MODCOD_UMBRALES[0], TASA_FIJA,
+                           0.0)
+TASA_TECHO = 3.6                          # limite visual del eje (> 3.33)
+
+BITS_ACM = RES_ACM["bits_acm"]            # ~526.6 unidades-simbolo, MEDIDO
+BITS_FIJO = RES_ACM["bits_fijo"]          # 220.0 unidades-simbolo, MEDIDO
+DESPERDICIO_PCT = (BITS_ACM - BITS_FIJO) / BITS_ACM * 100.0   # ~58.2 %
+FACTOR_ACM = BITS_ACM / BITS_FIJO         # ~2.39 -> "x2.4" MEDIDO
+OUTAGE_ACM = RES_ACM["outage_acm_min"]    # 20 min sin enlace (att > techo)
+OUTAGE_FIJO = RES_ACM["outage_fijo_min"]  # 20 min: el MISMO corte, no paga extra
+
+# el unico tramo de corte de la serie (un solo bloque contiguo, MEDIDO):
+_idx_corte = np.where(ELECCION < 0)[0]
+CORTE_INICIO = int(_idx_corte[0])         # minuto 36
+CORTE_FIN = int(_idx_corte[-1])           # minuto 55 (20 minutos exactos)
+
+# -- clip 4: la cuenta final (barras ACM vs fijo) -------------------------
+BARRA_TOPE = 560.0                        # techo visual del eje (> BITS_ACM)
 
 
 # --- Rotulos ----------------------------------------------------------
