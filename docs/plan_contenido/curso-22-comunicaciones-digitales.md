@@ -199,24 +199,24 @@ agente; los agentes NO tocan librería ni git; informe final con
 
 | Lección | plan | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ 29/28/29/28 s | — | — | — | — | — |
-| 1.2 | ✔ | ✔ | ✔ 31/37/40/34 s | — | — | — | — | — |
-| 1.3 | ✔ | ✔ | ✔ 31/33/31/32 s | — | — | — | — | — |
-| 2.1 | ✔ | ✔ | ✔ 30/31/30/30 s | — | — | — | — | — |
-| 2.2 | ✔ | ✔ | ✔ 32/29/31/34 s | — | — | — | — | — |
-| 2.3 | ✔ | ✔ | ✔ 31/31/31/33 s | — | — | — | — | — |
-| 3.1 | ✔ | ✔ | ✔ 29/30/29/32 s | — | — | — | — | — |
-| 3.2 | ✔ | ✔ | ✔ 30/29/30/30 s | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ✔ 33/30/33/39 s | — | — | — | — | — |
-| 4.1 | ✔ | ✔ | ✔ 31/32/32/34 s | — | — | — | — | — |
-| 4.2 | ✔ | ✔ | ✔ 32/38/39/34 s | — | — | — | — | — |
-| 4.3 | ✔ | ✔ | ✔ 34/34/34/42 s | — | — | — | — | — |
-| 5.1 | ✔ | ✔ | ✔ 29/29/28/31 s | — | — | — | — | — |
-| 5.2 | ✔ | ✔ | ✔ 34/30/30/35 s | — | — | — | — | — |
-| 5.3 | ✔ | ✔ | ✔ 33/33/31/34 s | — | — | — | — | — |
-| 6.1 | ✔ | ✔ | ✔ 31/33/30/36 s | — | — | — | — | — |
-| 6.2 | ✔ | ✔ | ✔ 34/31/33/40 s | — | — | — | — | — |
-| 6.3 | ✔ | ✔ | ✔ 34/31/39/37 s | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ 29/28/29/28 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.2 | ✔ | ✔ | ✔ 31/37/40/34 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.3 | ✔ | ✔ | ✔ 31/33/31/32 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.1 | ✔ | ✔ | ✔ 30/31/30/30 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.2 | ✔ | ✔ | ✔ 32/29/31/34 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.3 | ✔ | ✔ | ✔ 31/31/31/33 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.1 | ✔ | ✔ | ✔ 29/30/29/32 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ 30/29/30/30 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ 33/30/33/39 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ 31/32/32/34 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.2 | ✔ | ✔ | ✔ 32/38/39/34 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.3 | ✔ | ✔ | ✔ 34/34/34/42 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.1 | ✔ | ✔ | ✔ 29/29/28/31 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.2 | ✔ | ✔ | ✔ 34/30/30/35 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.3 | ✔ | ✔ | ✔ 33/33/31/34 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.1 | ✔ | ✔ | ✔ 31/33/30/36 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.2 | ✔ | ✔ | ✔ 34/31/33/40 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.3 | ✔ | ✔ | ✔ 34/31/39/37 s | PR #45 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 
 ## Módulo 1 — Del dato al símbolo
 
@@ -556,6 +556,20 @@ griegas — 10^-3 y ∈/Σ van en MathTex; `tag_hud` solo ASCII;
 contenido; `render_local` muestrea 8 frames y puede caer en relevos de
 pie; pies ≥ 5 s y ANTES de la animación; un cierre por lección).
 Propias de esta familia se cosecharán al final.
+
+## Hitos globales
+
+- **2026-08-21**: familia PUBLICADA de punta a punta. PR #45 mergeado a
+  main; 18/18 proyectos en produccion con 72/72 qh adoptados; narracion
+  Charon serial (18/18 rc=0, 72 wavs a la primera); 18
+  `exports/comunicaciones-digitales-*/curso_narrado.mp4` (2:13-2:42,
+  picos globales <= -0.5 dB, 10 clips re-muxeados a -1.5 dB).
+- **La marca sonora, de serie**: intro y cierre con SFX espaciales en el
+  mux, pico -6.0 dB EXACTO medido dentro de las 18 salidas finales, AAC
+  24 kHz mono continuo (segunda familia tras Calculo vectorial; el
+  pipeline de la marca ya es rutina).
+- Dos bugs de libreria hallados por los agentes del modulo 4 y corregidos
+  con re-validacion (G=(7,5) real; costo Hamming de Viterbi en int).
 
 ## Cosecha de trampas de la familia (medida durante la produccion)
 
