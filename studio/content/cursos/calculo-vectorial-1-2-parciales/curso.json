@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 1.2 Derivadas parciales: cortar el paisaje",
+  "description": "Lección 1.2 del curso Cálculo vectorial (módulo 1: el paisaje escalar), en 4 clips: la pendiente depende de la dirección, cortar el paisaje con x y con y para leer las dos parciales, y el plano tangente como mejor aproximación lineal.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-pendiente-en-que-direccion.py",
+      "title": "1 · ¿Pendiente en qué dirección?",
+      "scene": "Clip1",
+      "final_state": "Mapa de curvas de nivel con el punto P0 (0.3, 0.1) y su altura medida; cinco flechas cian en abanico (E, NE, N, NO, O) con su subida (grad·û) rotulada junto a cada punta; pie invita a cortar el paisaje en esas dos direcciones especiales; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-cortar-con-x.py",
+      "title": "2 · Cortar con x: la parcial en x",
+      "scene": "Clip2",
+      "final_state": "Gráfica 2D del corte y=cte (curva roja en su caja de ejes f vs x), con el punto de P0 y su tangente cian ya trazada; pie transicional a cortar en y; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-cortar-con-y.py",
+      "title": "3 · Cortar con y: la otra parcial",
+      "scene": "Clip3",
+      "final_state": "Mapa de curvas de nivel con P0 marcado y, en el panel superior derecho, las dos parciales medidas juntas (∂f/∂x = 0.7, ∂f/∂y = 0.6); pie anuncia el plano tangente; HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-el-plano-tangente.py",
+      "title": "4 · El plano tangente",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «Derivar en 2D es cortar.» sobre «Dos cortes bastan.» en cian, con el pie 'Siguiente lección: el gradiente, la flecha que sube.'; HUD 'MODULO 04'."
+    }
+  ]
+}

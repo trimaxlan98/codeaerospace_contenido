@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 3.3 Campos conservativos: el camino no importa",
+  "description": "Lección 3.3 del curso Cálculo vectorial (módulo 3: fuentes y remolinos), en 4 clips: tres caminos con el mismo trabajo (4.0), el circuito cerrado gratis frente al rotor que cobra, el potencial como paisaje y el test del rotacional.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-tres-caminos-un-numero.py",
+      "title": "1 · Tres caminos, un número",
+      "scene": "Clip1",
+      "final_state": "El plano con el campo F = grad(phi) en flechas, A en el origen y B en (2,1) etiquetados en ambar, y los tres caminos rojos dibujados a la vez (recta, arco y escalera); en la esquina derecha el contador 'trabajo W = 4.00' y las tres filas verdes recta / arco / escalera, W = 4.00 las tres. Pie: 'Tres caminos distintos, el mismo numero. Aqui el camino no importa.'"
+    },
+    {
+      "file": "clips/02-el-circuito-gratis.py",
+      "title": "2 · El circuito gratis",
+      "scene": "Clip2",
+      "final_state": "El campo rotor en flechas con el circulo rojo de radio 1.5 y sus marcas de sentido; el contador de la esquina marca 'circuito W = 14.14' y debajo las dos filas verdes comparadas: gradiente 0.00 y rotor 14.14. Pie: 'Un campo es conservativo cuando toda vuelta cerrada sale gratis.'"
+    },
+    {
+      "file": "clips/03-el-potencial.py",
+      "title": "3 · El potencial",
+      "scene": "Clip3",
+      "final_state": "El mapa de curvas de nivel de phi = x^2 y (frio->calido) con el campo gradiente cruzandolas en perpendicular, A y B marcados con phi(A) = 0.00 y phi(B) = 4.00, el camino recto rojo entre ambos, el altimetro 'phi = 4.00' arriba a la derecha y las dos cuentas verdes: la integral de A a B = 4.00 y phi(B) - phi(A) = 4.00. Pie: 'El trabajo no es una suma de tramos: es una resta de alturas.'"
+    },
+    {
+      "file": "clips/04-el-test-del-rotacional.py",
+      "title": "4 · El test del rotacional",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Si el campo es un gradiente, el camino da igual.' en blanco y 'Solo cuentan los extremos.' en cian, con el pie 'Siguiente leccion: el teorema de Green.'"
+    }
+  ]
+}

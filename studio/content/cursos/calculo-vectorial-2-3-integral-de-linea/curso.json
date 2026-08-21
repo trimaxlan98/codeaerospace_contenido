@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 2.3 La integral de línea: el trabajo de un camino",
+  "description": "Lección 2.3 del curso Cálculo vectorial (módulo 2: campos y caminos), en 4 clips: el campo cobra peaje, solo cuenta la componente tangente, sumar tramitos es integrar y el sentido del recorrido cambia el signo (con el circuito del rotor acumulando 14.14).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-campo-cobra-peaje.py",
+      "title": "1 · El campo cobra peaje",
+      "scene": "Clip1",
+      "final_state": "Plano con el campo de viento (malla fría→cálida) y el camino rojo A→B; tres lecturas del par F (azul) y dr (cian) con sus ángulos medidos —78, 43 y 23 grados— y el panel F·dr a la derecha; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-solo-cuenta-lo-tangente.py",
+      "title": "2 · Solo cuenta lo tangente",
+      "scene": "Clip2",
+      "final_state": "Plano con el viento y el camino tenue; en tres puntos del camino la componente tangente en verde (de lado casi nula, oblicua, a favor entera) y el panel con las cifras medidas F·T = 0.20 / 0.99 / 1.36; HUD 'MODULO 02'."
+    },
+    {
+      "file": "clips/03-sumar-tramitos.py",
+      "title": "3 · Sumar tramitos",
+      "scene": "Clip3",
+      "final_state": "El camino barrido entero en rojo sobre el campo de viento, el contador 'trabajo acumulado' parado en 7.22 y la fórmula ∫_C F·dr = 7.22 en el pie (las dos cifras salen de integral_linea); HUD 'MODULO 03'."
+    },
+    {
+      "file": "clips/04-a-favor-o-en-contra.py",
+      "title": "4 · A favor o en contra",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: «El trabajo se paga por tramos.» sobre «El camino y el sentido importan.» en cian; HUD 'MODULO 04'."
+    }
+  ]
+}

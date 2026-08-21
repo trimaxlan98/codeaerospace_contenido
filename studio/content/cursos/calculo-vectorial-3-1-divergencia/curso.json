@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 3.1 La divergencia: fuentes y sumideros",
+  "description": "Lección 3.1 del curso Cálculo vectorial (módulo 3: fuentes y remolinos), en 4 clips: la cajita contable, fuente/sumidero/neutro con cifras medidas, la fórmula término a término y el mapa de la divergencia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-cajita-contable.py",
+      "title": "1 · La cajita contable",
+      "scene": "Clip1",
+      "final_state": "Caja naranja en el campo radial con sus 4 flechas (verde sale, rojo entra) y las cifras por lado; panel con flujo = 2.9, area = 1.4 y, resaltado, div = flujo / area = 2.0."
+    },
+    {
+      "file": "clips/02-fuente-sumidero-neutro.py",
+      "title": "2 · Fuente, sumidero, neutro",
+      "scene": "Clip2",
+      "final_state": "La cajita sobre el rotor puro (flechas mixtas verde/rojo) con la fila NEUTRO div = 0.0 recien anadida; panel completo en la esquina: FUENTE div = +2.0, SUMIDERO div = -2.0, NEUTRO div = 0.0."
+    },
+    {
+      "file": "clips/03-la-formula.py",
+      "title": "3 · La fórmula",
+      "scene": "Clip3",
+      "final_state": "Formula ∇·F = ∂Fx/∂x + ∂Fy/∂y en ambar sobre la cajita del campo radial; panel con dFx/dx = 1.0, dFy/dy = 1.0 y, en verde, suma = div = 2.0."
+    },
+    {
+      "file": "clips/04-el-mapa-de-la-divergencia.py",
+      "title": "4 · El mapa de la divergencia",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «La divergencia es el balance de la cajita.» en blanco y «Fuentes y sumideros, punto a punto.» en cian, con el pie «Siguiente lección: la ruedecita y el rotacional.»."
+    }
+  ]
+}

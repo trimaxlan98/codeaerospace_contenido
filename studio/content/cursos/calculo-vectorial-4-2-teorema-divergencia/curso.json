@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 4.2 Flujo y el teorema de la divergencia",
+  "description": "Lección 4.2 del curso Cálculo vectorial (módulo 4: los grandes teoremas), en 4 clips: el flujo como conteo de cruces, las cajitas interiores que se cancelan, el cubo 3D con sus 6 caras medidas (total 3.0) y la ley de Gauss (el flujo solo ve lo encerrado).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-flujo-contar-cruces.py",
+      "title": "1 · El flujo: contar cruces",
+      "scene": "Clip1",
+      "final_state": "Plano con rejilla y el campo radial atenuado; circulo naranja de radio 1.5 rodeado por 12 normales n ambar, tres lecturas cian \"F.n = 1.50\" junto al borde y, en el panel de la derecha, la integral cerrada de F.n ds con la cuenta \"1.50 x 9.42 = 14.14\" y \"flujo = 14.14\" en verde."
+    },
+    {
+      "file": "clips/02-cajitas-que-se-cancelan.py",
+      "title": "2 · Cajitas que se cancelan",
+      "scene": "Clip2",
+      "final_state": "La region naranja ya fundida (sin cajitas) con 16 normales ambar repartidas por su borde sobre el campo radial, y el panel de la derecha con \"integral de F.n ds = integral doble de div F dA\" y los dos lados medidos en verde: \"borde = 12.00\" e \"interior = 12.00\"."
+    },
+    {
+      "file": "clips/03-en-3d-el-cubo.py",
+      "title": "3 · En 3D: el cubo",
+      "scene": "Clip3",
+      "final_state": "El espacio3 con su rejilla y el campo radial 3D atenuado; el cubo naranja con una flecha de flujo por cara (verdes las que salen, rojas las que entran), rotuladas \"+x 4.61\", \"+z 4.61\" y \"-x -0.51\", y el panel con el teorema de la divergencia y los dos lados en verde: \"flujo = 12.29\" y \"3.00 x 4.096 = 12.29\"."
+    },
+    {
+      "file": "clips/04-la-ley-de-gauss.py",
+      "title": "4 · La ley de Gauss",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: \"Suma las fuentes de dentro.\" en blanco sobre \"O cuenta lo que cruza la frontera.\" en cian, con el pie \"Siguiente leccion: Stokes y Maxwell, los campos que nos comunican.\"."
+    }
+  ]
+}
