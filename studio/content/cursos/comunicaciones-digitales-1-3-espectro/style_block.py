@@ -119,9 +119,69 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. UNA sola realizacion de bits (SIMBOLOS_A, semilla fija)
+# alimenta los tres primeros clips: se conforma con distintos pulsos/sps,
+# pero lo dibujado (onda) y lo medido (PSD, ancho de banda) salen SIEMPRE
+# del mismo array. `ancho_banda` se usa con frac=0.9 en TODA la leccion:
+# al 0.99 el lobulo sinc^2 del rectangular casi toca el borde de Nyquist
+# (satura, no hay cifra honesta que leer ahi) — el 90% es la que se mide.
+#
+# TRAMPA de libreria (NO tocar comunicaciones.py, solo rodearla): con
+# span PAR, `pulso_rect(span, sps)` marca 1.0 en AMBOS extremos exactos
+# t=+-0.5, que caen en el mismo grid que el simbolo vecino; al convolver
+# con `conformar`, dos simbolos consecutivos se SUMAN un instante en el
+# borde (glitches +-2/0 donde debería seguir en +-1). El rectangular
+# NRZ se genera aqui con `np.repeat` (igual que la validacion oficial de
+# la libreria, `valida_vis_com.py`), que no tiene ese defecto; el coseno
+# alzado (clip 3) sí necesita `conformar`+`pulso_rc` porque su cola cruza
+# varios simbolos, y esa forma no tiene el borde plano que causa el bug.
+SEMILLA_BITS = 11
+FS = 8.0                     # "frecuencia de muestreo" comun a los clips 1-3
+N_BITS = 400                 # simbolos para una PSD de Welch limpia (varios segmentos)
+N_VISIBLE = 16                # simbolos que se ALCANZAN A VER en la onda (ventana)
+BETA_RC = 0.35                # roll-off del coseno alzado (clip 3)
+
+_rng_bits = np.random.default_rng(SEMILLA_BITS)
+SIMBOLOS_A = 2 * _rng_bits.integers(0, 2, N_BITS) - 1   # +-1, NRZ
+
+SPS_1, SPS_2 = 8, 4           # muestras por simbolo: clip 1/3 vs la mitad en clip 2
+RS_1 = FS / SPS_1             # 1.0  simbolos/s equivalentes
+RS_2 = FS / SPS_2             # 2.0  simbolos/s equivalentes (el doble)
+# Ventana de tiempo ABSOLUTO fija (en muestras a FS): las dos ondas del
+# clip 2 se recortan a la MISMA duracion real, no al mismo numero de
+# simbolos — si no, sps=4 mostraria los mismos 16 simbolos que sps=8 y
+# "mas rapido" no se veria en pantalla.
+VENTANA_MUESTRAS = N_VISIBLE * SPS_1
+
+# --- clip 1 y base de clip 2: rectangular NRZ a SPS_1 -------------------
+Y_RECT_1 = np.repeat(SIMBOLOS_A, SPS_1).astype(float)
+T_RECT_1 = np.arange(len(Y_RECT_1)) / FS              # tiempo REAL (seg-eq)
+F_1, P_1_DB = psd_db(Y_RECT_1, fs=FS)
+BW_1_90 = ancho_banda(F_1, P_1_DB, frac=0.9)          # ~0.75 (Hz-equiv)
+T_VIS_1 = T_RECT_1[:VENTANA_MUESTRAS]
+Y_VIS_1 = Y_RECT_1[:VENTANA_MUESTRAS]
+
+# --- clip 2: la MISMA secuencia, ahora a SPS_2 (el doble de veloz) -----
+Y_RECT_2 = np.repeat(SIMBOLOS_A, SPS_2).astype(float)
+T_RECT_2 = np.arange(len(Y_RECT_2)) / FS              # MISMO tiempo real
+F_2, P_2_DB = psd_db(Y_RECT_2, fs=FS)                 # MISMO eje f que F_1
+BW_2_90 = ancho_banda(F_2, P_2_DB, frac=0.9)          # ~1.39 (Hz-equiv)
+T_VIS_2 = T_RECT_2[:VENTANA_MUESTRAS]                 # misma ventana: se ve EL DOBLE de simbolos
+Y_VIS_2 = Y_RECT_2[:VENTANA_MUESTRAS]
+RATIO_ANCHO = BW_2_90 / BW_1_90                       # ~1.85 (casi el doble)
+
+# --- clip 3: la MISMA secuencia conformada con coseno alzado -----------
+_, _H_RC = pulso_rc(beta=BETA_RC, span=8, sps=SPS_1)
+T_RC, Y_RC = conformar(SIMBOLOS_A, _H_RC, sps=SPS_1)
+F_RC, P_RC_DB = psd_db(Y_RC, fs=FS)                   # MISMO eje f que F_1
+BW_RC_90 = ancho_banda(F_RC, P_RC_DB, frac=0.9)       # ~0.40 (Hz-equiv)
+T_VIS_RC = T_RC[:VENTANA_MUESTRAS]
+Y_VIS_RC = Y_RC[:VENTANA_MUESTRAS]
+AHORRO_RC = (1.0 - BW_RC_90 / BW_1_90) * 100.0        # ~46 % menos ancho
+
+# --- clip 4: las bandas de la Deep Space Network ------------------------
+F_S_GHZ, F_X_GHZ, F_KA_GHZ = 2.3, 8.4, 32.0
 
 
 # --- Rotulos ----------------------------------------------------------

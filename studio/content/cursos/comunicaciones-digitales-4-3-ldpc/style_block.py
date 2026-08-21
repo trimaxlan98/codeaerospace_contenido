@@ -119,9 +119,74 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: el grafo dibujado y la cifra escrita no pueden
+# discrepar. Los calculos caros (Monte Carlo) viven AQUI, a nivel de
+# modulo, una sola vez.
+
+# --- el codigo pequeno: H (9 x 12) del sistema triple de Steiner ------
+H_LDPC = ldpc_pequeno()                       # 9 checks x 12 bits
+N_CHECKS, N_BITS = H_LDPC.shape               # 9, 12
+PESO_COL = int(H_LDPC.sum(axis=0)[0])         # 3 checks por bit
+PESO_FIL = int(H_LDPC.sum(axis=1)[0])         # 4 bits por check
+CHECK_DEMO = 0                                # el check que se ilustra
+BITS_CHECK = [int(i) for i in np.nonzero(H_LDPC[CHECK_DEMO])[0]]  # 0,3,6,9
+FILAS_H_TXT = [" ".join(str(int(v)) for v in fila) for fila in H_LDPC]
+
+# --- el par de errores garantizado por la validacion de la libreria ---
+BITS_ERROR = (0, 2)                           # sindrome 6 -> 3 -> 0
+X_LIMPIO = np.zeros(N_BITS, dtype=int)
+S_LIMPIO = (H_LDPC @ X_LIMPIO) % 2            # todo par: peso 0
+X_ERROR = X_LIMPIO.copy()
+X_ERROR[list(BITS_ERROR)] = 1
+PASOS_LDPC = ldpc_decodificar(X_ERROR, H_LDPC)   # [(x, s, bit_volteado)]
+PESOS_S = [int(s.sum()) for _, s, _ in PASOS_LDPC]        # [6, 3, 0]
+VOLTEOS = [v for _, _, v in PASOS_LDPC][1:]               # [0, 2]
+S_ERROR = PASOS_LDPC[0][1]                    # el sindrome que acusa
+CUENTAS_0 = (H_LDPC.T @ S_ERROR)              # acusaciones por bit
+CUENTA_MAX = int(CUENTAS_0.max())             # 3 = todos sus checks
+ACUSADOS = [int(i) for i in np.nonzero(CUENTAS_0 == CUENTA_MAX)[0]]
+
+# --- geometria del grafo (misma en los 3 primeros clips) --------------
+ANCHO_GRAFO, ALTO_GRAFO = 6.0, 2.3
+POS_GRAFO = LEFT * 1.35 + DOWN * 0.15
+
+# --- clip 4: la cascada sin codigo y la pared de Shannon --------------
+PUNTOS_Q, BITS_Q = constelacion_qpsk()
+SEMILLA_MC, N_MC = 7, 200000
+EBN0_MC = [2.0, 4.0, 6.0, 8.0]
+_MC = [ber_montecarlo(PUNTOS_Q, BITS_Q, db, N_MC, SEMILLA_MC)
+       for db in EBN0_MC]
+BER_MC = [m[0] for m in _MC]                  # BER contadas
+PARES_MC = list(zip(EBN0_MC, BER_MC))
+ERR_4DB, NBITS_4DB = _MC[1][1], _MC[1][2]     # errores y bits a 4 dB
+BER_4DB, BER_8DB = BER_MC[1], BER_MC[3]
+BER_OBJETIVO = 1e-5                           # un error por cada 100 000
+
+
+def _ebn0_para_ber(objetivo, lo=-2.0, hi=14.0):
+    """El Eb/N0 (dB) al que la QPSK SIN codigo alcanza `objetivo`,
+    resuelto por biseccion sobre la BER teorica de la libreria."""
+    for _ in range(60):
+        med = 0.5 * (lo + hi)
+        if float(np.atleast_1d(ber_teorica_qam(4, med))[0]) > objetivo:
+            lo = med
+        else:
+            hi = med
+    return 0.5 * (lo + hi)
+
+
+EBN0_SIN_CODIGO = _ebn0_para_ber(BER_OBJETIVO)   # ~9.6 dB
+EBN0_SHANNON = 0.0        # techo de Shannon para tasa 1/2 (curso 21)
+BRECHA_DB = EBN0_SIN_CODIGO - EBN0_SHANNON       # el premio del codigo
+N_DVBS2 = 64800           # bits del bloque LDPC de DVB-S2
+BER_X0, BER_X1 = -2.0, 12.0
+POS_BER = LEFT * 2.15 + DOWN * 0.15
+
+
+def fmt_ber(b):
+    """Una BER en notacion cientifica ASCII (fmt no llega a 10^-5)."""
+    return f"{float(b):.1e}"
 
 
 # --- Rotulos ----------------------------------------------------------

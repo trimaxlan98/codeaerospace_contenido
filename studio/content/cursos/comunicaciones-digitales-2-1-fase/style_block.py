@@ -119,9 +119,79 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la onda dibujada y la cifra rotulada salen del MISMO
+# array. La fase de cada simbolo sale de constelacion_bpsk/qpsk (nunca
+# grados escritos a mano) y se arma en TRAMOS por simbolo con la MISMA t
+# global (por eso el salto de fase se ve como un vuelco en la onda).
+F_PORT = 5.0                     # Hz de la portadora (frecuencia visual)
+PERIODO_PORT = 1.0 / F_PORT      # 0.2 s: un ciclo completo
+T_SIMBOLO = 0.4                  # s por simbolo (2 ciclos de portadora)
+MUESTRAS_POR_SIMBOLO = 60
+TASA_SIMBOLOS = 1.0 / T_SIMBOLO  # 2.5 simbolos/s
+
+
+def _segmentos_por_fases(fases, f=F_PORT, t_simbolo=T_SIMBOLO,
+                         muestras=MUESTRAS_POR_SIMBOLO):
+    """Tramos (tk, yk) de una portadora por simbolo: la t es GLOBAL (no se
+    reinicia en cada simbolo), solo cambia la fase -> el salto entre
+    tramos consecutivos con distinta fase se ve como un vuelco real."""
+    segmentos = []
+    for k, fase in enumerate(fases):
+        t0, t1 = k * t_simbolo, (k + 1) * t_simbolo
+        tk = np.linspace(t0, t1, muestras)
+        yk = np.cos(2 * math.pi * f * tk + fase)
+        segmentos.append((tk, yk))
+    return segmentos
+
+
+def _concat(segmentos):
+    return (np.concatenate([s[0] for s in segmentos]),
+            np.concatenate([s[1] for s in segmentos]))
+
+
+# --- Clip 1: la portadora vacia (sin bits, una sola fase) --------------
+N_VACIA = 4
+SEG_VACIA = _segmentos_por_fases([0.0] * N_VACIA)
+T_VACIA, Y_VACIA = _concat(SEG_VACIA)
+
+# --- Clip 2: BPSK --------------------------------------------------------
+PUNTOS_BPSK, BITS_TABLA_BPSK = constelacion_bpsk()   # bit i -> punto i
+FASES_BPSK = np.angle(PUNTOS_BPSK)                   # bit 0 -> 0, bit 1 -> pi
+BITS_BPSK = [0, 1, 0, 0, 1]                          # incluye un "no vuelco"
+FASES_BPSK_SEQ = [FASES_BPSK[b] for b in BITS_BPSK]
+SEG_BPSK = _segmentos_por_fases(FASES_BPSK_SEQ)
+T_BPSK, Y_BPSK = _concat(SEG_BPSK)
+FRONTERAS_BPSK = [k * T_SIMBOLO for k in range(1, len(BITS_BPSK))]
+TASA_BITS_BPSK = TASA_SIMBOLOS * 1                   # 2.5 bit/s
+
+# --- Clip 3: QPSK --------------------------------------------------------
+PUNTOS_QPSK, BITS_TABLA_QPSK = constelacion_qpsk()   # Gray: 00,01,11,10
+FASES_QPSK = np.angle(PUNTOS_QPSK)
+
+
+def _indice_par(par, tabla=BITS_TABLA_QPSK):
+    for i, b in enumerate(tabla):
+        if tuple(int(x) for x in b) == tuple(par):
+            return i
+    raise ValueError(par)
+
+
+PARES_QPSK = [(0, 0), (0, 1), (1, 1), (1, 0)]        # las 4 fases, en orden
+BITS_QPSK_FLAT = [b for par in PARES_QPSK for b in par]   # tren_bits (8)
+FASES_QPSK_SEQ = [FASES_QPSK[_indice_par(p)] for p in PARES_QPSK]
+SEG_QPSK = _segmentos_por_fases(FASES_QPSK_SEQ)
+T_QPSK, Y_QPSK = _concat(SEG_QPSK)
+FRONTERAS_QPSK = [k * T_SIMBOLO for k in range(1, len(PARES_QPSK))]
+TASA_BITS_QPSK = TASA_SIMBOLOS * 2                   # 5.0 bit/s: el doble
+
+# --- Clip 4: el mapa IQ es el idioma -------------------------------------
+DMIN_BPSK = d_min(PUNTOS_BPSK)                       # 2.00
+DMIN_QPSK = d_min(PUNTOS_QPSK)                       # 1.41 (misma energia)
+ENERGIA_BPSK = energia_media(PUNTOS_BPSK)            # 1.0
+ENERGIA_QPSK = energia_media(PUNTOS_QPSK)            # 1.0
+# el par vecino en Gray que ilustra d_min (difieren en 1 bit: 00 y 01)
+_I_A, _I_B = _indice_par((0, 0)), _indice_par((0, 1))
 
 
 # --- Rotulos ----------------------------------------------------------

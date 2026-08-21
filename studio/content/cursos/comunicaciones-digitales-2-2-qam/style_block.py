@@ -119,9 +119,77 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. Las cuatro constelaciones (QPSK/16-QAM/64-QAM/16-APSK)
+# vienen normalizadas a Es=1 (misma energia media): el precio de meter
+# mas puntos en el mismo circulo de energia es que d_min baja.
+QPSK, BITS_QPSK = constelacion_qpsk()
+QAM16, BITS_QAM16 = constelacion_qam16()
+QAM64, BITS_QAM64 = constelacion_qam64()
+APSK16, BITS_APSK16 = constelacion_apsk16()
+
+E_QPSK = energia_media(QPSK)        # 1.000
+E_QAM16 = energia_media(QAM16)      # 1.000  (MISMA energia que QPSK)
+E_QAM64 = energia_media(QAM64)      # 1.000
+E_APSK16 = energia_media(APSK16)    # 1.000
+
+D_QPSK = d_min(QPSK)        # 1.414
+D_QAM16 = d_min(QAM16)      # 0.632  (el precio de la densidad)
+D_QAM64 = d_min(QAM64)      # 0.309
+D_APSK16 = d_min(APSK16)    # 0.510
+
+
+def _par_dmin(puntos):
+    """Indices (i, j) del par de puntos MAS CERCANO (el que fija d_min)."""
+    p = np.asarray(puntos)
+    d = np.abs(p[:, None] - p[None, :])
+    np.fill_diagonal(d, np.inf)
+    i, j = np.unravel_index(np.argmin(d), d.shape)
+    return int(i), int(j)
+
+
+PAR_QPSK = _par_dmin(QPSK)
+PAR_QAM16 = _par_dmin(QAM16)
+PAR_QAM64 = _par_dmin(QAM64)
+PAR_APSK16 = _par_dmin(APSK16)
+
+# Cada doblez de densidad exige mas energia para mantener el mismo d_min:
+# la cuenta, en dB de potencia (20 log10 del cociente de distancias).
+DB_QPSK_A_QAM16 = 20.0 * math.log10(D_QPSK / D_QAM16)     # ~7.0 dB
+DB_QAM16_A_QAM64 = 20.0 * math.log10(D_QAM16 / D_QAM64)   # ~6.2 dB
+
+# El amplificador de a bordo (Saleh, AM/AM): retroceso (drive) elegido
+# porque deforma la reticula 16-QAM de forma bien visible sin colapsarla.
+RETROCESO = 1.15
+QAM16_AMP = amplificar(QAM16, retroceso=RETROCESO)
+APSK16_AMP = amplificar(APSK16, retroceso=RETROCESO)
+D_QAM16_AMP = d_min(QAM16_AMP)      # 0.107  (0.632 -> 0.107: se hunde)
+D_APSK16_AMP = d_min(APSK16_AMP)    # 0.284  (0.510 -> 0.284: sufre menos)
+PAR_QAM16_AMP = _par_dmin(QAM16_AMP)
+PAR_APSK16_AMP = _par_dmin(APSK16_AMP)
+
+# El punto MAS ALEJADO del centro (la esquina de la reticula) es el que
+# mas se mueve con el amplificador: misma pareja ideal/deformada, leida
+# del MISMO indice en los dos arrays.
+I_ESQUINA_QAM16 = int(np.argmax(np.abs(QAM16)))
+R_ESQUINA_QAM16 = float(np.abs(QAM16[I_ESQUINA_QAM16]))          # 1.342
+R_ESQUINA_QAM16_AMP = float(np.abs(QAM16_AMP[I_ESQUINA_QAM16]))  # 0.982
+
+# Los anillos de la 16-APSK (4 interior + 12 exterior), ideal y tras el
+# amplificador: radios leidos directo de los puntos (ambos anillos son
+# uniformes porque `con_fase=False` solo afecta la magnitud).
+R_INT_APSK16 = float(np.abs(APSK16[0]))          # 0.361
+R_EXT_APSK16 = float(np.abs(APSK16[4]))          # 1.136
+R_INT_APSK16_AMP = float(np.abs(APSK16_AMP[0]))  # 0.779
+R_EXT_APSK16_AMP = float(np.abs(APSK16_AMP[4]))  # 1.063
+
+# Curva AM/AM del amplificador saturado (Saleh), para dibujarla como
+# grafica f(r) -> A(r).
+def _saleh_f(r):
+    return float(saleh(r))
+
+
+A_RETROCESO = _saleh_f(RETROCESO)   # A(1.15) ~ 0.990: ya pasado el pico
 
 
 # --- Rotulos ----------------------------------------------------------

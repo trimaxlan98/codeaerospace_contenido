@@ -119,9 +119,94 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la nube DIBUJADA y el error CONTADO salen del mismo
+# array, y los puntos Monte Carlo caen sobre la curva teorica porque son
+# la misma cuenta. Los calculos caros (ber_montecarlo) viven aqui, a
+# nivel de modulo, una sola vez — jamas dentro de un updater.
+
+# La constelacion del modulo 2: QPSK (2 bits/simbolo) y 16-QAM (4).
+PQ, BQ = constelacion_qpsk()          # 4 puntos Gray, Es = 1
+P16, B16 = constelacion_qam16()       # 16 puntos Gray, Es = 1
+K_QPSK, K_QAM16 = int(BQ.shape[1]), int(B16.shape[1])
+D_MIN_QPSK = d_min(PQ)                # 1.41 con energia media 1
+
+# --- Las dos nubes que se ven en pantalla (clips 1 y 2) ---------------
+ALCANCE_IQ = 1.75                     # el marco del plano_iq
+SEM_NUBE = 5                          # semilla FIJA de las dos nubes
+N_NUBE = 500                          # tope de plano_iq.nube
+EBN0_ALTO, EBN0_BAJO = 12.0, 4.0      # dB de las dos nubes
+_IDX = np.tile(np.arange(len(PQ)), N_NUBE // len(PQ))
+
+
+def _dentro(rx):
+    """Los que caen DENTRO del marco: los unicos que plano_iq.nube pinta."""
+    return ((np.abs(np.real(rx)) <= ALCANCE_IQ)
+            & (np.abs(np.imag(rx)) <= ALCANCE_IQ))
+
+
+_RX_A = awgn(PQ[_IDX], EBN0_ALTO, K_QPSK, semilla=SEM_NUBE)
+_RX_B = awgn(PQ[_IDX], EBN0_BAJO, K_QPSK, semilla=SEM_NUBE)
+# se cuenta EXACTAMENTE sobre lo que se dibuja (aqui no cae ninguno fuera)
+VISIBLES = _dentro(_RX_A) & _dentro(_RX_B)
+RX_ALTO, RX_BAJO, IDX_VIS = _RX_A[VISIBLES], _RX_B[VISIBLES], _IDX[VISIBLES]
+N_VIS = int(len(IDX_VIS))                       # 500 simbolos en pantalla
+DEC_ALTO = demodular(RX_ALTO, PQ)
+DEC_BAJO = demodular(RX_BAJO, PQ)
+MAL_ALTO = DEC_ALTO != IDX_VIS                  # ninguno a 12 dB
+MAL_BAJO = DEC_BAJO != IDX_VIS                  # los que cruzan a 4 dB
+N_MAL_ALTO = int(np.sum(MAL_ALTO))              # 0
+N_MAL_BAJO = int(np.sum(MAL_BAJO))              # 14
+SER_BAJO = N_MAL_BAJO / N_VIS                   # 2.8e-2 simbolos
+BITS_MAL_BAJO = int(np.sum(BQ[IDX_VIS] != BQ[DEC_BAJO]))
+N_BITS_VIS = N_VIS * K_QPSK                     # 1000 bits en pantalla
+BER_NUBE = BITS_MAL_BAJO / N_BITS_VIS           # 1.4e-2 bits
+# las cuatro regiones del demodulador ideal, al borde exacto del marco
+CAMPO_QPSK, XS_QPSK = campo_vecino(PQ, -ALCANCE_IQ, ALCANCE_IQ, 88)
+
+# --- La curva BER medida (clips 3 y 4) --------------------------------
+SEM_MC = 3                            # semilla FIJA del Monte Carlo
+N_MC = 200000                         # 2e5 simbolos por punto (tope)
+DB_QPSK = (2.0, 4.0, 6.0, 8.0)
+DB_QAM16 = (2.0, 4.0, 6.0, 8.0, 10.0, 12.0)
+BER_QPSK = [(db, ber_montecarlo(PQ, BQ, db, N_MC, SEM_MC)[0])
+            for db in DB_QPSK]
+BER_QAM16 = [(db, ber_montecarlo(P16, B16, db, N_MC, SEM_MC)[0])
+             for db in DB_QAM16]
+BER_4 = dict(BER_QPSK)[4.0]           # 1.2e-2 medido
+BER_8 = dict(BER_QPSK)[8.0]           # 1.9e-4 medido
+RAZON_4_8 = BER_4 / BER_8             # ~65 veces menos errores
+
+
+def _db_para_ber(m, objetivo):
+    """El Eb/N0 (dB) al que la M-QAM teorica alcanza `objetivo` de BER."""
+    lo, hi = 0.0, 24.0
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if float(np.atleast_1d(ber_teorica_qam(m, mid))[0]) > objetivo:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+BER_OBJ = 1e-4                        # la tasa a la que se comparan
+DB_OBJ_QPSK = _db_para_ber(4, BER_OBJ)     # 8.4 dB
+DB_OBJ_QAM16 = _db_para_ber(16, BER_OBJ)   # 12.2 dB
+BRECHA_DB = DB_OBJ_QAM16 - DB_OBJ_QPSK     # 3.8 dB de precio
+
+
+def sci(x, dec=1):
+    """Notacion cientifica para MathTex: '1.2 \\cdot 10^{-2}'.
+    NUNCA en Text/tag_hud — Rajdhani y Space Mono no traen superindices."""
+    x = float(x)
+    if x <= 0.0:
+        return "0"
+    e = int(math.floor(math.log10(x)))
+    m = x / 10.0 ** e
+    if round(m, dec) >= 10.0:
+        m, e = m / 10.0, e + 1
+    return r"%s \cdot 10^{%d}" % (fmt(m, dec), e)
 
 
 # --- Rotulos ----------------------------------------------------------

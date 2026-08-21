@@ -119,9 +119,94 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: el pulso dibujado y la cifra escrita no pueden
+# discrepar. Cada pulso se muestrea a SPS puntos por simbolo y vive sobre
+# el MISMO eje t (en simbolos), de -SPAN/2 a +SPAN/2: por eso las tres
+# formas son gemelas de estructura identica y se pueden Transform.
+SPS = 16                      # muestras por simbolo (resolucion del trazo)
+SPAN = 6                      # simbolos de soporte de cada pulso
+BETA = 0.35                   # roll-off del coseno alzado (el de DVB-S2)
+TAU_CANAL = 0.9               # constante del canal de un polo, en simbolos
+
+T_PULSO, H_RECT = pulso_rect(span=SPAN, sps=SPS)          # el ideal
+_T_L, H_LENTO = pulso_lento(TAU_CANAL, span=SPAN, sps=SPS)   # el torpe
+_T_R, H_RC = pulso_rc(BETA, span=SPAN, sps=SPS)              # el de Nyquist
+RANGO_PULSO = (-0.42, 1.30)   # caja comun de los tres pulsos
+
+# Lo que vale cada pulso en SU instante de decision y en el de los vecinos
+# (isi_en MIDE la cola sobre el array que se dibuja).
+LENTO_K = [isi_en(H_LENTO, SPS, k) for k in range(4)]   # 0.67 0.57 0.19 0.06
+RC_K = [isi_en(H_RC, SPS, k) for k in range(4)]         # 1.00 0.00 0.00 0.00
+K_CEROS = (-3, -2, -1, 1, 2, 3)     # donde el coseno alzado cruza cero
+RC_CEROS = [isi_en(H_RC, SPS, k) for k in K_CEROS]      # todos 0.00
+
+# Los tres simbolos de la leccion (+1, +1, -1) con un hueco a cada lado
+# para que se vean los pulsos enteros: deciden en t = 1, 2 y 3.
+SIMBOLOS = [0, 1, 1, -1, 0]
+BITS_SIMBOLOS = [1, 1, 0]           # los mismos, escritos como bits
+K_DECISION = (1, 2, 3)
+AMPLITUDES = (1, 1, -1)
+
+T_TREN, Y_LENTO = conformar(SIMBOLOS, H_LENTO, SPS)
+_T2, Y_RC = conformar(SIMBOLOS, H_RC, SPS)
+DEC_LENTO = [float(Y_LENTO[k * SPS]) for k in K_DECISION]   # .67 1.24 .09
+DEC_RC = [float(Y_RC[k * SPS]) for k in K_DECISION]         # 1.00 1.00 -1.00
+RANGO_TREN = (-1.55, 1.55)          # caja comun de los dos trenes
+
+# El eco de cada simbolo por separado (mismo eje que el tren): la suma de
+# los tres ES Y_LENTO, y lo que cada uno aporta en t = 3 son las cifras
+# que se rotulan en el clip 2.
+ECOS_LENTO = []
+for _k, _a in zip(K_DECISION, AMPLITUDES):
+    _s = [0] * len(SIMBOLOS)
+    _s[_k] = _a
+    ECOS_LENTO.append(conformar(_s, H_LENTO, SPS)[1])
+APORTES_EN_3 = [float(_y[3 * SPS]) for _y in ECOS_LENTO]    # .19 .57 -.67
+
+# El diagrama de ojo: 31 simbolos aleatorios de semilla fija conformados
+# con el coseno alzado. Con SPS=16 y 31 simbolos la pieza dibuja 28
+# trazas y la apertura MEDIDA cubre exactamente los instantes dibujados.
+SEMILLA_BITS = 20260821
+SEMILLA_RUIDO = 4242
+N_SIMBOLOS_OJO = 31
+N_TRAZAS = 28
+RANGO_OJO = 2.8                     # deja sitio a las trazas con ruido
+BITS_OJO = (np.random.default_rng(SEMILLA_BITS)
+            .integers(0, 2, N_SIMBOLOS_OJO) * 2 - 1)
+T_OJO, Y_OJO = conformar(BITS_OJO, H_RC, SPS)
+APERTURA_LIMPIA = apertura_ojo(Y_OJO, SPS)                  # 2.00
+
+SIGMA_1, SIGMA_2 = 0.18, 0.42       # dos niveles del mismo ruido gaussiano
+RUIDO_1 = np.random.default_rng(SEMILLA_RUIDO).normal(0, SIGMA_1, len(Y_OJO))
+RUIDO_2 = np.random.default_rng(SEMILLA_RUIDO).normal(0, SIGMA_2, len(Y_OJO))
+Y_OJO_1 = Y_OJO + RUIDO_1
+Y_OJO_2 = Y_OJO + RUIDO_2
+APERTURA_1 = apertura_ojo(Y_OJO_1, SPS)                     # 1.42
+APERTURA_2 = apertura_ojo(Y_OJO_2, SPS)                     # 0.65
+
+
+def _snr_db(senal, ruido):
+    """SNR MEDIDA entre los dos arrays que se dibujan, en dB."""
+    return 10.0 * math.log10(float(np.mean(np.asarray(senal) ** 2)
+                                   / np.mean(np.asarray(ruido) ** 2)))
+
+
+SNR_1 = _snr_db(Y_OJO, RUIDO_1)     # ~14.9 dB
+SNR_2 = _snr_db(Y_OJO, RUIDO_2)     # ~7.6 dB
+
+
+def bordes_ojo(y, sps=SPS):
+    """Los dos bordes que MIDE `apertura_ojo`: la traza positiva mas baja
+    y la negativa mas alta en el instante de decision. Sirven para dibujar
+    la barra de apertura exactamente donde esta la cifra rotulada."""
+    v = np.asarray(y, dtype=float)[2 * sps::sps]
+    return float(v[v > 0].min()), float(v[v < 0].max())
+
+
+BORDES_LIMPIO = bordes_ojo(Y_OJO)   # (1.00, -1.00)
+BORDES_1 = bordes_ojo(Y_OJO_1)
+BORDES_2 = bordes_ojo(Y_OJO_2)
 
 
 # --- Rotulos ----------------------------------------------------------

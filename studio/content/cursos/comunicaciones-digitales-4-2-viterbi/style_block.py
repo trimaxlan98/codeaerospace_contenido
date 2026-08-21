@@ -119,9 +119,130 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: el trellis dibujado y la metrica escrita no pueden
+# discrepar. El mensaje es REAL: se codifica, se ensucia y se decodifica
+# con la libreria, y las tres cosas salen del MISMO array.
+CONV_K = 3                       # memoria del codigo (leccion 4.1)
+CONV_G = "(7,5)"                 # generadores en octal
+CONV_TASA = "1/2"                # dos bits de salida por bit de entrada
+PASOS = 8                        # bits del mensaje = pasos del trellis
+N_ESTADOS = 4                    # 2^(K-1)
+MENSAJE = [1, 0, 1, 1, 0, 1, 1, 0]           # los 8 bits que salen de la sonda
+_COD, ESTADOS = conv_codificar(MENSAJE)      # 16 bits codificados, 9 estados
+CODIFICADO = [int(b) for b in _COD]
+N_CAMINOS = 2 ** PASOS           # 256 caminos posibles en la rejilla
+IDX_ERROR = (3, 11)              # los dos bits que el canal voltea
+RECIBIDO = list(CODIFICADO)
+for _i in IDX_ERROR:
+    RECIBIDO[_i] ^= 1
+N_ERR_CANAL = sum(int(a != b) for a, b in zip(CODIFICADO, RECIBIDO))   # 2
+PARES_RX = [(RECIBIDO[2 * t], RECIBIDO[2 * t + 1]) for t in range(PASOS)]
+
+INF_MET = 10 ** 9                # marca de estado inalcanzable
+
+# El camino ganador y los bits salen de la libreria...
+VIT = viterbi(RECIBIDO)
+BITS_DEC = [int(b) for b in VIT["bits"]]
+CAMINO = [int(s) for s in VIT["camino"]]
+ESTADO_FINAL = CAMINO[-1]
+
+# ...pero las METRICAS se recalculan aqui. BUG de la libreria (reportado,
+# no tocado): en `viterbi` el costo de rama se escribe
+#     costo = (o1 != r[t][0]) + (o2 != r[t][1])
+# y como r es un array de numpy, cada comparacion es un np.bool_: la suma
+# de dos np.bool_ es un OR logico, no una suma. El resultado satura en 1 y
+# una rama que difiere en LOS DOS bits cuesta 1 en vez de 2. Como esta
+# leccion ROTULA en pantalla la distancia Hamming de las ramas (una rama
+# que predice 00 contra un par recibido 11 tiene que costar 2), la tabla
+# rehace la pasada hacia adelante con enteros de python. La libreria
+# decodifica el mismo camino en este caso y se comprueba con un assert.
+def _metricas_hamming():
+    """Pasada de Viterbi con distancia Hamming de BITS (enteros puros).
+    -> metricas[t][s] acumuladas (INF_MET = estado inalcanzable)."""
+    met = [[INF_MET] * N_ESTADOS for _ in range(PASOS + 1)]
+    met[0][0] = 0
+    for t in range(PASOS):
+        for s in range(N_ESTADOS):
+            if met[t][s] >= INF_MET:
+                continue
+            for _s, b, s2, (o1, o2) in RAMAS_CONV:
+                if _s != s:
+                    continue
+                c = int(o1 != PARES_RX[t][0]) + int(o2 != PARES_RX[t][1])
+                if met[t][s] + c < met[t + 1][s2]:
+                    met[t + 1][s2] = met[t][s] + c
+    return met
+
+
+METRICAS = _metricas_hamming()   # metricas[t][s], INF_MET = inalcanzable
+METRICA_FINAL = min(METRICAS[PASOS])         # 2 = los dos bits volteados
+CORREGIDO = [int(b) for b in conv_codificar(BITS_DEC)[0]]
+N_ERR_VITERBI = sum(int(a != b) for a, b in zip(CODIFICADO, CORREGIDO))  # 0
+N_DIF_BITS = sum(int(a != b) for a, b in zip(MENSAJE, BITS_DEC))         # 0
+VOYAGER_K = 7                    # el codigo que volo a los planetas exteriores
+VOYAGER_ESTADOS = 2 ** (VOYAGER_K - 1)       # 64 estados en vez de 4
+
+# El camino ambar del clip 1 (mensaje verdadero) y el verde del clip 4
+# (superviviente de Viterbi) tienen que ser el MISMO: se comprueba aqui.
+assert CAMINO == list(ESTADOS)
+assert BITS_DEC == MENSAJE and N_DIF_BITS == 0 and N_ERR_VITERBI == 0
+# el estado mas barato de la ultima columna es el final del camino ganador
+assert METRICAS[PASOS][ESTADO_FINAL] == METRICA_FINAL == N_ERR_CANAL
+
+_SALIDA = {(s, b): sal for s, b, _s2, sal in RAMAS_CONV}
+_DESTINO = {(s, b): s2 for s, b, s2, _sal in RAMAS_CONV}
+_ORDEN_RAMA = {(s, b): k for k, (s, b, _s2, _sal) in enumerate(RAMAS_CONV)}
+
+
+def vivo(t, s):
+    """True si el estado s es alcanzable en la etapa t (metrica finita)."""
+    return METRICAS[t][s] < INF_MET
+
+
+def salida_rama(s, b):
+    """Los dos bits que PREDICE la rama (estado s, bit b)."""
+    return _SALIDA[(s, b)]
+
+
+def destino_rama(s, b):
+    """El estado al que lleva la rama (s, b): s2 = (b<<1) | (s>>1)."""
+    return _DESTINO[(s, b)]
+
+
+def costo_rama(t, s, b):
+    """Distancia Hamming entre lo que predice la rama y el par recibido."""
+    o1, o2 = _SALIDA[(s, b)]
+    return int((o1 != PARES_RX[t][0]) + (o2 != PARES_RX[t][1]))
+
+
+def idx_rama(t, s, b):
+    """Indice de la rama (t, s, b) dentro de trellis.todas_ramas()."""
+    return t * len(RAMAS_CONV) + _ORDEN_RAMA[(s, b)]
+
+
+def poda(t):
+    """Que sobrevive en el tramo t -> t+1. -> {s2: (gana, pierde, total)}
+    con gana/pierde = (s, b) y total = la metrica acumulada del ganador.
+    El desempate (metrica igual) es el de `viterbi`: gana el estado de
+    indice menor, que es el que la libreria visita primero."""
+    salida = {}
+    for s2 in range(N_ESTADOS):
+        cands = sorted((METRICAS[t][s] + costo_rama(t, s, b), s, b)
+                       for s, b, ss, _sal in RAMAS_CONV
+                       if ss == s2 and vivo(t, s))
+        if not cands:
+            continue
+        salida[s2] = {"gana": (cands[0][1], cands[0][2]),
+                      "pierde": [(c[1], c[2]) for c in cands[1:]],
+                      "total": int(cands[0][0])}
+    return salida
+
+
+# la poda reconstruida y la tabla de metricas coinciden SIEMPRE
+for _t in range(PASOS):
+    for _s2, _d in poda(_t).items():
+        assert _d["total"] == METRICAS[_t + 1][_s2]
 
 
 # --- Rotulos ----------------------------------------------------------

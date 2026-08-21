@@ -457,7 +457,7 @@ for _s in range(4):
     for _b in range(2):
         _m1, _m0 = (_s >> 1) & 1, _s & 1
         _o1 = _b ^ _m0 ^ _m1        # g1 = 111
-        _o2 = _b ^ _m1              # g2 = 101
+        _o2 = _b ^ _m0              # g2 = 101 (taps b y m0)
         _CONV_SALIDAS[(_s, _b)] = ((_b << 1) | (_s >> 1), (_o1, _o2))
 # ojo: estado = (bit_nuevo, memoria_vieja_alta); transicion arriba
 
@@ -490,7 +490,7 @@ def viterbi(recibidos):
                 continue
             for b in (0, 1):
                 s2, (o1, o2) = _CONV_SALIDAS[(s, b)]
-                costo = (o1 != r[t][0]) + (o2 != r[t][1])
+                costo = int(o1 != r[t][0]) + int(o2 != r[t][1])
                 if met[t][s] + costo < met[t + 1][s2]:
                     met[t + 1][s2] = met[t][s] + costo
                     prev[t + 1][s2] = (s, b)

@@ -119,9 +119,42 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo dibujado y la cifra rotulada salen del MISMO array.
+
+# Clip 1: repetir no basta (repeticion x3, cara del curso 21) ----------
+MSG_REP = [1, 0, 1]                                   # el mensaje util
+REP_TRIPLE = [b for b in MSG_REP for _ in range(3)]   # cada bit, x3
+GASTO_REP = len(REP_TRIPLE) // len(MSG_REP)           # 3 bits por bit util
+# el canal voltea DOS de las tres copias del primer bit: el voto pierde
+REP_RECIBIDO = list(REP_TRIPLE)
+REP_RECIBIDO[1] = 1 - REP_RECIBIDO[1]
+REP_RECIBIDO[2] = 1 - REP_RECIBIDO[2]
+
+
+def _voto_mayoria(copias):
+    return int(sum(copias) > len(copias) / 2)
+
+
+VOTO_PRIMER_BIT = _voto_mayoria(REP_RECIBIDO[0:3])    # 0: el voto pierde
+
+# Clips 2-4: el codigo convolucional K=3, G=(7,5), tasa 1/2 -------------
+K_CONV, G_CONV, TASA_CONV = 3, "(7,5)", "1/2"
+BITS_MENSAJE = [1, 0, 1, 1, 0]                        # la ristra real
+SALIDA_CONV, ESTADOS_CONV = conv_codificar(BITS_MENSAJE)
+SALIDA_CONV = [int(x) for x in SALIDA_CONV]
+# SALIDA_CONV = [1,1, 1,1, 0,1, 0,0, 0,1]  ESTADOS_CONV = [0,2,1,2,3,1]
+
+# Clip 4: la memoria protege --------------------------------------------
+T_ERROR = 2                                # el 3er par de salida (indices 4,5)
+IDX_ERROR = 2 * T_ERROR
+RX_CONV = list(SALIDA_CONV)
+RX_CONV[IDX_ERROR] = 1 - RX_CONV[IDX_ERROR]           # un bit volteado
+ESTADO_ERROR = ESTADOS_CONV[T_ERROR]                  # 1
+ESTADO_ERROR_BIN = format(ESTADO_ERROR, "02b")        # "01"
+OPCIONES_ERROR = [(b, sal) for (s, b, s2, sal) in RAMAS_CONV
+                  if s == ESTADO_ERROR]               # las DOS salidas validas
+RECIBIDO_PAR = (RX_CONV[IDX_ERROR], RX_CONV[IDX_ERROR + 1])   # (1, 1)
 
 
 # --- Rotulos ----------------------------------------------------------

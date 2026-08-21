@@ -8,25 +8,25 @@
       "file": "clips/01-el-trellis.py",
       "title": "1 · El trellis",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "El trellis completo (4 estados x 8 pasos) con todas sus ramas tenues y el camino ambar del mensaje verdadero atenuado al 25%; arriba el tren de 8 bits del mensaje (1 0 1 1 0 1 1 0) y a la derecha el panel K = 3, G = (7,5) octal, tasa 1/2; el pie dice que el receptor no ve el camino, ve la senal."
     },
     {
       "file": "clips/02-el-precio-de-cada-rama.py",
       "title": "2 · El precio de cada rama",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "El tren de 16 bits recibidos con los bits 3 y 11 en rojo, el trellis tenue con la rama verdadera del segundo tramo en ambar y su precio 1 rotulado, la comparacion recibido 10 / la rama predice 11 bajo el recuadro rojo, y en el pie la formula m(camino) = suma de las distancias Hamming."
     },
     {
       "file": "clips/03-podar.py",
       "title": "3 · Podar: quedarse con lo barato",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "El trellis podado entero: solo las ramas supervivientes en azul, las metricas acumuladas rotuladas columna a columna (0; 2 y 0; 3 1 3 1; ... ; 3 2 3 4 en la ultima), la mejor metrica 2 enmarcada en verde sobre el estado 01, y el panel supervivientes = 4 / mejor metrica = 2."
     },
     {
       "file": "clips/04-el-superviviente.py",
       "title": "4 · El superviviente",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre de la leccion en dos lineas: 'Entre todos los mensajes posibles,' en blanco y 'gana el que menos ruido necesita.' en cian, con el pie 'Siguiente leccion: LDPC, el murmullo que corrige.'"
     }
   ]
 }

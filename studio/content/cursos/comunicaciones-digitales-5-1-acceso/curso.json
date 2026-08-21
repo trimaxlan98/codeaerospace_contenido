@@ -8,25 +8,25 @@
       "file": "clips/01-la-rejilla-tiempo-frecuencia.py",
       "title": "1 · La rejilla tiempo-frecuencia",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "La rejilla 3x6 en su plan TDMA (columnas: usuario 1 ámbar, usuario 2 verde, usuario 3 azul) con un marco gris rodeándola; pie: 'Frecuencia o tiempo: se reparte de un modo o de otro, pero la sábana no crece.'"
     },
     {
       "file": "clips/02-cdma-hablar-a-la-vez.py",
       "title": "2 · CDMA: hablar a la vez",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Los 64 chips mezclados de los dos usuarios como onda azul escalonada, rotulados '64 chips sumados'; pie: 'Se ve caótica. Pero los códigos eran ortogonales: nada se perdió.'"
     },
     {
       "file": "clips/03-el-despreading.py",
       "title": "3 · El despreading",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Los 64 chips mezclados arriba y, debajo, la correlación con el código de u3 (no usado) totalmente plana en cero, rotulada 'pico = 0.0' en rojo; pie: 'Con el código de un usuario que nunca transmitió, la correlación es CERO.'"
     },
     {
       "file": "clips/04-los-haces-de-la-constelacion.py",
       "title": "4 · Los haces de la constelación",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El cielo no se agranda.' (blanca) y 'Se reparte mejor.' (cian); pie anuncia la siguiente lección (5.2, ACM)."
     }
   ]
 }

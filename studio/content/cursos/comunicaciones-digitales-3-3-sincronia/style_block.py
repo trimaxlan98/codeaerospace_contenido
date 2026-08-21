@@ -119,9 +119,72 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la curva dibujada y la cifra escrita salen del MISMO
+# array. Semillas fijas -> mismo script, mismo render.
+
+# La llave: m-secuencia de 31 chips (LFSR de 5 bits, x^5 + x^2 + 1).
+PN = secuencia_pn()                       # 31 chips +-1
+N_CHIPS = len(PN)                         # 31
+BITS_PN = [1 if c > 0 else 0 for c in PN]  # la misma secuencia, en bits
+R_AUTO = correlacion_circular(PN, PN)     # autocorrelacion circular
+R_PICO = float(R_AUTO[0])                 # 31.0 en fase
+R_FUERA = float(np.max(R_AUTO[1:]))       # -1.0 (TODOS los demas)
+K_MUESTRA = 7                             # el desplazamiento de ejemplo
+R_MUESTRA = float(R_AUTO[K_MUESTRA])      # -1.0
+PN_ROTADA = np.roll(PN, -K_MUESTRA)       # la copia desplazada 7 chips
+
+# El mar de ruido: la PN enterrada a 0 dB por chip, semilla fija.
+OFFSET_REAL = 40
+SNR_CHIP_DB = 0.0
+N_TOTAL = 140
+SEMILLA_RX = 7
+RX = senal_con_preambulo(offset=OFFSET_REAL, snr_db=SNR_CHIP_DB,
+                         n_total=N_TOTAL, semilla=SEMILLA_RX)
+T_RX = np.arange(N_TOTAL, dtype=float)
+
+# La busqueda: correlacion deslizante sobre las 110 ventanas posibles.
+CORR, OFFSET_HALLADO = buscar_preambulo(RX, PN)   # -> 40
+N_VENTANAS = len(CORR)                            # 110
+T_CORR = np.arange(N_VENTANAS, dtype=float)
+C_PICO = float(CORR[OFFSET_HALLADO])              # 33.4
+_ORDEN = np.argsort(CORR)[::-1]
+OFFSET_2 = int(_ORDEN[1])                         # 23
+C_SEGUNDO = float(CORR[OFFSET_2])                 # 14.2
+RAZON_PICO = C_PICO / C_SEGUNDO                   # 2.4 veces
+# A ojo la energia NO distingue: la ventana mas fuerte cae en 44.
+ENERGIA = np.array([float(np.sum(RX[k:k + N_CHIPS] ** 2))
+                    for k in range(N_VENTANAS)])
+K_ENERGIA = int(np.argmax(ENERGIA))               # 44, y NO es el mensaje
+E_MAX = float(ENERGIA[K_ENERGIA])                 # 62.2
+E_EN_OFFSET = float(ENERGIA[OFFSET_REAL])         # 59.4
+
+# Adquisicion: los datos que siguen al preambulo (otra m-secuencia) con
+# conformado de coseno alzado; el simbolo k decide en t = k.
+INICIO_DATOS = OFFSET_REAL + N_CHIPS              # 71
+SPS = 8
+BETA_RC = 0.35
+_T_H, H_RC = pulso_rc(BETA_RC, span=8, sps=SPS)
+SIMB_DATOS = secuencia_pn(semilla_reg=0b11011)[:20]
+T_DATOS, Y_DATOS = conformar(SIMB_DATOS, H_RC, sps=SPS)
+N_SIMB = len(SIMB_DATOS)
+APERTURA = apertura_ojo(Y_DATOS, sps=SPS)         # 2.00: el ojo abierto
+T_DECISION = np.arange(N_SIMB, dtype=float)
+Y_DECISION = Y_DATOS[::SPS]
+
+
+def _escalera(v):
+    """Serie escalonada (un chip = un escalon) para dibujarla con `onda`:
+    devuelve (t, y) con dos puntos por chip. NO inventa valores: repite
+    los del array."""
+    v = np.asarray(v, dtype=float)
+    k = np.arange(len(v), dtype=float)
+    t = np.repeat(k, 2) + np.tile(np.array([-0.5, 0.5]), len(v))
+    return t, np.repeat(v, 2)
+
+
+T_PN, Y_PN = _escalera(PN)
+T_PN_ROT, Y_PN_ROT = _escalera(PN_ROTADA)
 
 
 # --- Rotulos ----------------------------------------------------------

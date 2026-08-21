@@ -4,7 +4,7 @@ class Clip2(Scene):
 
     def construct(self):
         rot = Rotulos(self)
-        self.add(hud_modulo("Modulo 01"))
+        self.add(hud_modulo("Modulo 02"))
 
         titulo = titulo_curso("Muestrear: cada cuánto preguntar")
         rot.mostrar(titulo, zona="arriba", run_time=0.6)

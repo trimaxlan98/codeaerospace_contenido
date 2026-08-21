@@ -8,25 +8,25 @@
       "file": "clips/01-la-esfera-que-se-reparte.py",
       "title": "1 · La esfera que se reparte",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla con el HUD 'MODULO 03' y el título 'La esfera que se reparte' arriba. Al centro-izquierda, tres anillos concéntricos azules (dos de ellos resaltados en cian) alrededor de un punto ámbar rotulado 'la señal'. A la derecha, un panel con d = 550 km / FSPL = 168.8 dB, d = 1100 km / FSPL = 174.9 dB y delta = 6.0 dB. Pie: la fórmula FSPL_dB = 92.45 + 20 log10 d + 20 log10 f en MathTex."
     },
     {
       "file": "clips/02-la-escalera-de-los-enlaces.py",
       "title": "2 · La escalera de los enlaces",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Cuatro barras azules ascendentes sobre un eje horizontal, unidas por una línea escalonada, rotuladas LEO/GEO/MARTE/VOYAGER con sus cifras en cian arriba: 168.8 dB, 205.1 dB, 278.0 dB y 318.8 dB. Pie: 'Y aun asi se oye: el presupuesto del enlace -- antenas, ganancia, codigos, visto en Cerrar el enlace (curso 13) -- compensa cada escalon.'"
     },
     {
       "file": "clips/03-la-lluvia-cobra-en-ka.py",
       "title": "3 · La lluvia cobra en Ka",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Gráfica de atenuación (0-18 dB) con dos curvas: Ka en naranja (picos que cruzan varias veces la línea roja discontinua 'margen = 10 dB') y X en azul, siempre por debajo del margen. Panel superior derecho con 'Ka: hasta 14.9 dB' y 'X: hasta 2.6 dB'. Pie: '26 de los 240 minutos, Ka se cae del margen. X, ninguno: la altura de banda tiene precio.'"
     },
     {
       "file": "clips/04-la-fibra-el-canal-terrestre.py",
       "title": "4 · La fibra: el canal terrestre",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Cierre de lección a pantalla limpia: dos líneas centradas, 'En la Tierra, la luz viaja acompañada.' en blanco y 'En el espacio, la señal va sola.' en cian, con el HUD 'MODULO 03' arriba y el pie 'Siguiente leccion: Doppler, la frecuencia que se corre.' abajo."
     }
   ]
 }

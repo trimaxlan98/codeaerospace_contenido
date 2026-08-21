@@ -8,25 +8,25 @@
       "file": "clips/01-16qam-la-reticula.py",
       "title": "1 · 16-QAM: la retícula",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Plano IQ con la retícula 16-QAM (16 puntos ámbar, sin etiquetas de bits), segmento cian del par más cercano a la izquierda; panel superior derecho con 'E[16-QAM] = 1.000' y 'd_min = 0.632'; pie: 'Misma energía, cuatro bits por símbolo: d_min cae de 1.414 a 0.632.'"
     },
     {
       "file": "clips/02-la-escalera-de-densidades.py",
       "title": "2 · 64-QAM y la escalera de densidades",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Escalera de tres constelaciones (QPSK, 16-QAM, 64-QAM) en miniatura, cada una con su d_min rotulada (1.414 / 0.632 / 0.309); debajo, las cifras de coste medidas '1.414 / 0.632 -> 7.0 dB' y '0.632 / 0.309 -> 6.2 dB'; pie: 'Cada doblez de densidad cuesta cerca de 6 dB de energía para no perder margen.'"
     },
     {
       "file": "clips/03-el-amplificador-de-a-bordo.py",
       "title": "3 · El amplificador de a bordo",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Plano IQ con la retícula 16-QAM ideal tenue (ámbar) y la deformada por el amplificador (roja) superpuestas; flecha roja en la esquina con la cifra '1.342 -> 0.982'; panel superior derecho 'd_min: 0.632 -> 0.107'; pie: 'd_min se hunde con el mismo retroceso: el receptor pierde margen ante el ruido.'"
     },
     {
       "file": "clips/04-apsk-anillos-para-el-espacio.py",
       "title": "4 · APSK: anillos para el espacio",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'En tierra, la retícula.' (blanca) y 'En órbita, los anillos.' (cian); pie: 'Siguiente lección: el ruido decide, la curva BER.'"
     }
   ]
 }

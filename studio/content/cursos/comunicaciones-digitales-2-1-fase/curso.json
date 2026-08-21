@@ -8,25 +8,25 @@
       "file": "clips/01-la-portadora-vacia.py",
       "title": "1 · La portadora vacía",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con la onda azul (coseno de f = 5 Hz, con el periodo T = 0.20 s marcado con llave) a la izquierda y el plano I/Q con un solo punto cian quieto en (1,0) etiquetado 'sin bits' a la derecha; el pie muestra la formula s(t) = cos(2 pi f t + phi) en cian."
     },
     {
       "file": "clips/02-bpsk-un-bit-por-vuelco.py",
       "title": "2 · BPSK: un bit por vuelco",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "El tren de 5 bits (0,1,0,0,1) con las celdas resaltadas en cian, la onda BPSK completa con sus 4 fronteras de simbolo (cian donde hubo vuelco, gris donde el bit se repitio) y el plano I/Q con los dos puntos +-1 rotulados '0' y '1'; panel superior derecho con 'tasa = 2.5 simb/s' (ambar) y '= 2.5 bit/s' (cian)."
     },
     {
       "file": "clips/03-qpsk-dos-bits-por-fase.py",
       "title": "3 · QPSK: dos bits por fase",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "El tren de 8 bits resaltado en cian, la onda QPSK completa con sus 3 fronteras de simbolo en cian y el plano I/Q con las 4 fases rotuladas con el mapa de Gray (01, 00, 11, 10) tomado de la libreria; panel superior derecho con 'BPSK: 2.5 bit/s' (ambar) y 'QPSK: 5.0 bit/s' (cian)."
     },
     {
       "file": "clips/04-el-mapa-iq.py",
       "title": "4 · El mapa IQ es el idioma",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Cierre de leccion a pantalla limpia: solo el HUD 'MODULO 04' y dos lineas centradas, 'La onda es la misma.' en blanco y 'El mensaje vive en su fase.' en cian, con el pie 'Siguiente leccion: mas bits por simbolo, QAM y APSK.'"
     }
   ]
 }

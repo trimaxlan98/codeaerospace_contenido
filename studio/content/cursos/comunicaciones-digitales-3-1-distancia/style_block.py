@@ -119,9 +119,60 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la esfera dibujada y la cifra rotulada salen del MISMO
+# calculo con fspl_db.
+
+# -- clip 1: la esfera que se reparte (la regla de los 6 dB al doblar) ----
+F_LEO = 12.0                          # GHz, banda de la LEO de la escalera
+D_LEO = 550.0                         # km, la LEO del clip 2
+D_LEO_DOBLE = 2.0 * D_LEO             # 1100 km: la misma LEO, el doble lejos
+FSPL_LEO = fspl_db(D_LEO, F_LEO)              # ~168.8 dB
+FSPL_LEO_DOBLE = fspl_db(D_LEO_DOBLE, F_LEO)  # ~174.9 dB
+DELTA_DOBLE_DB = FSPL_LEO_DOBLE - FSPL_LEO     # ~6.0 dB, la regla MEDIDA
+
+# -- clip 2: la escalera de los enlaces (los 4 presupuestos del modulo) ---
+F_MARTE = 8.4                         # GHz, banda X del espacio profundo
+D_GEO = 35786.0                       # km, geoestacionaria
+D_MARTE = 2.25e8                      # km, Marte en oposicion lejana
+D_VOYAGER = 2.46e10                   # km, Voyager 1
+FSPL_GEO = fspl_db(D_GEO, F_LEO)             # ~205.1 dB
+FSPL_MARTE = fspl_db(D_MARTE, F_MARTE)       # ~278.0 dB
+FSPL_VOYAGER = fspl_db(D_VOYAGER, F_MARTE)   # ~318.8 dB
+ESCALERA = [("LEO", D_LEO, F_LEO, FSPL_LEO),
+            ("GEO", D_GEO, F_LEO, FSPL_GEO),
+            ("MARTE", D_MARTE, F_MARTE, FSPL_MARTE),
+            ("VOYAGER", D_VOYAGER, F_MARTE, FSPL_VOYAGER)]
+FSPL_BASE = 150.0                     # dB, piso VISUAL de la escalera (no 0)
+FSPL_TOPE = 330.0                     # dB, techo visual de la escalera
+
+# -- clip 3: la lluvia cobra en Ka (la misma serie, dos bandas) -----------
+F_KA = 20.0                           # GHz, downlink Ka tipico
+T_LLUVIA, ATT_KA = lluvia_serie()     # serie Ka con memoria, semilla fija
+MIN_TOTAL = len(T_LLUVIA)             # minutos totales de la serie
+# La atenuacion especifica de la lluvia crece con la frecuencia (ITU-R
+# P.838); se aproxima aqui con el cociente de frecuencias al cuadrado
+# (declarado en el pie del clip, no es una medida de la libreria).
+RATIO_X_KA = (F_MARTE / F_KA) ** 2        # ~0.176
+ATT_X = ATT_KA * RATIO_X_KA
+MARGEN_ENLACE_DB = 10.0               # dB, margen de diseno del enlace
+ATT_KA_MAX = float(ATT_KA.max())          # ~14.9 dB, MEDIDO en la serie
+ATT_X_MAX = float(ATT_X.max())            # ~2.6 dB, MEDIDO en la serie
+MIN_FUERA_KA = int(np.sum(ATT_KA > MARGEN_ENLACE_DB))  # minutos sobre margen
+
+# -- clip 4: la fibra, el canal terrestre ---------------------------------
+FIBRA_DB_KM = 0.2                     # dB/km, atenuacion tipica de fibra SMF
+AMPLI_KM = 80.0                       # km, separacion tipica de un EDFA
+TRAMO_DB = FIBRA_DB_KM * AMPLI_KM         # 16.0 dB perdidos por tramo
+FIBRA_A_MARTE_DB = FIBRA_DB_KM * D_MARTE  # 4.5e7 dB: la regla de tres a Marte
+
+
+def fmt_exp(x, dec=1):
+    """Notacion cientifica ASCII compacta (4.5e7): para cifras demasiado
+    grandes para `fmt` de punto fijo (Space Mono no lleva superindices).
+    RESUELTO en este style_block: no existe en la libreria."""
+    return f"{x:.{dec}e}".replace("e+0", "e").replace("e-0", "e-").replace(
+        "e+", "e")
 
 
 # --- Rotulos ----------------------------------------------------------

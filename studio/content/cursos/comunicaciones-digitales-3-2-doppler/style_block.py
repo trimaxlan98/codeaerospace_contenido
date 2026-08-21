@@ -119,9 +119,46 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la curva dibujada y la cifra escrita no pueden
+# discrepar. Geometria REAL del pase (Tierra sin rotar, se declara en el
+# pie de cierre del clip 1).
+H_LEO_KM = 550.0             # altura del cubesat LEO
+ELEV_MAX_DEG = 60.0          # elevacion maxima del pase (cenit casi puro)
+F_UHF_MHZ = 437.0            # portadora del cubesat, banda UHF
+
+PASE = pase_leo(H_LEO_KM, ELEV_MAX_DEG)
+T_S = PASE["t_s"]                        # segundos, cenit en t=0
+T_MIN = T_S / 60.0                       # minutos: eje x de las curvas
+ELEV_DEG = PASE["elev_deg"]
+D_KM = PASE["d_km"]
+T_TOTAL_S = float(PASE["t_total_s"])
+T_TOTAL_MIN = T_TOTAL_S / 60.0           # ~12.1 min horizonte a horizonte
+D_MIN_KM = float(np.min(D_KM))           # ~627 km en el cenit
+D_MAX_KM = float(np.max(D_KM))           # ~2704 km en el horizonte
+N_PASE = len(T_S)
+DT_S = float(T_S[1] - T_S[0])            # paso uniforme del muestreo
+
+FD_KHZ = doppler_de(PASE, F_UHF_MHZ)     # la curva S, kHz
+FD_MAX_KHZ = float(np.max(FD_KHZ))       # ~+10.1 kHz al entrar
+FD_MIN_KHZ = float(np.min(FD_KHZ))       # ~-10.1 kHz al salir
+
+BANDA_FILTRO_KHZ = 3.0                   # ancho fijo del receptor (+-3 kHz)
+_DENTRO = np.abs(FD_KHZ) < BANDA_FILTRO_KHZ
+N_ENGANCHE = int(np.sum(_DENTRO))
+S_ENGANCHE = N_ENGANCHE * DT_S           # segundos CONTADOS dentro del filtro
+
+# Correccion: el receptor conoce el pase de antemano (efemerides) y usa la
+# MISMA curva medida como su prediccion -> el residual es 0 en todo punto.
+# (predicion perfecta; se declara "efemerides" en el pie del clip 4)
+FD_PREDICHA_KHZ = FD_KHZ
+FD_CORREGIDA_KHZ = FD_KHZ - FD_PREDICHA_KHZ
+
+
+def idx_de_frac(frac):
+    """Mismo indice que usa PaseCielo.sat_en(frac): la cifra rotulada y el
+    punto dibujado leen SIEMPRE el mismo indice del MISMO array."""
+    return int(np.clip(round(float(frac) * (N_PASE - 1)), 0, N_PASE - 1))
 
 
 # --- Rotulos ----------------------------------------------------------

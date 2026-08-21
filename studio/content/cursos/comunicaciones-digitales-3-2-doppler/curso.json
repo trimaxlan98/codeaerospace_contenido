@@ -8,25 +8,25 @@
       "file": "clips/01-el-pase.py",
       "title": "1 · El pase",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Titulo 'El pase'. Curva azul en U de la distancia al satelite (minimo en el centro), con un punto cian en el minimo rotulado 'minimo: 627 km'. Panel cian arriba a la derecha: 'pase: 12.1 min', 'elev max: 60 deg', 'd min: 627 km'. Pie: 'Tierra sin rotar y pase de maxima elevacion 60 grados: geometria simplificada.'"
     },
     {
       "file": "clips/02-la-curva-s.py",
       "title": "2 · La curva S",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Titulo 'La curva S'. Curva S azul del Doppler con extremos marcados '+10.1 kHz' (arriba-izq.) y '-10.1 kHz' (abajo-der.), cruce por cero en el cenit con lineas discontinuas y tramo cian grueso rotulado 'cenit: pendiente maxima'. Panel cian arriba a la derecha: 'portadora 437 MHz', 'maximo +10.1 kHz', 'minimo -10.1 kHz'. Pie: 'Diez kilohercios arriba, diez abajo: la frecuencia recibida nunca es la transmitida.'"
     },
     {
       "file": "clips/03-perder-al-satelite.py",
       "title": "3 · Perder al satélite",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Titulo 'Perder al satélite'. Curva S coloreada: rojo fuera de la franja naranja del filtro (+-3 kHz), verde dentro; dos lineas verdes discontinuas marcan la ventana de enganche alrededor del cenit. Panel cian arriba a la derecha: 'dentro: 51.5 s', 'pase total: 728 s', 'filtro +-3 kHz'. Pie: 'Contados del propio array: apenas unos segundos utiles de un pase de doce minutos.'"
     },
     {
       "file": "clips/04-perseguir-la-frecuencia.py",
       "title": "4 · Corregir: perseguir la frecuencia",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Cierre a pantalla limpia (HUD 'Modulo 04' en la esquina): dos lineas centradas, 'El cielo nunca da la frecuencia prometida.' en blanco y 'Da la que hay que saber perseguir.' en cian. Pie: 'Siguiente leccion: encontrar donde empieza la señal.'"
     }
   ]
 }

@@ -8,25 +8,25 @@
       "file": "clips/01-el-grafo.py",
       "title": "1 · El grafo",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "El grafo bipartito de H completo a la izquierda: 12 circulos de bits abajo, 9 cuadrados de comprobacion arriba y las 36 aristas grises; la comprobacion 0, sus 4 aristas y sus 4 bits (0, 3, 6, 9) quedan iluminados en verde, con las etiquetas '12 bits' y '9 comprobaciones'. A la derecha, el panel con la matriz H entera (9 filas de 12 digitos, verde), 'columnas de peso 3' y 'filas de peso 4' en cian. Pie: 'Ese vecindario se escribe como una matriz H: una fila por comprobacion, un uno por vecino.'"
     },
     {
       "file": "clips/02-el-sindrome-acusa.py",
       "title": "2 · El síndrome acusa",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "El mismo grafo con el mensaje recibido: los bits 0 y 2 rellenos de ambar y rodeados por un circulo rojo, seis comprobaciones encendidas en rojo y tres en verde. Bajo cada bit, su cuenta de acusaciones en cian (3 0 3 2 2 2 2 2 2 2 2 2) con la etiqueta 'acusaciones por bit'. Panel derecho: 'sindrome s = H x (mod 2)', la fila '1 0 1 1 0 1 1 0 1' y 'peso = 6 de 9' en rojo. Pie: 'Dos bits reciben las 3 acusaciones posibles. Ninguno mas pasa de 2.'"
     },
     {
       "file": "clips/03-el-murmullo.py",
       "title": "3 · El murmullo (bit-flipping)",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "El grafo ya corregido: los 12 bits vacios y las 9 comprobaciones en verde. A la derecha, el diario del bit-flipping con sus tres lineas: 'it 0  peso s = 6', 'it 1  peso s = 3  volteo b0' y 'it 2  peso s = 0  volteo b2' (la ultima en verde). Pie: 'Ninguna comprobacion conocia el mensaje: solo su vecindario. Entre todas, lo reconstruyeron.'"
     },
     {
       "file": "clips/04-a-un-paso-del-techo.py",
       "title": "4 · A un paso del techo",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia del cierre de leccion: 'Nadie corrige solo.' en blanco sobre 'El mensaje se corrige en comunidad.' en cian, y el pie 'Siguiente modulo: compartir el cielo entre mil terminales.'"
     }
   ]
 }

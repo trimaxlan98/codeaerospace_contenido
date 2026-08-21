@@ -119,9 +119,61 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo dibujado y la cifra rotulada salen del MISMO array.
+# Semillas fijas -> mismo script, mismo render.
+
+# 1. La rejilla tiempo-frecuencia: 3 usuarios, 3 bandas x 6 ranuras.
+NF_REJ, NT_REJ = 3, 6
+N_USUARIOS_REJ = NF_REJ
+# FDMA: cada usuario, una FILA (una banda fija, todo el tiempo).
+PLAN_FDMA = np.array([[f] * NT_REJ for f in range(NF_REJ)], dtype=int)
+# TDMA: cada usuario, una COLUMNA (todo el ancho, un tramo de tiempo).
+PLAN_TDMA = np.array([[t // 2 for t in range(NT_REJ)]] * NF_REJ, dtype=int)
+
+# 2. CDMA: dos usuarios con codigos de Walsh W[1] y W[2] (8 chips).
+W_WALSH = walsh(8)
+N_CHIPS_W = W_WALSH.shape[0]           # 8
+W1, W2, W3 = W_WALSH[1], W_WALSH[2], W_WALSH[3]
+DOT_W1_W2 = float(np.dot(W1, W2))      # 0.0: ortogonales, MEDIDO
+DOT_W1_W1 = float(np.dot(W1, W1))      # 8.0: energia del propio codigo
+
+SEMILLA_U1, SEMILLA_U2 = 11, 22
+BITS_U1 = np.random.default_rng(SEMILLA_U1).integers(0, 2, N_CHIPS_W) * 2 - 1
+BITS_U2 = np.random.default_rng(SEMILLA_U2).integers(0, 2, N_CHIPS_W) * 2 - 1
+BITS_U1_01 = ((BITS_U1 + 1) // 2).astype(int)  # los mismos bits, en 0/1
+BITS_U2_01 = ((BITS_U2 + 1) // 2).astype(int)
+
+CHIPS_MEZCLA = cdma_mezclar([BITS_U1, BITS_U2], [W1, W2])  # 64 chips
+
+# 3. El despreading: correlar con cada codigo.
+COR_U1, SGN_U1 = cdma_extraer(CHIPS_MEZCLA, W1)
+COR_U2, SGN_U2 = cdma_extraer(CHIPS_MEZCLA, W2)
+COR_U3, SGN_U3 = cdma_extraer(CHIPS_MEZCLA, W3)  # codigo NO usado
+SGN_U1_01 = ((SGN_U1 + 1) // 2).astype(int)      # bits recuperados, en 0/1
+ACIERTOS_U1 = int(np.sum(SGN_U1 == BITS_U1))     # 8 de 8, MEDIDO
+ACIERTOS_U2 = int(np.sum(SGN_U2 == BITS_U2))     # 8 de 8, MEDIDO
+COR_U3_PICO = float(np.max(np.abs(COR_U3)))      # 0.0: codigo ajeno
+
+# 4. Los haces de la constelacion LEO: 9 haces, 3 bandas reutilizadas.
+N_HACES = 9
+ASIGNACION_HACES = [0, 1, 2, 0, 1, 2, 0, 1, 2]
+N_BANDAS_HACES = len(set(ASIGNACION_HACES))      # 3
+
+
+def _escalera(v):
+    """Serie escalonada (un chip = un escalon) para dibujarla con `onda`:
+    devuelve (t, y) con dos puntos por chip. NO inventa valores: repite
+    los del array (misma trampa que en 3.3)."""
+    v = np.asarray(v, dtype=float)
+    k = np.arange(len(v), dtype=float)
+    t = np.repeat(k, 2) + np.tile(np.array([-0.5, 0.5]), len(v))
+    return t, np.repeat(v, 2)
+
+
+T_W1, Y_W1 = _escalera(W1)
+T_W2, Y_W2 = _escalera(W2)
+T_CHIPS, Y_CHIPS = _escalera(CHIPS_MEZCLA)
 
 
 # --- Rotulos ----------------------------------------------------------
