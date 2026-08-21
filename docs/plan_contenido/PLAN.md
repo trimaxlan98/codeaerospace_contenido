@@ -51,6 +51,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 21 | Teoria de la informacion: los bits de Shannon | original (divulgacion, telecom; puente con Criptografia y con Cerrar el enlace) | `informacion.py` | publicado (PR #20): qh en prod, narrado y muxeado con intro/cierre |
 | 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + #36): 18 lecciones, 72 qh en prod, narradas y muxeadas con intro/cierre (2026-08-19) |
 | 23 | Calculo vectorial (familia, 12 lecciones) | original (divulgacion, muy visual: el espacio que fluye; secuela de Algebra lineal, cierra en Maxwell) | `calculo_vectorial.py` (sobre `algebra_lineal.py`) | publicado (PR #43): 12 lecciones, 48 qh en prod, narradas y muxeadas — PRIMER curso con el intro/cierre SONOROS (2026-08-20) |
+| 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
@@ -154,6 +155,19 @@ modulo 3) y un style_block molde. Storyboard: `curso-18-metrologia-optica.md`.
 | 3.1 | El enlace optico entre satelites | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.2 | Apuntar, adquirir, seguir | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
 | 3.3 | Satelites que se miden entre si | 4 | publicado: qh en prod, narrado y muxeado (PR #21) |
+
+## Familia "Comunicaciones digitales" (2026-08-21, curso 24)
+
+18 proyectos `Comunicaciones digitales · N.M <titulo>` (6 modulos x 3
+lecciones, 72 clips): la capa de simbolos del enlace — muestreo,
+constelaciones, canal espacial, codigos con memoria, sistemas
+adaptativos y la IA en el enlace — con ejemplos de mayoria espacial
+(cubesats, DSN, Voyager, DVB-S2, LEO, Marte) y la fibra como excepcion
+terrestre declarada. Plan, storyboards, tablero e hitos:
+`curso-22-comunicaciones-digitales.md`. Libreria `comunicaciones.py`
+(validada 63/63 en contenedor; LDPC = Steiner S(2,3,9), IA en numpy puro
+con semillas). Produccion con 17 subagentes + molde propio; toda cifra en
+pantalla medida.
 
 ## Familia "Calculo vectorial" (2026-08-20, formato de lecciones)
 
