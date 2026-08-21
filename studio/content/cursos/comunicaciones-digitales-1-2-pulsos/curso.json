@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 1.2 El pulso y su eco: ISI y Nyquist",
+  "description": "Lección 1.2 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: el rectángulo imposible, el eco sobre el vecino (ISI medida), el coseno alzado de ceros exactos y el diagrama de ojo abriéndose. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-rectangulo-imposible.py",
+      "title": "1 · El rectángulo imposible",
+      "scene": "Clip1",
+      "final_state": "La onda azul del pulso lento en su caja de ejes (marcas t = -1, 0, 1, 2 bajo el eje), con las dos verticales punteadas cian en t = 0 y t = 1 y sus puntos medidos sobre la curva, la barra roja de la cola en t = 1 rotulada 'la cola', el bloque 'canal de banda limitada' arriba a la izquierda, el rótulo azul 'el simbolo, tal como llega' sobre la curva, el panel derecho con h(0) = 0.67 y h(1) = 0.57 en cian, y el pie 'Ese resto no desaparece: cae justo donde el vecino tiene que decidir.'"
+    },
+    {
+      "file": "clips/02-el-eco-sobre-el-vecino.py",
+      "title": "2 · El eco sobre el vecino",
+      "scene": "Clip2",
+      "final_state": "El tren de los tres símbolos con el pulso torpe: la suma en azul sobre los tres ecos ámbar tenues, la vertical punteada cian en t = 3, el punto ámbar en -0.67 y el punto rojo en +0.09 unidos por una flecha roja, la línea de umbral roja en cero, el rótulo rojo 'decide +1, era -1' en el hueco de arriba a la derecha, el panel derecho 'en t = 3' con suyo -0.67 / vecino +0.57 / lejano +0.19 / suma +0.09, y el pie 'Se envió un menos uno y llega un más nueve centésimas: el vecino ha mentido.'"
+    },
+    {
+      "file": "clips/03-el-pulso-de-nyquist.py",
+      "title": "3 · El pulso de Nyquist",
+      "scene": "Clip3",
+      "final_state": "El tren de los mismos tres símbolos conformado con el coseno alzado (curva azul), las tres verticales punteadas cian en t = 1, 2 y 3 con sus puntos medidos encima, el panel derecho 'el receptor lee' con t = 1 +1.00 / t = 2 +1.00 / t = 3 -1.00, el rótulo 'el pulso de DVB-S2' arriba a la izquierda y la fórmula cian beta = 0.35 en la zona del pie."
+    },
+    {
+      "file": "clips/04-el-diagrama-de-ojo.py",
+      "title": "4 · El diagrama de ojo",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia de cierre: 'El símbolo perfecto no es el más cuadrado.' en blanco sobre 'Es el que calla cuando hablan los demás.' en cian, con el pie 'Siguiente lección: el precio en hercios.' y el HUD 'Modulo 04' en la esquina superior izquierda."
+    }
+  ]
+}

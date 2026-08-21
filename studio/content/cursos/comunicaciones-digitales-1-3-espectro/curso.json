@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 1.3 El espectro: el precio en hercios",
+  "description": "Lección 1.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la señal vista en frecuencia, más símbolos = más ancho (medido), el conformado que ahorra espectro y las bandas S/X/Ka del espacio profundo. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-senal-en-frecuencia.py",
+      "title": "1 · La señal vista en frecuencia",
+      "scene": "Clip1",
+      "final_state": "HUD 'MODULO 01' y título arriba. Arriba, una onda NRZ azul (8 muestras/símbolo, 16 símbolos visibles). Abajo, su PSD de Welch en naranja (área rellena, lóbulo sinc²), con una marca cian vertical en BW(90%) = 0.75 Hz-eq y su cifra rotulada encima. Pie: 'Toda señal ocupa un trozo de espectro.'"
+    },
+    {
+      "file": "clips/02-mas-rapido-mas-ancho.py",
+      "title": "2 · Más rápido = más ancho",
+      "scene": "Clip2",
+      "final_state": "HUD y título arriba. Arriba, la onda NRZ azul rápida (Rs = 2.0 símb/s, rotulada). Abajo, su PSD naranja con marca cian en BW(90%) = 1.39, y a la derecha del panel la cifra 'BW(90%)=1.39 / BW(90%)=0.75 = x1.85' en cian. Pie: 'Casi el doble: el tiempo y la frecuencia se compran uno al otro.'"
+    },
+    {
+      "file": "clips/03-el-conformado-ahorra.py",
+      "title": "3 · El conformado ahorra espectro",
+      "scene": "Clip3",
+      "final_state": "HUD y título arriba. Arriba, la onda conformada con coseno alzado en verde (etiqueta 'coseno alzado'). Abajo, su PSD verde con caída abrupta y marca cian en BW(90%) = 0.40; a la derecha, cifra cian 'ahorro = 46%'. Pie: 'Por eso nadie transmite rectángulos.'"
+    },
+    {
+      "file": "clips/04-las-bandas-del-espacio.py",
+      "title": "4 · Las bandas del espacio",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia (solo HUD 'MODULO 01' visible arriba): dos líneas centradas, blanca 'El espectro es la tierra firme de las comunicaciones.' y cian 'Y está toda repartida.', con el pie pequeño 'Siguiente leccion: la fase que habla.' debajo."
+    }
+  ]
+}

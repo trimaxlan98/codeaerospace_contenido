@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 3.3 Sincronía: encontrar la señal",
+  "description": "Lección 3.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: el mar de ruido, la secuencia PN que solo se parece a sí misma (31/−1), la correlación que explota en el offset justo y la adquisición. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-mar-de-ruido.py",
+      "title": "1 · El mar de ruido",
+      "scene": "Clip1",
+      "final_state": "Onda azul de las 140 muestras recibidas, sin ventanas ni cifras encima; pie: «A simple vista no hay nada. Y aun así, el mensaje está ahí.»; HUD «MODULO 01»."
+    },
+    {
+      "file": "clips/02-la-llave-pn.py",
+      "title": "2 · La llave: una secuencia PN",
+      "scene": "Clip2",
+      "final_state": "Barras cian de la autocorrelación de la PN: un pico solitario de 31 en k = 0 y las otras 30 clavadas en el piso; línea punteada del piso, eje rotulado «desplazamiento k» y las cifras «R[0] = 31» y «R[k != 0] = -1»."
+    },
+    {
+      "file": "clips/03-deslizar-y-correlar.py",
+      "title": "3 · Deslizar y correlar",
+      "scene": "Clip3",
+      "final_state": "Arriba, lo recibido en azul con la plantilla PN ámbar encajada en la muestra 40 (ventana ámbar y vertical cian); abajo, la curva de correlación cian completa con su pico marcado en 40; panel de cifras «offset = 40», «pico = 33.4», «2do mayor = 14.2», «en k = 23», «razon = 2.4x»."
+    },
+    {
+      "file": "clips/04-adquisicion.py",
+      "title": "4 · Adquisición",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: «Oír no es lo difícil.» (blanca) y «Lo difícil es saber cuándo empezó la frase.» (cian); el pie anuncia el módulo de los códigos con memoria."
+    }
+  ]
+}

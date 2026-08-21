@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 2.3 El ruido decide: la curva BER",
+  "description": "Lección 2.3 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la nube AWGN sobre la constelación, los símbolos que cruzan la frontera contados, la curva BER Monte Carlo sobre la teórica y la cascada QPSK vs 16-QAM. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-nube-awgn.py",
+      "title": "1 · La nube AWGN",
+      "scene": "Clip1",
+      "final_state": "Plano I/Q con las cuatro nubes azules de 500 símbolos QPSK a 12 dB, los cuatro símbolos ámbar encima y sus etiquetas Gray 00/01/11/10; las fronteras de decisión en naranja con los cuatro cuadrantes teñidos; columna derecha 'Eb/N0 = 12 dB', 'simbolos = 500', 'fuera de region = 0'; pie sobre decidir por cercanía; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-cruzar-la-frontera.py",
+      "title": "2 · Cuando la nube cruza la frontera",
+      "scene": "Clip2",
+      "final_state": "Plano I/Q a 4 dB con las nubes ensanchadas tocándose en las fronteras naranjas; los 14 símbolos caídos en región ajena en rojo, cada uno con su anillo; tag 'Eb/N0 = 4 dB' sobre el plano; columna derecha 'simbolos = 500', 'en region ajena = 14', 'bits errados = 14 de 1000' y debajo la MathTex 'BER = 14/1000 = 1.4·10^-2'; pie sobre Gray y el conteo que sale de los puntos en pantalla."
+    },
+    {
+      "file": "clips/03-la-curva-ber-medida.py",
+      "title": "3 · La curva BER medida",
+      "scene": "Clip3",
+      "final_state": "Eje semilog de BER con la curva teórica cian de QPSK y los cuatro puntos verdes medidos (2, 4, 6 y 8 dB) cayendo sobre ella; verticales punteadas en 4 y 8 dB con las cifras MathTex '1.2·10^-2' y '1.9·10^-4'; leyenda 'teoria: funcion Q' / 'medido: Monte Carlo'; columna derecha con 'P_b = Q(raíz(2 Eb/N0))', la fracción '1.2·10^-2 / 1.9·10^-4 ≈ 64' y 'veces menos errores'; pie sobre la cascada."
+    },
+    {
+      "file": "clips/04-la-cascada-compara.py",
+      "title": "4 · La cascada compara familias",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El ruido no se negocia.' (blanca) y 'Se mide, y se le hace sitio.' (cian); pie anuncia la siguiente lección, el precio de la distancia."
+    }
+  ]
+}

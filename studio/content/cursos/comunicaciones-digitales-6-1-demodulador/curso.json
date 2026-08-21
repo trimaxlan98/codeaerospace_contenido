@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 6.1 El demodulador que aprende",
+  "description": "Lección 6.1 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: la constelación deformada por el amplificador, la frontera de libro que falla (errores contados), entrenar la red en pantalla y el veredicto medido. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-constelacion-deformada.py",
+      "title": "1 · La constelación deformada",
+      "scene": "Clip1",
+      "final_state": "Plano I/Q a la izquierda con la nube azul de 400 símbolos recibidos sobre los 16 puntos deformados en rojo y la retícula ideal en ámbar apagado; etiqueta '400 de 2400 simbolos dibujados'; panel derecho 'lo que llega / Eb/N0 = 13.0 dB / 2400 simbolos medidos'; pie: la cuadrícula del libro ya no está donde la espera."
+    },
+    {
+      "file": "clips/02-la-frontera-de-libro-falla.py",
+      "title": "2 · La frontera de libro falla",
+      "scene": "Clip2",
+      "final_state": "La nube con las regiones Voronoi grises de la retícula ideal encima: casi todos los símbolos en rojo y unos pocos azules; panel derecho 'demodulador de libro / errores = 1952 de 2400 / tasa = 81.3 %'; pie: falla porque presume una retícula que el canal ya movió."
+    },
+    {
+      "file": "clips/03-entrenar.py",
+      "title": "3 · Entrenar",
+      "scene": "Clip3",
+      "final_state": "La frontera aprendida en fucsia, de celdas curvas que abrazan la nube azul sobre el plano I/Q; etiqueta '400 de 2400 simbolos dibujados'; panel derecho 'frontera aprendida / 500 pasos de ajuste / acierto = 98.3 %'; pie: no son rectas, se doblan para abrazar la espiral."
+    },
+    {
+      "file": "clips/04-el-veredicto.py",
+      "title": "4 · El veredicto",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'La frontera de libro presume el canal.' (blanca) y 'La aprendida lo escucha.' (cian); pie anuncia la siguiente lección."
+    }
+  ]
+}

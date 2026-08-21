@@ -1,0 +1,32 @@
+{
+  "name": "Comunicaciones digitales · 4.1 El código con memoria",
+  "description": "Lección 4.1 del curso Comunicaciones digitales, en 4 clips animados —una idea por clip—: repetir no basta, el registro que recuerda (K=3), la máquina de estados con salida real y la memoria que vuelve detectable el error. La voz que cruza el vacío, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-repetir-no-basta.py",
+      "title": "1 · Repetir no basta",
+      "scene": "Clip1",
+      "final_state": "Tren 'el mensaje' [1,0,1] arriba; tren 'cada bit, x3' [1,1,1,0,0,0,1,1,1] ámbar; tren 'lo que llega' con las celdas 1 y 2 marcadas en rojo; panel arriba a la derecha 'bit real = 1' / 'voto = 0' en rojo; pie: 'Repetir gasta bits y aun asi puede fallar. Hace falta gastar mejor.'"
+    },
+    {
+      "file": "clips/02-el-registro-que-recuerda.py",
+      "title": "2 · El registro que recuerda",
+      "scene": "Clip2",
+      "final_state": "registro_conv con b=0, m1=1, m0=0 y sus dos XOR; cifras 'o1 = 1' / 'o2 = 0' bajo las salidas; panel arriba a la derecha 'K = 3' / 'G = (7,5)' / 'tasa = 1/2'; tren 'la salida, en verde' [1,1,1,0]; pie: 'Dos bits salen por cada bit que entra: el costo que compra la memoria.'"
+    },
+    {
+      "file": "clips/03-la-maquina-de-estados.py",
+      "title": "3 · La máquina de estados",
+      "scene": "Clip3",
+      "final_state": "Tren 'la entrada' [1,0,1,1,0] arriba; trellis de 4 estados (00,01,10,11) x 6 pasos con la rejilla completa tenue y el camino real 00-10-01-10-11-01 iluminado en ámbar; tren 'la salida' [1,1,1,0,0,0,0,1,0,1] verde; panel 'bit=1 en 00 -> 11' / 'bit=1 en 01 -> 00'; pie: 'La salida depende del camino, no solo del bit.'"
+    },
+    {
+      "file": "clips/04-la-memoria-protege.py",
+      "title": "4 · La memoria protege",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Un código sin memoria olvida.' (blanca) y 'Este recuerda por ti.' (cian); pie anuncia la siguiente lección (Viterbi)."
+    }
+  ]
+}
