@@ -141,7 +141,7 @@ mismo script → mismo render.
     conv_codificar(bits)        K=3, G=(7,5) octal, tasa 1/2
     trellis_caminos(recibido)   métricas de rama y acumuladas
     viterbi(recibido)           bits decodificados + camino ganador
-    ldpc_pequeno()              H (6×12 regular), grafo bipartito
+    ldpc_pequeno()              H (9×12, Steiner S(2,3,9)), grafo bipartito
     ldpc_decodificar(rx, H)     bit-flipping; síndromes por iteración
     walsh(n=8)                  matriz de Hadamard, filas ortogonales
     cdma_mezclar / cdma_extraer superposición y despreading exactos
@@ -199,24 +199,24 @@ agente; los agentes NO tocan librería ni git; informe final con
 
 | Lección | plan | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | — | — | — | — | — | — | — |
-| 1.2 | ✔ | — | — | — | — | — | — | — |
-| 1.3 | ✔ | — | — | — | — | — | — | — |
-| 2.1 | ✔ | — | — | — | — | — | — | — |
-| 2.2 | ✔ | — | — | — | — | — | — | — |
-| 2.3 | ✔ | — | — | — | — | — | — | — |
-| 3.1 | ✔ | — | — | — | — | — | — | — |
-| 3.2 | ✔ | — | — | — | — | — | — | — |
-| 3.3 | ✔ | — | — | — | — | — | — | — |
-| 4.1 | ✔ | — | — | — | — | — | — | — |
-| 4.2 | ✔ | — | — | — | — | — | — | — |
-| 4.3 | ✔ | — | — | — | — | — | — | — |
-| 5.1 | ✔ | — | — | — | — | — | — | — |
-| 5.2 | ✔ | — | — | — | — | — | — | — |
-| 5.3 | ✔ | — | — | — | — | — | — | — |
-| 6.1 | ✔ | — | — | — | — | — | — | — |
-| 6.2 | ✔ | — | — | — | — | — | — | — |
-| 6.3 | ✔ | — | — | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ 29/28/29/28 s | — | — | — | — | — |
+| 1.2 | ✔ | ✔ | ✔ 31/37/40/34 s | — | — | — | — | — |
+| 1.3 | ✔ | ✔ | ✔ 31/33/31/32 s | — | — | — | — | — |
+| 2.1 | ✔ | ✔ | ✔ 30/31/30/30 s | — | — | — | — | — |
+| 2.2 | ✔ | ✔ | ✔ 32/29/31/34 s | — | — | — | — | — |
+| 2.3 | ✔ | ✔ | ✔ 31/31/31/33 s | — | — | — | — | — |
+| 3.1 | ✔ | ✔ | ✔ 29/30/29/32 s | — | — | — | — | — |
+| 3.2 | ✔ | ✔ | ✔ 30/29/30/30 s | — | — | — | — | — |
+| 3.3 | ✔ | ✔ | ✔ 33/30/33/39 s | — | — | — | — | — |
+| 4.1 | ✔ | ✔ | ✔ 31/32/32/34 s | — | — | — | — | — |
+| 4.2 | ✔ | ✔ | ✔ 32/38/39/34 s | — | — | — | — | — |
+| 4.3 | ✔ | ✔ | ✔ 34/34/34/42 s | — | — | — | — | — |
+| 5.1 | ✔ | ✔ | ✔ 29/29/28/31 s | — | — | — | — | — |
+| 5.2 | ✔ | ✔ | ✔ 34/30/30/35 s | — | — | — | — | — |
+| 5.3 | ✔ | ✔ | ✔ 33/33/31/34 s | — | — | — | — | — |
+| 6.1 | ✔ | ✔ | ✔ 31/33/30/36 s | — | — | — | — | — |
+| 6.2 | ✔ | ✔ | ✔ 34/31/33/40 s | — | — | — | — | — |
+| 6.3 | ✔ | ✔ | ✔ 34/31/39/37 s | — | — | — | — | — |
 
 ## Módulo 1 — Del dato al símbolo
 
@@ -416,15 +416,18 @@ Decodificar es encontrar el camino barato en el trellis.
 ### 4.3 LDPC: el murmullo que corrige  (slug `comunicaciones-digitales-4-3-ldpc`)
 Miles de comprobaciones simples hablando entre sí rozan el techo de
 Shannon.
-1. **El grafo** — `grafo_ldpc` (12 bits, 6 comprobaciones): cada check
+1. **El grafo** — `grafo_ldpc` (12 bits, 9 comprobaciones — el sistema
+   triple de Steiner S(2,3,9), plano afín de orden 3): cada check
    exige paridad par a sus vecinos; H en el panel. Un código es un
    sistema de vecindarios.
-2. **El síndrome acusa** — llegan 2 bits volteados: los checks
-   insatisfechos se encienden en rojo (`sindrome` medido); los bits
-   señalados por más checks encendidos son los sospechosos.
+2. **El síndrome acusa** — llegan 2 bits volteados (un par de líneas
+   paralelas: checks disjuntos): los 6 checks insatisfechos se encienden
+   en rojo (`sindrome` medido); las cuentas H^T·s señalan a los dos.
 3. **El murmullo (bit-flipping)** — `ldpc_decodificar` itera EN
-   PANTALLA: voltea el más acusado, el síndrome baja (peso 4→2→0,
-   medido por iteración); el grafo queda verde.
+   PANTALLA: voltea el más acusado, el síndrome baja (peso 6→3→0,
+   medido por iteración); el grafo queda verde. El código chico es de
+   tasa 1/4 (k=3): se declara, y el techo del clip 4 se rotula para la
+   tasa 1/2 de DVB-S2.
 4. **A un paso del techo** — `curva_ber`: sin código vs con LDPC
    (medida con el código pequeño) y la pared de Shannon (violeta,
    curso 21 citado): DVB-S2 opera a ~1 dB del techo con esta idea a
@@ -553,3 +556,58 @@ griegas — 10^-3 y ∈/Σ van en MathTex; `tag_hud` solo ASCII;
 contenido; `render_local` muestrea 8 frames y puede caer en relevos de
 pie; pies ≥ 5 s y ANTES de la animación; un cierre por lección).
 Propias de esta familia se cosecharán al final.
+
+## Cosecha de trampas de la familia (medida durante la produccion)
+
+- pulso_lento: pico en t=+0.5 (canal causal); TAU=0.9 para el error literal.
+- pulso_rect: borde |t|<=0.5 inclusivo -> picos 2.0 al conformar; NRZ con
+  np.repeat (patron de valida_vis_com).
+- ancho_banda con frac=0.9 (el 99% del sinc^2 satura cerca de Nyquist).
+- DiagramaOjo sin localizador publico (usar ._en; candidato .en publico);
+  con_apertura NO existe (la gemela es con_trazas); SNR medida entre series
+  dibujadas en vez de Eb/N0.
+- regiones de QPSK caen sobre los ejes I/Q (pintarlas C_BANDA + cuadrantes
+  tenues); nube filtra por alcance ADEMAS de maximo (pre-filtrar y contar
+  sobre lo visible); Transform de nubes: partir AMBAS con la misma mascara.
+- awgn a 12 dB: empujon ~0.13 u (elegir la muestra de ruido maximo para la
+  flecha).
+- curva_ber: leyendas fuera de la caja (la zona interior derecha la ocupan
+  las curvas); la llave de brecha cabe ARRIBA del recuadro.
+- hud_modulo: K = numero de CLIP (el molde 1.1 nacio mal y se corrigio).
+- RegistroConv: el cableado (taps 0,2) era el correcto; el bug era el
+  encoder (arreglado). viterbi: np.bool_ + np.bool_ no suma (arreglado).
+- El storyboard prometia trellis_caminos y .podar que no existen (la poda
+  se reconstruye con RAMAS_CONV en el style_block de 4.2; docstrings ya
+  corregidos).
+- PaseCielo sin .horizonte/.cupula publicos (VGroup(*submobjects[1:4])).
+- tag_hud: ~0.0094*font_size unidades por caracter (medir antes de anclar
+  paneles); fmt no hace notacion cientifica (helpers fmt_exp/fmt_ber/sci
+  locales en 3.1/4.3/2.3; candidato a libreria).
+- Onda.muestras sirve de stem plot; _escalera(v) para chips cuadrados
+  (style_block de 3.3; candidata a libreria).
+- ldpc: H 9x12 Steiner, sindrome 6-3-0 con par (0,2); el codigo chico es
+  tasa 1/4 (declararlo; el techo violeta se rotula para tasa 1/2 DVB-S2).
+- grafo_ldpc con sindrome=None = "sin comprobar" (gris) para no mentir
+  entre beats.
+- Grafica(etiqueta_x/y) son hijos internos: no aparecen si animas
+  .ejes/.curva por separado (rotulos propios).
+- banda_espacio(0,6) para llegar al laser (193000 GHz); ticks >=1e3 en THz.
+- interpolate_color exige ManimColor (las C_* de la familia son str).
+- bandido_acm no exporta su entorno (ATT/snr_claro/epsilon): replicar en
+  la tabla para explicar la politica; candidato a devolverlos en el dict.
+- formula_pie con \sum o fracciones + llave hacia abajo = choque seguro
+  (la formula sube a la franja libre bajo el titulo).
+- Transform de cifras durante animaciones largas deja digitos a medio
+  morfar en los frames: Succession(Transform corto, Wait) — la cifra
+  salta y descansa; y ancho fijo (03d) para pasos.
+- Onda siempre construye su curva: para dibujarla por tramos, remove(
+  on.curva) y curva_de por segmentos.
+- frontera_de/campo_vecino con el alcance COMPLETO del plano roza los
+  rotulos I/Q: calcular el campo a ~0.9x el alcance (6.1 uso 1.58).
+- perceptron_mini dibuja max 8 nodos por capa: rotular la arquitectura
+  real + "(se dibujan N por capa)" con N leido de la pieza.
+- Rotulos.mostrar de la familia cobra salida=0.25 extra en cada relevo:
+  contarlo al estimar duraciones.
+- Sector() de manim 0.20.1 no acepta outer_radius (solo radius).
+- Los agentes de renderizado: extraer el ultimo frame real con ffmpeg
+  para final_state (el frame 8 muestreado puede caer antes del cierre).
