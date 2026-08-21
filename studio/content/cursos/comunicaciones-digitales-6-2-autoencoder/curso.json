@@ -8,25 +8,25 @@
       "file": "clips/01-el-enlace-como-red.py",
       "title": "1 · El enlace como red",
       "scene": "Clip1",
-      "final_state": "RELLENAR"
+      "final_state": "Esquema del enlace: 3 bits ámbar, codificador (2-6-2, oculta fucsia), bloque azul 'canal' con motas rojas y '+ ruido', decodificador (2-6-8) y 3 bits ámbar de salida; llave fucsia 'una sola red' bajo los tres bloques y la pérdida en cian arriba, L = suma de exp(-d_ij^2/8 sigma^2); pie: bajar esa cota es separar los puntos; HUD 'MODULO 01'."
     },
     {
       "file": "clips/02-el-gradiente-mueve-los-puntos.py",
       "title": "2 · El gradiente mueve los puntos",
       "scene": "Clip2",
-      "final_state": "RELLENAR"
+      "final_state": "Plano I/Q a la izquierda con la constelación aprendida en fucsia (siete puntos en el anillo y uno en el centro) y las cifras 'paso 250', 'd_min = 0.926', 'E media = 1.000'; a la derecha la curva cian de la distancia mínima por paso, completa hasta su punto final, con el rótulo 'd_min: 0.151 -> 0.926'; pie sobre el amasijo vuelto constelación."
     },
     {
       "file": "clips/03-la-constelacion-que-nadie-dibujo.py",
       "title": "3 · La constelación que nadie dibujó",
       "scene": "Clip3",
-      "final_state": "RELLENAR"
+      "final_state": "Los dos planos I/Q lado a lado: 8-PSK del manual en ámbar con su segmento de distancia mínima en cian y las cifras 'E media = 1.000' y 'd_min = 0.765'; la aprendida en 250 pasos, en fucsia, con su segmento y 'E media = 1.000', 'd_min = 0.926'; pie: nadie la dibujó en una pizarra, la eligió este canal."
     },
     {
       "file": "clips/04-mejor-medido.py",
       "title": "4 · ¿Mejor? Medido",
       "scene": "Clip4",
-      "final_state": "RELLENAR"
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Cien años dibujando constelaciones.' (blanca) y 'La red dibujó la suya en mil pasos.' (cian); el pie recuerda que el 6G y el espacio profundo lo investigan hoy."
     }
   ]
 }
