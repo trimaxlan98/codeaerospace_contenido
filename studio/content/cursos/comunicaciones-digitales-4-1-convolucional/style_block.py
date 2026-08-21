@@ -143,7 +143,7 @@ K_CONV, G_CONV, TASA_CONV = 3, "(7,5)", "1/2"
 BITS_MENSAJE = [1, 0, 1, 1, 0]                        # la ristra real
 SALIDA_CONV, ESTADOS_CONV = conv_codificar(BITS_MENSAJE)
 SALIDA_CONV = [int(x) for x in SALIDA_CONV]
-# SALIDA_CONV = [1,1, 1,1, 0,1, 0,0, 0,1]  ESTADOS_CONV = [0,2,1,2,3,1]
+# SALIDA_CONV = [1,1, 1,0, 0,0, 0,1, 0,1]  ESTADOS_CONV = [0,2,1,2,3,1]
 
 # Clip 4: la memoria protege --------------------------------------------
 T_ERROR = 2                                # el 3er par de salida (indices 4,5)
@@ -154,7 +154,7 @@ ESTADO_ERROR = ESTADOS_CONV[T_ERROR]                  # 1
 ESTADO_ERROR_BIN = format(ESTADO_ERROR, "02b")        # "01"
 OPCIONES_ERROR = [(b, sal) for (s, b, s2, sal) in RAMAS_CONV
                   if s == ESTADO_ERROR]               # las DOS salidas validas
-RECIBIDO_PAR = (RX_CONV[IDX_ERROR], RX_CONV[IDX_ERROR + 1])   # (1, 1)
+RECIBIDO_PAR = (RX_CONV[IDX_ERROR], RX_CONV[IDX_ERROR + 1])   # medido
 
 
 # --- Rotulos ----------------------------------------------------------
