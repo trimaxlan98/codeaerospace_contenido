@@ -119,9 +119,63 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# RELLENAR: todo valor que se rotule sale de aqui o de la libreria,
-# nunca escrito a mano en el clip. Fijar aqui semillas, constantes y
-# valores MEDIDOS de la leccion (ver su seccion del storyboard).
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: la nube dibujada y los errores contados salen del MISMO
+# array de simbolos. El entrenamiento (~1 s) vive AQUI, a nivel de modulo:
+# se hace UNA vez por render y jamas dentro de un updater.
+EBN0_DB = 13.0                   # Eb/N0 del enlace de la leccion
+K_BITS = 4                       # bits por simbolo (16-QAM)
+M_CLASES = 16                    # simbolos de la constelacion
+N_SIM = 2400                     # simbolos medidos
+N_VISIBLES = 400                 # simbolos DIBUJADOS (se declara en pantalla)
+RETROCESO = 0.9                  # drive del amplificador (leccion 2.2)
+ALCANCE = 1.75                   # medio lado del plano IQ
+ALCANCE_CAMPO = 1.58             # las fronteras se quedan DENTRO de los
+                                 # ejes: si llegan a la punta, rozan los
+                                 # rotulos I y Q del plano
+N_MALLA = 70                     # resolucion de las fronteras (tope 90)
+
+P16, B16 = constelacion_qam16()              # la reticula IDEAL
+PD = amplificar(P16, RETROCESO, con_fase=True)   # Saleh AM/AM + AM/PM
+D_MIN_IDEAL = d_min(P16)                     # 0.63
+D_MIN_DEFORM = d_min(PD)                     # 0.33
+
+IDX = np.random.default_rng(2).integers(0, M_CLASES, N_SIM)   # que se envio
+RX = awgn(PD[IDX], EBN0_DB, K_BITS, semilla=11)               # lo que llega
+
+# El demodulador DE LIBRO: vecino mas cercano sobre la reticula ideal.
+DEC_LIBRO = demodular(RX, P16)
+MASCARA_LIBRO = DEC_LIBRO != IDX
+ERR_LIBRO = int(np.sum(MASCARA_LIBRO))       # 1952 de 2400 (medido)
+TASA_LIBRO = 100.0 * ERR_LIBRO / N_SIM       # %
+
+# El demodulador que APRENDE: MLP 2-16-16 entrenado en numpy con semilla.
+N_OCULTAS = 16                   # neuronas de la capa oculta
+PASOS = 500
+RED = entrenar_frontera(RX, IDX, M_CLASES, ocultas=N_OCULTAS, pasos=PASOS,
+                        lr=0.6, semilla=2)
+DEC_RED = predecir_red(RED, RX)
+MASCARA_RED = DEC_RED != IDX
+ERR_RED = int(np.sum(MASCARA_RED))           # 41 de 2400 (medido)
+TASA_RED = 100.0 * ERR_RED / N_SIM           # %
+MEJORA = ERR_LIBRO / max(ERR_RED, 1)         # veces menos errores
+PERDIDAS = np.array(RED["perdidas"], dtype=float)     # 51 muestras, cada 10
+T_PERDIDAS = np.arange(len(PERDIDAS), dtype=float) * 10.0
+PERDIDA_INI, PERDIDA_FIN = float(PERDIDAS[0]), float(PERDIDAS[-1])
+ACIERTO_FIN = 100.0 * float(RED["aciertos"][-1])      # % de acierto medido
+
+# Campos de decision, algo mas estrechos que el plano (ver ALCANCE_CAMPO).
+# Cubren de sobra la nube: el simbolo mas alejado cae en |I|, |Q| < 1.4.
+CAMPO_LIBRO, XS_LIBRO = campo_vecino(P16, -ALCANCE_CAMPO, ALCANCE_CAMPO,
+                                     N_MALLA)
+CAMPO_RED, XS_RED = frontera_de(RED, -ALCANCE_CAMPO, ALCANCE_CAMPO, N_MALLA)
+
+# Los subconjuntos que se DIBUJAN (los mismos arrays que se cuentan).
+RX_VIS = RX[:N_VISIBLES]
+RX_VIS_OK_LIBRO = RX_VIS[~MASCARA_LIBRO[:N_VISIBLES]]
+RX_VIS_ERR_LIBRO = RX_VIS[MASCARA_LIBRO[:N_VISIBLES]]
+RX_VIS_OK_RED = RX_VIS[~MASCARA_RED[:N_VISIBLES]]
+RX_VIS_ERR_RED = RX_VIS[MASCARA_RED[:N_VISIBLES]]
 
 
 # --- Rotulos ----------------------------------------------------------
