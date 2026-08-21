@@ -1,0 +1,32 @@
+{
+  "name": "Cálculo vectorial · 4.1 El teorema de Green: el borde cuenta lo de dentro",
+  "description": "Lección 4.1 del curso Cálculo vectorial (módulo 4: los grandes teoremas), en 4 clips: las circulaciones interiores se cancelan por pares, solo sobrevive el borde, la comprobación numérica (8.0 = 8.0) y el planímetro que mide áreas caminando.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-ruedecitas-que-se-cancelan.py",
+      "title": "1 · Ruedecitas que se cancelan",
+      "scene": "Clip1",
+      "final_state": "El mosaico de 3x3 baldosas naranjas sobre el campo azul; las dos vecinas de la fila central, ya separadas y con su ruedecita cian, sin el par de flechas del lado compartido (se acaba de borrar); en el panel derecho sube -0.20, baja 0.20 y suma 0.00 en verde; pie: «Suman cero: se borran. Y eso le pasa a TODO tramo interior.»"
+    },
+    {
+      "file": "clips/02-solo-queda-el-borde.py",
+      "title": "2 · Solo queda el borde",
+      "scene": "Clip2",
+      "final_state": "La region [-1,1]^2 naranja sobre el plano, ya sin campo, con el circuito del borde recorrido en rojo y las flechitas naranjas de direccion antihoraria; en la banda del pie, en cian, la formula de Green: ∮∂R F·dr = ∬R (∇×F) dA."
+    },
+    {
+      "file": "clips/03-la-comprobacion.py",
+      "title": "3 · La comprobación",
+      "scene": "Clip3",
+      "final_state": "El plano corrido a la izquierda con la region cubierta entera por la cortina cian del barrido y su borde naranja; en el panel derecho ∮∂R F·dr = 8.00, ∬R (∇×F) dA = 8.00 y debajo la igualdad 8.00 = 8.00 en verde; pie: «El mismo numero por los dos caminos: el teorema, comprobado.»"
+    },
+    {
+      "file": "clips/04-medir-areas-caminando.py",
+      "title": "4 · Medir áreas caminando",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: «Lo de dentro se cancela.» en blanco sobre «El borde lo cuenta todo.» en cian, con el pie «Siguiente leccion: el flujo y el teorema de la divergencia.»"
+    }
+  ]
+}
