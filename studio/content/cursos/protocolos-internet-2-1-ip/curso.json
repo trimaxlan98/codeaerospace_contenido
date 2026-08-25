@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 2.1 IP: la dirección y el datagrama",
+  "description": "Lección 2.1 del curso Protocolos de Internet (módulo 2: direcciones y caminos), en 4 clips animados —una idea por clip—: la cabecera IPv4 real con su checksum calculado, el mejor esfuerzo y sus tres fracasos legales, el TTL como seguro contra los bucles, y la fragmentación con offsets reales. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-cabecera-ipv4.py",
+      "title": "1 · La cabecera IPv4",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/02-el-mejor-esfuerzo.py",
+      "title": "2 · El mejor esfuerzo",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/03-ttl.py",
+      "title": "3 · TTL: el seguro contra los bucles",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/04-fragmentar.py",
+      "title": "4 · Fragmentar",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    }
+  ]
+}

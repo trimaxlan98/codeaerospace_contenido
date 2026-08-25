@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 1.2 El sobre dentro del sobre: capas y encapsulación",
+  "description": "Lección 1.2 del curso Protocolos de Internet (módulo 1: la red de redes), en 4 clips animados —una idea por clip—: las cuatro capas y qué hace cada una, encapsular con los bytes reales sumándose, por qué en el camino nadie abre de más, y desencapsular hasta el dato original. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-cuatro-capas.py",
+      "title": "1 · Cuatro capas, cuatro trabajos",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/02-encapsular.py",
+      "title": "2 · Encapsular: el sobre dentro del sobre",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/03-nadie-abre-de-mas.py",
+      "title": "3 · En el camino nadie abre de más",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    },
+    {
+      "file": "clips/04-desencapsular.py",
+      "title": "4 · Desencapsular",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+    }
+  ]
+}
