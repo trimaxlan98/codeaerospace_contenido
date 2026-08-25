@@ -44,7 +44,7 @@ class Clip4(Scene):
         # fragmentos (1480 B mas larga que 1040 B) y la cabecera mide lo
         # mismo en los tres, como en la realidad.
         caps = VGroup(*[
-            paquete([("Cabecera IP", 0.95, "20 B"),
+            paquete([("Cabecera IP", 0.95, "%d B" % FRAG_CAB),
                      ("Carga", 4.6 * f["datos"] / FRAG_UTIL,
                       "%d B" % f["datos"])],
                     ancho=0.95 + 4.6 * f["datos"] / FRAG_UTIL, alto=0.58,
@@ -52,8 +52,9 @@ class Clip4(Scene):
             for f in FRAGS])
         caps.arrange(DOWN, buff=0.58, aligned_edge=LEFT)
         caps.move_to(np.array([-3.35, 0.45, 0.0]))
-        et_escala = tag_hud("esquema: la carga va a escala; los 20 B de "
-                            "cabecera, no", font_size=15, color=C_EJE)
+        et_escala = tag_hud("esquema: la carga va a escala; los %d B de "
+                            "cabecera, no" % FRAG_CAB,
+                            font_size=15, color=C_EJE)
         et_escala.move_to(np.array([-1.55, 2.62, 0.0]))
         self.play(LaggedStart(*[FadeIn(c, shift=0.18 * RIGHT) for c in caps],
                               lag_ratio=0.35), run_time=1.6)
@@ -69,7 +70,9 @@ class Clip4(Scene):
         tab.move_to(np.array([3.85, caps[1].get_center()[1], 0.0]))
         self.play(FadeIn(tab), run_time=1.0)
         et_extra = tag_hud("el desplazamiento va en unidades de 8 B:  "
-                           "1480 / 8 = 185", font_size=19, color=C_EJE)
+                           "%d / 8 = %d" % (FRAGS[1]["offset_bytes"],
+                                            FRAGS[1]["offset_campo"]),
+                           font_size=19, color=C_EJE)
         et_extra.move_to(DOWN * 1.80)
         et_coste = tag_hud("y ahora viajan %d B de cabecera de mas"
                            % FRAG_EXTRA, font_size=21, color=C_COLA)

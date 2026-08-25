@@ -191,6 +191,7 @@ FRAG_UTIL = FRAG["util"]                         # 1480
 FRAG_EXTRA = FRAG["bytes_extra"]                 # 40 B de cabeceras de mas
 FRAG_PERDIDO = 2                                 # el que se cae (1-based)
 FRAG_ESCALA = 8.0 / CARGA_BYTES                  # unidades por byte
+FRAG_CAB = FRAG_EXTRA // (FRAG_N - 1)            # 20 B de cabecera IP
 FILAS_FRAG = [["%d" % (i + 1), "%d" % f["offset_campo"],
                "%d B" % f["datos"], "%d" % f["mf"]] for i, f in
               enumerate(FRAGS)]
