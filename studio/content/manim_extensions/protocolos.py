@@ -611,8 +611,8 @@ class Paquete(_Anclada):
             caja.move_to(self._origen() + np.array(
                 [x + ancho_k / 2.0, 0.0, 0.0]))
             nt = _hud(nom, self.fs - 3, C_EJE)
-            if nt.width > ancho_k * 0.96:
-                nt.scale(ancho_k * 0.96 / nt.width)
+            if nt.width > ancho_k * 0.86:   # aire entre campos
+                nt.scale(ancho_k * 0.86 / nt.width)
             nt.next_to(caja, UP, buff=0.10)
             vt = _hud(val, self.fs, col)
             if vt.width > ancho_k * 0.92:

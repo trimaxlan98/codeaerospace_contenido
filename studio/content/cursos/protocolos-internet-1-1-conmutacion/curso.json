@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 1.1 Trocear el mensaje: conmutación de paquetes",
+  "description": "Lección 1.1 del curso Protocolos de Internet (módulo 1: la red de redes), en 4 clips animados —una idea por clip—: la línea reservada del circuito y lo que desperdicia, trocear y rotular con el sobrecosto medido, la multiplexación estadística que hace caber a diez donde cabían tres, y el precio de no reservar: la cola, la espera y los descartes contados. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-linea-reservada.py",
+      "title": "1 · La línea reservada",
+      "scene": "Clip1",
+      "final_state": "Topología azul con el circuito A-R1-R2-R4-B resaltado en verde; abajo el banco de 3 circuitos del enlace lleno, dos cruces rojas y el rótulo '2 de 5 llamadas rechazadas'; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-trocear-y-rotular.py",
+      "title": "2 · Trocear y rotular",
+      "scene": "Clip2",
+      "final_state": "Pantalla con tres cifras en Space Mono: '9 paquetes de 1460 B utiles', 'cabeceras: 360 B -> 2.9 % del cable' y en rojo 'un mensaje de 100 B -> 28.6 % del cable'; pie sobre el costo de rotular."
+    },
+    {
+      "file": "clips/03-compartir-sin-reservar.py",
+      "title": "3 · Compartir sin reservar",
+      "scene": "Clip3",
+      "final_state": "Gráfica ámbar de la demanda de 10 flujos con la línea naranja de capacidad en 6 Mb/s y los picos por encima marcados con puntos rojos; rótulo 'por encima de la capacidad el 4.17 % del tiempo'."
+    },
+    {
+      "file": "clips/04-el-precio-la-espera.py",
+      "title": "4 · El precio: la espera",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Internet no te reserva nada.' (blanca) y 'Te deja competir, y casi siempre alcanza.' (cian); pie anuncia la siguiente lección."
+    }
+  ]
+}
