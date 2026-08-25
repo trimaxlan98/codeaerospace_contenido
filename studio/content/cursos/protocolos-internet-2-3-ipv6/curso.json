@@ -8,25 +8,25 @@
       "file": "clips/01-se-acabo.py",
       "title": "1 · 2^32 se acabó",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pantalla en negro con tres cifras apiladas en Space Mono: '4 294 967 296 direcciones' y '8 100 000 000 personas' en gris, y '0.53 direcciones por persona' en cian grande; pie 'La direccion era de 32 bits porque nadie imagino esto'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-128-bits.py",
       "title": "2 · 128 bits",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Tabla violeta de 8 grupos hexadecimales (2001 0db8 0000 0000 0000 ff00 0042 8329) sin marco; debajo, en cian grande, '2001:db8::ff00:42:8329'; pie sobre la regla del doble dos puntos; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-slaac.py",
       "title": "3 · La dirección que se pone sola",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Barra de 128 celdas sin digitos: mitad azul 'prefijo del router' y mitad cian 'interfaz (de la MAC)' separadas por una raya cian en el bit 64; debajo, en cian, '2001:db8:1:1:a8bb:ccff:fe11:2233'; pie sobre juntar prefijo e interfaz; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-convivir.py",
       "title": "4 · Convivir",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La red nueva ya esta aqui.' (blanca) y 'Lleva veinte anos mudandose.' (cian); pie anuncia la siguiente leccion (vector distancia); HUD 'Modulo 04'."
     }
   ]
 }

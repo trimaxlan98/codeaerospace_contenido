@@ -8,25 +8,25 @@
       "file": "clips/01-la-raya-movil.py",
       "title": "1 · La raya móvil",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Barra de 32 bits de 192.168.10.0 con la raya cian en el bit 26 (violeta red 0-25, ambar host 26-31), rotulo '192.168.10.0/26'; abajo en cian 'mascara 255.255.255.192', 'rango 192.168.10.1 - 192.168.10.62' y 'hosts 62'; pie 'Menos bits libres, menos maquinas: de 254 a 62 hosts, mascara 255.255.255.192.'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-cidr-agrega.py",
       "title": "2 · CIDR: agrupar para no ahogarse",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Una sola barra de 32 bits de 203.0.112.0 con la raya en el bit 22, rotulo '203.0.112.0/22'; abajo en cian 'filas antes -> despues  4 -> 1' y en verde 'ahorro  3 filas'; pie sobre `agregar_rutas` plegando las cuatro filas; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-la-tabla-de-ruteo.py",
       "title": "3 · La tabla de ruteo",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Tabla de 5 filas (Prefijo / Siguiente salto) con la caja ambar 'Destino 10.20.30.9' arriba y la fila '10.20.30.0/24  R4' resaltada en cian; debajo en cian 'coincide con 4 filas' y 'gana 10.20.30.0/24 por R4'; pie 'De las cuatro, la tabla se queda con la mas especifica: /24 por R4.'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-prefijo-mas-largo.py",
       "title": "4 · El prefijo más largo gana",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Cierre a pantalla limpia de la leccion: 'Un router no conoce el mundo.' (blanco) y 'Conoce el trozo de mundo que le toca.' (cian); pie 'Siguiente: IPv6, el espacio que no se acaba.'; HUD 'Modulo 04'."
     }
   ]
 }

@@ -103,10 +103,47 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 2.2. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip: lo que se dibuja y lo que se escribe no pueden
-# discrepar. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# NUNCA escrito a mano en el clip: lo que se dibuja y lo que se escribe no
+# pueden discrepar. Medido en el contenedor (docker run manim) antes de
+# escribir los clips.
+
+# Clip 1 - la raya movil: la misma red en /24 y en /26.
+DIR_BASE = "192.168.10.0"
+CIDR_24 = cidr(DIR_BASE + "/24")     # hosts=254, mascara 255.255.255.0
+CIDR_26 = cidr(DIR_BASE + "/26")     # hosts=62,  mascara 255.255.255.192
+
+# Clip 2 - CIDR agrega: cuatro /24 contiguos se pliegan en un /22.
+RUTAS_AGREGAR = ["203.0.112.0/24", "203.0.113.0/24",
+                 "203.0.114.0/24", "203.0.115.0/24"]
+AGREGADO = agregar_rutas(RUTAS_AGREGAR)         # ahorro=3 filas
+CIDR_UNIDA = cidr(AGREGADO["agregados"][0])     # 203.0.112.0/22
+
+# Clip 3 y 4 - la tabla de ruteo y el prefijo mas largo.
+TABLA_RUTAS = [("0.0.0.0/0", "ISP"), ("10.0.0.0/8", "R2"),
+               ("10.20.0.0/16", "R3"), ("10.20.30.0/24", "R4"),
+               ("192.168.0.0/16", "R5")]
+
+
+def _fila_de(prefijo):
+    """Indice de la fila de TABLA_RUTAS que anuncia `prefijo`."""
+    return [p for p, _ in TABLA_RUTAS].index(prefijo)
+
+
+IP_A = "10.20.30.9"    # coincide con 4 filas, gana R4 (/24)
+IP_B = "10.20.99.9"    # coincide con 3 filas, gana R3 (/16)
+IP_C = "8.8.8.8"       # coincide solo con la ruta por defecto
+IP_D = "10.20.31.9"    # IP_A con UN bit distinto (el ultimo de /24)
+
+RES_A = prefijo_mas_largo(TABLA_RUTAS, IP_A)
+RES_B = prefijo_mas_largo(TABLA_RUTAS, IP_B)
+RES_C = prefijo_mas_largo(TABLA_RUTAS, IP_C)
+RES_D = prefijo_mas_largo(TABLA_RUTAS, IP_D)
+
+IDX_A = _fila_de(RES_A["elegida"])
+IDX_B = _fila_de(RES_B["elegida"])
+IDX_C = _fila_de(RES_C["elegida"])
+IDX_D = _fila_de(RES_D["elegida"])
 
 
 # --- Rotulos ----------------------------------------------------------

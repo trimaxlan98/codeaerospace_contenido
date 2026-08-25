@@ -103,10 +103,145 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 1.3. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip: lo que se dibuja y lo que se escribe no pueden
-# discrepar. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# NUNCA escrito a mano en el clip: lo que se dibuja y lo que se escribe no
+# pueden discrepar. Medido en el contenedor antes de escribir los clips.
+
+# --- Clip 1: la trama Ethernet y su FCS -------------------------------
+MAC_A = "aa:bb:cc:00:11:22"      # el vecino que recibe
+MAC_B = "aa:bb:cc:00:33:44"      # el que envia
+MAC_C = "aa:bb:cc:00:55:66"      # los otros dos del cable
+MAC_D = "aa:bb:cc:00:77:88"
+CARGA_TRAMA = "HOLA MUNDO"
+TRAMA = trama_ethernet(MAC_A, MAC_B, CARGA_TRAMA)
+TRAMA_BYTES = len(TRAMA["bytes"])          # 60 B (carga rellenada a 46)
+TRAMA_RELLENO = TRAMA["relleno"]           # 36 B de relleno
+FCS_OK = "0x%08x" % TRAMA["fcs"]           # 0xdb518637
+TIPO_OK = "0x%04x" % TRAMA["tipo"]         # 0x0800 = IPv4
+
+# El bit 97 cae en el byte 12: el byte alto del campo Tipo. Al voltearlo,
+# 0x08 pasa a 0x48 y el CRC-32 recalculado ya no coincide con el FCS que
+# viajaba: la trama se descarta.
+BIT_ROTO = 97
+BYTE_ROTO = BIT_ROTO // 8                  # 12
+BYTES_ROTOS = voltear_bit(TRAMA["bytes"], BIT_ROTO)
+FCS_ROTO = "0x%08x" % crc32_trama(BYTES_ROTOS)   # 0xb7d3857e
+TIPO_ROTO = "0x%02x%02x" % (BYTES_ROTOS[12], BYTES_ROTOS[13])   # 0x4800
+
+# La trama como pieza `paquete`: pesos medidos para que ninguna MAC se
+# encime (la pieza reescala el texto que no cabe en su campo).
+ANCHO_TRAMA = 11.0
+CAMPOS_TRAMA = [("Destino", 2.1, MAC_A), ("Origen", 2.1, MAC_B),
+                ("Tipo", 1.0, TIPO_OK), ("Carga", 2.2, CARGA_TRAMA),
+                ("FCS", 1.5, FCS_OK)]
+
+
+def trama_pieza(valores=None):
+    """La trama de la leccion, con el FCS (cifra calculada) en cian.
+
+    `valores` = dict {campo: valor} para la GEMELA. La estructura es
+    identica campo a campo, y los valores que cambian conservan su
+    longitud: se puede hacer Transform entre dos de estas.
+    """
+    campos = CAMPOS_TRAMA
+    if valores:
+        campos = [(n, w, str(valores.get(n, v))) for n, w, v in campos]
+    p = paquete(campos, ancho=ANCHO_TRAMA, alto=0.80, fs=16,
+                color=C_PAQUETE, color_carga=C_PAQUETE)
+    p.iluminar("FCS", C_CIFRA)
+    return p
+
+
+# --- Clip 2: CSMA/CD, tres estaciones sobre el mismo cable ------------
+# Semillas probadas: 5 -> 7 ranuras / 2 colisiones (esperas 1,1,0 y 3,1:
+# se ven ranuras de silencio, que es lo que hay que contar); 7 -> 14
+# ranuras, no cabe en pantalla; 11 -> 5 ranuras pero casi todas las
+# esperas salen 0 y el backoff no se ve. Se fija la 5.
+CSMA_SEMILLA = 5
+CSMA = csma_cd(3, semilla=CSMA_SEMILLA)
+CSMA_N = CSMA["n_estaciones"]              # 3
+CSMA_RANURAS = CSMA["ranuras"]             # 7 ranuras dibujadas
+CSMA_COLISIONES = CSMA["colisiones"]       # 2 colisiones contadas
+CSMA_POR_RANURA = {h["ranura"]: h for h in CSMA["historia"]}
+ESTACIONES = ["E0", "E1", "E2"]
+
+# Geometria del clip 2: el cable arriba, las estaciones colgando de el y
+# la regla de ranuras abajo (7 cajas, una por ranura de la historia).
+CABLE_Y = 1.62
+CABLE_X = (-5.2, 5.2)
+X_ESTACION = (-3.2, 0.0, 3.2)
+EST_Y = 0.46          # centro de las estaciones
+ESPERA_Y = -0.52      # donde se rotula la espera sorteada de cada una
+RANURA_Y = -1.35      # centro de la regla de ranuras
+CONTEO_Y = -2.45      # el conteo final de colisiones
+
+
+def csma_evento(r):
+    """Que pasa en la ranura r: dict de la historia o None (silencio)."""
+    return CSMA_POR_RANURA.get(int(r))
+
+
+# --- Clip 3: el switch que aprende ------------------------------------
+# En el cable los nombres son MACs. Se rotula la COLA de cada una (los
+# tres primeros bytes son el mismo fabricante en las cuatro): asi la
+# tabla MAC cabe al lado de la red sin encimarse.
+COLA_MAC = {k: v[-5:] for k, v in
+            (("A", MAC_A), ("B", MAC_B), ("C", MAC_C), ("D", MAC_D))}
+PUERTOS_SW = {COLA_MAC["A"]: 1, COLA_MAC["B"]: 2, COLA_MAC["C"]: 3}
+EV_SWITCH = [(COLA_MAC["A"], COLA_MAC["B"]),   # inunda: no conoce a B
+             (COLA_MAC["B"], COLA_MAC["A"]),   # unicast: ya aprendio A
+             (COLA_MAC["A"], COLA_MAC["B"]),   # unicast: ya aprendio B
+             (COLA_MAC["C"], COLA_MAC["A"])]   # unicast: A sigue en tabla
+SW = switch_aprende(EV_SWITCH, PUERTOS_SW)
+SW_PASOS = SW["pasos"]
+SW_INUNDADAS = SW["inundadas"]             # 1 de 4
+SW_UNICAST = SW["unicast"]                 # 3 de 4
+SW_TOTAL = SW["total"]                     # 4
+SW_FILAS = 3                               # filas fijas de la tabla MAC
+
+POS_SW = {"SW": (-3.55, 0.35),
+          COLA_MAC["A"]: (-6.05, 1.80), COLA_MAC["B"]: (-6.05, -1.10),
+          COLA_MAC["C"]: (-0.95, 1.80), COLA_MAC["D"]: (-0.95, -1.10)}
+ARISTAS_SW = {("SW", COLA_MAC["A"]): "p1", ("SW", COLA_MAC["B"]): "p2",
+              ("SW", COLA_MAC["C"]): "p3", ("SW", COLA_MAC["D"]): "p4"}
+TIPOS_SW = {"SW": "switch", COLA_MAC["A"]: "host", COLA_MAC["B"]: "host",
+            COLA_MAC["C"]: "host", COLA_MAC["D"]: "host"}
+HOSTS_SW = [COLA_MAC[k] for k in ("A", "B", "C", "D")]
+TABLA_SW_POS = (3.85, 0.55)     # centro de la tabla MAC
+ACCION_Y = -2.35                # donde se rotula inunda / unicast
+
+
+def filas_mac(tabla_mac):
+    """La tabla MAC como 3 filas SIEMPRE (las vacias con guiones): la
+    gemela `.con_filas` exige estructura identica para el Transform."""
+    filas = [[m, "p%d" % p] for m, p in sorted(tabla_mac.items(),
+                                               key=lambda kv: kv[1])]
+    while len(filas) < SW_FILAS:
+        filas.append(["-", "-"])
+    return filas[:SW_FILAS]
+
+
+# --- Clip 4: ARP, quien tiene esta IP ---------------------------------
+IP_YO = "192.168.1.10"
+IP_DEST = "192.168.1.20"
+VECINOS = {IP_DEST: MAC_B, "192.168.1.30": MAC_C, "192.168.1.40": MAC_D}
+ARP1 = arp_resolver(IP_DEST, VECINOS)              # pregunta: 1
+ARP2 = arp_resolver(IP_DEST, VECINOS, ARP1["cache"])   # ya en cache: 0
+ARP_MAC = ARP1["mac"]                              # aa:bb:cc:00:33:44
+ARP_BROADCAST = ARP1["pasos"][0]["a"]              # ff:ff:ff:ff:ff:ff
+ARP_PREGUNTAS = ARP1["preguntas"] + ARP2["preguntas"]   # 1 en 2 envios
+ARP_IPS = [IP_YO, IP_DEST, "192.168.1.30", "192.168.1.40"]
+ARP_MACS = [MAC_A, MAC_B, MAC_C, MAC_D]
+# Geometria del clip 4: los cuatro vecinos colgando del mismo cable, la
+# pregunta/respuesta bajo el cable y la cache ARP mas abajo.
+ARP_X = (-4.65, -1.55, 1.55, 4.65)
+ARP_CABLE_X = (-5.9, 5.9)
+ARP_CABLE_Y = 0.05
+ARP_HOST_Y = 1.05
+ARP_IP_Y = 1.88
+ARP_TAG_Y = -0.72       # la pregunta y luego la respuesta
+ARP_TABLA_Y = -1.72     # la cache ARP
+ARP_CUENTA_Y = -2.58    # preguntas contadas
 
 
 # --- Rotulos ----------------------------------------------------------

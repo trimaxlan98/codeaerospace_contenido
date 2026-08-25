@@ -8,25 +8,25 @@
       "file": "clips/01-la-trama-y-su-sello.py",
       "title": "1 · La trama y su sello",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pantalla sin la trama (ya descartada) con tres lineas en Space Mono: 'FCS que viajaba 0xdb518637' en cian, 'CRC-32 recalculado 0xb7d3857e' en rojo y 'no coinciden -> trama descartada' en rojo; pie 'El que recibe recalcula el CRC y compara. Los dos numeros no son el mismo.'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-hablar-todos-a-la-vez.py",
       "title": "2 · Hablar todos a la vez",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "El cable azul con las tres estaciones E0, E1, E2 colgando y la regla de 7 ranuras coloreada segun la historia real (0 roja, 1 verde, 2 roja, 3 naranja, 4 verde, 5 naranja, 6 verde); debajo, en rojo, '3 estaciones -> 2 colisiones contadas en 7 ranuras'; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-el-switch-aprende.py",
       "title": "3 · El switch aprende",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "El switch azul con sus cuatro puertos p1-p4 y sus cuatro vecinos; a la derecha la tabla MAC llena con 11:22/p1, 33:44/p2 y 55:66/p3, y bajo ella 'inundadas 1 de 4' en naranja y 'unicast 3 de 4' en verde; abajo, en verde, '55:66 -> 11:22 destino en la tabla: unicast por p1'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-arp.py",
       "title": "4 · ARP: ¿quién tiene esta IP?",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'En tu cable no hay direcciones de Internet.' (blanca) y 'Hay vecinos que responden.' (cian); pie 'Siguiente: IP, la direccion y el datagrama.'; HUD 'Modulo 04'."
     }
   ]
 }

@@ -103,10 +103,97 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 2.1. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip: lo que se dibuja y lo que se escribe no pueden
-# discrepar. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# NUNCA escrito a mano en el clip: lo que se dibuja y lo que se escribe no
+# pueden discrepar. Medido en el contenedor antes de escribir los clips.
+
+# Clip 1 - la cabecera IPv4 REAL de 20 bytes y su checksum calculado.
+IP_ORIGEN = "10.0.0.7"
+IP_DESTINO = "93.184.216.34"
+CAB = cabecera_ipv4(origen=IP_ORIGEN, destino=IP_DESTINO, ttl=64,
+                    protocolo=6, longitud=1500, ident=0x1c46, banderas=2)
+CAB_BYTES = CAB["bytes"]
+CAB_VAL = CAB["valores"]
+CAB_N_CAMPOS = len(CAMPOS_IPV4)                  # 12
+CAB_HEX = " ".join("%02x" % b for b in CAB_BYTES)
+# Los cuatro campos que DECIDEN algo (el resto es burocracia del formato).
+CAMPOS_DECIDEN = ("Direccion origen", "Direccion destino", "TTL",
+                  "Protocolo")
+# Geometria de la pieza `cabecera` MEDIDA (sonda de anchos en el
+# contenedor): con estos tres numeros ningun rotulo de los 12 campos se
+# encoge ni se encima, ni siquiera Banderas (3 bits) ni IHL (4 bits).
+CAB_ANCHO = 11.6
+CAB_ALTO = 0.55
+CAB_FS = 15
+
+# El checksum, paso a paso y en pantalla: las diez palabras de 16 bits con
+# el propio campo de checksum a cero, su suma, el pliegue del acarreo y el
+# complemento a uno. CK_FINAL tiene que salir igual que CAB["checksum"].
+CAB_CERO = bytes(CAB_BYTES[:10]) + b"\x00\x00" + bytes(CAB_BYTES[12:])
+CK_PALABRAS = [(CAB_CERO[i] << 8) | CAB_CERO[i + 1] for i in range(0, 20, 2)]
+CK_SUMA = sum(CK_PALABRAS)                       # 0x22709
+CK_BAJA = CK_SUMA & 0xFFFF                       # 0x2709
+CK_ACARREO = CK_SUMA >> 16                       # 0x2
+CK_PLEGADA = CK_BAJA + CK_ACARREO                # 0x270b
+CK_FINAL = checksum_ip(CAB_CERO)                 # 0xd8f4
+assert CK_FINAL == CAB["checksum"] == (~CK_PLEGADA) & 0xFFFF
+
+# Verificar: sumar la cabecera ENTERA da 0 si esta intacta (la regla real).
+CK_INTACTA = verificar_checksum(CAB_BYTES)       # 0
+BIT_ROTO = 8 * 8 + 3                             # un bit del byte del TTL
+CAB_ROTA = voltear_bit(CAB_BYTES, BIT_ROTO)
+TTL_ROTO = CAB_ROTA[8]                           # 64 -> 80
+CK_ROTA = verificar_checksum(CAB_ROTA)           # 61439: corrupta
+
+# Clip 2 - el mejor esfuerzo: cinco redes en fila y tres fracasos legales.
+POS_CAMINO = {"A": (-5.55, 0.0), "R1": (-3.25, 0.0), "R2": (-0.95, 0.0),
+              "R3": (1.35, 0.0), "R4": (3.55, 0.0), "B": (5.55, 0.0)}
+ARISTAS_CAMINO = {("A", "R1"): "cobre", ("R1", "R2"): "fibra",
+                  ("R2", "R3"): "radio", ("R3", "R4"): "satelite",
+                  ("R4", "B"): "fibra"}
+TIPOS_CAMINO = {"A": "host", "B": "servidor", "R3": "satelite"}
+CAMINO = ["A", "R1", "R2", "R3", "R4", "B"]
+N_REDES = len(ARISTAS_CAMINO)                    # 5
+FRACASOS = ("perder", "duplicar", "desordenar")
+ORDEN_SALIDA = [1, 2, 3]
+ORDEN_LLEGADA = [2, 3, 1]                        # el desorden que se ve
+
+# Clip 3 - TTL: el seguro contra los bucles.
+TTL0 = 64
+CICLO = ["R1", "R2", "R3", "R4"]
+TTL_CAM = ttl_camino(TTL0, CICLO, bucle=True)
+TTL_RUTA = TTL_CAM["ruta"]
+TTL_SALTOS = TTL_CAM["saltos"]                   # 64
+TTL_MUERTO = TTL_CAM["muerto"]                   # True
+TTL_VUELTAS = TTL_SALTOS // len(CICLO)           # 16
+TTL_NODO_FINAL = TTL_RUTA[-1]["nodo"]            # R4
+
+
+def TTL_EN(salto):
+    """El TTL medido tras el salto `salto` (1-based) del camino circular."""
+    i = min(max(int(salto), 1), TTL_SALTOS) - 1
+    return TTL_RUTA[i]["ttl"]
+
+
+POS_BUCLE = {"A": (-5.30, 1.30), "R1": (-2.30, 1.30), "R2": (1.40, 1.30),
+             "R3": (1.40, -1.30), "R4": (-2.30, -1.30)}
+ARISTAS_BUCLE = {("A", "R1"): None, ("R1", "R2"): None, ("R2", "R3"): None,
+                 ("R3", "R4"): None, ("R4", "R1"): None}
+TIPOS_BUCLE = {"A": "host"}
+
+# Clip 4 - fragmentar 4000 B por un enlace de MTU 1500.
+CARGA_BYTES = 4000
+MTU = 1500
+FRAG = fragmentar(CARGA_BYTES, mtu=MTU)
+FRAGS = FRAG["fragmentos"]
+FRAG_N = FRAG["n"]                               # 3
+FRAG_UTIL = FRAG["util"]                         # 1480
+FRAG_EXTRA = FRAG["bytes_extra"]                 # 40 B de cabeceras de mas
+FRAG_PERDIDO = 2                                 # el que se cae (1-based)
+FRAG_ESCALA = 8.0 / CARGA_BYTES                  # unidades por byte
+FILAS_FRAG = [["%d" % (i + 1), "%d" % f["offset_campo"],
+               "%d B" % f["datos"], "%d" % f["mf"]] for i, f in
+              enumerate(FRAGS)]
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -191,6 +278,27 @@ def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
     t = Text(texto, font_size=font_size, color=col)
     t.next_to(b, direccion, buff=buff)
     return VGroup(b, t)
+
+
+def ruta_de(topo, nombres):
+    """Camino poligonal por los centros de una lista de nodos de la
+    topologia, listo para `MoveAlongPath`. La libreria dibuja la topologia
+    y sabe resaltar un camino, pero no lo expone como trayectoria."""
+    v = VMobject()
+    v.set_points_as_corners([topo.punto(k) for k in nombres])
+    return v
+
+
+def ficha(texto="", lado=0.40, color=C_PAQUETE, fs=16):
+    """Un datagrama como ficha cuadrada rotulada: el objeto que viaja
+    cuando no toca abrirle la cabecera."""
+    c = Square(lado, stroke_color=color, stroke_width=2.4,
+               fill_color=color, fill_opacity=0.22)
+    if str(texto) == "":
+        return VGroup(c)
+    t = tag_hud(str(texto), font_size=fs, color=color)
+    t.move_to(c.get_center())
+    return VGroup(c, t)
 
 
 def cierre_leccion(escena, rot, linea_blanca, linea_cian, pie=None,

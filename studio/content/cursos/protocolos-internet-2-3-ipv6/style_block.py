@@ -57,11 +57,12 @@ _al.Text = Text
 import protocolos as _pr  # noqa: E402
 from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         C_OK, C_PAQUETE, C_PERDIDA, C_RED,
-                        CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
-                        arp_resolver, barra_bits, cabecera,
+                        CAMPOS_IPV4, CAMPOS_IPV6, CAPAS_TCPIP,
+                        agregar_rutas, arp_resolver, barra_bits, cabecera,
                         cabecera_ipv4, checksum_ip, cidr, cola,
                         cola_mm1, conmutacion, crc32_trama, csma_cd,
-                        encapsular, enlace, entero_a_ip, eui64,
+                        encapsular, enlace, entero_a_ip,
+                        espacio_direcciones, eui64,
                         fragmentar, ip_a_entero, ipv6_comprimir,
                         ipv6_expandir, little, mascara_bits,
                         mux_estadistico, nodo, paquete, pila,
@@ -103,10 +104,83 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 2.3. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip: lo que se dibuja y lo que se escribe no pueden
-# discrepar. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# NUNCA escrito a mano en el clip. Medido en el contenedor:
+#   espacio_direcciones(32)  = {'total': 4294967296, 'por_persona': 0.5302}
+#   espacio_direcciones(128) = {'exp10': 38.5318, 'por_m2_tierra': 6.6722e23}
+#   ipv6_comprimir('2001:0db8:...:8329')      -> '2001:db8::ff00:42:8329'
+#   eui64('aa:bb:cc:11:22:33')  -> interfaz 'a8bb:ccff:fe11:2233',
+#       direccion '2001:db8:1:1:a8bb:ccff:fe11:2233', 0xaa -> 0xa8
+#   sum(bits) CAMPOS_IPV4 = 160 (20 B); sum(bits) CAMPOS_IPV6 = 320 (40 B)
+
+
+def _cientifica(x, dec=2):
+    """(mantisa_str, exponente) para notacion cientifica en MathTex.
+
+    Helper de formato sobre un numero que YA viene de la libreria (nunca
+    se inventa el valor, solo se le da forma de mantisa x 10^exp)."""
+    x = float(x)
+    exp = int(math.floor(math.log10(x))) if x > 0 else 0
+    mant = x / (10.0 ** exp)
+    return fmt(mant, dec), exp
+
+
+# Clip 1 - el espacio de 32 bits se agoto.
+E32 = espacio_direcciones(32)
+TOTAL_32_TXT = f"{E32['total']:,}".replace(",", " ")     # "4 294 967 296"
+POR_PERSONA_32 = fmt(E32["por_persona"], 2)               # "0.53"
+POBLACION_TXT = "8 100 000 000"                           # 8.1e9, del propio
+                                                          # espacio_direcciones
+# Cronologia REAL del agotamiento del pool libre de IPv4 por registro
+# regional (fechas publicas de IANA/los 5 RIR; no las calcula la libreria,
+# no hay numero que inventar: son fechas de un hecho historico).
+AGOTAMIENTO_IPV4 = [
+    ("IANA", 2011), ("APNIC", 2011), ("RIPE NCC", 2012),
+    ("LACNIC", 2014), ("ARIN", 2015), ("AFRINIC", 2020),
+]
+
+# Clip 2 - 128 bits: la escala honesta.
+E128 = espacio_direcciones(128)
+E128_MANT, E128_EXP = _cientifica(E128["total"])          # "3.40", 38
+M2_MANT, M2_EXP = _cientifica(E128["por_m2_tierra"])      # "6.67", 23
+DIR6_EJEMPLO = "2001:0db8:0000:0000:0000:ff00:0042:8329"
+DIR6_GRUPOS = ipv6_expandir(DIR6_EJEMPLO)                 # 8 grupos de 4 hex
+DIR6_COMPRIMIDA = ipv6_comprimir(DIR6_EJEMPLO)            # '2001:db8::ff00:42:8329'
+
+
+def _hex_a_binario(grupos):
+    """Los N*16 bits de una lista de grupos hexadecimales -> '0101...'."""
+    return "".join(format(int(g, 16), "016b") for g in grupos)
+
+
+# Clip 3 - SLAAC / EUI-64.
+MAC_EJEMPLO = "aa:bb:cc:11:22:33"
+PREFIJO_SLAAC = "2001:db8:1:1"                            # /64 (4 grupos)
+EUI = eui64(MAC_EJEMPLO, PREFIJO_SLAAC)
+DIR6_SLAAC_BIN = _hex_a_binario(ipv6_expandir(EUI["direccion"]))
+MAC_BYTES = MAC_EJEMPLO.split(":")                        # ['aa','bb',...]
+
+# Clip 4 - convivir: la cabecera fija de 40 B junto a la de 20 B.
+CAB4 = cabecera_ipv4(origen="192.0.2.10", destino="192.0.2.20", ttl=64,
+                     protocolo=6)
+BITS_IPV4 = sum(b for _, b in CAMPOS_IPV4)                # 160 -> 20 B
+BITS_IPV6 = sum(b for _, b in CAMPOS_IPV6)                # 320 -> 40 B
+BYTES_IPV4, BYTES_IPV6 = BITS_IPV4 // 8, BITS_IPV6 // 8
+# Mapeo EXACTO entre los 12 campos de CAMPOS_IPV4 y los 8 de CAMPOS_IPV6
+# (verificado: fuera + renombrados + iguales = 12; iguales + renombrados +
+# nuevo = 8).
+CAMPOS_FUERA = ["IHL", "Identificacion", "Banderas", "Desplazamiento",
+               "Checksum"]
+CAMPOS_RENOMBRADOS = [("DSCP/ECN", "Clase de trafico"),
+                      ("Longitud total", "Longitud de carga"),
+                      ("TTL", "Limite de saltos"),
+                      ("Protocolo", "Siguiente cabecera")]
+CAMPOS_IGUALES = ["Version", "Direccion origen", "Direccion destino"]
+CAMPO_NUEVO_IPV6 = "Etiqueta de flujo"
+# Adopcion real de IPv6 en trafico mundial: cifra publica aproximada
+# (mediciones de Google sobre su propio trafico), NO calculada por
+# `protocolos.py` -> se declara como tal en el pie, nunca como "medido".
+ADOPCION_IPV6_PCT = 45.0
 
 
 # --- Rotulos ----------------------------------------------------------

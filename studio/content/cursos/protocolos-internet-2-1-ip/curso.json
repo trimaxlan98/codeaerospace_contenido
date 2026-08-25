@@ -8,25 +8,25 @@
       "file": "clips/01-la-cabecera-ipv4.py",
       "title": "1 · La cabecera IPv4",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Cabecera IPv4 de 12 campos con sus valores reales; el campo TTL en rojo con el valor 80 tras voltearle un bit; debajo, en Space Mono, 'cabecera intacta  verificacion = 0' en verde y 'un bit del TTL volteado  verificacion = 61439' en rojo, con 'descartada' debajo; pie sobre el router que vuelve a sumar; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-el-mejor-esfuerzo.py",
       "title": "2 · El mejor esfuerzo",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Cadena azul A-R1-R2-R3-R4-B (R3 satelite) con tres fichas ambar numeradas 1, 2 y 3 detenidas en tres carriles antes de B; debajo 'desordenar' en naranja y las dos lineas 'orden de salida 1 2 3' en cian y 'orden de llegada 2 3 1' en naranja; pie 'IP no promete entregar; promete intentarlo.'; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-ttl.py",
       "title": "3 · TTL: el seguro contra los bucles",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Bucle rojo R1-R2-R3-R4 con el host A colgando a la izquierda, el contador 'TTL 00' en rojo a la derecha y una flecha violeta de R4 a A; debajo 'ICMP: tiempo excedido' en violeta y 'saltos hasta morir: 64' en cian; pie sobre el salto 64; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-fragmentar.py",
       "title": "4 · Fragmentar",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'IP es un acuerdo minimo.' (blanca) y 'Por eso cupo todo el mundo dentro.' (cian); pie 'Siguiente: el prefijo manda.'; HUD 'Modulo 04'."
     }
   ]
 }

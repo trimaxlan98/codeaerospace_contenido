@@ -103,10 +103,29 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 1.2. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip: lo que se dibuja y lo que se escribe no pueden
-# discrepar. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de una llamada a `encapsular`,
+# NUNCA escrito a mano en el clip. Medido en el contenedor:
+#   encapsular(100)  -> pasos 100/120/140/158 B, sobrecosto 36.71 %
+#   encapsular(1400) -> pasos 1400/1420/1440/1458 B, sobrecosto 3.98 %
+DATOS_CHICO = 100
+DATOS_GRANDE = 1400
+ENC_CHICO = encapsular(DATOS_CHICO, CAPAS_TCPIP)
+ENC_GRANDE = encapsular(DATOS_GRANDE, CAPAS_TCPIP)
+
+# Capas en el orden en que las lee un APARATO en el camino: de afuera
+# hacia adentro (Enlace primero, Aplicacion al final) — al reves del
+# orden de la Pila TCP/IP (Aplicacion arriba, Enlace abajo). Solo para
+# las mini-pilas del clip 3: `Pila.con_encapsulado` enciende desde el
+# indice 0, y aqui el indice 0 tiene que ser "lo primero que se lee".
+CAPAS_DESDE_FUERA = tuple(reversed(CAPAS_TCPIP))
+
+# Clip 1 - un ejemplo concreto de "quien hace que" por capa.
+EJEMPLOS_CAPA = {
+    "Aplicacion": "el navegador arma la peticion",
+    "Transporte": "TCP numera el byte y abre el puerto",
+    "Red": "IP elige el siguiente salto",
+    "Enlace": "Ethernet entrega en esta red local",
+}
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -179,6 +198,41 @@ def panel_derecha(*mobjetos, buff=0.30):
     g = VGroup(*mobjetos).arrange(DOWN, buff=buff)
     g.to_corner(UR, buff=0.55).shift(DOWN * 0.5)
     return _con_fondo(g, buff=0.18, opacidad=0.75)
+
+
+def lineas_pares(pila_izq, pila_der, color=C_EJE, grosor=1.6):
+    """Una linea punteada por cada capa que conecta dos `Pila` gemelas: la
+    ilusion de que cada capa solo habla con su igual del otro lado (clip
+    1). No es una pieza de la libreria: son `DashedLine` sueltas."""
+    n = len(pila_izq.capas)
+    return VGroup(*[
+        DashedLine(pila_izq.capa(i).get_right(), pila_der.capa(i).get_left(),
+                   color=color, stroke_width=grosor)
+        for i in range(n)])
+
+
+def pila_abierta(capas, k, datos=DATOS_CHICO, opacidad_sellada=0.35,
+                 ancho=3.2, alto=0.62, fs=14):
+    """Una `Pila` con las primeras `k` capas de `capas` YA ABIERTAS (ambar,
+    `Pila` las pinta sola) y el resto SELLADAS en violeta atenuado.
+
+    Falta en la libreria: `Pila.con_encapsulado` solo enciende un prefijo
+    desde el indice 0 en el orden Aplicacion->Enlace (sirve para "el dato
+    baja la pila"), pero el switch/router de este clip abren de afuera
+    hacia adentro. Se resuelve pasando `capas` ya invertidas
+    (`CAPAS_DESDE_FUERA`) y atenuando aqui lo que queda sin abrir; los
+    tamanos en bytes se ocultan porque en orden invertido no son la cifra
+    medida de verdad (esa vive en `ENC_CHICO`/`ENC_GRANDE`) y este clip es
+    cualitativo: que capa abre, no cuanto pesa.
+    """
+    p = pila(capas=capas, datos=datos, encapsulado=k, ancho=ancho,
+             alto=alto, fs=fs, color=C_CAPA)
+    p.tamanos.set_opacity(0.0)
+    for i in range(k, len(capas)):
+        p.capa(i).set_stroke(opacity=opacidad_sellada)
+        p.capa(i).set_fill(opacity=0.03)
+        p.rotulo(i).set_opacity(opacidad_sellada)
+    return p
 
 
 def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,

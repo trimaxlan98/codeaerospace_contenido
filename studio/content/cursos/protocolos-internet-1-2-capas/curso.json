@@ -8,25 +8,25 @@
       "file": "clips/01-cuatro-capas.py",
       "title": "1 · Cuatro capas, cuatro trabajos",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Dos pilas de cuatro capas violeta, 'emisor' a la izquierda y 'receptor' a la derecha, unidas por una linea punteada gris por cada capa (Aplicacion/HTTP, Transporte/TCP, Red/IP, Enlace/Ethernet); a la derecha los tamanos en cian 100/120/140/158 B; pie 'Por eso dos capas iguales, en extremos distintos, se entienden aunque el medio cambie por completo'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-encapsular.py",
       "title": "2 · Encapsular: el sobre dentro del sobre",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Pila completa con las cuatro capas en ambar (Aplicacion HTTP, Transporte TCP, Red IP, Enlace Ethernet) y sus tamanos en cian 100/120/140/158 B; debajo dos lineas en Space Mono: '100 B de datos -> 158 B en el cable (36.7 % de sobrecosto)' y '1400 B de datos -> 1458 B en el cable (4.0 % de sobrecosto)'; pie sobre el peso del sobre frente a la carta; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-nadie-abre-de-mas.py",
       "title": "3 · En el camino nadie abre de más",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Fila alta de aparatos A - SW - R1 - B en azul con el paquete ambar 'DATO' posado sobre el cable junto a B; debajo el recuento en Space Mono: 'switch abre 1 capa (enlace)' y 'router abre 2 capas (enlace, red)' en violeta y 'el destino abre las 4' en ambar; pie: 'El router no sabe que pediste, y no le importa.'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-desencapsular.py",
       "title": "4 · Desencapsular",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg), no el frame 8 muestreado."
+      "final_state": "Cierre a pantalla limpia de la leccion: 'Nadie entiende la red entera.' en blanco y 'Cada capa entiende su propio sobre.' en cian; pie 'Siguiente: el vecindario, Ethernet y MAC.'; HUD 'Modulo 04'."
     }
   ]
 }
