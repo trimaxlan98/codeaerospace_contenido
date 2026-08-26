@@ -8,25 +8,25 @@
       "file": "clips/01-el-arbol-de-nombres.py",
       "title": "1 · El árbol de nombres",
       "scene": "Clip1",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Arbol de 4 niveles (raiz, com/net/org, sitio.com/sitio.net/ejemplo.org, www.sitio.com/www.sitio.net/www.ejemplo.org) con el camino real marcado en ambar: '.', 'org', 'ejemplo.org', 'www.ejemplo.org'; a la derecha de cada nodo marcado los numeros '1' (www.ejemplo.org), '2' (org) y '3' (la raiz), leidos de abajo-derecha hacia arriba-centro; pie 'www.ejemplo.org, luego .org, luego la raiz: primero lo especifico, al final quien manda sobre todos.'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-la-resolucion.py",
       "title": "2 · La resolución paso a paso",
       "scene": "Clip2",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Escalera completa de 5 actores (cliente, resolutor, raiz, TLD .org, autoritativo) con las 4 flechas ambar reveladas y los tiempos acumulados en cian a la izquierda: 2 ms, 32 ms, 77 ms, 137 ms; la ultima flecha rotulada '93.184.216.34'; abajo en cian el resumen '4 viajes -> 137 ms'; pie sobre los cuatro viajes antes de la primera pagina; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-la-cache-y-el-ttl.py",
       "title": "3 · La caché y el TTL",
       "scene": "Clip3",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Tabla violeta de dos columnas (TTL / tasa de acierto) con tres filas: 4 s -> 39.5 %, 8 s -> 54.0 %, 20 s -> 71.5 % (la fila de 20 s resaltada en cian); pie 'Un TTL largo acierta mas, pero cuando expira el ciclo entero vuelve a empezar: es el precio de poder mudarte de servidor.'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-la-raiz.py",
       "title": "4 · La raíz",
       "scene": "Clip4",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La red enruta numeros.' (blanca) y 'Los nombres son un servicio que alguien sostiene.' (cian); pie 'Siguiente: DHCP y NAT.'; HUD 'Modulo 04'."
     }
   ]
 }

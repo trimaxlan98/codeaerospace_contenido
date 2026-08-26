@@ -277,7 +277,7 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 5.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | — | — | — | — | — |
 | 5.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 5.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 6.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |

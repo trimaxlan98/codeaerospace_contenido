@@ -113,9 +113,72 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 5.1. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Medido en el contenedor (protocolos.py, semillas fijas):
+#   resolver_dns("www.ejemplo.org")   -> 4 viajes, RTT 2 -> 32 -> 77 -> 137 ms
+#   la misma con cache caliente       -> 2 ms, 1 viaje  (68.5x mas rapido)
+#   cache_dns(200, 12, ttl=N)         -> 39.5 % (ttl 4) / 54.0 % (ttl 8) /
+#                                        71.5 % (ttl 20)
+
+# Clip 1 - el arbol de nombres (JERARQUIA_DNS: raiz, TLD, dominio,
+# subdominio). `Arbol` empareja padre/hijo por INDICE proporcional entre
+# niveles consecutivos: si cada nivel no tiene el MISMO numero de
+# hermanos, la rama que se dibuja no es la real (una etiqueta se queda
+# sin hijo y otra cuelga del padre equivocado). Por eso los tres niveles
+# no-raiz tienen 3 hermanos cada uno y el camino REAL (los valores
+# exactos de JERARQUIA_DNS) va siempre en el indice 2, el ULTIMO: la
+# rama real queda a la DERECHA en cada nivel y la raiz, con un unico
+# hijo, queda centrada. Leer el camino de abajo (subdominio) hacia
+# arriba (raiz) es entonces leer de derecha a izquierda: asi se resuelve
+# un nombre de verdad.
+_JD = dict(JERARQUIA_DNS)
+ARBOL_NIVELES = [[_JD["raiz"]],
+                 ["com", "net", _JD["TLD"]],
+                 ["sitio.com", "sitio.net", _JD["dominio"]],
+                 ["www.sitio.com", "www.sitio.net", _JD["subdominio"]]]
+ARBOL_RAIZ = [(0, 0)]
+ARBOL_TLD = ARBOL_RAIZ + [(1, 2)]
+ARBOL_DOMINIO = ARBOL_TLD + [(2, 2)]
+ARBOL_SUB = ARBOL_DOMINIO + [(3, 2)]      # camino completo marcado
+
+# Clip 2 - la resolucion paso a paso (resolver_dns real, cache vacia: los
+# CUATRO viajes de verdad, cliente incluido).
+RESOLUCION = resolver_dns("www.ejemplo.org")
+TOTAL_DNS_MS = RESOLUCION["total_ms"]           # 137.0 ms
+VIAJES_DNS = RESOLUCION["viajes"]               # 4
+ACTORES_DNS = ["cliente", "resolutor", "raiz", "TLD .org", "autoritativo"]
+
+
+def _texto_paso_dns(p):
+    """Texto de una flecha de la Escalera, tomado del dict REAL que
+    entrega resolver_dns() (nunca escrito a mano)."""
+    if p["responde"] is None:
+        return "%s ?" % p["pregunta"]
+    return p["respuesta"]
+
+
+EVENTOS_DNS = [dict(de=p["de"], a=p["a"], t_ms=p["acumulado"],
+                    texto=_texto_paso_dns(p)) for p in RESOLUCION["pasos"]]
+
+# Clip 3 - la cache y el TTL. La misma consulta, con la cache ya caliente
+# (el "cache" que devolvio la resolucion de arriba).
+RESOLUCION_CACHE = resolver_dns("www.ejemplo.org", cache=RESOLUCION["cache"])
+TOTAL_CACHE_MS = RESOLUCION_CACHE["total_ms"]    # 2.0 ms
+VIAJES_CACHE = RESOLUCION_CACHE["viajes"]        # 1
+ACELERACION_CACHE = TOTAL_DNS_MS / TOTAL_CACHE_MS   # 68.5x
+
+TTLS = (4, 8, 20)
+CACHES_TTL = {ttl: cache_dns(200, 12, ttl=ttl) for ttl in TTLS}
+TASA_TTL = {ttl: CACHES_TTL[ttl]["tasa_acierto"] for ttl in TTLS}   # %
+
+# Clip 4 - la raiz. 13 identidades de servidor raiz publicadas por IANA:
+# es un dato PUBLICO, no lo calcula la libreria, y por eso se rotula en
+# C_TENUE (nunca en C_CIFRA, para que el cian siga significando "esto lo
+# midio la libreria"). `PING_IP` si es una medicion real de la libreria:
+# la red entrega el paquete aunque el nombre no se resuelva.
+RAIZ_LETRAS = list("ABCDEFGHIJKLM")
+RAIZ_N = len(RAIZ_LETRAS)                        # 13 (dato publico)
+PING_IP = ping()
+PING_IP_MS = PING_IP["media"]                    # ~97 ms a la IP numerica
 
 
 # --- Rotulos ----------------------------------------------------------
