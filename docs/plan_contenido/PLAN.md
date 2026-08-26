@@ -1,6 +1,6 @@
 # Plan de contenido: de la Academia a los cursos de video
 
-Fecha: 2026-08-06 (ultima actualizacion: 2026-08-15). Responsable de
+Fecha: 2026-08-06 (ultima actualizacion: 2026-08-25). Responsable de
 arquitectura: Fable (guiones, diseño de curso); agentes sonnet/opus escriben
 el codigo de los clips y librerias.
 
@@ -52,6 +52,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 22 | Algebra lineal (familia, 18 lecciones) | original (divulgacion, muy visual: la rejilla que se deforma; ejemplos aeroespaciales donde salen solos) | `algebra_lineal.py` | publicado (PR #35 + #36): 18 lecciones, 72 qh en prod, narradas y muxeadas con intro/cierre (2026-08-19) |
 | 23 | Calculo vectorial (familia, 12 lecciones) | original (divulgacion, muy visual: el espacio que fluye; secuela de Algebra lineal, cierra en Maxwell) | `calculo_vectorial.py` (sobre `algebra_lineal.py`) | publicado (PR #43): 12 lecciones, 48 qh en prod, narradas y muxeadas — PRIMER curso con el intro/cierre SONOROS (2026-08-20) |
 | 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
+| 25 | Protocolos de Internet (familia, 24 lecciones) | original (divulgacion: la capa de paquetes; del cable de cobre a Marte, cierra en DTN/CCSDS) | `protocolos.py` | **en produccion por lotes** (plan completo en `curso-23-protocolos-internet.md`; 4 lotes de 6 lecciones) |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
