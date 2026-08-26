@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 5.2 DHCP y NAT: casa prestada, puerta compartida",
+  "description": "Lección 5.2 del curso Protocolos de Internet (módulo 5: los servicios), en 4 clips animados —una idea por clip—: los cuatro mensajes de DORA, una sola IP pública para toda la casa, la tabla de traducción que renumera puertos, y lo que NAT rompió. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dora.py",
+      "title": "1 · DORA",
+      "scene": "Clip1",
+      "final_state": "Escalera cliente/servidor con las cuatro flechas ambar DISCOVER, OFFER, REQUEST y ACK ya trazadas; debajo del ACK dos lineas en cian: 'IP 192.168.1.37  mascara 255.255.255.0' y 'puerta 192.168.1.1  DNS 192.168.1.1  arriendo 24 h'; pie 'El ACK no trae solo la IP: trae mascara, puerta de enlace y DNS. Todo lo necesario.'; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-una-ip-para-todos.py",
+      "title": "2 · Una IP para todos",
+      "scene": "Clip2",
+      "final_state": "Cuatro filas en cian con el veredicto de es_privada(): 192.168.1.10, 10.5.5.5 y 172.16.0.1 marcadas 'NO RUTEABLE' en rojo, 93.184.216.34 marcada 'RUTEABLE' en verde; pie 'La misma pregunta para cuatro direcciones: es_privada?'; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-la-tabla-de-traduccion.py",
+      "title": "3 · La tabla de traducción",
+      "scene": "Clip3",
+      "final_state": "Paquete verde arriba mostrando la respuesta ya destraducida: 'Origen 93.184.216.34:443' -> 'Destino 192.168.1.10:51000'; debajo la tabla de traduccion completa con sus tres filas (laptop, telefono, tv) y la fila de la laptop resaltada en azul; pie 'Cuando la respuesta vuelve al puerto publico 40000, el router deshace la traduccion.'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-lo-que-nat-rompio.py",
+      "title": "4 · Lo que NAT rompió",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'NAT le regalo veinte anos a IPv4.' (blanca) y 'Y a cambio se quedo con la llave de la puerta.' (cian); pie 'Siguiente: ver la red, ICMP, ping y traceroute.'; HUD 'Modulo 04'."
+    }
+  ]
+}

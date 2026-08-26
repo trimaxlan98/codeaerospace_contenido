@@ -227,8 +227,8 @@ lecciones en producción aunque el resto no se haga nunca.
 | Lote | Módulos | Lecciones | Librería que aporta | Estado |
 |---|---|---|---|---|
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
-| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **en curso** (librería lista y validada; 6 agentes escribiendo) |
-| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | pendiente |
+| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
+| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **en curso** (librería lista y validada; 6 agentes escribiendo) |
 | 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
 
 ## Receta de lote (la misma en los cuatro)
@@ -271,18 +271,18 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 3.1 | ✔ | ✔ | ✔ | ✔ 32/35/36/41 s | — | — | — | — | — |
-| 3.2 | ✔ | ✔ | ✔ | ✔ 31/30/31/29 s | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ✔ | ✔ 32/35/35/40 s | — | — | — | — | — |
-| 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | — | — | — | — | — |
-| 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | — | — | — | — | — |
-| 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | — | — | — | — | — |
-| 5.1 | ✔ | — | — | — | — | — | — | — | — |
-| 5.2 | ✔ | — | — | — | — | — | — | — | — |
-| 5.3 | ✔ | — | — | — | — | — | — | — | — |
-| 6.1 | ✔ | — | — | — | — | — | — | — | — |
-| 6.2 | ✔ | — | — | — | — | — | — | — | — |
-| 6.3 | ✔ | — | — | — | — | — | — | — | — |
+| 3.1 | ✔ | ✔ | ✔ | ✔ 32/35/36/41 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ | ✔ 31/30/31/29 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ | ✔ 32/35/35/40 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | — | — | — | — | — |
+| 5.2 | ✔ | ✔ | ✔ | ✔ 30/29/34/30 s | — | — | — | — | — |
+| 5.3 | ✔ | ✔ | ✔ | ✔ 36/30/30/38 s | — | — | — | — | — |
+| 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | — | — | — | — | — |
+| 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | — | — | — | — | — |
+| 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | — | — | — | — | — |
 | 7.1 | ✔ | — | — | — | — | — | — | — | — |
 | 7.2 | ✔ | — | — | — | — | — | — | — | — |
 | 7.3 | ✔ | — | — | — | — | — | — | — | — |
@@ -872,7 +872,76 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
 - A 480p un stroke rojo fino sobre un nodo con aristas encima **parece
   azul**: antes de dar por roto el código, ampliar el frame con ffmpeg.
 
+## Cosecha de trampas del lote 3 (medida durante la producción)
+
+**Bugs REALES de la librería que encontraron los agentes**
+- **`Escalera.paso(k)` / `.marca_tiempo(k)` indexaban mal.** `tiempos` solo
+  tiene entrada para los eventos CON `t_ms`, así que un evento mudo (un
+  salto de traceroute que no contesta) desfasaba todos los siguientes: el
+  salto mudo enseñaba la hora del salto de después. Corregido con un mapa
+  evento→marca; el rodeo que montó la 5.3 sigue funcionando igual.
+- **`cadena_certificados` no devolvía el número que sale al abrir la
+  firma**, que es justo el que hay que enseñar al lado del hash para que el
+  fallo se lea como una desigualdad. Corregido con `abre` en cada eslabón;
+  antes obligaba a importar `cripto.rsa_cifrar` desde el style_block.
+- **`dh_pequeno` no devolvía sus entradas** (p, g, a, b), que había que
+  duplicar a mano para poder rotular lo público y lo privado. Corregido.
+
+**De honestidad**
+- **`hol_bloqueo` cuenta FLUJOS, no partes.** Sobre TCP sí suben las partes
+  que llegaron ANTES del hueco (2 de 12): rotular "0 entregadas" habría
+  sido mentir. La cifra se deriva del patrón dibujado.
+- **El veredicto y la cifra que lo desmiente no pueden convivir**: apagar
+  el "coinciden / cadena válida" en el MISMO `play` en que entra el
+  `2840 ≠ 60`.
+- El modo `serie` de `http_transferencia` es HTTP/1.0 (una conexión por
+  objeto), no "HTTP/1.1 en serie": por eso existe `keepalive`. Decir cuál
+  es cuál.
+- Datos públicos que la librería no calcula (las 13 identidades raíz) van
+  en `C_TENUE`, no en el cian de "esto lo midió la librería".
+
+**De piezas**
+- **`arbol` empareja padre e hijo por índice proporcional**, no por
+  relación real: con distinto número de hermanos por nivel, un nodo cuelga
+  del padre equivocado. Dar el mismo número de hermanos a cada nivel.
+- **`Paquete.con_valores` conserva lo iluminado** (mejora del lote 1): si
+  iluminas en rojo para marcar una colisión, la gemela hereda el rojo. Hay
+  que re-iluminar en el color final antes del Transform.
+- **`Ficha` es gemela segura de Transform** (ancla + caja + 1 glifo): una
+  fila de 12 fichas se reordena con UN solo Transform sin romper dígitos.
+- Un `Brace` sobre UNA fila de `Tabla` sale como una astilla y se come su
+  etiqueta: una sola fila se marca con un `tag_hud` al lado.
+- Escalar una `Tabla` o una `Pila` con `.animate.scale()` encoge la letra
+  por debajo de lo legible: reconstruir con `ancho`/`alto`/`fs` explícitos.
+- `Grafica` no expone API pública para añadir una curva a unos ejes ya
+  construidos (hay que usar `_en`). No se toca `algebra_lineal.py`: es
+  compartido con tres familias publicadas. Candidato para el futuro.
+
+**De color y composición**
+- **`C_COLA` (naranja) y `C_PAQUETE` (ámbar) son el mismo color a 480p** en
+  piezas pequeñas: pintar también el `fill`, o reservar el contraste al par
+  verde/naranja.
+- `Text` de manim **cuantiza el ancho por tramos de font_size**: 15, 17 y
+  19 miden casi lo mismo; el salto real está en 12→15→22. Medir al tamaño
+  exacto que se va a usar.
+- Sondear anchos en el contenedor exige **cwd escribible**: con
+  `/workspace:ro` manim revienta al crear `media/texts`.
+- Contra el muestreo de `--frames 8`: alargar un `wait` **posterior** al
+  relevo lo aleja del punto de muestreo; alargar uno **anterior** lo
+  arrastra consigo y no sirve de nada.
+- Una ficha detenida se monta sobre el nodo también en topologías en línea.
+  Y si el fallo está en el ENLACE (el MTU pequeño), la ficha para en el
+  enlace, no en el nodo.
+
 ## Hitos globales
+
+- **2026-08-26**: **LOTE 2 PUBLICADO DE PUNTA A PUNTA.** PR #48 mergeado
+  (`d51a673`); 12 proyectos en producción con 48/48 `qh` adoptados;
+  narración Charon **serial 6/6 a la primera** (24 wavs, 0 reintentos); 6
+  `exports/protocolos-internet-[34]-*/curso_narrado.mp4` de 2:17–2:41 con
+  picos ≤ −0.5 dB (9 clips re-muxeados; dos llegaban a −0.0 dB y bajaron
+  2 dB). Marca sonora a −6.0 dB exacto dentro de las salidas.
+  **Medio curso hecho: 12 de 24 lecciones publicadas.**
 
 - **2026-08-25**: plan maestro escrito (24 lecciones, 8 módulos, 4 lotes) y
   rama `curso/protocolos-internet` creada desde `origin/main` (34d5890).

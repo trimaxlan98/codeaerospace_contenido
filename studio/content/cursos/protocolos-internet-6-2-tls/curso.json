@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 6.2 TLS: el candado de la web",
+  "description": "Lección 6.2 del curso Protocolos de Internet (módulo 6: la web y el candado), en 4 clips animados —una idea por clip—: el apretón con sus viajes contados, la clave que nadie mandó, el certificado y su cadena de firmas verificadas de verdad, y TLS 1.3 en un solo viaje. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-apreton.py",
+      "title": "1 · El apretón",
+      "scene": "Clip1",
+      "final_state": "Escalera cliente-servidor con los ocho mensajes: tres azules de TCP (SYN, SYN-ACK, ACK), cuatro fucsias de TLS 1.2 (ClientHello, ServerHello + Certificado, ClaveIntercambio + Finished, Finished) y el GET ámbar a los 120 ms; a la derecha el panel 'TCP 1 RTT = 40 ms', 'TLS 1.2 2 RTT = 80 ms' y en cian 'total 3 RTT = 120 ms'; pie '120 ms de ida y vuelta antes de pedir la pagina'; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-la-clave-que-nadie-mando.py",
+      "title": "2 · La clave que nadie mandó",
+      "scene": "Clip2",
+      "final_state": "Cliente y servidor azules unidos por el cable, con las fichas ámbar 8 y 19 ya cruzadas al lado contrario y el espía rojo pinchando el cable; bajo cada extremo 'privado: 6' y 'privado: 15' en fucsia y la caja cian 'clave = 2' en los dos, con 'el mismo numero' en verde entre ambas; abajo 'el espia oyo: 23, 5, 8, 19' en rojo y 'nunca viajaron: 6, 15, 2' en verde; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-el-certificado.py",
+      "title": "3 · El certificado y su cadena",
+      "scene": "Clip3",
+      "final_state": "Cadena CA Raiz -> CA Intermedia (verdes, verificadas) -> ejemplo.org con el recuadro en rojo; a su derecha las comparaciones 834=834 y 731=731 con 'coinciden' en verde, y en rojo 'cuerpo: sitio|ejemplo.org! (un byte de mas)' con 'hash del cuerpo 2840' frente a 'al abrir la firma 60' y 'NO coinciden'; sello rojo 'cadena NO valida'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-uno-tres-un-viaje.py",
+      "title": "4 · 1.3: un viaje",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El candado no lo pone el sitio.' (blanca) y 'Lo pone una cadena de firmas que decidiste creer.' (cian); pie 'Siguiente: HTTP/2 y QUIC, el fin de la fila india.'; HUD 'Modulo 04'."
+    }
+  ]
+}

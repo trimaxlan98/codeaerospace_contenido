@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 6.1 HTTP: pedir y responder",
+  "description": "Lección 6.1 del curso Protocolos de Internet (módulo 6: la web y el candado), en 4 clips animados —una idea por clip—: la petición y la respuesta en texto plano con los bytes contados, los códigos de estado, la caché condicional y su ahorro medido, y una fila para cuarenta objetos. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-peticion.py",
+      "title": "1 · La petición",
+      "scene": "Clip1",
+      "final_state": "Pieza Paquete horizontal: una franja violeta fina rotulada 'Protocolo 175 B' junto a un bloque ambar grande 'Carga util 2048 B'; debajo en cian 'protocolo: 7.9 % del total (2223 B)'; pie con los tres bytes contados; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-los-codigos.py",
+      "title": "2 · Los códigos",
+      "scene": "Clip2",
+      "final_state": "Tabla chica de codigos (200/301/404/500) con la fila 301 resaltada en cian, arriba; debajo una Escalera Navegador-Servidor con los 4 mensajes de una redireccion (GET, 301 Location, GET de nuevo, 200 OK) y sus tiempos acumulados en cian (0/40/40/80 ms); tag '2 RTT completos = 80 ms'; pie con la cifra de 80 ms; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-sin-estado-con-memoria.py",
+      "title": "3 · Sin estado, con memoria",
+      "scene": "Clip3",
+      "final_state": "Dos piezas Paquete apiladas: arriba la respuesta completa (175 B violeta + 2048 B ambar, 'respuesta completa: 2223 B'); abajo, mucho mas chica y proporcional, la 304 (93 B violeta + 180 B verde, '304 Not Modified: 273 B'); debajo en cian 'ahorro: 1950 B (87.7 %)'; pie con el mismo ahorro; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-una-fila-para-40.py",
+      "title": "4 · Una fila para cuarenta objetos",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Pedir es facil.' (blanca) y 'Pedir cuarenta cosas por un solo tubo, no.' (cian); pie 'Siguiente: TLS, el candado de la web.'; HUD 'Modulo 04'."
+    }
+  ]
+}
