@@ -228,7 +228,7 @@ lecciones en producción aunque el resto no se haga nunca.
 |---|---|---|---|---|
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
-| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **en curso** (librería lista y validada; 6 agentes escribiendo) |
+| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **PUBLICADO** (PR #49; 24 qh, narrado y muxeado) |
 | 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **en curso** (librería lista y validada; 6 agentes escribiendo) |
 
 ## Receta de lote (la misma en los cuatro)
@@ -277,12 +277,12 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | — | — | — | — | — |
-| 5.2 | ✔ | ✔ | ✔ | ✔ 30/29/34/30 s | — | — | — | — | — |
-| 5.3 | ✔ | ✔ | ✔ | ✔ 36/30/30/38 s | — | — | — | — | — |
-| 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | — | — | — | — | — |
-| 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | — | — | — | — | — |
-| 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | — | — | — | — | — |
+| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.2 | ✔ | ✔ | ✔ | ✔ 30/29/34/30 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.3 | ✔ | ✔ | ✔ | ✔ 36/30/30/38 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 7.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 7.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 7.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
@@ -934,6 +934,15 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   enlace, no en el nodo.
 
 ## Hitos globales
+
+- **2026-08-26**: **LOTE 3 PUBLICADO DE PUNTA A PUNTA.** PR #49 mergeado
+  (`89328e5`); 18 proyectos en producción con 72/72 `qh` adoptados;
+  narración Charon **serial 6/6 a la primera** (24 wavs); 6
+  `exports/protocolos-internet-[56]-*/curso_narrado.mp4` de 2:18–2:36 con
+  picos ≤ −0.5 dB. Este lote vino especialmente caliente de fábrica: **11
+  clips re-muxeados**, y tres de ellos (5.1c3, 5.3c2 y 6.3c4) tocaban
+  0.0 dB —recorte real— y bajaron 2.5 dB en vez de los 1.5 habituales.
+  **18 de 24 lecciones publicadas.**
 
 - **2026-08-26**: **LOTE 2 PUBLICADO DE PUNTA A PUNTA.** PR #48 mergeado
   (`d51a673`); 12 proyectos en producción con 48/48 `qh` adoptados;
