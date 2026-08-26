@@ -113,9 +113,59 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 5.2. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, NUNCA escrito a
+# mano en el clip. Medido en el contenedor antes de escribir los clips
+# (ver informe final del agente).
+
+# Clip 1 - DORA: los cuatro mensajes REALES de dhcp_dora() (valores por
+# defecto: red 192.168.1.0/24, arriendo 24 h).
+DORA = dhcp_dora()
+
+
+def _texto_dora(e):
+    """Texto de la flecha de la Escalera, construido desde el dict REAL
+    que entrega dhcp_dora() (nunca a mano)."""
+    return "%s   %s -> %s" % (e["mensaje"], e["origen"], e["destino"])
+
+
+# DISCOVER y REQUEST van "a todos" (broadcast, 255.255.255.255): la
+# Escalera solo conoce actores, asi que la flecha se dibuja hacia el
+# servidor (quien de verdad escucha), y el pie explica el broadcast.
+EVENTOS_DORA = [dict(e, a=("servidor" if e["a"] == "todos" else e["a"]),
+                     texto=_texto_dora(e)) for e in DORA["eventos"]]
+
+# Clip 2 - una IP para todos: la casa comparte una direccion publica; las
+# franjas RFC 1918 no salen de casa (es_privada() manda).
+N_APARATOS = 8
+IP_LAPTOP = "192.168.1.10"
+IP_TELEFONO = "192.168.1.44"
+NAT_IP_PUBLICA = "203.0.113.7"       # el mismo default de nat_traducir()
+RFC1918_FILAS = [[p, cidr(p)["mascara"], "%s direcciones" % fmt(cidr(p)[
+    "hosts"], 0)] for p in RFC1918]
+IPS_PRUEBA = ["192.168.1.10", "10.5.5.5", "172.16.0.1", "93.184.216.34"]
+PRIVADAS = [(ip, es_privada(ip)) for ip in IPS_PRUEBA]
+
+# Clip 3 - la tabla de traduccion: tres sesiones salientes, DOS aparatos
+# piden el MISMO puerto de origen (51000) y nat_traducir() los renumera.
+DISPOSITIVOS_NAT = ["laptop", "telefono", "tv"]
+SESIONES_NAT = [
+    (IP_LAPTOP, 51000, "93.184.216.34", 443),
+    (IP_TELEFONO, 51000, "93.184.216.34", 443),
+    ("192.168.1.30", 52000, "198.51.100.9", 443),
+]
+NAT = nat_traducir(SESIONES_NAT, ip_publica=NAT_IP_PUBLICA)
+FILAS_NAT = [[DISPOSITIVOS_NAT[i], f["ip_o"], str(f["pto_o"]),
+             "%s:%d" % (f["ip_d"], f["pto_d"]), str(f["pto_publico"])]
+            for i, f in enumerate(NAT["filas"])]
+RENUMERADOS = NAT["renumerados"]            # 1: 51000 choca, sale 40000/40001
+PUERTOS_USADOS = NAT["puertos_usados"]      # 3
+
+# Clip 4 - lo que NAT rompio: intentos entrantes contra la MISMA tabla de
+# NAT de arriba (la conversacion sigue: la fila de la laptop sigue viva).
+INTENTOS_ENTRANTES = [22, 40000, 8080, 40001]
+NAT_ENTRA = nat_entrante(INTENTOS_ENTRANTES, NAT["tabla"])
+BLOQUEADOS = NAT_ENTRA["bloqueados"]        # 2
+TOTAL_INTENTOS = NAT_ENTRA["total"]         # 4
 
 
 # --- Rotulos ----------------------------------------------------------
