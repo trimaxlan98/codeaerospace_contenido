@@ -8,25 +8,25 @@
       "file": "clips/01-el-enlace-que-no-esta.py",
       "title": "1 · El enlace que no está",
       "scene": "Clip1",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Cadena azul rover-orbitador-DSN-control con la ficha SYN roja parada sobre el orbitador y una X roja en el tramo orbitador-DSN; debajo, los tres carriles del plan de contactos con sus ventanas azules sobre el eje de 12 h; en rojo 'SYN seq 1000 enviado: nadie al otro lado' y en gris 'las ventanas no se solapan: nunca existe la ruta'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-el-bundle-y-la-custodia.py",
       "title": "2 · El bundle y la custodia",
       "scene": "Clip2",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Cadena azul con el orbitador en verde, una X roja en el tramo orbitador-DSN y cuatro almacenes bajo los nodos (solo el del orbitador con una ranura ambar llena); rotulos 'almacen' y 'custodia aceptada' en verde; abajo, en ambar '8 MB ocupando disco en el orbitador, no un bufer de ms' y en verde 'el rover ya borro su copia: la responsabilidad viajo con el bundle'."
     },
     {
       "file": "clips/03-plan-de-contactos.py",
       "title": "3 · Plan de contactos",
       "scene": "Clip3",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Los tres carriles del plan sobre el eje de 12 h con sus ventanas azules, las dos barras naranjas de retencion bajo los carriles 2 y 3, y el bundle 'B' en verde al inicio de la ultima ventana; en cian 't = 07.65 h' junto a 'entregado a las 7.65 h' en verde, y las tres lineas de salto con esperas 0.00 / 5.95 / 1.55 h."
     },
     {
       "file": "clips/04-entregado.py",
       "title": "4 · Entregado",
       "scene": "Clip4",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Internet supone que siempre hay camino.' (blanca) y 'Fuera de casa, esa suposicion se cae.' (cian); el pie anuncia la leccion 8.3, Internet interplanetario, CCSDS y Marte."
     }
   ]
 }

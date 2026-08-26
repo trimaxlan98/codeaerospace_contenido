@@ -8,25 +8,25 @@
       "file": "clips/01-la-ley-de-little.py",
       "title": "1 · La ley de Little",
       "scene": "Clip1",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Pantalla con el título 'La ley de Little' arriba y una curva naranja en ejes grises que sube suavemente y se dispara hacia el final (ocupación media de la cola frente a la carga, de 0.05 a 0.99); pie 'Y si subes la carga hacia 1, la ocupación no crece poco a poco: EXPLOTA.'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-el-bufer-grande.py",
       "title": "2 · El búfer grande que empeora",
       "scene": "Clip2",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Topología azul 'tu' -> nube 'internet' con una ficha ámbar 'ping' sobre el enlace; abajo tres cifras en Space Mono: 'ping en reposo: 97.1 ms' (verde), 'ping con carga 0.85: 124.3 ms' (rojo) y 'diferencia: +27.2 ms' (cian); pie sobre la videollamada que se corta; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-aqm.py",
       "title": "3 · AQM: descartar a tiempo",
       "scene": "Clip3",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Cola ámbar pequeña de 8 casillas ('con CoDel: 8 paquetes') y debajo la tabla violeta comparando 'sin AQM · 1000 · 600.0 ms' contra 'con CoDel · 8 · 4.8 ms'; pie 'Es preferible perder un paquete que esconder medio segundo.'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-prioridad.py",
       "title": "4 · Prioridad",
       "scene": "Clip4",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El bufer no te regala tiempo.' (blanca) y 'Te lo cobra en latencia.' (cian); pie anuncia la lección 7.3 (tiempo real, voz, video y jitter)."
     }
   ]
 }

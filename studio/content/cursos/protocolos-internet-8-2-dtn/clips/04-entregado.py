@@ -25,15 +25,17 @@ class Clip4(Scene):
         cadena = topologia(pos, aristas, tipos, costos=False, tam=0.46)
         cadena.shift(UP * 1.75)
         self.play(FadeIn(cadena.enlaces), FadeIn(cadena.nodos), run_time=0.9)
-        b = ficha("B", lado=0.46, fs=15)
-        b.move_to(cadena.punto("rover") + UP * 0.50)
+        b = ficha("B", lado=0.42, fs=15)
+        b.move_to(cadena.punto("rover") + UP * 0.62)
         self.play(FadeIn(b, scale=1.3), run_time=0.4)
         for i, p in enumerate(PASOS):
-            self.play(b.animate.move_to(cadena.punto(p["a"]) + UP * 0.50),
+            self.play(b.animate.move_to(cadena.punto(p["a"]) + UP * 0.62),
                       run_time=0.62)
+            # la marca de tiempo va DEBAJO del aparato: sobre la ficha se
+            # sube hasta el titulo, y la ficha ya tapa medio servidor.
             et = tag_hud("t = %s h" % fmt(p["t_h"], 2), font_size=17,
                          color=C_CALCULO)
-            et.next_to(b, UP, buff=0.16)
+            et.next_to(cadena.nodo(p["a"]), DOWN, buff=0.26)
             self.play(FadeIn(et), run_time=0.22)
             self.play(FadeOut(et), run_time=0.18)
         self.play(b.animate.set_color(C_OK),

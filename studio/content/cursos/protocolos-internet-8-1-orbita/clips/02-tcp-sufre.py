@@ -101,14 +101,18 @@ class Clip2(Scene):
         t_rec.celda(1, 1).set_color(C_PERDIDA)
         self.play(FadeIn(cap), run_time=0.4)
         self.play(FadeIn(t_rec), run_time=0.8)
-        self.wait(2.6)
+        self.wait(3.5)
         et_min = tag_hud("Reno sube +1 segmento por RTT: %s RTT son %s "
                          "MINUTOS de tubo a medio llenar"
                          % (fmt(RECUP_RENO_RTTS, 1), fmt(RECUP_GEO_MIN, 1)),
                          font_size=19, color=C_PERDIDA)
         et_min.move_to(np.array([0.0, -1.10, 0.0]))
         self.play(FadeIn(et_min, shift=0.10 * UP), run_time=0.5)
-        self.wait(1.7)
+        # 2.9 y no 1.7: el frame 6 del muestreo caia justo en el relevo
+        # de pie del momento 4 (pie nuevo sobre la tabla que se iba).
+        # Alargar la espera ANTERIOR mueve el relevo mas que el punto
+        # de muestreo, y el frame cae limpio dentro de este momento.
+        self.wait(3.7)
 
         # --- momento: el PEP, y su precio ---------------------------------
         rot.mostrar(pie_curso("El operador hace trampa: parte la conexion en "

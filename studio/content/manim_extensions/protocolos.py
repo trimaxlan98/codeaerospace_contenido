@@ -181,7 +181,7 @@ def cola_mm1(lmbda=0.85, mu=1.0, n_llegadas=4000, capacidad=8, semilla=3):
     t_llegada = np.cumsum(entre)
     libre_en = 0.0
     en_cola = []          # instantes de salida de los que siguen dentro
-    esperas, descartes = [], 0
+    esperas, servicios, descartes = [], [], 0
     traza_t, traza_n = [], []
     for i in range(n):
         t = t_llegada[i]
@@ -197,13 +197,26 @@ def cola_mm1(lmbda=0.85, mu=1.0, n_llegadas=4000, capacidad=8, semilla=3):
         libre_en = fin
         en_cola.append(fin)
         esperas.append(inicio - t)
+        servicios.append(servicio[i])   # el servicio de los ACEPTADOS
     esperas = np.array(esperas)
+    servicios = np.array(servicios)
+    # Para que la ley de Little cierre hay que usar la lambda EFECTIVA (la
+    # que entra de verdad, no la nominal: hay descartes) y el tiempo TOTAL
+    # en el sistema (espera + servicio, no solo la espera en cola). Con la
+    # nominal y solo la espera el error es del ~25 %, y sin decirlo eso
+    # engana mas que ayuda.
+    aceptados = n - descartes
+    lmbda_ef = float(lmbda) * aceptados / n
+    w_total = float(esperas.mean() + servicios.mean())
     return {"t": np.array(traza_t), "ocupacion": np.array(traza_n),
             "espera_media": float(esperas.mean()),
             "espera_max": float(esperas.max()),
-            "servicio_medio": float(servicio[:len(esperas)].mean()),
+            "servicio_medio": float(servicios.mean()),
             "ocupacion_media": float(np.mean(traza_n)),
             "descartes": int(descartes), "llegadas": n,
+            "aceptados": int(aceptados),
+            "lambda_nominal": float(lmbda), "lambda_efectiva": lmbda_ef,
+            "w_total": w_total, "little": lmbda_ef * w_total,
             "pct_descarte": 100.0 * descartes / n,
             "utilizacion": float(lmbda) / float(mu),
             "capacidad": int(capacidad)}
@@ -609,6 +622,25 @@ CAMPOS_IPV6 = (("Version", 4), ("Clase de trafico", 8),
 # =====================================================================
 # PIEZAS DE DIBUJO
 # =====================================================================
+def tasa(mbps):
+    """Rotula una tasa eligiendo la unidad por magnitud.
+
+    `fmt(0.5, 0)` escribe "0 Mb/s", que es un rotulo FALSO y pasa el
+    primer render sin que nadie lo note; y "1000.0 Mb/s" no cabe donde si
+    cabe "1 Gb/s".
+    """
+    v = float(mbps)
+    if v >= 1000.0:
+        g = v / 1000.0
+        return "%s Gb/s" % (("%d" % round(g)) if abs(g - round(g)) < 0.05
+                            else fmt(g, 1))
+    if v >= 10.0:
+        return "%d Mb/s" % round(v)
+    if v >= 0.1:
+        return "%s Mb/s" % fmt(v, 1)
+    return "%s kb/s" % fmt(v * 1000.0, 0)
+
+
 def _hud(t, fs=15, color=C_EJE):
     return _texto_hud(str(t), font_size=fs, color=color)
 
@@ -791,7 +823,8 @@ def cabecera(campos, valores=None, ancho=6.4, alto_fila=0.46, fs=13,
 class Nodo(_Anclada):
     """Un aparato de la red. tipo: host|switch|router|servidor|satelite."""
 
-    _FORMAS = ("host", "switch", "router", "servidor", "satelite", "nube")
+    _FORMAS = ("host", "switch", "router", "servidor", "satelite", "nube",
+               "antena")
 
     def __init__(self, tipo="host", etiqueta=None, tam=0.52, color=C_RED,
                  fs=14, **kwargs):
@@ -820,6 +853,23 @@ class Nodo(_Anclada):
                                (-0.32, -0.28, 0), (-0.9, -0.28, 0))],
                             color=color, stroke_width=2.2,
                             fill_color=color, fill_opacity=0.10)
+        elif t == "antena":
+            # parabolica: la DSN dibujada con `nube` se leia como "otra red"
+            plato = Polygon(*[np.array(p) * s for p in
+                              ((-0.85, 0.45, 0), (0.85, 0.45, 0),
+                               (0.42, -0.10, 0), (-0.42, -0.10, 0))],
+                            color=color, stroke_width=2.4,
+                            fill_color=color, fill_opacity=0.12)
+            forma = VGroup(
+                plato,
+                Line(np.array([0.0, 0.18, 0]) * s,
+                     np.array([0.0, -0.62, 0]) * s, color=color,
+                     stroke_width=2.4),
+                Line(np.array([-0.34, -0.62, 0]) * s,
+                     np.array([0.34, -0.62, 0]) * s, color=color,
+                     stroke_width=2.4),
+                Dot(np.array([0.0, 0.30, 0]) * s, radius=s * 0.07,
+                    color=color))
         elif t == "nube":
             forma = VGroup(*[Circle(radius=s * r, color=color,
                                     stroke_width=2.0, fill_color=color,
@@ -1048,9 +1098,15 @@ class Pila(_Anclada):
     """Torre de capas. .capa(i) .rotulo(i) .con_encapsulado(k) GEMELA."""
 
     def __init__(self, capas=CAPAS_TCPIP, datos=100, encapsulado=0,
-                 ancho=3.2, alto=0.62, fs=14, color=C_CAPA, **kwargs):
+                 ancho=3.2, alto=0.62, fs=14, color=C_CAPA,
+                 mostrar_tamanos=True, **kwargs):
         super().__init__(**kwargs)
-        self.capas = tuple(capas)
+        # Las tablas de pilas del curso (PILA_TCPIP, PILA_CCSDS) son de dos
+        # campos: se completan con cabecera 0. Y para una pila de la NASA
+        # los bytes serian inventados, asi que se pueden ocultar.
+        self.capas = tuple((c[0], c[1], c[2] if len(c) > 2 else 0)
+                           for c in capas)
+        self.mostrar_tamanos = bool(mostrar_tamanos)
         self.datos, self.encapsulado = int(datos), int(encapsulado)
         self.ancho, self.alto, self.fs = float(ancho), float(alto), int(fs)
         self.color = color
@@ -1077,7 +1133,9 @@ class Pila(_Anclada):
             self.cajas.add(caja)
             self.rotulos.add(rot)
             self.tamanos.add(tam)
-        self.add(self.cajas, self.rotulos, self.tamanos)
+        self.add(self.cajas, self.rotulos)
+        if self.mostrar_tamanos:
+            self.add(self.tamanos)
         self.info = info
 
     def capa(self, i):
@@ -1091,15 +1149,17 @@ class Pila(_Anclada):
 
     def con_encapsulado(self, k):
         o = Pila(self.capas, self.datos, k, self.ancho, self.alto, self.fs,
-                 self.color)
+                 self.color, self.mostrar_tamanos)
         o.shift(self._origen() - o._origen())
         return o
 
 
 def pila(capas=CAPAS_TCPIP, datos=100, encapsulado=0, ancho=3.2, alto=0.62,
-         fs=14, color=C_CAPA):
-    """Ver `Pila`."""
-    return Pila(capas, datos, encapsulado, ancho, alto, fs, color)
+         fs=14, color=C_CAPA, mostrar_tamanos=True):
+    """Ver `Pila`. Acepta capas de 2 o de 3 campos;
+    `mostrar_tamanos=False` para pilas donde los bytes no vienen a cuento."""
+    return Pila(capas, datos, encapsulado, ancho, alto, fs, color,
+                mostrar_tamanos)
 
 
 class Tabla(_Anclada):
@@ -1206,26 +1266,35 @@ class Reloj(_Anclada):
     """Contador de milisegundos en cian. .con_ms(x) GEMELA."""
 
     def __init__(self, ms=0.0, etiqueta="RTT", dec=1, fs=22,
-                 color=C_CIFRA, **kwargs):
+                 color=C_CIFRA, unidad="ms", ancho_fijo=None, **kwargs):
         super().__init__(**kwargs)
         self.ms, self.etiqueta_txt = float(ms), str(etiqueta)
         self.dec, self.fs, self.color = int(dec), int(fs), color
+        # La unidad estaba a fuego: inservible para un reloj de horas (8.2)
+        # o de minutos. `ancho_fijo` (p. ej. "%05.2f") mantiene el numero de
+        # glifos constante para que las gemelas no rompan el Transform.
+        self.unidad, self.ancho_fijo = str(unidad), ancho_fijo
         self._poner_ancla(ORIGIN)
-        self.texto = _hud("%s %s ms" % (self.etiqueta_txt,
-                                        fmt(self.ms, self.dec)),
+        num = (self.ancho_fijo % self.ms) if self.ancho_fijo \
+            else fmt(self.ms, self.dec)
+        self.texto = _hud("%s %s %s" % (self.etiqueta_txt, num,
+                                        self.unidad),
                           self.fs, color)
         self.texto.move_to(self._origen())
         self.add(self.texto)
 
     def con_ms(self, ms):
-        o = Reloj(ms, self.etiqueta_txt, self.dec, self.fs, self.color)
+        o = Reloj(ms, self.etiqueta_txt, self.dec, self.fs, self.color,
+                  self.unidad, self.ancho_fijo)
         o.shift(self._origen() - o._origen())
         return o
 
 
-def reloj(ms=0.0, etiqueta="RTT", dec=1, fs=22, color=C_CIFRA):
-    """Ver `Reloj`."""
-    return Reloj(ms, etiqueta, dec, fs, color)
+def reloj(ms=0.0, etiqueta="RTT", dec=1, fs=22, color=C_CIFRA, unidad="ms",
+          ancho_fijo=None):
+    """Ver `Reloj`. `unidad` cambia el sufijo ("h", "min"); `ancho_fijo`
+    (p. ej. "%05.2f") deja el numero de glifos constante entre gemelas."""
+    return Reloj(ms, etiqueta, dec, fs, color, unidad, ancho_fijo)
 
 
 class BarraBits(_Anclada):
@@ -1871,11 +1940,13 @@ class Escalera(_Anclada):
 
     def __init__(self, actores, eventos, ancho=6.0, alto=3.4, fs=15,
                  color=C_RED, color_msg=C_PAQUETE, mostrar_tiempo=True,
-                 **kwargs):
+                 unidad="ms", **kwargs):
         super().__init__(**kwargs)
         self.actores_txt = [str(a) for a in actores]
         self.eventos = [dict(e) for e in eventos]
         self.ancho, self.alto, self.fs = float(ancho), float(alto), int(fs)
+        # Fuera de la Tierra el eje son minutos u horas, no milisegundos.
+        self.unidad = str(unidad)
         self._poner_ancla(ORIGIN)
         o = self._origen()
         n = len(self.actores_txt)
@@ -1911,7 +1982,8 @@ class Escalera(_Anclada):
             self.flechas.add(f)
             self.rotulos.add(r)
             if mostrar_tiempo and e.get("t_ms") is not None:
-                t = _hud("%s ms" % fmt(e["t_ms"], 0), self.fs - 3, C_CIFRA)
+                t = _hud("%s %s" % (fmt(e["t_ms"], 0), self.unidad),
+                         self.fs - 3, C_CIFRA)
                 t.move_to(o + np.array([-self.ancho / 2.0 - 0.75, y, 0]))
                 self._idx_tiempo[k] = len(self.tiempos)
                 self.tiempos.add(t)
@@ -1945,10 +2017,11 @@ class Escalera(_Anclada):
 
 
 def escalera(actores, eventos, ancho=6.0, alto=3.4, fs=15, color=C_RED,
-             color_msg=C_PAQUETE, mostrar_tiempo=True):
-    """Ver `Escalera`. `eventos` = [{de, a, texto, t_ms, color}, ...]."""
+             color_msg=C_PAQUETE, mostrar_tiempo=True, unidad="ms"):
+    """Ver `Escalera`. `eventos` = [{de, a, texto, t_ms, color}, ...].
+    `unidad` cambia el sufijo del eje de tiempo ("min", "h"...)."""
     return Escalera(actores, eventos, ancho, alto, fs, color, color_msg,
-                    mostrar_tiempo)
+                    mostrar_tiempo, unidad)
 
 
 class Sierra(_Anclada):
