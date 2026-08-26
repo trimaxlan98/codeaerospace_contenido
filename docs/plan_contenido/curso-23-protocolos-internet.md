@@ -227,7 +227,7 @@ lecciones en producción aunque el resto no se haga nunca.
 | Lote | Módulos | Lecciones | Librería que aporta | Estado |
 |---|---|---|---|---|
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
-| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **en curso** (librería lista y validada; 6 agentes escribiendo) |
+| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
 | 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | pendiente |
 | 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
 
@@ -271,12 +271,12 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 3.1 | ✔ | ✔ | ✔ | ✔ 32/35/36/41 s | — | — | — | — | — |
-| 3.2 | ✔ | ✔ | ✔ | ✔ 31/30/31/29 s | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ✔ | ✔ 32/35/35/40 s | — | — | — | — | — |
-| 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | — | — | — | — | — |
-| 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | — | — | — | — | — |
-| 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | — | — | — | — | — |
+| 3.1 | ✔ | ✔ | ✔ | ✔ 32/35/36/41 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.2 | ✔ | ✔ | ✔ | ✔ 31/30/31/29 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.3 | ✔ | ✔ | ✔ | ✔ 32/35/35/40 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 5.1 | ✔ | — | — | — | — | — | — | — | — |
 | 5.2 | ✔ | — | — | — | — | — | — | — | — |
 | 5.3 | ✔ | — | — | — | — | — | — | — | — |
@@ -873,6 +873,14 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   azul**: antes de dar por roto el código, ampliar el frame con ffmpeg.
 
 ## Hitos globales
+
+- **2026-08-26**: **LOTE 2 PUBLICADO DE PUNTA A PUNTA.** PR #48 mergeado
+  (`d51a673`); 12 proyectos en producción con 48/48 `qh` adoptados;
+  narración Charon **serial 6/6 a la primera** (24 wavs, 0 reintentos); 6
+  `exports/protocolos-internet-[34]-*/curso_narrado.mp4` de 2:17–2:41 con
+  picos ≤ −0.5 dB (9 clips re-muxeados; dos llegaban a −0.0 dB y bajaron
+  2 dB). Marca sonora a −6.0 dB exacto dentro de las salidas.
+  **Medio curso hecho: 12 de 24 lecciones publicadas.**
 
 - **2026-08-25**: plan maestro escrito (24 lecciones, 8 módulos, 4 lotes) y
   rama `curso/protocolos-internet` creada desde `origin/main` (34d5890).
