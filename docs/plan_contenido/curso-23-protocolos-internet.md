@@ -226,8 +226,8 @@ lecciones en producción aunque el resto no se haga nunca.
 
 | Lote | Módulos | Lecciones | Librería que aporta | Estado |
 |---|---|---|---|---|
-| 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **en curso** |
-| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | pendiente |
+| 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
+| 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **en curso** (librería lista y validada; 6 agentes escribiendo) |
 | 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | pendiente |
 | 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
 
@@ -265,18 +265,18 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 
 | Lección | plan | librería | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ molde | ✔ 30/33/30/31 s | — | — | — | — | — |
-| 1.2 | ✔ | ✔ | ✔ | ✔ 30/30/31/32 s | — | — | — | — | — |
-| 1.3 | ✔ | ✔ | ✔ | ✔ 29/32/34/35 s | — | — | — | — | — |
-| 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | — | — | — | — | — |
-| 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | — | — | — | — | — |
-| 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | — | — | — | — | — |
-| 3.1 | ✔ | — | — | — | — | — | — | — | — |
-| 3.2 | ✔ | — | — | — | — | — | — | — | — |
-| 3.3 | ✔ | — | — | — | — | — | — | — | — |
-| 4.1 | ✔ | — | — | — | — | — | — | — | — |
-| 4.2 | ✔ | — | — | — | — | — | — | — | — |
-| 4.3 | ✔ | — | — | — | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ molde | ✔ 30/33/30/31 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.2 | ✔ | ✔ | ✔ | ✔ 30/30/31/32 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 1.3 | ✔ | ✔ | ✔ | ✔ 29/32/34/35 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 3.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 3.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 3.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 4.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 4.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 4.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 5.1 | ✔ | — | — | — | — | — | — | — | — |
 | 5.2 | ✔ | — | — | — | — | — | — | — | — |
 | 5.3 | ✔ | — | — | — | — | — | — | — | — |
@@ -799,7 +799,14 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
 
 - **2026-08-25**: plan maestro escrito (24 lecciones, 8 módulos, 4 lotes) y
   rama `curso/protocolos-internet` creada desde `origin/main` (34d5890).
-- **2026-08-25**: **lote 1 escrito y validado en `ql`** — 6 lecciones, 24
+- **2026-08-26**: **LOTE 1 PUBLICADO DE PUNTA A PUNTA.** PR #47 mergeado
+  (`fa3caf4`); 6 proyectos en producción con 24/24 `qh` adoptados; narración
+  Charon **serial 6/6 a la primera** (24 wavs, 0 reintentos); 6
+  `exports/protocolos-internet-*/curso_narrado.mp4` de 2:18–2:29 con picos
+  ≤ −0.5 dB (4 clips re-muxeados a −1.5 dB). **Marca sonora a −6.0 dB
+  EXACTO medida dentro de las 6 salidas** (AAC 24 kHz mono continuo):
+  tercera familia con la marca, ya es rutina.
+- **2026-08-25**: lote 1 escrito y validado en `ql` — 6 lecciones, 24
   clips, todos entre 28 y 35 s, frames revisados uno a uno. Librería
   `protocolos.py` con los números de los módulos 1 y 2 y 13 piezas de
   dibujo. Los 151 tests del Studio en verde.
