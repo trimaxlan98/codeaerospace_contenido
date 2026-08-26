@@ -229,7 +229,7 @@ lecciones en producción aunque el resto no se haga nunca.
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
 | 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **PUBLICADO** (PR #49; 24 qh, narrado y muxeado) |
-| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **en curso** (librería lista y validada; 6 agentes escribiendo) |
+| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **escrito, validado y con los 24 qh hechos; PR #50 esperando merge** |
 
 ## Receta de lote (la misma en los cuatro)
 
@@ -1000,6 +1000,13 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   correctas y la pantalla miente. La escala va en `ancho_viaje`.
 
 ## Hitos globales
+
+- **2026-08-26**: **LAS 24 LECCIONES ESCRITAS Y VALIDADAS.** El lote 4
+  (módulos 7 y 8) cierra el curso: 24 clips en `ql` entre 28.5 y 35.3 s,
+  frames revisados uno a uno, y los **96 renders `qh` del curso completo**
+  hechos en local a 1920×1080. Los 151 tests del Studio en verde.
+  **PR #50 abierto y esperando merge** — es lo único que falta para
+  publicar el lote 4; los lotes 1, 2 y 3 ya están en producción.
 
 - **2026-08-26**: **LOTE 3 PUBLICADO DE PUNTA A PUNTA.** PR #49 mergeado
   (`89328e5`); 18 proyectos en producción con 72/72 `qh` adoptados;
