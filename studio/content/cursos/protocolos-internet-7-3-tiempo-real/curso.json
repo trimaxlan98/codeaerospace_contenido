@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 7.3 Tiempo real: voz, video y jitter",
+  "description": "Lección 7.3 del curso Protocolos de Internet (módulo 7: la red real), en 4 clips animados —una idea por clip—: RTP y el reloj, el jitter medido y el búfer que compra suavidad con retardo, ABR escogiendo calidad frente al reproductor fijo que se atasca, y el directo. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-rtp-y-el-reloj.py",
+      "title": "1 · RTP y el reloj",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-jitter-y-bufer.py",
+      "title": "2 · Jitter y el búfer",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-abr.py",
+      "title": "3 · ABR: escoger calidad",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-en-vivo.py",
+      "title": "4 · En vivo",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

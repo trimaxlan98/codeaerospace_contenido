@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 8.3 Internet interplanetario: CCSDS y Marte",
+  "description": "Lección 8.3 del curso Protocolos de Internet (módulo 8: fuera de la Tierra), en 4 clips animados —una idea por clip—: de 4 a 21 minutos luz según la posición orbital, la pila del espacio frente a la de casa, el recorrido completo de una imagen desde el rover, y el cierre del curso. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-minutos-luz.py",
+      "title": "1 · Minutos luz",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-la-pila-del-espacio.py",
+      "title": "2 · La pila del espacio",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-un-archivo-a-marte.py",
+      "title": "3 · Un archivo a Marte",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-cierre.py",
+      "title": "4 · La red que nadie manda, tampoco allá",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

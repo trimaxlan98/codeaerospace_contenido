@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 8.2 DTN: la red que tolera la desconexión",
+  "description": "Lección 8.2 del curso Protocolos de Internet (módulo 8: fuera de la Tierra), en 4 clips animados —una idea por clip—: el enlace que no está y el apretón que falla por definición, el bundle y la custodia, el plan de contactos que sabe cuándo habrá enlace, y la entrega por una ruta que nunca existió. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-enlace-que-no-esta.py",
+      "title": "1 · El enlace que no está",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-el-bundle-y-la-custodia.py",
+      "title": "2 · El bundle y la custodia",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-plan-de-contactos.py",
+      "title": "3 · Plan de contactos",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-entregado.py",
+      "title": "4 · Entregado",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

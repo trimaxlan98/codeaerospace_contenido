@@ -20,7 +20,7 @@ La regla de color de la familia: **el color dice el papel**.
     C_CLAVE    fucsia   seguridad: claves, certificados, lo cifrado
     C_COLA     naranja  colas, buferes, espera, ancho de banda
 
-Numeros de los LOTES 1, 2 y 3 (modulos 1 a 6). Toda cifra en pantalla sale
+Numeros del curso COMPLETO (modulos 1 a 8). Toda cifra en pantalla sale
 de aqui o de la tabla del style_block, nunca escrita a mano:
     troceado / conmutacion / mux_estadistico / cola_mm1 / little
     encapsular / crc32_trama / trama_ethernet / csma_cd
@@ -39,6 +39,11 @@ de aqui o de la tabla del style_block, nunca escrita a mano:
     http_peticion / cache_condicional / http_transferencia
     tls_viajes / dh_pequeno / cadena_certificados
     hol_bloqueo / quic_migracion
+    anycast / anycast_caida / cdn / bufferbloat / codel
+    jitter / buffer_reproduccion / abr / latencia_directo
+    rtt_orbital / tcp_en_orbita / malla_laser
+    retardo_marte / rango_marte / ventanas_contacto / tcp_sin_camino
+    dtn_custodia / pila_ccsds / archivo_a_marte
 
 Piezas (VGroup con localizadores que siguen move_to/shift, NO scale;
 todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
@@ -94,6 +99,7 @@ C_COLA = C_AREA        # naranja: colas, buferes, espera
 
 _LUZ_KM_S = 299792.458
 _FIBRA_KM_S = 2.0 * _LUZ_KM_S / 3.0   # ~200 000 km/s: la luz en vidrio
+_R_TIERRA = 6371.0                     # km
 
 
 # =====================================================================
@@ -2543,3 +2549,446 @@ def regla_viajes(viajes, etiqueta=None, ms=None, ancho_viaje=0.62,
     varias reglas apiladas comparten origen y se comparan a ojo."""
     return ReglaViajes(viajes, etiqueta, ms, ancho_viaje, alto, fs, color,
                        nombres)
+
+
+# =====================================================================
+# Modulo 7 — La red real: escala y tiempo
+# =====================================================================
+# `distribuido.CIUDADES` solo trae cuatro, y con tres de ellas de sitio el
+# anycast queda degenerado (cada usuario en su propio PoP, 0 km). Esta tabla
+# es del curso; la formula del haversine es la misma del curso 18.
+CIUDADES_PI = {
+    "CDMX": (19.43, -99.13), "Nueva York": (40.71, -74.01),
+    "Sao Paulo": (-23.55, -46.63), "Santiago": (-33.45, -70.67),
+    "Madrid": (40.42, -3.70), "Londres": (51.51, -0.13),
+    "Lagos": (6.52, 3.38), "Johannesburgo": (-26.20, 28.05),
+    "Mumbai": (19.08, 72.88), "Singapur": (1.35, 103.82),
+    "Tokio": (35.68, 139.69), "Sidney": (-33.87, 151.21),
+}
+
+
+def km_entre(a, b, ciudades=None):
+    """Haversine entre dos ciudades de `CIUDADES_PI`."""
+    c = ciudades or CIUDADES_PI
+    la1, lo1 = (math.radians(x) for x in c[a])
+    la2, lo2 = (math.radians(x) for x in c[b])
+    h = (math.sin((la2 - la1) / 2) ** 2 +
+         math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2)
+    return 2.0 * _R_TIERRA * math.asin(math.sqrt(h))
+
+
+def anycast(sitios, usuarios, ms_por_salto=0.4, saltos=6, ciudades=None):
+    """La MISMA IP anunciada desde varios sitios: cada usuario cae en el
+    mas cercano. -> dict MEDIDO (haversine del curso 18).
+
+    `sitios` y `usuarios` son nombres de `distribuido.CIUDADES`.
+    """
+    filas, latencias = [], []
+    for u in usuarios:
+        opciones = [(km_entre(u, s, ciudades), s) for s in sitios]
+        opciones.sort()
+        d, s = opciones[0]
+        # ida y vuelta por fibra + proceso de los saltos intermedios
+        ms = 2.0 * 1000.0 * d / _FIBRA_KM_S + 2.0 * saltos * ms_por_salto
+        peor = 2.0 * 1000.0 * max(o[0] for o in opciones) / _FIBRA_KM_S
+        filas.append({"usuario": u, "sitio": s, "km": d, "ms": ms,
+                      "ms_peor": peor, "opciones": opciones})
+        latencias.append(ms)
+    return {"filas": filas, "sitios": list(sitios),
+            "usuarios": list(usuarios),
+            "media_ms": float(np.mean(latencias)),
+            "peor_ms": float(max(latencias)),
+            "mejor_ms": float(min(latencias))}
+
+
+def anycast_caida(sitios, usuarios, caido, **kw):
+    """Se cae un PoP y BGP re-enruta: la latencia sube, pero nadie queda
+    sin servicio. -> dict con el antes y el despues MEDIDOS."""
+    antes = anycast(sitios, usuarios, **kw)
+    quedan = [s for s in sitios if s != caido]
+    despues = anycast(quedan, usuarios, **kw)
+    movidos = [a["usuario"] for a, d in zip(antes["filas"], despues["filas"])
+               if a["sitio"] != d["sitio"]]
+    return {"antes": antes, "despues": despues, "caido": caido,
+            "movidos": movidos, "n_movidos": len(movidos),
+            "subida_ms": despues["media_ms"] - antes["media_ms"],
+            "sin_servicio": 0}
+
+
+def cdn(n_peticiones=500, catalogo=40, semilla=7, zipf=1.1, cacheables=0.8,
+        tam_cache=8):
+    """Peticiones con localidad sobre una cache FINITA (LRU): cuantas
+    sirve el borde y cuanto alivia al origen. -> dict MEDIDO.
+
+    La cache tiene que ser finita o la tasa de acierto la fija el catalogo
+    y no la localidad, y entonces la leccion estaria ensenando otra cosa.
+    """
+    rng = np.random.default_rng(int(semilla))
+    pesos = 1.0 / (np.arange(1, int(catalogo) + 1) ** float(zipf))
+    pesos = pesos / pesos.sum()
+    objetos = rng.choice(int(catalogo), size=int(n_peticiones), p=pesos)
+    es_cacheable = rng.random(int(n_peticiones)) < float(cacheables)
+    cache, aciertos, al_origen = [], 0, 0
+    for o, c in zip(objetos, es_cacheable):
+        o = int(o)
+        if c and o in cache:
+            aciertos += 1
+            cache.remove(o)
+            cache.append(o)                  # usado -> al final (LRU)
+        else:
+            al_origen += 1
+            if c:
+                cache.append(o)
+                if len(cache) > int(tam_cache):
+                    cache.pop(0)             # se va el menos usado
+    return {"peticiones": int(n_peticiones), "aciertos": aciertos,
+            "al_origen": al_origen, "catalogo": int(catalogo),
+            "tam_cache": int(tam_cache),
+            "tasa_acierto": 100.0 * aciertos / int(n_peticiones),
+            "alivio_pct": 100.0 * aciertos / int(n_peticiones),
+            "cacheable_pct": 100.0 * float(cacheables)}
+
+
+def bufferbloat(cola_pkts, mbps=20.0, tam_bytes=1500, carga=1.2):
+    """Un bufer grande no evita la congestion: la esconde en LATENCIA.
+
+    Con el enlace saturado la cola se llena, y el ultimo paquete espera a
+    que salgan todos los de delante. -> dict MEDIDO.
+    """
+    tx_ms = 1000.0 * float(tam_bytes) * 8.0 / (float(mbps) * 1e6)
+    espera = float(cola_pkts) * tx_ms
+    return {"cola_pkts": int(cola_pkts), "mbps": float(mbps),
+            "tx_ms": tx_ms, "espera_ms": espera,
+            "espera_s": espera / 1000.0, "carga": float(carga),
+            "bytes_en_cola": int(cola_pkts) * int(tam_bytes)}
+
+
+def codel(cola_pkts=1000, mbps=20.0, objetivo_ms=5.0, tam_bytes=1500):
+    """AQM: descartar temprano y poco mantiene la cola CORTA. -> dict.
+
+    Compara la cola que se llena hasta el tope con la que CoDel recorta al
+    objetivo: es preferible perder un paquete que esconder un segundo.
+    """
+    sin = bufferbloat(cola_pkts, mbps, tam_bytes)
+    tx_ms = sin["tx_ms"]
+    pkts_objetivo = max(1, int(round(float(objetivo_ms) / tx_ms)))
+    con = bufferbloat(pkts_objetivo, mbps, tam_bytes)
+    return {"sin_aqm": sin, "con_aqm": con,
+            "objetivo_ms": float(objetivo_ms),
+            "pkts_objetivo": pkts_objetivo,
+            "veces_mejor": sin["espera_ms"] / con["espera_ms"],
+            "descartes_extra_pct": 100.0 * (1.0 - pkts_objetivo /
+                                            float(cola_pkts))}
+
+
+def jitter(n=60, media_ms=20.0, desv_ms=6.0, semilla=9, picos=()):
+    """Llegadas irregulares de paquetes de voz. -> dict con el jitter
+    MEDIDO (RFC 3550: media movil de |D|)."""
+    rng = np.random.default_rng(int(semilla))
+    huecos = rng.normal(float(media_ms), float(desv_ms), int(n))
+    for p in picos:
+        if 0 <= int(p) < int(n):
+            huecos[int(p)] += 4.0 * float(desv_ms)
+    huecos = np.clip(huecos, 1.0, None)
+    llegadas = np.cumsum(huecos)
+    d = np.abs(np.diff(huecos))
+    j, serie = 0.0, []
+    for x in d:                                  # J += (|D| - J) / 16
+        j += (x - j) / 16.0
+        serie.append(j)
+    return {"huecos": huecos, "llegadas": llegadas, "jitter_ms": j,
+            "jitter_serie": np.array(serie), "media_ms": float(media_ms),
+            "desv_medida": float(huecos.std()), "n": int(n)}
+
+
+def buffer_reproduccion(datos_jitter, tam_ms=40.0, paso_ms=20.0):
+    """El bufer de reproduccion: cuanto retardo metes para no cortarte.
+    -> cortes CONTADOS y retardo anadido."""
+    huecos = np.asarray(datos_jitter["huecos"], dtype=float)
+    reloj, cortes, retraso = float(tam_ms), 0, []
+    for h in huecos:
+        reloj += float(paso_ms) - h              # se llena y se vacia
+        if reloj < 0:
+            cortes += 1
+            reloj = float(tam_ms)                # re-llenar tras el corte
+        retraso.append(reloj)
+    return {"tam_ms": float(tam_ms), "cortes": int(cortes),
+            "ocupacion": np.array(retraso),
+            "retardo_medio_ms": float(np.mean(retraso)),
+            "paquetes": len(huecos)}
+
+
+def abr(traza_mbps=None, escalones=(0.3, 0.7, 1.5, 3.0, 6.0), buffer0=8.0,
+        seg_s=4.0, semilla=11):
+    """Video adaptativo: escoge calidad segun el ancho que MIDE.
+    -> decisiones, cambios y atascos CONTADOS."""
+    rng = np.random.default_rng(int(semilla))
+    if traza_mbps is None:
+        base = np.array([6.0] * 10 + [1.2] * 8 + [4.0] * 6 + [0.5] * 5 +
+                        [5.0] * 11)
+        traza_mbps = np.clip(base + rng.normal(0, 0.3, len(base)), 0.15,
+                             None)
+    traza_mbps = np.asarray(traza_mbps, dtype=float)
+    esc = list(escalones)
+    buf, decisiones, atascos, cambios = float(buffer0), [], 0, 0
+    ultimo = 0
+    for ancho in traza_mbps:
+        # elegir el escalon mas alto que quepa en el ancho medido
+        elegido = 0
+        for i, e in enumerate(esc):
+            if e <= ancho:
+                elegido = i
+        descarga = seg_s * esc[elegido] / max(ancho, 1e-6)
+        buf += seg_s - descarga
+        if buf < 0:
+            atascos += 1
+            buf = 0.0
+        if elegido != ultimo:
+            cambios += 1
+        decisiones.append({"ancho": float(ancho), "escalon": elegido,
+                           "mbps": esc[elegido], "buffer_s": buf})
+        ultimo = elegido
+    return {"decisiones": decisiones, "atascos": int(atascos),
+            "cambios": int(cambios), "escalones": esc,
+            "traza": traza_mbps, "seg_s": float(seg_s),
+            "calidad_media": float(np.mean([d["mbps"] for d in decisiones]))}
+
+
+def abr_fijo(traza_mbps=None, calidad=3.0, buffer0=8.0, seg_s=4.0,
+             semilla=11):
+    """El mismo video a calidad FIJA sobre la misma traza. -> atascos
+    CONTADOS.
+
+    Es el contraste que hace honesta a la 7.3: el adaptativo casi no se
+    atasca *porque* cambia de calidad, no porque sea magia.
+    """
+    if traza_mbps is None:
+        traza_mbps = abr(None, semilla=semilla)["traza"]
+    traza_mbps = np.asarray(traza_mbps, dtype=float)
+    buf, atascos, ocupacion = float(buffer0), 0, []
+    for ancho in traza_mbps:
+        buf += seg_s - seg_s * float(calidad) / max(ancho, 1e-6)
+        if buf < 0:
+            atascos += 1
+            buf = 0.0
+        ocupacion.append(buf)
+    return {"calidad": float(calidad), "atascos": int(atascos),
+            "ocupacion": np.array(ocupacion), "traza": traza_mbps,
+            "segmentos": len(traza_mbps)}
+
+
+def latencia_directo(captura_ms=40.0, codificacion_ms=120.0, cdn_ms=90.0,
+                     buffer_s=6.0):
+    """Donde se van los segundos de un directo. -> desglose MEDIDO."""
+    partes = [("captura", captura_ms), ("codificacion", codificacion_ms),
+              ("red y CDN", cdn_ms), ("bufer del reproductor",
+                                      buffer_s * 1000.0)]
+    total = sum(v for _, v in partes)
+    return {"partes": partes, "total_ms": total, "total_s": total / 1000.0,
+            "peor": max(partes, key=lambda x: x[1]),
+            "webrtc_ms": captura_ms + 20.0 + cdn_ms}
+
+
+# =====================================================================
+# Modulo 8 — Internet fuera de la Tierra
+# =====================================================================
+H_GEO = 35786.0
+H_LEO = 550.0
+UA_KM = 149_597_870.7
+
+
+def rtt_orbital(h_km=H_GEO, elevacion_deg=90.0):
+    """El retardo que impone la geometria. -> dict MEDIDO.
+
+    A 90 grados de elevacion la distancia es la altura; mas bajo, el
+    camino se alarga (la ley del coseno con el radio terrestre).
+    """
+    h = float(h_km)
+    if elevacion_deg >= 89.99:
+        d = h
+    else:
+        e = math.radians(float(elevacion_deg))
+        d = (-_R_TIERRA * math.sin(e) +
+             math.sqrt((_R_TIERRA * math.sin(e)) ** 2 +
+                       h ** 2 + 2 * _R_TIERRA * h))
+    ida = 1000.0 * d / _LUZ_KM_S              # en el vacio, no en fibra
+    return {"h_km": h, "d_km": d, "ida_ms": ida, "rtt_ms": 2.0 * ida,
+            "elevacion_deg": float(elevacion_deg),
+            "rtt_usuario_ms": 4.0 * ida}      # subida y bajada, ida y vuelta
+
+
+def tcp_en_orbita(rtt_ms, ventana_kb=64, capacidad_mbps=50.0, pep=False):
+    """El techo por ventana/RTT: por mucho ancho que contrates, si la
+    ventana es pequena y el RTT grande, no pasas de ahi. -> dict MEDIDO."""
+    bits = float(ventana_kb) * 1024.0 * 8.0
+    mbps = bits / (float(rtt_ms) / 1000.0) / 1e6
+    techo = min(mbps, float(capacidad_mbps))
+    r = {"rtt_ms": float(rtt_ms), "ventana_kb": float(ventana_kb),
+         "mbps_ventana": mbps, "mbps": techo,
+         "capacidad_mbps": float(capacidad_mbps),
+         "pct_capacidad": 100.0 * techo / float(capacidad_mbps),
+         "limitado_por": "la ventana" if mbps < capacidad_mbps
+         else "el enlace"}
+    if pep:
+        # el PEP parte la conexion: el emisor ve un RTT terrestre
+        local = tcp_en_orbita(40.0, ventana_kb, capacidad_mbps)
+        r["con_pep_mbps"] = local["mbps"]
+        r["ganancia_pep"] = local["mbps"] / techo if techo else float("nan")
+        r["precio_pep"] = ("rompe el extremo a extremo: con TLS el PEP no "
+                           "puede leer nada")
+    return r
+
+
+def malla_laser(planos=4, por_plano=6, coste_intra=1.0, coste_inter=1.6,
+                origen=None, destino=None):
+    """La constelacion como grafo de enlaces opticos, y el MISMO
+    `dijkstra` del modulo 3 buscando el camino. -> dict.
+
+    Cada satelite habla con el de delante y el de atras en su plano, y con
+    sus vecinos de los planos contiguos. El camino cambia cuando la
+    constelacion se mueve: eso se ve cambiando `origen`/`destino`.
+    """
+    def nom(p, i):
+        return "S%d-%d" % (p, i)
+
+    aristas = {}
+    for p in range(int(planos)):
+        for i in range(int(por_plano)):
+            aristas[(nom(p, i), nom(p, (i + 1) % por_plano))] = coste_intra
+            if p + 1 < planos:
+                aristas[(nom(p, i), nom(p + 1, i))] = coste_inter
+    origen = origen or nom(0, 0)
+    destino = destino or nom(planos - 1, por_plano // 2)
+    dij = dijkstra(aristas, origen)
+    ruta = camino_dijkstra(dij, destino)
+    return {"aristas": aristas, "planos": int(planos),
+            "por_plano": int(por_plano), "satelites": planos * por_plano,
+            "origen": origen, "destino": destino, "ruta": ruta,
+            "saltos": len(ruta) - 1, "coste": dij["dist"][destino],
+            "dijkstra": dij}
+
+
+def retardo_marte(ua):
+    """Minutos luz a Marte segun la distancia del momento. -> dict.
+
+    Marte anda entre ~0.52 UA (oposicion) y ~2.52 UA (conjuncion): el
+    retardo NO es un numero, es un rango que cambia con el ano.
+    """
+    km = float(ua) * UA_KM
+    ida_s = km / _LUZ_KM_S
+    return {"ua": float(ua), "km": km, "ida_s": ida_s,
+            "ida_min": ida_s / 60.0, "rtt_min": 2.0 * ida_s / 60.0}
+
+
+def rango_marte(n=13):
+    """El ano sintetico: la distancia y su retardo, de oposicion a
+    conjuncion. -> dict con los dos extremos MEDIDOS."""
+    uas = np.linspace(0.52, 2.52, int(n))
+    filas = [retardo_marte(u) for u in uas]
+    return {"uas": uas, "filas": filas,
+            "min_min": filas[0]["ida_min"], "max_min": filas[-1]["ida_min"],
+            "rtt_min_min": filas[0]["rtt_min"],
+            "rtt_max_min": filas[-1]["rtt_min"]}
+
+
+def ventanas_contacto(plan):
+    """El plan de contactos: cuando HAY enlace y cuando no. -> dict.
+
+    `plan` = [(desde_h, hasta_h, "de", "a"), ...]. Fuera de esas ventanas
+    no existe camino, asi que no hay a quien hacerle el apreton.
+    """
+    v = [{"desde": float(a), "hasta": float(b), "de": de, "a": a2,
+          "horas": float(b) - float(a)} for a, b, de, a2 in plan]
+    cubierto = sum(x["horas"] for x in v)
+    fin = max(x["hasta"] for x in v) if v else 0.0
+    return {"ventanas": v, "n": len(v), "horas_con_enlace": cubierto,
+            "horas_totales": fin,
+            "pct_con_enlace": 100.0 * cubierto / fin if fin else 0.0,
+            "huecos": [(v[i]["hasta"], v[i + 1]["desde"])
+                       for i in range(len(v) - 1)
+                       if v[i + 1]["desde"] > v[i]["hasta"]]}
+
+
+def tcp_sin_camino(plan):
+    """Con ventanas disjuntas NO hay camino extremo a extremo en ningun
+    instante: el apreton de TCP falla por definicion, no por mala suerte."""
+    v = ventanas_contacto(plan)
+    solapan = any(a["desde"] < b["hasta"] and b["desde"] < a["hasta"]
+                  for i, a in enumerate(v["ventanas"])
+                  for b in v["ventanas"][i + 1:])
+    return {"hay_camino_completo": bool(solapan),
+            "por_que": ("hay un instante con todos los tramos vivos"
+                        if solapan else
+                        "las ventanas no se solapan: nunca existe la ruta"),
+            "ventanas": v}
+
+
+def dtn_custodia(camino, plan, tam_mb=8.0):
+    """El bundle salta de custodio en custodio, esperando su ventana.
+    -> dict con las retenciones y el tiempo total MEDIDOS."""
+    v = ventanas_contacto(plan)["ventanas"]
+    t, pasos = 0.0, []
+    for i in range(len(camino) - 1):
+        de, a = camino[i], camino[i + 1]
+        vent = next((x for x in v if x["de"] == de and x["a"] == a), None)
+        if vent is None:
+            pasos.append({"de": de, "a": a, "estado": "sin ventana",
+                          "espera_h": None, "t_h": t})
+            continue
+        espera = max(0.0, vent["desde"] - t)
+        t = max(t, vent["desde"]) + 0.05        # la transmision es corta
+        pasos.append({"de": de, "a": a, "estado": "entregado",
+                      "espera_h": espera, "t_h": t,
+                      "ventana": (vent["desde"], vent["hasta"])})
+    retenido = sum(p["espera_h"] or 0.0 for p in pasos)
+    return {"pasos": pasos, "camino": list(camino), "tam_mb": float(tam_mb),
+            "total_h": t, "retenido_h": retenido,
+            "saltos": len(camino) - 1,
+            "entregado": all(p["estado"] == "entregado" for p in pasos)}
+
+
+PILA_TCPIP = (("Aplicacion", "HTTP"), ("Transporte", "TCP"),
+              ("Red", "IP"), ("Enlace", "Ethernet"))
+PILA_CCSDS = (("Aplicacion", "CFDP / imagenes"),
+              ("Bundle", "BP + custodia"),
+              ("Red", "Encapsulacion CCSDS"),
+              ("Enlace", "Proximity-1 / AOS"),
+              ("Codificacion", "turbo / LDPC"))
+
+
+def pila_ccsds():
+    """La pila del espacio frente a la de casa. -> dict con las dos y con
+    lo que cambia y por que."""
+    return {"tcpip": PILA_TCPIP, "ccsds": PILA_CCSDS,
+            "cambios": [
+                ("TCP -> Bundle Protocol",
+                 "no hay apreton posible: se guarda y se reenvia"),
+                ("IP -> encapsulacion CCSDS",
+                 "el camino se planifica, no se descubre"),
+                ("Ethernet -> Proximity-1 / AOS",
+                 "el enlace es una ventana, no un cable"),
+                ("+ codificacion fuerte",
+                 "el ruido no se retransmite: se corrige (curso 24)")]}
+
+
+def archivo_a_marte(tam_mb=8.0, ua=1.5):
+    """El recorrido completo de una imagen: rover -> orbitador -> DSN ->
+    control, con el retardo y la tasa de cada tramo. -> dict MEDIDO."""
+    r = retardo_marte(ua)
+    tramos = [
+        {"tramo": "rover -> orbitador", "enlace": "Proximity-1",
+         "mbps": 2.0, "retardo_s": 0.02, "ventana_min": 8.0},
+        {"tramo": "orbitador -> DSN", "enlace": "banda X",
+         "mbps": 0.5, "retardo_s": r["ida_s"], "ventana_min": 480.0},
+        {"tramo": "DSN -> centro de control", "enlace": "fibra terrestre",
+         "mbps": 1000.0, "retardo_s": 0.06, "ventana_min": None},
+    ]
+    total_s = 0.0
+    for t in tramos:
+        t["tx_s"] = float(tam_mb) * 8.0 / t["mbps"]
+        t["total_s"] = t["tx_s"] + t["retardo_s"]
+        total_s += t["total_s"]
+    return {"tramos": tramos, "tam_mb": float(tam_mb), "ua": float(ua),
+            "total_s": total_s, "total_min": total_s / 60.0,
+            "total_h": total_s / 3600.0, "luz_min": r["ida_min"],
+            "el_lento": max(tramos, key=lambda t: t["total_s"])["tramo"]}

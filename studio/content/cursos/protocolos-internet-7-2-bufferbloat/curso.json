@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 7.2 Colas, latencia y bufferbloat",
+  "description": "Lección 7.2 del curso Protocolos de Internet (módulo 7: la red real), en 4 clips animados —una idea por clip—: la ley de Little verificada sobre la simulación, el búfer grande que empeora las cosas escondiendo un segundo de latencia, AQM descartando a tiempo, y la prioridad. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-ley-de-little.py",
+      "title": "1 · La ley de Little",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-el-bufer-grande.py",
+      "title": "2 · El búfer grande que empeora",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-aqm.py",
+      "title": "3 · AQM: descartar a tiempo",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-prioridad.py",
+      "title": "4 · Prioridad",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

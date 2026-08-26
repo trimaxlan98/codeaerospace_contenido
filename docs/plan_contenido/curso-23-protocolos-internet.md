@@ -229,7 +229,7 @@ lecciones en producción aunque el resto no se haga nunca.
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
 | 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **en curso** (librería lista y validada; 6 agentes escribiendo) |
-| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
+| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **en curso** (librería lista y validada; 6 agentes escribiendo) |
 
 ## Receta de lote (la misma en los cuatro)
 
@@ -283,12 +283,12 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | — | — | — | — | — |
 | 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | — | — | — | — | — |
 | 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | — | — | — | — | — |
-| 7.1 | ✔ | — | — | — | — | — | — | — | — |
-| 7.2 | ✔ | — | — | — | — | — | — | — | — |
-| 7.3 | ✔ | — | — | — | — | — | — | — | — |
-| 8.1 | ✔ | — | — | — | — | — | — | — | — |
-| 8.2 | ✔ | — | — | — | — | — | — | — | — |
-| 8.3 | ✔ | — | — | — | — | — | — | — | — |
+| 7.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 7.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 7.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 8.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 8.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 8.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 
 ## Módulo 1 — La red de redes
 
