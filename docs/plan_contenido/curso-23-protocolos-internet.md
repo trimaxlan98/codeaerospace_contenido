@@ -271,7 +271,7 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | PR #47 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 3.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 3.1 | ✔ | ✔ | ✔ | ✔ 32/35/36/41 s | — | — | — | — | — |
 | 3.2 | ✔ | ✔ | ✔ | ✔ 31/30/31/29 s | — | — | — | — | — |
 | 3.3 | ✔ | ✔ | ✔ | ✔ 32/35/35/40 s | — | — | — | — | — |
 | 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | — | — | — | — | — |
@@ -794,6 +794,83 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   solo en `tag_hud`), como los cursos 22 y 24. Los acentos viven en
   `curso.json` (título y descripción), que no se renderiza.
 - `2^32`, `2^128`, `λ` y `≈` solo en `MathTex`.
+
+## Cosecha de trampas del lote 2 (medida durante la producción)
+
+**De honestidad — las tres que había que cazar antes de animarlas**
+- **El conteo al infinito solo ocurre si el corte deja el destino
+  inalcanzable.** Con otro corte la red converge tranquilamente y no hay
+  nada que contar. Con la cadena A—B—C—D cortando C—D salen las series
+  reales (3, 5, 7, … 15, 16 = el infinito de RIP), y con horizonte
+  dividido muere en 2 rondas.
+- **`conteo_al_infinito` devolvía `max_rondas` de historia aunque la red se
+  hubiera estabilizado antes**: su corte exigía que el destino fuera
+  inalcanzable. Para un corte que sí converge decía 12 cuando lo honesto
+  era 7. Corregido en la librería con `rondas_estable` (lo encontró la
+  agente de la 3.1 midiendo a mano en vez de fiarse del campo).
+- **Comparar la MEDIA de dos sierras cortas hace parecer que CUBIC es peor
+  que Reno** (21.06 frente a 27.63). Lo que de verdad los separa es el
+  tiempo de recuperación: Reno sube +1 por RTT y depende del RTT, CUBIC no.
+  A 20 ms **gana Reno 1.9×**, a 40 ms empatan, a 200 ms gana CUBIC 5.4×.
+  La 4.3 enseña las dos cosas y pone el pie "compararlas aquí sería mentir".
+- Los datos que la librería no calcula (los ~75 000 AS de Internet) se
+  rotulan como medición pública **y en otro color**, para que el cian siga
+  significando "esto lo calculó la librería".
+- Un camino rechazado por política **no tiene por qué ser más corto**: la
+  3.3 lo midió, tenía los mismos saltos, y el pie quedó en "El cable está
+  ahí. El contrato, no".
+
+**De `Topologia`**
+- Cuelga la etiqueta SIEMPRE debajo del nodo: si dos nodos conectados
+  comparten la coordenada x, la arista sale vertical y **tacha la letra**.
+  Le pasó a la 3.1 y a la 3.2 por separado. Se arregla separando las
+  posiciones o con `etiquetas_a({nodo: UP})`, ya en la librería.
+- `enlace(a, b)` devuelve la MISMA línea para (a,b) y (b,a), dibujada en el
+  sentido en que se declaró la arista: un `MoveAlongPath` sobre ella va al
+  revés la mitad de las veces → `tramo(a, b, desde, hasta)`, ya en la
+  librería.
+- Una ficha que termina su trayecto en el nodo se monta encima de él y de
+  la etiqueta del vecino: parar en 0.66–0.74 y encender el nodo.
+- Encadenar tramos a secas **teletransporta** la ficha en cada relevo:
+  construir el trayecto desde la posición ACTUAL.
+- `resaltar_camino()` también recolorea los NODOS: pisa un color que ya
+  hubieras puesto (p. ej. el verde de "fijado" de Dijkstra).
+- `grafo_de` exige costo numérico: un `None` revienta con `float(None)`.
+  Declarar coste 1 y dibujar con `costos=False`.
+- Una ficha sobre el cable tapa los rótulos de coste: si el clip quiere que
+  se lean, usar `ShowPassingFlash` sobre la línea.
+
+**De `Tabla`, `Paquete` y las gemelas**
+- **`"%2d"` no es ancho fijo**: la sombra de `Text` descarta el glifo del
+  espacio, así que `" 3"` tiene 1 glifo y `"16"` tiene 2 → gemelas rotas.
+  `"%02d"` sí.
+- `Transform` **no actualiza los atributos Python** del objeto original: si
+  solo iluminas la copia destino, el `_iluminados` del original queda vacío
+  y la siguiente gemela pierde el resaltado.
+- `Tabla` pinta la fila entera de un color: para que solo las cifras vayan
+  en cian hay que repintar por celda (repintar no toca la estructura, así
+  que las gemelas siguen siendo válidas).
+- Mantener el **orden de fila FIJO** al animar una tabla que crece:
+  reordenar por costo hace saltar de fila a los routers cada ronda.
+- Los empates de coste **parecen un bug en pantalla** (la columna
+  "siguiente" cambia sin que cambie el costo): elegir los pesos de la red
+  para que no haya ninguno.
+- `Sierra` fija sus marcas de pérdida en la CONSTRUCCIÓN: pasar los índices
+  ya al constructor y diferir solo el `FadeIn` de ese hijo.
+
+**De composición**
+- El style_block del **molde** solo importa lo del lote 1: cada lección de
+  los módulos 3 y 4 tiene que ampliar su `from protocolos import`.
+- `FadeOut(viejo) + FadeIn(nuevo)` en la misma posición dentro de UN solo
+  `play` se cruzan y el frame muestreado enseña los dos textos encimados.
+- Bajo una topología solo cabe UNA línea de cifras entre los rótulos de
+  nodo y el pie.
+- Al cortar un enlace hay que apagar su etiqueta de coste: la cruz roja va
+  al punto medio y el rótulo está a +0.26.
+- Un `tag_hud` largo anclado con `next_to` a un objeto descentrado hereda
+  su centro horizontal y se sale del cuadro: `move_to` a un punto fijo.
+- A 480p un stroke rojo fino sobre un nodo con aristas encima **parece
+  azul**: antes de dar por roto el código, ampliar el frame con ffmpeg.
 
 ## Hitos globales
 

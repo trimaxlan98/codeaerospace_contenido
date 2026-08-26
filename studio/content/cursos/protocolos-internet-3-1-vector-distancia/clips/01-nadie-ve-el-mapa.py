@@ -17,6 +17,7 @@ class Clip1(Scene):
                     zona="abajo", run_time=0.5)
         topo = topologia(POS_RED, ARISTAS_RED, TIPOS_RED, costos=True,
                          tam=0.46, fs=15)
+        topo.etiquetas_a(ETIQUETAS_RED)
         self.play(FadeIn(topo.enlaces), run_time=0.9)
         self.play(FadeIn(topo.nodos), run_time=0.7)
         et_dest = tag_hud("destino: %s" % DESTINO, font_size=19, color=C_OK)

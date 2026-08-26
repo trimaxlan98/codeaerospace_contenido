@@ -18,6 +18,7 @@ class Clip2(Scene):
                     zona="abajo", run_time=0.5)
         topo = topologia(POS_RED, ARISTAS_RED, TIPOS_RED, costos=True,
                          tam=0.46, fs=15)
+        topo.etiquetas_a(ETIQUETAS_RED)
         topo.nodo(DESTINO).forma.set_stroke(C_OK, width=3.4)
         tab = tabla_rutas(BF_HIST[0])
         et_tab = tag_hud("tabla de rutas hacia %s" % DESTINO,

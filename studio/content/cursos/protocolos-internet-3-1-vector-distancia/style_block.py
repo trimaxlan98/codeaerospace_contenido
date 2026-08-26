@@ -125,6 +125,10 @@ POS_RED = {"A": (-6.05, 0.05), "B": (-4.35, 1.55), "C": (-4.35, -1.45),
 ARISTAS_RED = {("A", "B"): 2, ("A", "C"): 1, ("B", "C"): 4, ("B", "D"): 5,
                ("C", "E"): 6, ("D", "E"): 3, ("D", "F"): 7, ("E", "F"): 1}
 TIPOS_RED = {"F": "servidor"}
+# B esta justo encima de C y D encima de E: las aristas B-C y D-E salen
+# VERTICALES y tachan la letra del nodo de arriba (que cuelga debajo por
+# defecto). Se suben esos dos rotulos con `Topologia.etiquetas_a`.
+ETIQUETAS_RED = {"B": UP, "D": UP}
 VECINOS = grafo_de(ARISTAS_RED)
 
 BF = bellman_ford(ARISTAS_RED, DESTINO)

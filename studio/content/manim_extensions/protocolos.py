@@ -1523,10 +1523,18 @@ def conteo_al_infinito(aristas, destino, corte, max_rondas=12,
             break
     subidas = {n: sum(1 for a, b in zip(s[:-1], s[1:]) if b > a)
                for n, s in series.items()}
+    # `rondas` es cuantas se simularon; la HONESTA es en cual dejo de
+    # cambiar nada. Cuando el destino sigue alcanzable por otro camino la
+    # red converge antes de `max_rondas` y citar el tope seria mentir.
+    estable = len(historia) - 1
+    for i in range(len(historia) - 1):
+        if historia[i] == historia[i + 1]:
+            estable = i
+            break
     return {"historia": historia, "series": series, "corte": tuple(corte),
             "destino": destino, "huerfano": huerfano,
-            "rondas": len(historia) - 1, "infinito": int(infinito),
-            "subidas": subidas,
+            "rondas": len(historia) - 1, "rondas_estable": estable,
+            "infinito": int(infinito), "subidas": subidas,
             "cuenta": max(subidas.values()) if subidas else 0,
             "alcanzable": alcanzable}
 
