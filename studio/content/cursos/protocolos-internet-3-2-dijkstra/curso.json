@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 3.2 Estado del enlace: el mapa completo",
+  "description": "Lección 3.2 del curso Protocolos de Internet (módulo 3: encontrar el camino), en 4 clips animados —una idea por clip—: inundar el mapa con los mensajes contados, Dijkstra fijando nodo a nodo, el árbol de caminos mínimos, y converger rápido frente al vector distancia. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-inundar-el-mapa.py",
+      "title": "1 · Inundar el mapa",
+      "scene": "Clip1",
+      "final_state": "Pantalla con la tabla 'Router / Enlaces en su mapa': las seis filas A-F, todas en 8 (cian); a la izquierda 'rondas 4' y 'mensajes 16' en cian; pie 'Nadie tiene nada nuevo que anunciar: la inundacion se detiene. Las seis bases de datos son identicas.'; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-dijkstra-paso-a-paso.py",
+      "title": "2 · Dijkstra paso a paso",
+      "scene": "Clip2",
+      "final_state": "Topologia azul con los seis nodos en verde (fijados) y su distancia en cian sobre cada uno (0,2,4,6,7,9); arriba 'orden: A, B, C, D, E, F'; el camino A-B-D-F resaltado en ambar con el rotulo 'A -> B -> D -> F = 9' en cian; pie sobre el orden y el costo definitivo; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-el-arbol-de-caminos.py",
+      "title": "3 · El árbol de caminos",
+      "scene": "Clip3",
+      "final_state": "Topologia con el NUEVO arbol resaltado en verde (A-B, A-C, C-E, E-D, E-F, con el enlace A-C ahora en 1, cian); a la derecha el panel B 2, C 1, D 5, E 4, F 6 en cian; pie 'B sigue costando 2. C, D, E y F llegan mas baratos por el nuevo atajo.'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-converger-rapido.py",
+      "title": "4 · Converger rápido",
+      "scene": "Clip4",
+      "final_state": "Cierre de la leccion a pantalla limpia: 'Un mapa compartido cuesta mas de mantener.' en blanco y 'Y se equivoca mucho menos.' en cian; pie 'Siguiente: BGP, la politica entre paises.'; HUD 'Modulo 04'."
+    }
+  ]
+}

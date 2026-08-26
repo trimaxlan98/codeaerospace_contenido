@@ -1,0 +1,311 @@
+# =====================================================================
+# CO.DE Academy - "Protocolos de Internet · 3.2 Estado del enlace: el mapa completo".
+# Bloque de estilo del proyecto. Se antepone al script de CADA clip;
+# los clips NO repiten imports: solo definen su ClipN(Scene).
+#
+# Copia del MOLDE de la familia (leccion 1.1): solo cambian esta
+# cabecera y la tabla de numeros de la leccion.
+# =====================================================================
+import math
+import sys
+
+sys.path.insert(0, "/workspace/studio/content/manim_extensions")
+
+import numpy as np
+from manim import *
+
+import bloques as _bloques
+import code_brand as _code_brand
+from bloques import bloque, conectar, flujo
+from brillo import con_brillo, punto_brillante
+from code_brand import (CODE_ACCENT, CODE_ACCENT_2, CODE_BG, CODE_INK,
+                        CODE_MUTED, FUENTE_DISPLAY, FUENTE_HUD, Rotulos,
+                        esquinas_hud, etiqueta_hud, marca_agua,
+                        registrar_fuentes, titulo_marca)
+from transiciones import (transicion_deslizar, transicion_persiana,
+                          transicion_zoom)
+
+# --- Tipografia de marca ---------------------------------------------
+registrar_fuentes()
+Text.set_default(font=FUENTE_DISPLAY)
+
+_TextBase = Text
+
+
+class Text(_TextBase):
+    """Sombra de Text que descarta los glifos vacios (espacios).
+
+    Manim 0.20.1 deja el glifo del espacio anclado donde nacio el texto: al
+    mover el mobject, el bounding box se infla y rompe next_to / Brace /
+    SurroundingRectangle. Filtrarlos tras construir lo deja estable sin
+    alterar la posicion de las letras (ya esta horneada).
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.submobjects = [s for s in self.submobjects if s.has_points()]
+
+
+_bloques.Text = Text
+_code_brand.Text = Text
+
+import algebra_lineal as _al  # noqa: E402  (tras definir la sombra)
+from algebra_lineal import C_EJE, C_REJILLA, fmt, grafica  # noqa: E402
+
+_al.Text = Text
+
+import protocolos as _pr  # noqa: E402
+from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
+                        C_OK, C_PAQUETE, C_PERDIDA, C_RED,
+                        CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
+                        arp_resolver, barra_bits, bellman_ford, cabecera,
+                        cabecera_ipv4, camino_dijkstra, checksum_ip, cidr,
+                        cola, cola_mm1, conmutacion, crc32_trama, csma_cd,
+                        dijkstra, encapsular, enlace, entero_a_ip, eui64,
+                        fragmentar, inundacion, ip_a_entero, ipv6_comprimir,
+                        ipv6_expandir, little, mascara_bits,
+                        mux_estadistico, nodo, paquete, pila,
+                        prefijo_mas_largo, reloj, switch_aprende,
+                        tabla, topologia, trama_ethernet, troceado,
+                        ttl_camino, verificar_checksum, voltear_bit)
+
+_pr.Text = Text
+
+_RotulosBase = Rotulos
+
+
+class Rotulos(_RotulosBase):
+    """Relevo SECUENCIAL por zona: el rotulo anterior sale ANTES de que
+    entre el nuevo (el original los cruza y se ven superpuestos)."""
+
+    def mostrar(self, mobjeto, zona="abajo", run_time=0.45, salida=0.25,
+                **kwargs):
+        if self._zonas.get(zona) is not None:
+            self.limpiar(zona, run_time=salida)
+        return super().mostrar(mobjeto, zona=zona, run_time=run_time,
+                               **kwargs)
+
+
+config.background_color = CODE_BG
+
+# --- Paleta del curso -------------------------------------------------
+# Regla: EL COLOR DICE EL PAPEL. Ambar el paquete y el dato que viaja;
+# cian TODA cifra calculada; azul la red (nodos, enlaces, topologia);
+# rojo la perdida, el descarte y la congestion; verde lo entregado y
+# confirmado; violeta las capas, cabeceras y jerarquias; fucsia la
+# seguridad; naranja las colas y la espera; gris el mobiliario.
+C_TITULO = CODE_INK          # #e8edf3 titulos
+C_TENUE = CODE_MUTED         # #94a0b0 pies y elementos secundarios
+C_ACENTO = CODE_ACCENT       # #f59e0b ambar
+C_ACENTO_2 = CODE_ACCENT_2   # #ea580c naranja de cierre
+C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
+
+MARGEN_PIE = 0.68            # separacion del pie al borde inferior
+
+# --- Numeros de la leccion --------------------------------------------
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. Medido en el contenedor antes de escribir los clips.
+
+# La red compartida de la leccion (los mismos seis routers de 3.1).
+RED = {("A", "B"): 2, ("A", "C"): 5, ("B", "C"): 2, ("B", "D"): 4,
+       ("C", "E"): 3, ("D", "E"): 1, ("D", "F"): 3, ("E", "F"): 2}
+# Ningun par CONECTADO comparte la coordenada x: con B encima de C (y D
+# encima de E) las aristas B-C y D-E salian verticales y tachaban la letra
+# del nodo de arriba y la cifra de distancia del de abajo.
+POS_RED = {"A": (-4.4, 0.5), "B": (-2.2, 2.1), "C": (-1.2, -1.2),
+           "D": (1.7, 1.8), "E": (0.7, -1.6), "F": (4.2, 0.1)}
+N_ENLACES = len(RED)                    # 8: lo que cada router acaba sabiendo
+
+# Clip 1 - inundar el mapa: rondas y mensajes CONTADOS por `inundacion`.
+INUN = inundacion(RED, "A")
+# INUN["rondas"]: [{'ronda':1,'nuevos':['B','C'],'mensajes':2}, ...]
+#                  ronda 2 nuevos=['D','E'] mensajes=6
+#                  ronda 3 nuevos=['F']     mensajes=6
+#                  ronda 4 nuevos=[]        mensajes=2
+# INUN["n_rondas"] = 4, INUN["mensajes"] = 16, INUN["todos"] = True
+
+
+def _vecinos_de(red):
+    g = {}
+    for (a, b) in red:
+        g.setdefault(a, set()).add(b)
+        g.setdefault(b, set()).add(a)
+    return g
+
+
+def _rondas_de_envios(vecinos, origen):
+    """Replica la MISMA logica de `inundacion` pero devolviendo, ronda a
+    ronda, la lista (emisor, receptor) de cada mensaje enviado -- lo que
+    se anima. El total por ronda coincide con INUN['rondas'][i]['mensajes']
+    (verificado en el contenedor): cada router reenvia a TODOS sus
+    vecinos, incluso a los que ya lo saben."""
+    tienen, frontera, rondas = {origen}, {origen}, []
+    while frontera:
+        envios, nueva = [], set()
+        for n in sorted(frontera):
+            for v in sorted(vecinos[n]):
+                envios.append((n, v))
+                if v not in tienen:
+                    nueva.add(v)
+        tienen |= nueva
+        rondas.append(envios)
+        frontera = nueva
+    return rondas
+
+
+RONDAS_ENVIOS = _rondas_de_envios(_vecinos_de(RED), "A")
+
+# Clips 2 y 3 - Dijkstra desde A: orden de fijacion REAL y su arbol.
+DIJ = dijkstra(RED, "A")
+ORDEN_DIJ = DIJ["orden"]                # ['A', 'B', 'C', 'D', 'E', 'F']
+CAMINO_AF = camino_dijkstra(DIJ, "F")   # ['A', 'B', 'D', 'F'], costo 9
+ARBOL_DIJ = sorted(DIJ["arbol"])        # [('A','B'),('B','C'),('B','D'),
+                                         #  ('C','E'),('D','F')]
+DESTINOS = ["B", "C", "D", "E", "F"]
+
+# Clip 3 - se cambia un costo de enlace (A-C baja de 5 a 1) y el arbol
+# de caminos minimos se redibuja distinto (medido, no supuesto).
+RED2 = dict(RED)
+RED2[("A", "C")] = 1
+DIJ2 = dijkstra(RED2, "A")
+ARBOL_DIJ2 = sorted(DIJ2["arbol"])      # [('A','B'),('A','C'),('C','E'),
+                                         #  ('D','E'),('E','F')]
+
+# Clip 4 - contraste honesto: rumores (Bellman-Ford desde F) frente al
+# mapa compartido (inundacion desde A, ya medida arriba).
+BF_F = bellman_ford(RED, "F")           # converge en 3 rondas
+
+
+# --- Rotulos ----------------------------------------------------------
+def _con_fondo(mobjeto, buff=0.14, opacidad=0.82):
+    """Rectangulo del color del fondo detras de un rotulo: el texto se lee
+    limpio aunque haya piezas debajo."""
+    fondo = BackgroundRectangle(mobjeto, color=CODE_BG, fill_opacity=opacidad,
+                                buff=buff)
+    return VGroup(fondo, mobjeto)
+
+
+def titulo_curso(texto, font_size=34, color=None):
+    """Titulo de clip (Rajdhani) anclado arriba. Zona 'arriba' de Rotulos."""
+    t = titulo_marca(texto, font_size=font_size,
+                     color=C_TITULO if color is None else color)
+    if t.width > 7.6:
+        t.scale_to_fit_width(7.6)
+    t.to_edge(UP, buff=0.52)
+    return _con_fondo(t)
+
+
+def pie_curso(texto, font_size=25, color=None):
+    """Pie narrativo anclado abajo. Zona 'abajo' de Rotulos."""
+    t = Text(texto, font_size=font_size,
+             color=C_TENUE if color is None else color)
+    if t.width > config.frame_width - 2.6:
+        t.scale_to_fit_width(config.frame_width - 2.6)
+    t.to_edge(DOWN, buff=MARGEN_PIE)
+    return _con_fondo(t)
+
+
+def formula_pie(tex, font_size=34, color=None):
+    """MathTex corto que ocupa la MISMA zona que el pie (nunca se suman)."""
+    m = MathTex(tex, font_size=font_size,
+                color=C_CALCULO if color is None else color)
+    if m.width > config.frame_width - 3.0:
+        m.scale_to_fit_width(config.frame_width - 3.0)
+    m.to_edge(DOWN, buff=MARGEN_PIE)
+    return _con_fondo(m)
+
+
+def hud_modulo(texto):
+    """Etiqueta de telemetria del modulo, esquina superior izquierda."""
+    t = etiqueta_hud(texto)
+    t.to_corner(UL, buff=0.5)
+    return t
+
+
+def tag_junto(mobjeto, texto, direccion=DOWN, buff=0.16, font_size=18,
+              color=None):
+    """Etiqueta corta de mobiliario pegada a un mobject (no narrativa)."""
+    t = Text(texto, font_size=font_size,
+             color=C_TENUE if color is None else color)
+    t.set_opacity(0.85)
+    t.next_to(mobjeto, direccion, buff=buff)
+    return t
+
+
+def tag_hud(texto, font_size=17, color=None):
+    """Cifra o etiqueta tecnica en Space Mono (SOLO ASCII: sin acentos ni
+    superindices — Space Mono no los trae)."""
+    t = Text(texto, font=FUENTE_HUD, font_size=font_size,
+             color=C_CALCULO if color is None else color)
+    return t
+
+
+def panel_derecha(*mobjetos, buff=0.30):
+    """Columna de mobjects (cifras, esquemas) en la esquina superior
+    derecha, con fondo, sin pisar el titulo ni el HUD."""
+    g = VGroup(*mobjetos).arrange(DOWN, buff=buff)
+    g.to_corner(UR, buff=0.55).shift(DOWN * 0.5)
+    return _con_fondo(g, buff=0.18, opacidad=0.75)
+
+
+def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
+          buff=0.12):
+    """Brace opcionalmente etiquetado (etiquetas de 1-2 palabras)."""
+    col = C_CALCULO if color is None else color
+    b = Brace(mobjeto, direction=direccion, color=col)
+    if texto is None:
+        return VGroup(b)
+    t = Text(texto, font_size=font_size, color=col)
+    t.next_to(b, direccion, buff=buff)
+    return VGroup(b, t)
+
+
+def salto(topo, desde, hasta, frac=0.55):
+    """Trayectoria de UN salto para `MoveAlongPath`, del centro de `desde`
+    a un punto A MEDIO CAMINO del enlace (nunca al centro de `hasta`): una
+    ficha que termina su viaje montada en el nodo lo tapa (trampa heredada
+    de la familia). La llegada se marca aparte, encendiendo el nodo."""
+    e = topo.enlace(desde, hasta)
+    origen = topo.punto(desde)
+    cerca_de_a = (np.linalg.norm(origen - e.a) <= np.linalg.norm(origen - e.b))
+    destino = e.punto_en(frac if cerca_de_a else 1.0 - frac)
+    v = VMobject()
+    v.set_points_as_corners([origen, destino])
+    return v
+
+
+def mensaje(color=C_PAQUETE, lado=0.20):
+    """Un anuncio/mensaje viajando por el enlace: un cuadrado chico del
+    color del dato que viaja (regla de la paleta: ambar)."""
+    return Square(lado, stroke_color=color, stroke_width=1.6,
+                 fill_color=color, fill_opacity=0.85)
+
+
+def cierre_leccion(escena, rot, linea_blanca, linea_cian, pie=None,
+                   *apagar, espera=4.6):
+    """El cierre a pantalla limpia de la leccion (clip 4): apaga lo que se
+    le pase, limpia el titulo y muestra dos lineas (blanca y cian)."""
+    if apagar:
+        escena.play(*[FadeOut(m) for m in apagar], run_time=0.8)
+    rot.limpiar("arriba", run_time=0.4)
+    l1 = Text(linea_blanca, font_size=40, color=C_TITULO)
+    l2 = Text(linea_cian, font_size=40, color=C_CALCULO)
+    l1.move_to(UP * 0.42)
+    l2.move_to(DOWN * 0.42)
+    if pie is not None:
+        rot.mostrar(pie_curso(pie), zona="abajo", run_time=0.5)
+    escena.play(FadeIn(l1, shift=0.2 * UP), run_time=0.7)
+    escena.play(FadeIn(l2, shift=0.2 * UP), run_time=0.7)
+    escena.wait(espera)
+    return VGroup(l1, l2)
+
+
+# --- Marca de la escena (sombra de Scene) -----------------------------
+_SceneBase = Scene
+
+
+class Scene(_SceneBase):
+    def setup(self):
+        super().setup()
+        self.camera.background_color = CODE_BG
+        self.add(esquinas_hud(), marca_agua())

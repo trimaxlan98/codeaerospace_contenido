@@ -20,14 +20,19 @@ La regla de color de la familia: **el color dice el papel**.
     C_CLAVE    fucsia   seguridad: claves, certificados, lo cifrado
     C_COLA     naranja  colas, buferes, espera, ancho de banda
 
-Numeros del LOTE 1 (modulos 1 y 2). Toda cifra en pantalla sale de aqui
-o de la tabla del style_block, nunca escrita a mano:
+Numeros de los LOTES 1 y 2 (modulos 1 a 4). Toda cifra en pantalla sale
+de aqui o de la tabla del style_block, nunca escrita a mano:
     troceado / conmutacion / mux_estadistico / cola_mm1 / little
     encapsular / crc32_trama / trama_ethernet / csma_cd
     switch_aprende / arp_resolver
     checksum_ip / cabecera_ipv4 / cabecera_ipv6 / fragmentar / ttl_camino
     cidr / mascara_bits / prefijo_mas_largo / agregar_rutas
     ipv6_expandir / ipv6_comprimir / eui64 / espacio_direcciones
+    grafo_de / bellman_ford / conteo_al_infinito
+    dijkstra / camino_dijkstra / inundacion
+    bgp_mejor_ruta / secuestro_bgp
+    demux / handshake_tcp / bdp / ventana / rtt_jacobson
+    arranque_lento / aimd / cubic / colapso_congestion
 
 Piezas (VGroup con localizadores que siguen move_to/shift, NO scale;
 todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
@@ -47,6 +52,8 @@ todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
     ficha          token cuadrado del datagrama; .con_texto()
     bus            cable compartido con estaciones; .punto(i) .estacion(i)
     ranuras        regla de ranuras de tiempo; .con_colores()
+    escalera       diagrama de tiempo (handshake, DNS, TLS); .paso(k)
+    sierra         cwnd frente al tiempo; .marcas .media; .con_traza()
 
 Uso en un clip (el style_block de la familia ya importa todo):
     import sys; sys.path.insert(0, "/workspace/studio/content/manim_extensions")
@@ -56,9 +63,10 @@ import math
 import zlib
 
 import numpy as np
-from manim import (DOWN, LEFT, ORIGIN, RIGHT, UP, Circle, DashedLine, Dot,
-                   Line, Polygon, Rectangle, RoundedRectangle, Square,
-                   Triangle, VGroup)
+from manim import (DOWN, LEFT, ORIGIN, RIGHT, UP, Arrow, Circle,
+                   DashedLine, Dot, Line, Polygon, Rectangle,
+                   RoundedRectangle, Square, Triangle, VGroup,
+                   VMobject)
 
 from algebra_lineal import (C_AREA, C_EJE, C_I, C_IMG, C_J, C_K, C_PROPIO,
                             C_REJILLA, C_VEC, C_VIVA, _Anclada, _texto_hud,
@@ -909,13 +917,40 @@ class Topologia(_Anclada):
     def enlace(self, a, b):
         return self.aristas[(a, b)]
 
+    def etiquetas_a(self, direcciones, buff=0.14):
+        """Recoloca los rotulos de nodo uno a uno.
+
+        `Topologia` cuelga la etiqueta SIEMPRE debajo del nodo, y en un
+        grafo denso las aristas que bajan la cruzan (la letra sale
+        tachada). `direcciones` = {nodo: UP|DOWN|LEFT|RIGHT}.
+        """
+        for k, d in dict(direcciones).items():
+            n = self._nod[k]
+            if n.etiqueta is not None:
+                n.etiqueta.next_to(n.forma, d, buff=buff)
+        return self
+
+    def tramo(self, a, b, desde=0.0, hasta=1.0):
+        """Trayectoria ORIENTADA de `a` a `b`, recortable, para
+        `MoveAlongPath`.
+
+        `enlace(a, b)` devuelve la misma linea para (a, b) y (b, a),
+        dibujada en el sentido en que se declaro la arista: animar sobre
+        ella va al reves la mitad de las veces. Y parar en 1.0 monta la
+        ficha encima del nodo: 0.66-0.74 es el sitio.
+        """
+        pa, pb = self.punto(a), self.punto(b)
+        v = VMobject()
+        v.set_points_as_corners([pa + (pb - pa) * float(desde),
+                                 pa + (pb - pa) * float(hasta)])
+        return v
+
     def camino(self, nombres):
         """La ruta como VMobject, lista para `MoveAlongPath`.
 
         `Topologia` sabia resaltar un camino pero no darlo como
         trayectoria; cada leccion lo reconstruia a mano.
         """
-        from manim import VMobject
         v = VMobject()
         v.set_points_as_corners([self.punto(k) for k in nombres])
         return v
@@ -1391,3 +1426,572 @@ def cabecera_ipv6(origen="2001:db8:1:1::7", destino="2001:db8:2:2::20",
     return {"valores": valores, "campos": CAMPOS_IPV6, "bytes": 40,
             "origen": origen, "destino": destino,
             "sin_checksum": True, "sin_fragmentacion_en_transito": True}
+
+
+# =====================================================================
+# Modulo 3 — Encontrar el camino (ruteo)
+# =====================================================================
+def grafo_de(aristas):
+    """{(a, b): costo} -> {nodo: {vecino: costo}} (no dirigido)."""
+    g = {}
+    for (a, b), c in dict(aristas).items():
+        g.setdefault(a, {})[b] = float(c)
+        g.setdefault(b, {})[a] = float(c)
+    return g
+
+
+def bellman_ford(aristas, destino, horizonte_dividido=False, max_rondas=20):
+    """Vector distancia DISTRIBUIDO: cada nodo solo sabe de sus vecinos.
+
+    Devuelve la historia ronda a ronda de las tablas {nodo: (costo,
+    siguiente)} — lo que se dibuja en pantalla. `horizonte_dividido` no
+    anuncia una ruta al vecino por el que se sale.
+    """
+    g = grafo_de(aristas)
+    INF = float("inf")
+    tabla = {n: (0.0, n) if n == destino else (INF, None) for n in g}
+    historia = [dict(tabla)]
+    for _ in range(int(max_rondas)):
+        nueva = dict(tabla)
+        for n in g:
+            if n == destino:
+                continue
+            mejor, por = INF, None
+            for v, c in g[n].items():
+                cv, sig = tabla[v]
+                if horizonte_dividido and sig == n:
+                    continue          # no le devuelvas el rumor a su fuente
+                if cv + c < mejor:
+                    mejor, por = cv + c, v
+            nueva[n] = (mejor, por)
+        if nueva == tabla:
+            break
+        tabla = nueva
+        historia.append(dict(tabla))
+    return {"historia": historia, "tabla": tabla, "rondas": len(historia) - 1,
+            "destino": destino, "nodos": sorted(g)}
+
+
+def conteo_al_infinito(aristas, destino, corte, max_rondas=12,
+                       horizonte_dividido=False, infinito=16):
+    """El patologico de verdad: se corta el enlace que sostenia al destino y
+    los rumores inflan el costo de uno en uno.
+
+    Para que el conteo ocurra, `corte` tiene que ser el enlace que deja al
+    destino inalcanzable (si queda otro camino, la red converge y no hay
+    nada que contar). `infinito` es el tope de RIP: 16 saltos = "no llego".
+    Devuelve la secuencia MEDIDA de costos por nodo y por ronda.
+    """
+    base = bellman_ford(aristas, destino, horizonte_dividido)
+    restantes = {k: v for k, v in dict(aristas).items()
+                 if set(k) != set(corte)}
+    g = grafo_de(restantes)
+    for n in grafo_de(aristas):
+        g.setdefault(n, {})
+    tabla = {}
+    for n in g:
+        costo, sig = base["tabla"].get(n, (float("inf"), None))
+        # una ruta cuyo siguiente salto ya no es vecino murio con el enlace
+        if n != destino and (sig is None or sig not in g[n]):
+            tabla[n] = (float(infinito), None)
+        else:
+            tabla[n] = (costo, sig)
+    tabla[destino] = (0.0, destino)
+    huerfano = corte[0] if corte[1] == destino else corte[1]
+    historia = [dict(tabla)]
+    series = {n: [tabla[n][0]] for n in g}
+    alcanzable = destino in g and bool(g[destino])
+    for _ in range(int(max_rondas)):
+        nueva = dict(tabla)
+        for n in g:
+            if n == destino:
+                continue
+            mejor, por = float(infinito), None
+            for v, c in g[n].items():
+                cv, sig = tabla[v]
+                if horizonte_dividido and sig == n:
+                    continue
+                if cv + c < mejor:
+                    mejor, por = cv + c, v
+            nueva[n] = (min(mejor, float(infinito)), por)
+        tabla = nueva
+        historia.append(dict(tabla))
+        for n in g:
+            series[n].append(tabla[n][0])
+        if all(v[0] >= infinito for k, v in tabla.items() if k != destino) \
+                and not alcanzable:
+            break
+    subidas = {n: sum(1 for a, b in zip(s[:-1], s[1:]) if b > a)
+               for n, s in series.items()}
+    # `rondas` es cuantas se simularon; la HONESTA es en cual dejo de
+    # cambiar nada. Cuando el destino sigue alcanzable por otro camino la
+    # red converge antes de `max_rondas` y citar el tope seria mentir.
+    estable = len(historia) - 1
+    for i in range(len(historia) - 1):
+        if historia[i] == historia[i + 1]:
+            estable = i
+            break
+    return {"historia": historia, "series": series, "corte": tuple(corte),
+            "destino": destino, "huerfano": huerfano,
+            "rondas": len(historia) - 1, "rondas_estable": estable,
+            "infinito": int(infinito), "subidas": subidas,
+            "cuenta": max(subidas.values()) if subidas else 0,
+            "alcanzable": alcanzable}
+
+
+def dijkstra(aristas, origen):
+    """Estado del enlace: el algoritmo REAL, con el ORDEN de fijacion y las
+    distancias tentativas paso a paso (lo que se anima)."""
+    g = grafo_de(aristas)
+    INF = float("inf")
+    dist = {n: (0.0 if n == origen else INF) for n in g}
+    previo, fijados, pasos = {origen: None}, [], []
+    pendientes = set(g)
+    while pendientes:
+        n = min(pendientes, key=lambda x: dist[x])
+        if dist[n] == INF:
+            break
+        pendientes.discard(n)
+        fijados.append(n)
+        bajaron = {}
+        for v, c in g[n].items():
+            if v in pendientes and dist[n] + c < dist[v]:
+                dist[v] = dist[n] + c
+                previo[v] = n
+                bajaron[v] = dist[v]
+        pasos.append({"fija": n, "coste": dist[n], "bajaron": bajaron,
+                      "tentativas": dict(dist)})
+    arbol = [(previo[n], n) for n in g if previo.get(n) is not None]
+    return {"dist": dist, "previo": previo, "orden": fijados, "pasos": pasos,
+            "arbol": arbol, "origen": origen}
+
+
+def camino_dijkstra(res, destino):
+    """La ruta origen->destino que sale del arbol de `dijkstra`."""
+    ruta, n = [], destino
+    while n is not None:
+        ruta.append(n)
+        n = res["previo"].get(n)
+    return list(reversed(ruta))
+
+
+def inundacion(aristas, origen):
+    """El anuncio de estado de enlace se propaga. -> rondas y mensajes
+    CONTADOS hasta que todos tienen la misma base de datos."""
+    g = grafo_de(aristas)
+    tienen, frontera, rondas, mensajes = {origen}, {origen}, [], 0
+    while frontera:
+        nueva, envios = set(), 0
+        for n in frontera:
+            for v in g[n]:
+                envios += 1                     # se envia aunque ya lo tenga
+                if v not in tienen:
+                    nueva.add(v)
+        mensajes += envios
+        tienen |= nueva
+        rondas.append({"ronda": len(rondas) + 1, "nuevos": sorted(nueva),
+                       "tienen": sorted(tienen), "mensajes": envios})
+        frontera = nueva
+    return {"rondas": rondas, "n_rondas": len(rondas), "mensajes": mensajes,
+            "nodos": len(g), "todos": len(tienen) == len(g)}
+
+
+def bgp_mejor_ruta(rutas):
+    """El proceso de decision de BGP, en su orden REAL (los tres primeros
+    criterios, que son los que deciden en la practica).
+
+    `rutas` = [{"vecino":, "as_path":[...], "local_pref":, "med":}, ...]
+    Devuelve la elegida y POR QUE criterio gano.
+    """
+    rutas = [dict(r) for r in rutas]
+    criterios = [("local-pref mas alta", lambda r: -r.get("local_pref", 100)),
+                 ("AS-path mas corto", lambda r: len(r["as_path"])),
+                 ("MED mas bajo", lambda r: r.get("med", 0))]
+    quedan = list(rutas)
+    razon = "unica ruta"
+    for nombre, clave in criterios:
+        if len(quedan) == 1:
+            break
+        mejor = min(clave(r) for r in quedan)
+        filtradas = [r for r in quedan if clave(r) == mejor]
+        if len(filtradas) < len(quedan):
+            razon = nombre
+            quedan = filtradas
+    return {"elegida": quedan[0], "razon": razon, "rutas": rutas,
+            "descartadas": [r for r in rutas if r is not quedan[0]]}
+
+
+def secuestro_bgp(aristas_as, origen_legitimo, atacante, prefijo="203.0.113.0/24",
+                  mas_especifico=True):
+    """Un AS anuncia un prefijo que no es suyo. -> ASes envenenados CONTADOS.
+
+    Modelo de vector de caminos: cada AS se queda con el anuncio de AS-path
+    mas corto; un prefijo MAS ESPECIFICO gana siempre (longest prefix match,
+    el mismo del modulo 2) sin importar el camino.
+    """
+    g = grafo_de(aristas_as)
+
+    def propagar(origen):
+        dist, orden = {origen: 0}, [origen]
+        i = 0
+        caminos = {origen: [origen]}
+        while i < len(orden):
+            n = orden[i]
+            i += 1
+            for v in g[n]:
+                if v not in dist:
+                    dist[v] = dist[n] + 1
+                    caminos[v] = caminos[n] + [v]
+                    orden.append(v)
+        return dist, caminos
+
+    d_leg, c_leg = propagar(origen_legitimo)
+    d_ata, c_ata = propagar(atacante)
+    envenenados, fieles = [], []
+    for n in sorted(g):
+        if n in (origen_legitimo, atacante):
+            continue
+        gana_atacante = mas_especifico or d_ata.get(n, 1e9) < d_leg.get(n, 1e9)
+        (envenenados if gana_atacante else fieles).append(n)
+    return {"prefijo": prefijo, "legitimo": origen_legitimo,
+            "atacante": atacante, "envenenados": envenenados,
+            "fieles": fieles, "n_envenenados": len(envenenados),
+            "n_total": len(g) - 2,
+            "pct": 100.0 * len(envenenados) / max(1, len(g) - 2),
+            "camino_legitimo": c_leg, "camino_atacante": c_ata,
+            "mas_especifico": bool(mas_especifico)}
+
+
+# =====================================================================
+# Modulo 4 — La entrega confiable (transporte)
+# =====================================================================
+def demux(paquetes, sockets):
+    """La 4-tupla decide a que socket va cada paquete. -> lista de pasos.
+
+    `paquetes` = [{"ip_o":, "pto_o":, "ip_d":, "pto_d":}, ...]
+    `sockets`  = {(ip_d, pto_d): "nombre del programa"} (escucha pasiva)
+    """
+    pasos = []
+    for p in paquetes:
+        clave = (p["ip_d"], p["pto_d"])
+        pasos.append({"paquete": dict(p), "socket": sockets.get(clave),
+                      "tupla": (p["ip_o"], p["pto_o"], p["ip_d"], p["pto_d"]),
+                      "entregado": clave in sockets})
+    return {"pasos": pasos, "entregados": sum(1 for x in pasos
+                                              if x["entregado"]),
+            "total": len(pasos)}
+
+
+def handshake_tcp(isn_cliente=1000, isn_servidor=5000, rtt_ms=40.0):
+    """Los tres mensajes REALES, con sus numeros y el RTT acumulado."""
+    mitad = float(rtt_ms) / 2.0
+    ev = [
+        {"t_ms": 0.0, "de": "cliente", "a": "servidor", "flags": "SYN",
+         "seq": isn_cliente, "ack": None, "estado_c": "SYN-SENT",
+         "estado_s": "LISTEN"},
+        {"t_ms": mitad, "de": "servidor", "a": "cliente", "flags": "SYN-ACK",
+         "seq": isn_servidor, "ack": isn_cliente + 1,
+         "estado_c": "SYN-SENT", "estado_s": "SYN-RECEIVED"},
+        {"t_ms": 2 * mitad, "de": "cliente", "a": "servidor", "flags": "ACK",
+         "seq": isn_cliente + 1, "ack": isn_servidor + 1,
+         "estado_c": "ESTABLISHED", "estado_s": "SYN-RECEIVED"},
+        {"t_ms": 3 * mitad, "de": "cliente", "a": "servidor", "flags": "datos",
+         "seq": isn_cliente + 1, "ack": isn_servidor + 1,
+         "estado_c": "ESTABLISHED", "estado_s": "ESTABLISHED"},
+    ]
+    return {"eventos": ev, "rtt_ms": float(rtt_ms),
+            "antes_del_primer_byte_ms": 2 * mitad, "viajes": 1.5}
+
+
+def bdp(mbps, rtt_ms):
+    """Producto ancho de banda x retardo: los bytes que caben EN VUELO."""
+    bits = float(mbps) * 1e6 * float(rtt_ms) / 1000.0
+    return {"bits": bits, "bytes": bits / 8.0, "kb": bits / 8.0 / 1024.0,
+            "mbps": float(mbps), "rtt_ms": float(rtt_ms),
+            "segmentos_1460": bits / 8.0 / 1460.0}
+
+
+def ventana(w_segmentos, rtt_ms=40.0, tam_seg=1460, capacidad_mbps=100.0):
+    """Throughput MEDIDO de una ventana de W segmentos. -> dict.
+
+    Con W segmentos en vuelo por RTT, el emisor no puede pasar de
+    W*tam/RTT — por mucho ancho de banda que haya contratado.
+    """
+    por_rtt = float(w_segmentos) * float(tam_seg) * 8.0
+    mbps = por_rtt / (float(rtt_ms) / 1000.0) / 1e6
+    tope = min(mbps, float(capacidad_mbps))
+    return {"w": int(w_segmentos), "mbps": mbps, "mbps_real": tope,
+            "pct_capacidad": 100.0 * tope / float(capacidad_mbps),
+            "limitado_por": "la ventana" if mbps < capacidad_mbps
+            else "el enlace"}
+
+
+def rtt_jacobson(muestras, alfa=0.125, beta=0.25, k=4.0):
+    """El estimador REAL de TCP (RFC 6298): SRTT, RTTVAR y RTO paso a paso."""
+    m = [float(x) for x in muestras]
+    srtt = m[0]
+    rttvar = m[0] / 2.0
+    pasos = [{"muestra": m[0], "srtt": srtt, "rttvar": rttvar,
+              "rto": srtt + k * rttvar}]
+    for x in m[1:]:
+        rttvar = (1 - beta) * rttvar + beta * abs(srtt - x)
+        srtt = (1 - alfa) * srtt + alfa * x
+        pasos.append({"muestra": x, "srtt": srtt, "rttvar": rttvar,
+                      "rto": srtt + k * rttvar})
+    return {"pasos": pasos, "srtt": srtt, "rttvar": rttvar,
+            "rto": srtt + k * rttvar,
+            "margen": (srtt + k * rttvar) - srtt}
+
+
+def arranque_lento(ssthresh=16, cwnd0=1, rtts=10):
+    """cwnd duplicandose cada RTT hasta el umbral, luego lineal."""
+    cwnd, traza, fase = float(cwnd0), [], []
+    for r in range(int(rtts)):
+        traza.append(cwnd)
+        fase.append("exponencial" if cwnd < ssthresh else "lineal")
+        cwnd = cwnd * 2.0 if cwnd < ssthresh else cwnd + 1.0
+    return {"traza": traza, "fase": fase, "ssthresh": float(ssthresh),
+            "rtts_hasta_umbral": sum(1 for f in fase if f == "exponencial")}
+
+
+def aimd(rtts=60, ssthresh0=32, perdidas=(18, 34, 50), cwnd_max=None):
+    """La sierra de TCP Reno: +1 por RTT, /2 al perder. Traza MEDIDA."""
+    perdidas = set(int(p) for p in perdidas)
+    cwnd, ssthresh = 1.0, float(ssthresh0)
+    traza, eventos = [], []
+    for r in range(int(rtts)):
+        traza.append(cwnd)
+        if r in perdidas:
+            ssthresh = max(2.0, cwnd / 2.0)
+            cwnd = ssthresh
+            eventos.append({"rtt": r, "tipo": "perdida", "cwnd_nuevo": cwnd})
+        elif cwnd < ssthresh:
+            cwnd *= 2.0
+        else:
+            cwnd += 1.0
+        if cwnd_max:
+            cwnd = min(cwnd, float(cwnd_max))
+    return {"traza": traza, "eventos": eventos, "media": sum(traza) / len(traza),
+            "pico": max(traza), "ssthresh0": float(ssthresh0),
+            "perdidas": sorted(perdidas)}
+
+
+def cubic(rtts=60, w_max=32.0, c=0.4, beta=0.7, perdidas=(18, 34, 50),
+          rtt_s=0.04):
+    """CUBIC (el de Linux): la cubica que se acerca despacio al maximo y
+    sondea rapido al pasarlo. W(t) = C(t-K)^3 + W_max."""
+    perdidas = set(int(p) for p in perdidas)
+    traza, eventos = [], []
+    w_ult, t_perdida = float(w_max), 0.0
+    cwnd = float(w_max) * beta
+    for r in range(int(rtts)):
+        traza.append(cwnd)
+        if r in perdidas:
+            w_ult = cwnd
+            cwnd = cwnd * beta
+            t_perdida = r
+            eventos.append({"rtt": r, "tipo": "perdida", "cwnd_nuevo": cwnd})
+        else:
+            t = (r - t_perdida) * rtt_s
+            k = (w_ult * (1 - beta) / c) ** (1.0 / 3.0)
+            cwnd = max(1.0, c * (t - k) ** 3 + w_ult)
+    return {"traza": traza, "eventos": eventos,
+            "media": sum(traza) / len(traza), "pico": max(traza),
+            "w_max": float(w_max), "beta": float(beta)}
+
+
+def recuperacion_tras_perdida(w_max=342.0, rtt_ms=40.0, beta=0.7, c=0.4):
+    """Cuanto tarda cada algoritmo en volver a llenar el tubo tras una
+    perdida. -> dict MEDIDO.
+
+    Es LA diferencia entre Reno y CUBIC, y no se ve en la media de una
+    sierra corta: Reno sube +1 segmento por RTT, asi que su recuperacion
+    depende del RTT; la cubica de CUBIC depende del TIEMPO, no del RTT.
+    """
+    w_max = float(w_max)
+    caida_reno = w_max / 2.0
+    rtts_reno = w_max - caida_reno                 # +1 por RTT
+    s_reno = rtts_reno * float(rtt_ms) / 1000.0
+    s_cubic = (w_max * (1.0 - beta) / c) ** (1.0 / 3.0)   # la K de CUBIC
+    return {"w_max": w_max, "rtt_ms": float(rtt_ms),
+            "reno_rtts": rtts_reno, "reno_s": s_reno,
+            "cubic_s": s_cubic, "cubic_rtts": s_cubic / (rtt_ms / 1000.0),
+            "veces": s_reno / s_cubic if s_cubic else float("nan"),
+            "caida_reno": caida_reno, "caida_cubic": w_max * beta}
+
+
+def colapso_congestion(cargas=None, capacidad=1.0, k=2.5):
+    """El colapso de 1986: al pasar de la capacidad, el trabajo UTIL cae en
+    vez de estancarse (cada perdida se retransmite y empuja mas)."""
+    if cargas is None:
+        cargas = [0.2 * i for i in range(1, 16)]
+    util = []
+    for x in float(capacidad) and cargas:
+        x = float(x)
+        if x <= capacidad:
+            util.append(x)
+        else:
+            exceso = x - capacidad
+            util.append(max(0.05, capacidad * math.exp(-k * exceso)))
+    return {"carga": [float(x) for x in cargas], "util": util,
+            "capacidad": float(capacidad),
+            "util_max": max(util), "util_final": util[-1],
+            "caida_pct": 100.0 * (1.0 - util[-1] / max(util))}
+
+
+class Escalera(_Anclada):
+    """Diagrama de tiempo: actores en vertical, el tiempo hacia ABAJO.
+
+    .actor(i) .linea_vida(i) .flecha(k) .rotulo(k) .marca_tiempo(k)
+    Se construye con todos los eventos y se revelan uno a uno con
+    `Create(esc.flecha(k))`, que es como se anima en los clips.
+    """
+
+    def __init__(self, actores, eventos, ancho=6.0, alto=3.4, fs=15,
+                 color=C_RED, color_msg=C_PAQUETE, mostrar_tiempo=True,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.actores_txt = [str(a) for a in actores]
+        self.eventos = [dict(e) for e in eventos]
+        self.ancho, self.alto, self.fs = float(ancho), float(alto), int(fs)
+        self._poner_ancla(ORIGIN)
+        o = self._origen()
+        n = len(self.actores_txt)
+        self._xs = [(-self.ancho / 2.0 + self.ancho * i / max(1, n - 1))
+                    for i in range(n)]
+        self.actores, self.vidas = VGroup(), VGroup()
+        for i, nombre in enumerate(self.actores_txt):
+            t = _hud(nombre, self.fs, color)
+            t.move_to(o + np.array([self._xs[i], self.alto / 2.0 + 0.30, 0]))
+            v = DashedLine(o + np.array([self._xs[i], self.alto / 2.0, 0]),
+                           o + np.array([self._xs[i], -self.alto / 2.0, 0]),
+                           color=C_EJE, stroke_width=1.4, dash_length=0.09)
+            self.actores.add(t)
+            self.vidas.add(v)
+        self.flechas, self.rotulos, self.tiempos = VGroup(), VGroup(), VGroup()
+        m = max(1, len(self.eventos) - 1)
+        for k, e in enumerate(self.eventos):
+            i = self.actores_txt.index(str(e["de"]))
+            j = self.actores_txt.index(str(e["a"]))
+            y = self.alto / 2.0 - (k + 0.7) * self.alto / (m + 1.2)
+            col = e.get("color", color_msg)
+            f = Arrow(o + np.array([self._xs[i], y, 0]),
+                      o + np.array([self._xs[j], y - 0.16, 0]),
+                      color=col, stroke_width=3.0, buff=0.10,
+                      max_tip_length_to_length_ratio=0.06)
+            r = _hud(str(e.get("texto", "")), self.fs - 2, col)
+            r.move_to((f.get_start() + f.get_end()) / 2.0 + UP * 0.20)
+            self.flechas.add(f)
+            self.rotulos.add(r)
+            if mostrar_tiempo and e.get("t_ms") is not None:
+                t = _hud("%s ms" % fmt(e["t_ms"], 0), self.fs - 3, C_CIFRA)
+                t.move_to(o + np.array([-self.ancho / 2.0 - 0.75, y, 0]))
+                self.tiempos.add(t)
+        self.add(self.vidas, self.actores, self.flechas, self.rotulos,
+                 self.tiempos)
+
+    def actor(self, i):
+        return self.actores[i]
+
+    def linea_vida(self, i):
+        return self.vidas[i]
+
+    def flecha(self, k):
+        return self.flechas[k]
+
+    def rotulo(self, k):
+        return self.rotulos[k]
+
+    def marca_tiempo(self, k):
+        return self.tiempos[k] if k < len(self.tiempos) else None
+
+    def paso(self, k):
+        """Flecha + rotulo + marca de tiempo del evento k (para animarlo)."""
+        piezas = [self.flechas[k], self.rotulos[k]]
+        if k < len(self.tiempos):
+            piezas.append(self.tiempos[k])
+        return VGroup(*piezas)
+
+
+def escalera(actores, eventos, ancho=6.0, alto=3.4, fs=15, color=C_RED,
+             color_msg=C_PAQUETE, mostrar_tiempo=True):
+    """Ver `Escalera`. `eventos` = [{de, a, texto, t_ms, color}, ...]."""
+    return Escalera(actores, eventos, ancho, alto, fs, color, color_msg,
+                    mostrar_tiempo)
+
+
+class Sierra(_Anclada):
+    """cwnd frente al tiempo: la sierra de AIMD, la cubica de CUBIC.
+
+    .ejes .curva .marcas (perdidas en rojo) .media (linea punteada)
+    .con_traza(t) GEMELA.
+    """
+
+    def __init__(self, traza, perdidas=(), ancho=6.4, alto=2.8,
+                 color=C_PAQUETE, y_max=None, media=True, etiqueta=None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.traza = [float(x) for x in traza]
+        self.perdidas = tuple(int(p) for p in perdidas)
+        self.ancho, self.alto, self.color = float(ancho), float(alto), color
+        self.y_max = float(y_max) if y_max else max(self.traza) * 1.15
+        self.mostrar_media = bool(media)
+        self.etiqueta_txt = etiqueta
+        self._poner_ancla(ORIGIN)
+        o = self._origen()
+        self.ejes = VGroup(
+            Line(o + np.array([-self.ancho / 2.0, -self.alto / 2.0, 0]),
+                 o + np.array([self.ancho / 2.0, -self.alto / 2.0, 0]),
+                 color=C_EJE, stroke_width=1.8),
+            Line(o + np.array([-self.ancho / 2.0, -self.alto / 2.0, 0]),
+                 o + np.array([-self.ancho / 2.0, self.alto / 2.0, 0]),
+                 color=C_EJE, stroke_width=1.8))
+        self.curva = VMobject(color=color, stroke_width=3.0)
+        self.curva.set_points_as_corners([self.punto(i)
+                                          for i in range(len(self.traza))])
+        self.marcas = VGroup(*[Dot(self.punto(p), radius=0.07,
+                                   color=C_PERDIDA)
+                               for p in self.perdidas
+                               if p < len(self.traza)])
+        self.media = VGroup()
+        if self.mostrar_media and self.traza:
+            m = sum(self.traza) / len(self.traza)
+            self.valor_medio = m
+            y = self._y(m)
+            self.media.add(DashedLine(
+                o + np.array([-self.ancho / 2.0, y - o[1], 0]) + np.array([0, o[1], 0]),
+                o + np.array([self.ancho / 2.0, y - o[1], 0]) + np.array([0, o[1], 0]),
+                color=C_CIFRA, stroke_width=1.8, dash_length=0.10))
+        else:
+            self.valor_medio = 0.0
+        self.add(self.ejes, self.curva, self.marcas, self.media)
+        self.etiqueta = None
+        if etiqueta:
+            self.etiqueta = _hud(etiqueta, 15, C_EJE)
+            self.etiqueta.next_to(self.ejes, UP, buff=0.16)
+            self.add(self.etiqueta)
+
+    def _y(self, v):
+        f = float(v) / self.y_max
+        return (self._origen()[1] - self.alto / 2.0 +
+                min(max(f, 0.0), 1.0) * self.alto)
+
+    def punto(self, i):
+        n = max(1, len(self.traza) - 1)
+        x = (self._origen()[0] - self.ancho / 2.0 +
+             self.ancho * float(i) / n)
+        return np.array([x, self._y(self.traza[int(i)]), 0.0])
+
+    def con_traza(self, traza, perdidas=None):
+        o = Sierra(traza, self.perdidas if perdidas is None else perdidas,
+                   self.ancho, self.alto, self.color, self.y_max,
+                   self.mostrar_media, self.etiqueta_txt)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def sierra(traza, perdidas=(), ancho=6.4, alto=2.8, color=C_PAQUETE,
+           y_max=None, media=True, etiqueta=None):
+    """Ver `Sierra`."""
+    return Sierra(traza, perdidas, ancho, alto, color, y_max, media,
+                  etiqueta)

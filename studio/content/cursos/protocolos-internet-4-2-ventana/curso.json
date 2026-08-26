@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 4.2 El apretón y la ventana",
+  "description": "Lección 4.2 del curso Protocolos de Internet (módulo 4: la entrega confiable), en 4 clips animados —una idea por clip—: los tres mensajes del apretón con sus números reales, secuencia y ACK ordenando lo desordenado, la ventana deslizante frente al producto ancho de banda por retardo, y el RTO de Jacobson calculado paso a paso. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-los-tres-mensajes.py",
+      "title": "1 · Los tres mensajes",
+      "scene": "Clip1",
+      "final_state": "Escalera cliente-servidor con las cuatro flechas ambar completas (SYN seq=1000, SYN-ACK seq=5000 ack=1001, ACK seq=1001 ack=5001, datos) y sus tiempos en cian (0/20/40/60 ms); abajo 'cliente: ESTABLISHED' y 'servidor: ESTABLISHED' en verde, y el rotulo cian '40 ms antes del primer byte util (RTT = 40 ms)'."
+    },
+    {
+      "file": "clips/02-secuencia-y-ack.py",
+      "title": "2 · Secuencia y ACK",
+      "scene": "Clip2",
+      "final_state": "Cuatro fichas ambar con los numeros de secuencia 6841/9761/11221 (la 8301 ya desaparecio, marcada como perdida); abajo en cian 'ACK = 8301 (el hueco)' y en rojo '2 ACK duplicados'."
+    },
+    {
+      "file": "clips/03-la-ventana-deslizante.py",
+      "title": "3 · La ventana deslizante",
+      "scene": "Clip3",
+      "final_state": "Barra del enlace completamente verde (llena) bajo el rotulo azul 'enlace: 100 Mb/s RTT: 40 ms'; abajo en cian 'W=343 -> 100.0 Mb/s (limitado por el enlace)'."
+    },
+    {
+      "file": "clips/04-retransmitir-a-tiempo.py",
+      "title": "4 · Retransmitir a tiempo",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Fiabilidad no es no perder nada.' (blanca) y 'Es darse cuenta a tiempo.' (cian); pie anuncia la leccion de congestion."
+    }
+  ]
+}

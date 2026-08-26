@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 3.1 Vector distancia: aprender por rumores",
+  "description": "Lección 3.1 del curso Protocolos de Internet (módulo 3: encontrar el camino), en 4 clips animados —una idea por clip—: nadie ve el mapa entero, el rumor que converge ronda a ronda, el enlace que se cae, y el conteo al infinito con la secuencia real de costos subiendo hasta el 16 de RIP. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-nadie-ve-el-mapa.py",
+      "title": "1 · Nadie ve el mapa",
+      "scene": "Clip1",
+      "final_state": "Topologia azul de 6 routers con sus costos y F en verde a la derecha; a la derecha la tabla de rutas hacia F con las cinco filas en \"no llego\" y la de F en verde (0 / yo); en ambar bajo la red el rotulo \"estas son mis rutas\"; pie sobre el anuncio cada treinta segundos; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-el-rumor-converge.py",
+      "title": "2 · El rumor converge",
+      "scene": "Clip2",
+      "final_state": "La misma topologia con el camino A>C>E>F resaltado en ambar y el rotulo ambar 'A > C > E > F  costo 8'; la tabla convergida en cian (A 8 C, B 9 D, C 7 E, D 4 E, E 1 F, F 0 yo) con la fila de A resaltada y 'ronda 03' debajo; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-se-cae-un-enlace.py",
+      "title": "3 · Se cae un enlace",
+      "scene": "Clip3",
+      "final_state": "La topologia con el enlace E-F en rojo tenue y una cruz roja encima, el camino nuevo A>B>D>F en ambar y el rotulo 'A > B > D > F  costo 14  (antes 8)'; la tabla en cian (A 14 B, B 12 D, C 15 A, D 7 F, E 10 D) con 'ronda 07' y '7 rondas para digerir un cable roto'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-conteo-al-infinito.py",
+      "title": "4 · Conteo al infinito",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Si solo repites lo que te dicen,' (blanca) y 'tardas mucho en enterarte de una mala noticia.' (cian); pie 'Siguiente: el mapa completo.'; HUD 'Modulo 04'."
+    }
+  ]
+}

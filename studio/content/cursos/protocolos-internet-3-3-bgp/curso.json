@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 3.3 BGP: la política entre países",
+  "description": "Lección 3.3 del curso Protocolos de Internet (módulo 3: encontrar el camino), en 4 clips animados —una idea por clip—: el mapa de los sistemas autónomos, el camino de vectores que crece y detecta bucles, la política decidiendo por encima de la distancia, y el secuestro de prefijo contado. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-mapa-de-los-as.py",
+      "title": "1 · El mapa de los AS",
+      "scene": "Clip1",
+      "final_state": "Mapa de 8 AS con los enlaces cliente-proveedor en violeta y los dos enlaces de pares en verde; la ficha ambar 'dato' a mitad del tramo AS100-AS300 tras el rodeo, AS300 encendido en verde; en cian 'dentro de una red manda la distancia; entre redes, el contrato'; pie sobre el cable que existe y el contrato que no; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-camino-de-vectores.py",
+      "title": "2 · Camino de vectores",
+      "scene": "Clip2",
+      "final_state": "A la izquierda el anillo de 5 AS con AS700 en ambar (dueno de 203.0.113.0/24) y los otros cuatro en verde; a la derecha la tabla completa 'AS que recibe / AS-path que ve' con las cinco filas, la ultima (AS700 | 400 200 100 300 700) resaltada, tachada en rojo y con un recuadro rojo sobre su propio 700; en cian 'BGP evita bucles sin conocer el mapa: le basta leer el camino'; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-la-politica-decide.py",
+      "title": "3 · La política decide",
+      "scene": "Clip3",
+      "final_state": "A la izquierda AS100 en cian con sus tres vecinos; a la derecha la tabla de las tres rutas con las local-pref ya igualadas a 100 y la fila de AS300 (300 700, 2 saltos) resaltada en cian; debajo tres lineas: 'empate en local-pref: 100 y 100', 'gana AS300 por AS-path mas corto' y 'solo ahora cuenta la distancia: 2 saltos'; pie 'La distancia solo decide cuando el interes empata.'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-el-secuestro.py",
+      "title": "4 · El secuestro",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La red que nadie manda se sostiene en la palabra.' (blanca) y 'Y a veces alguien miente.' (cian); pie 'RPKI firma el origen, no el camino: solo frena al que filtra.'; HUD 'Modulo 04'."
+    }
+  ]
+}

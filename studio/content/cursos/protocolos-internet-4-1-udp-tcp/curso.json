@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 4.1 Dos contratos: UDP y TCP",
+  "description": "Lección 4.1 del curso Protocolos de Internet (módulo 4: la entrega confiable), en 4 clips animados —una idea por clip—: los puertos que reparten a cada programa, UDP desnudo perdiendo un datagrama sin que nadie se entere, TCP prometiendo y rellenando el hueco, y cuál elegir con las cifras. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-puertos.py",
+      "title": "1 · Puertos: la extensión telefónica",
+      "scene": "Clip1",
+      "final_state": "Paquete ambar con IP origen 198.51.100.11, Puerto origen 52500, IP destino 203.0.113.10 y Puerto destino 9999 en cian (el campo que decide, iluminado); a la izquierda el host azul 203.0.113.10; a la derecha tres sockets ya en verde ':443 Navegador', ':53 DNS', ':25 Correo'; texto cian '3 de 4 paquetes entregados'; pie 'Un puerto sin socket no es un fallo de la red: ahi no hay nadie. Por eso existe 'puerto cerrado''; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-udp-desnudo.py",
+      "title": "2 · UDP desnudo",
+      "scene": "Clip2",
+      "final_state": "Pantalla con dos lineas en Space Mono: '32 B de datos -> 78 B con UDP (59.0 % de cabeceras)' en cian y '32 B de datos -> 90 B con TCP (64.4 % de cabeceras)' en violeta; pie 'El ahorro se paga en garantias: ocho bytes frente a los veinte de TCP, y una perdida que no deja rastro'; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-tcp-promete.py",
+      "title": "3 · TCP promete",
+      "scene": "Clip3",
+      "final_state": "Emisor y receptor azules unidos por un enlace verde; debajo tres ranuras del receptor con los numeros 1, 2 y 3 completos (el 2 recien rellenado, con el marco todavia verde de la reparacion); texto verde 'entregado: 3 de 3, en orden, sin duplicados'; pie 'Y se rellena: el emisor lo manda otra vez, y el hueco se cierra en su lugar'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-cual-elegir.py",
+      "title": "4 · Cuál elegir",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'No hay un protocolo mejor.' (blanca) y 'Hay una promesa que quieres o no.' (cian); pie 'Siguiente: el apreton y la ventana'; HUD 'Modulo 04'."
+    }
+  ]
+}
