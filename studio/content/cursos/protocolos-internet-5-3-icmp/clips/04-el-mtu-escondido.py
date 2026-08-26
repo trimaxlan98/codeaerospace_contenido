@@ -50,8 +50,8 @@ class Clip4(Scene):
         self.play(pk.animate.set_color(C_PERDIDA), run_time=0.35)
         self.play(FadeOut(pk), run_time=0.45)
         aviso = Arrow(topo.enlace("R2", "R3").punto_en(0.32) + DOWN * 0.55,
-                     topo.punto("origen") + DOWN * 0.55, color=C_CAPA,
-                     stroke_width=3.0, buff=0.10,
+                     topo.punto("origen") + DOWN * 0.55 + RIGHT * 0.42,
+                     color=C_CAPA, stroke_width=3.0, buff=0.10,
                      max_tip_length_to_length_ratio=0.05)
         et_icmp = tag_hud("ICMP: fragmentacion necesaria, MTU=1400",
                           font_size=18, color=C_CAPA)

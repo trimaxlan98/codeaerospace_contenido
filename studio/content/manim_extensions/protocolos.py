@@ -1879,6 +1879,11 @@ class Escalera(_Anclada):
             self.actores.add(t)
             self.vidas.add(v)
         self.flechas, self.rotulos, self.tiempos = VGroup(), VGroup(), VGroup()
+        # `tiempos` solo tiene entrada para los eventos CON t_ms, asi que
+        # indexarlo por el numero de evento presta la hora del siguiente en
+        # cuanto hay un evento mudo (un salto que no contesta en un
+        # traceroute, por ejemplo). Este mapa evita ese desfase.
+        self._idx_tiempo = {}
         m = max(1, len(self.eventos) - 1)
         for k, e in enumerate(self.eventos):
             i = self.actores_txt.index(str(e["de"]))
@@ -1896,6 +1901,7 @@ class Escalera(_Anclada):
             if mostrar_tiempo and e.get("t_ms") is not None:
                 t = _hud("%s ms" % fmt(e["t_ms"], 0), self.fs - 3, C_CIFRA)
                 t.move_to(o + np.array([-self.ancho / 2.0 - 0.75, y, 0]))
+                self._idx_tiempo[k] = len(self.tiempos)
                 self.tiempos.add(t)
         self.add(self.vidas, self.actores, self.flechas, self.rotulos,
                  self.tiempos)
@@ -1913,13 +1919,16 @@ class Escalera(_Anclada):
         return self.rotulos[k]
 
     def marca_tiempo(self, k):
-        return self.tiempos[k] if k < len(self.tiempos) else None
+        """La marca del evento k, o None si ese evento no trae `t_ms`."""
+        i = self._idx_tiempo.get(k)
+        return None if i is None else self.tiempos[i]
 
     def paso(self, k):
         """Flecha + rotulo + marca de tiempo del evento k (para animarlo)."""
         piezas = [self.flechas[k], self.rotulos[k]]
-        if k < len(self.tiempos):
-            piezas.append(self.tiempos[k])
+        t = self.marca_tiempo(k)
+        if t is not None:
+            piezas.append(t)
         return VGroup(*piezas)
 
 

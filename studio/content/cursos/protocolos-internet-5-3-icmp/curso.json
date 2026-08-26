@@ -8,25 +8,25 @@
       "file": "clips/01-icmp.py",
       "title": "1 · ICMP: el protocolo que se queja",
       "scene": "Clip1",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Lista violeta de los tres avisos ICMP de la lección: 'tipo 3  destino inalcanzable', 'tipo 11  tiempo excedido', 'tipo 3/4  fragmentacion necesaria'; pie 'Tres de esos avisos son los que vamos a usar hoy'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-ping-mide.py",
       "title": "2 · Ping mide",
       "scene": "Clip2",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Gráfica con dos curvas de 8 pings reales superpuestas (azul sin carga, naranja con el enlace al 85%), una flecha cian entre ambas con el rótulo '+27.2 ms de cola'; pie 'El mismo cable, el mismo destino: con el enlace al 85% de carga, la media sube 27.2 ms, toda ella de cola'; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-traceroute.py",
       "title": "3 · Traceroute",
       "scene": "Clip3",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Escalera completa de 7 saltos (violeta los que contestan, rojo el salto 4 mudo con su asterisco, verde el último con la respuesta de eco), cada fila con su tiempo real en cian a la izquierda; arriba el resumen 'total hasta el destino: 91.1 ms (salto 4: sin dato)'; pie 'Siete saltos, seis nombres y un hueco: asi se ve un traceroute de verdad'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-el-mtu-escondido.py",
       "title": "4 · El MTU escondido",
       "scene": "Clip4",
-      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+      "final_state": "Cierre a pantalla limpia de la lección: 'La red no es opaca.' en blanco y 'Sabe quejarse, si la dejas.' en cian; pie 'Siguiente: HTTP, pedir y responder'; HUD 'Modulo 04'."
     }
   ]
 }
