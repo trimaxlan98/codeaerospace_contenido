@@ -18,6 +18,17 @@ class Clip3(Scene):
                     zona="abajo", run_time=0.5)
         esc = escalera(ACTORES_TR, EVENTOS_TR, ancho=10.0, alto=3.9, fs=11)
         esc.move_to(DOWN * 0.30)
+
+        def paso_seguro(k):
+            """`esc.paso(k)` indexa `tiempos` por k a secas: con el salto
+            mudo sin reloj, le presta el ms del salto SIGUIENTE. Se
+            reconstruye a mano con el mapeo real `_TIEMPO_IDX`."""
+            piezas = [esc.flecha(k), esc.rotulo(k)]
+            idx = _TIEMPO_IDX[k]
+            if idx is not None:
+                piezas.append(esc.tiempos[idx])
+            return VGroup(*piezas)
+
         self.play(FadeIn(esc.actores), Create(esc.vidas), run_time=1.0)
         self.wait(1.6)
 
@@ -26,7 +37,7 @@ class Clip3(Scene):
                               "nombre."),
                     zona="abajo", run_time=0.5)
         for k in range(3):
-            self.play(Create(esc.paso(k)), run_time=0.65)
+            self.play(Create(paso_seguro(k)), run_time=0.65)
         self.wait(1.6)
 
         # --- momento: el salto mudo -------------------------------------
@@ -34,7 +45,7 @@ class Clip3(Scene):
                               "No significa que la ruta se rompio, solo "
                               "que ese router calla."),
                     zona="abajo", run_time=0.5)
-        self.play(Create(esc.paso(3)), run_time=0.8)
+        self.play(Create(paso_seguro(3)), run_time=0.8)
         self.wait(3.2)
 
         # --- momento: los siguientes si contestan, mas lejos -----------------
@@ -42,7 +53,7 @@ class Clip3(Scene):
                               "uno mas lejos que el anterior."),
                     zona="abajo", run_time=0.5)
         for k in (4, 5):
-            self.play(Create(esc.paso(k)), run_time=0.7)
+            self.play(Create(paso_seguro(k)), run_time=0.7)
         self.wait(2.6)
 
         # --- momento: el ultimo salto ya no es un error -----------------
@@ -50,7 +61,7 @@ class Clip3(Scene):
                               "un error: es un eco real. Ahi esta el "
                               "destino."),
                     zona="abajo", run_time=0.5)
-        self.play(Create(esc.paso(6)), run_time=0.9)
+        self.play(Create(paso_seguro(6)), run_time=0.9)
         self.wait(3.4)
 
         # --- momento: el mapa completo, con su hueco -----------------------

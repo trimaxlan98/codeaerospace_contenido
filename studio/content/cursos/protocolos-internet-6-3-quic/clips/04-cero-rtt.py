@@ -70,8 +70,10 @@ class Clip4(Scene):
                               "el ID no ha cambiado."),
                     zona="abajo", run_time=0.5)
         igual = [tab.celda(4, j).animate.set_color(C_OK) for j in range(3)]
-        br_der = llave(tab.fila(4), "solo QUIC", RIGHT, font_size=18,
-                       color=C_OK)
+        # Un Brace sobre UNA fila sale como una astilla y se come su
+        # propia etiqueta: la marca de esa fila va como tag suelto.
+        br_der = tag_hud("no cambia", font_size=18, color=C_OK)
+        br_der.next_to(tab.celda(4, 2), RIGHT, buff=0.55)
         self.play(*igual, FadeIn(br_der), run_time=0.7)
         razones = VGroup(
             tag_hud("TCP:   %s" % POR_QUE_TCP, font_size=19,
@@ -89,4 +91,4 @@ class Clip4(Scene):
             "La web no se hizo mas rapida cambiando el cable.",
             "Se hizo mas rapida cambiando la cola.",
             "Cierra el modulo 6. En el 7, la red real: distancia y colas.",
-            tab, br_izq, br_der, razones, espera=4.4)
+            tab, br_izq, br_der, razones, espera=6.6)

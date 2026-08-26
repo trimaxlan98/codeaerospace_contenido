@@ -62,6 +62,8 @@ todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
     sierra         cwnd frente al tiempo; .marcas .media; .con_traza()
     arbol          jerarquia por niveles (DNS, cadena de certificados);
                    .nodo(nivel, i); .con_marcados()
+    regla_viajes   barra segmentada, un rectangulo por RTT, con el borde
+                   izquierdo en el ancla: la LONGITUD es el tiempo
 
 Uso en un clip (el style_block de la familia ya importa todo):
     import sys; sys.path.insert(0, "/workspace/studio/content/manim_extensions")
@@ -2457,3 +2459,78 @@ def arbol(niveles, marcados=(), ancho=7.0, alto=3.2, fs=15, color=C_CAPA,
           color_marca=C_PAQUETE):
     """Ver `Arbol`. `niveles` = [["."], ["org", "com"], ...]."""
     return Arbol(niveles, marcados, ancho, alto, fs, color, color_marca)
+
+
+class ReglaViajes(_Anclada):
+    """Barra de tiempo segmentada: un rectangulo por viaje (RTT), pegados
+    y con el borde IZQUIERDO comun, para que dos modos se comparen a ojo y
+    la LONGITUD sea el tiempo.
+
+    Es el visual natural de `tls_viajes`, `http_transferencia` y del RTT
+    orbital de la leccion 8.1. `ranuras` no vale aqui: numera desde 0 y
+    estas casillas tienen nombre, no numero.
+    """
+
+    def __init__(self, viajes, etiqueta=None, ms=None, ancho_viaje=0.62,
+                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.n = int(viajes)
+        self.etiqueta_txt, self.ms = etiqueta, ms
+        self.ancho_viaje, self.alto = float(ancho_viaje), float(alto)
+        self.fs, self.color = int(fs), color
+        self.nombres = list(nombres or [])
+        self._poner_ancla(ORIGIN)
+        o = self._origen()
+        self.cajas, self.textos = VGroup(), VGroup()
+        for i in range(self.n):
+            x = (i + 0.5) * self.ancho_viaje
+            c = Rectangle(width=self.ancho_viaje, height=self.alto,
+                          stroke_color=color, stroke_width=1.8,
+                          fill_color=color, fill_opacity=0.30)
+            c.move_to(o + np.array([x, 0.0, 0.0]))
+            self.cajas.add(c)
+            if i < len(self.nombres):
+                t = _hud(str(self.nombres[i]), self.fs - 2, color)
+                if t.width > self.ancho_viaje * 0.92:
+                    t.scale(self.ancho_viaje * 0.92 / t.width)
+                t.move_to(c.get_center())
+                self.textos.add(t)
+        if self.n == 0:                       # cero viajes: se marca el sitio
+            c = Line(o + np.array([0.0, -self.alto / 2, 0]),
+                     o + np.array([0.0, self.alto / 2, 0]),
+                     color=color, stroke_width=3.0)
+            self.cajas.add(c)
+        self.add(self.cajas, self.textos)
+        self.etiqueta = None
+        if etiqueta:
+            self.etiqueta = _hud(str(etiqueta), self.fs, C_EJE)
+            self.etiqueta.next_to(o + np.array([0.0, 0.0, 0.0]), LEFT,
+                                  buff=0.28)
+            self.add(self.etiqueta)
+        self.cifra = None
+        if ms is not None:
+            self.cifra = _hud("%s ms" % fmt(ms, 0), self.fs + 2, C_CIFRA)
+            ancla = (self.cajas[-1] if self.n else
+                     self.cajas[0])
+            self.cifra.next_to(ancla, RIGHT, buff=0.30)
+            self.add(self.cifra)
+
+    def viaje(self, i):
+        return self.cajas[i]
+
+    def con_viajes(self, viajes, ms=None, nombres=None):
+        o = ReglaViajes(viajes, self.etiqueta_txt,
+                        self.ms if ms is None else ms, self.ancho_viaje,
+                        self.alto, self.fs, self.color,
+                        self.nombres if nombres is None else nombres)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def regla_viajes(viajes, etiqueta=None, ms=None, ancho_viaje=0.62,
+                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None):
+    """Ver `ReglaViajes`. El borde izquierdo queda en el ancla, asi que
+    varias reglas apiladas comparten origen y se comparan a ojo."""
+    return ReglaViajes(viajes, etiqueta, ms, ancho_viaje, alto, fs, color,
+                       nombres)

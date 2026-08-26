@@ -20,7 +20,7 @@ class Clip4(Scene):
                         tam=0.46, fs=15)
         topo.move_to(UP * 1.35)
         self.play(FadeIn(topo.enlaces), FadeIn(topo.nodos), run_time=1.0)
-        self.wait(3.0)
+        self.wait(2.4)
 
         # --- momento: sale un paquete de 1500, con DF ------------------------
         rot.mostrar(pie_curso("Sale un paquete de 1500 bytes con la "
@@ -31,8 +31,16 @@ class Clip4(Scene):
         pk.move_to(topo.punto("origen"))
         self.add(pk)
         self.play(MoveAlongPath(pk, topo.camino(["origen", "R1", "R2"])),
-                  run_time=1.2)
-        self.wait(1.2)
+                  run_time=1.1)
+        # El limite esta en el ENLACE R2-R3 (MTU 1400), no en el nodo R2:
+        # avanza un tramo corto sobre ese cable, por DEBAJO, para no
+        # montarse en R2 ni tapar el rotulo "1400" que cuelga arriba.
+        tope = VMobject()
+        tope.set_points_as_corners([topo.punto("R2") + DOWN * 0.36,
+                                    topo.enlace("R2", "R3").punto_en(0.32)
+                                    + DOWN * 0.36])
+        self.play(MoveAlongPath(pk, tope), run_time=0.5)
+        self.wait(1.0)
 
         # --- momento: no cabe, rebota con ICMP ------------------------------
         rot.mostrar(pie_curso("En el siguiente enlace no cabe: rebota con "
@@ -41,8 +49,8 @@ class Clip4(Scene):
                     zona="abajo", run_time=0.5)
         self.play(pk.animate.set_color(C_PERDIDA), run_time=0.35)
         self.play(FadeOut(pk), run_time=0.45)
-        aviso = Arrow(topo.punto("R2") + DOWN * 0.62,
-                     topo.punto("origen") + DOWN * 0.62, color=C_CAPA,
+        aviso = Arrow(topo.enlace("R2", "R3").punto_en(0.32) + DOWN * 0.55,
+                     topo.punto("origen") + DOWN * 0.55, color=C_CAPA,
                      stroke_width=3.0, buff=0.10,
                      max_tip_length_to_length_ratio=0.05)
         et_icmp = tag_hud("ICMP: fragmentacion necesaria, MTU=1400",
@@ -50,7 +58,7 @@ class Clip4(Scene):
         et_icmp.move_to(DOWN * 1.35)
         self.play(Create(aviso), run_time=0.8)
         self.play(FadeIn(et_icmp), run_time=0.4)
-        self.wait(2.8)
+        self.wait(2.3)
 
         # --- momento: el emisor ajusta su tamano ---------------------------
         self.play(FadeOut(aviso), FadeOut(et_icmp), run_time=0.4)
@@ -67,7 +75,7 @@ class Clip4(Scene):
                            font_size=19)
         et_final.next_to(tab, DOWN, buff=0.30)
         self.play(FadeIn(et_final), run_time=0.5)
-        self.wait(4.2)
+        self.wait(3.4)
 
         # --- momento: agujero negro si se filtra el ICMP --------------------
         self.play(FadeOut(topo), FadeOut(tab), FadeOut(et_final),
@@ -84,15 +92,21 @@ class Clip4(Scene):
         pk2.move_to(topo2.punto("origen"))
         self.add(pk2)
         self.play(MoveAlongPath(pk2, topo2.camino(["origen", "R1", "R2"])),
-                  run_time=1.1)
+                  run_time=1.0)
+        tope2 = VMobject()
+        tope2.set_points_as_corners([topo2.punto("R2") + DOWN * 0.36,
+                                     topo2.enlace("R2", "R3").punto_en(0.32)
+                                     + DOWN * 0.36])
+        self.play(MoveAlongPath(pk2, tope2), run_time=0.4)
         self.play(pk2.animate.set_color(C_PERDIDA), run_time=0.3)
         self.play(pk2.animate.scale(1.5).set_opacity(0.0), run_time=0.6)
         self.remove(pk2)
         cruz = tag_hud("X  el ICMP se filtra: nunca sale de aqui",
                        font_size=17, color=C_PERDIDA)
-        cruz.next_to(topo2.punto("R2"), DOWN, buff=0.55)
+        cruz.next_to(topo2.enlace("R2", "R3").punto_en(0.32), DOWN,
+                    buff=0.55)
         self.play(FadeIn(cruz), run_time=0.4)
-        self.wait(1.6)
+        self.wait(1.2)
 
         rot.mostrar(pie_curso("Sin el aviso, la conexion se cuelga sin "
                               "motivo aparente: el agujero negro de "
@@ -106,7 +120,7 @@ class Clip4(Scene):
         puntos.next_to(et_negro, DOWN, buff=0.28)
         self.play(FadeIn(et_negro), run_time=0.5)
         self.play(FadeIn(puntos), run_time=0.4)
-        self.wait(3.2)
+        self.wait(2.6)
 
         # --- cierre de la leccion -------------------------------------------
         cierre_leccion(

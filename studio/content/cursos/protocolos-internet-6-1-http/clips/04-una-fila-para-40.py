@@ -78,10 +78,11 @@ class Clip4(Scene):
             [g._en(x, min(F_PARALELO(x), 4800.0))
              for x in np.linspace(1, N_OBJETOS, 161)])
         self.play(Create(curva_par), run_time=1.4)
-        et_par = tag_hud("paralelo (6 conexiones): %d ms"
-                        % int(HT_PARALELO["ms"]), font_size=19,
-                        color=C_OK)
-        et_par.move_to(g._en(33, HT_PARALELO["ms"]) + UP * 0.48)
+        et_par = tag_hud("paralelo: %d ms" % int(HT_PARALELO["ms"]),
+                        font_size=17, color=C_OK)
+        et_par.move_to(np.array(
+            [0.0, g._en(N_OBJETOS, HT_PARALELO["ms"])[1], 0.0]))
+        et_par.to_edge(RIGHT, buff=0.3)
         self.play(FadeIn(et_par), run_time=0.4)
         self.wait(3.0)
 

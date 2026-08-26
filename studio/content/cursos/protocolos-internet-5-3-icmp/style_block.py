@@ -174,6 +174,20 @@ EVENTOS_TR = [
               (C_OK if s["icmp"] == "respuesta de eco" else C_CAPA))}
     for s in TRACE["saltos"]]
 
+# Trampa de libreria: `Escalera.paso(k)`/`.marca_tiempo(k)` indexan
+# `self.tiempos` por k asumiendo que TODOS los eventos traen `t_ms`. El
+# salto mudo no trae (None) y la lista `tiempos` se queda mas corta: a
+# partir de ahi cada `paso(k)` le presta el ms del evento SIGUIENTE al
+# que le toca. Se resuelve aqui, sin tocar la libreria, con el mapeo
+# real evento -> indice en `tiempos` (None si ese evento no tiene reloj).
+_TIEMPO_IDX, _n_tiempo = [], 0
+for _e in EVENTOS_TR:
+    if _e["t_ms"] is None:
+        _TIEMPO_IDX.append(None)
+    else:
+        _TIEMPO_IDX.append(_n_tiempo)
+        _n_tiempo += 1
+
 # Clip 4 - El MTU escondido (pmtud MEDIDO, con y sin agujero negro).
 MTUS_CAMINO = [1500, 1500, 1400, 1500]
 PMTU_OK = pmtud(MTUS_CAMINO)                   # mtu_camino=1400, red=100
