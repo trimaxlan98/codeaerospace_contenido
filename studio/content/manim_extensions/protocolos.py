@@ -917,6 +917,34 @@ class Topologia(_Anclada):
     def enlace(self, a, b):
         return self.aristas[(a, b)]
 
+    def etiquetas_a(self, direcciones, buff=0.14):
+        """Recoloca los rotulos de nodo uno a uno.
+
+        `Topologia` cuelga la etiqueta SIEMPRE debajo del nodo, y en un
+        grafo denso las aristas que bajan la cruzan (la letra sale
+        tachada). `direcciones` = {nodo: UP|DOWN|LEFT|RIGHT}.
+        """
+        for k, d in dict(direcciones).items():
+            n = self._nod[k]
+            if n.etiqueta is not None:
+                n.etiqueta.next_to(n.forma, d, buff=buff)
+        return self
+
+    def tramo(self, a, b, desde=0.0, hasta=1.0):
+        """Trayectoria ORIENTADA de `a` a `b`, recortable, para
+        `MoveAlongPath`.
+
+        `enlace(a, b)` devuelve la misma linea para (a, b) y (b, a),
+        dibujada en el sentido en que se declaro la arista: animar sobre
+        ella va al reves la mitad de las veces. Y parar en 1.0 monta la
+        ficha encima del nodo: 0.66-0.74 es el sitio.
+        """
+        pa, pb = self.punto(a), self.punto(b)
+        v = VMobject()
+        v.set_points_as_corners([pa + (pb - pa) * float(desde),
+                                 pa + (pb - pa) * float(hasta)])
+        return v
+
     def camino(self, nombres):
         """La ruta como VMobject, lista para `MoveAlongPath`.
 

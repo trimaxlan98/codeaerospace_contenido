@@ -61,8 +61,9 @@ from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         arp_resolver, barra_bits, cabecera,
                         cabecera_ipv4, checksum_ip, cidr, cola,
                         cola_mm1, conmutacion, crc32_trama, csma_cd,
-                        encapsular, enlace, entero_a_ip, eui64,
-                        fragmentar, ip_a_entero, ipv6_comprimir,
+                        demux, encapsular, enlace, entero_a_ip, eui64,
+                        escalera, ficha, fragmentar, handshake_tcp,
+                        ip_a_entero, ipv6_comprimir,
                         ipv6_expandir, little, mascara_bits,
                         mux_estadistico, nodo, paquete, pila,
                         prefijo_mas_largo, reloj, switch_aprende,
@@ -103,9 +104,86 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 4.1. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. Medido en el contenedor (ver informe final del agente).
+
+# Clip 1 - demux: la 4-tupla decide el socket. Un host, tres programas
+# escuchando y CUATRO paquetes: el cuarto apunta a un puerto sin nadie
+# escuchando y no se entrega.
+IP_HOST = "203.0.113.10"
+SOCKETS = {(IP_HOST, 443): "Navegador", (IP_HOST, 53): "DNS",
+          (IP_HOST, 25): "Correo"}
+PAQUETES_DEMUX = [
+    {"ip_o": "198.51.100.5", "pto_o": 51000, "ip_d": IP_HOST, "pto_d": 443},
+    {"ip_o": "198.51.100.7", "pto_o": 51500, "ip_d": IP_HOST, "pto_d": 53},
+    {"ip_o": "198.51.100.9", "pto_o": 52000, "ip_d": IP_HOST, "pto_d": 25},
+    {"ip_o": "198.51.100.11", "pto_o": 52500, "ip_d": IP_HOST,
+     "pto_d": 9999},
+]
+DEMUX = demux(PAQUETES_DEMUX, SOCKETS)
+SOCKET_DE = {443: "Navegador", 53: "DNS", 25: "Correo"}
+SOCKET_Y = {443: 1.15, 53: 0.0, 25: -1.15}          # fila de cada socket
+
+# Clip 2/3 - las cabeceras REALES de transporte (campos = [(nombre, bits)],
+# RFC 768 / RFC 793 sin opciones). No hay `CAMPOS_UDP`/`CAMPOS_TCP` en la
+# libreria (a diferencia de `CAMPOS_IPV4`): se definen aqui, con los MISMOS
+# anchos de bit que el estandar, para que `cabecera()` los dibuje.
+CAMPOS_UDP = (("Puerto origen", 16), ("Puerto destino", 16),
+             ("Longitud", 16), ("Checksum", 16))
+CAMPOS_TCP = (("Puerto origen", 16), ("Puerto destino", 16),
+             ("Numero de secuencia", 32), ("Numero de ACK", 32),
+             ("Offset y flags", 16), ("Ventana", 16),
+             ("Checksum", 16), ("Puntero urgente", 16))
+
+# El sobrecosto MEDIDO con `encapsular`: la misma carga (una consulta
+# chica de 32 B) por UDP y por TCP. Los 8 B / 20 B de transporte se leen
+# directo de `CAPAS_UDP`/`CAPAS_TCPIP`; el resto (IP + Ethernet) es igual
+# en los dos casos, asi el contraste es limpio.
+DATOS_EJEMPLO = 32
+CAPAS_UDP = (("Aplicacion", "DNS", 0), ("Transporte", "UDP", 8),
+            ("Red", "IP", 20), ("Enlace", "Ethernet", 18))
+ENC_UDP = encapsular(DATOS_EJEMPLO, capas=CAPAS_UDP)
+ENC_TCP = encapsular(DATOS_EJEMPLO, capas=CAPAS_TCPIP)
+
+# Valores de ejemplo de la cabecera UDP: puertos ilustrativos (el mismo
+# estilo que las IP de ejemplo en 1.2/2.1), y la Longitud tomada del
+# propio `ENC_UDP` (el tamano tras la capa de Transporte: 8 + 32 = 40).
+CAB_UDP_VAL = {"Puerto origen": "51500", "Puerto destino": "53",
+              "Longitud": str(ENC_UDP["pasos"][1]["tamano"]),
+              "Checksum": "0x1a2f"}
+
+# Valores de ejemplo de la cabecera TCP: los numeros de secuencia y de ACK
+# NO se inventan, salen del evento ACK real de `handshake_tcp()` (misma
+# funcion que da el costo del apreton mas abajo).
+HS = handshake_tcp()
+_ACK_EV = HS["eventos"][2]                    # el tercer mensaje: ACK
+CAB_TCP_VAL = {"Puerto origen": "51500", "Puerto destino": "443",
+              "Numero de secuencia": str(_ACK_EV["seq"]),
+              "Numero de ACK": str(_ACK_EV["ack"]),
+              "Offset y flags": "20 B / ACK", "Ventana": "64240",
+              "Checksum": "0x8f3c", "Puntero urgente": "0"}
+
+# Clip 2/3 - los mismos tres datagramas/segmentos, la misma perdida (el
+# numero 2), para que el contraste UDP/TCP sea la MISMA historia dos
+# veces, no dos historias distintas.
+NUMEROS_ENVIADOS = [1, 2, 3]
+PERDIDO = 2
+
+# Clip 4 - la tabla comparada y el costo del primer byte. El apreton
+# ENTERO (ISN, SYN/ACK paso a paso) es de la 4.2: aqui solo se cita el
+# costo en tiempo, ya calculado arriba en `HS`.
+ANTES_PRIMER_BYTE_TCP = HS["antes_del_primer_byte_ms"]     # 40.0 ms
+ANTES_PRIMER_BYTE_UDP = 0.0
+FILAS_TABLA = [
+    ["Cabecera", "8 B", "20 B"],
+    ["Antes del primer byte", "0 ms", "%d ms" % ANTES_PRIMER_BYTE_TCP],
+    ["Si se pierde un dato", "nadie se entera", "se detecta y se rellena"],
+]
+CASOS_USO = [
+    ("DNS: una pregunta y una respuesta cortas", "UDP"),
+    ("Voz o video en vivo: mejor tarde que repetido", "UDP"),
+    ("Una pagina o un archivo: tiene que llegar completo", "TCP"),
+]
 
 
 # --- Rotulos ----------------------------------------------------------

@@ -58,16 +58,18 @@ import protocolos as _pr  # noqa: E402
 from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         C_OK, C_PAQUETE, C_PERDIDA, C_RED,
                         CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
-                        arp_resolver, barra_bits, cabecera,
-                        cabecera_ipv4, checksum_ip, cidr, cola,
-                        cola_mm1, conmutacion, crc32_trama, csma_cd,
+                        aimd, arp_resolver, arranque_lento, barra_bits,
+                        bdp, cabecera, cabecera_ipv4, checksum_ip,
+                        cidr, cola, cola_mm1, colapso_congestion,
+                        conmutacion, crc32_trama, csma_cd, cubic,
                         encapsular, enlace, entero_a_ip, eui64,
                         fragmentar, ip_a_entero, ipv6_comprimir,
                         ipv6_expandir, little, mascara_bits,
                         mux_estadistico, nodo, paquete, pila,
-                        prefijo_mas_largo, reloj, switch_aprende,
-                        tabla, topologia, trama_ethernet, troceado,
-                        ttl_camino, verificar_checksum, voltear_bit)
+                        prefijo_mas_largo, recuperacion_tras_perdida,
+                        reloj, sierra, switch_aprende, tabla,
+                        topologia, trama_ethernet, troceado, ttl_camino,
+                        ventana, verificar_checksum, voltear_bit)
 
 _pr.Text = Text
 
@@ -103,9 +105,87 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 4.3. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# nunca escrito a mano en el clip: lo que se dibuja y lo que se escribe no
+# pueden discrepar. Medido en el contenedor antes de escribir los clips.
+
+# Clip 1 - el colapso de 1986: al pasar de la capacidad, el trabajo UTIL
+# cae en vez de estancarse (cada perdida se retransmite y empuja mas).
+COLAPSO = colapso_congestion()             # cargas 0.2 .. 3.0, capacidad 1.0
+COL_X = [float(x) for x in COLAPSO["carga"]]
+COL_U = [float(u) for u in COLAPSO["util"]]
+COL_N = len(COL_X)                         # 15 puntos MEDIDOS
+COL_CAP = COLAPSO["capacidad"]             # 1.0 = la capacidad del enlace
+COL_CAIDA = COLAPSO["caida_pct"]           # 95.0 % de caida del trabajo util
+
+
+def UTIL(x):
+    """Trabajo util MEDIDO para la carga x (interpola entre los puntos).
+
+    Con `muestras=COL_N` sobre (COL_X[0], COL_X[-1]) la grafica cae
+    EXACTAMENTE en los 15 puntos medidos: no se dibuja nada interpolado.
+    """
+    return float(np.interp(float(x), COL_X, COL_U))
+
+
+# La cola del router con la carga por encima de la capacidad (lambda = 1.4).
+COLA_COLAPSO = cola_mm1(lmbda=1.4, mu=1.0, n_llegadas=4000, capacidad=8,
+                        semilla=3)
+COLA_CAP = COLA_COLAPSO["capacidad"]                 # 8 ranuras
+OCUPACIONES = [0, 1, 2, 3, 4, 5, 6, 7, 8]            # el llenado en pantalla
+BUCLE = ("la cola se llena", "se descarta", "se retransmite")
+
+# Clip 2 - arranque lento: cwnd duplicandose hasta el umbral.
+SLOW = arranque_lento(ssthresh=16, cwnd0=1, rtts=10)
+SLOW_TRAZA = SLOW["traza"]                 # 1 2 4 8 16 17 18 19 20 21
+SLOW_EXP = SLOW["rtts_hasta_umbral"]       # 4 RTT duplicando
+SLOW_SSTHRESH = SLOW["ssthresh"]           # 16 segmentos
+SLOW_LINEAL = SLOW_TRAZA[SLOW_EXP + 1:]   # 17 18 19 20 21: la parte de +1
+# El tubo que hay que llenar: 100 Mb/s con 40 ms de ida y vuelta.
+TUBO = bdp(100.0, 40.0)
+TUBO_SEG = int(TUBO["segmentos_1460"])     # 342 segmentos de 1460 B en vuelo
+TUBO_MBPS, TUBO_RTT = TUBO["mbps"], TUBO["rtt_ms"]
+
+# Clip 3 - la sierra de TCP Reno: +1 por RTT, /2 al perder.
+RENO = aimd(rtts=60, ssthresh0=32, perdidas=(18, 34, 50))
+RENO_TRAZA = RENO["traza"]
+RENO_PERDIDAS = RENO["perdidas"]           # 18, 34, 50
+RENO_MEDIA = RENO["media"]                 # 27.63 segmentos EN ESTA VENTANA
+RENO_PICO = RENO["pico"]                   # 45 segmentos
+RENO_RTTS = len(RENO_TRAZA)                # 60 RTT dibujados
+# cwnd justo ANTES y justo DESPUES de cada perdida, leidos de la traza.
+RENO_CORTES = [(e["rtt"], RENO_TRAZA[e["rtt"]], e["cwnd_nuevo"])
+               for e in RENO["eventos"]]
+
+# Clip 4 - CUBIC frente a Reno, y BBR.
+CUBIC = cubic(rtts=60, w_max=32.0, c=0.4, beta=0.7, perdidas=(18, 34, 50),
+              rtt_s=0.04)
+CUBIC_TRAZA = CUBIC["traza"]
+CUBIC_MEDIA = CUBIC["media"]               # 21.06 EN ESTA MISMA VENTANA
+CUBIC_PICO = CUBIC["pico"]
+Y_MAX_SIERRA = RENO_PICO * 1.15            # MISMA escala para las dos sierras
+# La media de una ventana corta hace parecer PEOR a CUBIC. Lo que de verdad
+# los separa es el tiempo en volver a llenar el tubo tras una perdida, para
+# la MISMA ventana de TUBO_SEG segmentos y tres RTT distintos.
+RTTS_COMPARADOS = (20.0, 40.0, 200.0)
+RECUP = [recuperacion_tras_perdida(TUBO_SEG, r) for r in RTTS_COMPARADOS]
+RECUP_CUBIC_S = RECUP[0]["cubic_s"]        # 6.35 s: NO depende del RTT
+RECUP_RENO_RTTS = RECUP[0]["reno_rtts"]    # 171 RTT de +1 segmento cada uno
+
+
+def GANADOR(r):
+    """Quien recupera antes y por cuanto, MEDIDO. Dentro del 10 % se
+    declara empate en vez de fingir una diferencia que no se ve."""
+    if r["reno_s"] < r["cubic_s"] * 0.90:
+        return "Reno  %sx" % fmt(r["cubic_s"] / r["reno_s"], 1)
+    if r["cubic_s"] < r["reno_s"] * 0.90:
+        return "CUBIC %sx" % fmt(r["veces"], 1)
+    return "empate"
+
+
+# BBR no lo calcula la libreria: se nombra como lo que es (un algoritmo que
+# ESTIMA el cuello de botella en vez de esperar la perdida) y no se le
+# inventa ninguna cifra en pantalla.
 
 
 # --- Rotulos ----------------------------------------------------------

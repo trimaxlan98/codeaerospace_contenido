@@ -58,11 +58,11 @@ import protocolos as _pr  # noqa: E402
 from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         C_OK, C_PAQUETE, C_PERDIDA, C_RED,
                         CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
-                        arp_resolver, barra_bits, cabecera,
-                        cabecera_ipv4, checksum_ip, cidr, cola,
-                        cola_mm1, conmutacion, crc32_trama, csma_cd,
-                        encapsular, enlace, entero_a_ip, eui64,
-                        fragmentar, ip_a_entero, ipv6_comprimir,
+                        arp_resolver, barra_bits, bellman_ford, cabecera,
+                        cabecera_ipv4, camino_dijkstra, checksum_ip, cidr,
+                        cola, cola_mm1, conmutacion, crc32_trama, csma_cd,
+                        dijkstra, encapsular, enlace, entero_a_ip, eui64,
+                        fragmentar, inundacion, ip_a_entero, ipv6_comprimir,
                         ipv6_expandir, little, mascara_bits,
                         mux_estadistico, nodo, paquete, pila,
                         prefijo_mas_largo, reloj, switch_aprende,
@@ -103,9 +103,77 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 3.2. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. Medido en el contenedor antes de escribir los clips.
+
+# La red compartida de la leccion (los mismos seis routers de 3.1).
+RED = {("A", "B"): 2, ("A", "C"): 5, ("B", "C"): 2, ("B", "D"): 4,
+       ("C", "E"): 3, ("D", "E"): 1, ("D", "F"): 3, ("E", "F"): 2}
+# Ningun par CONECTADO comparte la coordenada x: con B encima de C (y D
+# encima de E) las aristas B-C y D-E salian verticales y tachaban la letra
+# del nodo de arriba y la cifra de distancia del de abajo.
+POS_RED = {"A": (-4.4, 0.5), "B": (-2.2, 2.1), "C": (-1.2, -1.2),
+           "D": (1.7, 1.8), "E": (0.7, -1.6), "F": (4.2, 0.1)}
+N_ENLACES = len(RED)                    # 8: lo que cada router acaba sabiendo
+
+# Clip 1 - inundar el mapa: rondas y mensajes CONTADOS por `inundacion`.
+INUN = inundacion(RED, "A")
+# INUN["rondas"]: [{'ronda':1,'nuevos':['B','C'],'mensajes':2}, ...]
+#                  ronda 2 nuevos=['D','E'] mensajes=6
+#                  ronda 3 nuevos=['F']     mensajes=6
+#                  ronda 4 nuevos=[]        mensajes=2
+# INUN["n_rondas"] = 4, INUN["mensajes"] = 16, INUN["todos"] = True
+
+
+def _vecinos_de(red):
+    g = {}
+    for (a, b) in red:
+        g.setdefault(a, set()).add(b)
+        g.setdefault(b, set()).add(a)
+    return g
+
+
+def _rondas_de_envios(vecinos, origen):
+    """Replica la MISMA logica de `inundacion` pero devolviendo, ronda a
+    ronda, la lista (emisor, receptor) de cada mensaje enviado -- lo que
+    se anima. El total por ronda coincide con INUN['rondas'][i]['mensajes']
+    (verificado en el contenedor): cada router reenvia a TODOS sus
+    vecinos, incluso a los que ya lo saben."""
+    tienen, frontera, rondas = {origen}, {origen}, []
+    while frontera:
+        envios, nueva = [], set()
+        for n in sorted(frontera):
+            for v in sorted(vecinos[n]):
+                envios.append((n, v))
+                if v not in tienen:
+                    nueva.add(v)
+        tienen |= nueva
+        rondas.append(envios)
+        frontera = nueva
+    return rondas
+
+
+RONDAS_ENVIOS = _rondas_de_envios(_vecinos_de(RED), "A")
+
+# Clips 2 y 3 - Dijkstra desde A: orden de fijacion REAL y su arbol.
+DIJ = dijkstra(RED, "A")
+ORDEN_DIJ = DIJ["orden"]                # ['A', 'B', 'C', 'D', 'E', 'F']
+CAMINO_AF = camino_dijkstra(DIJ, "F")   # ['A', 'B', 'D', 'F'], costo 9
+ARBOL_DIJ = sorted(DIJ["arbol"])        # [('A','B'),('B','C'),('B','D'),
+                                         #  ('C','E'),('D','F')]
+DESTINOS = ["B", "C", "D", "E", "F"]
+
+# Clip 3 - se cambia un costo de enlace (A-C baja de 5 a 1) y el arbol
+# de caminos minimos se redibuja distinto (medido, no supuesto).
+RED2 = dict(RED)
+RED2[("A", "C")] = 1
+DIJ2 = dijkstra(RED2, "A")
+ARBOL_DIJ2 = sorted(DIJ2["arbol"])      # [('A','B'),('A','C'),('C','E'),
+                                         #  ('D','E'),('E','F')]
+
+# Clip 4 - contraste honesto: rumores (Bellman-Ford desde F) frente al
+# mapa compartido (inundacion desde A, ya medida arriba).
+BF_F = bellman_ford(RED, "F")           # converge en 3 rondas
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -190,6 +258,27 @@ def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
     t = Text(texto, font_size=font_size, color=col)
     t.next_to(b, direccion, buff=buff)
     return VGroup(b, t)
+
+
+def salto(topo, desde, hasta, frac=0.55):
+    """Trayectoria de UN salto para `MoveAlongPath`, del centro de `desde`
+    a un punto A MEDIO CAMINO del enlace (nunca al centro de `hasta`): una
+    ficha que termina su viaje montada en el nodo lo tapa (trampa heredada
+    de la familia). La llegada se marca aparte, encendiendo el nodo."""
+    e = topo.enlace(desde, hasta)
+    origen = topo.punto(desde)
+    cerca_de_a = (np.linalg.norm(origen - e.a) <= np.linalg.norm(origen - e.b))
+    destino = e.punto_en(frac if cerca_de_a else 1.0 - frac)
+    v = VMobject()
+    v.set_points_as_corners([origen, destino])
+    return v
+
+
+def mensaje(color=C_PAQUETE, lado=0.20):
+    """Un anuncio/mensaje viajando por el enlace: un cuadrado chico del
+    color del dato que viaja (regla de la paleta: ambar)."""
+    return Square(lado, stroke_color=color, stroke_width=1.6,
+                 fill_color=color, fill_opacity=0.85)
 
 
 def cierre_leccion(escena, rot, linea_blanca, linea_cian, pie=None,

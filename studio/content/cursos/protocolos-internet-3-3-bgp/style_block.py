@@ -58,15 +58,16 @@ import protocolos as _pr  # noqa: E402
 from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         C_OK, C_PAQUETE, C_PERDIDA, C_RED,
                         CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
-                        arp_resolver, barra_bits, cabecera,
-                        cabecera_ipv4, checksum_ip, cidr, cola,
-                        cola_mm1, conmutacion, crc32_trama, csma_cd,
-                        encapsular, enlace, entero_a_ip, eui64,
-                        fragmentar, ip_a_entero, ipv6_comprimir,
-                        ipv6_expandir, little, mascara_bits,
-                        mux_estadistico, nodo, paquete, pila,
-                        prefijo_mas_largo, reloj, switch_aprende,
-                        tabla, topologia, trama_ethernet, troceado,
+                        arp_resolver, barra_bits, bgp_mejor_ruta,
+                        cabecera, cabecera_ipv4, checksum_ip, cidr,
+                        cola, cola_mm1, conmutacion, crc32_trama,
+                        csma_cd, encapsular, enlace, entero_a_ip,
+                        eui64, ficha, fragmentar, grafo_de,
+                        ip_a_entero, ipv6_comprimir, ipv6_expandir,
+                        little, mascara_bits, mux_estadistico, nodo,
+                        paquete, pila, prefijo_mas_largo, reloj,
+                        secuestro_bgp, switch_aprende, tabla,
+                        topologia, trama_ethernet, troceado,
                         ttl_camino, verificar_checksum, voltear_bit)
 
 _pr.Text = Text
@@ -103,9 +104,133 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 3.3. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo que se dibuja y lo que se escribe no pueden
+# discrepar. Medido en el contenedor antes de escribir un solo clip.
+
+# El mapa de la leccion: OCHO sistemas autonomos.
+#   AS100 y AS200 son tier-1 y PARES entre si; AS100 y AS300 tambien son
+#   pares. Lo demas son enlaces cliente->proveedor (jerarquia):
+#   AS500 y AS300 cuelgan de AS100, AS400 de AS200, AS600 de AS500 y de
+#   AS300, AS700 de AS300 y de AS400, y AS900 (el atacante) de AS500.
+# El costo va a 1 porque `grafo_de` (y con el `secuestro_bgp`) lo exige;
+# el dibujo va con costos=False, asi que ese 1 nunca sale en pantalla.
+POS_AS = {"AS100": (-1.5, 1.80), "AS200": (1.6, 1.80),
+          "AS300": (0.9, -1.30), "AS400": (4.0, 0.55),
+          "AS500": (-4.0, 0.55), "AS600": (-1.9, -1.30),
+          "AS700": (3.4, -1.45), "AS900": (-4.3, -1.60)}
+ARISTAS_AS = {("AS100", "AS200"): 1, ("AS100", "AS300"): 1,
+              ("AS100", "AS500"): 1, ("AS200", "AS400"): 1,
+              ("AS300", "AS700"): 1, ("AS400", "AS700"): 1,
+              ("AS500", "AS600"): 1, ("AS600", "AS300"): 1,
+              ("AS500", "AS900"): 1}
+TIPOS_AS = {"AS700": "servidor", "AS900": "host"}
+# Hacia donde va el nombre de cada AS: puesto a mano porque `Topologia`
+# los cuelga siempre DEBAJO y ahi los cruzan las aristas que bajan.
+ETIQ_AS = {"AS100": UP, "AS200": UP, "AS300": DOWN, "AS400": RIGHT,
+           "AS500": LEFT, "AS600": DOWN, "AS700": RIGHT, "AS900": DOWN}
+PARES = (("AS100", "AS200"), ("AS100", "AS300"))
+JERARQUIA = tuple(a for a in ARISTAS_AS if a not in PARES)
+
+# Cuantos AS hay de verdad: NO lo calcula la libreria, es una medicion
+# publica (CIDR Report / RIRs, 2025) y se declara como tal en pantalla.
+AS_EN_INTERNET = "~75 000"
+
+# El cable que existe y no se usa: AS600 cuelga de AS500 y de AS300, y no
+# va a pagar a sus dos proveedores por llevar trafico que no es suyo.
+VALLE = ("AS500", "AS600", "AS300")
+RODEO = ("AS500", "AS100", "AS300")
+
+# --- Clip 2: el anuncio recorre un anillo y vuelve al origen -----------
+# Sub-mapa (los cinco AS del anillo), redibujado a la izquierda para que
+# quepa la tabla: mismas aristas que en el mapa grande.
+POS_ANILLO = {"AS700": (-4.85, -1.30), "AS300": (-5.25, 0.60),
+              "AS100": (-3.65, 1.85), "AS200": (-1.85, 1.10),
+              "AS400": (-2.15, -0.85)}
+ARISTAS_ANILLO = {("AS700", "AS300"): 1, ("AS300", "AS100"): 1,
+                  ("AS100", "AS200"): 1, ("AS200", "AS400"): 1,
+                  ("AS400", "AS700"): 1}
+ANILLO = ("AS700", "AS300", "AS100", "AS200", "AS400", "AS700")
+ETIQ_ANILLO = {"AS700": DOWN, "AS300": LEFT, "AS100": UP, "AS200": RIGHT,
+               "AS400": DOWN}
+
+
+def _num(as_):
+    """'AS300' -> '300'. El AS-path de BGP se escribe con numeros pelados."""
+    return str(as_)[2:]
+
+
+# Lo que VE cada AS al recibir el anuncio: el camino que ya trae, del
+# vecino que se lo pasa hasta el origen. Crece un numero por salto.
+FILAS_ANUNCIO = tuple(
+    (ANILLO[i],
+     " ".join(_num(a) for a in
+              list(reversed(ANILLO[1:i])) + [ANILLO[0]]))
+    for i in range(1, len(ANILLO)))
+# -> (('AS300','700'), ('AS100','300 700'), ('AS200','100 300 700'),
+#     ('AS400','200 100 300 700'), ('AS700','400 200 100 300 700'))
+FILA_BUCLE = len(FILAS_ANUNCIO) - 1        # la que se descarta
+AS_PATH_FINAL = FILAS_ANUNCIO[-1][1]
+
+# --- Clip 3: tres rutas al MISMO prefijo, vistas desde AS100 -----------
+PREFIJO = "203.0.113.0/24"
+LP_CLIENTE = 200      # ruta por un cliente: la que le da dinero a AS100
+LP_PAR = 100          # ruta por un par: ni cobra ni paga
+RUTAS_BGP = ({"vecino": "AS200", "as_path": ["AS200", "AS400", "AS700"],
+              "local_pref": LP_PAR},
+             {"vecino": "AS300", "as_path": ["AS300", "AS700"],
+              "local_pref": LP_PAR},
+             {"vecino": "AS500",
+              "as_path": ["AS500", "AS600", "AS300", "AS700"],
+              "local_pref": LP_CLIENTE})
+RUTAS_EMPATE = tuple(dict(r, local_pref=LP_PAR) for r in RUTAS_BGP)
+# El que decide, con sus tres vecinos: mini-mapa a la izquierda de la tabla.
+DECIDE = "AS100"
+POS_DECISION = {"AS100": (-5.15, 0.35), "AS200": (-6.45, 1.55),
+                "AS300": (-3.85, 1.55), "AS500": (-5.15, -1.10)}
+ARISTAS_DECISION = {("AS200", "AS100"): 1, ("AS300", "AS100"): 1,
+                    ("AS500", "AS100"): 1}
+ETIQ_DECISION = {"AS100": RIGHT, "AS200": UP, "AS300": UP, "AS500": DOWN}
+BGP_POLITICA = bgp_mejor_ruta([dict(r) for r in RUTAS_BGP])
+BGP_DISTANCIA = bgp_mejor_ruta([dict(r) for r in RUTAS_EMPATE])
+# MEDIDO: gana AS500 por "local-pref mas alta" con 4 saltos (el camino mas
+# largo); igualando las local-pref gana AS300 por "AS-path mas corto" (2).
+GANA_POLITICA = BGP_POLITICA["elegida"]["vecino"]
+GANA_DISTANCIA = BGP_DISTANCIA["elegida"]["vecino"]
+SALTOS_POLITICA = len(BGP_POLITICA["elegida"]["as_path"])
+SALTOS_DISTANCIA = len(BGP_DISTANCIA["elegida"]["as_path"])
+I_POLITICA = [r["vecino"] for r in RUTAS_BGP].index(GANA_POLITICA)
+I_DISTANCIA = [r["vecino"] for r in RUTAS_BGP].index(GANA_DISTANCIA)
+
+
+def _filas_rutas(rutas):
+    """Las tres rutas como filas de tabla (gemelas: misma estructura)."""
+    return [(r["vecino"], " ".join(_num(a) for a in r["as_path"]),
+             str(len(r["as_path"])), str(r["local_pref"])) for r in rutas]
+
+
+FILAS_RUTAS = _filas_rutas(RUTAS_BGP)
+FILAS_RUTAS_EMPATE = _filas_rutas(RUTAS_EMPATE)
+
+# --- Clip 4: el secuestro ---------------------------------------------
+PREF_ESPECIFICO = "203.0.113.0/25"
+CIDR_LEG = cidr(PREFIJO)
+CIDR_ATA = cidr(PREF_ESPECIFICO)
+LEGITIMO, ATACANTE = "AS700", "AS900"
+IP_VICTIMA = "203.0.113.10"
+LPM = prefijo_mas_largo([(PREFIJO, LEGITIMO), (PREF_ESPECIFICO, ATACANTE)],
+                        IP_VICTIMA)
+SEC_MISMO = secuestro_bgp(ARISTAS_AS, LEGITIMO, ATACANTE, PREFIJO,
+                          mas_especifico=False)
+SEC_ESPEC = secuestro_bgp(ARISTAS_AS, LEGITIMO, ATACANTE, PREF_ESPECIFICO,
+                          mas_especifico=True)
+AS_CAE = SEC_MISMO["envenenados"][0]         # el unico que cae sin mentir mas
+SALTOS_ATA = len(SEC_MISMO["camino_atacante"][AS_CAE]) - 1
+SALTOS_LEG = len(SEC_MISMO["camino_legitimo"][AS_CAE]) - 1
+# MEDIDO: con el MISMO prefijo el atacante se lleva 1 de 6 (16.67 %), solo
+# el AS que le queda mas cerca por AS-path (AS500, su propio proveedor);
+# con un prefijo MAS ESPECIFICO se lleva 6 de 6 (100 %), porque el prefijo
+# mas largo gana siempre (la regla del modulo 2).
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -152,6 +277,41 @@ def hud_modulo(texto):
     t = etiqueta_hud(texto)
     t.to_corner(UL, buff=0.5)
     return t
+
+
+def etiquetas_a(topo, direcciones, buff=0.14):
+    """Recoloca los rotulos de nodo de una topologia, uno a uno.
+
+    `Topologia` los pone SIEMPRE debajo del nodo, y en un grafo denso eso
+    los deja justo encima de las aristas que salen hacia abajo. Aqui cada
+    nodo dice hacia donde quiere su nombre (UP/DOWN/LEFT/RIGHT).
+    """
+    for k, d in dict(direcciones).items():
+        n = topo.nodo(k)
+        if n.etiqueta is not None:
+            n.etiqueta.next_to(n.forma, d, buff=buff)
+    return topo
+
+
+def tramo(topo, a, b, desde=0.0, hasta=1.0):
+    """Trayectoria ORIENTADA de `a` a `b` sobre un enlace de la topologia.
+
+    `Topologia.enlace(a, b)` devuelve la MISMA linea para (a, b) y (b, a),
+    dibujada en el sentido en que se declaro la arista: un MoveAlongPath
+    sobre ella va al reves la mitad de las veces. Ademas conviene poder
+    parar antes del nodo (`hasta` < 1), porque una ficha que termina en el
+    nodo se le monta encima. Los extremos ya vienen con el `buff` del
+    enlace, asi que el segmento no cruza los circulos.
+    """
+    e = topo.enlace(a, b)
+    p0, p1 = e.linea.get_start(), e.linea.get_end()
+    pa = topo.punto(a)
+    if np.linalg.norm(p0 - pa) > np.linalg.norm(p1 - pa):
+        p0, p1 = p1, p0
+    v = VMobject()
+    v.set_points_as_corners([p0 + (p1 - p0) * float(desde),
+                             p0 + (p1 - p0) * float(hasta)])
+    return v
 
 
 def tag_junto(mobjeto, texto, direccion=DOWN, buff=0.16, font_size=18,

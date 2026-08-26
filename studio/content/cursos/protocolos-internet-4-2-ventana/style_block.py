@@ -57,17 +57,8 @@ _al.Text = Text
 import protocolos as _pr  # noqa: E402
 from protocolos import (C_CAPA, C_CIFRA, C_CLAVE, C_COLA,  # noqa: E402
                         C_OK, C_PAQUETE, C_PERDIDA, C_RED,
-                        CAMPOS_IPV4, CAPAS_TCPIP, agregar_rutas,
-                        arp_resolver, barra_bits, cabecera,
-                        cabecera_ipv4, checksum_ip, cidr, cola,
-                        cola_mm1, conmutacion, crc32_trama, csma_cd,
-                        encapsular, enlace, entero_a_ip, eui64,
-                        fragmentar, ip_a_entero, ipv6_comprimir,
-                        ipv6_expandir, little, mascara_bits,
-                        mux_estadistico, nodo, paquete, pila,
-                        prefijo_mas_largo, reloj, switch_aprende,
-                        tabla, topologia, trama_ethernet, troceado,
-                        ttl_camino, verificar_checksum, voltear_bit)
+                        bdp, escalera, ficha, handshake_tcp, paquete,
+                        reloj, rtt_jacobson, sierra, tabla, ventana)
 
 _pr.Text = Text
 
@@ -103,9 +94,60 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 4.2. Todo valor que se
-# rotule sale de aqui o de la libreria `protocolos.py`, NUNCA escrito a
-# mano en el clip. Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria `protocolos.py`,
+# nunca escrito a mano en el clip. Medido en el contenedor antes de
+# escribir los clips (ver informe final del agente).
+
+# Clip 1 - los tres mensajes (handshake_tcp real, ISN por defecto).
+HS = handshake_tcp()
+RTT_HS = HS["rtt_ms"]                          # 40.0 ms
+ANTES_PRIMER_BYTE = HS["antes_del_primer_byte_ms"]   # 40.0 ms
+
+
+def _texto_evento(e):
+    """Texto de una flecha de la Escalera, construido desde el dict REAL
+    que entrega handshake_tcp() (nunca a mano)."""
+    if e["flags"] == "datos":
+        return "datos (primer byte util)"
+    partes = ["seq=%d" % e["seq"]]
+    if e["ack"] is not None:
+        partes.append("ack=%d" % e["ack"])
+    return "%s  %s" % (e["flags"], " ".join(partes))
+
+
+EVENTOS_HS = [dict(e, texto=_texto_evento(e)) for e in HS["eventos"]]
+
+# Clip 2 - secuencia y ACK. La biblioteca no trae una funcion dedicada a
+# esto (es aritmetica de numeros de secuencia, no un algoritmo que
+# validar); el punto de partida SI es real: el primer byte util que ya
+# midio handshake_tcp() arriba.
+TAM_SEG = 1460
+ISN_DATOS = HS["eventos"][-1]["seq"]           # 1001
+N_SEGMENTOS = 4
+SEQS = [ISN_DATOS + i * TAM_SEG for i in range(N_SEGMENTOS)]
+ORDEN_LLEGADA = [0, 2, 1, 3]                   # 1o, 3o, 2o, 4o (envio 0-index)
+ACK_TRAS_REORDEN = SEQS[-1] + TAM_SEG          # 6841: todo confirmado
+
+# Segunda tanda: se pierde el segmento en el indice 1 (seq 8301) y los dos
+# que llegan despues del hueco disparan cada uno un ACK duplicado.
+SEQS_2 = [ACK_TRAS_REORDEN + i * TAM_SEG for i in range(4)]
+IDX_PERDIDO = 1
+ACK_DUP = SEQS_2[IDX_PERDIDO]                  # 8301: el hueco que no avanza
+N_ACK_DUP = 2
+
+# Clip 3 - la ventana deslizante (bdp + ventana, ambas REALES).
+BDP_40 = bdp(100.0, 40.0)
+VENTANAS = [ventana(w, 40.0, TAM_SEG, 100.0) for w in (1, 10, 100, 342, 343)]
+V1, V10, V100, V342, V343 = VENTANAS
+W_LLENA = V343["w"]                            # 343: primer W que satura
+
+# Clip 4 - RTO de Jacobson (RFC 6298), paso a paso sobre muestras reales.
+MUESTRAS_RTT = [40.0, 42.0, 38.0, 95.0, 41.0, 39.0, 40.0]
+RJ = rtt_jacobson(MUESTRAS_RTT)
+IDX_PICO = 3                                   # la muestra de 95 ms
+RATIO_RTO_SRTT = RJ["rto"] / RJ["srtt"]         # cuanto mas grande es el RTO
+FILAS_RJ = [[str(k), fmt(p["muestra"], 1), fmt(p["srtt"], 2),
+            fmt(p["rto"], 2)] for k, p in enumerate(RJ["pasos"])]
 
 
 # --- Rotulos ----------------------------------------------------------

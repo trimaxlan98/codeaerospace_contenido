@@ -8,25 +8,25 @@
       "file": "clips/01-el-colapso.py",
       "title": "1 · El colapso",
       "scene": "Clip1",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+      "final_state": "Gráfica ámbar del trabajo útil frente a la carga ofrecida: sube hasta la línea naranja punteada de capacidad y se desploma, con los diez puntos de la rama descendente marcados en rojo; debajo, en rojo, 'trabajo util 1.00 -> 0.05 de la capacidad (95.0 % menos)'; pie 'Pasada la capacidad, empujar mas entrega menos. Eso es el colapso.'; HUD 'Modulo 01'."
     },
     {
       "file": "clips/02-arranque-lento.py",
       "title": "2 · Arranque lento",
       "scene": "Clip2",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+      "final_state": "Curva ámbar de cwnd frente al RTT con los cinco puntos cian rotulados 1, 2, 4, 8 y 16, la línea naranja punteada 'ssthresh = 16' y los cinco puntos verdes de la fase lineal; abajo, en cian, 'el tubo de 100 Mb/s con 40 ms de ida y vuelta son 342 segmentos en vuelo'; pie 'Duplicar no es lento: es la unica forma de encontrar el techo sin tumbarlo.'; HUD 'Modulo 02'."
     },
     {
       "file": "clips/03-la-sierra.py",
       "title": "3 · La sierra",
       "scene": "Clip3",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+      "final_state": "La sierra ámbar de TCP Reno a lo largo de 60 RTT con las tres pérdidas marcadas por puntos rojos y flechas rojas de caída, y la media cian punteada cruzando toda la gráfica; debajo, 'pico de la ventana 45 segmentos' en ámbar y 'media MEDIDA en estos 60 RTT 27.63 segmentos' en cian; pie 'El emisor casi nunca usa su pico: usa el promedio de la sierra.'; HUD 'Modulo 03'."
     },
     {
       "file": "clips/04-cubic-y-bbr.py",
       "title": "4 · CUBIC y BBR",
       "scene": "Clip4",
-      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Nadie obliga a tu computadora a frenar.' (blanca) y 'Frena porque, si no, no funciona para nadie.' (cian); pie 'Cierra el modulo 4. En el 8, el RTT sera de cientos de ms.'; HUD 'Modulo 04'."
     }
   ]
 }
