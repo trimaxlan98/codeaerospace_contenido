@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 5.2 DHCP y NAT: casa prestada, puerta compartida",
+  "description": "Lección 5.2 del curso Protocolos de Internet (módulo 5: los servicios), en 4 clips animados —una idea por clip—: los cuatro mensajes de DORA, una sola IP pública para toda la casa, la tabla de traducción que renumera puertos, y lo que NAT rompió. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dora.py",
+      "title": "1 · DORA",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-una-ip-para-todos.py",
+      "title": "2 · Una IP para todos",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-la-tabla-de-traduccion.py",
+      "title": "3 · La tabla de traducción",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-lo-que-nat-rompio.py",
+      "title": "4 · Lo que NAT rompió",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

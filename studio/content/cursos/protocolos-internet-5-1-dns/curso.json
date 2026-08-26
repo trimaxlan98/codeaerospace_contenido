@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 5.1 DNS: el directorio del mundo",
+  "description": "Lección 5.1 del curso Protocolos de Internet (módulo 5: los servicios), en 4 clips animados —una idea por clip—: el árbol de nombres leído de derecha a izquierda, la resolución paso a paso con el RTT acumulado, la caché y el TTL con la tasa de acierto medida, y la raíz. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-arbol-de-nombres.py",
+      "title": "1 · El árbol de nombres",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/02-la-resolucion.py",
+      "title": "2 · La resolución paso a paso",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/03-la-cache-y-el-ttl.py",
+      "title": "3 · La caché y el TTL",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    },
+    {
+      "file": "clips/04-la-raiz.py",
+      "title": "4 · La raíz",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): el ultimo frame REAL (ffmpeg)."
+    }
+  ]
+}

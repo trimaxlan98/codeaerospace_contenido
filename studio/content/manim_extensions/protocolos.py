@@ -20,7 +20,7 @@ La regla de color de la familia: **el color dice el papel**.
     C_CLAVE    fucsia   seguridad: claves, certificados, lo cifrado
     C_COLA     naranja  colas, buferes, espera, ancho de banda
 
-Numeros de los LOTES 1 y 2 (modulos 1 a 4). Toda cifra en pantalla sale
+Numeros de los LOTES 1, 2 y 3 (modulos 1 a 6). Toda cifra en pantalla sale
 de aqui o de la tabla del style_block, nunca escrita a mano:
     troceado / conmutacion / mux_estadistico / cola_mm1 / little
     encapsular / crc32_trama / trama_ethernet / csma_cd
@@ -33,6 +33,12 @@ de aqui o de la tabla del style_block, nunca escrita a mano:
     bgp_mejor_ruta / secuestro_bgp
     demux / handshake_tcp / bdp / ventana / rtt_jacobson
     arranque_lento / aimd / cubic / colapso_congestion
+    recuperacion_tras_perdida
+    resolver_dns / cache_dns / dhcp_dora / es_privada
+    nat_traducir / nat_entrante / ping / traceroute / pmtud
+    http_peticion / cache_condicional / http_transferencia
+    tls_viajes / dh_pequeno / cadena_certificados
+    hol_bloqueo / quic_migracion
 
 Piezas (VGroup con localizadores que siguen move_to/shift, NO scale;
 todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
@@ -54,6 +60,8 @@ todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
     ranuras        regla de ranuras de tiempo; .con_colores()
     escalera       diagrama de tiempo (handshake, DNS, TLS); .paso(k)
     sierra         cwnd frente al tiempo; .marcas .media; .con_traza()
+    arbol          jerarquia por niveles (DNS, cadena de certificados);
+                   .nodo(nivel, i); .con_marcados()
 
 Uso en un clip (el style_block de la familia ya importa todo):
     import sys; sys.path.insert(0, "/workspace/studio/content/manim_extensions")
@@ -1995,3 +2003,448 @@ def sierra(traza, perdidas=(), ancho=6.4, alto=2.8, color=C_PAQUETE,
     """Ver `Sierra`."""
     return Sierra(traza, perdidas, ancho, alto, color, y_max, media,
                   etiqueta)
+
+
+# =====================================================================
+# Modulo 5 — Los servicios que hacen usable la red
+# =====================================================================
+JERARQUIA_DNS = (("raiz", "."),
+                 ("TLD", "org"),
+                 ("dominio", "ejemplo.org"),
+                 ("subdominio", "www.ejemplo.org"))
+
+
+def resolver_dns(nombre="www.ejemplo.org", cache=None, rtt_local=2.0,
+                 rtt_raiz=30.0, rtt_tld=45.0, rtt_auto=60.0):
+    """La resolucion PASO A PASO, con el RTT acumulado. -> dict MEDIDO.
+
+    Si el nombre esta en `cache`, se responde en un solo salto local: esa
+    es toda la diferencia entre una web que abre y una que se piensa.
+    """
+    cache = dict(cache or {})
+    if nombre in cache:
+        return {"nombre": nombre, "pasos": [
+            {"de": "cliente", "a": "resolutor", "pregunta": nombre,
+             "rtt": rtt_local, "acumulado": rtt_local,
+             "responde": "la cache", "respuesta": cache[nombre]}],
+            "total_ms": rtt_local, "viajes": 1, "desde_cache": True,
+            "ip": cache[nombre], "cache": cache}
+    partes = nombre.split(".")
+    etapas = [("resolutor", "raiz", ".", rtt_raiz,
+               "no la se; pregunta al de .%s" % partes[-1]),
+              ("resolutor", "TLD .%s" % partes[-1], ".".join(partes[-1:]),
+               rtt_tld, "no la se; pregunta al de %s"
+               % ".".join(partes[-2:])),
+              ("resolutor", "autoritativo", ".".join(partes[-2:]), rtt_auto,
+               "93.184.216.34")]
+    pasos = [{"de": "cliente", "a": "resolutor", "pregunta": nombre,
+              "rtt": rtt_local, "acumulado": rtt_local,
+              "responde": None, "respuesta": None}]
+    acc = rtt_local
+    for de, a, zona, rtt, resp in etapas:
+        acc += rtt
+        pasos.append({"de": de, "a": a, "pregunta": nombre, "zona": zona,
+                      "rtt": rtt, "acumulado": acc, "responde": a,
+                      "respuesta": resp})
+    cache[nombre] = "93.184.216.34"
+    return {"nombre": nombre, "pasos": pasos, "total_ms": acc,
+            "viajes": len(pasos), "desde_cache": False,
+            "ip": "93.184.216.34", "cache": cache}
+
+
+def cache_dns(n_consultas=200, n_nombres=12, ttl=8, semilla=5, zipf=1.4):
+    """Traza de consultas con localidad (Zipf) y una cache con TTL.
+    -> tasa de acierto MEDIDA, no supuesta."""
+    rng = np.random.default_rng(int(semilla))
+    pesos = 1.0 / (np.arange(1, int(n_nombres) + 1) ** float(zipf))
+    pesos = pesos / pesos.sum()
+    consultas = rng.choice(int(n_nombres), size=int(n_consultas), p=pesos)
+    expira, aciertos, fallos, historia = {}, 0, 0, []
+    for t, n in enumerate(consultas):
+        n = int(n)
+        vivo = expira.get(n, -1) > t
+        if vivo:
+            aciertos += 1
+        else:
+            fallos += 1
+            expira[n] = t + int(ttl)
+        historia.append({"t": t, "nombre": n, "acierto": vivo})
+    return {"consultas": int(n_consultas), "aciertos": aciertos,
+            "fallos": fallos, "historia": historia, "ttl": int(ttl),
+            "tasa_acierto": 100.0 * aciertos / int(n_consultas),
+            "nombres": int(n_nombres)}
+
+
+def dhcp_dora(mac="aa:bb:cc:11:22:33", ip="192.168.1.37",
+              red="192.168.1.0/24", arriendo_s=86400,
+              dns="192.168.1.1", puerta="192.168.1.1"):
+    """Los cuatro mensajes de DHCP, con lo que viaja en cada uno."""
+    c = cidr(red)
+    ev = [
+        {"n": 1, "mensaje": "DISCOVER", "de": "cliente", "a": "todos",
+         "destino": "255.255.255.255", "origen": "0.0.0.0",
+         "dice": "hay algun servidor DHCP?"},
+        {"n": 2, "mensaje": "OFFER", "de": "servidor", "a": "cliente",
+         "destino": "255.255.255.255", "origen": puerta,
+         "dice": "te ofrezco %s" % ip},
+        {"n": 3, "mensaje": "REQUEST", "de": "cliente", "a": "todos",
+         "destino": "255.255.255.255", "origen": "0.0.0.0",
+         "dice": "acepto %s" % ip},
+        {"n": 4, "mensaje": "ACK", "de": "servidor", "a": "cliente",
+         "destino": ip, "origen": puerta,
+         "dice": "tuya por %d h" % (arriendo_s // 3600)},
+    ]
+    return {"eventos": ev, "ip": ip, "mac": mac, "mascara": c["mascara"],
+            "puerta": puerta, "dns": dns, "arriendo_s": int(arriendo_s),
+            "arriendo_h": arriendo_s // 3600, "red": c["prefijo"]}
+
+
+RFC1918 = ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+
+
+def es_privada(ip):
+    """Las direcciones que NO existen fuera de tu casa."""
+    return any(en_prefijo(ip, p) for p in RFC1918)
+
+
+def nat_traducir(sesiones, ip_publica="203.0.113.7", puerto0=40000):
+    """El router reescribe origen Y PUERTO, y anota la fila. -> dict.
+
+    `sesiones` = [(ip_privada, puerto_origen, ip_destino, puerto_destino)].
+    Dos aparatos que usan el mismo puerto de origen no chocan porque NAT
+    los renumera: eso se ve en la tabla.
+    """
+    tabla, filas, siguiente, choques = {}, [], int(puerto0), 0
+    for ip_o, pto_o, ip_d, pto_d in sesiones:
+        clave = (ip_o, pto_o, ip_d, pto_d)
+        if clave not in tabla:
+            if any(f["pto_o"] == pto_o for f in filas):
+                choques += 1        # mismo puerto de origen, distinto host
+            tabla[clave] = siguiente
+            siguiente += 1
+        filas.append({"ip_o": ip_o, "pto_o": pto_o, "ip_d": ip_d,
+                      "pto_d": pto_d, "pto_publico": tabla[clave],
+                      "ip_publica": ip_publica,
+                      "privada": es_privada(ip_o)})
+    return {"filas": filas, "tabla": tabla, "ip_publica": ip_publica,
+            "sesiones": len(filas), "renumerados": choques,
+            "puertos_usados": siguiente - int(puerto0)}
+
+
+def nat_entrante(intentos, tabla_nat):
+    """De fuera hacia dentro no se puede iniciar nada. -> bloqueados
+    CONTADOS (por eso existen STUN, TURN y el agujereado de UDP)."""
+    validos = set(tabla_nat.values())
+    pasos = []
+    for pto in intentos:
+        pasos.append({"puerto": int(pto), "pasa": int(pto) in validos})
+    return {"pasos": pasos, "bloqueados": sum(1 for p in pasos
+                                              if not p["pasa"]),
+            "total": len(pasos)}
+
+
+ICMP_TIPOS = {0: "respuesta de eco", 3: "destino inalcanzable",
+              8: "peticion de eco", 11: "tiempo excedido",
+              (3, 4): "fragmentacion necesaria"}
+
+
+def ping(distancia_km=9000.0, saltos=8, carga=0.0, ms_por_salto=0.35,
+         semilla=2, n=8):
+    """RTT = propagacion (tope duro: la luz en fibra) + cola. -> dict.
+
+    `carga` de 0 a 1 encola el enlace: el mismo ping sube su RTT en la
+    cifra medida, que es la demostracion del bufferbloat de 7.2.
+    """
+    rng = np.random.default_rng(int(semilla))
+    prop = 2.0 * 1000.0 * float(distancia_km) / _FIBRA_KM_S
+    proceso = 2.0 * float(saltos) * float(ms_por_salto)
+    espera = 0.0
+    if carga > 0:
+        espera = float(saltos) * 0.6 * (float(carga) / (1.0 - min(carga,
+                                                                  0.98)))
+    muestras = prop + proceso + espera + rng.gamma(2.0, 0.6, int(n))
+    return {"prop_ms": prop, "proceso_ms": proceso, "espera_ms": espera,
+            "muestras": muestras, "min": float(muestras.min()),
+            "media": float(muestras.mean()), "max": float(muestras.max()),
+            "distancia_km": float(distancia_km), "carga": float(carga),
+            "tope_luz_ms": prop}
+
+
+def traceroute(camino, mudos=(), distancia_km=9000.0, semilla=4):
+    """TTL=1, 2, 3... cada router delata su direccion al quejarse. -> dict.
+
+    `mudos` = indices (1-based) de los saltos que no contestan: salen como
+    `*`, que es lo que se ve en un traceroute de verdad.
+    """
+    rng = np.random.default_rng(int(semilla))
+    mudos = set(int(m) for m in mudos)
+    n = len(camino)
+    saltos = []
+    for i, nodo in enumerate(camino, start=1):
+        frac = i / float(n)
+        base = 2.0 * 1000.0 * float(distancia_km) * frac / _FIBRA_KM_S
+        ms = base + float(rng.gamma(2.0, 0.5))
+        saltos.append({"ttl": i, "nodo": None if i in mudos else nodo,
+                       "ms": None if i in mudos else ms,
+                       "mudo": i in mudos,
+                       "icmp": "tiempo excedido" if i < n
+                       else "respuesta de eco"})
+    return {"saltos": saltos, "n": n, "mudos": sorted(mudos),
+            "total_ms": saltos[-1]["ms"] if not saltos[-1]["mudo"] else None}
+
+
+def pmtud(mtus, tam=1500, filtra_icmp=False):
+    """Descubrir el MTU del camino. -> dict.
+
+    Si alguien FILTRA el ICMP de "fragmentacion necesaria", el emisor no
+    se entera y la conexion se cuelga sin motivo aparente: el agujero
+    negro. Eso tambien se devuelve medido.
+    """
+    pasos, actual = [], int(tam)
+    for i, m in enumerate(mtus, start=1):
+        cabe = actual <= int(m)
+        pasos.append({"salto": i, "mtu": int(m), "intento": actual,
+                      "cabe": cabe,
+                      "icmp": None if cabe else
+                      ("filtrado" if filtra_icmp
+                       else "fragmentacion necesaria, MTU=%d" % m)})
+        if not cabe:
+            if filtra_icmp:
+                return {"pasos": pasos, "mtu_camino": None,
+                        "agujero_negro": True, "intentos": len(pasos),
+                        "tam_inicial": int(tam)}
+            actual = int(m)
+    return {"pasos": pasos, "mtu_camino": actual, "agujero_negro": False,
+            "intentos": len(pasos), "tam_inicial": int(tam),
+            "reduccion": int(tam) - actual}
+
+
+# =====================================================================
+# Modulo 6 — La web y el candado
+# =====================================================================
+CODIGOS_HTTP = ((200, "OK", "aqui lo tienes"),
+                (301, "Moved Permanently", "ya no vivo aqui, ve alli"),
+                (304, "Not Modified", "el que tienes sirve"),
+                (404, "Not Found", "eso no existe"),
+                (500, "Internal Server Error", "me rompi yo"))
+
+
+def http_peticion(metodo="GET", ruta="/index.html", host="ejemplo.org",
+                  cuerpo=2048, estado=200):
+    """Una peticion y su respuesta en texto plano. -> dict con BYTES."""
+    pet = ("%s %s HTTP/1.1\r\n"
+           "Host: %s\r\n"
+           "User-Agent: navegador/1.0\r\n"
+           "Accept: text/html\r\n\r\n" % (metodo, ruta, host))
+    nombre = dict((c, t) for c, t, _ in CODIGOS_HTTP).get(estado, "")
+    cab_resp = ("HTTP/1.1 %d %s\r\n"
+                "Content-Type: text/html\r\n"
+                "Content-Length: %d\r\n"
+                "ETag: \"a1b2c3\"\r\n\r\n" % (estado, nombre, cuerpo))
+    total = len(pet) + len(cab_resp) + int(cuerpo)
+    return {"peticion": pet, "respuesta_cabecera": cab_resp,
+            "bytes_peticion": len(pet), "bytes_cabecera": len(cab_resp),
+            "bytes_cuerpo": int(cuerpo), "bytes_total": total,
+            "protocolo_pct": 100.0 * (len(pet) + len(cab_resp)) / total,
+            "estado": int(estado), "nombre_estado": nombre}
+
+
+def cache_condicional(bytes_cuerpo=2048, cabecera_304=180):
+    """`If-None-Match` -> 304: lo que se ahorra en bytes, MEDIDO."""
+    completo = http_peticion(cuerpo=bytes_cuerpo)["bytes_total"]
+    corto = http_peticion(cuerpo=0, estado=304)["bytes_peticion"] + \
+        int(cabecera_304)
+    return {"con_cuerpo": completo, "solo_304": corto,
+            "ahorro": completo - corto,
+            "ahorro_pct": 100.0 * (completo - corto) / completo}
+
+
+def http_transferencia(n_objetos=40, modo="serie", rtt_ms=40.0,
+                       conexiones=6, tls=True, version_tls="1.3"):
+    """Cuanto tarda una pagina de N objetos segun COMO se piden. -> dict.
+
+    El cuello de botella no es el ancho de banda: son los VIAJES. Se
+    cuentan los RTT, que es lo unico que no se puede comprar.
+
+    Modos, del peor al mejor:
+      serie      HTTP/1.0: una conexion (y un apreton) por cada objeto
+      keepalive  HTTP/1.1: UNA conexion reutilizada, pero en fila india
+      paralelo   HTTP/1.1: `conexiones` conexiones a la vez (6 tipico)
+      h2         HTTP/2: una conexion, todo multiplexado
+      h3         HTTP/3: QUIC junta el apreton de transporte y el de TLS
+      h3-0rtt    HTTP/3 reanudando: datos en el primer paquete
+    """
+    rtt = float(rtt_ms)
+    apreton = 1.0 + (tls_viajes(version_tls)["rtt"] if tls else 0.0)
+    if modo == "serie":                       # HTTP/1.0: una conexion cada uno
+        rtts = n_objetos * (apreton + 1.0)
+        conex = n_objetos
+    elif modo == "keepalive":                 # HTTP/1.1: UNA conexion, en fila
+        rtts = apreton + n_objetos * 1.0
+        conex = 1
+    elif modo == "paralelo":                  # HTTP/1.1: 6 conexiones
+        conex = int(conexiones)
+        tandas = math.ceil(n_objetos / conex)
+        rtts = apreton + tandas * 1.0
+    elif modo == "h2":                        # una conexion, multiplexado
+        conex = 1
+        rtts = apreton + 1.0
+    elif modo == "h3":                        # QUIC: transporte y TLS juntos
+        conex = 1
+        rtts = 1.0 + 1.0
+    elif modo == "h3-0rtt":
+        conex = 1
+        rtts = 0.0 + 1.0
+    else:
+        raise ValueError("modo desconocido: %s" % modo)
+    return {"modo": modo, "objetos": int(n_objetos), "conexiones": conex,
+            "rtts": rtts, "ms": rtts * rtt, "rtt_ms": rtt,
+            "apreton_rtts": apreton}
+
+
+def tls_viajes(version="1.3", reanudado=False):
+    """Los RTT del apreton de TLS antes del primer byte de HTTP."""
+    if reanudado and version == "1.3":
+        return {"version": "1.3 (0-RTT)", "rtt": 0.0, "mensajes": 1,
+                "aviso": "los datos de 0-RTT son repetibles por un atacante"}
+    tabla = {"1.2": 2.0, "1.3": 1.0}
+    if version not in tabla:
+        raise ValueError("version TLS desconocida: %s" % version)
+    return {"version": version, "rtt": tabla[version],
+            "mensajes": 4 if version == "1.2" else 2, "aviso": None}
+
+
+def dh_pequeno(p=23, g=5, a=6, b=15):
+    """Diffie-Hellman con numeros de juguete: los dos llegan al MISMO
+    numero sin que ese numero cruce nunca el cable. Se apoya en el curso
+    19 (`cripto.diffie_hellman`), no lo repite."""
+    from cripto import diffie_hellman
+    d = diffie_hellman(p, g, a, b)
+    d["iguales"] = True
+    return d
+
+
+def cadena_certificados(sitio="ejemplo.org", alterar=False):
+    """La cadena raiz -> intermedia -> sitio, con firmas RSA REALES.
+
+    Firmar = elevar el hash a la privada; verificar = elevarlo a la
+    publica y comparar. Con `alterar=True` se cambia un byte del
+    certificado y la verificacion FALLA.
+    """
+    from cripto import (E_RSA, rsa_juguete, rsa_cifrar, rsa_descifrar,
+                        sha256_hex)
+    claves = rsa_juguete()      # devuelve {n, phi, d}: la `e` es E_RSA
+    e, d, n = E_RSA, claves["d"], claves["n"]
+    eslabones = []
+    for nombre, quien in (("raiz", "CA Raiz"), ("intermedia", "CA Intermedia"),
+                          ("sitio", sitio)):
+        cuerpo = "%s|%s" % (nombre, quien)
+        if alterar and nombre == "sitio":
+            cuerpo += "!"          # un byte de mas: el hash ya no cuadra
+        h = int(sha256_hex(cuerpo)[:4], 16) % n
+        firma = rsa_descifrar(h, d, n)          # firmar = con la privada
+        eslabones.append({"nivel": nombre, "quien": quien, "cuerpo": cuerpo,
+                          "hash": h, "firma": firma,
+                          "verifica": rsa_cifrar(firma, e, n) == h})
+    if alterar:
+        # el certificado alterado se presenta con la firma del original
+        original = "sitio|%s" % sitio
+        h_bueno = int(sha256_hex(original)[:4], 16) % n
+        eslabones[-1]["firma"] = rsa_descifrar(h_bueno, d, n)
+        eslabones[-1]["verifica"] = \
+            rsa_cifrar(eslabones[-1]["firma"], e, n) == eslabones[-1]["hash"]
+    return {"eslabones": eslabones, "e": e, "n": n, "alterado": bool(alterar),
+            "cadena_valida": all(x["verifica"] for x in eslabones)}
+
+
+def hol_bloqueo(n_flujos=4, objetos_por_flujo=6, perdida_en=2, semilla=3):
+    """Bloqueo de cabeza de linea: se pierde UN segmento. -> dict MEDIDO.
+
+    Sobre TCP, la entrega EN ORDEN para todos los flujos aunque los datos
+    de los demas ya esten ahi; sobre QUIC cada flujo tiene su propio
+    orden y solo se para el afectado.
+    """
+    tcp, quic = [], []
+    for f in range(int(n_flujos)):
+        parado_tcp = True                      # TCP: se paran todos
+        parado_quic = (f == int(perdida_en))   # QUIC: solo el del segmento
+        tcp.append({"flujo": f, "parado": parado_tcp})
+        quic.append({"flujo": f, "parado": parado_quic})
+    return {"tcp": tcp, "quic": quic, "n_flujos": int(n_flujos),
+            "parados_tcp": sum(1 for x in tcp if x["parado"]),
+            "parados_quic": sum(1 for x in quic if x["parado"]),
+            "perdida_en": int(perdida_en),
+            "objetos_por_flujo": int(objetos_por_flujo)}
+
+
+def quic_migracion(id_conexion="0x7a1c", de="wifi", a="movil"):
+    """El ID de conexion sobrevive al cambio de red: no hay que
+    reconectar (con TCP la 4-tupla cambia y la conexion muere)."""
+    return {"id": id_conexion, "de": de, "a": a,
+            "tcp": {"sobrevive": False,
+                    "por_que": "la conexion es la 4-tupla; al cambiar la IP, muere"},
+            "quic": {"sobrevive": True,
+                     "por_que": "la conexion es el ID, no la direccion"}}
+
+
+class Arbol(_Anclada):
+    """Jerarquia por niveles (el arbol del DNS, la cadena de
+    certificados). .nodo(nivel, i) .rama(nivel, i) .con_marcados()."""
+
+    def __init__(self, niveles, marcados=(), ancho=7.0, alto=3.2, fs=15,
+                 color=C_CAPA, color_marca=C_PAQUETE, **kwargs):
+        super().__init__(**kwargs)
+        self.niveles = [list(n) for n in niveles]
+        self.marcados = set(tuple(m) for m in marcados)
+        self.ancho, self.alto, self.fs = float(ancho), float(alto), int(fs)
+        self.color, self.color_marca = color, color_marca
+        self._poner_ancla(ORIGIN)
+        o = self._origen()
+        nn = len(self.niveles)
+        self.cajas, self.textos, self.ramas = VGroup(), VGroup(), VGroup()
+        self._pos = {}
+        for k, fila in enumerate(self.niveles):
+            y = self.alto / 2.0 - (k * self.alto / max(1, nn - 1))
+            m = len(fila)
+            for i, etq in enumerate(fila):
+                x = (-self.ancho / 2.0 + self.ancho * (i + 0.5) / m)
+                marcado = (k, i) in self.marcados
+                col = color_marca if marcado else color
+                t = _hud(str(etq), self.fs, col)
+                caja = Rectangle(width=max(t.width + 0.26, 0.6),
+                                 height=0.42, stroke_color=col,
+                                 stroke_width=2.2, fill_color=col,
+                                 fill_opacity=0.18 if marcado else 0.06)
+                caja.move_to(o + np.array([x, y, 0.0]))
+                t.move_to(caja.get_center())
+                self.cajas.add(caja)
+                self.textos.add(t)
+                self._pos[(k, i)] = len(self.cajas) - 1
+        for k in range(nn - 1):
+            for i in range(len(self.niveles[k + 1])):
+                padre = min(int(i * len(self.niveles[k]) /
+                                max(1, len(self.niveles[k + 1]))),
+                            len(self.niveles[k]) - 1)
+                a = self.cajas[self._pos[(k, padre)]]
+                b = self.cajas[self._pos[(k + 1, i)]]
+                self.ramas.add(Line(a.get_bottom(), b.get_top(),
+                                    color=C_EJE, stroke_width=1.6))
+        self.add(self.ramas, self.cajas, self.textos)
+
+    def nodo(self, nivel, i=0):
+        return self.cajas[self._pos[(nivel, i)]]
+
+    def texto(self, nivel, i=0):
+        return self.textos[self._pos[(nivel, i)]]
+
+    def con_marcados(self, marcados):
+        o = Arbol(self.niveles, marcados, self.ancho, self.alto, self.fs,
+                  self.color, self.color_marca)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def arbol(niveles, marcados=(), ancho=7.0, alto=3.2, fs=15, color=C_CAPA,
+          color_marca=C_PAQUETE):
+    """Ver `Arbol`. `niveles` = [["."], ["org", "com"], ...]."""
+    return Arbol(niveles, marcados, ancho, alto, fs, color, color_marca)

@@ -228,7 +228,7 @@ lecciones en producción aunque el resto no se haga nunca.
 |---|---|---|---|---|
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
-| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | pendiente |
+| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **en curso** (librería lista y validada; 6 agentes escribiendo) |
 | 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
 
 ## Receta de lote (la misma en los cuatro)
@@ -277,12 +277,12 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 5.1 | ✔ | — | — | — | — | — | — | — | — |
-| 5.2 | ✔ | — | — | — | — | — | — | — | — |
-| 5.3 | ✔ | — | — | — | — | — | — | — | — |
-| 6.1 | ✔ | — | — | — | — | — | — | — | — |
-| 6.2 | ✔ | — | — | — | — | — | — | — | — |
-| 6.3 | ✔ | — | — | — | — | — | — | — | — |
+| 5.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 5.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 5.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 6.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 6.2 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 6.3 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
 | 7.1 | ✔ | — | — | — | — | — | — | — | — |
 | 7.2 | ✔ | — | — | — | — | — | — | — | — |
 | 7.3 | ✔ | — | — | — | — | — | — | — | — |
