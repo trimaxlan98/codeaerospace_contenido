@@ -268,7 +268,7 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 1.1 | ✔ | ✔ | ✔ molde | ✔ 30/33/30/31 s | — | — | — | — | — |
 | 1.2 | ✔ | ✔ | ✔ | ✔ 30/30/31/32 s | — | — | — | — | — |
 | 1.3 | ✔ | ✔ | ✔ | ✔ 29/32/34/35 s | — | — | — | — | — |
-| 2.1 | ✔ | ✔ | — | — | — | — | — | — | — |
+| 2.1 | ✔ | ✔ | ✔ | ✔ 32/35/31/34 s | — | — | — | — | — |
 | 2.2 | ✔ | ✔ | ✔ | ✔ 29/30/30/34 s | — | — | — | — | — |
 | 2.3 | ✔ | ✔ | ✔ | ✔ 30/28/30/33 s | — | — | — | — | — |
 | 3.1 | ✔ | — | — | — | — | — | — | — | — |
@@ -723,7 +723,83 @@ que cambian):
   tablas se encima con facilidad**. Toda `Cabecera`/`Tabla` se dimensiona por
   medición (`tag_hud` ≈ 0.0094·font_size por carácter) y nunca a ojo.
 
+## Cosecha de trampas del lote 1 (medida durante la producción)
+
+Propias de esta familia; se suman a la cosecha heredada de arriba.
+
+**De la pieza `Cabecera` / `Paquete` (mucho texto en poco sitio)**
+- La cabecera IPv4 de 12 campos **se mide, no se ajusta a ojo**: una sonda
+  en el contenedor que imprima campo a campo ancho de caja / de rótulo / de
+  valor evita agrandar la pieza por corazonadas. Con `ancho=11.6`,
+  `alto_fila=0.55`, `fs=15` ningún rótulo se encoge (2.1).
+- **La sonda debe replicar la sombra de `Text` del style_block**: sin ella,
+  el glifo del espacio infla el bbox y "Longitud total" mide 3.43 en vez de
+  1.37 → falsos positivos de colisión.
+- Con nombre **y** valor, la fila necesita ≥ 0.42 de alto; a 0.27 las dos
+  líneas se salen de su caja y las filas se enciman (2.3).
+- Dos cabeceras lado a lado a 5.0 de ancho dejan los campos estrechos a
+  ~6 px: **apiladas a todo el ancho** se leen (2.3).
+- Rótulos de campo contiguos se tocan: la pieza los encoge al 0.86 del
+  ancho de su caja (corregido en la librería tras el molde).
+- Una cabecera que nace **sin valores** tiene textos vacíos (0 glifos): el
+  Transform a la versión con valores NO es estructura idéntica. Nacer
+  siempre con todos los valores puestos.
+
+**De `Tabla`**
+- `con_filas` con distinto **número** de filas deja de ser gemela. Se
+  resuelve con `filas_max` (reserva las filas y rellena con guiones).
+- El resaltado añade un `Rectangle`: mezclar `resaltar=None` con
+  `resaltar=i` entre gemelas también rompe la estructura → `resaltable=True`
+  lo reserva en todas las filas. **Es opt-in a propósito**: los rectángulos
+  ensanchan el bounding box y moverían las tablas ya aprobadas.
+- Una MAC completa (17 caracteres) no cabe junto a una topología: se rotula
+  la cola (`MAC[-5:]`), que es lo que distingue a los vecinos.
+
+**De `Topologia` y las fichas que viajan**
+- Los rótulos de arista van a +0.26 de la línea y los de nodo a −0.49:
+  cualquier ficha que viaje **sobre** el cable los pisa → carriles
+  +0.60 / 0.0 / −0.80 y `ocultar_etiquetas()`.
+- Una ficha que termina su `MoveAlongPath` en un nodo **se le monta encima**:
+  parar en `enlace(a, b).punto_en(0.55)` y marcar la entrega encendiendo el
+  nodo.
+- Un paquete posado sobre un aparato tapa el aparato y su etiqueta: que
+  viaje por encima del cable (`punto(k) + UP*0.6`).
+- Un camino resaltado con `Line(punto(a), punto(b))` cruza los círculos de
+  los nodos: usar `enlace(a, b).linea.copy()`, que ya trae el buff.
+
+**De composición y ritmo**
+- Escalar un VGroup para que quepa **encoge también la letra**: a 0.58 los
+  rótulos de una `Pila` se vuelven ilegibles. Pasar `ancho`/`alto`/`fs` a la
+  pieza en vez de escalar.
+- Los rótulos del momento anterior deben apagarse **antes** del pie nuevo, o
+  el frame muestreado enseña pie nuevo + rótulo viejo.
+- Los clips que salen en 26–27 s en el primer render se engordan con
+  `wait`, no metiendo más contenido: el tope inferior es 28 s.
+- `--frames 8` cae a veces en un relevo y muestra un frame casi vacío: no es
+  un fallo, pero el `final_state` hay que sacarlo del **último frame real**
+  con ffmpeg.
+
+**De honestidad con las cifras**
+- Si se dibuja una **ventana** de una simulación más larga, la estadística
+  se mide sobre la ventana dibujada: citar la corrida entera mientras se ve
+  un trozo es mentir (1.1 clip 3: 3 de 60 = 5.0 %, no el 4.17 % global).
+- Los datos que **no** calcula la librería (adopción de IPv6, cronología de
+  agotamiento de IPv4) se declaran como medición pública en el propio pie.
+- `Paquete` reparte el ancho por pesos normalizados: si los pesos **suman**
+  el ancho, cada caja mide exactamente su peso → cabecera constante entre
+  fragmentos y carga a escala (declarando la escala en pantalla).
+
+**De tipografía**
+- La familia es **estrictamente sin acentos** en todo texto en pantalla (no
+  solo en `tag_hud`), como los cursos 22 y 24. Los acentos viven en
+  `curso.json` (título y descripción), que no se renderiza.
+- `2^32`, `2^128`, `λ` y `≈` solo en `MathTex`.
+
 ## Hitos globales
 
 - **2026-08-25**: plan maestro escrito (24 lecciones, 8 módulos, 4 lotes) y
   rama `curso/protocolos-internet` creada desde `origin/main` (34d5890).
+- **2026-08-25**: **lote 1 escrito y validado en `ql`** — 6 lecciones, 24
+  clips, todos entre 28 y 35 s, frames revisados uno a uno. Librería
+  `protocolos.py` con los números de los módulos 1 y 2 y 13 piezas de
+  dibujo. Los 151 tests del Studio en verde.

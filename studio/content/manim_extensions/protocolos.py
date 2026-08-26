@@ -25,7 +25,7 @@ o de la tabla del style_block, nunca escrita a mano:
     troceado / conmutacion / mux_estadistico / cola_mm1 / little
     encapsular / crc32_trama / trama_ethernet / csma_cd
     switch_aprende / arp_resolver
-    checksum_ip / cabecera_ipv4 / fragmentar / ttl_camino
+    checksum_ip / cabecera_ipv4 / cabecera_ipv6 / fragmentar / ttl_camino
     cidr / mascara_bits / prefijo_mas_largo / agregar_rutas
     ipv6_expandir / ipv6_comprimir / eui64 / espacio_direcciones
 
@@ -36,11 +36,17 @@ todo lo que cambia tiene gemela `con_*` de estructura IDENTICA):
     nodo           host / switch / router / servidor / satelite
     enlace         linea entre nodos; .punto_en(frac)
     topologia      grafo dibujado; .nodo(n) .enlace(a,b) .resaltar_camino()
+                   .camino(nombres) da la ruta para MoveAlongPath;
+                   .ocultar_etiquetas() para que una ficha no las pise
     cola           bufer con ranuras; .con_ocupacion(n)
     pila           torre de capas; .capa(i); .con_encapsulado(k)
-    tabla          filas x columnas de texto HUD; .con_filas()
+    tabla          filas x columnas de texto HUD; .con_filas();
+                   `filas_max` reserva sitio para que la tabla CREZCA
     reloj          contador de milisegundos en cian; .con_ms()
     barra_bits     32/128 bits con raya movil red|host; .con_prefijo(n)
+    ficha          token cuadrado del datagrama; .con_texto()
+    bus            cable compartido con estaciones; .punto(i) .estacion(i)
+    ranuras        regla de ranuras de tiempo; .con_colores()
 
 Uso en un clip (el style_block de la familia ya importa todo):
     import sys; sys.path.insert(0, "/workspace/studio/content/manim_extensions")
@@ -624,6 +630,7 @@ class Paquete(_Anclada):
             self._idx[nom] = k
             x += ancho_k
         self.add(self.cajas, self.nombres, self.valores)
+        self._iluminados = {}
 
     def campo(self, nombre):
         return self.cajas[self._idx[nombre]]
@@ -639,13 +646,18 @@ class Paquete(_Anclada):
         self.cajas[i].set_stroke(color, width=3.4)
         self.valores[i].set_color(color)
         self.nombres[i].set_color(color)
+        self._iluminados[nombre] = color
         return self
 
     def con_valores(self, nuevos, color=None):
+        """Gemela con otros valores. CONSERVA lo iluminado: si no, el campo
+        destacado se apaga a mitad del Transform (trampa de la 1.3)."""
         campos = [(n, w, str(nuevos.get(n, v)))
                   for n, w, v in self.campos_spec]
         o = Paquete(campos, self.ancho, self.alto, self.fs,
                     color or self.color, self.color_carga)
+        for nombre, col in self._iluminados.items():
+            o.iluminar(nombre, col)
         o.shift(self._origen() - o._origen())
         return o
 
@@ -708,6 +720,7 @@ class Cabecera(_Anclada):
                 fila += filas_alto
                 usado = 0
         self.add(self.cajas, self.nombres, self.textos)
+        self._iluminados = {}
 
     def campo(self, nombre):
         return self.cajas[self._idx[nombre]]
@@ -715,18 +728,32 @@ class Cabecera(_Anclada):
     def texto(self, nombre):
         return self.textos[self._idx[nombre]]
 
-    def iluminar(self, nombre, color=C_CIFRA):
+    def iluminar(self, nombre, color=C_CIFRA, rotulo=False):
+        """Destaca un campo. `rotulo=True` tine tambien su nombre (por
+        defecto no, para no cambiar el aspecto de las lecciones ya
+        aprobadas)."""
         i = self._idx[nombre]
         self.cajas[i].set_stroke(color, width=3.0)
         self.cajas[i].set_fill(color, opacity=0.16)
         self.textos[i].set_color(color)
+        if rotulo:
+            self.nombres[i].set_color(color)
+        self._iluminados[nombre] = (color, bool(rotulo))
         return self
 
     def con_valores(self, nuevos):
+        """Gemela con otros valores, CONSERVANDO lo iluminado.
+
+        Ojo: una cabecera que nace SIN valores tiene textos vacios (0
+        glifos); el Transform a una con valores no es estructura identica.
+        Nacer siempre con todos los valores puestos.
+        """
         v = dict(self.valores_spec)
         v.update(nuevos)
         o = Cabecera(self.campos_spec, v, self.ancho, self.alto_fila,
                      self.fs, self.color, self.bits_fila)
+        for nombre, (col, rot) in self._iluminados.items():
+            o.iluminar(nombre, col, rot)
         o.shift(self._origen() - o._origen())
         return o
 
@@ -882,6 +909,25 @@ class Topologia(_Anclada):
     def enlace(self, a, b):
         return self.aristas[(a, b)]
 
+    def camino(self, nombres):
+        """La ruta como VMobject, lista para `MoveAlongPath`.
+
+        `Topologia` sabia resaltar un camino pero no darlo como
+        trayectoria; cada leccion lo reconstruia a mano.
+        """
+        from manim import VMobject
+        v = VMobject()
+        v.set_points_as_corners([self.punto(k) for k in nombres])
+        return v
+
+    def ocultar_etiquetas(self, opacidad=0.0):
+        """Apaga los rotulos de arista: cualquier ficha que viaje SOBRE el
+        cable los pisa (los rotulos van a +0.26 de la linea)."""
+        for e in self.enlaces:
+            if e.etiqueta is not None:
+                e.etiqueta.set_opacity(opacidad)
+        return self
+
     def resaltar_camino(self, camino, color=C_PAQUETE, grosor=4.4):
         for a, b in zip(camino[:-1], camino[1:]):
             self.aristas[(a, b)].resaltar(color, grosor)
@@ -1009,10 +1055,29 @@ class Tabla(_Anclada):
     """Filas x columnas de texto HUD. .celda(i,j) .fila(i) .con_filas()."""
 
     def __init__(self, cabeceras, filas, anchos=None, alto=0.40, fs=14,
-                 color=C_EJE, color_cab=C_CAPA, resaltar=None, **kwargs):
+                 color=C_EJE, color_cab=C_CAPA, resaltar=None,
+                 filas_max=None, vacio="-", resaltable=False, **kwargs):
         super().__init__(**kwargs)
         self.cabeceras = [str(c) for c in cabeceras]
-        self.filas_spec = [[str(c) for c in f] for f in filas]
+        self.filas_max = int(filas_max) if filas_max else None
+        self.vacio = str(vacio)
+        # `resaltable`: reserva el rectangulo de resaltado en TODAS las
+        # filas (invisible donde no toca) para que dos gemelas con distinto
+        # `resaltar` tengan la misma estructura. Es opt-in porque los
+        # rectangulos ensanchan el bounding box y moverian las tablas de
+        # las lecciones que ya estan aprobadas.
+        self.resaltable = bool(resaltable)
+        filas = [[str(c) for c in f] for f in filas]
+        if self.filas_max:
+            # Una tabla que CRECE: siempre `filas_max` filas, las que aun no
+            # existen rellenas con `vacio`. Sin esto, `con_filas` con otro
+            # numero de filas deja de ser estructura identica y el Transform
+            # rompe los glifos (trampa de la 1.3).
+            fila_vacia = [self.vacio] * len(self.cabeceras)
+            filas = (filas + [list(fila_vacia)
+                              for _ in range(self.filas_max - len(filas))]
+                     )[:self.filas_max]
+        self.filas_spec = filas
         nc = len(self.cabeceras)
         self.anchos = list(anchos) if anchos else [1.6] * nc
         self.alto, self.fs = float(alto), int(fs)
@@ -1040,11 +1105,12 @@ class Tabla(_Anclada):
         self._celdas = {}
         for i, fila in enumerate(self.filas_spec):
             y = (nf / 2.0 - i - 0.5) * self.alto
-            col = C_CIFRA if resaltar is not None and i == resaltar else color
-            if resaltar is not None and i == resaltar:
+            marcada = resaltar is not None and i == resaltar
+            col = C_CIFRA if marcada else color
+            if marcada or self.resaltable:
                 fondo = Rectangle(width=ancho_total + 0.12, height=self.alto,
                                   stroke_width=0.0, fill_color=C_CIFRA,
-                                  fill_opacity=0.12)
+                                  fill_opacity=0.12 if marcada else 0.0)
                 fondo.move_to(self._origen() + np.array([0.0, y, 0.0]))
                 self.celdas.add(fondo)
             for j, valor in enumerate(fila):
@@ -1066,17 +1132,23 @@ class Tabla(_Anclada):
                         for j in range(len(self.cabeceras))])
 
     def con_filas(self, filas, resaltar=None):
+        """Gemela con otras filas. Con `filas_max` puesto, la tabla puede
+        CRECER conservando la estructura (Transform seguro)."""
         o = Tabla(self.cabeceras, filas, self.anchos, self.alto, self.fs,
-                  self.color, self.color_cab, resaltar)
+                  self.color, self.color_cab, resaltar, self.filas_max,
+                  self.vacio, self.resaltable)
         o.shift(self._origen() - o._origen())
         return o
 
 
 def tabla(cabeceras, filas, anchos=None, alto=0.40, fs=14, color=C_EJE,
-          color_cab=C_CAPA, resaltar=None):
-    """Ver `Tabla`."""
+          color_cab=C_CAPA, resaltar=None, filas_max=None, vacio="-",
+          resaltable=False):
+    """Ver `Tabla`. `filas_max` reserva sitio para que la tabla crezca;
+    `resaltable` reserva el resaltado en todas las filas (gemelas seguras
+    cuando el resaltado se mueve de fila)."""
     return Tabla(cabeceras, filas, anchos, alto, fs, color, color_cab,
-                 resaltar)
+                 resaltar, filas_max, vacio, resaltable)
 
 
 class Reloj(_Anclada):
@@ -1176,3 +1248,146 @@ def barra_bits(valor="192.168.10.37", prefijo=24, bits=32, ancho=6.6,
     """Ver `BarraBits`."""
     return BarraBits(valor, prefijo, bits, ancho, alto, fs, color_red,
                      color_host, mostrar_texto)
+
+
+class Ficha(_Anclada):
+    """Token cuadrado para el datagrama cuando NO toca abrir la cabecera.
+    .con_texto(t) GEMELA."""
+
+    def __init__(self, texto="", lado=0.50, fs=15, color=C_PAQUETE,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.texto_str, self.lado = str(texto), float(lado)
+        self.fs, self.color = int(fs), color
+        self._poner_ancla(ORIGIN)
+        self.caja = Square(self.lado, stroke_color=color, stroke_width=2.4,
+                           fill_color=color, fill_opacity=0.20)
+        self.caja.move_to(self._origen())
+        self.texto = _hud(self.texto_str, self.fs, color)
+        if self.texto.width > self.lado * 0.88:
+            self.texto.scale(self.lado * 0.88 / self.texto.width)
+        self.texto.move_to(self.caja.get_center())
+        self.add(self.caja, self.texto)
+
+    def con_texto(self, texto, color=None):
+        o = Ficha(texto, self.lado, self.fs, color or self.color)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def ficha(texto="", lado=0.50, fs=15, color=C_PAQUETE):
+    """Ver `Ficha`."""
+    return Ficha(texto, lado, fs, color)
+
+
+class Bus(_Anclada):
+    """Cable compartido con estaciones colgando. .estacion(i) .punto(i)
+    .bajada(i). Para CSMA/CD, acceso al medio y cualquier medio compartido."""
+
+    def __init__(self, n=3, etiquetas=None, ancho=6.2, caida=0.85,
+                 tam=0.42, fs=13, color=C_RED, **kwargs):
+        super().__init__(**kwargs)
+        self.n, self.ancho, self.caida = int(n), float(ancho), float(caida)
+        self._poner_ancla(ORIGIN)
+        o = self._origen()
+        self.cable = Line(o + np.array([-self.ancho / 2.0, 0.0, 0.0]),
+                          o + np.array([self.ancho / 2.0, 0.0, 0.0]),
+                          color=color, stroke_width=3.2)
+        self.estaciones, self.bajadas = VGroup(), VGroup()
+        etiquetas = list(etiquetas or ["E%d" % i for i in range(self.n)])
+        for i in range(self.n):
+            x = self._x(i)
+            arriba = o + np.array([x, 0.0, 0.0])
+            e = Nodo("host", etiquetas[i], tam, color, fs)
+            e.move_to(o + np.array([x, -self.caida, 0.0]))
+            b = DashedLine(arriba, e.forma.get_top(), color=C_EJE,
+                           stroke_width=1.4, dash_length=0.07)
+            self.estaciones.add(e)
+            self.bajadas.add(b)
+        self.add(self.cable, self.bajadas, self.estaciones)
+
+    def _x(self, i):
+        if self.n == 1:
+            return 0.0
+        return (-self.ancho / 2.0 * 0.82 +
+                self.ancho * 0.82 * i / (self.n - 1))
+
+    def estacion(self, i):
+        return self.estaciones[i]
+
+    def punto(self, i):
+        """El punto del CABLE sobre la estacion i."""
+        return self._origen() + np.array([self._x(i), 0.0, 0.0])
+
+    def bajada(self, i):
+        return self.bajadas[i]
+
+
+def bus(n=3, etiquetas=None, ancho=6.2, caida=0.85, tam=0.42, fs=13,
+        color=C_RED):
+    """Ver `Bus`."""
+    return Bus(n, etiquetas, ancho, caida, tam, fs, color)
+
+
+class Ranuras(_Anclada):
+    """Regla de ranuras de tiempo numeradas. .ranura(i) .con_colores(cs)
+    GEMELA. Para CSMA/CD, TDMA y cualquier eje de tiempo discreto."""
+
+    def __init__(self, n=8, colores=None, lado=0.46, fs=13, etiqueta=None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.n, self.lado, self.fs = int(n), float(lado), int(fs)
+        self.colores = list(colores or [None] * self.n)
+        self.etiqueta_txt = etiqueta
+        self._poner_ancla(ORIGIN)
+        self.cajas, self.numeros = VGroup(), VGroup()
+        for i in range(self.n):
+            x = (i - (self.n - 1) / 2.0) * (self.lado + 0.06)
+            col = self.colores[i] if i < len(self.colores) else None
+            c = Square(self.lado, stroke_color=col or C_EJE,
+                       stroke_width=2.0, fill_color=col or C_EJE,
+                       fill_opacity=0.35 if col else 0.0)
+            c.move_to(self._origen() + np.array([x, 0.0, 0.0]))
+            t = _hud(str(i), self.fs - 2, C_EJE)
+            t.next_to(c, DOWN, buff=0.10)
+            self.cajas.add(c)
+            self.numeros.add(t)
+        self.add(self.cajas, self.numeros)
+        self.etiqueta = None
+        if etiqueta:
+            self.etiqueta = _hud(etiqueta, self.fs, C_EJE)
+            self.etiqueta.next_to(self.cajas, LEFT, buff=0.30)
+            self.add(self.etiqueta)
+
+    def ranura(self, i):
+        return self.cajas[i]
+
+    def con_colores(self, colores):
+        o = Ranuras(self.n, colores, self.lado, self.fs, self.etiqueta_txt)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def ranuras(n=8, colores=None, lado=0.46, fs=13, etiqueta=None):
+    """Ver `Ranuras`."""
+    return Ranuras(n, colores, lado, fs, etiqueta)
+
+
+def cabecera_ipv6(origen="2001:db8:1:1::7", destino="2001:db8:2:2::20",
+                  carga=1440, siguiente=6, saltos=64, clase=0, flujo=0x1a2b3):
+    """Los valores de una cabecera IPv6 (40 B fijos). -> dict.
+
+    Analogo a `cabecera_ipv4`, pero IPv6 no lleva checksum ni longitud de
+    cabecera: por eso aqui no hay nada que calcular, solo que declarar.
+    """
+    valores = {"Version": "6", "Clase de trafico": str(clase),
+               "Etiqueta de flujo": "0x%05x" % flujo,
+               "Longitud de carga": str(carga),
+               "Siguiente cabecera": {6: "6 TCP", 17: "17 UDP",
+                                      58: "58 ICMPv6"}.get(int(siguiente),
+                                                           str(siguiente)),
+               "Limite de saltos": str(saltos),
+               "Direccion origen": origen, "Direccion destino": destino}
+    return {"valores": valores, "campos": CAMPOS_IPV6, "bytes": 40,
+            "origen": origen, "destino": destino,
+            "sin_checksum": True, "sin_fragmentacion_en_transito": True}
