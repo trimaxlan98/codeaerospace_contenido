@@ -116,8 +116,64 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 7.2. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de la libreria, NUNCA escrito a
+# mano en el clip: lo que se dibuja y lo que se rotula no pueden discrepar.
+
+# Clip 1 - la cola M/M/1 con bufer finito (capacidad 8) y la ley de
+# Little verificada SOBRE la simulacion, no citada.
+CAP_COLA1 = 8
+LAMBDA_COLA1 = 0.85
+MU_COLA1 = 1.0
+COLA1 = cola_mm1(lmbda=LAMBDA_COLA1, mu=MU_COLA1, n_llegadas=4000,
+                 capacidad=CAP_COLA1, semilla=3)
+L_MEDIDA = COLA1["ocupacion_media"]                    # L: en el sistema
+# lambda EFECTIVA: la que de verdad entro (los descartes no cuentan).
+LAMBDA_EFECTIVA = LAMBDA_COLA1 * (1.0 - COLA1["pct_descarte"] / 100.0)
+# W: tiempo medio TOTAL en el sistema (espera en cola + servicio), no solo
+# la espera: L cuenta a todos, incluido el que ya esta siendo atendido.
+W_MEDIA = COLA1["espera_media"] + COLA1["servicio_medio"]
+L_PREDICHA = little(LAMBDA_EFECTIVA, W_MEDIA)
+GAP_LITTLE_PCT = 100.0 * abs(L_MEDIDA - L_PREDICHA) / L_MEDIDA
+
+# La MISMA cola, barrida en carga (misma capacidad, misma semilla): la
+# ocupacion media explota cuando la carga se acerca a 1.
+CARGAS_SWEEP = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.75,
+               0.8, 0.85, 0.88, 0.9, 0.93, 0.95, 0.97, 0.99]
+OCUPACION_SWEEP = [
+    cola_mm1(lmbda=c, mu=MU_COLA1, n_llegadas=4000, capacidad=CAP_COLA1,
+            semilla=3)["ocupacion_media"] for c in CARGAS_SWEEP]
+
+
+def OCUPACION_EN(carga):
+    """Ocupacion media interpolada de la MISMA simulacion barrida en
+    carga (para dibujarla como curva continua con `grafica`)."""
+    return float(np.interp(carga, CARGAS_SWEEP, OCUPACION_SWEEP))
+
+
+# La traza real de ocupacion en el tiempo de la simulacion de arriba,
+# resumida a un numero de puntos manejable para la `Sierra`.
+_IDX_TRAZA = np.linspace(0, len(COLA1["ocupacion"]) - 1, 90).astype(int)
+TRAZA_OCUPACION = [float(COLA1["ocupacion"][i]) for i in _IDX_TRAZA]
+
+# Clip 2 - el mismo enlace de 20 Mb/s con tres tamanos de bufer.
+ENLACE_MBPS = 20.0
+BB_8 = bufferbloat(8, ENLACE_MBPS)
+BB_100 = bufferbloat(100, ENLACE_MBPS)
+BB_1000 = bufferbloat(1000, ENLACE_MBPS)
+
+# La demostracion domestica: el mismo ping, en reposo y con el enlace
+# cargado al 85 % (alguien descargando).
+PING_REPOSO = ping(9000, 8, carga=0.0)
+PING_CARGADO = ping(9000, 8, carga=0.85)
+PING_DELTA_MS = PING_CARGADO["media"] - PING_REPOSO["media"]
+
+# Clip 3 - CoDel recorta la cola de 1000 paquetes al objetivo de 5 ms.
+CODEL_1000 = codel(1000, ENLACE_MBPS, objetivo_ms=5.0)
+CODEL_PCT_QUEDA = 100.0 * (CODEL_1000["pkts_objetivo"] /
+                          float(CODEL_1000["sin_aqm"]["cola_pkts"]))
+
+# Clip 4 - prioridad: reutiliza PING_REPOSO/PING_CARGADO (la voz) y
+# BB_1000 (la descarga, que sigue igual de encolada y no le importa).
 
 
 # --- Rotulos ----------------------------------------------------------

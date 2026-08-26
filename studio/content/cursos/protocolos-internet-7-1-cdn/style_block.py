@@ -116,8 +116,67 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 7.1. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de la libreria, NUNCA escrito a
+# mano en el clip. Todas las cifras se remidieron dentro del contenedor.
+
+# Clip 1 - el viaje largo: un usuario en CDMX pide algo a un servidor en
+# Madrid (el mismo sitio que en el 3 hara de "un solo origen"). El limite
+# fisico (2c/3 en fibra, ida y vuelta) y lo medido de verdad, con saltos.
+D_CDMX_MADRID = km_entre("CDMX", "Madrid")            # 9062.8 km
+VIAJE_LARGO = ping(distancia_km=D_CDMX_MADRID)        # saltos=8 (defecto)
+RTT_MIN_LARGO = VIAJE_LARGO["tope_luz_ms"]            # 90.7 ms: la luz, y ya
+RTT_REAL_LARGO = VIAJE_LARGO["media"]                 # 97.7 ms: lo medido
+PROCESO_LARGO = VIAJE_LARGO["proceso_ms"]             # 5.6 ms: los routers
+
+# Clip 2 - la cache al borde: un PoP a 30 km, 2 saltos (la otra punta de la
+# ciudad, o del mismo proveedor) frente al viaje del clip 1 hasta Madrid.
+VIAJE_BORDE = ping(distancia_km=30.0, saltos=2, semilla=9)
+RTT_BORDE = VIAJE_BORDE["media"]                      # 2.7 ms
+
+# La tasa de acierto depende de la LOCALIDAD (zipf) y del TAMANO de cache.
+CDN_ZIPF = {0.6: cdn(500, 40, zipf=0.6, tam_cache=8),
+           1.1: cdn(500, 40, zipf=1.1, tam_cache=8),
+           1.8: cdn(500, 40, zipf=1.8, tam_cache=8)}
+CDN_CACHE = {4: cdn(500, 40, zipf=1.1, tam_cache=4),
+            8: cdn(500, 40, zipf=1.1, tam_cache=8),
+            20: cdn(500, 40, zipf=1.1, tam_cache=20)}
+CDN_CACHEABLE_PCT = CDN_ZIPF[1.1]["cacheable_pct"]     # 80.0 % se puede guardar
+CDN_NOCACHE_PCT = 100.0 - CDN_CACHEABLE_PCT            # 20.0 % siempre al origen
+
+
+def ACIERTO_DE_ZIPF(z):
+    """Tasa de acierto (cache de 8) en funcion de la localidad. Para la
+    `Grafica`: la misma `cdn()` evaluada punto a punto, nunca interpolada
+    a mano."""
+    return cdn(500, 40, zipf=float(z), tam_cache=8)["tasa_acierto"]
+
+
+# Clip 3 y 4 - anycast: la MISMA IP anunciada desde 8 PoP; las 12 ciudades
+# de CIUDADES_PI como usuarios (todas, no una ventana).
+IP_ANYCAST = "198.51.100.53"                           # TEST-NET-2, ficticia
+SITIOS_ANYCAST = ["CDMX", "Nueva York", "Sao Paulo", "Madrid", "Lagos",
+                 "Mumbai", "Tokio", "Sidney"]
+USUARIOS_ANYCAST = list(CIUDADES_PI.keys())            # las 12, completas
+ANYCAST_8 = anycast(SITIOS_ANYCAST, USUARIOS_ANYCAST)
+ANYCAST_1 = anycast(["Madrid"], USUARIOS_ANYCAST)       # un solo origen
+ANYCAST_FACTOR = ANYCAST_1["media_ms"] / ANYCAST_8["media_ms"]   # 5.6x
+_FILA_8 = {f["usuario"]: f for f in ANYCAST_8["filas"]}
+EJEMPLO_LOCAL = _FILA_8["CDMX"]              # cae en si misma: 4.8 ms
+EJEMPLO_MEDIO = _FILA_8["Londres"]           # cae en Madrid: 17.4 ms
+EJEMPLO_LEJOS = _FILA_8["Johannesburgo"]     # cae en Lagos: 49.9 ms
+
+ANYCAST_CAIDA = anycast_caida(SITIOS_ANYCAST, USUARIOS_ANYCAST, "Madrid")
+_FILA_DESPUES = {f["usuario"]: f for f in ANYCAST_CAIDA["despues"]["filas"]}
+REENRUTADO_MADRID = _FILA_DESPUES["Madrid"]     # ahora cae en Lagos: 43.2 ms
+REENRUTADO_LONDRES = _FILA_DESPUES["Londres"]   # ahora cae en Lagos: 55.0 ms
+
+# Posiciones aproximadas del mapa (orden geografico este-oeste, NO a escala
+# real: es un croquis, no una proyeccion cartografica).
+POS_MUNDO = {"CDMX": (-4.6, 0.7), "Nueva York": (-3.4, 1.6),
+            "Sao Paulo": (-2.4, -1.1), "Madrid": (-0.3, 1.6),
+            "Londres": (0.7, 2.3), "Lagos": (0.9, 0.2),
+            "Johannesburgo": (2.0, -1.3), "Mumbai": (3.3, 0.7),
+            "Tokio": (5.8, 1.4), "Sidney": (6.3, -1.4)}
 
 
 # --- Rotulos ----------------------------------------------------------

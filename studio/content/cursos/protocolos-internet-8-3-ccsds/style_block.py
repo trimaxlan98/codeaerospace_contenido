@@ -116,8 +116,115 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 8.3. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip. Medido en el contenedor antes de escribir un solo clip.
+
+# --- Clip 1: el retardo NO es un numero, es un rango ------------------
+# `rango_marte` recorre el ano sintetico de oposicion (0.52 UA) a
+# conjuncion (2.52 UA). El retardo es la distancia dividida por c: por eso
+# la curva del retardo es la MISMA curva de la distancia, en otra unidad.
+RANGO = rango_marte(13)
+UA_CERCA = float(RANGO["uas"][0])
+UA_LEJOS = float(RANGO["uas"][-1])
+IDA_CERCA = RANGO["min_min"]              # 4.32 min luz
+IDA_LEJOS = RANGO["max_min"]              # 20.96 min luz
+RTT_CERCA = RANGO["rtt_min_min"]          # 8.65 min
+RTT_LEJOS = RANGO["rtt_max_min"]          # 41.92 min
+KM_CERCA = RANGO["filas"][0]["km"]
+KM_LEJOS = RANGO["filas"][-1]["km"]
+# El peor retardo de la Internet terrestre, para anclar la escala (8.1).
+GEO_RTT_MS = rtt_orbital(H_GEO)["rtt_ms"]  # 238.7 ms
+# Cuantas veces cabe el peor RTT terrestre en el mejor RTT marciano.
+VECES_GEO = RTT_CERCA * 60_000.0 / GEO_RTT_MS
+
+
+# Escala de las reglas del clip 1: unidades de pantalla por minuto luz.
+# Las dos reglas comparten borde izquierdo, asi que la LONGITUD compara.
+ESCALA_MIN = 0.145
+X_REGLAS = -5.40                          # borde izquierdo comun
+
+
+def tasa(mbps):
+    """La tasa de un tramo en la unidad que le queda bien.
+
+    `fmt(0.5, 0)` dice "0" y `fmt(1000.0, 1)` dice "1000.0": ninguna de las
+    dos es la cifra que hay que leer en un rotulo de enlace.
+    """
+    m = float(mbps)
+    if m >= 1000.0:
+        return "%s Gb/s" % fmt(m / 1000.0, 0)
+    if m >= 10.0:
+        return "%s Mb/s" % fmt(m, 0)
+    return "%s Mb/s" % fmt(m, 1)
+
+
+def IDA_EN(ua):
+    """Minutos luz de ida a `ua` unidades astronomicas (la curva)."""
+    return retardo_marte(ua)["ida_min"]
+
+
+# --- Clip 2: la pila del espacio frente a la de casa ------------------
+# `Pila` pide capas de 3 campos (nombre, protocolo, cabecera) porque
+# calcula el encapsulado; PILA_TCPIP y PILA_CCSDS son de 2. Se convierten
+# aqui con cabecera 0 y se apagan los tamanos (ver `pila_desnuda`).
+PILA = pila_ccsds()
+CAPAS_CASA = PILA["tcpip"]
+CAPAS_ESPACIO = PILA["ccsds"]
+CAMBIOS = PILA["cambios"]
+# Que capa de casa se corresponde con cual del espacio (indices).
+PARES = [(0, 0), (1, 1), (2, 2), (3, 3)]
+SE_VA = [1, 2, 3]              # capas de casa que se caen: TCP, IP, Ethernet
+CAMBIOS_IDA = [0, 1, 2]        # sus razones en CAMBIOS
+SE_ANADE = 4                   # la capa del espacio que en casa no existe
+CAMBIO_NUEVO = 3               # su razon en CAMBIOS
+
+# --- Clip 3: una imagen de 8 MB desde un rover ------------------------
+VIAJE = archivo_a_marte(8.0, 1.5)
+VIAJE_MB = VIAJE["tam_mb"]
+VIAJE_UA = VIAJE["ua"]
+TRAMOS = VIAJE["tramos"]
+VIAJE_MIN = VIAJE["total_min"]             # 15.14 min
+VIAJE_LUZ_MIN = VIAJE["luz_min"]           # 12.48 min: solo luz en camino
+VIAJE_TX_S = sum(t["tx_s"] for t in TRAMOS)
+VIAJE_TX_MIN = VIAJE_TX_S / 60.0           # 2.67 min de transmision
+VIAJE_LUZ_PCT = 100.0 * VIAJE["luz_min"] * 60.0 / VIAJE["total_s"]   # 82.4
+VIAJE_TX_PCT = 100.0 * VIAJE_TX_S / VIAJE["total_s"]                 # 17.6
+LENTO = VIAJE["el_lento"]                  # "orbitador -> DSN"
+# El contrafactual honesto: con banda X instantanea seguirian siendo...
+SIN_CUELLO_MIN = (VIAJE["total_s"] - TRAMOS[1]["tx_s"]) / 60.0       # 13.01
+# Minutos acumulados al final de cada tramo (las marcas de la escalera).
+ACUM_MIN = []
+_t = 0.0
+for _tr in TRAMOS:
+    _t += _tr["total_s"]
+    ACUM_MIN.append(_t / 60.0)             # 0.53 / 15.14 / 15.14
+
+# Los cuatro actores del viaje y los pares (de, a) de cada tramo.
+ACTORES_VIAJE = ["rover", "orbitador", "DSN", "control"]
+ACTORES_PARES = [("rover", "orbitador"), ("orbitador", "DSN"),
+                 ("DSN", "control")]
+X_MARCAS = -4.95              # columna de las marcas de tiempo (minutos)
+ANCHO_BARRA = 9.0             # la barra de reparto del tiempo del clip 3
+
+
+# --- Clip 4: el cierre del curso --------------------------------------
+KM_VIAJE = retardo_marte(VIAJE_UA)["km"]   # 224 millones de km
+MKM_VIAJE = KM_VIAJE / 1e6
+# La linea entera del curso: de un cable de casa al suelo de Marte.
+POS_LINEA = {"PC": (-5.5, 0.0), "Router": (-3.0, 0.0), "DSN": (-0.5, 0.0),
+             "Orbitador": (2.2, 0.0), "Rover": (4.9, 0.0)}
+ARISTAS_LINEA = {("PC", "Router"): None, ("Router", "DSN"): None,
+                 ("DSN", "Orbitador"): None, ("Orbitador", "Rover"): None}
+TIPOS_LINEA = {"PC": "host", "Router": "router", "DSN": "nube",
+               "Orbitador": "satelite", "Rover": "host"}
+CAMINO_LINEA = ["PC", "Router", "DSN", "Orbitador", "Rover"]
+# Lo que sobrevive del Internet terrestre, y donde se aprendio.
+PRINCIPIOS = [
+    ("capas", "la pila cambia de piezas, no de idea"),
+    ("direcciones", "el destino se nombra antes de saber el camino"),
+    ("tolerar el fallo", "si no hay ruta, el dato espera y sigue"),
+    ("acuerdos", "un comite escribe las reglas; nadie las manda"),
+]
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -157,6 +264,21 @@ def formula_pie(tex, font_size=34, color=None):
         m.scale_to_fit_width(config.frame_width - 3.0)
     m.to_edge(DOWN, buff=MARGEN_PIE)
     return _con_fondo(m)
+
+
+def pila_desnuda(capas2, **kw):
+    """`Pila` con capas de DOS campos (nombre, protocolo).
+
+    `PILA_TCPIP` y `PILA_CCSDS` son de dos campos, pero `Pila` pide tres
+    porque calcula el encapsulado y rotula "N B" a la derecha de cada
+    caja. Aqui no hay bytes que ensenar (una pila de la NASA no encapsula
+    los mismos tamanos que una de casa): se completa con cabecera 0 y se
+    quitan los tamanos, que ademas ensancharian la pieza y chocarian con
+    la pila de al lado.
+    """
+    p = pila([(n, pr, 0) for n, pr in capas2], **kw)
+    p.remove(p.tamanos)
+    return p
 
 
 def hud_modulo(texto):

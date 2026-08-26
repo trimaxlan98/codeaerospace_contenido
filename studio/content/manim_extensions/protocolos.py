@@ -1385,8 +1385,13 @@ class Ranuras(_Anclada):
     GEMELA. Para CSMA/CD, TDMA y cualquier eje de tiempo discreto."""
 
     def __init__(self, n=8, colores=None, lado=0.46, fs=13, etiqueta=None,
-                 **kwargs):
+                 inicio=0, **kwargs):
         super().__init__(**kwargs)
+        # `inicio` desplaza la numeracion: las ranuras de tiempo se cuentan
+        # desde 0, pero si representan algo que ya se numera desde 1 (los
+        # numeros de secuencia de RTP, por ejemplo) hay que decirlo o el
+        # rotulo de al lado no coincide con ninguna casilla.
+        self.inicio = int(inicio)
         self.n, self.lado, self.fs = int(n), float(lado), int(fs)
         self.colores = list(colores or [None] * self.n)
         self.etiqueta_txt = etiqueta
@@ -1399,7 +1404,7 @@ class Ranuras(_Anclada):
                        stroke_width=2.0, fill_color=col or C_EJE,
                        fill_opacity=0.35 if col else 0.0)
             c.move_to(self._origen() + np.array([x, 0.0, 0.0]))
-            t = _hud(str(i), self.fs - 2, C_EJE)
+            t = _hud(str(i + self.inicio), self.fs - 2, C_EJE)
             t.next_to(c, DOWN, buff=0.10)
             self.cajas.add(c)
             self.numeros.add(t)
@@ -1414,14 +1419,15 @@ class Ranuras(_Anclada):
         return self.cajas[i]
 
     def con_colores(self, colores):
-        o = Ranuras(self.n, colores, self.lado, self.fs, self.etiqueta_txt)
+        o = Ranuras(self.n, colores, self.lado, self.fs, self.etiqueta_txt,
+                    self.inicio)
         o.shift(self._origen() - o._origen())
         return o
 
 
-def ranuras(n=8, colores=None, lado=0.46, fs=13, etiqueta=None):
-    """Ver `Ranuras`."""
-    return Ranuras(n, colores, lado, fs, etiqueta)
+def ranuras(n=8, colores=None, lado=0.46, fs=13, etiqueta=None, inicio=0):
+    """Ver `Ranuras`. `inicio=1` numera desde 1 en vez de desde 0."""
+    return Ranuras(n, colores, lado, fs, etiqueta, inicio)
 
 
 def cabecera_ipv6(origen="2001:db8:1:1::7", destino="2001:db8:2:2::20",
@@ -2703,16 +2709,22 @@ def jitter(n=60, media_ms=20.0, desv_ms=6.0, semilla=9, picos=()):
 
 def buffer_reproduccion(datos_jitter, tam_ms=40.0, paso_ms=20.0):
     """El bufer de reproduccion: cuanto retardo metes para no cortarte.
-    -> cortes CONTADOS y retardo anadido."""
+
+    -> cortes CONTADOS, `cortes_en` (en que paquete cae cada uno, para
+    poder marcarlos en la curva sin replicar este bucle) y el retardo
+    medio que se paga por la suavidad.
+    """
     huecos = np.asarray(datos_jitter["huecos"], dtype=float)
-    reloj, cortes, retraso = float(tam_ms), 0, []
-    for h in huecos:
+    reloj, cortes, retraso, cortes_en = float(tam_ms), 0, [], []
+    for i, h in enumerate(huecos):
         reloj += float(paso_ms) - h              # se llena y se vacia
         if reloj < 0:
             cortes += 1
+            cortes_en.append(i)                  # para marcarlos en la curva
             reloj = float(tam_ms)                # re-llenar tras el corte
         retraso.append(reloj)
     return {"tam_ms": float(tam_ms), "cortes": int(cortes),
+            "cortes_en": cortes_en,
             "ocupacion": np.array(retraso),
             "retardo_medio_ms": float(np.mean(retraso)),
             "paquetes": len(huecos)}

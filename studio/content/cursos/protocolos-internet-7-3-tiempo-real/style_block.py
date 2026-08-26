@@ -116,8 +116,74 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 7.3. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de una llamada a la libreria,
+# nunca escrito a mano en el clip.
+
+# Clip 1 - la voz en paquetes de 20 ms, con su propio reloj, sobre UDP.
+RTP_PASO_MS = 20.0
+RTP_N = 6
+RTP_ORDEN_LLEGADA = [1, 2, 3, 5, 4, 6]      # el 4 se retrasa: llega tras el 5
+RTP_PERDIDO = 4                              # se descarta por llegar tarde
+DEMUX_SOCKETS = {("198.51.100.7", 5004): "app_voz"}
+DEMUX_PAQUETES = [{"ip_o": "203.0.113.9", "pto_o": 40000 + i,
+                   "ip_d": "198.51.100.7", "pto_d": 5004}
+                  for i in range(RTP_N)]
+DEMUX = demux(DEMUX_PAQUETES, DEMUX_SOCKETS)
+
+# Clip 2 - el jitter medido (RFC 3550) y el bufer de reproduccion.
+JITTER = jitter(60, 20.0, 6.0, semilla=9, picos=(20, 40))
+BUFER_10 = buffer_reproduccion(JITTER, tam_ms=10.0, paso_ms=RTP_PASO_MS)
+BUFER_40 = buffer_reproduccion(JITTER, tam_ms=40.0, paso_ms=RTP_PASO_MS)
+BUFER_120 = buffer_reproduccion(JITTER, tam_ms=120.0, paso_ms=RTP_PASO_MS)
+
+
+def _cortes_indices(datos_jitter, tam_ms, paso_ms=RTP_PASO_MS):
+    """`buffer_reproduccion` no devuelve DONDE cae cada corte, solo el
+    conteo total; para marcarlos en la `Sierra` se replica el MISMO
+    bucle (identica formula, ningun numero nuevo) y se guardan los
+    indices. Verificado con el assert de abajo contra la cifra oficial."""
+    huecos = np.asarray(datos_jitter["huecos"], dtype=float)
+    reloj, idx = float(tam_ms), []
+    for i, h in enumerate(huecos):
+        reloj += float(paso_ms) - h
+        if reloj < 0:
+            idx.append(i)
+            reloj = float(tam_ms)
+    return idx
+
+
+CORTES_10 = _cortes_indices(JITTER, 10.0)
+CORTES_40 = _cortes_indices(JITTER, 40.0)
+assert len(CORTES_10) == BUFER_10["cortes"]
+assert len(CORTES_40) == BUFER_40["cortes"]
+
+
+def HUECOS(k):
+    """El hueco entre llegadas (ms) en el paso k de la ventana dibujada."""
+    i = int(round(k))
+    i = min(max(i, 0), JITTER["n"] - 1)
+    return float(JITTER["huecos"][i])
+
+
+# Cuantas "ranuras" de 20 ms representa cada bufer, solo para dar una idea
+# fisica de tamano antes de ver las curvas (no es una cifra medida, es la
+# traduccion directa de ms a pasos de RTP_PASO_MS).
+CAP_10 = max(1, math.ceil(BUFER_10["tam_ms"] / RTP_PASO_MS))
+CAP_40 = max(1, math.ceil(BUFER_40["tam_ms"] / RTP_PASO_MS))
+CAP_120 = max(1, math.ceil(BUFER_120["tam_ms"] / RTP_PASO_MS))
+
+
+# Clip 3 - ABR escoge calidad sobre una traza real; a calidad FIJA se atasca.
+ABR = abr()
+ABR_N = len(ABR["decisiones"])
+ABR_TRAZA_MBPS = [d["mbps"] for d in ABR["decisiones"]]
+AF_15 = abr_fijo(calidad=1.5)
+AF_30 = abr_fijo(calidad=3.0)
+AF_60 = abr_fijo(calidad=6.0)
+
+# Clip 4 - donde se van los segundos de un directo (cierre de la leccion).
+DIRECTO = latencia_directo()
+DIRECTO_PEOR_NOMBRE, DIRECTO_PEOR_MS = DIRECTO["peor"]
 
 
 # --- Rotulos ----------------------------------------------------------

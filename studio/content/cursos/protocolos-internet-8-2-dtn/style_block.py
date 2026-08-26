@@ -116,8 +116,51 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 8.2. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo que se dibuja y lo que se escribe no pueden
+# discrepar.
+
+# El plan de contactos de la leccion: tres tramos entre el rover y el
+# centro de control, cada uno con SU ventana, y ninguna se solapa con la
+# siguiente. De ahi sale TODO lo demas.
+PLAN = [(0, 2, "rover", "orbitador"),
+        (6, 7.5, "orbitador", "DSN"),
+        (7.6, 12, "DSN", "control")]
+CAMINO = ["rover", "orbitador", "DSN", "control"]
+
+VENT = ventanas_contacto(PLAN)          # 3 ventanas, 7.9 h de 12 = 65.8 %
+SIN_CAMINO = tcp_sin_camino(PLAN)       # False: nunca existe la ruta
+DTN = dtn_custodia(CAMINO, PLAN)        # 8 MB entregados en 7.65 h
+
+H_INI = 0.0
+H_FIN = VENT["horas_totales"]           # 12.0 h de plan dibujado
+HORAS_SIN_ENLACE = VENT["horas_totales"] - VENT["horas_con_enlace"]   # 4.1
+HUECO_LARGO = VENT["huecos"][0]         # (2.0, 6.0) -> 4.0 h
+HUECO_CORTO = VENT["huecos"][1]         # (7.5, 7.6) -> 0.1 h = 6 min
+HUECO_LARGO_H = HUECO_LARGO[1] - HUECO_LARGO[0]
+HUECO_CORTO_MIN = 60.0 * (HUECO_CORTO[1] - HUECO_CORTO[0])
+
+PASOS = DTN["pasos"]                    # tres saltos, con su espera y su t
+ESPERAS = [p["espera_h"] for p in PASOS]            # 0.00 / 5.95 / 1.55 h
+T_SALTO = [p["t_h"] for p in PASOS]                 # 0.05 / 6.05 / 7.65 h
+PCT_RETENIDO = 100.0 * DTN["retenido_h"] / DTN["total_h"]   # 98.0 %
+EN_ENLACE_H = DTN["total_h"] - DTN["retenido_h"]    # 0.15 h de los 7.65
+TAM_MB = DTN["tam_mb"]                              # 8 MB
+
+# El apreton que ni siquiera empieza (clip 1). Los mensajes son los de
+# la libreria; lo que no existe es el segundo tramo cuando el SYN pide paso.
+HS = handshake_tcp()
+SYN = HS["eventos"][0]
+
+# La distancia que obliga a todo esto: Marte a 1.5 UA (modulo 8). El
+# apreton de TCP gasta un RTT completo antes del primer byte.
+MARTE = retardo_marte(1.5)                          # 12.48 min luz de ida
+MIN_ANTES_DEL_PRIMER_BYTE = (MARTE["rtt_min"] *
+                             HS["antes_del_primer_byte_ms"] / HS["rtt_ms"])
+
+# Para comparar: el enlace geoestacionario del clip 8.1, donde TCP AUN
+# funciona. Es la ultima frontera en la que hay camino completo.
+GEO = rtt_orbital(H_GEO)                            # 238.7 ms de RTT
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -202,6 +245,111 @@ def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
     t = Text(texto, font_size=font_size, color=col)
     t.next_to(b, direccion, buff=buff)
     return VGroup(b, t)
+
+
+# --- El plan de contactos dibujado ------------------------------------
+# La libreria no trae eje de tiempo CONTINUO (`ranuras` es discreta y las
+# ventanas de esta leccion caen en 7.5 y 7.6 h), asi que los carriles se
+# dibujan aqui. Las cifras siguen saliendo de `ventanas_contacto`.
+ANCHO_PLAN = 8.4          # unidades de manim para las 12 h del eje
+ALTO_CARRIL = 0.32
+SEP_CARRIL = 0.82
+
+
+def plan_contactos(fs=15, color_ventana=C_RED):
+    """Un carril por tramo sobre UN eje de horas comun.
+
+    Devuelve el VGroup con `.carriles`, `.barras`, `.etiquetas` y `.eje`
+    (la linea del eje sirve para convertir horas en x DESPUES de mover el
+    grupo: ver `x_hora`).
+    """
+    x0, x1 = -ANCHO_PLAN / 2.0, ANCHO_PLAN / 2.0
+    carriles, barras, etiquetas = VGroup(), VGroup(), VGroup()
+    n = len(VENT["ventanas"])
+    for i, v in enumerate(VENT["ventanas"]):
+        y = (n - 1 - i) * SEP_CARRIL           # el primer tramo, arriba
+        base = Rectangle(width=x1 - x0, height=ALTO_CARRIL,
+                         stroke_color=C_EJE, stroke_width=1.4,
+                         fill_opacity=0.0)
+        base.move_to(np.array([0.0, y, 0.0]))
+        a = x0 + (x1 - x0) * (v["desde"] - H_INI) / (H_FIN - H_INI)
+        b = x0 + (x1 - x0) * (v["hasta"] - H_INI) / (H_FIN - H_INI)
+        barra = Rectangle(width=max(b - a, 0.07), height=ALTO_CARRIL,
+                          stroke_color=color_ventana, stroke_width=2.0,
+                          fill_color=color_ventana, fill_opacity=0.45)
+        barra.move_to(np.array([(a + b) / 2.0, y, 0.0]))
+        et = tag_hud("%s > %s" % (v["de"], v["a"]), font_size=fs,
+                     color=C_EJE)
+        et.next_to(base, LEFT, buff=0.26)
+        carriles.add(base)
+        barras.add(barra)
+        etiquetas.add(et)
+    y_eje = -SEP_CARRIL * 0.70
+    eje = Line(np.array([x0, y_eje, 0.0]), np.array([x1, y_eje, 0.0]),
+               color=C_EJE, stroke_width=1.6)
+    marcas = VGroup()
+    for h in range(0, 13, 2):
+        x = x0 + (x1 - x0) * (h - H_INI) / (H_FIN - H_INI)
+        tick = Line(np.array([x, y_eje, 0.0]),
+                    np.array([x, y_eje - 0.11, 0.0]),
+                    color=C_EJE, stroke_width=1.4)
+        num = tag_hud("%d" % h, font_size=fs - 2, color=C_EJE)
+        num.next_to(tick, DOWN, buff=0.08)
+        marcas.add(tick, num)
+    et_eje = tag_hud("horas", font_size=fs - 1, color=C_EJE)
+    et_eje.next_to(eje, RIGHT, buff=0.20)
+    g = VGroup(carriles, barras, etiquetas, eje, marcas, et_eje)
+    g.carriles, g.barras, g.etiquetas = carriles, barras, etiquetas
+    g.eje, g.mobiliario = eje, VGroup(eje, marcas, et_eje)
+    return g
+
+
+def x_hora(g, h):
+    """La x de la hora `h` en un plan ya colocado en pantalla."""
+    a, b = g.eje.get_start()[0], g.eje.get_end()[0]
+    return a + (b - a) * (float(h) - H_INI) / (H_FIN - H_INI)
+
+
+def y_carril(g, i):
+    """La y del carril del tramo `i` (0 = el de arriba)."""
+    return g.carriles[i].get_center()[1]
+
+
+def en_plan(g, h, i, dy=0.0):
+    """El punto (hora, carril) de un plan ya colocado."""
+    return np.array([x_hora(g, h), y_carril(g, i) + dy, 0.0])
+
+
+def reloj_h(h, etiqueta="t", color=None):
+    """Contador de HORAS (la pieza `reloj` de la libreria rotula ms).
+
+    Ancho FIJO (`%05.2f`): las gemelas conservan el numero de glifos y el
+    Transform entre dos relojes no rompe los digitos.
+    """
+    return tag_hud("%s = %05.2f h" % (etiqueta, float(h)), font_size=23,
+                   color=C_CALCULO if color is None else color)
+
+
+def cruz(punto, tam=0.20, color=C_PERDIDA, grosor=5.0):
+    """Una X sobre un punto: el tramo que no existe (la libreria no trae
+    marca de corte)."""
+    g = VGroup(
+        Line(np.array([-tam, -tam, 0.0]), np.array([tam, tam, 0.0]),
+             color=color, stroke_width=grosor),
+        Line(np.array([-tam, tam, 0.0]), np.array([tam, -tam, 0.0]),
+             color=color, stroke_width=grosor))
+    g.move_to(punto)
+    return g
+
+
+def cifras_apiladas(lineas, fs=20, buff=0.20, pos=None):
+    """Columna de `tag_hud` alineada a la izquierda. `lineas` = [(texto,
+    color), ...]."""
+    g = VGroup(*[tag_hud(t, font_size=fs, color=c) for t, c in lineas])
+    g.arrange(DOWN, buff=buff, aligned_edge=LEFT)
+    if pos is not None:
+        g.move_to(pos)
+    return g
 
 
 def cierre_leccion(escena, rot, linea_blanca, linea_cian, pie=None,

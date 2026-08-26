@@ -84,6 +84,14 @@ from protocolos import (  # noqa: E402  (la API completa)
 
 _pr.Text = Text
 
+# `pase_leo` vive en la libreria del curso 24 (comunicaciones
+# digitales): la 8.1 la reutiliza tal cual para la duracion del
+# pase y el traspaso, como manda el contrato de protocolos.py.
+import comunicaciones as _com  # noqa: E402
+from comunicaciones import pase_leo  # noqa: E402
+
+_com.Text = Text
+
 _RotulosBase = Rotulos
 
 
@@ -116,8 +124,138 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 8.1. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo que se dibuja y lo que se escribe no pueden
+# discrepar. Medido en el contenedor ANTES de escribir los clips.
+
+# --- La escala DECLARADA de la geometria (clips 1 y 3) ---------------
+# Una sola escala para las dos orbitas: si el GEO se dibujara comodo y el
+# LEO tambien, la leccion mentiria. A esta escala el LEO roza el suelo.
+ESCALA_KM = 12000.0                 # km por unidad de pantalla
+R_TIERRA_KM = 6371.0
+R_TIERRA_U = R_TIERRA_KM / ESCALA_KM        # 0.531
+GEO_U = H_GEO / ESCALA_KM                   # 2.982
+LEO_U = H_LEO / ESCALA_KM                   # 0.046
+
+# --- Clip 1: el retardo que impone la luz -----------------------------
+GEO = rtt_orbital(H_GEO)                    # 35 786 km, elevacion 90
+GEO_KM = GEO["d_km"]                        # 35786.0
+GEO_IDA = GEO["ida_ms"]                     # 119.4 ms un tramo suelo-satelite
+GEO_RTT = GEO["rtt_ms"]                     # 238.7 ms subir y bajar
+GEO_USR = GEO["rtt_usuario_ms"]             # 477.5 ms de usuario a usuario
+# La misma ida y vuelta por un cable submarino de 9 000 km (fibra, no
+# vacio: `ping` usa la velocidad en fibra y suma el proceso de 8 saltos).
+CABLE_KM = 9000.0
+CABLE = ping(CABLE_KM, saltos=8)
+CABLE_MS = CABLE["media"]                   # 97.1 ms ida y vuelta
+
+# --- Clip 2: TCP con 477 ms de ida y vuelta ---------------------------
+CAP_MBPS = 50.0                             # el enlace CONTRATADO
+TUBO = bdp(CAP_MBPS, GEO_USR)
+TUBO_KB = TUBO["kb"]                        # 2914.3 kB en vuelo
+TUBO_SEG = int(TUBO["segmentos_1460"])      # 2043 segmentos de 1460 B
+VENT_CHICA, VENT_GRANDE = 64, 256           # kB de ventana
+T64 = tcp_en_orbita(GEO_USR, VENT_CHICA, CAP_MBPS, pep=True)
+T256 = tcp_en_orbita(GEO_USR, VENT_GRANDE, CAP_MBPS, pep=True)
+PRECIO_PEP = T64["precio_pep"]              # lo dice la libreria, no yo
+# Llenar el tubo con arranque lento: cwnd duplicandose cada RTT hasta
+# cubrir los TUBO_SEG segmentos. El umbral se pone alto a proposito para
+# medir la exponencial entera.
+SLOW = arranque_lento(ssthresh=4096, cwnd0=1, rtts=14)
+SLOW_RTTS = next(i for i, c in enumerate(SLOW["traza"]) if c >= TUBO_SEG)
+SLOW_CWND = SLOW["traza"][SLOW_RTTS]        # 2048 segmentos
+SLOW_S = SLOW_RTTS * GEO_USR / 1000.0       # 5.25 s solo para arrancar
+SLOW_S_LEO = SLOW_RTTS * rtt_orbital(H_LEO)["rtt_usuario_ms"] / 1000.0
+# El enganche con la 4.3: alli la diferencia Reno/CUBIC era teorica porque
+# el RTT era corto. Con el RTT orbital deja de serlo.
+RTT_TIERRA = 40.0
+RECUP = [recuperacion_tras_perdida(TUBO_SEG, r)
+         for r in (RTT_TIERRA, GEO_USR)]
+RECUP_CUBIC_S = RECUP[0]["cubic_s"]         # 11.53 s: NO depende del RTT
+RECUP_RENO_RTTS = RECUP[1]["reno_rtts"]     # 1021.5 RTT de +1 segmento
+RECUP_GEO_MIN = RECUP[1]["reno_s"] / 60.0   # 8.13 minutos de Reno
+
+
+def GANADOR(r):
+    """Quien recupera antes y por cuanto, MEDIDO (la misma regla de la
+    4.3: dentro del 10 % se declara empate en vez de fingir)."""
+    if r["reno_s"] < r["cubic_s"] * 0.90:
+        return "Reno  %sx" % fmt(r["cubic_s"] / r["reno_s"], 1)
+    if r["cubic_s"] < r["reno_s"] * 0.90:
+        return "CUBIC %sx" % fmt(r["veces"], 1)
+    return "empate"
+
+
+# --- Clip 3: LEO y el pase --------------------------------------------
+LEO = rtt_orbital(H_LEO)                    # 550 km, elevacion 90
+LEO_KM = LEO["d_km"]
+LEO_IDA = LEO["ida_ms"]                     # 1.8 ms un tramo
+LEO_RTT = LEO["rtt_ms"]                     # 3.7 ms
+LEO_USR = LEO["rtt_usuario_ms"]             # 7.3 ms de usuario a usuario
+VECES_LEO = GEO_USR / LEO_USR               # 65.1 veces menos
+# El pase sobre la estacion (Tierra sin rotar: se declara en el pie).
+PASE = pase_leo(H_LEO, elev_max=60.0)
+PASE_S = float(PASE["t_total_s"])           # 727.6 s horizonte a horizonte
+PASE_MIN = PASE_S / 60.0                    # 12.13 min
+ELEV_MAX = 60.0
+ELEV_UMBRAL = 25.0                          # por debajo, la antena lo suelta
+_M = np.asarray(PASE["elev_deg"]) >= ELEV_UMBRAL
+PASE_UTIL_S = float(np.asarray(PASE["t_s"])[_M].max() -
+                    np.asarray(PASE["t_s"])[_M].min())   # 254.7 s
+PASE_UTIL_MIN = PASE_UTIL_S / 60.0          # 4.24 min
+PASE_T0 = float(np.asarray(PASE["t_s"]).min())           # -363.8 s
+PASE_T1 = float(np.asarray(PASE["t_s"]).max())           # +363.8 s
+# El retardo NO es constante durante el pase: cambia con la elevacion.
+# (elevacion 0 = horizonte: 2703.8 km, el mismo d_km que mide `pase_leo`.)
+LEO_IDA_CENIT = rtt_orbital(H_LEO, elevacion_deg=ELEV_MAX)["ida_ms"]   # 2.09
+LEO_IDA_HORIZ = rtt_orbital(H_LEO, elevacion_deg=0.0)["ida_ms"]        # 9.02
+LEO_D_HORIZ = rtt_orbital(H_LEO, elevacion_deg=0.0)["d_km"]            # 2703.8
+TRASPASOS_HORA = 3600.0 / PASE_S            # 4.95 pases por hora
+
+
+def ELEV(t):
+    """Elevacion MEDIDA (grados) en el segundo t del pase."""
+    return float(np.interp(float(t), np.asarray(PASE["t_s"]),
+                           np.asarray(PASE["elev_deg"])))
+
+
+# --- Clip 4: la malla optica ------------------------------------------
+MALLA = malla_laser(4, 6)                   # 4 planos de 6 satelites
+MALLA_N = MALLA["satelites"]                # 24
+MALLA_ENLACES = len(MALLA["aristas"])       # 42 enlaces opticos
+MALLA_PLANOS, MALLA_POR_PLANO = MALLA["planos"], MALLA["por_plano"]
+ORIGEN_MALLA = MALLA["origen"]              # S0-0
+DESTINO_A = MALLA["destino"]                # S3-3: el que ve Londres ahora
+RUTA_A = MALLA["ruta"]                      # 6 saltos
+SALTOS_A, COSTE_A = MALLA["saltos"], MALLA["coste"]
+DESTINO_B = "S3-1"                          # 10 min despues lo ve otro
+RUTA_B = camino_dijkstra(MALLA["dijkstra"], DESTINO_B)
+SALTOS_B = len(RUTA_B) - 1                  # 4 saltos
+COSTE_B = MALLA["dijkstra"]["dist"][DESTINO_B]
+# Cada plano es un anillo (el satelite habla con el de delante y el de
+# atras) inclinado 18 grados; los planos se ven de canto y separados 2.9.
+# Parametros hallados por barrido en el contenedor: con ellos ninguna
+# arista pasa a menos de 0.58 de un nodo que no sea suyo (a ojo se
+# encimaban).
+_MALLA_AX, _MALLA_AY, _MALLA_GAP = 1.10, 1.85, 2.90
+_MALLA_TILT = math.radians(18.0)
+
+
+def _pos_malla():
+    ct, st = math.cos(_MALLA_TILT), math.sin(_MALLA_TILT)
+    x0 = -_MALLA_GAP * (MALLA_PLANOS - 1) / 2.0
+    pos = {}
+    for p in range(MALLA_PLANOS):
+        for i in range(MALLA_POR_PLANO):
+            a = 2.0 * math.pi * i / MALLA_POR_PLANO
+            dx, dy = _MALLA_AX * math.sin(a), _MALLA_AY * math.cos(a)
+            pos["S%d-%d" % (p, i)] = (x0 + p * _MALLA_GAP + dx * ct - dy * st,
+                                      dx * st + dy * ct)
+    return pos
+
+
+POS_MALLA = _pos_malla()
+TIPOS_MALLA = {k: "satelite" for k in POS_MALLA}
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -202,6 +340,33 @@ def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
     t = Text(texto, font_size=font_size, color=col)
     t.next_to(b, direccion, buff=buff)
     return VGroup(b, t)
+
+
+def miles(x):
+    """Entero con separador de millares en ESPACIO (ASCII puro): 35 786.
+    `fmt` no separa millares, y "35786 km" junto a un pie que dice
+    "35 786 km" se lee como dos cifras distintas."""
+    return "{:,}".format(int(round(float(x)))).replace(",", " ")
+
+
+def apagar_camino(topo, camino, color=C_RED, grosor=2.4, grosor_nodo=2.2):
+    """Deshace `Topologia.resaltar_camino`: la pieza recolorea aristas Y
+    nodos y no trae inversa, asi que sin esto la segunda ruta del clip 4
+    se dibujaria ENCIMA de la primera y se verian las dos a la vez."""
+    for a, b in zip(camino[:-1], camino[1:]):
+        topo.enlace(a, b).linea.set_stroke(color, width=grosor)
+    for k in camino:
+        topo.nodo(k).forma.set_stroke(color, width=grosor_nodo)
+    return topo
+
+
+def cifra_ms(regla, ms, dec=1, font_size=20, color=None, buff=0.30):
+    """La cifra en ms pegada al final de una `regla_viajes`, con los
+    decimales que quiero (la pieza solo rotula enteros)."""
+    t = tag_hud("%s ms" % fmt(ms, dec), font_size=font_size,
+                color=C_CALCULO if color is None else color)
+    t.next_to(regla.cajas[-1], RIGHT, buff=buff)
+    return t
 
 
 def cierre_leccion(escena, rot, linea_blanca, linea_cian, pie=None,
