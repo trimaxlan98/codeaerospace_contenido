@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 7.1 Acercar el contenido: CDN y anycast",
+  "description": "Lección 7.1 del curso Protocolos de Internet (módulo 7: la red real), en 4 clips animados —una idea por clip—: el viaje largo con el tope que impone la luz, la caché al borde con su tasa medida, anycast repartiendo a cada usuario su PoP más cercano, y qué pasa cuando el borde falla. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-viaje-largo.py",
+      "title": "1 · El viaje largo",
+      "scene": "Clip1",
+      "final_state": "Cable punteado CDMX-Madrid con '9063 km' en cian; las fichas ambar 'GET' y verde '200' paradas antes de sus nodos; abajo dos barras proporcionales al tiempo: 'limite fisico (2c/3) 91 ms' y 'medido, con routers de por medio 98 ms'; pie: 'Ni el mejor router del mundo baja esa cifra: es la luz, no es software.'; HUD 'Modulo 01'."
+    },
+    {
+      "file": "clips/02-la-cache-al-borde.py",
+      "title": "2 · La caché al borde",
+      "scene": "Clip2",
+      "final_state": "Pantalla con dos lineas en Space Mono: '80% SI se cachea: imagenes, video, JS estatico' en verde y '20% siempre al origen: paginas dinamicas, tu carrito' en azul; pie: 'Y no todo se puede guardar: lo estatico si, lo que cambia por usuario, no.'; HUD 'Modulo 02'."
+    },
+    {
+      "file": "clips/03-anycast.py",
+      "title": "3 · Anycast",
+      "scene": "Clip3",
+      "final_state": "Dos barras de longitud proporcional al tiempo: '1 solo sitio (Madrid) 84 ms' y 'anycast, 8 sitios 15 ms', con '5.6x mejor' en verde debajo; pie: 'Sobre las doce ciudades del mapa, la latencia media cae de golpe. Es ruteo, no magia.'; HUD 'Modulo 03'."
+    },
+    {
+      "file": "clips/04-cuando-el-borde-falla.py",
+      "title": "4 · Cuando el borde falla",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion en dos lineas (la segunda en cian) y el pie anunciando la siguiente; HUD 'Modulo 04'."
+    }
+  ]
+}

@@ -228,8 +228,8 @@ lecciones en producción aunque el resto no se haga nunca.
 |---|---|---|---|---|
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
-| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **en curso** (librería lista y validada; 6 agentes escribiendo) |
-| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | pendiente |
+| 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **PUBLICADO** (PR #49; 24 qh, narrado y muxeado) |
+| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **escrito, validado y con los 24 qh hechos; PR #50 esperando merge** |
 
 ## Receta de lote (la misma en los cuatro)
 
@@ -277,18 +277,18 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 4.1 | ✔ | ✔ | ✔ | ✔ 30/29/29/35 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.2 | ✔ | ✔ | ✔ | ✔ 30/30/30/33 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 4.3 | ✔ | ✔ | ✔ | ✔ 31/30/31/37 s | PR #48 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | — | — | — | — | — |
-| 5.2 | ✔ | ✔ | ✔ | ✔ 30/29/34/30 s | — | — | — | — | — |
-| 5.3 | ✔ | ✔ | ✔ | ✔ 36/30/30/38 s | — | — | — | — | — |
-| 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | — | — | — | — | — |
-| 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | — | — | — | — | — |
-| 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | — | — | — | — | — |
-| 7.1 | ✔ | — | — | — | — | — | — | — | — |
-| 7.2 | ✔ | — | — | — | — | — | — | — | — |
-| 7.3 | ✔ | — | — | — | — | — | — | — | — |
-| 8.1 | ✔ | — | — | — | — | — | — | — | — |
-| 8.2 | ✔ | — | — | — | — | — | — | — | — |
-| 8.3 | ✔ | — | — | — | — | — | — | — | — |
+| 5.1 | ✔ | ✔ | ✔ | ✔ 29/33/30/30 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.2 | ✔ | ✔ | ✔ | ✔ 30/29/34/30 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 5.3 | ✔ | ✔ | ✔ | ✔ 36/30/30/38 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 7.1 | ✔ | ✔ | ✔ | ✔ 30/30/31/31 s | — | — | — | — | — |
+| 7.2 | ✔ | ✔ | ✔ | ✔ 29/30/29/29 s | — | — | — | — | — |
+| 7.3 | ✔ | ✔ | ✔ | ✔ 32/30/30/30 s | — | — | — | — | — |
+| 8.1 | ✔ | ✔ | ✔ | ✔ 32/36/35/31 s | — | — | — | — | — |
+| 8.2 | ✔ | ✔ | ✔ | ✔ 31/30/30/31 s | — | — | — | — | — |
+| 8.3 | ✔ | ✔ | ✔ | ✔ 30/30/33/32 s | — | — | — | — | — |
 
 ## Módulo 1 — La red de redes
 
@@ -927,13 +927,95 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
 - Sondear anchos en el contenedor exige **cwd escribible**: con
   `/workspace:ro` manim revienta al crear `media/texts`.
 - Contra el muestreo de `--frames 8`: alargar un `wait` **posterior** al
-  relevo lo aleja del punto de muestreo; alargar uno **anterior** lo
-  arrastra consigo y no sirve de nada.
+  relevo lo aleja del punto de muestreo. **CORRECCIÓN (lote 4)**: alargar
+  uno **anterior** también sirve, al contrario de lo que decía aquí.
+  Alargarlo mueve el relevo +Δ y el punto de muestreo solo +(k/n)·Δ, así
+  que el desplazamiento relativo es (1−k/n)·Δ. Medido en la 8.1: al frame 6
+  le hicieron falta +1.7 s por delante (con +1.2 s todavía caía dentro).
 - Una ficha detenida se monta sobre el nodo también en topologías en línea.
   Y si el fallo está en el ENLACE (el MTU pequeño), la ficha para en el
   enlace, no en el nodo.
 
+## Cosecha de trampas del lote 4 (medida durante la producción)
+
+**Bugs REALES de la librería que encontraron los agentes**
+- **`fmt(0.5, 0)` escribía "0 Mb/s"**: un rótulo FALSO que pasó el primer
+  render sin que nadie lo notara. Se añade `tasa()`, que elige la unidad
+  por magnitud (y de paso "1 Gb/s" cabe donde "1000.0 Mb/s" no).
+- **`cola_mm1` calculaba `servicio_medio` sobre las primeras N muestras del
+  array completo**, no sobre el servicio de los paquetes ACEPTADOS. Salía
+  bien por ser iid, pero era frágil. Corregido, y ahora expone
+  `lambda_efectiva`, `w_total` y `little`.
+- **`Pila` no aceptaba las tablas de dos campos del propio curso**
+  (`PILA_TCPIP`, `PILA_CCSDS`): las constantes no eran usables con su
+  propia pieza de dibujo. Corregido, más `mostrar_tamanos=False`.
+- **`Escalera` y `Reloj` rotulaban "ms" a fuego**: inservibles fuera de la
+  Tierra, donde el eje son minutos u horas. Ahora llevan `unidad`.
+- `Nodo` no tenía forma de antena: la DSN dibujada con `nube` se leía como
+  "otra red". Añadida.
+
+**De honestidad**
+- **La ley de Little no cierra con las magnitudes ingenuas.** Con la λ
+  nominal y solo la espera en cola el error es del **24.5 %**; con la λ
+  efectiva (hay descartes) y el tiempo TOTAL en el sistema, del **1.0 %**.
+  Enseñar la primera sin explicarlo engaña más que ayuda.
+- **La cifra manda sobre el storyboard**: el guion decía "espera 6 horas" y
+  la librería mide 5.95 h. Todos los rótulos dicen 5.95.
+- Cuando dos sumandos no cuadran con el total a un decimal (12.5 + 2.7 ≠
+  15.1), la barra de reparto rotula **porcentajes**, que sí suman 100.
+- Dibujar 1000 paquetes de búfer es imposible: se escala la pieza y se
+  declara la escala en el propio rótulo ("1 casilla = N").
+- El color se elige por el ROL, no por el reflejo: una curva de ocupación
+  que explota es `C_COLA` (naranja, colas), no `C_PERDIDA` (rojo), porque
+  mide ocupación y no pérdida.
+
+**De composición**
+- El salto **14→15 de `font_size`** en Space Mono es enorme (7.09 → 10.40
+  de ancho): fs 14 es el tamaño útil para listas de dos columnas a ancho
+  completo.
+- **Dos columnas de texto HUD no se alinean con espacios** (la sombra de
+  `Text` los descarta): medir la columna más ancha y desplazar a un x fijo.
+- **`ReglaViajes.move_to` centra el bbox, no el ancla** (y la etiqueta
+  cuenta): para compartir borde izquierdo, alinear por
+  `r.viaje(0).get_left()`.
+- Una ficha sobre un nodo alto necesita ≥ 0.62 de separación; y su marca de
+  tiempo va DEBAJO del aparato, no encima (choca con el fondo del título).
+- Un `Sierra`/`Tabla` recién creado sigue en pantalla si solo apagas sus
+  etiquetas satélite: `FadeOut` de la pieza entera.
+
+**De proceso (no de código)**
+- **Dos agentes se quedaron colgados esperando la notificación de un render
+  que habían mandado al fondo**, con la lección escrita y sin validar. El
+  render se lanza en primer plano y se espera: tarda un par de minutos y
+  devuelve solo. Anotado ya en el contrato de los agentes.
+- **Filtrar la salida del render con `grep video:` esconde los
+  tracebacks**: la 7.1 parecía colgarse durante 40 minutos y en realidad
+  crasheaba en 13 segundos. Al diagnosticar, capturar la salida ENTERA.
+- **`MoveAlongPath` sobre un enlace punteado revienta**: una `DashedLine`
+  es un VGroup de guiones sin puntos propios. Corregido en la librería:
+  `Enlace` guarda una recta invisible y expone `.camino()`.
+- **`regla_viajes` codifica VIAJES, no milisegundos.** Usarla con
+  `viajes=1` para comparar 84 ms contra 15 ms dibuja dos barras IGUALES
+  junto al rótulo "5.6x mejor": el render no protesta, las cifras son
+  correctas y la pantalla miente. La escala va en `ancho_viaje`.
+
 ## Hitos globales
+
+- **2026-08-26**: **LAS 24 LECCIONES ESCRITAS Y VALIDADAS.** El lote 4
+  (módulos 7 y 8) cierra el curso: 24 clips en `ql` entre 28.5 y 35.3 s,
+  frames revisados uno a uno, y los **96 renders `qh` del curso completo**
+  hechos en local a 1920×1080. Los 151 tests del Studio en verde.
+  **PR #50 abierto y esperando merge** — es lo único que falta para
+  publicar el lote 4; los lotes 1, 2 y 3 ya están en producción.
+
+- **2026-08-26**: **LOTE 3 PUBLICADO DE PUNTA A PUNTA.** PR #49 mergeado
+  (`89328e5`); 18 proyectos en producción con 72/72 `qh` adoptados;
+  narración Charon **serial 6/6 a la primera** (24 wavs); 6
+  `exports/protocolos-internet-[56]-*/curso_narrado.mp4` de 2:18–2:36 con
+  picos ≤ −0.5 dB. Este lote vino especialmente caliente de fábrica: **11
+  clips re-muxeados**, y tres de ellos (5.1c3, 5.3c2 y 6.3c4) tocaban
+  0.0 dB —recorte real— y bajaron 2.5 dB en vez de los 1.5 habituales.
+  **18 de 24 lecciones publicadas.**
 
 - **2026-08-26**: **LOTE 2 PUBLICADO DE PUNTA A PUNTA.** PR #48 mergeado
   (`d51a673`); 12 proyectos en producción con 48/48 `qh` adoptados;

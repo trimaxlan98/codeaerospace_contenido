@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 8.1 Internet en órbita: GEO, LEO y la malla láser",
+  "description": "Lección 8.1 del curso Protocolos de Internet (módulo 8: fuera de la Tierra), en 4 clips animados —una idea por clip—: los 477 ms de ida y vuelta de un GEO, TCP sufriendo por la ventana y el PEP que lo salva rompiendo el extremo a extremo, LEO y el traspaso, y rutear la malla óptica. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-geo.py",
+      "title": "1 · GEO: la luz manda",
+      "scene": "Clip1",
+      "final_state": "Tres reglas de viaje ambar compartiendo borde izquierdo sobre fondo negro: 'al satelite' con una casilla y 119.4 ms en cian, 'y de vuelta' con dos y 238.7 ms en cian, 'y contestar' con cuatro (subir/bajar/subir/bajar) y 477.5 ms en ambar; una raya vertical punteada verde cruza las tres dentro de la primera casilla, rotulada 'un cable de 9 000 km, ida y vuelta: 97.1 ms'. HUD 'MODULO 01', titulo 'GEO: la luz manda' y pie 'Esa cifra no la pone el operador. La pone la luz, y no hay contrato que la baje.'"
+    },
+    {
+      "file": "clips/02-tcp-sufre.py",
+      "title": "2 · TCP sufre",
+      "scene": "Clip2",
+      "final_state": "Esquema de cuatro nodos azules: 'tu' (host) unido al 'PEP' (router) por un cable VERDE rotulado 'TCP 1: RTT terrestre', y el PEP al 'servidor' por dos tramos AMBAR que suben al satelite 'GEO', rotulados 'TCP 2: la ventana la maneja el PEP'. Debajo, dos lineas en cian ('con PEP, ventana 64 kB  13.1 Mb/s  11.9x' y 'con PEP, ventana 256 kB  50.0 Mb/s  11.4x  el enlace entero') y una tercera en ROJO: 'rompe el extremo a extremo: con TLS el PEP no puede leer nada'. HUD 'MODULO 02', titulo 'TCP sufre' y pie 'Pero mira lo que se rompe: ya no hay una conexion tuya de punta a punta.'"
+    },
+    {
+      "file": "clips/03-leo.py",
+      "title": "3 · LEO: bajar la órbita",
+      "scene": "Clip3",
+      "final_state": "La antena en el suelo (linea de horizonte punteada gris) con la cupula del cielo en gris: a la izquierda un satelite con su enlace en ROJO tenue rotulado 'se pone', a la derecha otro con el enlace en VERDE rotulado 'entra'. Arriba, en cian, 'un pase de 12.1 min -> 4.9 traspasos por hora, cada uno una ruta nueva' y, en gris, '(Tierra sin rotar: el pase real es algo mas corto)'. HUD 'MODULO 03', titulo 'LEO: bajar la orbita' y pie 'Cuando se pone, otro entra. Y ese traspaso es una ruta que cambia.'"
+    },
+    {
+      "file": "clips/04-rutear-la-malla.py",
+      "title": "4 · Rutear la malla",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion en dos lineas centradas: 'Los mismos protocolos, un poco mas arriba.' en blanco y 'Y de pronto la luz es lenta.' en cian. HUD 'MODULO 04' arriba a la izquierda y pie 'Siguiente: la red que tolera la desconexion.'"
+    }
+  ]
+}
