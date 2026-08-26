@@ -33,13 +33,13 @@ class Clip2(Scene):
         pedido = ficha("GET")
         pedido.move_to(cable_corto.a)
         self.play(FadeIn(pedido), run_time=0.2)
-        self.play(MoveAlongPath(pedido, cable_corto.linea), run_time=0.5,
+        self.play(MoveAlongPath(pedido, cable_corto.camino()), run_time=0.5,
                   rate_func=linear)
         vuelta_corta = enlace(pop.centro(), usuario.centro())
         respuesta = ficha("200", color=C_OK)
         respuesta.move_to(vuelta_corta.a)
         self.play(FadeIn(respuesta), run_time=0.2)
-        self.play(MoveAlongPath(respuesta, vuelta_corta.linea), run_time=0.5,
+        self.play(MoveAlongPath(respuesta, vuelta_corta.camino()), run_time=0.5,
                   rate_func=linear)
         corto_ms = regla_viajes(1, etiqueta="PoP cercano", ms=RTT_BORDE)
         corto_ms.move_to(DOWN * 1.5)
@@ -49,7 +49,7 @@ class Clip2(Scene):
         pedido2 = ficha("GET")
         pedido2.move_to(cable_largo.a)
         self.play(FadeIn(pedido2), run_time=0.2)
-        self.play(MoveAlongPath(pedido2, cable_largo.linea), run_time=1.0,
+        self.play(MoveAlongPath(pedido2, cable_largo.camino()), run_time=1.0,
                   rate_func=linear)
         largo_ms = regla_viajes(1, etiqueta="ir hasta el origen (Madrid)",
                                 ms=RTT_REAL_LARGO)

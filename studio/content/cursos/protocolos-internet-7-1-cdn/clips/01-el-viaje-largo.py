@@ -37,16 +37,19 @@ class Clip1(Scene):
                               "velocidad de la luz en fibra: dos tercios "
                               "de c."),
                     zona="abajo", run_time=0.5)
-        self.play(MoveAlongPath(paq, cable.linea), run_time=1.6,
+        # Parar ANTES del nodo: una ficha que termina su trayecto en el
+        # aparato se le monta encima (trampa de la cosecha).
+        self.play(MoveAlongPath(paq, tramo_corto(cable)), run_time=1.6,
                   rate_func=linear)
         vuelta = enlace(destino.centro(), origen.centro())
         respuesta = ficha("200", lado=0.42, color=C_OK)
         respuesta.move_to(vuelta.a)
         self.play(FadeIn(respuesta), run_time=0.2)
-        self.play(MoveAlongPath(respuesta, vuelta.linea), run_time=1.6,
-                  rate_func=linear)
+        self.play(MoveAlongPath(respuesta, tramo_corto(vuelta)),
+                  run_time=1.6, rate_func=linear)
         limite = regla_viajes(1, etiqueta="limite fisico (2c/3)",
-                              ms=RTT_MIN_LARGO)
+                              ms=RTT_MIN_LARGO,
+                              ancho_viaje=RTT_MIN_LARGO * MS_UD1)
         limite.move_to(DOWN * 1.55)
         self.play(FadeIn(limite), run_time=0.6)
         self.wait(4.0)
@@ -56,7 +59,8 @@ class Clip1(Scene):
                               "cifra: es la luz, no es software."),
                     zona="abajo", run_time=0.5)
         medido = regla_viajes(1, etiqueta="medido, con routers de por medio",
-                              ms=RTT_REAL_LARGO)
+                              ms=RTT_REAL_LARGO,
+                              ancho_viaje=RTT_REAL_LARGO * MS_UD1)
         medido.move_to(DOWN * 2.35)
         self.play(FadeIn(medido), run_time=0.6)
         self.wait(4.5)

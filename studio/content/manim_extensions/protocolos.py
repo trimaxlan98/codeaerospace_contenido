@@ -935,6 +935,12 @@ class Enlace(_Anclada):
         self._poner_ancla((self.a + self.b) / 2.0)
         cls = DashedLine if punteada else Line
         self.linea = cls(self.a, self.b, color=color, stroke_width=grosor)
+        # Una DashedLine es un VGroup de guiones y NO tiene puntos propios:
+        # `MoveAlongPath` y `point_from_proportion` sobre ella revientan con
+        # "Mobject with no points". Se guarda siempre una recta invisible
+        # como trayectoria, para que animar sobre un enlace punteado
+        # funcione igual que sobre uno continuo.
+        self._camino = Line(self.a, self.b, stroke_opacity=0.0)
         self.add(self.linea)
         self.etiqueta = None
         if etiqueta:
@@ -944,8 +950,13 @@ class Enlace(_Anclada):
             self.add(self.etiqueta)
 
     def punto_en(self, frac):
-        return self.linea.point_from_proportion(
+        return self._camino.point_from_proportion(
             float(min(max(frac, 0.0), 1.0)))
+
+    def camino(self):
+        """La trayectoria del enlace para `MoveAlongPath`. Usa esto, no
+        `.linea`: si el enlace es punteado, `.linea` no tiene puntos."""
+        return self._camino
 
     def resaltar(self, color=C_PAQUETE, grosor=4.2):
         self.linea.set_stroke(color, width=grosor)

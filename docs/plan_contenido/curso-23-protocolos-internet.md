@@ -283,7 +283,7 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 7.1 | ✔ | ✔ | ~ agentes | — | — | — | — | — | — |
+| 7.1 | ✔ | ✔ | ✔ | ✔ 30/30/31/31 s | — | — | — | — | — |
 | 7.2 | ✔ | ✔ | ✔ | ✔ 29/30/29/29 s | — | — | — | — | — |
 | 7.3 | ✔ | ✔ | ✔ | ✔ 32/30/30/30 s | — | — | — | — | — |
 | 8.1 | ✔ | ✔ | ✔ | ✔ 32/36/35/31 s | — | — | — | — | — |
@@ -988,6 +988,16 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   que habían mandado al fondo**, con la lección escrita y sin validar. El
   render se lanza en primer plano y se espera: tarda un par de minutos y
   devuelve solo. Anotado ya en el contrato de los agentes.
+- **Filtrar la salida del render con `grep video:` esconde los
+  tracebacks**: la 7.1 parecía colgarse durante 40 minutos y en realidad
+  crasheaba en 13 segundos. Al diagnosticar, capturar la salida ENTERA.
+- **`MoveAlongPath` sobre un enlace punteado revienta**: una `DashedLine`
+  es un VGroup de guiones sin puntos propios. Corregido en la librería:
+  `Enlace` guarda una recta invisible y expone `.camino()`.
+- **`regla_viajes` codifica VIAJES, no milisegundos.** Usarla con
+  `viajes=1` para comparar 84 ms contra 15 ms dibuja dos barras IGUALES
+  junto al rótulo "5.6x mejor": el render no protesta, las cifras son
+  correctas y la pantalla miente. La escala va en `ancho_viaje`.
 
 ## Hitos globales
 

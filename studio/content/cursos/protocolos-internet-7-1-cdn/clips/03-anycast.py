@@ -64,7 +64,7 @@ class Clip3(Scene):
         self.play(Create(ruta_londres.linea), run_time=0.5)
         paq_l = ficha("GET", lado=0.28)
         paq_l.move_to(ruta_londres.a)
-        self.play(MoveAlongPath(paq_l, ruta_londres.linea), run_time=0.6,
+        self.play(MoveAlongPath(paq_l, ruta_londres.camino()), run_time=0.6,
                   rate_func=linear)
         et_londres = tag_hud("Londres -> Madrid: %s ms"
                              % fmt(EJEMPLO_MEDIO["ms"], 1), font_size=18,
@@ -82,7 +82,7 @@ class Clip3(Scene):
         self.play(Create(ruta_jo.linea), run_time=0.5)
         paq_j = ficha("GET", lado=0.28)
         paq_j.move_to(ruta_jo.a)
-        self.play(MoveAlongPath(paq_j, ruta_jo.linea), run_time=0.6,
+        self.play(MoveAlongPath(paq_j, ruta_jo.camino()), run_time=0.6,
                   rate_func=linear)
         et_jo = tag_hud("Johannesburgo -> Lagos: %s ms"
                         % fmt(EJEMPLO_LEJOS["ms"], 1), font_size=18,
@@ -99,11 +99,17 @@ class Clip3(Scene):
                               "latencia media cae de golpe. Es ruteo, no "
                               "magia."),
                     zona="abajo", run_time=0.5)
+        # La LONGITUD tiene que ser el tiempo: `regla_viajes` codifica
+        # viajes, y con viajes=1 las dos barras medirian igual (84 y 15 ms
+        # se dibujaban del mismo tamano, contradiciendo a sus propias
+        # cifras). El ancho de la casilla lleva la escala.
         barra_uno = regla_viajes(1, etiqueta="1 solo sitio (Madrid)",
-                                 ms=ANYCAST_1["media_ms"])
+                                 ms=ANYCAST_1["media_ms"],
+                                 ancho_viaje=ANYCAST_1["media_ms"] * MS_UD)
         barra_uno.move_to(UP * 0.6)
         barra_ocho = regla_viajes(1, etiqueta="anycast, 8 sitios",
-                                  ms=ANYCAST_8["media_ms"])
+                                  ms=ANYCAST_8["media_ms"],
+                                  ancho_viaje=ANYCAST_8["media_ms"] * MS_UD)
         barra_ocho.move_to(DOWN * 0.3)
         self.play(FadeIn(barra_uno), run_time=0.5)
         self.wait(1.0)

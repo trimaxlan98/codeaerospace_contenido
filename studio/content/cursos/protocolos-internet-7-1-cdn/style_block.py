@@ -179,6 +179,22 @@ POS_MUNDO = {"CDMX": (-4.6, 0.7), "Nueva York": (-3.4, 1.6),
             "Tokio": (5.8, 1.4), "Sidney": (6.3, -1.4)}
 
 
+# Escalas de las barras de tiempo: la LONGITUD de la barra es el tiempo.
+# `regla_viajes` codifica VIAJES, asi que con viajes=1 dos barras miden lo
+# mismo aunque sus cifras difieran; el ancho de casilla lleva la escala.
+MS_UD1 = 5.0 / RTT_REAL_LARGO            # clip 1: la mayor mide 5.0
+MS_UD = 5.0 / ANYCAST_1["media_ms"]      # clip 3: idem
+
+
+def tramo_corto(enl, hasta=0.86):
+    """La trayectoria de un enlace RECORTADA antes del nodo: una ficha que
+    termina su MoveAlongPath en el aparato se le monta encima."""
+    a, b = enl.a, enl.b
+    v = VMobject()
+    v.set_points_as_corners([a, a + (b - a) * float(hasta)])
+    return v
+
+
 # --- Rotulos ----------------------------------------------------------
 def _con_fondo(mobjeto, buff=0.14, opacidad=0.82):
     """Rectangulo del color del fondo detras de un rotulo: el texto se lee

@@ -55,8 +55,8 @@ class Clip4(Scene):
         paq_m.move_to(ruta_madrid.a)
         paq_l = ficha("GET", lado=0.28, color=C_COLA)
         paq_l.move_to(ruta_londres.a)
-        self.play(MoveAlongPath(paq_m, ruta_madrid.linea),
-                  MoveAlongPath(paq_l, ruta_londres.linea), run_time=0.8,
+        self.play(MoveAlongPath(paq_m, ruta_madrid.camino()),
+                  MoveAlongPath(paq_l, ruta_londres.camino()), run_time=0.8,
                   rate_func=linear)
         et_re = tag_hud("%d usuarios re-enrutados a Lagos"
                         % ANYCAST_CAIDA["n_movidos"], font_size=19,
