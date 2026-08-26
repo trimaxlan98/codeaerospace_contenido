@@ -622,6 +622,19 @@ CAMPOS_IPV6 = (("Version", 4), ("Clase de trafico", 8),
 # =====================================================================
 # PIEZAS DE DIBUJO
 # =====================================================================
+def miles(x, dec=0):
+    """Separa los millares con espacio fino. -> str.
+
+    `fmt` no lo hace, y "35786 km" al lado de un pie que dice "35 786 km"
+    se lee como dos cifras distintas. Devuelve **str**: no lo metas en un
+    `%d`.
+    """
+    v = float(x)
+    ent = "{:,}".format(int(abs(v))).replace(",", " ")
+    resto = ("%s" % fmt(abs(v) - int(abs(v)), dec))[1:] if dec else ""
+    return ("-" if v < 0 else "") + ent + resto
+
+
 def tasa(mbps):
     """Rotula una tasa eligiendo la unidad por magnitud.
 
@@ -1010,6 +1023,16 @@ class Topologia(_Anclada):
         v.set_points_as_corners([pa + (pb - pa) * float(desde),
                                  pa + (pb - pa) * float(hasta)])
         return v
+
+    def apagar_camino(self, camino, color=None, grosor=2.4):
+        """La inversa de `resaltar_camino`. Sin ella, la segunda ruta se
+        dibuja encima de la primera y se ven las dos."""
+        col = color or C_RED
+        for a, b in zip(camino[:-1], camino[1:]):
+            self.aristas[(a, b)].linea.set_stroke(col, width=grosor)
+        for k in camino:
+            self._nod[k].forma.set_stroke(col, width=2.4)
+        return self
 
     def camino(self, nombres):
         """La ruta como VMobject, lista para `MoveAlongPath`.
@@ -2566,10 +2589,12 @@ class ReglaViajes(_Anclada):
     """
 
     def __init__(self, viajes, etiqueta=None, ms=None, ancho_viaje=0.62,
-                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None,
+                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None, dec=0,
                  **kwargs):
         super().__init__(**kwargs)
         self.n = int(viajes)
+        # `dec`: 119.4 / 238.7 / 477.5 ms no se pueden rotular con enteros
+        self.dec = int(dec)
         self.etiqueta_txt, self.ms = etiqueta, ms
         self.ancho_viaje, self.alto = float(ancho_viaje), float(alto)
         self.fs, self.color = int(fs), color
@@ -2604,7 +2629,8 @@ class ReglaViajes(_Anclada):
             self.add(self.etiqueta)
         self.cifra = None
         if ms is not None:
-            self.cifra = _hud("%s ms" % fmt(ms, 0), self.fs + 2, C_CIFRA)
+            self.cifra = _hud("%s ms" % fmt(ms, self.dec), self.fs + 2,
+                              C_CIFRA)
             ancla = (self.cajas[-1] if self.n else
                      self.cajas[0])
             self.cifra.next_to(ancla, RIGHT, buff=0.30)
@@ -2617,17 +2643,18 @@ class ReglaViajes(_Anclada):
         o = ReglaViajes(viajes, self.etiqueta_txt,
                         self.ms if ms is None else ms, self.ancho_viaje,
                         self.alto, self.fs, self.color,
-                        self.nombres if nombres is None else nombres)
+                        self.nombres if nombres is None else nombres,
+                        self.dec)
         o.shift(self._origen() - o._origen())
         return o
 
 
 def regla_viajes(viajes, etiqueta=None, ms=None, ancho_viaje=0.62,
-                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None):
+                 alto=0.40, fs=13, color=C_PAQUETE, nombres=None, dec=0):
     """Ver `ReglaViajes`. El borde izquierdo queda en el ancla, asi que
     varias reglas apiladas comparten origen y se comparan a ojo."""
     return ReglaViajes(viajes, etiqueta, ms, ancho_viaje, alto, fs, color,
-                       nombres)
+                       nombres, dec)
 
 
 # =====================================================================

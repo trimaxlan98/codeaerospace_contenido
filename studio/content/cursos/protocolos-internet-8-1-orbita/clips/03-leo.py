@@ -106,22 +106,22 @@ class Clip3(Scene):
         curva = g.curva
         g.remove(curva)
         umbral = g.horizontal_en(ELEV_UMBRAL, color=C_COLA)
-        et_umbral = tag_hud("%s grados: por debajo, la antena lo suelta"
-                            % fmt(ELEV_UMBRAL, 0), font_size=17,
-                            color=C_COLA)
-        et_umbral.next_to(umbral, DOWN, buff=0.10).shift(RIGHT * 1.9)
+        et_umbral = tag_hud("%s grados" % fmt(ELEV_UMBRAL, 0),
+                            font_size=17, color=C_COLA)
+        et_umbral.next_to(umbral, UP, buff=0.08).shift(LEFT * 3.10)
         self.play(FadeIn(g), run_time=0.5)
         self.play(Create(curva), run_time=1.3)
         self.play(Create(umbral), FadeIn(et_umbral), run_time=0.5)
         datos = VGroup(
             tag_hud("pase entero, horizonte a horizonte   %s min"
-                    % fmt(PASE_MIN, 1), font_size=19),
-            tag_hud("por encima de los %s grados          %s min"
+                    % fmt(PASE_MIN, 1), font_size=18),
+            tag_hud("por encima de %s grados (debajo, la antena lo "
+                    "suelta)    %s min"
                     % (fmt(ELEV_UMBRAL, 0), fmt(PASE_UTIL_MIN, 1)),
-                    font_size=19),
+                    font_size=18),
             tag_hud("y el retardo cambia con el: de %s a %s ms por tramo"
                     % (fmt(LEO_IDA_CENIT, 1), fmt(LEO_IDA_HORIZ, 1)),
-                    font_size=19, color=C_PAQUETE),
+                    font_size=18, color=C_PAQUETE),
         ).arrange(DOWN, buff=0.22, aligned_edge=LEFT)
         datos.move_to(np.array([0.0, -1.85, 0.0]))
         self.play(LaggedStart(*[FadeIn(d, shift=0.10 * UP) for d in datos],
@@ -174,10 +174,10 @@ class Clip3(Scene):
                           "cada uno una ruta nueva"
                           % (fmt(PASE_MIN, 1), fmt(TRASPASOS_HORA, 1)),
                           font_size=19)
-        et_tras.move_to(np.array([0.0, 1.55, 0.0]))
+        et_tras.move_to(np.array([0.0, 1.98, 0.0]))
         nota = tag_hud("(Tierra sin rotar: el pase real es algo mas corto)",
                        font_size=16, color=C_EJE)
-        nota.move_to(np.array([0.0, 1.05, 0.0]))
+        nota.move_to(np.array([0.0, 1.48, 0.0]))
         self.play(FadeIn(et_tras, shift=0.10 * UP), run_time=0.5)
         self.play(FadeIn(nota), run_time=0.4)
         self.wait(4.0)
