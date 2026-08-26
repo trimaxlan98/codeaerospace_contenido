@@ -81,6 +81,8 @@ from protocolos import (  # noqa: E402  (la API completa)
 
 _pr.Text = Text
 
+from cripto import rsa_cifrar  # noqa: E402  (abrir una firma con la publica: es lo que hace la casa)
+
 _RotulosBase = Rotulos
 
 
@@ -113,9 +115,102 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 6.2. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo que se dibuja y lo que se escribe no pueden
+# discrepar. Medido en el contenedor antes de escribir un solo clip.
+
+RTT_MS = 40.0                  # el RTT de la leccion, el mismo en los 4 clips
+
+# --- Clip 1: el apreton. TCP primero, TLS ENCIMA; los RTT se SUMAN ----
+HS = handshake_tcp(rtt_ms=RTT_MS)
+RTT_TCP_MS = HS["rtt_ms"]                        # 40.0 ms
+TCP_ANTES_MS = HS["antes_del_primer_byte_ms"]    # 40.0 ms: TCP cuesta 1 RTT
+TCP_RTTS = TCP_ANTES_MS / RTT_MS                 # 1.0
+TLS12 = tls_viajes("1.2")                        # 2 RTT, 4 mensajes
+TLS13 = tls_viajes("1.3")                        # 1 RTT, 2 mensajes
+TLS13R = tls_viajes("1.3", reanudado=True)       # 0 RTT, 1 mensaje
+AVISO_0RTT = TLS13R["aviso"]                     # la letra chica, de la libreria
+
+# El apreton COMPLETO (TCP + TLS) no se suma a mano: `http_transferencia`
+# ya lo define como 1 RTT de transporte mas los de TLS. Se lo pedimos.
+APRETON_12 = http_transferencia(1, "keepalive", RTT_MS,
+                                version_tls="1.2")["apreton_rtts"]   # 3.0
+APRETON_13 = http_transferencia(1, "keepalive", RTT_MS,
+                                version_tls="1.3")["apreton_rtts"]   # 2.0
+APRETON_0RTT = TCP_RTTS + TLS13R["rtt"]                              # 1.0
+MS_12 = APRETON_12 * RTT_MS        # 120 ms antes del primer byte de HTTP
+MS_13 = APRETON_13 * RTT_MS        # 80 ms
+MS_0RTT = APRETON_0RTT * RTT_MS    # 40 ms
+AHORRO_13_MS = MS_12 - MS_13       # 40 ms: justo un viaje
+
+_MEDIO = RTT_MS / 2.0              # media vuelta: lo que tarda un mensaje
+
+# Los tres mensajes de TCP salen TAL CUAL de handshake_tcp(); los cinco de
+# TLS 1.2 van encima, a media vuelta de distancia cada uno, y el ultimo
+# evento es el primer byte de HTTP: ahi es donde se lee la suma.
+_TEXTO_TCP = {"SYN": "SYN", "SYN-ACK": "SYN-ACK", "ACK": "ACK  (TCP listo)"}
+EVENTOS_TLS12 = [
+    dict(e, texto=_TEXTO_TCP[e["flags"]], color=C_RED)
+    for e in HS["eventos"][:3]
+] + [
+    {"de": "cliente", "a": "servidor", "texto": "ClientHello",
+     "t_ms": TCP_ANTES_MS, "color": C_CLAVE},
+    {"de": "servidor", "a": "cliente", "texto": "ServerHello + Certificado",
+     "t_ms": TCP_ANTES_MS + _MEDIO, "color": C_CLAVE},
+    {"de": "cliente", "a": "servidor", "texto": "ClaveIntercambio + Finished",
+     "t_ms": TCP_ANTES_MS + 2 * _MEDIO, "color": C_CLAVE},
+    {"de": "servidor", "a": "cliente", "texto": "Finished",
+     "t_ms": TCP_ANTES_MS + 3 * _MEDIO, "color": C_CLAVE},
+    {"de": "cliente", "a": "servidor", "texto": "GET /index.html",
+     "t_ms": MS_12, "color": C_PAQUETE},
+]
+IDX_TCP = (0, 1, 2)                # que eventos son de TCP
+IDX_TLS_1 = (3, 4)                 # primer viaje de TLS 1.2
+IDX_TLS_2 = (5, 6)                 # segundo viaje
+IDX_HTTP = (7,)                    # el primer byte util
+
+# --- Clip 2: la clave que nadie mando (dh_pequeno -> cripto) ---------
+# Numeros de juguete a proposito: el curso 19 ya explico la matematica
+# modular. Aqui solo se ensena el GESTO.
+DH_P, DH_G, DH_A, DH_B = 23, 5, 6, 15       # p y g publicos; a y b privados
+DH = dh_pequeno(DH_P, DH_G, DH_A, DH_B)
+DH_PUB_C, DH_PUB_S = DH["A"], DH["B"]       # 8 y 19: lo que se grita
+DH_SECRETO = DH["s_ana"]                    # 2
+DH_IGUALES = bool(DH["iguales"]) and DH["s_ana"] == DH["s_beto"]
+DH_EN_EL_CABLE = (DH_P, DH_G, DH_PUB_C, DH_PUB_S)   # lo que oye el espia
+DH_EN_CASA = (DH_A, DH_B, DH_SECRETO)               # lo que nunca viaja
+
+# --- Clip 3: el certificado y su cadena (firmas RSA de verdad) -------
+CERT = cadena_certificados("ejemplo.org")
+CERT_MAL = cadena_certificados("ejemplo.org", alterar=True)
+RSA_E, RSA_N = CERT["e"], CERT["n"]         # 17 y 3233
+ESL = CERT["eslabones"]                     # raiz -> intermedia -> sitio
+ESL_MAL = CERT_MAL["eslabones"][-1]         # el eslabon del sitio, alterado
+
+
+def ABRIR(firma):
+    """Abrir una firma con la clave publica de la CA. La libreria ya dice
+    si `verifica`; esto recupera el NUMERO que sale al abrirla, que es lo
+    que hay que poner en pantalla al lado del hash para que se vea por que
+    la firma falla."""
+    return rsa_cifrar(int(firma), RSA_E, RSA_N)
+
+
+CERT_ABRE = [ABRIR(x["firma"]) for x in ESL]        # 834, 731, 60
+CERT_HASH_MAL = ESL_MAL["hash"]                     # 2840: el cuerpo cambio
+CERT_ABRE_MAL = ABRIR(ESL_MAL["firma"])             # 60: la firma no cambio
+CERT_VALIDA = CERT["cadena_valida"]                 # True
+CERT_VALIDA_MAL = CERT_MAL["cadena_valida"]         # False
+
+# --- Clip 4: las tres barras (1.2, 1.3, 1.3 reanudado) ---------------
+# Cada barra es el tiempo ANTES del primer byte de HTTP: un tramo azul de
+# TCP mas un tramo fucsia de TLS. La escala es la misma en las tres.
+BARRAS_TLS = (
+    ("TLS 1.2", TLS12["rtt"], APRETON_12, MS_12),
+    ("TLS 1.3", TLS13["rtt"], APRETON_13, MS_13),
+    ("1.3 reanudado", TLS13R["rtt"], APRETON_0RTT, MS_0RTT),
+)
+UNIDAD_RTT = 1.45              # unidades de pantalla por RTT (escala unica)
 
 
 # --- Rotulos ----------------------------------------------------------

@@ -113,9 +113,59 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 6.1. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, NUNCA escrito a
+# mano en el clip. Medido en el contenedor (docker run ... protocolos.py).
+
+# Clip 1 - la peticion y la respuesta, en texto plano, bytes contados.
+PET = http_peticion()                    # GET /index.html HTTP/1.1 ...
+PET_LINEAS = [l for l in PET["peticion"].split("\r\n") if l]
+RESP_LINEAS = [l for l in PET["respuesta_cabecera"].split("\r\n") if l]
+BYTES_PETICION = PET["bytes_peticion"]           # 93
+BYTES_CAB_RESP = PET["bytes_cabecera"]           # 82
+BYTES_CUERPO = PET["bytes_cuerpo"]               # 2048
+BYTES_PROTOCOLO = BYTES_PETICION + BYTES_CAB_RESP  # 175
+BYTES_TOTAL = PET["bytes_total"]                 # 2223
+PROTOCOLO_PCT = PET["protocolo_pct"]             # 7.87...
+
+# Clip 2 - los codigos de estado y el costo de una redireccion.
+CODIGOS_LECCION = tuple(c for c in CODIGOS_HTTP if c[0] in (200, 301, 404, 500))
+RTT_MS = 40.0                 # el mismo RTT que se usa en todo el clip 4
+APRETON = tls_viajes("1.3")   # 1 RTT de TLS (se cita en el clip 4)
+
+# Clip 3 - la cache condicional: lo que se ahorra, MEDIDO.
+CACHE = cache_condicional()
+CACHE_COMPLETO = CACHE["con_cuerpo"]     # 2223 B
+CACHE_304 = CACHE["solo_304"]            # 273 B
+CACHE_AHORRO = CACHE["ahorro"]           # 1950 B
+CACHE_AHORRO_PCT = CACHE["ahorro_pct"]   # 87.7 %
+# La peticion condicional pesa lo mismo que cualquier GET (93 B): la
+# diferencia con `solo_304` es lo que ocupan el 304 y su ETag.
+CACHE_CABECERA_304 = CACHE_304 - BYTES_PETICION   # 180 B
+
+# Clip 4 - una pagina de 40 objetos, tres formas de pedirla.
+N_OBJETOS = 40
+HT_SERIE = http_transferencia(N_OBJETOS, "serie", RTT_MS)
+HT_KEEPALIVE = http_transferencia(N_OBJETOS, "keepalive", RTT_MS)
+HT_PARALELO = http_transferencia(N_OBJETOS, "paralelo", RTT_MS, conexiones=6)
+# Curvas de tiempo acumulado objeto a objeto: cada punto es una llamada
+# REAL a la libreria con k objetos ya pedidos (no una formula copiada).
+CURVA_SERIE = [http_transferencia(k, "serie", RTT_MS)["ms"]
+              for k in range(1, N_OBJETOS + 1)]
+CURVA_KEEPALIVE = [http_transferencia(k, "keepalive", RTT_MS)["ms"]
+                   for k in range(1, N_OBJETOS + 1)]
+CURVA_PARALELO = [http_transferencia(k, "paralelo", RTT_MS, conexiones=6)["ms"]
+                  for k in range(1, N_OBJETOS + 1)]
+
+
+def _curva(datos):
+    def f(x):
+        i = min(max(int(round(x)) - 1, 0), len(datos) - 1)
+        return float(datos[i])
+    return f
+
+
+F_SERIE, F_KEEPALIVE, F_PARALELO = (_curva(CURVA_SERIE), _curva(CURVA_KEEPALIVE),
+                                    _curva(CURVA_PARALELO))
 
 
 # --- Rotulos ----------------------------------------------------------

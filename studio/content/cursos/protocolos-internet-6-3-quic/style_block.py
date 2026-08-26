@@ -113,9 +113,124 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 6.3. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Todo valor que se rotule sale de aqui o de la libreria, nunca escrito a
+# mano en el clip: lo que se dibuja y lo que se escribe no pueden
+# discrepar. Medido en el contenedor antes de escribir los clips.
+
+# La pagina de la leccion: 40 objetos, RTT de 40 ms, TLS 1.3 siempre.
+N_OBJETOS = 40
+RTT_MS = 40.0
+
+# La escalera completa: la MISMA pagina pedida de seis maneras. Los tres
+# primeros escalones los conto la leccion 6.1 (punto de partida, no se
+# vuelven a explicar); los tres ultimos son los de esta leccion.
+MODOS = ("serie", "keepalive", "paralelo", "h2", "h3", "h3-0rtt")
+ESCALERA = dict((m, http_transferencia(N_OBJETOS, modo=m, rtt_ms=RTT_MS))
+                for m in MODOS)
+NOMBRE_MODO = {
+    "serie":     "HTTP/1.0  una conexion por objeto",
+    "keepalive": "HTTP/1.1  una conexion, fila india",
+    "paralelo":  "HTTP/1.1  seis conexiones",
+    "h2":        "HTTP/2    una conexion multiplexada",
+    "h3":        "HTTP/3    QUIC sobre UDP",
+    "h3-0rtt":   "HTTP/3    reanudado con 0-RTT",
+}
+
+
+def MS(modo):
+    """Milisegundos MEDIDOS de la pagina completa en ese modo."""
+    return ESCALERA[modo]["ms"]
+
+
+def VIAJES(modo):
+    """RTT (viajes de ida y vuelta) que cuesta la pagina en ese modo."""
+    return ESCALERA[modo]["rtts"]
+
+
+# Los saltos que rotula la leccion (division de cifras ya medidas).
+GANANCIA_H2 = MS("paralelo") / MS("h2")        # 3.0x sobre 6 conexiones
+GANANCIA_H2_FILA = MS("keepalive") / MS("h2")  # 14x sobre la fila india
+GANANCIA_H3 = MS("h2") / MS("h3")              # 1.5x sobre HTTP/2
+AHORRO_H3_MS = MS("h2") - MS("h3")             # 40 ms = un viaje entero
+GANANCIA_0RTT = MS("serie") / MS("h3-0rtt")    # 120x sobre HTTP/1.0
+
+# Clip 1 - lo que HTTP/1.1 repetia en cada objeto (HPACK lo comprime; la
+# libreria no modela la compresion, asi que solo se cuenta lo repetido).
+PET = http_peticion()
+CABECERAS_REPETIDAS = N_OBJETOS * PET["bytes_peticion"]
+
+# El apreton, escalon a escalon. En HTTP/2 son dos viajes (TCP y luego
+# TLS 1.3); QUIC funde los dos en uno; reanudando, ninguno.
+TLS13 = tls_viajes("1.3")
+TLS0 = tls_viajes("1.3", reanudado=True)
+AVISO_0RTT = TLS0["aviso"]
+APRETON_H2 = ESCALERA["h2"]["apreton_rtts"]    # 2.0 viajes
+APRETON_H3 = VIAJES("h3") - 1.0                # 1.0 viaje
+APRETON_0RTT = VIAJES("h3-0rtt") - 1.0         # 0.0 viajes
+
+# Las reglas de viajes que se dibujan: (etiqueta, color) por viaje.
+# Naranja = espera de protocolo; ambar = el viaje que trae los datos.
+VIAJES_H2 = (("TCP", C_COLA), ("TLS 1.3", C_COLA), ("datos", C_PAQUETE))
+VIAJES_H3 = (("QUIC+TLS", C_COLA), ("datos", C_PAQUETE))
+VIAJES_0RTT = (("datos", C_PAQUETE),)
+
+# Clips 2 y 3 - el bloqueo de cabeza de linea.
+HOL = hol_bloqueo(4, 6, perdida_en=2)
+HOL_FLUJOS = HOL["n_flujos"]
+HOL_PARADOS_TCP = HOL["parados_tcp"]           # 4 de 4
+HOL_PARADOS_QUIC = HOL["parados_quic"]         # 1 de 4
+HOL_FLUJO_PERDIDO = HOL["perdida_en"]          # indice 0..3
+# Se dibujan las 3 PRIMERAS rondas de las 6 (12 partes entrelazadas): la
+# estadistica de partes se mide sobre la ventana dibujada, no sobre la
+# corrida entera.
+HOL_RONDAS = 3
+PATRON_MUX = [f for _ in range(HOL_RONDAS) for f in range(HOL_FLUJOS)]
+PATRON_FILA = [f for f in range(HOL_FLUJOS) for _ in range(HOL_RONDAS)]
+HOL_PARTES = len(PATRON_MUX)                   # 12 partes en el cable
+IDX_PERDIDO = PATRON_MUX.index(HOL_FLUJO_PERDIDO)   # la primera del flujo 3
+# Sobre TCP solo sube lo que llego ANTES del hueco: en cuanto falta una
+# parte, todo lo que viene detras espera en el bufer aunque ya este ahi.
+TCP_LLEGADAS = HOL_PARTES - 1
+TCP_ENTREGADAS = IDX_PERDIDO
+TCP_ESPERANDO = HOL_PARTES - 1 - IDX_PERDIDO
+# Sobre QUIC cada flujo tiene su propio orden: solo el flujo del segmento
+# perdido espera; los demas suben a la aplicacion.
+QUIC_ENTREGADAS = sum(1 for i, f in enumerate(PATRON_MUX)
+                      if f != HOL_FLUJO_PERDIDO and i != IDX_PERDIDO)
+QUIC_ESPERANDO = HOL_PARTES - 1 - QUIC_ENTREGADAS
+
+
+def ETIQUETA_FLUJO(f):
+    """El flujo f (0-based) rotulado como lo ve el espectador."""
+    return "%d" % (f + 1)
+
+
+# Clip 4 - la mudanza de red: la misma conexion vista desde las dos redes.
+QMIG = quic_migracion()
+IP_WIFI = "192.168.1.37"
+IP_MOVIL = "10.44.9.212"
+PTO_CLIENTE = 51514
+IP_SITIO = "93.184.216.34"
+PTO_SITIO = 443
+SOCKETS = {(IP_SITIO, PTO_SITIO): "servidor web"}
+MUDANZA = demux(
+    [{"ip_o": IP_WIFI, "pto_o": PTO_CLIENTE,
+      "ip_d": IP_SITIO, "pto_d": PTO_SITIO},
+     {"ip_o": IP_MOVIL, "pto_o": PTO_CLIENTE,
+      "ip_d": IP_SITIO, "pto_d": PTO_SITIO}],
+    SOCKETS)
+TUPLA_WIFI = MUDANZA["pasos"][0]["tupla"]
+TUPLA_MOVIL = MUDANZA["pasos"][1]["tupla"]
+CAMPOS_TUPLA = ("IP origen", "Puerto origen", "IP destino", "Puerto destino")
+# Fila a fila: campo, valor en wifi, valor en movil. La quinta fila no es
+# de la 4-tupla: es el ID de conexion de QUIC, que no cambia.
+FILAS_MUDANZA = [[CAMPOS_TUPLA[i], str(TUPLA_WIFI[i]), str(TUPLA_MOVIL[i])]
+                 for i in range(4)]
+FILAS_MUDANZA.append(["ID de conexion QUIC", QMIG["id"], QMIG["id"]])
+CAMBIA_FILA = [i for i in range(5)
+               if FILAS_MUDANZA[i][1] != FILAS_MUDANZA[i][2]]   # solo la 0
+POR_QUE_TCP = QMIG["tcp"]["por_que"]
+POR_QUE_QUIC = QMIG["quic"]["por_que"]
 
 
 # --- Rotulos ----------------------------------------------------------
@@ -180,6 +295,36 @@ def tag_hud(texto, font_size=17, color=None):
     t = Text(texto, font=FUENTE_HUD, font_size=font_size,
              color=C_CALCULO if color is None else color)
     return t
+
+
+def fila_viajes(viajes, etiqueta, ms, y=0.0, x0=-3.60, ancho_viaje=1.55,
+                alto=0.50, fs=14):
+    """Una linea de tiempo medida en VIAJES de ida y vuelta.
+
+    Un rectangulo por RTT, pegados y con el borde izquierdo comun en `x0`:
+    dos filas se comparan a ojo y la longitud ES el tiempo. Naranja los
+    viajes que solo son protocolo (el apreton), ambar el que trae los
+    datos. `protocolos.py` no trae una regla de RTT (`ranuras` numera del
+    0 y aqui las casillas tienen nombre, no numero), asi que vive aqui.
+    """
+    cajas = VGroup()
+    for k, (texto, col) in enumerate(viajes):
+        r = Rectangle(width=ancho_viaje, height=alto, stroke_color=col,
+                      stroke_width=2.6, fill_color=col, fill_opacity=0.20)
+        r.move_to(np.array([x0 + ancho_viaje * (k + 0.5), y, 0.0]))
+        t = tag_hud(texto, font_size=fs, color=col)
+        if t.width > ancho_viaje * 0.86:
+            t.scale_to_fit_width(ancho_viaje * 0.86)
+        t.move_to(r.get_center())
+        cajas.add(r, t)
+    et = tag_hud(etiqueta, font_size=20, color=C_TENUE)
+    et.next_to(cajas, LEFT, buff=0.30)
+    n = len(viajes)
+    tot = tag_hud("%s ms  =  %d %s" % (fmt(ms, 0), n,
+                                       "viaje" if n == 1 else "viajes"),
+                  font_size=20, color=C_CALCULO)
+    tot.next_to(cajas, RIGHT, buff=0.34)
+    return VGroup(cajas, et, tot)
 
 
 def panel_derecha(*mobjetos, buff=0.30):

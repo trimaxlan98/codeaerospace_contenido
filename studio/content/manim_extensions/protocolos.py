@@ -2320,7 +2320,9 @@ def dh_pequeno(p=23, g=5, a=6, b=15):
     19 (`cripto.diffie_hellman`), no lo repite."""
     from cripto import diffie_hellman
     d = diffie_hellman(p, g, a, b)
-    d["iguales"] = True
+    d.update({"p": p, "g": g, "a": a, "b": b, "iguales": True,
+              "publico": (p, g, d.get("A"), d.get("B")),
+              "privado": (a, b)})
     return d
 
 
@@ -2330,6 +2332,11 @@ def cadena_certificados(sitio="ejemplo.org", alterar=False):
     Firmar = elevar el hash a la privada; verificar = elevarlo a la
     publica y comparar. Con `alterar=True` se cambia un byte del
     certificado y la verificacion FALLA.
+
+    Cada eslabon trae `hash` (el del cuerpo) y `abre` (el numero que sale
+    al abrir la firma con la publica): son los DOS que hay que enseñar
+    juntos, para que el fallo se lea como una desigualdad y no como un
+    dogma.
     """
     from cripto import (E_RSA, rsa_juguete, rsa_cifrar, rsa_descifrar,
                         sha256_hex)
@@ -2343,16 +2350,18 @@ def cadena_certificados(sitio="ejemplo.org", alterar=False):
             cuerpo += "!"          # un byte de mas: el hash ya no cuadra
         h = int(sha256_hex(cuerpo)[:4], 16) % n
         firma = rsa_descifrar(h, d, n)          # firmar = con la privada
+        abre = rsa_cifrar(firma, e, n)          # verificar = con la publica
         eslabones.append({"nivel": nombre, "quien": quien, "cuerpo": cuerpo,
-                          "hash": h, "firma": firma,
-                          "verifica": rsa_cifrar(firma, e, n) == h})
+                          "hash": h, "firma": firma, "abre": abre,
+                          "verifica": abre == h})
     if alterar:
         # el certificado alterado se presenta con la firma del original
         original = "sitio|%s" % sitio
         h_bueno = int(sha256_hex(original)[:4], 16) % n
         eslabones[-1]["firma"] = rsa_descifrar(h_bueno, d, n)
+        eslabones[-1]["abre"] = rsa_cifrar(eslabones[-1]["firma"], e, n)
         eslabones[-1]["verifica"] = \
-            rsa_cifrar(eslabones[-1]["firma"], e, n) == eslabones[-1]["hash"]
+            eslabones[-1]["abre"] == eslabones[-1]["hash"]
     return {"eslabones": eslabones, "e": e, "n": n, "alterado": bool(alterar),
             "cadena_valida": all(x["verifica"] for x in eslabones)}
 

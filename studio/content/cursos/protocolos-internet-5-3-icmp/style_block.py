@@ -113,9 +113,83 @@ C_CALCULO = C_CIFRA          # cian: cifras y resultados numericos
 MARGEN_PIE = 0.68            # separacion del pie al borde inferior
 
 # --- Numeros de la leccion --------------------------------------------
-# TODO(agente): la tabla de numeros de la leccion 5.3. Todo valor que se
-# rotule sale de aqui o de la libreria, NUNCA escrito a mano en el clip.
-# Medir en el contenedor ANTES de escribir los clips.
+# Medido en el contenedor (ver informe final). Todo valor que se rotule
+# sale de aqui o de una llamada directa a la libreria en el clip.
+
+# Clip 1 - ICMP: el protocolo que se queja.
+DATOS_NORMALES = [("Cabecera", 1.0, "20 B"), ("Datos de la app", 3.0,
+                                              "1460 B")]
+CADENA_TTL = ["R1", "R2", "R3"]
+TTL_CAM = ttl_camino(ttl0=3, saltos=CADENA_TTL)          # muere en R3, ttl=0
+CULPABLE = cabecera_ipv4(origen="10.0.0.7", destino="93.184.216.34",
+                         ttl=0, protocolo=17, longitud=576, ident=0x2f19)
+TIPO_TEXCEDIDO, CODIGO_TEXCEDIDO = 11, 0                 # ICMP_TIPOS[11]
+ICMP_CAMPOS = [("Tipo", 1.0, str(TIPO_TEXCEDIDO)),
+              ("Codigo", 1.0, str(CODIGO_TEXCEDIDO)),
+              ("Cabecera original", 3.0, "el paquete culpable (20 B)")]
+LISTA_ICMP = [("3", ICMP_TIPOS[3]), ("11", ICMP_TIPOS[11]),
+             ("3/4", ICMP_TIPOS[(3, 4)])]     # tipo/codigo, ya en texto
+CAB_ANCHO, CAB_ALTO, CAB_FS = 11.6, 0.55, 15             # medido en 2.1
+PATH_TTL = ["origen"] + CADENA_TTL
+POS_TTL1 = {"origen": (-4.4, 0.0), "R1": (-1.6, 0.0), "R2": (1.1, 0.0),
+           "R3": (3.8, 0.0)}
+ARISTAS_TTL1 = {("origen", "R1"): None, ("R1", "R2"): None,
+               ("R2", "R3"): None}
+TIPOS_TTL1 = {"origen": "host"}
+
+# Clip 2 - Ping mide (propagacion vs cola, RTT MEDIDO).
+PING_BASE = ping(9000.0, 8)                    # semilla=2, n=8 (de serie)
+PING_CARGA = ping(9000.0, 8, carga=0.85)
+RTT_MIN = PING_BASE["min"]                     # 96.4 ms
+PROP_MS = PING_BASE["prop_ms"]                 # 90.1 ms: tope duro, 2c/3
+RESTO_MS = RTT_MIN - PROP_MS                   # 6.3 ms: routers + jitter
+MEDIA_BASE = PING_BASE["media"]                # 97.1 ms
+MEDIA_CARGA = PING_CARGA["media"]              # 124.3 ms
+DELTA_COLA = PING_CARGA["espera_ms"]           # +27.2 ms de cola, exacto
+MUESTRAS_BASE = PING_BASE["muestras"]          # las 8 rondas dibujadas
+MUESTRAS_CARGA = PING_CARGA["muestras"]
+
+# Clip 3 - Traceroute: TTL 1..7, el salto 4 mudo.
+CAMINO_TR = ["R1", "R2", "R3", "R4", "R5", "R6", "destino"]
+TRACE = traceroute(CAMINO_TR, mudos=(4,), distancia_km=9000.0, semilla=4)
+# Columnas GENERICAS por TTL (no por nombre de router): el salto mudo
+# necesita su PROPIA columna, o el evento se queda con de==a (arco de
+# longitud cero, invisible).
+ACTORES_TR = ["origen"] + ["salto %d" % i for i in range(1, len(CAMINO_TR))
+                          ] + ["destino"]
+
+
+def _texto_evento_tr(s):
+    if s["mudo"]:
+        return "*   sin respuesta"
+    if s["icmp"] == "respuesta de eco":
+        return "%s   llegue: eco" % s["nodo"]
+    return "%s   tiempo excedido" % s["nodo"]
+
+
+EVENTOS_TR = [
+    {"de": "origen", "a": ACTORES_TR[s["ttl"]], "texto": _texto_evento_tr(s),
+     "t_ms": s["ms"],
+     "color": (C_PERDIDA if s["mudo"] else
+              (C_OK if s["icmp"] == "respuesta de eco" else C_CAPA))}
+    for s in TRACE["saltos"]]
+
+# Clip 4 - El MTU escondido (pmtud MEDIDO, con y sin agujero negro).
+MTUS_CAMINO = [1500, 1500, 1400, 1500]
+PMTU_OK = pmtud(MTUS_CAMINO)                   # mtu_camino=1400, red=100
+PMTU_NEGRO = pmtud(MTUS_CAMINO, filtra_icmp=True)   # agujero_negro=True
+FRAG_CAMINO = fragmentar(1500 - 20, mtu=1400)  # contraste: fragmentar SI
+                                               # se hiciera en el camino
+POS_MTU = {"origen": (-5.4, 0.0), "R1": (-2.6, 0.0), "R2": (0.2, 0.0),
+          "R3": (3.0, 0.0), "destino": (5.6, 0.0)}
+ARISTAS_MTU = {("origen", "R1"): 1500, ("R1", "R2"): 1500,
+              ("R2", "R3"): 1400, ("R3", "destino"): 1500}
+TIPOS_MTU = {"origen": "host", "destino": "servidor"}
+TABLA_MTU_CAB = ["salto", "MTU", "intento", "resultado"]
+TABLA_MTU_FILAS = [
+    [str(p["salto"]), str(p["mtu"]), str(p["intento"]),
+     ("cabe" if p["cabe"] else p["icmp"])]
+    for p in PMTU_OK["pasos"]]
 
 
 # --- Rotulos ----------------------------------------------------------
