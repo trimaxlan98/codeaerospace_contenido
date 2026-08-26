@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 4.3 Congestión: la cortesía que sostiene la red",
+  "description": "Lección 4.3 del curso Protocolos de Internet (módulo 4: la entrega confiable), en 4 clips animados —una idea por clip—: el colapso de 1986 con el trabajo útil desplomándose, el arranque lento exponencial, la sierra de AIMD con su media medida, y por qué CUBIC solo gana a Reno cuando el RTT es largo. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-colapso.py",
+      "title": "1 · El colapso",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/02-arranque-lento.py",
+      "title": "2 · Arranque lento",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/03-la-sierra.py",
+      "title": "3 · La sierra",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/04-cubic-y-bbr.py",
+      "title": "4 · CUBIC y BBR",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    }
+  ]
+}

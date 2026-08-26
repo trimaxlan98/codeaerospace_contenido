@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 4.1 Dos contratos: UDP y TCP",
+  "description": "Lección 4.1 del curso Protocolos de Internet (módulo 4: la entrega confiable), en 4 clips animados —una idea por clip—: los puertos que reparten a cada programa, UDP desnudo perdiendo un datagrama sin que nadie se entere, TCP prometiendo y rellenando el hueco, y cuál elegir con las cifras. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-puertos.py",
+      "title": "1 · Puertos: la extensión telefónica",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/02-udp-desnudo.py",
+      "title": "2 · UDP desnudo",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/03-tcp-promete.py",
+      "title": "3 · TCP promete",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/04-cual-elegir.py",
+      "title": "4 · Cuál elegir",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    }
+  ]
+}

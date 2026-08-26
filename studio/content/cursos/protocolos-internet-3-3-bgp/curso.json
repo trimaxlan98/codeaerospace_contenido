@@ -1,0 +1,32 @@
+{
+  "name": "Protocolos de Internet · 3.3 BGP: la política entre países",
+  "description": "Lección 3.3 del curso Protocolos de Internet (módulo 3: encontrar el camino), en 4 clips animados —una idea por clip—: el mapa de los sistemas autónomos, el camino de vectores que crece y detecta bucles, la política decidiendo por encima de la distancia, y el secuestro de prefijo contado. La red que nadie manda, estilo 3Blue1Brown en español, con librería propia.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-mapa-de-los-as.py",
+      "title": "1 · El mapa de los AS",
+      "scene": "Clip1",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/02-camino-de-vectores.py",
+      "title": "2 · Camino de vectores",
+      "scene": "Clip2",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/03-la-politica-decide.py",
+      "title": "3 · La política decide",
+      "scene": "Clip3",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    },
+    {
+      "file": "clips/04-el-secuestro.py",
+      "title": "4 · El secuestro",
+      "scene": "Clip4",
+      "final_state": "TODO(agente): describir el ultimo frame REAL (extraido con ffmpeg)."
+    }
+  ]
+}
