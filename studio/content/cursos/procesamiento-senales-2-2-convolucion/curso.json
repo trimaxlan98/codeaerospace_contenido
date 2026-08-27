@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 2.2 Convolución: deslizar y sumar",
+  "description": "Lección 2.2 del curso Procesamiento digital de señales (módulo 2: el sistema que reescribe la señal), en 4 clips animados: la convolución vista deslizar muestra a muestra, la longitud y los transitorios de los bordes, la estabilidad BIBO con la suma de |h| medida, y lo que cuesta en multiplicaciones. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-deslizamiento.py",
+      "title": "1 · Deslizar y sumar",
+      "scene": "Clip1",
+      "final_state": "Los cuatro carriles del deslizador con h volteada al final del recorrido, los productos en cian y la salida completa en verde."
+    },
+    {
+      "file": "clips/02-longitud-y-bordes.py",
+      "title": "2 · Longitud y bordes",
+      "scene": "Clip2",
+      "final_state": "La salida con los transitorios de entrada y de salida marcados; cifras N = 8, M = 4, salida = 11 y 5 salidas llenas."
+    },
+    {
+      "file": "clips/03-bibo.py",
+      "title": "3 · Cuando la salida se dispara",
+      "scene": "Clip3",
+      "final_state": "Las dos respuestas al impulso: la que decae con suma|h| = 6.67 y la que crece sin freno; cifra de la suma que no converge."
+    },
+    {
+      "file": "clips/04-lo-que-cuesta.py",
+      "title": "4 · Lo que cuesta",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Filtrar es deslizar y sumar.' (blanca) y 'Lo demas es hacerlo rapido.' (cian)."
+    }
+  ]
+}

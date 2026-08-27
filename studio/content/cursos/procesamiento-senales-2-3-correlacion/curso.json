@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 2.3 Correlación: hallar lo conocido",
+  "description": "Lección 2.3 del curso Procesamiento digital de señales (módulo 2: el sistema que reescribe la señal), en 4 clips animados: correlacionar no es convolucionar, el filtro adaptado que saca un eco de radar enterrado 10 dB bajo el ruido, la resolución que da el ancho de banda, y el correlador que encuentra un código dentro de un registro entero. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-correlar-no-es-convolucionar.py",
+      "title": "1 · Correlar no es convolucionar",
+      "scene": "Clip1",
+      "final_state": "La correlacion sin voltear frente a la convolucion y la autocorrelacion del ruido con su unico pico; cifras del pico y del lateral medidos."
+    },
+    {
+      "file": "clips/02-el-filtro-adaptado.py",
+      "title": "2 · El filtro adaptado",
+      "scene": "Clip2",
+      "final_state": "El chirp enterrado a -10 dB en el registro de ruido y el pico limpio de la correlacion; cifras de la ganancia de proceso 21.5 dB y el retardo hallado 421."
+    },
+    {
+      "file": "clips/03-la-resolucion.py",
+      "title": "3 · La resolucion",
+      "scene": "Clip3",
+      "final_state": "Los dos picos superpuestos: el del chirp de 2.0 us y el del pulso llano de 42.5 us; cifras de la compresion medida y de 1/B."
+    },
+    {
+      "file": "clips/04-el-correlador.py",
+      "title": "4 · El correlador",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'El ruido no se parece a nada.' (blanca) y 'Por eso la señal aparece.' (cian)."
+    }
+  ]
+}
