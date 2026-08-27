@@ -25,7 +25,7 @@ from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
 from .narracion import NarracionService
 from .narracion_api import make_router as make_narracion_router
-from .projects import ProjectService
+from .projects import FORMATO_DEFECTO, ProjectService
 from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
 from .scenes import detect_scenes
@@ -322,15 +322,18 @@ async def delete_finished_jobs(_=Depends(require_auth)):
 
 @app.post("/api/jobs/{job_id}/retry", status_code=201)
 async def retry_job(job_id: str, _=Depends(require_auth)):
-    """Reencola un job terminado con su mismo script/escena/calidad/timeout."""
+    """Reencola un job terminado con su mismo script/escena/calidad/formato."""
     job = _get_job_or_404(job_id)
     if job["status"] in ("queued", "running"):
         raise HTTPException(status_code=409, detail="El job ya esta activo")
     _check_quota()
+    # El formato viaja con el job (no se vuelve a leer del proyecto): un
+    # reintento tiene que producir el MISMO archivo que el intento original.
     return manager.create_job(job["script"], job["scene"], job["quality"],
                               job["timeout"], project_id=job.get("project_id"),
                               clip_id=job.get("clip_id"),
-                              content_hash=job.get("content_hash"))
+                              content_hash=job.get("content_hash"),
+                              formato=job.get("formato") or FORMATO_DEFECTO)
 
 
 @app.delete("/api/jobs/older-than/{days}")

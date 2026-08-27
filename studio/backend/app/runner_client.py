@@ -51,15 +51,22 @@ class RunnerClient:
     async def cancel(self, job_id: str) -> None:
         await self._request_one({"cmd": "cancel", "job_id": job_id}, timeout=30)
 
-    async def thumbnail(self, job_id: str) -> str:
-        """Pide al runner extraer thumb.jpg del video del job (ffmpeg en contenedor)."""
+    async def thumbnail(self, job_id: str) -> dict:
+        """Miniatura + resolucion medida del video del job.
+
+        Devuelve {"thumb": ruta relativa, "resolution": "1080x1920"}. La
+        resolucion puede faltar (ffprobe fallo) sin que la miniatura falle.
+        """
         resp = await self._request_one({"cmd": "thumbnail", "job_id": job_id}, timeout=120)
         if resp.get("type") != "ok":
             raise RunnerError(resp.get("error", "thumbnail fallo"))
-        return resp.get("thumb", "")
+        return {"thumb": resp.get("thumb", ""),
+                "resolution": resp.get("resolution", "")}
 
     async def render(
-        self, job_id: str, scene: str, quality: str, timeout: int
+        self, job_id: str, scene: str, quality: str, timeout: int,
+        formato: str = "horizontal", corto: int = 1080, largo: int = 1920,
+        fps: int = 60,
     ) -> AsyncIterator[dict]:
         """Genera eventos {"type": "log"|"done"|"error", ...} del render.
 
@@ -71,6 +78,7 @@ class RunnerClient:
             writer.write((json.dumps({
                 "cmd": "render", "job_id": job_id, "scene": scene,
                 "quality": quality, "timeout": timeout,
+                "formato": formato, "corto": corto, "largo": largo, "fps": fps,
             }) + "\n").encode())
             await writer.drain()
             # margen sobre el timeout del runner para recibir el "done"

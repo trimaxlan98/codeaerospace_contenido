@@ -65,14 +65,30 @@ CREATE TABLE IF NOT EXISTS auth (
 );
 """
 
-# Migraciones aditivas (ALTER TABLE ADD COLUMN es no destructivo en SQLite).
-MIGRATIONS = (
-    ("size_bytes", "ALTER TABLE jobs ADD COLUMN size_bytes INTEGER"),
-    ("thumb_path", "ALTER TABLE jobs ADD COLUMN thumb_path TEXT"),
-    ("project_id", "ALTER TABLE jobs ADD COLUMN project_id TEXT"),
-    ("clip_id", "ALTER TABLE jobs ADD COLUMN clip_id TEXT"),
-    ("content_hash", "ALTER TABLE jobs ADD COLUMN content_hash TEXT"),
-)
+# Migraciones aditivas (ALTER TABLE ADD COLUMN es no destructivo en SQLite),
+# por tabla. Las columnas nuevas viven SOLO aqui, no en SCHEMA: asi una base
+# nueva y una existente pasan por el mismo camino.
+MIGRATIONS = {
+    "jobs": (
+        ("size_bytes", "ALTER TABLE jobs ADD COLUMN size_bytes INTEGER"),
+        ("thumb_path", "ALTER TABLE jobs ADD COLUMN thumb_path TEXT"),
+        ("project_id", "ALTER TABLE jobs ADD COLUMN project_id TEXT"),
+        ("clip_id", "ALTER TABLE jobs ADD COLUMN clip_id TEXT"),
+        ("content_hash", "ALTER TABLE jobs ADD COLUMN content_hash TEXT"),
+        # Formato PEDIDO al renderizar; resolucion MEDIDA sobre el archivo
+        # que salio (ffprobe). Se guardan las dos: si no coinciden, es que
+        # la escena no aplico el lienzo y hay que verlo, no taparlo.
+        ("formato", "ALTER TABLE jobs ADD COLUMN formato TEXT NOT NULL"
+                    " DEFAULT 'horizontal'"),
+        ("resolution", "ALTER TABLE jobs ADD COLUMN resolution TEXT"),
+    ),
+    "projects": (
+        ("tipo", "ALTER TABLE projects ADD COLUMN tipo TEXT NOT NULL"
+                 " DEFAULT 'curso'"),
+        ("formato", "ALTER TABLE projects ADD COLUMN formato TEXT NOT NULL"
+                    " DEFAULT 'horizontal'"),
+    ),
+}
 
 
 class Database:
@@ -84,22 +100,25 @@ class Database:
         with self._lock:
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.executescript(SCHEMA)
-            cols = {r["name"] for r in self._conn.execute("PRAGMA table_info(jobs)")}
-            for col, ddl in MIGRATIONS:
-                if col not in cols:
-                    self._conn.execute(ddl)
+            for tabla, migraciones in MIGRATIONS.items():
+                cols = {r["name"] for r in
+                        self._conn.execute(f"PRAGMA table_info({tabla})")}
+                for col, ddl in migraciones:
+                    if col not in cols:
+                        self._conn.execute(ddl)
             self._conn.commit()
 
     def insert_job(self, job: dict) -> None:
         # project_id/clip_id/content_hash son opcionales (jobs sueltos de
         # /api/jobs no los traen): se completan con None si faltan.
-        job = {"project_id": None, "clip_id": None, "content_hash": None, **job}
+        job = {"project_id": None, "clip_id": None, "content_hash": None,
+               "formato": "horizontal", **job}
         with self._lock:
             self._conn.execute(
                 "INSERT INTO jobs (id, scene, quality, timeout, status, script,"
-                " created_at, project_id, clip_id, content_hash)"
+                " created_at, project_id, clip_id, content_hash, formato)"
                 " VALUES (:id, :scene, :quality, :timeout, :status, :script,"
-                " :created_at, :project_id, :clip_id, :content_hash)",
+                " :created_at, :project_id, :clip_id, :content_hash, :formato)",
                 job,
             )
             self._conn.commit()
@@ -123,7 +142,8 @@ class Database:
             rows = self._conn.execute(
                 "SELECT id, scene, quality, timeout, status, video_path, error,"
                 " created_at, started_at, finished_at, size_bytes, thumb_path,"
-                " project_id, clip_id, length(script) AS script_len"
+                " project_id, clip_id, formato, resolution,"
+                " length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()
@@ -192,12 +212,16 @@ class Database:
     # ── proyectos ────────────────────────────────────────────────────────────
 
     def insert_project(self, p: dict) -> None:
+        # Los defectos repiten los de projects.py (TIPO_DEFECTO /
+        # FORMATO_DEFECTO); no se importa de alli para no cerrar el ciclo
+        # projects -> db -> projects.
+        p = {"tipo": "curso", "formato": "horizontal", **p}
         with self._lock:
             self._conn.execute(
                 "INSERT INTO projects (id, name, description, quality, style_block,"
-                " created_at, updated_at)"
+                " tipo, formato, created_at, updated_at)"
                 " VALUES (:id, :name, :description, :quality, :style_block,"
-                " :created_at, :updated_at)",
+                " :tipo, :formato, :created_at, :updated_at)",
                 p,
             )
             self._conn.commit()

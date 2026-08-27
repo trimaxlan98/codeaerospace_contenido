@@ -110,15 +110,22 @@ class Formato:
                 f"mundo {self.ancho:.2f}x{self.alto:.2f} @{self.fps}fps>")
 
 
-def formato(nombre=None, calidad=None, corto_px=None, fps=None):
+def formato(nombre=None, calidad=None, corto_px=None, fps=None,
+            largo_px=None):
     """Configura manim para el formato pedido y devuelve el `Formato`.
 
     Se llama UNA vez, a nivel de modulo, antes de que exista la escena:
     manim importa el archivo entero antes de instanciarla, asi que aqui
     todavia se puede cambiar el lienzo.
 
-    Sin argumentos lee el entorno (lo que pone `render_promo.py`):
-    PROMO_FORMATO, PROMO_CALIDAD.
+    Sin argumentos lee el entorno (lo que ponen `render_promo.py` y el
+    runner de ManimStudio): PROMO_FORMATO, PROMO_CALIDAD, PROMO_CORTO,
+    PROMO_LARGO, PROMO_FPS.
+
+    `largo_px` existe para que quien encarga el render pueda fijar los DOS
+    lados. ManimStudio lo usa porque anuncia la resolucion en la interfaz
+    antes de renderizar, y 854x480 (el 16:9 de manim) no sale de ninguna
+    proporcion exacta: sin este parametro anunciaria 854 y produciria 852.
     """
     nombre = nombre or os.environ.get("PROMO_FORMATO", "vertical")
     if nombre not in PROPORCIONES:
@@ -126,11 +133,13 @@ def formato(nombre=None, calidad=None, corto_px=None, fps=None):
     calidad = calidad or os.environ.get("PROMO_CALIDAD", "qh")
     corto_px = int(corto_px or os.environ.get("PROMO_CORTO")
                    or LADO_CORTO[calidad])
+    largo_px = largo_px or os.environ.get("PROMO_LARGO") or 0
     fps = int(fps or os.environ.get("PROMO_FPS") or FPS[calidad])
 
     ancho, alto = PROPORCIONES[nombre]
     corto = corto_px - (corto_px % 2)
-    largo = int(round(corto * max(ancho, alto) / min(ancho, alto)))
+    largo = int(largo_px) or int(round(corto * max(ancho, alto)
+                                       / min(ancho, alto)))
     largo -= largo % 2                            # libx264 exige pares
     px_ancho, px_alto = (corto, largo) if alto > ancho else (largo, corto)
     if alto == ancho:
@@ -202,4 +211,4 @@ def fondo_seguro(fmt):
 
 
 __all__ = ["Formato", "formato", "marca_promo", "guias", "fondo_seguro",
-           "ALTURAS", "FPS", "SEGURA", "PROPORCIONES"]
+           "LADO_CORTO", "FPS", "SEGURA", "PROPORCIONES"]
