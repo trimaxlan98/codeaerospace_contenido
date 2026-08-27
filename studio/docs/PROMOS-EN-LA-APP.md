@@ -3,8 +3,8 @@
 Escrita el 2026-08-27, después de producir a mano los 10 primeros promos (rama
 `exp/promos-redes`, ver `docs/plan_contenido/promos-redes-sociales.md`).
 
-Estado: **P1, P2 y P3 hechos** (lienzo, sonido y verificación). Queda el importador de los
-diez promos existentes (sección 8) y desplegar.
+Estado: **completo** — P1 (lienzo), P2 (sonido), P3 (verificación) y el importador. Queda
+desplegar.
 
 ---
 
@@ -224,13 +224,27 @@ nadie abra el video.
 
 ---
 
-## 8. Importar los 10 promos que ya existen
+## 8. Importar los 10 promos que ya existen · **HECHO** (2026-08-27)
 
 `studio/tools/subir_promo.py`, hermano de `subir_curso.py`: lee
 `studio/content/promos/<slug>/{promo.json, style_block.py, escena.py}` y crea el proyecto
 (`tipo='promo'`, `formato='vertical'`, `quality='qh'`), su clip y su `audio_json`. El nombre
 del promo es la clave de emparejamiento, igual que en los cursos, para que re-subir actualice
-en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifiesto.
+en vez de duplicar.
+
+**Probado sobre los diez** contra una base de usar y tirar: los diez entran, con sus 6-8
+sonidos y sus frases; la segunda pasada dice «sin cambios / al día» (idempotente); y una
+comparación evento por evento confirma que **los diez producen exactamente la misma mezcla**
+que su `promo.json` original — el manifiesto ordena los eventos por tiempo, que es un cambio
+de forma, no de sonido (`sfx.mezclar` los suma sobre la línea de tiempo).
+
+En la interfaz salen agrupados bajo la familia «Promo», con su distintivo y el curso que
+promocionan entre corchetes en la descripción.
+
+**Nota para el despliegue**: el importador se corre en el VPS, contra
+`studio/backend/manimstudio.db`, DESPUÉS de desplegar el backend (necesita las columnas
+nuevas). Los diez entran «sin render»: hay que renderizarlos desde la interfaz — o adoptar
+los mp4 que ya existen en `exports/promos/`, que es una vuelta más y no la ha pedido nadie.
 
 ---
 
@@ -260,7 +274,7 @@ en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifi
 | ~~**P1 · Lienzo**~~ | ~~Autoría de promos en la app, sin sonido~~ · **hecho** | 1 sesión |
 | ~~**P2 · Sonido**~~ | ~~El promo se termina dentro de la app~~ · **hecho** | 2 sesiones |
 | ~~**P3 · Verificación**~~ | ~~Publicar sin abrir la terminal~~ · **hecho** | 1 sesión |
-| **Importador** | Los 10 promos existentes entran al catálogo | media sesión |
+| ~~**Importador**~~ | ~~Los 10 promos existentes entran al catálogo~~ · **hecho** | media sesión |
 
 P1 tiene valor por sí solo y no rompe nada: hasta que llegue P2 se descarga el mp4 mudo y se
 sonoriza con las herramientas locales, exactamente como ahora.

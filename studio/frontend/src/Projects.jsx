@@ -361,6 +361,16 @@ function ProjectsList({ onOpen }) {
   )
 }
 
+/** Cómo se llama lo que hay dentro de un grupo. Una familia de promos son
+ *  promos, no «lecciones»: llamarlas así sería heredar la palabra del caso
+ *  que ya existía. */
+function contar(items, loose) {
+  const uno = items.length === 1
+  if (items.every((p) => p.tipo === 'promo')) return uno ? 'promo' : 'promos'
+  if (loose) return uno ? 'curso' : 'cursos'
+  return uno ? 'lección' : 'lecciones'
+}
+
 function FamilyGroup({ name, items, loose, showNarr, open, onToggle, onOpen, onDelete }) {
   const t = totals(items)
   return (
@@ -375,10 +385,7 @@ function FamilyGroup({ name, items, loose, showNarr, open, onToggle, onOpen, onD
           : <Layers className="h-4 w-4 shrink-0 text-accent" />}
         <span className="truncate font-display text-[14.5px] font-semibold text-ink">{name}</span>
         <span className="shrink-0 font-mono text-[11px] text-faint">
-          {items.length}{' '}
-          {loose
-            ? (items.length === 1 ? 'curso' : 'cursos')
-            : (items.length === 1 ? 'lección' : 'lecciones')}
+          {items.length} {contar(items, loose)}
         </span>
         <span className="ml-auto hidden shrink-0 text-[12px] text-muted sm:block"><CountsLine t={t} /></span>
         {showNarr && <NarrBadge narrated={t.narrated} clips={t.clips} className="hidden sm:inline-flex" />}

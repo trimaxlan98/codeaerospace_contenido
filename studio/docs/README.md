@@ -253,6 +253,26 @@ mano, con `studio/tools/sfx.py`).
 Los tres responden 409 en un proyecto que no sea `tipo='promo'`: un curso se narra desde
 «Generar narración», que es otro camino y otro formato.
 
+### Importar los promos del repo (`subir_promo.py`)
+
+Los diez promos escritos a mano viven en `studio/content/promos/<slug>/` (`promo.json` +
+`style_block.py` + `escena.py`). `studio/tools/subir_promo.py` los mete en la base del Studio
+usando los mismos módulos que la API, sin pasar por HTTP — hermano de `subir_curso.py`:
+
+```bash
+studio/backend/venv/bin/python studio/tools/subir_promo.py --todos --dry-run
+studio/backend/venv/bin/python studio/tools/subir_promo.py --todos
+```
+
+Cada promo entra como un proyecto de **un clip**, `tipo='promo'`, vertical y `qh`, y **con su
+audio**: los bloques `audio` y `voz` del `promo.json` se guardan como manifiesto del clip,
+listos para mezclar desde la interfaz. El nombre lleva el prefijo `Promo · `, así que el
+índice los agrupa juntos (agrupa por lo que hay antes del `·`) y el grupo se cuenta en
+«promos», no en «lecciones».
+
+Es idempotente (empareja por nombre exacto): crea lo que falta, actualiza lo que cambió y
+avisa de lo que queda `stale` o con la mezcla vieja. No borra nada ni toca renders.
+
 ### Verificación de un promo (botón «Verificar»)
 
 Un promo se juzga por cuatro cosas y ninguna se ve mirando el vídeo una vez. La app las
