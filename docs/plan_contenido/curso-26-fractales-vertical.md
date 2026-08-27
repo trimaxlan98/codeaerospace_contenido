@@ -165,19 +165,106 @@ iteraciones (el VPS no renderiza esto, pero el contenedor local si), y
 | Paso | Estado |
 |---|---|
 | Plan maestro | hecho |
-| Libreria ampliada + sonda de validacion | pendiente |
-| Herramientas (render/sfx/unir) | pendiente |
-| Molde (clip 1) | pendiente |
-| Esqueletos de los 16 | pendiente |
-| Clips 1-3 (M1) | pendiente |
-| Clips 4-6 (M2) | pendiente |
-| Clips 7-11 (M3) | pendiente |
-| Clips 12-14 (M4) | pendiente |
-| Intro + cierre verticales | pendiente |
-| `qh` de las 16 piezas | pendiente |
-| Voz (VPS, serial) | pendiente |
+| Libreria ampliada + sonda de validacion | hecho (0 fallos, 17 s) |
+| Herramientas (render_vertical / sfx vertical / unir_vertical) | hecho |
+| Molde (clip 01) | hecho |
+| Esqueletos de los 16 | hecho |
+| Clips 1-3 (M1) | escritos y validados en `ql` |
+| Clips 4-6 (M2) | escritos y validados en `ql` |
+| Clips 7-11 (M3) | escritos y validados en `ql` |
+| Clips 12-14 (M4) | escritos y validados en `ql` |
+| Intro + cierre verticales | escritos y validados en `ql` |
+| `qh` de las 16 piezas | en curso |
+| Voz (VPS, serial) | manifiestos subidos a `/tmp/narrar-fractales` |
 | Mux + union + picos | pendiente |
+
+Duraciones medidas (`ql`, identicas en `qh`): intro 12.43 · 01 36.83 ·
+02 33.36 · 03 34.06 · 04 31.93 · 05 30.60 · 06 31.26 · 07 30.26 · 08 30.13 ·
+09 30.43 · 10 32.37 · 11 30.23 · 12 31.03 · 13 35.03 · 14 30.83 · cierre 8.90.
+**Total 8 min 30 s.**
 
 ## Cosecha de trampas
 
-(se llena durante la produccion)
+Las del formato vertical y las de manim que costaron una iteracion cada una.
+
+**Composicion y texto**
+
+- **La zona segura se mide, no se mira.** `hud()` y `cifra()` llaman a
+  `cabe()`, que ABORTA el render si el rotulo pasa de 5.76 unidades (el
+  doble del margen derecho, que es el mas ancho). Cazo nueve rotulos
+  largos antes de renderizarlos. La alternativa —revisar frames— no sirve:
+  un texto que se mete 0.2 unidades bajo la columna de botones de
+  Instagram no se nota en el frame de validacion.
+- **El ancho de `Text` NO escala de forma continua con `font_size`.** A
+  font 11 y 13 el mismo texto mide 5.87 y 5.89; a 15 y 17, 8.80 y 8.82.
+  Bajar un punto no reduce NADA: hay que acortar la cadena. (Se descubrio
+  intentando meter "ciencia / ingenieria / espacio" en la intro.)
+- **Un fundido cruzado en el mismo renglon deja dos rotulos encimados.**
+  Con pies de texto se perdona; en un curso SIN subtitulos ese medio
+  segundo es justo el que el espectador usa para leer la cifra. Se cambio
+  todo por `cambiar()`: lo viejo se apaga ANTES de que entre lo nuevo. Se
+  vio en el clip 05, con "24" y "200000" superpuestos.
+- **El pie de cifra vive en tres renglones fijos** (`Y_ETIQUETA`,
+  `Y_NUMERO`, `Y_SUB`). En vertical el ojo vuelve siempre al mismo punto:
+  una cifra que se mueve entre clips se lee como otra cifra.
+
+**Manim**
+
+- **`FadeOut` de un VGroup no quita los submobjects que entraron a escena
+  por su cuenta.** En el clip 04 cada marca del juego del caos entra con
+  su propio `FadeIn` dentro de un `play`: ademas de estar en el grupo es
+  un mobject suelto. `FadeOut(grupo)` lo saca del grupo y **lo deja
+  dibujado encima de la nube**. Hay que apagarlos uno a uno.
+- **z_index: lo que tapa el desbordamiento tambien tapa el texto.** Las
+  cortinas del clip 10 (z=50) escondian el pie de cifra, que nace en z=0.
+  `medida()` pone 800; los textos construidos a mano, no.
+- **Un contador que sube 20 veces no se hace con `always_redraw`** (un
+  render de pango por frame). Se pre-renderizan los 20 valores y se
+  intercambian con `become` dentro de un `UpdateFromAlphaFunc`, que ademas
+  garantiza que el mobject participe del `play` (la trampa del promo 2).
+- **`Transform` entre curvas de distinto numero de puntos no vale.** Para
+  hacer crecer los picos de Koch se reconstruye la MISMA curva con
+  `altura` de 0 a 1: el numero de puntos no cambia durante el barrido.
+
+**Honestidad de las cifras**
+
+- **c = -0.4+0.6i y c = 0.285+0.01i estan FUERA del conjunto** (la orbita
+  de 0 escapa en 25 y 18 pasos) aunque salgan en todos los libros como
+  ejemplos de Julia: por eso son polvo. Y los que estan al filo
+  (-0.8+0.156i) cambian de veredicto con `max_iter`: no se usan.
+- **El conteo de cajas sobre una CURVA converge despacio y por arriba**:
+  Koch mide 1.29 frente a 1.2619. Sobre una NUBE es fino (Sierpinski
+  1.592 frente a 1.5850). Por eso el clip 03 saca la D de Koch de la
+  autosemejanza —exacta— y deja la verificacion del metodo para
+  Sierpinski, donde medido y exacto coinciden al 0.5 %.
+- **Medir la frontera del Mandelbrot contando el borde de la mascara da
+  1.03**, porque mide el contorno de la cardioide: los filamentos son mas
+  finos que un pixel y no entran en la mascara. Hay que ir por el
+  estimador de distancia y el AREA DE LA ORLA. Y el resultado sube al
+  afinar la malla (1.593 a 900, 1.617 a 1400, 1.639 a 2200), que es
+  justamente lo que hay que enseñar.
+- **Los picos de Koch salen hacia dentro** si el poligono se recorre en
+  sentido antihorario (el generador gira +60 grados, o sea hacia la
+  izquierda de la marcha). El area BAJA en vez de subir. Lo caza
+  `area_poligono` contra `koch_area`, no el ojo.
+- **256 circulos en rejilla ocupan mas envoltorio que el circulo del que
+  salen** (el empaquetado deja un 22 % de aire), asi que "la seccion se
+  conserva" se dibuja con baldosas que teselan, partiendo alternando lado.
+  Con circulos, la imagen diria lo contrario que la cifra.
+- **Una orbita que se fuga hay que RECORTARLA al encuadre.** Sin recorte
+  cruza la pantalla entera y se lee como ruido; y en el clip 07 se metia
+  por encima del pie de cifra. Se conserva el ultimo punto de dentro y se
+  añade uno fuera del borde, en la misma direccion.
+- Los puntos de partida del clip 12 se eligieron **midiendo**: el par mas
+  manso (radio maximo 1.24) entre los que, separados 0.02, caen en raices
+  distintas. Con otros pares, Newton pega un salto enorme.
+
+**Herramienta**
+
+- El worktree usa el **venv del checkout principal** (`~/…contenido/studio/
+  backend/venv/bin/python`): el worktree no tiene venv propio.
+- Lanzar tres renders en paralelo desde una sola linea de bash con
+  `nohup … &` **se enreda con las comillas**: uno de los tres arranco con
+  la linea de comandos mezclada. Va en un `.sh` del scratchpad.
+- Los renders largos pasan del timeout por defecto de la herramienta bash
+  (2 min): hay que subirlo o lanzarlos en background.
