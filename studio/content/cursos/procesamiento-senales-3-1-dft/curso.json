@@ -1,0 +1,16 @@
+{
+  "name": "Procesamiento de señales · 3.1 La DFT: proyectar sobre giros",
+  "description": "Lección 3.1 del curso Procesamiento digital de señales (módulo 3: la frecuencia), en 4 clips animados: el giro que la DFT usa como regla, la proyección que suma 8 cuando coincide y se cancela cuando no, la base ortogonal medida, y la simetría que hace que la mitad del espectro sobre. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-giro.py", "title": "1 · El giro", "scene": "Clip1",
+     "final_state": "Los 16 puntos del giro k = 3 repartidos por el circulo unidad, unidos por el camino que salta de tres en tres; cifras N = 16 y k = 3, y la formula del giro en el carril inferior."},
+    {"file": "clips/02-la-proyeccion.py", "title": "2 · La proyección", "scene": "Clip2",
+     "final_state": "Los dos caminos de suma superpuestos en el plano complejo: el de k = 3 que se aleja en linea recta hasta 8.000 y el de k = 5 que se cierra sobre si mismo; cifras suma = 8.000 y suma = 3.6e-15."},
+    {"file": "clips/03-la-base.py", "title": "3 · Una base ortogonal", "scene": "Clip3",
+     "final_state": "Las cuatro primeras filas de la matriz W como secuencias apiladas; cifras del producto interno: 1.7e-15 entre dos distintas y 16 de una consigo misma."},
+    {"file": "clips/04-simetria-y-bins.py", "title": "4 · Simetría y bins", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos lineas: 'La DFT no descompone en ondas.' (blanca) y 'Proyecta sobre giros.' (cian)."}
+  ]
+}

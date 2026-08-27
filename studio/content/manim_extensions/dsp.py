@@ -23,8 +23,8 @@ Nada de cifras de tabla.
 import math
 
 import numpy as np
-from manim import (DashedLine, Dot, Line, ORIGIN, Polygon, Rectangle, Text,
-                   VGroup, VMobject)
+from manim import (Arc, Circle, DashedLine, Dot, Line, ORIGIN, Polygon,
+                   Rectangle, Text, VGroup, VMobject)
 
 from algebra_lineal import C_EJE, C_REJILLA, _Anclada, fmt  # noqa: F401
 from comunicaciones import (Onda, alias_de, cuantizar,  # noqa: F401
@@ -971,3 +971,500 @@ def espectro_doble(f, db, piso_db=-60.0, ancho=9.0, alto=2.3,
                    color=C_BANDA):
     """Ver `EspectroDoble`."""
     return EspectroDoble(f, db, piso_db, ancho, alto, color)
+
+
+# =====================================================================
+# 8. Frecuencia: DFT, FFT y ventanas (modulo 3)
+# =====================================================================
+def dft_matriz(n):
+    """La matriz W de la DFT: W[k, m] = exp(-2j pi k m / N).
+
+    Se construye a mano porque el modulo 3 la ENSEÑA: cada fila es un giro
+    y la DFT es el producto interno de la señal con cada uno.
+    """
+    n = int(n)
+    k = np.arange(n).reshape(-1, 1)
+    m = np.arange(n).reshape(1, -1)
+    return np.exp(-2j * np.pi * k * m / n)
+
+
+def dft(x):
+    """DFT por producto matricial (lo que se ve en pantalla)."""
+    x = np.asarray(x, dtype=complex)
+    return dft_matriz(len(x)) @ x
+
+
+def giro(k, n, m=None):
+    """Los puntos del giro e^{-2j pi k m / N} para m = 0..N-1: la fila k
+    de la matriz, que es lo que se dibuja girando en el plano."""
+    m = np.arange(int(n)) if m is None else np.asarray(m)
+    return np.exp(-2j * np.pi * int(k) * m / int(n))
+
+
+def ortogonales(n, k1, k2):
+    """Producto interno MEDIDO entre dos filas de la matriz DFT: 0 si son
+    distintas, N si son la misma. La ortogonalidad, comprobada."""
+    return complex(np.vdot(giro(k1, n), giro(k2, n)))
+
+
+def f_de_bin(k, fs, n):
+    """La frecuencia que le toca al bin k."""
+    return float(k) * float(fs) / float(n)
+
+
+def bin_de(f, fs, n):
+    """El bin (no entero) donde cae una frecuencia: si no es entero, hay
+    fuga."""
+    return float(f) * float(n) / float(fs)
+
+
+def ops_dft(n):
+    """Multiplicaciones COMPLEJAS de la DFT directa: N^2."""
+    return int(n) ** 2
+
+
+def ops_fft(n):
+    """Multiplicaciones COMPLEJAS de la FFT radix-2, CONTADAS sobre el
+    grafo (una por mariposa, N/2 por etapa, log2(N) etapas)."""
+    return sum(len(e) for e in mariposas(n))
+
+
+def mariposas(n):
+    """El grafo radix-2 DIT: una lista por etapa, y en cada etapa las
+    mariposas (i, j, k) — i arriba, j abajo, k el indice del factor de
+    giro W_N^k. Es el dibujo del clip 3.2.c2."""
+    n = int(n)
+    etapas = []
+    paso = 1
+    while paso < n:
+        etapa = []
+        for inicio in range(0, n, 2 * paso):
+            for r in range(paso):
+                i = inicio + r
+                j = i + paso
+                etapa.append((i, j, r * (n // (2 * paso))))
+        etapas.append(etapa)
+        paso *= 2
+    return etapas
+
+
+def bit_reverso(n):
+    """La permutacion de entrada de la FFT: indices con los bits al reves."""
+    n = int(n)
+    bits = int(math.log2(n))
+    return [int(format(i, f"0{bits}b")[::-1], 2) for i in range(n)]
+
+
+def fft_por_etapas(x):
+    """La FFT ejecutada etapa a etapa sobre el grafo de `mariposas`.
+    Devuelve la lista de estados intermedios (para animarla) y comprueba
+    que el resultado coincide con np.fft.fft."""
+    x = np.asarray(x, dtype=complex)
+    n = len(x)
+    v = x[bit_reverso(n)].copy()
+    estados = [v.copy()]
+    for etapa in mariposas(n):
+        for i, j, k in etapa:
+            w = np.exp(-2j * np.pi * k / n)
+            a, b = v[i], v[j] * w
+            v[i], v[j] = a + b, a - b
+        estados.append(v.copy())
+    return estados
+
+
+def lobulo_principal(w):
+    """Ancho MEDIDO del lobulo principal de una ventana, en bins (de nulo
+    a nulo), calculado sobre su propio espectro muy interpolado."""
+    w = np.asarray(w, float)
+    n = len(w)
+    mag = np.abs(np.fft.rfft(w, n=32 * n))
+    mag /= mag.max()
+    i = 1
+    while i < len(mag) - 1 and mag[i] < mag[i - 1]:
+        i += 1
+    return 2.0 * i / 32.0
+
+
+def lateral_db(w):
+    """El lobulo lateral mas alto de una ventana, en dB (medido)."""
+    w = np.asarray(w, float)
+    n = len(w)
+    mag = np.abs(np.fft.rfft(w, n=32 * n))
+    mag /= mag.max()
+    i = 1
+    while i < len(mag) - 1 and mag[i] < mag[i - 1]:
+        i += 1
+    return float(20.0 * np.log10(max(mag[i:].max(), 1e-12)))
+
+
+def enbw(w):
+    """Ancho de ruido equivalente en bins: N*sum(w^2)/sum(w)^2. Lo que la
+    ventana ensancha el filtro de cada bin."""
+    w = np.asarray(w, float)
+    return float(len(w) * np.sum(w ** 2) / np.sum(w) ** 2)
+
+
+def scalloping_db(w):
+    """Perdida MEDIDA para un tono que cae justo entre dos bins (el peor
+    caso): |W(0.5 bin)| / |W(0)| en dB."""
+    w = np.asarray(w, float)
+    n = len(w)
+    m = np.arange(n)
+    centro = abs(np.sum(w))
+    medio = abs(np.sum(w * np.exp(-2j * np.pi * 0.5 * m / n)))
+    return float(20.0 * np.log10(medio / centro))
+
+
+def fuga_db(f_hz, fs, n, ventana="rect", lejos_bins=8):
+    """La fuga MEDIDA: nivel del espectro a `lejos_bins` del tono, en dB
+    bajo el pico. Un tono que cae entre bins derrama; con ventana, menos."""
+    t = np.arange(int(n)) / float(fs)
+    x = np.cos(2 * np.pi * float(f_hz) * t)
+    _, db = espectro(x, fs, ventana=ventana)
+    k = bin_de(f_hz, fs, n)
+    lejos = np.abs(np.arange(len(db)) - k) >= lejos_bins
+    return float(db[lejos].max())
+
+
+def dos_tonos(f1, f2, fs, n, ventana="hann", amp2=1.0):
+    """Dos tonos y su espectro medido. -> (t, x, f, db, valle_db)
+
+    `valle_db` es lo que baja el espectro ENTRE los dos picos respecto al
+    mas bajo: si es 0, no se distinguen; cuanto mas negativo, mas resueltos.
+    """
+    t = np.arange(int(n)) / float(fs)
+    x = np.cos(2 * np.pi * f1 * t) + amp2 * np.cos(2 * np.pi * f2 * t + 0.4)
+    f, db = espectro(x, fs, ventana=ventana)
+    i1 = int(np.argmin(np.abs(f - f1)))
+    i2 = int(np.argmin(np.abs(f - f2)))
+    a, b = min(i1, i2), max(i1, i2)
+    if b - a < 2:
+        return t, x, f, db, 0.0
+    valle = float(db[a + 1:b].min())
+    pico_bajo = float(min(db[a], db[b]))
+    return t, x, f, db, valle - pico_bajo
+
+
+# =====================================================================
+# 9. La transformada Z (modulo 4)
+# =====================================================================
+def zpk(b, a=(1.0,)):
+    """Ceros, polos y ganancia de H(z) = B(z)/A(z). -> (ceros, polos, k)"""
+    b = np.atleast_1d(np.asarray(b, dtype=float))
+    a = np.atleast_1d(np.asarray(a, dtype=float))
+    ceros = np.roots(b) if len(b) > 1 else np.array([])
+    polos = np.roots(a) if len(a) > 1 else np.array([])
+    return ceros, polos, float(b[0] / a[0])
+
+
+def respuesta_frec(b, a=(1.0,), n=512):
+    """|H| en dB y fase (rad) sobre w = 0..pi. -> (w, mag_db, fase)
+
+    Se evalua a mano sobre el circulo unidad (z = e^{jw}): es lo que el
+    modulo 4 dibuja como producto de distancias.
+    """
+    b = np.atleast_1d(np.asarray(b, dtype=float))
+    a = np.atleast_1d(np.asarray(a, dtype=float))
+    w = np.linspace(0.0, np.pi, int(n))
+    z = np.exp(1j * w)
+    num = sum(bk * z ** (-k) for k, bk in enumerate(b))
+    den = sum(ak * z ** (-k) for k, ak in enumerate(a))
+    h = num / den
+    mag = np.maximum(np.abs(h), 1e-12)
+    return w, 20.0 * np.log10(mag), np.unwrap(np.angle(h))
+
+
+def h_en(b, a, w):
+    """H(e^{jw}) en un punto (para rotular el valor exacto)."""
+    z = np.exp(1j * float(w))
+    num = sum(bk * z ** (-k) for k, bk in
+              enumerate(np.atleast_1d(np.asarray(b, float))))
+    den = sum(ak * z ** (-k) for k, ak in
+              enumerate(np.atleast_1d(np.asarray(a, float))))
+    return complex(num / den)
+
+
+def por_distancias(ceros, polos, k, w):
+    """|H(e^{jw})| CALCULADO como producto de distancias a los ceros
+    entre producto de distancias a los polos (la construccion geometrica
+    del clip 4.2). -> (modulo, distancias_ceros, distancias_polos)"""
+    z = np.exp(1j * float(w))
+    dc = np.abs(z - np.asarray(ceros)) if len(ceros) else np.array([1.0])
+    dp = np.abs(z - np.asarray(polos)) if len(polos) else np.array([1.0])
+    return float(abs(k) * np.prod(dc) / np.prod(dp)), dc, dp
+
+
+def retardo_grupo(b, a=(1.0,), n=512):
+    """Retardo de grupo MEDIDO: -d(fase)/dw por diferencias finitas.
+    -> (w, retardo en muestras)"""
+    w, _, fase = respuesta_frec(b, a, n)
+    return w[1:-1], -np.gradient(fase, w)[1:-1]
+
+
+def es_estable(a):
+    """Todos los polos dentro del circulo unidad. -> (bool, radio_maximo)"""
+    _, polos, _ = zpk([1.0], a)
+    r = float(np.max(np.abs(polos))) if len(polos) else 0.0
+    return r < 1.0, r
+
+
+def es_fase_minima(b):
+    """Todos los ceros dentro del circulo. -> (bool, radio_maximo)"""
+    ceros, _, _ = zpk(b, [1.0])
+    r = float(np.max(np.abs(ceros))) if len(ceros) else 0.0
+    return r < 1.0, r
+
+
+def reflejar_ceros(b):
+    """El sistema de FASE MINIMA con el MISMO |H|: cada cero de fuera del
+    circulo se cambia por su reciproco conjugado (y se reescala). Sirve
+    para enseñar que el modulo no determina la fase."""
+    ceros, _, k = zpk(b, [1.0])
+    nuevos, ganancia = [], k
+    for c in ceros:
+        if abs(c) > 1.0:
+            nuevos.append(np.conj(1.0 / c))
+            ganancia *= abs(c)
+        else:
+            nuevos.append(c)
+    return np.real(ganancia * np.poly(nuevos))
+
+
+def resonador(radio, w0):
+    """Un par de polos conjugados en radio*e^{+-j w0}. -> (b, a)"""
+    a = np.real(np.poly([radio * np.exp(1j * w0),
+                         radio * np.exp(-1j * w0)]))
+    return np.array([1.0]), a
+
+
+def notch(radio, w0):
+    """Ceros EN el circulo en w0 y polos justo detras: mata una frecuencia
+    sin tocar el resto. -> (b, a)"""
+    b = np.real(np.poly([np.exp(1j * w0), np.exp(-1j * w0)]))
+    a = np.real(np.poly([radio * np.exp(1j * w0),
+                         radio * np.exp(-1j * w0)]))
+    return b, a
+
+
+# =====================================================================
+# 10. Piezas de dibujo del modulo 3 y 4
+# =====================================================================
+class PlanoZ(_Anclada):
+    """El plano complejo con el CIRCULO UNIDAD, los ceros (o) y los polos
+    (x). Es la imagen firma del modulo 4.
+
+    .en(z)             punto de la pieza para un complejo
+    .punto_en(w)       el punto e^{jw} sobre el circulo
+    .radios_a(w)       segmentos desde cada cero y cada polo hasta e^{jw}
+    .con_pz(c, p)      GEMELA (mismo numero de ceros y de polos)
+    .ceros .polos .circulo .ejes
+    """
+
+    def __init__(self, ceros=(), polos=(), unidad=1.55, alcance=1.75,
+                 color_cero=C_SALIDA, color_polo=C_RUIDO, **kwargs):
+        super().__init__(**kwargs)
+        self.c = np.asarray(list(ceros), dtype=complex)
+        self.p = np.asarray(list(polos), dtype=complex)
+        self.unidad = float(unidad)
+        self.alcance = float(alcance)
+        self.color_cero, self.color_polo = color_cero, color_polo
+        self._poner_ancla(ORIGIN)
+        a = self.alcance
+        ex = Line(self.en(-a), self.en(a), color=C_EJE, stroke_width=1.6)
+        ey = Line(self.en(-1j * a), self.en(1j * a), color=C_EJE,
+                  stroke_width=1.6)
+        self.ejes = VGroup(ex, ey)
+        self.circulo = Circle(radius=self.unidad, color=C_MUESTRA,
+                              stroke_width=2.2, stroke_opacity=0.75)
+        self.circulo.move_to(self._origen())
+        self.ceros = VGroup(*[self._marca_cero(z) for z in self.c])
+        self.polos = VGroup(*[self._marca_polo(z) for z in self.p])
+        self.add(self.ejes, self.circulo, self.ceros, self.polos)
+
+    def en(self, z):
+        z = complex(z)
+        return self._origen() + np.array([z.real * self.unidad,
+                                          z.imag * self.unidad, 0.0])
+
+    def punto_en(self, w):
+        return self.en(np.exp(1j * float(w)))
+
+    def _marca_cero(self, z, radio=0.10):
+        return Circle(radius=radio, color=self.color_cero, stroke_width=2.6)\
+            .move_to(self.en(z))
+
+    def _marca_polo(self, z, lado=0.10):
+        d = self.en(z)
+        return VGroup(
+            Line(d + np.array([-lado, -lado, 0]),
+                 d + np.array([lado, lado, 0]), color=self.color_polo,
+                 stroke_width=2.8),
+            Line(d + np.array([-lado, lado, 0]),
+                 d + np.array([lado, -lado, 0]), color=self.color_polo,
+                 stroke_width=2.8))
+
+    def punto(self, w, color=C_CALCULO, radio=0.07):
+        return Dot(self.punto_en(w), radius=radio, color=color)
+
+    def radios_a(self, w, grosor=2.0, opacidad=0.85):
+        """Los segmentos cuya razon de longitudes ES |H(e^{jw})|."""
+        destino = self.punto_en(w)
+        g = VGroup()
+        for z in self.c:
+            g.add(Line(self.en(z), destino, color=self.color_cero,
+                       stroke_width=grosor, stroke_opacity=opacidad))
+        for z in self.p:
+            g.add(Line(self.en(z), destino, color=self.color_polo,
+                       stroke_width=grosor, stroke_opacity=opacidad))
+        return g
+
+    def arco(self, w0, w1, color=C_CALCULO, grosor=3.0):
+        return Arc(radius=self.unidad, start_angle=float(w0),
+                   angle=float(w1) - float(w0), color=color,
+                   stroke_width=grosor).move_arc_center_to(self._origen())
+
+    def con_pz(self, ceros, polos):
+        """GEMELA: solo vale con el MISMO numero de ceros y de polos (si
+        cambia la cuenta, la estructura cambia y Transform rompe glifos)."""
+        if len(ceros) != len(self.c) or len(polos) != len(self.p):
+            raise ValueError("la gemela necesita el MISMO numero de ceros "
+                             "y de polos")
+        o = PlanoZ(ceros, polos, self.unidad, self.alcance, self.color_cero,
+                   self.color_polo)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def plano_z(ceros=(), polos=(), unidad=1.55, alcance=1.75):
+    """Ver `PlanoZ`."""
+    return PlanoZ(ceros, polos, unidad, alcance)
+
+
+class RespuestaFrec(_Anclada):
+    """|H(e^{jw})| en dB frente a w/pi (0 a 1).
+
+    .en(w, db) .marca_w(w) .banda(w0, w1) .con_mag(db2) GEMELA
+    """
+
+    def __init__(self, w, mag_db, ancho=5.6, alto=2.6, piso_db=-60.0,
+                 techo_db=None, color=C_SALIDA, **kwargs):
+        super().__init__(**kwargs)
+        self.w = np.asarray(w, dtype=float)
+        self.db = np.asarray(mag_db, dtype=float)
+        self.piso = float(piso_db)
+        self.techo = float(techo_db) if techo_db is not None else max(
+            5.0, float(np.max(self.db)) + 3.0)
+        self.ancho, self.alto = float(ancho), float(alto)
+        self.color = color
+        self._poner_ancla(ORIGIN)
+        ex = Line(self.en(self.w[0], self.piso),
+                  self.en(self.w[-1], self.piso), color=C_EJE,
+                  stroke_width=1.6)
+        ey = Line(self.en(self.w[0], self.piso),
+                  self.en(self.w[0], self.techo), color=C_EJE,
+                  stroke_width=1.6)
+        self.ejes = VGroup(ex, ey)
+        self.curva = VMobject(color=color, stroke_width=2.8)
+        self.curva.set_points_as_corners([self.en(a, b) for a, b in
+                                          zip(self.w, self.db)])
+        self.add(self.ejes, self.curva)
+
+    def en(self, w, db):
+        fx = (float(w) - self.w[0]) / (self.w[-1] - self.w[0])
+        fy = ((float(np.clip(db, self.piso, self.techo)) - self.piso)
+              / (self.techo - self.piso))
+        return (self._origen() + np.array([(fx - 0.5) * self.ancho,
+                                           (fy - 0.5) * self.alto, 0.0]))
+
+    def valor(self, w):
+        """El dB dibujado en w (interpolado sobre la propia curva)."""
+        return float(np.interp(float(w), self.w, self.db))
+
+    def marca_w(self, w, color=C_CALCULO):
+        return DashedLine(self.en(w, self.piso), self.en(w, self.techo),
+                          color=color, stroke_width=1.6, dash_length=0.07)
+
+    def punto(self, w, color=C_CALCULO, radio=0.06):
+        return Dot(self.en(w, self.valor(w)), radius=radio, color=color)
+
+    def banda(self, w0, w1, color=C_CALCULO, opacidad=0.14):
+        x0, x1 = self.en(w0, 0)[0], self.en(w1, 0)[0]
+        r = Rectangle(width=abs(x1 - x0), height=self.alto, stroke_width=0,
+                      fill_color=color, fill_opacity=opacidad)
+        r.move_to(np.array([(x0 + x1) / 2.0,
+                            self.en(self.w[0], (self.piso + self.techo) / 2)[1],
+                            0.0]))
+        return r
+
+    def con_mag(self, db2, color=None):
+        if len(db2) != len(self.db):
+            raise ValueError("la gemela necesita el MISMO eje de w")
+        o = RespuestaFrec(self.w, db2, self.ancho, self.alto, self.piso,
+                          self.techo, color or self.color)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def respuesta_dibujo(w, mag_db, ancho=5.6, alto=2.6, piso_db=-60.0,
+                     techo_db=None, color=C_SALIDA):
+    """Ver `RespuestaFrec`."""
+    return RespuestaFrec(w, mag_db, ancho, alto, piso_db, techo_db, color)
+
+
+class Mariposa(_Anclada):
+    """El grafo radix-2 de la FFT: log2(N)+1 columnas de N nodos y las
+    aristas de cada etapa.
+
+    .nodo(col, fila)   .etapa(k) VGroup de las aristas de la etapa k
+    .cruces(k)         solo las aristas que CRUZAN (las que dan el nombre)
+    """
+
+    def __init__(self, n=8, ancho=6.6, alto=4.2, color=C_MUESTRA, **kwargs):
+        super().__init__(**kwargs)
+        self.n = int(n)
+        self.etapas_datos = mariposas(self.n)
+        self.cols = len(self.etapas_datos) + 1
+        self.ancho, self.alto = float(ancho), float(alto)
+        self.color = color
+        self._poner_ancla(ORIGIN)
+        self.nodos = VGroup()
+        for c in range(self.cols):
+            col = VGroup(*[Dot(self._pos(c, f), radius=0.045, color=color)
+                           for f in range(self.n)])
+            self.nodos.add(col)
+        self.aristas = VGroup()
+        for k, etapa in enumerate(self.etapas_datos):
+            g = VGroup()
+            for i, j, _tw in etapa:
+                g.add(Line(self._pos(k, i), self._pos(k + 1, i),
+                           color=C_EJE, stroke_width=1.5),
+                      Line(self._pos(k, j), self._pos(k + 1, j),
+                           color=C_EJE, stroke_width=1.5),
+                      Line(self._pos(k, i), self._pos(k + 1, j),
+                           color=C_CALCULO, stroke_width=1.5),
+                      Line(self._pos(k, j), self._pos(k + 1, i),
+                           color=C_CALCULO, stroke_width=1.5))
+            self.aristas.add(g)
+        self.add(self.aristas, self.nodos)
+
+    def _pos(self, col, fila):
+        fx = col / max(self.cols - 1, 1)
+        fy = fila / max(self.n - 1, 1)
+        return (self._origen() + np.array([(fx - 0.5) * self.ancho,
+                                           (0.5 - fy) * self.alto, 0.0]))
+
+    def nodo(self, col, fila):
+        return self.nodos[int(col)][int(fila)]
+
+    def etapa(self, k):
+        return self.aristas[int(k)]
+
+    def cruces(self, k):
+        """Las aristas diagonales de la etapa k (una por mariposa x2)."""
+        g = self.aristas[int(k)]
+        return VGroup(*[g[i] for i in range(len(g)) if i % 4 >= 2])
+
+
+def mariposa_dibujo(n=8, ancho=6.6, alto=4.2, color=C_MUESTRA):
+    """Ver `Mariposa`."""
+    return Mariposa(n, ancho, alto, color)

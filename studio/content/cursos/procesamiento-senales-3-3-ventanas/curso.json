@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 3.3 Fugas, ventanas y resolución",
+  "description": "Lección 3.3 del curso Procesamiento digital de señales (módulo 3: la frecuencia), en 4 clips animados: el tono que cae entre bins y derrama, las ventanas que hunden los lóbulos laterales a costa de ensanchar el principal, lo que cuesta la ventana (ENBW y scalloping medidos) y por qué rellenar de ceros dibuja mejor pero no resuelve. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-fuga.py",
+      "title": "1 · La fuga",
+      "scene": "Clip1",
+      "final_state": "El espectro del tono que cae en un bin (una raya limpia) junto al del tono a medio bin, derramado por los 129 bins; cifra de la fuga medida a -23.7 dB."
+    },
+    {
+      "file": "clips/02-las-ventanas.py",
+      "title": "2 · Las ventanas",
+      "scene": "Clip2",
+      "final_state": "Las cuatro ventanas y sus espectros superpuestos, con el lobulo principal y el lateral mas alto medidos de cada una."
+    },
+    {
+      "file": "clips/03-lo-que-cuesta.py",
+      "title": "3 · Lo que cuesta la ventana",
+      "scene": "Clip3",
+      "final_state": "Las cifras de ENBW y de scalloping de las cuatro ventanas, con la de Hann marcada: 1.503 bins de ruido y -1.42 dB en el peor sitio."
+    },
+    {
+      "file": "clips/04-zero-padding.py",
+      "title": "4 · Rellenar de ceros",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Rellenar de ceros dibuja mejor.' (blanca) y 'Solo el tiempo resuelve.' (cian)."
+    }
+  ]
+}
