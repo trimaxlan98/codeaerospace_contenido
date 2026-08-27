@@ -25,6 +25,56 @@ QUALITY_SPECS = {
 }
 QUALITIES = set(QUALITY_SPECS)
 
+# --- formato del lienzo -----------------------------------------------
+# La calidad fija el LADO CORTO y los fps; el formato fija la PROPORCION.
+# Fijar el ALTO seria otra cosa: un "1080p" en 9:16 con 1080 de alto sale
+# 607x1080, que no es calidad alta sino un video pequeno.
+#
+# Los nombres y las proporciones son los de promo.py (la libreria que
+# configura el lienzo desde dentro de la escena). Al renderizar, el
+# backend le pasa por entorno el lado corto y los fps, de modo que lo que
+# se anuncia aqui y lo que produce manim salen del MISMO numero.
+FORMATO_DEFECTO = "horizontal"
+PROPORCIONES = {
+    "horizontal": (16, 9),
+    "vertical": (9, 16),
+    "cuadrado": (1, 1),
+}
+FORMATOS = set(PROPORCIONES)
+
+# Un promo de redes no es un curso: dura 8-15 s, va en bucle y no se
+# exporta como zip concatenado. El tipo solo cambia lo que la interfaz
+# ofrece; el modelo (proyecto -> clips -> jobs) es exactamente el mismo.
+TIPO_DEFECTO = "curso"
+TIPOS = {"curso", "promo"}
+
+
+def specs(quality: str, formato: str = FORMATO_DEFECTO) -> dict:
+    """Resolucion y fps reales de un proyecto, segun calidad y formato.
+
+    En horizontal devuelve la tabla de manim tal cual: 854x480 no es
+    exactamente 16:9, y es lo que produce el flag `-ql`. Anunciar 852x480
+    seria mentir sobre el archivo que sale.
+    """
+    if quality not in QUALITY_SPECS:
+        raise ValueError(f"calidad invalida: {quality}")
+    if formato not in PROPORCIONES:
+        raise ValueError(f"formato invalido: {formato}")
+    base = QUALITY_SPECS[quality]
+    ancho, alto = (int(v) for v in base["resolution"].split("x"))
+    corto = min(ancho, alto)
+    if formato == "horizontal":
+        px_ancho, px_alto = ancho, alto
+    else:
+        p_ancho, p_alto = PROPORCIONES[formato]
+        largo = round(corto * max(p_ancho, p_alto) / min(p_ancho, p_alto))
+        largo -= largo % 2  # libx264 exige lados pares
+        px_ancho, px_alto = ((corto, largo) if p_alto > p_ancho
+                             else (largo, corto))
+    return {"resolution": f"{px_ancho}x{px_alto}", "fps": base["fps"],
+            "width": px_ancho, "height": px_alto, "corto": corto,
+            "formato": formato}
+
 STYLE_MARKER = "# --- fin estilo del proyecto ---"
 
 
@@ -87,9 +137,14 @@ class ProjectService:
     # ── proyectos ────────────────────────────────────────────────────────────
 
     def create_project(self, name: str, description: str, quality: str,
-                        style_block: str) -> dict:
+                        style_block: str, tipo: str = TIPO_DEFECTO,
+                        formato: str = FORMATO_DEFECTO) -> dict:
         if quality not in QUALITIES:
             raise ValueError(f"calidad invalida: {quality}")
+        if tipo not in TIPOS:
+            raise ValueError(f"tipo invalido: {tipo}")
+        if formato not in FORMATOS:
+            raise ValueError(f"formato invalido: {formato}")
         now = time.time()
         project = {
             "id": uuid.uuid4().hex[:16],
@@ -97,6 +152,8 @@ class ProjectService:
             "description": description or "",
             "quality": quality,
             "style_block": style_block or "",
+            "tipo": tipo,
+            "formato": formato,
             "created_at": now,
             "updated_at": now,
         }
@@ -120,7 +177,12 @@ class ProjectService:
             else:
                 status = "rendered"
             clips.append({**clip_public(clip), "stale": stale, "status": status})
-        return {**project, "clips": clips}
+        # `specs` viaja con el detalle para que la interfaz sepa la
+        # proporcion del lienzo antes de que exista el primer render (y no
+        # tenga que repetir la tabla de calidades en JavaScript).
+        return {**project, "clips": clips,
+                "specs": specs(project["quality"],
+                               project.get("formato") or FORMATO_DEFECTO)}
 
     def list_projects_summary(self, extra=None) -> list[dict]:
         """Resumen por proyecto para el indice de cursos.
@@ -153,12 +215,21 @@ class ProjectService:
         return summaries
 
     def update_project(self, pid: str, **fields) -> dict:
-        if "quality" in fields:
+        # Calidad y formato definen el archivo que sale del render: si ya
+        # hay videos, cambiarlos dejaria clips de dos tamanos distintos en
+        # el mismo proyecto (y un `concat -c copy` que no pega).
+        fijos = [k for k in ("quality", "formato") if k in fields]
+        if fijos:
             clips = self.db.list_clips(pid)
             if any(c.get("job_id") for c in clips):
+                que = "la calidad" if fijos == ["quality"] else (
+                    "el formato" if fijos == ["formato"] else
+                    "la calidad ni el formato")
                 raise ValueError(
-                    "no se puede cambiar la calidad: hay clips con render vigente"
+                    f"no se puede cambiar {que}: hay clips con render vigente"
                 )
+        if "formato" in fields and fields["formato"] not in FORMATOS:
+            raise ValueError(f"formato invalido: {fields['formato']}")
         fields["updated_at"] = time.time()
         self.db.update_project(pid, **fields)
         return self.db.get_project(pid)
@@ -268,7 +339,7 @@ class ProjectService:
         project = self.db.get_project(pid)
         if not project:
             raise ValueError("proyecto no encontrado")
-        spec = QUALITY_SPECS[project["quality"]]
+        spec = specs(project["quality"], project.get("formato") or FORMATO_DEFECTO)
 
         items = []
         for clip in self.db.list_clips(pid):
@@ -319,7 +390,7 @@ class ProjectService:
         project = self.db.get_project(pid)
         if not project:
             raise ValueError("proyecto no encontrado")
-        spec = QUALITY_SPECS[project["quality"]]
+        spec = specs(project["quality"], project.get("formato") or FORMATO_DEFECTO)
 
         clips = []
         concat = []

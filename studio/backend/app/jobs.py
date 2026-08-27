@@ -16,6 +16,7 @@ from . import branding
 from .config import Settings
 from .db import Database
 from .events import EventBus
+from .projects import FORMATO_DEFECTO, specs
 from .runner_client import RunnerClient, RunnerError
 
 QUALITIES = {"ql", "qm", "qh"}
@@ -28,7 +29,7 @@ def job_public(job: dict) -> dict:
     """Vista del job para la API (sin el script completo)."""
     keys = ("id", "scene", "quality", "timeout", "status", "video_path", "error",
             "created_at", "started_at", "finished_at", "size_bytes",
-            "project_id", "clip_id")
+            "project_id", "clip_id", "formato", "resolution")
     return {k: job.get(k) for k in keys} | {"has_thumb": bool(job.get("thumb_path"))}
 
 
@@ -72,13 +73,15 @@ class JobManager:
 
     def create_job(self, script: str, scene: str, quality: str, timeout: int,
                    project_id: str | None = None, clip_id: str | None = None,
-                   content_hash: str | None = None) -> dict:
+                   content_hash: str | None = None,
+                   formato: str = FORMATO_DEFECTO) -> dict:
         job_id = uuid.uuid4().hex[:16]
         now = time.time()
         job = {
             "id": job_id, "scene": scene, "quality": quality, "timeout": timeout,
             "status": "queued", "script": script, "created_at": now,
             "project_id": project_id, "clip_id": clip_id, "content_hash": content_hash,
+            "formato": formato,
         }
         # El script se escribe en la ruta canonica que el runner espera, con
         # la identidad del canal garantizada (branding.aplicar). Lo que se
@@ -94,7 +97,8 @@ class JobManager:
         self.queue.put_nowait(job_id)
         self._publish_job(job_id)
         return job_public({**job, "video_path": None, "error": None,
-                           "started_at": None, "finished_at": None})
+                           "started_at": None, "finished_at": None,
+                           "resolution": None})
 
     async def cancel_job(self, job_id: str) -> bool:
         job = self.db.get_job(job_id)
@@ -189,9 +193,17 @@ class JobManager:
         timed_out = False
         runner_error: str | None = None
 
+        # El lienzo lo aplica la ESCENA (promo.formato()); el runner solo le
+        # pasa por entorno que formato, que lado corto y que fps quiere el
+        # proyecto. Un curso 16:9 no lee ese entorno y renderiza igual que
+        # siempre con el flag -q.
+        formato = job.get("formato") or FORMATO_DEFECTO
+        spec = specs(job["quality"], formato)
         try:
             async for event in self.runner.render(
-                job_id, job["scene"], job["quality"], job["timeout"]
+                job_id, job["scene"], job["quality"], job["timeout"],
+                formato=formato, corto=spec["corto"], fps=spec["fps"],
+                largo=max(spec["width"], spec["height"]),
             ):
                 etype = event.get("type")
                 if etype == "log":
@@ -218,9 +230,7 @@ class JobManager:
             if video:
                 self._cleanup_partial_files(job_id)
                 extra = {"size_bytes": video.stat().st_size}
-                thumb = await self._make_thumbnail(job_id, buf)
-                if thumb:
-                    extra["thumb_path"] = thumb
+                extra.update(await self._medir_video(job_id, buf))
                 self._finish(job_id, "done", video_path=str(video), **extra)
             else:
                 self._finish(job_id, "error",
@@ -228,16 +238,29 @@ class JobManager:
         else:
             self._finish(job_id, "error", error=f"manim salio con codigo {exit_code}")
 
-    async def _make_thumbnail(self, job_id: str, buf: deque) -> str | None:
-        """Miniatura via runner (ffmpeg dentro del contenedor). No fatal si falla."""
+    async def _medir_video(self, job_id: str, buf: deque) -> dict:
+        """Miniatura y resolucion REAL via runner (ffmpeg/ffprobe dentro del
+        contenedor; el backend no tiene ninguno de los dos).
+
+        La resolucion se mide sobre el archivo, no se deduce de la calidad:
+        el lienzo lo fija la escena, y si esta no aplico el formato pedido
+        la interfaz tiene que poder decirlo.
+
+        No es fatal: un job sin miniatura sigue siendo un render bueno.
+        """
+        extra: dict = {}
         try:
-            thumb_rel = await self.runner.thumbnail(job_id)
-            thumb = (self.cfg.workspace / thumb_rel).resolve()
-            if thumb.is_file():
-                return str(thumb)
+            res = await self.runner.thumbnail(job_id)
+            thumb_rel = res.get("thumb") or ""
+            if thumb_rel:
+                thumb = (self.cfg.workspace / thumb_rel).resolve()
+                if thumb.is_file():
+                    extra["thumb_path"] = str(thumb)
+            if res.get("resolution"):
+                extra["resolution"] = res["resolution"]
         except (RunnerError, asyncio.TimeoutError) as e:
             buf.append(f"[studio] miniatura no generada: {e}")
-        return None
+        return extra
 
     def _find_video(self, job_id: str) -> Path | None:
         media = self.cfg.render_jobs_dir / job_id / "media"

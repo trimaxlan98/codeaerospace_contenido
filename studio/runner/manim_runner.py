@@ -8,6 +8,9 @@ por un socket Unix con permisos 0660 root:manimstudio.
 Superficie deliberadamente minima — no es un proxy generico de Docker:
   - render : `docker compose run` del servicio `manim-render` de ESTE
              compose file, con script/escena/calidad validados por regex.
+             El lienzo (formato/lado corto/fps) entra como variables
+             PROMO_* validadas contra un conjunto y rangos cerrados; las
+             lee la escena, no el runner.
   - cancel : `docker rm -f` de un contenedor cuyo nombre coincide con el
              prefijo fijo de render de ManimStudio (no puede tocar otros).
   - stats  : lectura agregada (`docker ps` + `docker stats --no-stream`),
@@ -37,6 +40,14 @@ CONTAINER_PREFIX = "manimstudio-render-"
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 RE_SCENE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,127}$")
 QUALITIES = {"ql", "qm", "qh"}
+# El lienzo (formato/lado corto/fps) viaja al contenedor por entorno, y la
+# escena lo aplica con promo.formato(). Se valida contra un conjunto y unos
+# rangos cerrados, igual que la calidad: son valores que entran en la linea
+# de comandos de docker, no texto libre.
+FORMATOS = {"horizontal", "vertical", "cuadrado"}
+CORTO_MIN, CORTO_MAX = 240, 2160
+LARGO_MAX = 3840
+FPS_MIN, FPS_MAX = 5, 120
 TIMEOUT_MIN, TIMEOUT_MAX = 30, 1800
 MAX_LOG_LINE = 4000  # caracteres por linea reenviada
 STATS_CACHE_TTL = 4.0  # docker stats es caro; cachear para no castigar 2 vCPU
@@ -79,6 +90,10 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     scene = str(req.get("scene", ""))
     quality = str(req.get("quality", ""))
     timeout = req.get("timeout", 600)
+    formato = str(req.get("formato", "horizontal"))
+    corto = req.get("corto", 1080)
+    largo = req.get("largo", 1920)
+    fps = req.get("fps", 60)
 
     if not RE_JOB_ID.match(job_id):
         await send(writer, {"type": "error", "error": "job_id invalido"})
@@ -91,6 +106,18 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
         return
     if not isinstance(timeout, int) or not (TIMEOUT_MIN <= timeout <= TIMEOUT_MAX):
         await send(writer, {"type": "error", "error": "timeout fuera de rango"})
+        return
+    if formato not in FORMATOS:
+        await send(writer, {"type": "error", "error": "formato invalido"})
+        return
+    if not isinstance(corto, int) or not (CORTO_MIN <= corto <= CORTO_MAX):
+        await send(writer, {"type": "error", "error": "lado corto fuera de rango"})
+        return
+    if not isinstance(largo, int) or not (corto <= largo <= LARGO_MAX):
+        await send(writer, {"type": "error", "error": "lado largo fuera de rango"})
+        return
+    if not isinstance(fps, int) or not (FPS_MIN <= fps <= FPS_MAX):
+        await send(writer, {"type": "error", "error": "fps fuera de rango"})
         return
 
     # El script SIEMPRE se lee de la ruta canonica del job: el backend lo
@@ -106,9 +133,15 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     # ESTE job se monta rw, por invocacion, para que Manim pueda escribir
     # media/ sin exponer el resto del repo en escritura.
     job_mount = f"{os.path.join(PROJECT_DIR, RENDER_JOBS_DIR, job_id)}:/workspace/{RENDER_JOBS_DIR}/{job_id}:rw"
+    # El flag -q sigue mandando en un render 16:9 normal. Las variables
+    # PROMO_* solo las lee una escena que llame a promo.formato(): un curso
+    # las ignora y renderiza exactamente igual que antes.
+    lienzo = ("-e", f"PROMO_FORMATO={formato}", "-e", f"PROMO_CALIDAD={quality}",
+              "-e", f"PROMO_CORTO={corto}", "-e", f"PROMO_LARGO={largo}",
+              "-e", f"PROMO_FPS={fps}")
     argv = [
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
-        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, *lienzo,
         "-v", job_mount,
         "--name", container,
         "manim-render",
@@ -116,7 +149,8 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
         "--media_dir", f"/workspace/{RENDER_JOBS_DIR}/{job_id}/media",
         f"/workspace/{script_rel}", scene,
     ]
-    log(f"[render] job={job_id} scene={scene} q={quality} timeout={timeout}s")
+    log(f"[render] job={job_id} scene={scene} q={quality} fmt={formato}"
+        f" {corto}x{largo} fps={fps} timeout={timeout}s")
 
     proc = await asyncio.create_subprocess_exec(
         *argv,
@@ -204,8 +238,35 @@ async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
         await send(writer, {"type": "error",
                             "error": f"ffmpeg salio con codigo {code}: {err[-300:]}"})
         return
-    log(f"[thumbnail] job={job_id} ok")
-    await send(writer, {"type": "ok", "thumb": thumb_rel})
+    resolution = await _resolucion(video_rel, job_id, job_mount)
+    log(f"[thumbnail] job={job_id} ok res={resolution or '?'}")
+    await send(writer, {"type": "ok", "thumb": thumb_rel,
+                        "resolution": resolution})
+
+
+async def _resolucion(video_rel: str, job_id: str, job_mount: str) -> str:
+    """WxH del video, medido con ffprobe dentro del contenedor.
+
+    Devuelve "" si falla: la resolucion es informativa y no puede tumbar un
+    render que ya termino bien.
+    """
+    container = f"{CONTAINER_PREFIX}{job_id}-probe"
+    code, out, _err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
+        "--entrypoint", "ffprobe", "manim-render",
+        "-v", "error", "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=s=x:p=0", f"/workspace/{video_rel}",
+        timeout=90,
+    )
+    if code != 0:
+        await force_remove(container)
+        return ""
+    valor = out.strip().splitlines()[-1].strip() if out.strip() else ""
+    return valor if re.fullmatch(r"\d{2,5}x\d{2,5}", valor) else ""
 
 
 async def force_remove(container: str) -> None:
