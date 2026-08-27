@@ -291,13 +291,71 @@ class Scene(_SceneBase):
     Instagram: `promo.marca_promo` sube la marca al borde superior. El
     fondo opaco cubre el lienzo entero para que ningun re-encodeo de la app
     deje una linea negra en el borde.
+
+    Las piezas de IDENTIDAD (la intro y el cierre) ponen `marca_chica` y
+    `esquinas` a False: alli el wordmark grande ES la marca, y repetirla
+    pequeña arriba la duplica.
     """
+
+    marca_chica = True
+    esquinas = True
 
     def setup(self):
         super().setup()
         self.camera.background_color = CODE_BG
         self.add(_promo.fondo_seguro(FMT))
-        self.add(esquinas_hud(opacidad=0.14))
-        self.add(_promo.marca_promo(FMT, opacidad=0.34))
+        if self.esquinas:
+            self.add(esquinas_hud(opacidad=0.14))
+        if self.marca_chica:
+            self.add(_promo.marca_promo(FMT, opacidad=0.34))
         if GUIAS:
             self.add(_promo.guias(FMT))
+
+
+def reticula(paso=0.9, opacidad=0.10, color=C_EJE):
+    """Reticula HUD tenue a pantalla completa. Nace invisible (la opacidad
+    se enciende al paso del escaneo de la intro)."""
+    ancho = FMT.ancho / 2
+    alto = FMT.alto / 2
+    lineas = VGroup()
+    x = -ancho
+    while x <= ancho + 1e-6:
+        lineas.add(Line([x, -alto, 0], [x, alto, 0], stroke_width=1.0))
+        x += paso
+    y = -alto
+    while y <= alto + 1e-6:
+        lineas.add(Line([-ancho, y, 0], [ancho, y, 0], stroke_width=1.0))
+        y += paso
+    lineas.set_stroke(color=color, opacity=opacidad)
+    return lineas
+
+
+def wordmark(font_size=84):
+    """CO.DE en grande, centrado en el origen.
+
+    Devuelve (grupo, co, punto, de): las letras en tinta y el punto en
+    ambar, sueltos para poder animarlos por separado.
+    """
+    co = Text("CO", weight="SEMIBOLD", font_size=font_size, color=CODE_INK)
+    pt = Text(".", weight="BOLD", font_size=font_size, color=CODE_ACCENT)
+    de = Text("DE", weight="SEMIBOLD", font_size=font_size, color=CODE_INK)
+    g = VGroup(co, pt, de).arrange(buff=0.10, aligned_edge=DOWN)
+    g.move_to(ORIGIN)
+    return g, co, pt, de
+
+
+def academy(font_size=27):
+    """ACADEMY con tracking amplio (las letras van espaciadas a mano: la
+    sombra de Text descarta los glifos de espacio, pero su posicion ya
+    quedo horneada)."""
+    return Text("A C A D E M Y", weight="MEDIUM", font_size=font_size,
+                color=CODE_MUTED)
+
+
+def subrayado_marca(referencia, margen=0.14, grosor=3.5):
+    """Linea con el degradado de marca (ambar -> naranja) bajo un mobject."""
+    linea = Line(referencia.get_corner(DL), referencia.get_corner(DR),
+                 stroke_width=grosor)
+    linea.set_color(color_gradient([CODE_ACCENT, CODE_ACCENT_2], 2))
+    linea.shift(DOWN * margen)
+    return linea

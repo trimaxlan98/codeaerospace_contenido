@@ -1,8 +1,30 @@
 {
   "name": "15 · Cierre",
+  "tipo": "marca",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0,
-  "tipo": "marca"
+  "description": "La despedida de la marca en 9:16: el wordmark, el subrayado con el degradado ámbar-naranja, el pie «Sigue explorando.» y el punto parpadeando como cursor de una consola que sigue encendida. Sin narración: sólo la cama sonora, con el sting del cierre.",
+  "duracion_objetivo": 8.9,
+  "guion_visual": [
+    "0.4  se enciende CO.DE ACADEMY",
+    "1.8  el subrayado en degradado",
+    "2.9  «Sigue explorando.»",
+    "4.3  la firma HUD",
+    "4.8  el punto parpadea dos veces y pulsa",
+    "7.2  fundido a negro"
+  ],
+  "audio": {
+    "pico_db": -4.5,
+    "fade_in": 0.35,
+    "fade_out": [7.3, 8.6],
+    "eventos": [
+      ["nebulosa_cierre", 0.40, -12],
+      ["aire_largo", 0.55, -16],
+      ["subrayado", 1.90, -10],
+      ["blip_grave", 3.00, -18],
+      ["tick", 4.90, -9],
+      ["tick", 5.35, -9],
+      ["sting", 5.90, -10]
+    ]
+  }
 }
