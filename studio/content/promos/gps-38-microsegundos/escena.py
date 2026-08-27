@@ -44,7 +44,10 @@ class Promo(Scene):
         def estela(alpha):
             """Cola de cometa detras del satelite: da sensacion de avance
             tambien en la segunda vuelta, cuando la orbita ya esta pisada."""
-            a = ALPHA0 + VUELTAS * alpha
+            # El modulo no es cosmetico: sin el, la estela del ultimo frame
+            # pide un angulo de dos vueltas mas que la del primero. Es la
+            # misma geometria, pero el redondeo deja una costura medible.
+            a = (ALPHA0 + VUELTAS * alpha) % 1.0
             return Arc(radius=r_orb, start_angle=TAU * (a - COLA),
                        angle=TAU * COLA, arc_center=orb.tierra.get_center(),
                        stroke_color=C_SAT, stroke_width=3.0,

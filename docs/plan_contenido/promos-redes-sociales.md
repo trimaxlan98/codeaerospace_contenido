@@ -209,7 +209,7 @@ esta acabado, no a medias.
 |---|---|---|---|
 | 3 | El efecto mariposa | 15 · Caos | **LISTO** 12.90 s · bucle 0.000 · voz |
 | 4 | La tirania del cohete | 17 · Tsiolkovsky | **LISTO** 11.65 s · bucle 0.006 · voz |
-| 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.026 · voz |
+| 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.050 % (*) · voz |
 | 6 | Cuando el ruido se come el simbolo | 24 · Comunicaciones | **LISTO** 11.10 s · bucle 0.000 · voz |
 | 7 | Que es un determinante | 22 · Algebra lineal | **LISTO** 12.20 s · bucle 0.014 · voz |
 | 8 | El muro del sonido | 10 · Aerodinamica | **LISTO** 11.70 s · bucle 0.010 · voz |
@@ -331,6 +331,15 @@ verde el secreto. Pie: **EL VERDE NUNCA CRUZO**.
   version el "19" y el "2" quedaban a 1.1 u y se leian como **192**.
 - Los dos numeros publicos cruzan por carriles distintos para no pisarse.
 
+### (*) La unica costura que no es cero
+
+El promo del GPS marca 0.050 % de subpixeles distintos (los otros nueve
+estan en 0.000 %). Se persiguio hasta el final: NO es la estela acumulando
+dos vueltas —eso se normalizo con un modulo, y la cifra no cambio— sino el
+**antialiasing del trazo curvo** al reconstruirlo con `become`. Recortando
+la zona y mirandola al 100 % los dos frames son indistinguibles. Se deja
+asi, anotado, en vez de fingir que es cero.
+
 ### Calibracion de la voz (vale para todos los promos)
 
 Charon narra a **2.3–2.6 silabas por segundo, contando pausas** — no a
@@ -364,13 +373,27 @@ para que la cifra no engañe en ningun sentido: sin descontarlo, un bucle
 perfecto parece sucio, y con un umbral generoso uno sucio pasaria por
 limpio.
 
+## Verificacion final del lote (2026-08-27, madrugada)
+
+Los diez `exports/promos/*/vertical.mp4`, medidos sobre el archivo que se
+publica (no sobre el render intermedio):
+
+- **10/10** en 1080x1920 a 60 fps, de 10.80 a 13.30 s.
+- **10/10** con la costura del bucle en el suelo del codec (nueve en
+  0.000 %, el del GPS en 0.050 % — ver arriba).
+- **10/10** con audio AAC 24 kHz mono, picos entre −3.3 y −1.1 dBFS y los
+  dos extremos en silencio (−73 a −91 dB), asi que el salto del bucle no
+  suena.
+- **8/10** con voz Charon alineada a los instantes visuales (los dos de
+  filotaxis: el primero es solo SFX por diseño, el segundo lleva voz).
+
 ## Lo que falta (cuando se valide)
 
-1. Ver el vertical en un telefono de verdad (es lo unico que no se puede
-   comprobar aqui) y decidir si el disco crece o el ritmo cambia.
+1. Verlos en un telefono de verdad, que es lo unico que no se puede
+   comprobar aqui.
 2. Sacar el 16:9 en `qh`: el camino esta validado en `ql` (960x540, bucle
-   limpio), pero la composicion horizontal merece una pasada de ajuste — el
-   bloque de la cifra pide subir un poco.
+   limpio), pero la composicion horizontal de cada promo merece una pasada
+   de ajuste. Las escenas ya tienen su rama `else` escrita.
 3. La voz ya esta resuelta (promo 2): `narrar_promo.py` se copia al VPS, se
    sintetiza, se baja el wav y `sfx.py promo` lo mezcla con la cama. Los
    ficheros temporales del VPS se borran al terminar.
