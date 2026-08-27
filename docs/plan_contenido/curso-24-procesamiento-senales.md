@@ -227,7 +227,7 @@ agentes → revisión → PR → prod → narración → mux) antes de abrir el 
 |---|---|---|---|---|
 | 1 | 1–2 | 1.1–2.3 | `Secuencia`, `Escalera`, `Deslizador`, `Barras`, `EspectroDoble`, réplicas, cuantización, convolución, correlación | ~ producción |
 | 2 | 3–4 | 3.1–4.3 | `Mariposa`, `PlanoZ`, `RespuestaFrec`, DFT/FFT, ventanas, Z, retardo de grupo | ~ producción |
-| 3 | 5–6 | 5.1–6.3 | `LineaRetardos`, `Barras`, diseño FIR/IIR, biquads | — |
+| 3 | 5–6 | 5.1–6.3 | `LineaRetardos`, diseño FIR/IIR, biquads, Goertzel | ~ producción |
 | 4 | 7–8 | 7.1–8.3 | Q15, ciclos límite, overlap-add, polifase, CIC, Farrow | — |
 | 5 | 9–10 | 9.1–10.3 | `Espectrograma`, Welch, LMS, PLL, Kalman, Hilbert, STFT, filtro aprendido | — |
 
@@ -254,27 +254,36 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 
 | Lección | plan | libr. | clips | ql✔frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ | ✔ 32/33/30/33 s | ✔ #54 | ✔ | ✔ | ✔ | — |
-| 1.2 | ✔ | ✔ | ✔ | ✔ 37/37/35/36 s | ✔ #54 | ✔ | ✔ | ✔ | — |
-| 1.3 | ✔ | ✔ | ✔ | ✔ 32/28/29/34 s | ✔ #54 | ✔ | ✔ | ~ | — |
-| 2.1 | ✔ | ✔ | ✔ | ✔ 28/30/30/28 s | ✔ #54 | ✔ | ✔ | — | — |
-| 2.2 | ✔ | ✔ | ✔ | ✔ 39/35/34/37 s | ✔ #54 | ✔ | ✔ | — | — |
-| 2.3 | ✔ | ✔ | ✔ | ✔ 40/34/39/40 s | ✔ #54 | ✔ | ✔ | — | — |
-| 3.1 | ✔ | ✔ | ✔ | ✔ 29/29/29/32 s | — | — | — | — | — |
-| 3.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 4.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 4.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 4.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 5.1–6.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:27 |
+| 1.2 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:44 |
+| 1.3 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:22 |
+| 2.1 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:16 |
+| 2.2 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:43 |
+| 2.3 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:51 |
+| 3.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ~ | — |
+| 3.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
+| 3.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
+| 4.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
+| 4.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
+| 4.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
+| 5.1 | ✔ | ✔ | ✔ | ✔ 29/28/32/29 s | — | — | — | — | — |
+| 5.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 5.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 6.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 6.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 6.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
 | 7.1–8.3 | ✔ mapa | — | — | — | — | — | — | — | — |
 | 9.1–10.3 | ✔ mapa | — | — | — | — | — | — | — | — |
 
-**Dónde está la sesión ahora mismo**: lote 1 publicado en prod con sus 24 `qh`
-adoptados y narrándose (serial, en el VPS); lote 2 con la librería ampliada y
-validada, el molde 3.1 aprobado y 5 subagentes produciendo sus lecciones. El
-solape es deliberado: la narración ocupa el VPS y los renders de validación son
-locales, así que las dos cosas avanzan a la vez sin estorbarse.
+**Dónde está la sesión**: lote 1 **cerrado** (6 vídeos narrados y muxeados, con
+la marca sonora a −6.0 dB medidos dentro); lote 2 en prod con sus 24 `qh` y
+narrándose; lote 3 con la librería ampliada y validada, el molde 5.1 aprobado y
+5 subagentes produciendo. El solape es deliberado: la narración ocupa el VPS,
+los renders de validación son locales.
+
+**Salidas del lote 1** en `exports/procesamiento-senales-*/curso_narrado.mp4`
+(no versionadas): 2:16 a 2:51, picos entre −0.5 y −1.3 dB tras re-muxear 5
+clips a −1.5 dB.
 
 ## 13. Storyboard
 
@@ -440,7 +449,83 @@ unidad con polos y ceros y los radios al punto de trabajo), `RespuestaFrec`
   inverso estable. Cierre: «El módulo no cuenta toda la historia.» / «La fase
   dice cuándo llega cada cosa.»
 
-### Lotes 3–5
+### Lote 3 — Módulos 5 y 6
+
+Hilo del lote: **diseñar** un filtro. El módulo 4 enseñó a leer un filtro
+puesto en el plano; aquí se elige dónde poner las cosas para cumplir un
+pliego de condiciones, y se paga lo que cuesta. Pieza nueva: `LineaRetardos`
+(la forma directa dibujada).
+
+El pliego que se usa en las seis lecciones, para poder comparar: **paso hasta
+0.20π, rechazo desde 0.32π, −45 dB**. Todo lo demás se mide contra él.
+
+#### 5.1 «Truncar el ideal» (molde del lote)
+- **c1 · La sinc que no cabe** — el filtro ideal es una sinc infinita; lo único
+  posible es cortarla. `ideal_truncado`, `Secuencia`.
+- **c2 · Gibbs** — la oreja que sale junto a la transición: +0.82 dB, y **no
+  baja** al subir el orden (0.609 / 0.817 / 0.778 / 0.761 dB para órdenes
+  20/40/80/160). Lo que sí mejora es lo estrecha que es la transición.
+- **c3 · La ventana que ablanda** — al mismo orden 40: rect +0.817 dB de
+  sobrepico y −27.5 dB de atenuación; hann +0.056 / −33.7; hamming +0.020 /
+  −35.6; y **blackman +0.002 pero −24.1**, peor, porque su lóbulo principal se
+  come la banda de transición. El matiz que hay que contar.
+- **c4 · El precio** — para el pliego hacen falta **orden 72** por ventanas
+  (37 multiplicaciones) frente a **orden 40** equirriple (21). Cierre: «El
+  filtro ideal no existe.» / «Solo existe su recorte.»
+
+#### 5.2 «Equirriple»
+- **c1 · El margen que se tira** — el diseño por ventanas va de −28.1 a
+  −119.3 dB en la banda de rechazo: donde sobra atenuación, sobra orden.
+- **c2 · Repartir el error** — la idea del intercambio de Remez: mover los
+  extremos hasta que todos midan lo mismo.
+- **c3 · La alternancia** — 14 extremos medidos, todos entre −45.41 y
+  −45.46 dB: **0.055 dB de diferencia**. Eso es lo óptimo.
+- **c4 · Orden contra rizado** — 40 para −45 dB, 56 para −60 dB (medidos
+  probando, no por fórmula). Cierre: «Lo óptimo no es lo más plano.» / «Es lo
+  que reparte el error.»
+
+#### 5.3 «Cuánto cuesta un FIR»
+- **c1 · El retardo** — un FIR de orden N retrasa N/2 muestras. Medido.
+- **c2 · La simetría** — h[k] = h[N−k]: **21 multiplicaciones de 41**.
+- **c3 · La forma directa** — `LineaRetardos`: la señal cayendo por las cajas
+  z⁻¹ y las tomas sumándose.
+- **c4 · El presupuesto** — MAC por segundo a 48 kHz. Cierre: «Un filtro no se
+  mide en decibelios.» / «Se mide en multiplicaciones por segundo.»
+
+#### 6.1 «IIR: traer el analógico»
+- **c1 · El semicírculo** — los polos del Butterworth analógico, repartidos por
+  igual (`polos_butter_analogico`): |p| = 1 y ±112.5°, ±157.5° para orden 4.
+- **c2 · La bilineal** — el semiplano izquierdo ENTERO cabe dentro del círculo;
+  y el warping: 0.9π pide Ω = 6.31, no 0.9. Medido ida y vuelta.
+- **c3 · Las tres familias** — al mismo orden 8: butter −16.8 dB con 0.044 dB
+  de rizado; cheby1 −62.5 dB con 0.5 dB; elíptico −45.0 dB con 0.5 dB en las
+  dos bandas. Cada dB de atenuación se paga con rizado.
+- **c4 · IIR contra FIR** — el mismo pliego: FIR equirriple orden 40 (21
+  multiplicaciones) frente a IIR elíptico **orden 5** (11 coeficientes).
+  Cierre: «El filtro analogico no se copia.» / «Se dobla sobre el circulo.»
+
+#### 6.2 «Biquads en cascada»
+- **c1 · La forma directa revienta** — un IIR de orden 10 guardado con 16 bits
+  mueve sus polos **0.209** (¡y el filtro deja de ser el que era!).
+- **c2 · Secciones de segundo orden** — el mismo filtro partido en 5 biquads.
+- **c3 · La cifra** — a 16 bits: error 2.09e−01 en directa contra **1.78e−04**
+  en cascada, **1173×** mejor. A 12 bits, 220×.
+- **c4 · El orden de las secciones** — cuál va primero y por qué. Cierre: «Un
+  filtro no es su ecuacion.» / «Es como se calcula.»
+
+#### 6.3 «Peine, resonador, notch, Goertzel»
+- **c1 · El peine** — y[n] = x[n] + g·x[n−M]: con M = 8, **3 dientes** medidos
+  en 0.25π, 0.5π y 0.75π.
+- **c2 · El resonador** — el mismo par de polos del módulo 4, ahora como
+  herramienta.
+- **c3 · El notch** — matar una frecuencia sin tocar el resto: −39.7 dB en
+  0.4π con un cero en el círculo y un polo a 0.97.
+- **c4 · Goertzel** — una sola frecuencia sin FFT: **128 multiplicaciones
+  contra 448**, y el resultado **idéntico** al de la DFT (diferencia 0.0e+00).
+  Cierre: «No siempre hace falta el espectro entero.» / «A veces basta una
+  nota.»
+
+### Lotes 4–5
 Se escriben al abrir cada lote (§11 paso 1).
 
 ## 14. Cosecha heredada (lo que más riesgo tiene aquí)

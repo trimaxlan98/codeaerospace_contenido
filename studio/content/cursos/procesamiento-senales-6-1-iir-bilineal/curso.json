@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 6.1 IIR: traer el analógico",
+  "description": "Lección 6.1 del curso Procesamiento digital de señales (módulo 6: filtros IIR), en 4 clips animados: los polos de Butterworth repartidos por el semicírculo, la transformación bilineal que dobla el semiplano dentro del círculo y el warping que hay que compensar, las tres familias clásicas al mismo orden, y el mismo pliego resuelto con 21 multiplicaciones o con 11 coeficientes. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-semicirculo.py",
+      "title": "1 · El semicirculo",
+      "scene": "Clip1",
+      "final_state": "Los cuatro polos del Butterworth analogico repartidos por igual en el semicirculo izquierdo, con sus angulos medidos."
+    },
+    {
+      "file": "clips/02-la-bilineal.py",
+      "title": "2 · La bilineal",
+      "scene": "Clip2",
+      "final_state": "Los polos pasando del plano s al plano z, todos dentro del circulo, y la curva del warping con sus tres puntos medidos."
+    },
+    {
+      "file": "clips/03-las-tres-familias.py",
+      "title": "3 · Las tres familias",
+      "scene": "Clip3",
+      "final_state": "Las tres respuestas al mismo orden 8 superpuestas con sus cifras: -16.8 dB plano, -62.5 dB con rizado y -45.0 dB con rizado en las dos bandas."
+    },
+    {
+      "file": "clips/04-iir-contra-fir.py",
+      "title": "4 · IIR contra FIR",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'El filtro analogico no se copia.' (blanca) y 'Se dobla sobre el circulo.' (cian)."
+    }
+  ]
+}

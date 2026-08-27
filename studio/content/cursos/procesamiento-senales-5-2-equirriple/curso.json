@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 5.2 Equirriple: repartir el error",
+  "description": "Lección 5.2 del curso Procesamiento digital de señales (módulo 5: filtros FIR), en 4 clips animados: el margen que el diseño por ventanas tira a la basura, la idea de repartir el error por igual, el teorema de la alternancia medido sobre 14 extremos, y cuánto orden cuesta cada decibelio. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-margen-que-se-tira.py",
+      "title": "1 · El margen que sobra",
+      "scene": "Clip1",
+      "final_state": "La respuesta del diseño por ventanas con la banda de rechazo marcada: va de -28.1 a -119.3 dB, y solo el peor punto cuenta."
+    },
+    {
+      "file": "clips/02-repartir-el-error.py",
+      "title": "2 · Repartir el error",
+      "scene": "Clip2",
+      "final_state": "Las dos respuestas superpuestas: la de ventana con su rizado desigual y la equirriple con todos los extremos a la misma altura."
+    },
+    {
+      "file": "clips/03-la-alternancia.py",
+      "title": "3 · La alternancia",
+      "scene": "Clip3",
+      "final_state": "Los 14 extremos de la banda de rechazo marcados uno a uno, todos entre -45.41 y -45.46 dB; cifra de la diferencia maxima: 0.055 dB."
+    },
+    {
+      "file": "clips/04-orden-y-rizado.py",
+      "title": "4 · Orden y rizado",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Lo optimo no es lo mas plano.' (blanca) y 'Es lo que reparte el error.' (cian)."
+    }
+  ]
+}

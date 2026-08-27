@@ -23,8 +23,9 @@ Nada de cifras de tabla.
 import math
 
 import numpy as np
-from manim import (Arc, Circle, DashedLine, Dot, Line, ORIGIN, Polygon,
-                   Rectangle, Text, VGroup, VMobject)
+from manim import (Arc, Circle, DashedLine, Dot, DOWN, LEFT, Line,
+                   ORIGIN, Polygon, Rectangle, RIGHT, Text, UP,
+                   VGroup, VMobject)
 
 from algebra_lineal import C_EJE, C_REJILLA, _Anclada, fmt  # noqa: F401
 from comunicaciones import (Onda, alias_de, cuantizar,  # noqa: F401
@@ -42,6 +43,7 @@ C_IDEAL = "#a78bfa"    # violeta: el ideal, el limite teorico
 C_APREND = "#e879f9"   # fucsia: lo adaptado, lo aprendido
 C_BANDA = "#fb923c"    # naranja: el espectro, las replicas
 C_DATO = "#94a0b0"     # gris: dato publico, NO medido aqui
+CODE_BG_LOCAL = "#05070a"   # el fondo de la marca (para tapar detras)
 
 MUESTRAS_MAX = 4000
 
@@ -1261,20 +1263,23 @@ class PlanoZ(_Anclada):
     """
 
     def __init__(self, ceros=(), polos=(), unidad=1.55, alcance=1.75,
-                 color_cero=C_SALIDA, color_polo=C_RUIDO, **kwargs):
+                 color_cero=C_SALIDA, color_polo=C_RUIDO, lado_marca=0.10,
+                 color_circulo=C_MUESTRA, **kwargs):
         super().__init__(**kwargs)
         self.c = np.asarray(list(ceros), dtype=complex)
         self.p = np.asarray(list(polos), dtype=complex)
         self.unidad = float(unidad)
         self.alcance = float(alcance)
         self.color_cero, self.color_polo = color_cero, color_polo
+        self.lado_marca = float(lado_marca)
+        self.color_circulo = color_circulo
         self._poner_ancla(ORIGIN)
         a = self.alcance
         ex = Line(self.en(-a), self.en(a), color=C_EJE, stroke_width=1.6)
         ey = Line(self.en(-1j * a), self.en(1j * a), color=C_EJE,
                   stroke_width=1.6)
         self.ejes = VGroup(ex, ey)
-        self.circulo = Circle(radius=self.unidad, color=C_MUESTRA,
+        self.circulo = Circle(radius=self.unidad, color=color_circulo,
                               stroke_width=2.2, stroke_opacity=0.75)
         self.circulo.move_to(self._origen())
         self.ceros = VGroup(*[self._marca_cero(z) for z in self.c])
@@ -1289,11 +1294,13 @@ class PlanoZ(_Anclada):
     def punto_en(self, w):
         return self.en(np.exp(1j * float(w)))
 
-    def _marca_cero(self, z, radio=0.10):
+    def _marca_cero(self, z, radio=None):
+        radio = self.lado_marca if radio is None else radio
         return Circle(radius=radio, color=self.color_cero, stroke_width=2.6)\
             .move_to(self.en(z))
 
-    def _marca_polo(self, z, lado=0.10):
+    def _marca_polo(self, z, lado=None):
+        lado = self.lado_marca if lado is None else lado
         d = self.en(z)
         return VGroup(
             Line(d + np.array([-lado, -lado, 0]),
@@ -1330,20 +1337,37 @@ class PlanoZ(_Anclada):
             raise ValueError("la gemela necesita el MISMO numero de ceros "
                              "y de polos")
         o = PlanoZ(ceros, polos, self.unidad, self.alcance, self.color_cero,
-                   self.color_polo)
+                   self.color_polo, self.lado_marca, self.color_circulo)
         o.shift(self._origen() - o._origen())
         return o
 
 
-def plano_z(ceros=(), polos=(), unidad=1.55, alcance=1.75):
-    """Ver `PlanoZ`."""
-    return PlanoZ(ceros, polos, unidad, alcance)
+def plano_z(ceros=(), polos=(), unidad=1.55, alcance=1.75, lado_marca=0.10,
+            color_circulo=C_MUESTRA):
+    """Ver `PlanoZ`.
+
+    OJO con `lado_marca`: las aspas y los circulitos NO escalan solos con
+    `unidad`. Medido en el lote 3: con `unidad = 1.06`, un polo ESTABLE a
+    radio 0.994 se dibuja con la X llegando a 1.148, o sea cruzando el
+    circulo unidad — se lee justo como lo contrario de lo que es. Y con
+    diez polos juntos (Chebyshev de orden 10) las aspas se funden en una
+    mancha. Si te alejas de `unidad = 1.55` o dibujas muchos polos, pasa
+    `lado_marca` a mano.
+    """
+    return PlanoZ(ceros, polos, unidad, alcance, C_SALIDA, C_RUIDO,
+                  lado_marca, color_circulo)
 
 
 class RespuestaFrec(_Anclada):
     """|H(e^{jw})| en dB frente a w/pi (0 a 1).
 
     .en(w, db) .marca_w(w) .banda(w0, w1) .con_mag(db2) GEMELA
+
+    OJO: `.en()` recorta con np.clip entre `piso_db` y `techo_db`. Una curva
+    que no este acotada de forma natural (la del warping de la bilineal
+    llega a 31.8) sale como un segmento HORIZONTAL pegado al borde, que se
+    lee como saturacion — lo contrario de lo que hace. Quien dibuje una
+    curva asi tiene que recortar los PUNTOS antes, no fiarse del clip.
     """
 
     def __init__(self, w, mag_db, ancho=5.6, alto=2.6, piso_db=-60.0,
@@ -1468,3 +1492,308 @@ class Mariposa(_Anclada):
 def mariposa_dibujo(n=8, ancho=6.6, alto=4.2, color=C_MUESTRA):
     """Ver `Mariposa`."""
     return Mariposa(n, ancho, alto, color)
+
+
+# =====================================================================
+# 11. Diseño de filtros FIR (modulo 5)
+# =====================================================================
+def ideal_truncado(orden, fc, fs=2.0):
+    """El filtro ideal (una sinc infinita) cortado a `orden`+1 muestras.
+
+    Es el punto de partida honesto del diseño por ventanas: se calcula a
+    mano porque la leccion enseña QUE es truncar. fc en las mismas
+    unidades que fs (por defecto fs = 2, o sea fc en fracciones de pi).
+    """
+    n = int(orden) + 1
+    m = np.arange(n) - (n - 1) / 2.0
+    wc = 2.0 * float(fc) / float(fs)
+    return wc * np.sinc(wc * m)
+
+
+def fir_ventana(orden, fc, ventana="hann", fs=2.0):
+    """Ideal truncado x ventana: el diseño FIR mas simple que existe."""
+    h = ideal_truncado(orden, fc, fs)
+    return h * ventana_de(ventana, len(h))
+
+
+def gibbs_db(b, fc, fs=2.0, n=2048):
+    """El sobrepico MEDIDO junto a la transicion, en dB sobre 0 dB (la
+    oreja de Gibbs). Devuelve tambien donde esta."""
+    w, mag, _ = respuesta_frec(b, [1.0], n)
+    f = w / np.pi * (fs / 2.0)
+    dentro = f < float(fc) * 0.98
+    if not dentro.any():
+        return 0.0, 0.0
+    i = int(np.argmax(mag[dentro]))
+    return float(mag[dentro][i]), float(f[dentro][i])
+
+
+def rizado_db(b, a, f_paso, f_rechazo, fs=2.0, n=4096):
+    """Rizado MEDIDO en la banda de paso y atenuacion MEDIDA en la de
+    rechazo. -> (rizado_pp_db, atenuacion_db)"""
+    w, mag, _ = respuesta_frec(b, a, n)
+    f = w / np.pi * (fs / 2.0)
+    paso = mag[f <= float(f_paso)]
+    rech = mag[f >= float(f_rechazo)]
+    rizado = float(paso.max() - paso.min()) if len(paso) else 0.0
+    aten = float(rech.max()) if len(rech) else -np.inf
+    return rizado, aten
+
+
+def fir_equirriple(orden, f_paso, f_rechazo, fs=2.0, peso=(1.0, 1.0)):
+    """Parks-McClellan (intercambio de Remez) via scipy.signal.remez.
+
+    Es el unico diseño del curso que no se implementa a mano: el algoritmo
+    de intercambio no cabe en un clip, pero SU RESULTADO —el error que se
+    reparte por igual— es justo lo que hay que ver.
+    """
+    from scipy.signal import remez
+    return remez(int(orden) + 1, [0.0, float(f_paso), float(f_rechazo),
+                                  fs / 2.0], [1.0, 0.0], weight=list(peso),
+                 fs=float(fs))
+
+
+def alternancias(b, f_paso, f_rechazo, fs=2.0, n=4096):
+    """Los extremos del error (donde el rizado toca su tope) en la banda
+    de rechazo: el teorema de la alternancia, MEDIDO. -> lista de f"""
+    w, mag, _ = respuesta_frec(b, [1.0], n)
+    f = w / np.pi * (fs / 2.0)
+    m = f >= float(f_rechazo)
+    fr, mr = f[m], mag[m]
+    picos = []
+    for i in range(1, len(mr) - 1):
+        if (mr[i] > mr[i - 1] and mr[i] >= mr[i + 1]):
+            picos.append(float(fr[i]))
+    return picos
+
+
+def orden_necesario(f_paso, f_rechazo, aten_db, fs=2.0, tope=200):
+    """El orden MAS BAJO (par) que cumple la atenuacion pedida, hallado
+    probando: no hay formula honesta que valga para todo. -> (orden, aten)"""
+    for orden in range(10, int(tope) + 1, 2):
+        b = fir_equirriple(orden, f_paso, f_rechazo, fs)
+        _, aten = rizado_db(b, [1.0], f_paso, f_rechazo, fs)
+        if aten <= -abs(aten_db):
+            return orden, aten
+    return None, None
+
+
+def es_simetrico(b, tol=1e-9):
+    """Un FIR simetrico tiene fase lineal y la mitad de multiplicaciones."""
+    b = np.asarray(b, float)
+    return bool(np.max(np.abs(b - b[::-1])) < tol)
+
+
+def macs_fir(b):
+    """Multiplicaciones por muestra: N+1, o la mitad si es simetrico
+    (h[k] y h[N-k] multiplican al mismo coeficiente)."""
+    n = len(b)
+    return (n + 1) // 2 if es_simetrico(b) else n
+
+
+# =====================================================================
+# 12. Filtros IIR (modulo 6)
+# =====================================================================
+def polos_butter_analogico(orden, wc=1.0):
+    """Los polos del Butterworth ANALOGICO: repartidos por igual en el
+    semicirculo izquierdo de radio wc. Es la imagen que explica el nombre
+    'maximamente plano'."""
+    k = np.arange(1, int(orden) + 1)
+    ang = np.pi * (2 * k + orden - 1) / (2 * orden)
+    return wc * np.exp(1j * ang)
+
+
+def bilineal(polos_s, T=2.0):
+    """La transformacion bilineal z = (1 + sT/2)/(1 - sT/2): del plano s
+    al plano z. El semiplano izquierdo entero cabe dentro del circulo."""
+    s = np.asarray(polos_s, dtype=complex)
+    return (1.0 + s * T / 2.0) / (1.0 - s * T / 2.0)
+
+
+def warp(w_digital, T=2.0):
+    """La frecuencia analogica que hay que pedir para que la bilineal la
+    deje en w_digital: Omega = (2/T) tan(w/2). El 'prewarping'."""
+    return (2.0 / T) * np.tan(np.asarray(w_digital, float) / 2.0)
+
+
+def warp_inverso(omega, T=2.0):
+    return 2.0 * np.arctan(np.asarray(omega, float) * T / 2.0)
+
+
+def iir_butter(orden, fc, fs=2.0):
+    from scipy.signal import butter
+    return butter(int(orden), float(fc), btype="low", fs=float(fs))
+
+
+def iir_cheby1(orden, rizado_db_paso, fc, fs=2.0):
+    from scipy.signal import cheby1
+    return cheby1(int(orden), float(rizado_db_paso), float(fc),
+                  btype="low", fs=float(fs))
+
+
+def iir_elip(orden, rizado_db_paso, aten_db, fc, fs=2.0):
+    from scipy.signal import ellip
+    return ellip(int(orden), float(rizado_db_paso), float(aten_db),
+                 float(fc), btype="low", fs=float(fs))
+
+
+def secciones(b, a):
+    """Las secciones de segundo orden (biquads) de un filtro. -> (n, sos)
+
+    Un IIR de orden alto en forma directa es inservible en aritmetica
+    finita; en cascada de biquads, no. La cifra que lo demuestra esta en
+    `polos_cuantizados`.
+    """
+    from scipy.signal import tf2sos
+    sos = tf2sos(np.asarray(b, float), np.asarray(a, float))
+    return len(sos), sos
+
+
+def polos_cuantizados(b, a, bits):
+    """A donde se van los polos al guardar los coeficientes con `bits`,
+    en forma DIRECTA y en CASCADA de biquads.
+
+    -> (polos_exactos, polos_directa, polos_cascada, error_directa,
+        error_cascada) — los errores son la distancia maxima medida.
+    """
+    from scipy.signal import sos2zpk
+    b = np.asarray(b, float)
+    a = np.asarray(a, float)
+    paso = 2.0 ** -(int(bits) - 1)
+
+    def q(x):
+        return np.round(np.asarray(x, float) / paso) * paso
+
+    exactos = np.roots(a)
+    directa = np.roots(q(a))
+    _, sos = secciones(b, a)
+    sos_q = q(sos)
+    _, polos_c, _ = sos2zpk(sos_q)
+
+    def error(p2):
+        if len(p2) != len(exactos):
+            return float("nan")
+        # emparejar cada polo con el mas cercano
+        libres = list(range(len(p2)))
+        peor = 0.0
+        for p in exactos:
+            i = min(libres, key=lambda j: abs(p2[j] - p))
+            peor = max(peor, float(abs(p2[i] - p)))
+            libres.remove(i)
+        return peor
+
+    return exactos, directa, polos_c, error(directa), error(polos_c)
+
+
+def peine(retardo, ganancia=0.85):
+    """Filtro peine y = x[n] + g x[n-M]: dientes cada fs/M. -> (b, a)"""
+    b = np.zeros(int(retardo) + 1)
+    b[0] = 1.0
+    b[-1] = float(ganancia)
+    return b, np.array([1.0])
+
+
+def goertzel(x, k, n=None):
+    """El detector de UNA frecuencia sin FFT: un biquad y una salida.
+
+    Devuelve |X[k]| calculado por la recursion de Goertzel y, para
+    comprobarlo, el mismo valor sacado de la DFT.
+    """
+    x = np.asarray(x, float)
+    n = int(n or len(x))
+    w = 2.0 * np.pi * float(k) / n
+    coef = 2.0 * np.cos(w)
+    s1 = s2 = 0.0
+    for m in range(n):
+        s = x[m] + coef * s1 - s2
+        s2, s1 = s1, s
+    real = s1 - s2 * np.cos(w)
+    imag = s2 * np.sin(w)
+    por_goertzel = float(np.hypot(real, imag))
+    por_dft = float(abs(np.fft.rfft(x, n=n)[int(k)]))
+    return por_goertzel, por_dft
+
+
+def macs_goertzel(n):
+    """Multiplicaciones de Goertzel para UNA frecuencia: n (una por
+    muestra) frente a las n log2 n de una FFT entera."""
+    return int(n), int(ops_fft(int(n)))
+
+
+# =====================================================================
+# 13. La linea de retardos (la estructura, dibujada)
+# =====================================================================
+class LineaRetardos(_Anclada):
+    """La forma directa de un FIR: la señal entra, va cayendo por las
+    cajas z^-1, cada toma se multiplica por su coeficiente y todo se suma.
+
+    .cajas .tomas .coefs .suma
+    .encender(k)          resalta la rama k
+    .con_coefs(c)         GEMELA (mismo numero de tomas)
+    """
+
+    def __init__(self, coefs, ancho=9.0, alto=2.4, color=C_MUESTRA,
+                 dec=2, **kwargs):
+        super().__init__(**kwargs)
+        self.c = np.asarray(coefs, dtype=float)
+        self.ancho, self.alto = float(ancho), float(alto)
+        self.color, self.dec = color, int(dec)
+        self._poner_ancla(ORIGIN)
+        n = len(self.c)
+        paso = self.ancho / max(n, 1)
+        y_lin = self.alto / 2.0
+        y_sum = -self.alto / 2.0
+        self.linea = Line(self._p(0, y_lin) + LEFT * paso * 0.5,
+                          self._p(n - 1, y_lin), color=C_EJE,
+                          stroke_width=2.0)
+        self.cajas = VGroup()
+        self.tomas = VGroup()
+        self.coefs = VGroup()
+        for i in range(n):
+            p = self._p(i, y_lin)
+            if i > 0:
+                caja = Rectangle(width=paso * 0.46, height=0.34,
+                                 stroke_width=1.8, stroke_color=C_EJE,
+                                 fill_color=CODE_BG_LOCAL, fill_opacity=1.0)
+                caja.move_to(p + LEFT * paso * 0.5)
+                self.cajas.add(caja)
+            toma = Line(p, self._p(i, y_sum), color=C_EJE, stroke_width=1.4)
+            self.tomas.add(toma)
+            circ = Circle(radius=0.115, color=color, stroke_width=2.0)
+            circ.move_to(self._p(i, 0.0))
+            self.coefs.add(circ)
+        self.suma = Line(self._p(0, y_sum), self._p(n - 1, y_sum),
+                         color=C_EJE, stroke_width=2.0)
+        self.add(self.linea, self.cajas, self.tomas, self.suma, self.coefs)
+
+    def _p(self, i, y):
+        n = max(len(self.c), 1)
+        fx = (i + 0.5) / n
+        return (self._origen() + np.array([(fx - 0.5) * self.ancho, y, 0.0]))
+
+    def caja(self, i):
+        """La caja z^-1 que hay ANTES de la toma i (i >= 1)."""
+        return self.cajas[int(i) - 1]
+
+    def toma(self, i):
+        return self.tomas[int(i)]
+
+    def coef(self, i):
+        return self.coefs[int(i)]
+
+    def encender(self, i, color=C_CALCULO, grosor=3.2):
+        g = VGroup(self.tomas[int(i)].copy().set_stroke(color, grosor),
+                   self.coefs[int(i)].copy().set_stroke(color, grosor))
+        return g
+
+    def con_coefs(self, c2):
+        if len(c2) != len(self.c):
+            raise ValueError("la gemela necesita el MISMO numero de tomas")
+        o = LineaRetardos(c2, self.ancho, self.alto, self.color, self.dec)
+        o.shift(self._origen() - o._origen())
+        return o
+
+
+def linea_retardos(coefs, ancho=9.0, alto=2.4, color=C_MUESTRA, dec=2):
+    """Ver `LineaRetardos`."""
+    return LineaRetardos(coefs, ancho, alto, color, dec)
