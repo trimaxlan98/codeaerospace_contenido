@@ -298,6 +298,12 @@ Las del formato vertical y las de manim que costaron una iteracion cada una.
 
 **Herramienta**
 
+- **Manim deja una carpeta por resolucion** en `videos/scene/<res>/`, y
+  `sorted()` sobre los candidatos ordena `1920p60` ANTES que `960p30`: un
+  render `ql` posterior a uno `qh` copiaba el mp4 viejo y anunciaba
+  1080x1920 @60 tan tranquilo. Se descubrio verificando el lienzo despues
+  de mergear main. `render_vertical.py` ahora borra `videos/` antes de
+  renderizar y ademas elige por fecha.
 - El worktree usa el **venv del checkout principal** (`~/…contenido/studio/
   backend/venv/bin/python`): el worktree no tiene venv propio.
 - Lanzar tres renders en paralelo desde una sola linea de bash con

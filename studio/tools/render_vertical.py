@@ -33,6 +33,7 @@ El repo se monta READ-ONLY en el contenedor, igual que en produccion.
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -141,6 +142,13 @@ def renderizar(clip: dict, curso: dict, slug: str, args) -> bool:
     nombre_dir = clip["_slug"]
     trabajo = SALIDA / slug / nombre_dir
     trabajo.mkdir(parents=True, exist_ok=True)
+    # Manim escribe en videos/scene/<resolucion>/, asi que un render previo
+    # en OTRA calidad deja su carpeta ahi. Sin borrarla, la busqueda del mp4
+    # puede quedarse con el archivo viejo — y "1920p60" ordena antes que
+    # "960p30", asi que un `ql` posterior a un `qh` devolvia el `qh`. Se
+    # limpia antes de renderizar y ademas se elige por fecha.
+    if (trabajo / "videos").exists():
+        shutil.rmtree(trabajo / "videos")
     scene_py = trabajo / "scene.py"
     scene_py.write_text(branding.aplicar(
         compose_script(clip["_style"], clip["_script"])))
@@ -167,7 +175,8 @@ def renderizar(clip: dict, curso: dict, slug: str, args) -> bool:
         print(f"    FALLO el render (exit {proc.returncode}):\n{cola}")
         return False
 
-    candidatos = sorted((trabajo / "videos").rglob(f"{clip['scene']}.mp4"))
+    candidatos = sorted((trabajo / "videos").rglob(f"{clip['scene']}.mp4"),
+                        key=lambda p: p.stat().st_mtime, reverse=True)
     if not candidatos:
         print(f"    render sin video en {trabajo / 'videos'}")
         return False
