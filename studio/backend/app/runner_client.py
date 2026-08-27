@@ -63,6 +63,16 @@ class RunnerClient:
         return {"thumb": resp.get("thumb", ""),
                 "resolution": resp.get("resolution", "")}
 
+    async def postproceso(self, job_id: str, con_voz: bool) -> str:
+        """Mezcla el audio del promo sobre el video del job (sfx.py en el
+        contenedor). Devuelve la ruta relativa del mp4 sonorizado."""
+        resp = await self._request_one(
+            {"cmd": "postproceso", "job_id": job_id, "con_voz": con_voz},
+            timeout=360)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la mezcla de audio fallo"))
+        return resp.get("audio", "")
+
     async def render(
         self, job_id: str, scene: str, quality: str, timeout: int,
         formato: str = "horizontal", corto: int = 1080, largo: int = 1920,

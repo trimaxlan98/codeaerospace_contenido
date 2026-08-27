@@ -219,6 +219,40 @@ ManimStudio no hace en el servidor para no sumar otro paso de render):
    `concat.txt` ya trae los archivos en el orden del proyecto; `-c copy` es posible porque
    todos los clips de un proyecto comparten calidad (mismo códec/resolución).
 
+### Audio de los promos (botón «Audio» en un proyecto de tipo promo)
+
+Un promo de redes no lleva subtítulos: si no suena, no comunica. Este camino monta la
+**cama de sonido** y la **voz** sobre el video, dentro de la app (antes se hacía fuera, a
+mano, con `studio/tools/sfx.py`).
+
+- **Manifiesto por clip** (`clips.audio_json`, misma forma que el `promo.json` de los promos
+  escritos a mano): eventos `[sonido, t, dB]` y frases `[t_inicio, texto]`. Los sonidos son
+  los de `PALETA` en `sfx.py` — la UI los ofrece en un desplegable y `test_audio_promo.py`
+  compara las dos listas leyendo el archivo, para que no se separen en silencio.
+- **Avisos calculados** (no bloquean, se enseñan siempre): cuánta voz cabe entre dos
+  `t_inicio` a **2.45 sílabas/s** (medido con Charon sobre los diez primeros promos) y si la
+  voz termina a menos de **0.6 s** del final — en ese caso el salto del bucle se oye.
+- **Voz**: reusa `narracion.sintetizar()` con el texto escrito a mano, **sin** pasar por el
+  guion de Gemini, y se sintetiza contra `duración − 0.6 s` para que calle antes del último
+  frame. Se cachea por el hash del bloque `voz` (`voz.hash` en el directorio del job): mover
+  un sonido de la cama no vuelve a gastar TTS. Mismo feature-flag que el asistente.
+- **Mezcla**: el runner corre `sfx.py promo` dentro del contenedor manim (comando
+  `postproceso`, calcado de `thumbnail`: rutas fijas, solo recibe el `job_id`). El resultado
+  es `promo_audio.mp4` **al lado** del mudo: re-mezclar no obliga a re-renderizar.
+- **Lo que sirve la app**: `GET /api/jobs/{id}/video` devuelve el sonorizado si existe (la
+  Biblioteca marca «con sonido»), y si falta vuelve al mudo sin romperse.
+- **Estado**: `sin_manifiesto` · `sin_render` · `sin_mezclar` · `desactualizado` (cambió el
+  manifiesto o el video) · `al_dia`. Sale en el botón del clip y en el panel del proyecto.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/projects/{pid}/clips/{cid}/audio` | manifiesto + estado + avisos + duración real del video |
+| PUT | `/api/projects/{pid}/clips/{cid}/audio` | guarda el manifiesto (422 si un sonido no existe o un nivel se sale de rango) |
+| POST | `/api/projects/{pid}/clips/{cid}/audio/mezclar` | sintetiza la voz si hace falta y mezcla (409 sin render, 503 sin Vertex si hay frases) |
+
+Los tres responden 409 en un proyecto que no sea `tipo='promo'`: un curso se narra desde
+«Generar narración», que es otro camino y otro formato.
+
 ### Asistente IA (Vertex AI · Gemini 2.5 · us-central1)
 
 - Feature-flag: si no existe `studio/backend/gcp-key.json` (service account GCP, chmod 600,

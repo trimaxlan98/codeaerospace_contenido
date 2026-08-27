@@ -17,6 +17,7 @@ from .animations import AnimationStore
 from .auth import (change_password as auth_change_password, client_ip,
                    clear_session, create_session, get_rate_limiter,
                    require_auth, session_valid, verify_credentials)
+from .audio_api import make_router as make_audio_router
 from .config import get_settings
 from .conocimiento import Conocimiento
 from .db import Database
@@ -71,6 +72,8 @@ app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=No
 app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
 app.include_router(make_narracion_router(cfg, db, narracion_service))
+app.include_router(make_audio_router(cfg, db, manager, service,
+                                     narracion_service))
 
 # Endpoints que deben seguir accesibles con must_change_password activo: sin
 # ellos el usuario quedaria atrapado sin poder ni cambiar la password ni
@@ -284,11 +287,16 @@ async def get_video(job_id: str, _=Depends(require_auth)):
     job = _get_job_or_404(job_id)
     if job["status"] != "done" or not job.get("video_path"):
         raise HTTPException(status_code=404, detail="Video no disponible")
-    video = Path(job["video_path"]).resolve()
+    # Si el promo ya se mezcló, lo que sirve la app es el video CON sonido.
+    # El mudo se conserva al lado: re-mezclar no obliga a re-renderizar.
+    ruta = job.get("audio_path") or job["video_path"]
+    video = Path(ruta).resolve()
     # El video debe vivir dentro del directorio del job (defensa en profundidad)
     job_dir = (cfg.render_jobs_dir / job_id).resolve()
     if not video.is_file() or job_dir not in video.parents:
-        raise HTTPException(status_code=404, detail="Video no disponible")
+        video = Path(job["video_path"]).resolve()
+        if not video.is_file() or job_dir not in video.parents:
+            raise HTTPException(status_code=404, detail="Video no disponible")
     return FileResponse(video, media_type="video/mp4",
                         filename=f"{job['scene']}_{job_id}.mp4")
 

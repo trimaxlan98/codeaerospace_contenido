@@ -30,7 +30,12 @@ def job_public(job: dict) -> dict:
     keys = ("id", "scene", "quality", "timeout", "status", "video_path", "error",
             "created_at", "started_at", "finished_at", "size_bytes",
             "project_id", "clip_id", "formato", "resolution")
-    return {k: job.get(k) for k in keys} | {"has_thumb": bool(job.get("thumb_path"))}
+    # `audio_path` no viaja (es una ruta del servidor); lo que la interfaz
+    # necesita saber es si el video que sirve la app lleva sonido.
+    return {k: job.get(k) for k in keys} | {
+        "has_thumb": bool(job.get("thumb_path")),
+        "has_audio": bool(job.get("audio_path")),
+    }
 
 
 class JobManager:
@@ -99,6 +104,18 @@ class JobManager:
         return job_public({**job, "video_path": None, "error": None,
                            "started_at": None, "finished_at": None,
                            "resolution": None})
+
+    async def mezclar_audio(self, job_id: str, con_voz: bool) -> str:
+        """Mezcla la cama de sonido del promo sobre el video del job.
+
+        No pasa por la cola de render: es segundos de ffmpeg, no minutos de
+        manim, y no compite por el turno con un curso a medio renderizar.
+        """
+        return await self.runner.postproceso(job_id, con_voz)
+
+    def invalidate_storage(self) -> None:
+        """La mezcla añade un mp4 al directorio del job: la cuota cambió."""
+        self._invalidate_storage()
 
     async def cancel_job(self, job_id: str) -> bool:
         job = self.db.get_job(job_id)

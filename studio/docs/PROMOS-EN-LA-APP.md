@@ -3,7 +3,7 @@
 Escrita el 2026-08-27, después de producir a mano los 10 primeros promos (rama
 `exp/promos-redes`, ver `docs/plan_contenido/promos-redes-sociales.md`).
 
-Estado: **P1 hecho** (el lienzo). P2 (sonido) y P3 (verificación), propuestos.
+Estado: **P1 hecho** (el lienzo) y **P2 hecho** (el sonido). P3 (verificación), propuesto.
 
 ---
 
@@ -111,35 +111,51 @@ La resolución medida con ffprobe queda como comprobación, no como parche.
 
 ---
 
-## 5. Sprint P2 — El sonido
+## 5. Sprint P2 — El sonido · **HECHO** (2026-08-27)
 
-**Entregable:** el mp4 que sirve `/api/jobs/{id}/video` (`main.py:282`) ya viene con cama de
-sonido y, si hay voz, con voz. Hoy sale mudo y el `mux.sh` vive fuera de la app.
+**Entregable:** el mp4 que sirve `/api/jobs/{id}/video` ya viene con cama de sonido y, si hay
+voz, con voz. Antes salía mudo y el `mux.sh` vivía fuera de la app.
 
-- **Manifiesto por clip**: `clips.audio_json TEXT` (aditivo) con los bloques `audio` y `voz`
-  de `promo.json` tal cual. La UI lo edita con un formulario, no con un editor de JSON:
-  - *Cama*: filas `(sonido, t, dB)`. El catálogo de sonidos es cerrado y ya existe —
-    los 19 nombres de `PALETA` en `sfx.py:225` (`barrido`, `aire`, `blip_grave`, `pulso`,
-    `nebulosa`, `sting`…). Un `select`, no texto libre.
-  - *Voz*: filas `(t_inicio, texto)`. Con dos avisos calculados, no decorativos: **cuántas
-    sílabas caben** a 2.3-2.6 síl/s desde ese `t_inicio` hasta el siguiente, y si la voz
-    termina **a menos de 0.6 s del final** (el bucle chasquea). Los dos son errores que ya se
-    cometieron a mano.
-- **Runner, comando nuevo `postproceso`**: corre `sfx.py promo` dentro de la imagen
-  `manim-render`, con el directorio del job montado rw y la ruta del script fija dentro del
-  repo montado ro. Es el mismo patrón, casi línea por línea, que `handle_thumbnail`
-  (`manim_runner.py:158`): superficie mínima, sin rutas arbitrarias.
-- **Voz**: reusa `narracion.sintetizar()` (`narracion.py:358`) con las secciones escritas a
-  mano — **sin** pasar por el generador de guion de Gemini. Mismo feature-flag que hoy (sin
-  `gcp-key.json`, no hay voz), misma service account.
-- **Dos archivos por render**: se conserva el mudo y se escribe el sonorizado al lado.
-  Cambiar el manifiesto **no** obliga a re-renderizar el video: re-mezcla. Eso es importante
-  — el render en `qh` vertical es la parte cara, la mezcla cuesta segundos.
-- **Botón**: «Mezclar audio» junto a «Renderizar» en la tarjeta del promo, y se dispara solo
-  al terminar un render si el clip tiene manifiesto.
+**Verificado sobre el archivo**, montando el directorio del job como lo deja el backend y
+corriendo `sfx.py promo` con la misma línea de comandos que arma el runner:
 
-**Criterio de aceptación:** editar un evento de sonido en la UI, pulsar «Mezclar», y que el
-video que se descarga suene con ese cambio sin haber vuelto a renderizar.
+| Qué | Medido |
+|---|---|
+| Pista de audio | aac, 24 kHz, mono (la misma que el TTS) |
+| Pico | **−3.0 dBFS**, exactamente el que pide el manifiesto |
+| Extremos (100 ms) | entra a **−120 dBFS**, sale a **−64 dBFS** — el bucle no chasquea |
+| Duración | audio 10.58 s sobre video 10.67 s (el audio cierra antes, que es lo que se quiere) |
+
+**Dos cosas que costaron y quedan escritas.** La primera: `volumedetect` sobre una ventana de
+50 ms no mide 50 ms — arrastra el frame AAC entero y acusa de ruidoso un arranque que en las
+muestras es cero exacto. Los extremos se miden decodificando a wav y mirando las muestras, no
+con el medidor. La segunda: el catálogo de sonidos vive en `sfx.py` y la app lo repetía; ahora
+un test lee `PALETA` con `ast` y compara, porque un nombre inventado no falla al guardar sino
+dentro del contenedor, tarde y con un `KeyError`.
+
+**Lo que se hizo:**
+
+- **`audio_promo.py`** — módulo puro (sin Vertex, sin Docker, sin ffmpeg): manifiesto,
+  validación, sílabas y avisos. Es donde vive lo aprendido a mano.
+- **Manifiesto por clip** (`clips.audio_json`), con la forma exacta del `promo.json` de los
+  diez promos, para que el importador de la sección 8 sea copiar y pegar. La UI lo edita con
+  un formulario: los sonidos son un **desplegable** con los 19 nombres de `PALETA`, no texto
+  libre.
+- **Avisos calculados y siempre visibles**: cuánta voz cabe entre dos `t_inicio` (a 2.45
+  sílabas/s) y si la voz se pega al final. Los dos errores que ya se cometieron.
+- **Runner, comando `postproceso`** — `sfx.py promo` dentro de `manim-render`, job montado
+  rw, ruta del script fija: el mismo patrón que `handle_thumbnail`, sin rutas del exterior.
+- **Voz** — `narracion.sintetizar()` con el texto a mano, **sin** el guion de Gemini, contra
+  el límite `duración − 0.6 s`. Cacheada por el hash del bloque `voz`: retocar la cama no
+  gasta TTS.
+- **Dos archivos por render** — el mudo se conserva y el sonorizado se escribe al lado.
+  Cambiar el manifiesto re-mezcla en segundos; no re-renderiza.
+- **La app sirve el sonorizado** (`/api/jobs/{id}/video`), y la Biblioteca lo marca «con
+  sonido». Si el archivo falta, vuelve al mudo sin romperse.
+- **La interfaz deja de ofrecerle a un promo lo que no es suyo**: sin «Generar narración»
+  (ese camino escribe guiones de 28-45 s con Gemini), sin zip de curso — se descarga el mp4 —
+  y con el rango de duración del promo.
+- **16 pruebas nuevas** (`tests/test_audio_promo.py`), 178 en total en verde.
 
 ---
 
@@ -211,7 +227,7 @@ en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifi
 | Sprint | Qué habilita | Tamaño |
 |---|---|---|
 | ~~**P1 · Lienzo**~~ | ~~Autoría de promos en la app, sin sonido~~ · **hecho** | 1 sesión |
-| **P2 · Sonido** | El promo se termina dentro de la app | 2 sesiones |
+| ~~**P2 · Sonido**~~ | ~~El promo se termina dentro de la app~~ · **hecho** | 2 sesiones |
 | **P3 · Verificación** | Publicar sin abrir la terminal | 1 sesión |
 | **Importador** | Los 10 promos existentes entran al catálogo | media sesión |
 
