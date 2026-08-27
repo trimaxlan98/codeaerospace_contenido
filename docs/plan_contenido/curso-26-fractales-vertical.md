@@ -161,28 +161,43 @@ iteraciones (el VPS no renderiza esto, pero el contenedor local si), y
 | `studio/tools/alinear_voz.py` | narra frase a frase y las coloca en su `t_inicio` EXACTO, sin el tope de 2.5 s del ensamblador del backend |
 | `studio/tools/unir_vertical.py` | mux por clip (video + voz + SFX) y `concat -c copy` de las 16 piezas |
 
-## Tablero de estado
+## Tablero de estado — **CURSO TERMINADO** (2026-08-27)
 
 | Paso | Estado |
 |---|---|
 | Plan maestro | hecho |
 | Libreria ampliada + sonda de validacion | hecho (0 fallos, 17 s) |
-| Herramientas (render_vertical / sfx vertical / unir_vertical) | hecho |
-| Molde (clip 01) | hecho |
-| Esqueletos de los 16 | hecho |
-| Clips 1-3 (M1) | escritos y validados en `ql` |
-| Clips 4-6 (M2) | escritos y validados en `ql` |
-| Clips 7-11 (M3) | escritos y validados en `ql` |
-| Clips 12-14 (M4) | escritos y validados en `ql` |
-| Intro + cierre verticales | escritos y validados en `ql` |
-| `qh` de las 16 piezas | en curso |
-| Voz (VPS, serial) | manifiestos subidos a `/tmp/narrar-fractales` |
-| Mux + union + picos | pendiente |
+| Herramientas (render_vertical / alinear_voz / unir_vertical / sfx vertical) | hecho |
+| Las 16 piezas escritas y revisadas frame a frame | hecho |
+| `qh` de las 16 (1080x1920 @60) | hecho |
+| Voz (VPS, serial, alineada al instante exacto) | hecho |
+| Mux + union + picos | hecho |
 
-Duraciones medidas (`ql`, identicas en `qh`): intro 12.43 · 01 36.83 ·
-02 33.36 · 03 34.06 · 04 31.93 · 05 30.60 · 06 31.26 · 07 30.26 · 08 30.13 ·
-09 30.43 · 10 32.37 · 11 30.23 · 12 31.03 · 13 35.03 · 14 30.83 · cierre 8.90.
-**Total 8 min 30 s.**
+**La entrega**: `exports/verticales/fractales/fractales_vertical.mp4` —
+1080x1920 @60 fps, **7 min 48 s** (468.06 s), 16 piezas, pico −1.0 dB.
+No se versiona (`exports/` esta en .gitignore).
+
+Duraciones medidas en `qh`: intro 12.48 · 01 35.57 · 02 33.37 · 03 34.07 ·
+04 31.62 · 05 30.53 · 06 31.20 · 07 30.17 · 08 30.05 · 09 30.43 · 10 32.37 ·
+11 30.20 · 12 31.03 · 13 34.98 · 14 31.02 · cierre 8.93.
+
+**Verificaciones que se pasaron**
+
+- Sonda de la libreria en el contenedor: **0 fallos** (cifras y PNGs).
+- Guardian de zona segura activo en `hud()`/`cifra()`: ningun rotulo se
+  sale de las 5.76 unidades utiles.
+- **Costuras del montaje**: el ultimo frame de cada pieza contra el primero
+  de la siguiente, 0.003/255 de diferencia media (0.05 en las dos uniones
+  con las piezas de marca, que no llevan esquinas HUD). Ningun salto.
+- **Alineacion de la voz**: envelope RMS contra los `t_inicio` del
+  manifiesto. **Desfase maximo 0.90 s** (era 2.80 s con el ensamblador del
+  backend). Todas las piezas dejan >= 0.99 s de cola de silencio.
+- Picos: entre −1.0 y −4.5 dB por pieza; −1.0 dB el montaje. Sin recorte.
+
+**Lo que falta y no puede hacerse aqui**: verlo en un telefono de verdad
+(el juicio final de un vertical es el pulgar), y decidir con el dueño si el
+PR a `main` arrastra tambien la rama `exp/promos-redes`, sobre la que esta
+construido.
 
 ## Cosecha de trampas
 

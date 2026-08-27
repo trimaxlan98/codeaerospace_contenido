@@ -20,32 +20,32 @@
     "voz": "Charon",
     "secciones": [
       {
-        "t_inicio": 1.4,
-        "texto": "Una ecuación de una línea."
+        "t_inicio": 1.0,
+        "texto": "Una ecuación simple."
       },
       {
-        "t_inicio": 4.4,
-        "texto": "Dos finales. Luego cuatro. Luego ocho."
+        "t_inicio": 6.0,
+        "texto": "Dos finales. Cuatro. Ocho."
       },
       {
-        "t_inicio": 9.6,
+        "t_inicio": 11.5,
         "texto": "Y después, caos."
       },
       {
-        "t_inicio": 13.4,
-        "texto": "Pero dentro del caos hay una ventana."
+        "t_inicio": 15.0,
+        "texto": "Dentro del caos hay una ventana."
       },
       {
-        "t_inicio": 18.4,
-        "texto": "Y dentro está el dibujo entero, otra vez."
+        "t_inicio": 20.0,
+        "texto": "Y dentro, el dibujo entero otra vez."
       },
       {
-        "t_inicio": 24.2,
+        "t_inicio": 25.5,
         "texto": "Esta trayectoria nunca se repite."
       },
       {
-        "t_inicio": 29.2,
-        "texto": "Y su forma tampoco es una curva."
+        "t_inicio": 30.0,
+        "texto": "Y su forma no es una curva."
       }
     ]
   },
