@@ -1,0 +1,79 @@
+{
+  "name": "Cuando el ruido se come el simbolo",
+  "curso": "Comunicaciones digitales",
+  "description": "Promo del curso 24. Una constelacion 16-QAM con 500 simbolos recibidos: al bajar la relacion senal-ruido las nubes crecen hasta rozar la del vecino y el receptor decide mal. Los simbolos que caen en la region equivocada se ponen rojos y se cuentan: 31 de 500 en el peor momento (6.2 %). El barrido para en 7 dB porque ahi todavia se ve la rejilla y se entiende POR QUE falla; a 6 dB ya es confeti.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 11.1,
+  "guion_visual": [
+    "0.00 los 16 simbolos limpios, nada mas",
+    "0.35 aparecen los 500 envios con poco ruido",
+    "1.05 baja la senal: las nubes crecen y los errores se cuentan",
+    "6.05 el peor momento: 31 de 500",
+    "10.05 los envios se apagan",
+    "10.75 los 16 simbolos limpios otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.8,
+        "texto": "Dieciséis símbolos."
+      },
+      {
+        "t_inicio": 3.2,
+        "texto": "Baja la señal y se emborronan."
+      },
+      {
+        "t_inicio": 6.0,
+        "texto": "Treinta y un errores."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      10.2,
+      10.9
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -14
+      ],
+      [
+        "aire_largo",
+        0.4,
+        -18
+      ],
+      [
+        "barrido",
+        1.1,
+        -17
+      ],
+      [
+        "nebulosa",
+        5.6,
+        -15
+      ],
+      [
+        "sting",
+        5.9,
+        -15
+      ],
+      [
+        "aire",
+        9.9,
+        -17
+      ]
+    ]
+  }
+}

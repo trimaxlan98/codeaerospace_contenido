@@ -210,7 +210,7 @@ esta acabado, no a medias.
 | 3 | El efecto mariposa | 15 · Caos | **LISTO** 12.90 s · bucle 0.000 · voz |
 | 4 | La tirania del cohete | 17 · Tsiolkovsky | **LISTO** 11.65 s · bucle 0.006 · voz |
 | 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.026 · voz |
-| 6 | La constelacion con ruido | 24 · Comunicaciones | pendiente |
+| 6 | Cuando el ruido se come el simbolo | 24 · Comunicaciones | **LISTO** 11.10 s · bucle 0.000 · voz |
 | 7 | Que es un determinante | 22 · Algebra lineal | pendiente |
 
 ### Promo 3 — "El efecto mariposa" (curso 15)
@@ -260,6 +260,23 @@ de tiempo de vuelo de la luz).
 - El satelite de fabrica es un punto de dos pixeles en un telefono: se
   escala x2 y se le pone una estela de cometa (0.22 de vuelta) para que en
   la segunda vuelta, con la orbita ya pisada, se siga viendo avanzar.
+
+### Promo 6 — "Cuando el ruido se come el simbolo" (curso 24)
+
+`studio/content/promos/qam-el-ruido/`. 11.10 s. Una constelacion 16-QAM con
+**500 envios**: al bajar la señal las nubes crecen hasta rozar la del vecino
+y el receptor decide mal. Los que caen en region ajena se ponen rojos y se
+cuentan: **31 de 500** en el peor momento.
+
+- **El ruido es una realizacion gaussiana FIJA que se escala por la sigma de
+  cada Eb/N0** (la misma formula que `awgn`). Asi la nube respira en vez de
+  parpadear como estatica de television, y sigue siendo AWGN legitimo: los
+  500 dan 6.2 % de error a 7 dB frente al 6.69 % del Monte Carlo de 200 000.
+- **El barrido para en 7 dB, no en 6**, y la razon es pedagogica: a 7 dB la
+  nube de cada simbolo (3σ = 1.04 u) casi toca la del vecino (1.39 u) y se
+  VE por que falla; a 6 dB el cuadro es confeti y se pierde la rejilla.
+- La escala de la constelacion se bajo de 3.05 a 2.2 u: con la primera, la
+  nube del peor momento se salia del lienzo por los cuatro lados.
 
 ## Lo que falta (cuando se valide)
 
