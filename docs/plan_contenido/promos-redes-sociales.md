@@ -211,7 +211,7 @@ esta acabado, no a medias.
 | 4 | La tirania del cohete | 17 · Tsiolkovsky | **LISTO** 11.65 s · bucle 0.006 · voz |
 | 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.026 · voz |
 | 6 | Cuando el ruido se come el simbolo | 24 · Comunicaciones | **LISTO** 11.10 s · bucle 0.000 · voz |
-| 7 | Que es un determinante | 22 · Algebra lineal | pendiente |
+| 7 | Que es un determinante | 22 · Algebra lineal | **LISTO** 12.20 s · bucle 0.014 · voz |
 
 ### Promo 3 — "El efecto mariposa" (curso 15)
 
@@ -277,6 +277,21 @@ cuentan: **31 de 500** en el peor momento.
   VE por que falla; a 6 dB el cuadro es confeti y se pierde la rejilla.
 - La escala de la constelacion se bajo de 3.05 a 2.2 u: con la primera, la
   nube del peor momento se salia del lienzo por los cuatro lados.
+
+### Promo 7 — "Que es un determinante" (curso 22)
+
+`studio/content/promos/determinante/`. 12.20 s. La respuesta sin una sola
+formula: la rejilla se inclina bajo **M(s) = [[1,s],[s,1]]**, el cuadrado
+unidad se vuelve paralelogramo y la cifra es su area. En s=1 la matriz es
+singular y el plano ENTERO se aplasta sobre la recta y=x con el
+determinante en **0.00** exacto.
+
+- La cifra es `paralelogramo(pl, M).area` (area con signo de las columnas):
+  lo que se ve y lo que se lee son la misma cuenta.
+- La familia se eligio para que el barrido sea monotono (det = 1 − s²) y
+  para que el estado inicial vuelva solo, que es lo que cierra el bucle.
+- `pl.aplicar(M)` reconstruye la rejilla viva cada frame sin animar: es lo
+  que permite meter la transformacion dentro de un `UpdateFromAlphaFunc`.
 
 ## Lo que falta (cuando se valide)
 
