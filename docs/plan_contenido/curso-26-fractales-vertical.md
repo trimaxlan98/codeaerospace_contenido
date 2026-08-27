@@ -157,7 +157,8 @@ iteraciones (el VPS no renderiza esto, pero el contenedor local si), y
 | `studio/content/verticales/<slug>/` | curso vertical: `curso.json` + `style_block.py` + `clips/NN-<tema>/{clip.json,escena.py}` |
 | `studio/tools/render_vertical.py` | renderiza un clip (o todos) en 9:16, mide duracion, saca frames y avisa fuera de 30-45 s |
 | `studio/tools/sfx.py` (`vertical`) | cama sonora por clip desde `clip.json` (reusa `mezclar`) |
-| `studio/tools/narrar_promo.py` | ya sirve: acepta `clip.json` ademas de `promo.json` |
+| `studio/tools/narrar_promo.py` | acepta `clip.json` ademas de `promo.json` (se usa para promos) |
+| `studio/tools/alinear_voz.py` | narra frase a frase y las coloca en su `t_inicio` EXACTO, sin el tope de 2.5 s del ensamblador del backend |
 | `studio/tools/unir_vertical.py` | mux por clip (video + voz + SFX) y `concat -c copy` de las 16 piezas |
 
 ## Tablero de estado
@@ -258,6 +259,27 @@ Las del formato vertical y las de manim que costaron una iteracion cada una.
 - Los puntos de partida del clip 12 se eligieron **midiendo**: el par mas
   manso (radio maximo 1.24) entre los que, separados 0.02, caen en raices
   distintas. Con otros pares, Newton pega un salto enorme.
+
+**Voz**
+
+- **El ensamblador del backend acota el silencio entre frases a
+  `MAX_HUECO_S = 2.5 s`** (`app.narracion._ensamblar`). Para un guion de
+  curso horizontal, que habla casi todo el rato, esta bien; en un curso
+  vertical la voz es rala **a proposito** —la imagen enseña y la voz
+  remata— y hay huecos de 4 a 7 s. Con el tope, cada frase se ADELANTA
+  hasta 2.8 s y acaba comentando el plano equivocado. Medido sobre el
+  envelope RMS de los wavs: 2.8 s en el clip 01, 2.7 en el 02, 1.5 en el
+  10. Se resolvio con `studio/tools/alinear_voz.py`, que sintetiza frase a
+  frase y las coloca en su instante SIN tope. Tras el cambio, la voz cae
+  donde dice el manifiesto.
+- **La alineacion se verifica midiendo, no escuchando**: envelope RMS en
+  ventanas de 100 ms, arranques de habla y comparacion con los `t_inicio`.
+  Ocho minutos de audio no se auditan de oido frase por frase.
+- Si una frase se pasa de larga empuja a la siguiente: `alinear_voz.py` lo
+  AVISA con cuanto, y se arregla acortando el texto, no moviendo el audio.
+- La `duracion_objetivo` tiene que ser la del render **qh**, que no es la de
+  `ql`: en clips con muchos `play` cortos la diferencia llega a 0.3 s (el
+  redondeo a frame es distinto a 30 y a 60 fps).
 
 **Herramienta**
 
