@@ -212,6 +212,7 @@ esta acabado, no a medias.
 | 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.026 · voz |
 | 6 | Cuando el ruido se come el simbolo | 24 · Comunicaciones | **LISTO** 11.10 s · bucle 0.000 · voz |
 | 7 | Que es un determinante | 22 · Algebra lineal | **LISTO** 12.20 s · bucle 0.014 · voz |
+| 8 | El muro del sonido | 10 · Aerodinamica | **LISTO** 11.70 s · bucle 0.010 · voz |
 
 ### Promo 3 — "El efecto mariposa" (curso 15)
 
@@ -292,6 +293,28 @@ determinante en **0.00** exacto.
   para que el estado inicial vuelva solo, que es lo que cierra el bucle.
 - `pl.aplicar(M)` reconstruye la rejilla viva cada frame sin animar: es lo
   que permite meter la transformacion dentro de un `UpdateFromAlphaFunc`.
+
+### Promo 8 — "El muro del sonido" (curso 10)
+
+`studio/content/promos/muro-del-sonido/`. 11.70 s. Cada circunferencia es el
+sonido emitido hace k intervalos. Por debajo de Mach 1 los frentes se
+adelantan —el aire se entera de que vas—; **a Mach 1 son todos tangentes en
+la propia fuente**, que es la pared; y por encima la envolvente es el cono
+de Mach, con su semiangulo medido (**34 grados a Mach 1.8**).
+
+- Todo sale de `frentes_moviles` y `angulo_mach`: el dibujo a Mach 1 es
+  tangente por geometria, no por un ajuste a ojo.
+- El dibujo se **gira 90 grados** para que la fuente suba y la estela caiga:
+  asi una figura naturalmente horizontal llena el vertical. Como en la
+  construccion la fuente esta en el origen, girar alrededor del origen la
+  deja quieta y basta un `shift`.
+- Trampa: `next_to` respecto de una etiqueta VACIA no mide nada, y el
+  rotulo del cono aparecio en mitad del dibujo. Los renglones que a veces
+  estan vacios se posicionan por coordenada, no por vecindad.
+- Trampa de voz: los `t_inicio` tienen que dejar sitio a la frase anterior.
+  Con 0.8 / 4.0 / 7.4 cada frase empujaba a la siguiente y la cadena
+  terminaba pegada al ultimo frame — es decir, el bucle sonaba. Con
+  0.8 / 4.5 / 8.0 la voz acaba 1.3 s antes del final.
 
 ## Lo que falta (cuando se valide)
 
