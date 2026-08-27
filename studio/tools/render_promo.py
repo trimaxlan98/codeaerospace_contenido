@@ -48,7 +48,8 @@ FORMATOS = ("vertical", "horizontal", "cuadrado")
 CALIDADES = ("ql", "qm", "qh")
 
 # Un promo se ve en bucle: el ultimo frame tiene que ser el primero. Estos
-# son los umbrales por debajo de los cuales el corte NO se percibe.
+# son los umbrales por debajo de los cuales el corte NO se percibe, y se
+# aplican SOBRE EL SUELO DEL CODEC (ver `medir_bucle`).
 COSTURA_DIF_MEDIA = 0.5     # diferencia media por canal (0-255)
 COSTURA_PCT_PIXELES = 0.20  # % de subpixeles que cambian de forma visible
 
@@ -134,8 +135,24 @@ def _crudo_final(video: Path, ancho: int, tam: int) -> bytes:
     return cola[-tam:] if len(cola) >= tam else b""
 
 
+def _comparar(a: bytes, b: bytes) -> tuple[float, float]:
+    """(diferencia media por subpixel, % de subpixeles con salto visible)."""
+    if not a or len(a) != len(b):
+        return float("nan"), float("nan")
+    total = sum(abs(x - y) for x, y in zip(a, b))
+    visibles = sum(1 for x, y in zip(a, b) if abs(x - y) > 8)
+    return total / len(a), 100.0 * visibles / len(a)
+
+
 def medir_bucle(video: Path, datos: dict, destino: Path) -> dict:
-    """Compara el primer frame con el ultimo: ¿se nota el corte al repetir?"""
+    """Compara el primer frame con el ultimo: ¿se nota el corte al repetir?
+
+    La comparacion se hace CONTRA EL SUELO DEL CODEC. Dos frames que en la
+    escena son identicos (el 0 y el 1, dentro del respiro inicial) no salen
+    identicos del h264: en un fondo plano y oscuro la cuantizacion deja una
+    diferencia de fondo que puede llegar al 0.18 % de los subpixeles. Sin
+    descontarla, un bucle perfecto parece sucio y uno sucio parece limpio.
+    """
     destino.mkdir(parents=True, exist_ok=True)
     _frame(video, 0.0, destino / "primero.png")
     _frame_final(video, destino / "ultimo.png")
@@ -147,14 +164,17 @@ def medir_bucle(video: Path, datos: dict, destino: Path) -> dict:
 
     a = _crudo(video, 0.0, 240)
     b = _crudo_final(video, 240, len(a))
-    if not a or len(a) != len(b):
-        return {"ok": False, "media": float("nan"), "pct": float("nan")}
-    total = sum(abs(x - y) for x, y in zip(a, b))
-    visibles = sum(1 for x, y in zip(a, b) if abs(x - y) > 8)
-    media = total / len(a)
-    pct = 100.0 * visibles / len(a)
-    return {"ok": media <= COSTURA_DIF_MEDIA and pct <= COSTURA_PCT_PIXELES,
-            "media": media, "pct": pct}
+    media, pct = _comparar(a, b)
+    # El suelo: dos frames consecutivos del respiro inicial, que en la
+    # escena son el MISMO dibujo.
+    piso_media, piso_pct = _comparar(a, _crudo(video, 1.5 / datos["fps"], 240))
+    if media != media:  # NaN
+        return {"ok": False, "media": media, "pct": pct,
+                "piso_media": piso_media, "piso_pct": piso_pct}
+    return {"ok": (media - piso_media) <= COSTURA_DIF_MEDIA
+            and (pct - piso_pct) <= COSTURA_PCT_PIXELES,
+            "media": media, "pct": pct,
+            "piso_media": piso_media, "piso_pct": piso_pct}
 
 
 def extraer_frames(video: Path, destino: Path, cuantos: int,
@@ -217,7 +237,9 @@ def renderizar(promo: dict, slug: str, args) -> bool:
     bucle = medir_bucle(video, datos, trabajo / "bucle")
     marca = "BUCLE LIMPIO" if bucle["ok"] else "BUCLE VISIBLE"
     print(f"    {marca}: dif media {bucle['media']:.3f}/255 ·"
-          f" {bucle['pct']:.3f} % de subpixeles con salto visible")
+          f" {bucle['pct']:.3f} % de subpixeles con salto visible"
+          f"   (suelo del codec: {bucle['piso_media']:.3f} ·"
+          f" {bucle['piso_pct']:.3f} %)")
     if not bucle["ok"]:
         print("      -> el ultimo frame NO es el primero; mira"
               f" {(trabajo / 'bucle' / 'costura.png').relative_to(REPO)}")

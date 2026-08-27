@@ -1,0 +1,42 @@
+{
+  "name": "Nadie manda en Internet",
+  "curso": "Protocolos de Internet",
+  "description": "Promo del curso 25. La sierra de TCP: cada emisor sube su ventana de envio un paquete por viaje hasta que algo se pierde, y entonces la parte por la mitad. No hay ninguna autoridad repartiendo el ancho de banda: la red se sostiene porque cada uno frena solo. La traza y las tres perdidas son las de la libreria, y la linea punteada es la media medida de esa traza.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": ["vertical", "horizontal"],
+  "duracion_objetivo": 12.8,
+  "guion_visual": [
+    "0.00 los ejes vacios",
+    "0.35 la ventana sube y se parte por la mitad en cada perdida",
+    "6.85 aparece la media medida de la traza",
+    "8.05 respiro",
+    "10.65 el trazo se recoge",
+    "12.45 los ejes vacios otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 0.8, "texto": "Nadie manda en Internet."},
+      {"t_inicio": 5.0, "texto": "Suben hasta que algo falla."},
+      {"t_inicio": 9.2, "texto": "Y frenan solos."}
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [11.90, 12.60],
+    "eventos": [
+      ["nebulosa", 0.10, -14],
+      ["aire_largo", 0.40, -18],
+      ["tick", 2.30, -19],
+      ["tick", 4.05, -19],
+      ["tick", 5.80, -19],
+      ["nebulosa", 6.00, -15],
+      ["pulso", 7.00, -14],
+      ["aire", 10.70, -17]
+    ]
+  }
+}

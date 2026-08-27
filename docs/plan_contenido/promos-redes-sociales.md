@@ -214,6 +214,7 @@ esta acabado, no a medias.
 | 7 | Que es un determinante | 22 · Algebra lineal | **LISTO** 12.20 s · bucle 0.014 · voz |
 | 8 | El muro del sonido | 10 · Aerodinamica | **LISTO** 11.70 s · bucle 0.010 · voz |
 | 9 | El secreto que se grita en publico | 19 · Criptografia | **LISTO** 12.50 s · bucle 0.001 · voz |
+| 10 | Nadie manda en Internet | 25 · Protocolos | **LISTO** 12.80 s · bucle 0.000 · voz |
 
 ### Promo 3 — "El efecto mariposa" (curso 15)
 
@@ -340,6 +341,28 @@ el bucle SUENA. Regla: ≥ 4.5 s entre `t_inicio` para una frase de ~10
 silabas, y si la duracion que reporta la herramienta es casi el limite, es
 que se comprimieron los silencios. `narrar_promo.py` ahora **avisa** de ese
 caso (antes solo avisaba si no cabia).
+
+### Promo 10 — "Nadie manda en Internet" (curso 25)
+
+`studio/content/promos/tcp-la-sierra/`. 12.80 s. La sierra de TCP dibujandose
+en directo: la ventana sube un paquete por viaje hasta que algo se pierde
+(marca roja) y entonces se parte por la mitad. Al final aparece la media
+MEDIDA de la traza: **27.6**. La leccion es que no hay ninguna autoridad
+repartiendo el ancho de banda — la red aguanta porque cada emisor frena solo.
+
+- Las marcas rojas no se encienden a ojo: cada una compara el avance del
+  trazo con su indice en la traza de `aimd`.
+
+### La metrica del bucle tiene un suelo, y hay que descontarlo
+
+Este promo marcaba 0.184 % de subpixeles distintos entre el primer frame y
+el ultimo. No era una costura: **dos frames que en la escena son EL MISMO
+dibujo (el 0 y el 1 del respiro inicial) daban exactamente la misma cifra**.
+Es la cuantizacion del h264 sobre un fondo plano y oscuro. `render_promo.py`
+mide ahora ese suelo y juzga la costura por encima de el; lo imprime al lado
+para que la cifra no engañe en ningun sentido: sin descontarlo, un bucle
+perfecto parece sucio, y con un umbral generoso uno sucio pasaria por
+limpio.
 
 ## Lo que falta (cuando se valide)
 
