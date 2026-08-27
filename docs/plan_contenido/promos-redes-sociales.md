@@ -197,6 +197,37 @@ la voz callada 0.8 s antes del ultimo frame. Salida:
 - A 90.3 grados los cuatro rayos se convierten en cuatro brazos curvos: el
   barrido regala su propio momento visual a los pocos frames de arrancar.
 
+## Lote de la noche del 2026-08-27
+
+Encargo: *"mas videos de extractos de los demas cursos, muy buenos y
+llamativos, hechos con cuidado para que funcionen bien"*. Uno por curso, y
+cada uno se termina ENTERO (visual -> qh -> voz -> mezcla -> verificado ->
+commit) antes de empezar el siguiente: si la noche se corta, lo que hay
+esta acabado, no a medias.
+
+| # | Promo | Curso | Estado |
+|---|---|---|---|
+| 3 | El efecto mariposa | 15 · Caos | **LISTO** 12.90 s · bucle 0.000 · voz |
+| 4 | La tirania del cohete | 17 · Tsiolkovsky | pendiente |
+| 5 | Los 38 microsegundos del GPS | 16 · Relatividad | pendiente |
+| 6 | La constelacion con ruido | 24 · Comunicaciones | pendiente |
+| 7 | Que es un determinante | 22 · Algebra lineal | pendiente |
+
+### Promo 3 — "El efecto mariposa" (curso 15)
+
+`studio/content/promos/caos-efecto-mariposa/`. 12.90 s, 1080x1920 @ 60 fps.
+Dos trayectorias de Lorenz separadas por **una millonesima** se dibujan a la
+vez: durante 13.2 s simulados son la MISMA linea (el gemelo va encima) y
+despues se van a alas opuestas. La cifra de abajo es la distancia euclidea
+real paso a paso — se queda en `0.000` un buen rato y termina en **25.9**.
+
+- El corte del trazo se ELIGIO midiendo: a t=22 s las dos van por alas
+  opuestas con d=25.90; en t=20 o t=24 vuelven a coincidir de casualidad y
+  el remate se desinfla.
+- Lyapunov medido en el tramo recto: 0.807 /s.
+- Verificado: bucle identico al pixel, audio a −1.6 dBFS con los dos
+  extremos a −91 dB.
+
 ## Lo que falta (cuando se valide)
 
 1. Ver el vertical en un telefono de verdad (es lo unico que no se puede
