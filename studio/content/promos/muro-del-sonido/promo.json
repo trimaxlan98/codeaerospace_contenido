@@ -1,0 +1,84 @@
+{
+  "name": "El muro del sonido",
+  "curso": "Aerodinamica",
+  "description": "Promo del curso 10. Cada circunferencia es el sonido emitido hace k intervalos. Por debajo de Mach 1 los frentes se adelantan y el aire se entera de que vienes; a Mach 1 son todos tangentes en la propia fuente (la pared); por encima, la envolvente es el cono de Mach y aparece su semiangulo medido, 33.7 grados a Mach 1.8.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 11.75,
+  "guion_visual": [
+    "0.00 Mach 0: circulos concentricos",
+    "0.35 el Mach sube a 1: los frentes se apilan hasta ser tangentes",
+    "4.35 respiro en Mach 1.00, la pared",
+    "5.35 Mach 1.8: se abre el cono con su angulo medido",
+    "8.95 vuelve a Mach 0",
+    "11.35 circulos concentricos otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.8,
+        "texto": "El sonido va avisando."
+      },
+      {
+        "t_inicio": 4.5,
+        "texto": "A Mach uno ya no puede."
+      },
+      {
+        "t_inicio": 8.0,
+        "texto": "Detrás queda el cono."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      10.85,
+      11.55
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -14
+      ],
+      [
+        "aire_largo",
+        0.4,
+        -18
+      ],
+      [
+        "barrido",
+        2.6,
+        -16
+      ],
+      [
+        "sting",
+        4.3,
+        -13
+      ],
+      [
+        "nebulosa",
+        6.0,
+        -15
+      ],
+      [
+        "pulso",
+        5.6,
+        -14
+      ],
+      [
+        "aire",
+        9.1,
+        -17
+      ]
+    ]
+  }
+}

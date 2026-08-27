@@ -1,0 +1,72 @@
+{
+  "name": "El angulo que la naturaleza eligio",
+  "curso": "Matematicas en la naturaleza",
+  "description": "Promo de redes del curso 14. Las semillas de un girasol nacen del centro girando 137.5 grados cada una; se encienden las dos familias de espirales (21 en un sentido, 34 en el otro) y luego el angulo se desafina un grado y el patron se rompe y vuelve a cerrarse. Sin subtitulos: solo la cifra medida y el sonido. Termina en el mismo estado en el que empieza para que el bucle sea invisible.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 10.73,
+  "audio": {
+    "pico_db": -3.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      9.8,
+      10.5
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -13
+      ],
+      [
+        "aire_largo",
+        0.3,
+        -17
+      ],
+      [
+        "nebulosa",
+        5.6,
+        -15
+      ],
+      [
+        "blip_grave",
+        3.78,
+        -16
+      ],
+      [
+        "blip_medio",
+        4.85,
+        -16
+      ],
+      [
+        "barrido",
+        6.4,
+        -14
+      ],
+      [
+        "pulso",
+        8.85,
+        -13
+      ],
+      [
+        "aire",
+        9.3,
+        -16
+      ]
+    ]
+  },
+  "guion_visual": [
+    "0.00 el polo solo (estado de arranque Y de cierre)",
+    "0.35 las semillas nacen del centro hacia afuera",
+    "3.75 se encienden los 5 brazos de la familia 21",
+    "4.80 se apagan y se encienden los 8 brazos de la familia 34",
+    "6.35 el angulo se desafina +1.15 grados y VUELVE",
+    "8.95 el disco se consume desde el filo hacia el polo",
+    "10.45 el polo solo otra vez"
+  ]
+}

@@ -259,6 +259,23 @@ class Filotaxis(VGroup):
         return LaggedStart(*[GrowFromCenter(d) for d in dots],
                            lag_ratio=lag, run_time=run_time)
 
+    def girar_a(self, angulo_deg):
+        """Recoloca las semillas QUE YA EXISTEN con otro giro, sin
+        reconstruir el disco.
+
+        `con_angulo` devuelve un disco gemelo para Transform (un salto entre
+        dos angulos); esto mueve los puntos actuales, que es lo que permite
+        BARRER el angulo de forma continua desde un updater sin rehacer
+        cientos de Dots en cada frame.
+        """
+        pts = _puntos_filotaxis(self.n, float(angulo_deg),
+                                self._params["escala"])
+        polo = self.polo()
+        for d, p in zip(self.puntos, pts):
+            d.move_to(polo + np.append(p, 0.0))
+        self.angulo = float(angulo_deg)
+        return self
+
     def con_angulo(self, angulo_deg):
         """El mismo disco con otro giro por semilla, anclado en el polo:
         Transform semilla a semilla (mismo numero de puntos)."""
@@ -302,6 +319,63 @@ class Filotaxis(VGroup):
                            stroke_width=0, fill_color=color, fill_opacity=0.22)
             cunas.add(cuna)
         return cunas
+
+
+def hueco_maximo(n, angulo_deg, escala=2.6, res=96):
+    """El circulo VACIO mas grande que CABE DENTRO de un disco de filotaxis.
+
+    Es la medida honesta de "cuanto sitio se desperdicia": con un angulo
+    que divide la vuelta, las semillas se alinean en rayos y entre rayo y
+    rayo queda una cuña enorme; con el angulo aureo no hay donde meter un
+    circulo grande.
+
+    El radio en cada punto es el menor de dos: lo que hay hasta la semilla
+    mas cercana y lo que hay hasta el filo del disco. Sin la segunda
+    condicion el circulo "mas grande" se sale por el borde y la cifra
+    miente (a 90 grados daba 2.15 en vez de 1.35).
+
+    Devuelve {"centro": (x, y), "radio": r, "relativo": r/espaciado}, con
+    `espaciado` = escala/sqrt(n), el radio que le tocaria a cada semilla si
+    el disco se repartiera a partes iguales. `relativo` es adimensional: no
+    cambia si el disco se dibuja mas grande o mas pequeño.
+    """
+    n = _validar("hueco_maximo.n", n, SEMILLAS_MAX)
+    pts = _puntos_filotaxis(n, float(angulo_deg), float(escala))
+    lim = float(escala)
+
+    def _peor(centros):
+        """Punto de `centros` con el circulo vacio mas grande (por bloques:
+        la matriz completa de distancias no cabe comoda en memoria)."""
+        mejor_d, mejor_p = -1.0, centros[0]
+        for i in range(0, len(centros), 512):
+            bloque = centros[i:i + 512]
+            d = np.sqrt(((bloque[:, None, :] - pts[None, :, :]) ** 2)
+                        .sum(axis=2)).min(axis=1)
+            hasta_filo = lim - np.linalg.norm(bloque, axis=1)
+            d = np.minimum(d, hasta_filo)
+            k = int(np.argmax(d))
+            if d[k] > mejor_d:
+                mejor_d, mejor_p = float(d[k]), bloque[k]
+        return mejor_p, mejor_d
+
+    ejes = np.linspace(-lim, lim, int(res))
+    gx, gy = np.meshgrid(ejes, ejes)
+    dentro = gx ** 2 + gy ** 2 <= lim ** 2
+    p0, _ = _peor(np.column_stack([gx[dentro], gy[dentro]]))
+
+    # Refinado local: sin el, el valor salta al mover el angulo porque la
+    # malla gruesa cae en sitios distintos.
+    paso = 2 * lim / (int(res) - 1)
+    fx = np.linspace(p0[0] - paso, p0[0] + paso, 21)
+    fy = np.linspace(p0[1] - paso, p0[1] + paso, 21)
+    hx, hy = np.meshgrid(fx, fy)
+    fino = np.column_stack([hx.ravel(), hy.ravel()])
+    fino = fino[(fino[:, 0] ** 2 + fino[:, 1] ** 2) <= lim ** 2]
+    centro, radio = _peor(fino) if len(fino) else (p0, 0.0)
+
+    espaciado = float(escala) / math.sqrt(n)
+    return {"centro": (float(centro[0]), float(centro[1])),
+            "radio": float(radio), "relativo": float(radio / espaciado)}
 
 
 def filotaxis(n=600, angulo_deg=ANGULO_AUREO_DEG, escala=2.6,

@@ -1,0 +1,79 @@
+{
+  "name": "El efecto mariposa",
+  "curso": "Caos: el orden escondido",
+  "description": "Promo del curso 15. Dos copias del mismo sistema de Lorenz, separadas por una millonesima, se dibujan a la vez: durante trece segundos simulados son la misma linea y despues se van a alas opuestas. La cifra de abajo es la distancia real entre las dos en cada paso de la integracion, y se queda en 0.000 hasta que se dispara.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 12.87,
+  "guion_visual": [
+    "0.00 el punto de partida, solo",
+    "0.85 se traza el atractor: dos trayectorias en el mismo pixel",
+    "5.40 se abren; la cifra de separacion se dispara",
+    "8.45 respiro con las dos en alas opuestas (25.9 de separacion)",
+    "10.05 el trazo se recoge por donde vino",
+    "12.15 vuelve el marcador de salida: el ultimo frame es el primero"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.8,
+        "texto": "El mismo sistema, dos veces."
+      },
+      {
+        "t_inicio": 3.7,
+        "texto": "Cambia una millonésima."
+      },
+      {
+        "t_inicio": 7.2,
+        "texto": "Trece segundos: irreconocibles."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      11.9,
+      12.6
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -14
+      ],
+      [
+        "aire_largo",
+        0.4,
+        -18
+      ],
+      [
+        "nebulosa",
+        6.0,
+        -15
+      ],
+      [
+        "barrido",
+        4.9,
+        -16
+      ],
+      [
+        "pulso",
+        5.3,
+        -13
+      ],
+      [
+        "aire",
+        9.6,
+        -17
+      ]
+    ]
+  }
+}

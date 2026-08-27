@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Play, Download, FolderPlus, Search, ArrowUpRight } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, useCatalogo } from './catalogo.js'
+import { ratioDeJob, resolucionLegible } from './formatos.js'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -305,7 +306,10 @@ export default function Renders({ jobs, storage, onJobsChanged, onOpenProject })
                 {playing.scene} <span className="text-faint">· {playing.id.slice(0, 8)}</span>
               </DialogTitle>
             </div>
-            <video className="block max-h-[78vh] w-full bg-black" controls autoPlay src={videoUrl(playing.id)} />
+            {/* w-auto: un promo vertical se acota por ALTO. Con w-full el
+                video se metia en una caja ancha y se veia con bandas. */}
+            <video className="mx-auto block max-h-[78vh] w-auto max-w-full bg-black"
+              controls autoPlay src={videoUrl(playing.id)} />
           </DialogContent>
         )}
       </Dialog>
@@ -320,17 +324,19 @@ function RenderCard({ job, projectName, onPlay, onAddToProject, onOpenProject, o
     <article className="group flex flex-col overflow-hidden rounded-lg border border-line bg-surface-2 transition-colors hover:border-line-strong">
       {hasVideo ? (
         <button onClick={onPlay} aria-label={`ver ${job.scene}`}
-          className="relative block aspect-video w-full border-b border-line bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+          style={{ aspectRatio: ratioDeJob(job) }}
+          className="relative block max-h-[340px] w-full border-b border-line bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
           {job.has_thumb
             ? <img src={thumbUrl(job.id)} alt={`miniatura de ${job.scene}`} loading="lazy"
-                className="h-full w-full object-cover" />
+                className="h-full w-full object-contain" />
             : <span className="grid h-full place-items-center text-faint"><Play className="h-7 w-7" /></span>}
           <span className="absolute inset-0 grid place-items-center bg-canvas/45 text-accent opacity-0 transition-opacity group-hover:opacity-100">
             <Play className="h-9 w-9" fill="currentColor" />
           </span>
         </button>
       ) : (
-        <div className="grid aspect-video w-full place-items-center border-b border-line bg-canvas px-3 text-center">
+        <div style={{ aspectRatio: ratioDeJob(job) }}
+          className="grid max-h-[340px] w-full place-items-center border-b border-line bg-canvas px-3 text-center">
           <span className={cn('font-mono text-[11px] uppercase tracking-wide', m.text)}>{m.label}</span>
         </div>
       )}
@@ -345,7 +351,10 @@ function RenderCard({ job, projectName, onPlay, onAddToProject, onOpenProject, o
         )}
         <h3 className="truncate font-mono text-[13px] font-semibold text-ink" title={job.scene}>{job.scene}</h3>
         <p className="text-[11.5px] text-muted">
-          {fmtDate(job.created_at)} · {duration(job) || '—'} · {QUALITY_LABEL[job.quality] || job.quality}
+          {fmtDate(job.created_at)} · {duration(job) || '—'} ·{' '}
+          {/* La resolución que se muestra es la MEDIDA sobre el archivo
+              (ffprobe); la calidad solo la sustituye si aún no hay video. */}
+          {resolucionLegible(job) || QUALITY_LABEL[job.quality] || job.quality}
           {hasVideo && <> · {fmtSize(job.size_bytes)}</>}
         </p>
         {/* El motivo del fallo vivia solo en el chip del Estudio. */}

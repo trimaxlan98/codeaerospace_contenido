@@ -1,0 +1,84 @@
+{
+  "name": "El secreto que se grita en publico",
+  "curso": "Criptografia: el arte de guardar secretos",
+  "description": "Promo del curso 19. Diffie-Hellman con numeros de juguete reales (p=23, g=5): Ana guarda un 6 y Beto un 15, se gritan por un canal publico un 8 y un 19, y los dos acaban con el mismo secreto, el 2, que nunca cruzo el canal. El color lo cuenta solo: ambar lo privado (no se mueve), cian lo publico (es lo unico que cruza), verde el secreto compartido.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 12.5,
+  "guion_visual": [
+    "0.00 Ana con su 6 y Beto con su 15, privados",
+    "0.35 cada uno saca su numero publico",
+    "1.55 los publicos cruzan el canal a la vista",
+    "4.55 aparece el mismo secreto en los dos lados",
+    "6.65 respiro: el verde nunca cruzo la linea",
+    "10.55 todo vuelve a los dos numeros privados"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.8,
+        "texto": "Ana y Beto no se conocen."
+      },
+      {
+        "t_inicio": 5.4,
+        "texto": "Se gritan números."
+      },
+      {
+        "t_inicio": 8.6,
+        "texto": "Y el mismo secreto."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      11.6,
+      12.3
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -14
+      ],
+      [
+        "aire_largo",
+        0.4,
+        -18
+      ],
+      [
+        "blip_grave",
+        0.6,
+        -17
+      ],
+      [
+        "blip_medio",
+        0.9,
+        -17
+      ],
+      [
+        "nebulosa",
+        6.0,
+        -15
+      ],
+      [
+        "pulso",
+        5.7,
+        -13
+      ],
+      [
+        "aire",
+        10.6,
+        -17
+      ]
+    ]
+  }
+}

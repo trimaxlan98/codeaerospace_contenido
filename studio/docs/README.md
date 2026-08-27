@@ -125,8 +125,10 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 **Modelo:**
 
 - **Proyecto**: `name`, `description`, `quality` (fija para todos sus clips, `ql`/`qm`/`qh`),
-  `style_block` (código Python opcional que se antepone a cada clip antes de renderizar —
-  imports, paleta de colores, helpers de continuidad…).
+  `formato` (`horizontal` 16:9 · `vertical` 9:16 · `cuadrado` 1:1, también fijo para todos
+  sus clips), `tipo` (`curso` o `promo` de redes) y `style_block` (código Python opcional que
+  se antepone a cada clip antes de renderizar — imports, paleta de colores, helpers de
+  continuidad…).
 - **Clip**: pertenece a un proyecto, tiene `position` (orden dentro del curso), `title`,
   `script` (el código del clip, **sin** el estilo del proyecto), `scene` (nombre de la clase
   `Scene` a renderizar), `final_state` (nota de en qué queda la escena al terminar, visible
@@ -138,6 +140,21 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 
 - **Calidad fija por proyecto**: todos los clips de un proyecto se renderizan a la misma
   calidad (`project.quality`); el Estudio no permite cambiarla mientras se edita un clip.
+- **Formato del lienzo**: la calidad fija el **lado corto** y los fps; el formato fija la
+  **proporción**. «1080p» son 1920×1080 en horizontal y 1080×1920 en vertical (fijar el
+  *alto* daría 607×1080, que no es calidad alta sino un video pequeño). `projects.specs()`
+  calcula la pareja y la API la publica en `GET /api/projects/{pid}` (`specs`).
+  Calidad y formato quedan **bloqueados** en cuanto un clip tiene render vigente: mezclarlos
+  dejaría videos de dos tamaños en el mismo curso (y un `concat -c copy` que no pega).
+- **Quién aplica el lienzo**: la *escena*, no el runner. Un clip de curso 16:9 sale del flag
+  `-q` de manim, como siempre. Un promo llama a `promo.formato()` en su bloque de estilo, y el
+  runner le pasa al contenedor `PROMO_FORMATO`, `PROMO_CORTO`, `PROMO_LARGO`, `PROMO_FPS` y
+  `PROMO_CALIDAD` (valores validados contra un conjunto y rangos cerrados). Por eso **el mismo
+  código sale en 9:16 o en 16:9 cambiando el desplegable**, sin tocar una línea.
+- **La resolución que se muestra es la medida**: al terminar un render, el runner mide el
+  archivo con `ffprobe` y la guarda en `jobs.resolution`; la interfaz pinta miniaturas y
+  reproductores con esa proporción (`formatos.js`). Si una escena no aplicó el formato pedido,
+  se ve en la Biblioteca en vez de quedar tapado.
 - **Estilo compuesto**: al renderizar, el backend antepone `style_block` al `script` del
   clip (`compose_script`) y detecta las escenas (`detect_scenes`) sobre ese script
   **compuesto**, no sobre el script crudo. Si el estilo ocupa `N` líneas, los mensajes de
@@ -158,9 +175,9 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 | Método | Ruta | Notas |
 |---|---|---|
 | GET | `` | lista con contadores (`clip_count`, `rendered_count`, `stale_count`) |
-| POST | `` | crea proyecto (`name`, `description`, `quality`, `style_block`) |
-| GET | `/{pid}` | detalle con clips ordenados |
-| PATCH | `/{pid}` | edita nombre/descripción/calidad/estilo (413 si `style_block` > 200 KB) |
+| POST | `` | crea proyecto (`name`, `description`, `quality`, `formato`, `tipo`, `style_block`); 422 si el formato o el tipo no existen |
+| GET | `/{pid}` | detalle con clips ordenados y `specs` (resolución y fps reales del proyecto) |
+| PATCH | `/{pid}` | edita nombre/descripción/calidad/formato/estilo (413 si `style_block` > 200 KB; 409 si se cambia calidad o formato con clips ya renderizados) |
 | DELETE | `/{pid}` | borra proyecto y sus clips (no los jobs/videos ya generados) |
 | POST | `/{pid}/clips` | crea clip; `from_job_id` adopta un job existente como ya renderizado *si* su calidad coincide con la del proyecto y el estilo compuesto es idéntico al script del job (en la práctica: proyecto sin `style_block`) |
 | PATCH | `/{pid}/clips/{cid}` | edita `title`/`script`/`scene`/`final_state`/`notes` (413 si `script` > 200 KB) |

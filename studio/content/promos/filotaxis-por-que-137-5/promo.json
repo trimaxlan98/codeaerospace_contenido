@@ -1,0 +1,85 @@
+{
+  "name": "Por que 137.5",
+  "curso": "Matematicas en la naturaleza",
+  "description": "Promo informativo del curso 14, pareja del promo 1. Las semillas nacen primero con 90 grados: se alinean en cuatro rayos y dejan cuñas vacias. El circulo vacio mas grande que cabe en el disco se DIBUJA (lo mide la libreria), y al barrer el angulo hasta el aureo ese hueco se encoge 8 veces. La leccion entra por la imagen —el contraejemplo— para que tambien la entienda quien lo vea en silencio; la voz la remata.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": [
+    "vertical",
+    "horizontal"
+  ],
+  "duracion_objetivo": 13.3,
+  "guion_visual": [
+    "0.00 el polo solo (estado de arranque Y de cierre)",
+    "0.35 las semillas nacen con 90 grados: cuatro rayos y cuatro cuñas",
+    "2.75 se dibuja el hueco maximo medido (circulo rojo)",
+    "3.95 el angulo barre de 90 al aureo; los huecos se cierran",
+    "8.15 el hueco nuevo en cian, 8 veces mas pequeno, con el viejo de fantasma",
+    "11.35 el disco se consume desde el filo hacia el polo",
+    "12.95 el polo solo otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.8,
+        "texto": "Cada semilla nace girando igual."
+      },
+      {
+        "t_inicio": 3.9,
+        "texto": "Con noventa grados dejan huecos."
+      },
+      {
+        "t_inicio": 7.3,
+        "texto": "El ángulo áureo no deja ninguno."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      12.3,
+      13.05
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -14
+      ],
+      [
+        "aire_largo",
+        0.3,
+        -18
+      ],
+      [
+        "blip_grave",
+        2.85,
+        -17
+      ],
+      [
+        "barrido",
+        4.05,
+        -15
+      ],
+      [
+        "nebulosa",
+        6.2,
+        -16
+      ],
+      [
+        "pulso",
+        8.25,
+        -14
+      ],
+      [
+        "aire",
+        9.6,
+        -17
+      ]
+    ]
+  }
+}

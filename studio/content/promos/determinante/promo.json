@@ -1,0 +1,38 @@
+{
+  "name": "Que es un determinante",
+  "curso": "Algebra lineal",
+  "description": "Promo del curso 22. El determinante no es una receta de calculo: es cuanto estira o encoge el area una transformacion. La rejilla se inclina bajo M(s) = [[1,s],[s,1]], el cuadrado unidad se convierte en paralelogramo y la cifra en pantalla es su area (con signo, calculada por la libreria). En s=1 la matriz es singular: el plano entero se aplasta sobre la recta y=x y el determinante vale exactamente 0.00.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": ["vertical", "horizontal"],
+  "duracion_objetivo": 12.2,
+  "guion_visual": [
+    "0.00 la rejilla sin tocar y el cuadrado unidad; 1.00",
+    "0.35 el plano se inclina y el area baja hasta 0.00",
+    "5.35 respiro con el plano aplastado sobre una recta",
+    "8.85 vuelve a la identidad",
+    "11.85 la rejilla sin tocar otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 0.8, "texto": "Un número para todo el plano:"},
+      {"t_inicio": 5.3, "texto": "cuánto crece o se aplasta el área."}
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [11.30, 12.00],
+    "eventos": [
+      ["nebulosa", 0.10, -14],
+      ["aire_largo", 0.40, -18],
+      ["barrido", 0.90, -17],
+      ["nebulosa", 6.00, -15],
+      ["sting", 5.20, -14],
+      ["aire", 9.00, -17]
+    ]
+  }
+}

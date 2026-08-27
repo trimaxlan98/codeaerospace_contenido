@@ -1,0 +1,40 @@
+{
+  "name": "La tirania del cohete",
+  "curso": "Tsiolkovsky: la tirania del cohete",
+  "description": "Promo del curso 17. Con motor quimico y una sola etapa, el cohete se queda SIN carga util antes de llegar a orbita: el impulso se para en 8840 m/s y la orbita pide 9388. La silueta se va llenando de combustible y la franja cian de carga util desaparece; la referencia de orbita esta en pantalla desde el primer frame para que se vea que la cifra no llega.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": ["vertical", "horizontal"],
+  "duracion_objetivo": 11.65,
+  "guion_visual": [
+    "0.00 el cohete entero es carga util, impulso 0",
+    "0.35 el impulso sube y el combustible se come la carga",
+    "6.50 la carga llega a cero a 8840 m/s: la referencia se pone roja",
+    "7.20 respiro con FALTAN 548 M/S",
+    "8.80 el combustible se vacia y la carga vuelve",
+    "11.30 el cohete entero es carga util otra vez"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 0.8, "texto": "Todo esto es carga útil."},
+      {"t_inicio": 3.6, "texto": "Hasta que hay que acelerar."},
+      {"t_inicio": 7.0, "texto": "Y no alcanza para llegar."}
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [10.70, 11.45],
+    "eventos": [
+      ["nebulosa", 0.10, -14],
+      ["aire_largo", 0.40, -18],
+      ["barrido", 1.20, -17],
+      ["nebulosa", 6.00, -15],
+      ["sting", 6.55, -13],
+      ["aire", 9.00, -17]
+    ]
+  }
+}

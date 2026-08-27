@@ -19,6 +19,7 @@ import {
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl } from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
+import { FORMATOS, formatoPorId, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
 import { Button } from './components/ui/button.jsx'
@@ -30,11 +31,19 @@ import { cn } from '@/lib/utils'
 
 const QUALITY_LABEL = { ql: '480p', qm: '720p', qh: '1080p' }
 
-// Mismo rango que valida `studio/tools/render_local.py` (DURACION_MIN/MAX):
-// un clip mas corto no alcanza a contar nada y uno mas largo se cae del
-// formato. Aqui solo se avisa, no se bloquea nada.
-const DURACION_MIN = 28
-const DURACION_MAX = 45
+// Rango de duracion por tipo de proyecto. En un curso es el que valida
+// `studio/tools/render_local.py`: un clip mas corto no alcanza a contar nada
+// y uno mas largo se cae del formato. Un promo de redes juega otro juego
+// (8-15 s, en bucle), y medirlo con la vara del curso marcaba en ambar todos
+// los promos por estar "cortos". Aqui solo se avisa, no se bloquea nada.
+const DURACION = {
+  curso: { min: 28, max: 45 },
+  promo: { min: 8, max: 15 },
+}
+
+function rangoDuracion(tipo) {
+  return DURACION[tipo] || DURACION.curso
+}
 
 const STATUS_META = {
   rendered: { label: 'renderizado', dot: 'bg-ok', text: 'text-ok' },
@@ -396,8 +405,14 @@ function ProjectCard({ project, showNarr, onOpen, onDelete }) {
     <article className="group flex flex-col gap-2 overflow-hidden rounded-lg border border-line bg-surface-2 p-3 transition-colors hover:border-accent/50">
       <button onClick={onOpen}
         className="flex flex-col gap-1.5 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
-        <h3 className="truncate font-display text-[14px] font-semibold text-ink" title={project.name}>
-          {project.label || project.name}
+        <h3 className="flex items-center gap-1.5 truncate font-display text-[14px] font-semibold text-ink" title={project.name}>
+          <span className="truncate">{project.label || project.name}</span>
+          {project.tipo === 'promo' && (
+            <span className="shrink-0 rounded border border-accent/40 px-1 py-px font-mono text-[10px] uppercase tracking-wide text-accent"
+              title={`promo de redes · ${formatoPorId(project.formato).label}`}>
+              promo
+            </span>
+          )}
         </h3>
         {project.description && (
           <p className="line-clamp-2 text-[12px] text-muted">{project.description}</p>
@@ -429,6 +444,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [quality, setQuality] = useState('qm')
+  const [formato, setFormato] = useState('horizontal')
   const [styleBlock, setStyleBlock] = useState('')
   const [plantilla, setPlantilla] = useState('blanco')
   const [error, setError] = useState('')
@@ -437,14 +453,16 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
   useEffect(() => {
     if (open) {
       setName(''); setDescription(''); setQuality('qm'); setStyleBlock('')
-      setPlantilla('blanco'); setError(''); setBusy('')
+      setFormato('horizontal'); setPlantilla('blanco'); setError(''); setBusy('')
     }
   }, [open])
 
   const elegir = (id) => {
     setPlantilla(id)
-    // La calidad de la plantilla es una sugerencia: el campo sigue editable.
+    // La calidad y el formato de la plantilla son una sugerencia: los dos
+    // campos siguen editables.
     setQuality(plantillaPorId(id).quality)
+    setFormato(plantillaPorId(id).formato || 'horizontal')
   }
 
   const tpl = plantillaPorId(plantilla)
@@ -460,6 +478,8 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
         name: name.trim(),
         description,
         quality,
+        formato,
+        tipo: tpl.tipo || 'curso',
         // El textarea manda si el usuario escribio algo en el.
         style_block: styleBlock || built.styleBlock,
       })
@@ -531,6 +551,21 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                 </Select>
               </label>
               <label className="flex flex-col gap-1">
+                <span className="eyebrow">Formato</span>
+                <Select value={formato} onValueChange={setFormato}>
+                  <SelectTrigger className="max-w-[220px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {FORMATOS.map((f) => (
+                      <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-[11.5px] text-faint">
+                  {formatoPorId(formato).hint}. La calidad fija el lado corto:
+                  «1080p» son 1920×1080 en horizontal y 1080×1920 en vertical.
+                </span>
+              </label>
+              <label className="flex flex-col gap-1">
                 <span className="eyebrow">Estilo compartido (opcional)</span>
                 <textarea value={styleBlock} onChange={(e) => setStyleBlock(e.target.value)} rows={5}
                   placeholder={tpl.id === 'blanco'
@@ -539,9 +574,10 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                   className={cn(textareaCls, 'font-mono')} />
                 {tpl.id !== 'blanco' && !styleBlock && (
                   <span className="text-[11.5px] text-faint">
-                    La plantilla pondrá el tema oficial CO.DE Academy y creará {tpl.clips} clips
-                    («{tpl.clips === 4 ? 'Clip1…Clip4' : 'Clip1…Clip8'}») con un arranque que ya
-                    renderiza. Todo es editable después.
+                    {tpl.id === 'promo'
+                      ? 'La plantilla pondrá el tema CO.DE Academy sobre el lienzo del formato elegido, con la marca donde la app no la tapa, y creará 1 clip («Promo») que ya renderiza y cierra el bucle.'
+                      : `La plantilla pondrá el tema oficial CO.DE Academy y creará ${tpl.clips} clips («Clip1…Clip${tpl.clips}») con un arranque que ya renderiza.`}
+                    {' '}Todo es editable después.
                   </span>
                 )}
               </label>
@@ -668,6 +704,19 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
     } catch (err) {
       setError(err.message)
       setProject((p) => ({ ...p, name: savedRef.current.name }))
+    }
+  }
+
+  // El formato define el archivo que sale: cambiarlo con videos vigentes
+  // dejaria el proyecto con clips de dos tamanos. El backend lo rechaza con
+  // 409; aqui el select se deshabilita para que ni se intente.
+  const saveFormato = async (valor) => {
+    setError('')
+    try {
+      await api.patchProject(project.id, { formato: valor })
+      await load() // `specs` lo recalcula el backend, no el navegador
+    } catch (err) {
+      setError(err.message)
     }
   }
 
@@ -805,6 +854,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   // Cuenta solo los stale/no_render sin job en vuelo: coherente con lo que
   // "Re-renderizar desactualizados" realmente va a encolar.
   const staleCount = staleWithoutActiveJob(clips, jobs).length
+  const formatoFijo = clips.some((c) => c.job_id)
   const narrByClip = Object.fromEntries((narracion?.clips || []).map((c) => [c.clip_id, c]))
   const narrPending = (narracion?.clips || []).filter((c) => c.estado !== 'al_dia').length
   const narrAlDia = (narracion?.clips || []).filter((c) => c.estado === 'al_dia').length
@@ -814,7 +864,8 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   // narracion, que ya calcula `video_s` del mp4 vigente de cada clip.
   const duraciones = clips.map((c) => narrByClip[c.id]?.video_s).filter((s) => s != null)
   const totalDur = duraciones.reduce((a, s) => a + s, 0)
-  const fueraRango = duraciones.filter((s) => s < DURACION_MIN || s > DURACION_MAX).length
+  const rango = rangoDuracion(project.tipo)
+  const fueraRango = duraciones.filter((s) => s < rango.min || s > rango.max).length
   const { family, label } = splitName(project.name)
 
   return (
@@ -839,9 +890,29 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 onBlur={saveDescription} placeholder="Descripción (opcional)" aria-label="descripción del proyecto"
                 className="h-auto max-w-lg border-transparent bg-transparent px-0 text-[13px] text-muted hover:border-line focus-visible:border-line focus-visible:bg-canvas focus-visible:px-2" />
             </div>
-            <span className="shrink-0 rounded-md border border-accent/40 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-accent">
-              {QUALITY_LABEL[project.quality] || project.quality}
-            </span>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <span className="rounded-md border border-accent/40 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-accent"
+                title={project.specs ? `${project.specs.resolution} a ${project.specs.fps} fps` : undefined}>
+                {QUALITY_LABEL[project.quality] || project.quality}
+                {project.specs && (
+                  <span className="text-accent/70"> · {project.specs.resolution.replace('x', '×')}</span>
+                )}
+              </span>
+              <Select value={project.formato || 'horizontal'} onValueChange={saveFormato}
+                disabled={formatoFijo}>
+                <SelectTrigger className="h-[26px] w-[172px] text-[12px]"
+                  title={formatoFijo
+                    ? 'hay clips con render vigente: el formato queda fijo hasta borrar esos videos'
+                    : 'el mismo código sale en 9:16 o en 16:9; lo aplica la escena al renderizar'}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FORMATOS.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Panel de estado del curso: lo que hay que mirar antes de exportar. */}
@@ -853,7 +924,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               tone={fueraRango > 0 ? 'warn' : 'ok'}
               detail={duraciones.length < clips.length
                 ? `${duraciones.length}/${clips.length} medidos`
-                : fueraRango > 0 ? `${fueraRango} fuera de ${DURACION_MIN}-${DURACION_MAX} s` : `${DURACION_MIN}-${DURACION_MAX} s por clip`} />
+                : fueraRango > 0 ? `${fueraRango} fuera de ${rango.min}-${rango.max} s` : `${rango.min}-${rango.max} s por clip`} />
             <Stat label="Narración" value={narracion ? `${narrAlDia}/${clips.length}` : '—'}
               tone={narracion && narrAlDia === clips.length && clips.length > 0 ? 'ok' : 'muted'}
               detail={narracion?.voz || (narracion?.enabled === false ? 'sin Vertex' : '…')} />
@@ -947,7 +1018,8 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 onFieldChange={onFieldChange} onFieldBlur={onFieldBlur}
                 onMove={move} onDelete={removeClip} onRender={renderClip}
                 onOpenInStudio={openInStudio}
-                projectId={project.id} narr={narrByClip[clip.id]}
+                projectId={project.id} formato={project.formato} tipo={project.tipo}
+                narr={narrByClip[clip.id]}
                 narrando={narrRun?.current?.clip_id === clip.id}
                 narrBusy={Boolean(run)} narrEnabled={Boolean(narracion?.enabled)}
                 onVerGuion={() => setGuionClip(clip)}
@@ -987,21 +1059,21 @@ function Stat({ label, value, detail, tone }) {
 }
 
 // Duracion del clip con el semaforo del formato (28-45 s).
-function DurationBadge({ s }) {
+function DurationBadge({ s, rango = DURACION.curso }) {
   if (s == null) return null
-  const fuera = s < DURACION_MIN || s > DURACION_MAX
+  const fuera = s < rango.min || s > rango.max
   return (
     <span className={cn('rounded-md border px-1.5 py-0.5 font-mono text-[11px] tabular-nums',
       fuera ? 'border-warn/40 text-warn' : 'border-line text-muted')}
       title={fuera
-        ? `fuera del rango del formato (${DURACION_MIN}-${DURACION_MAX} s)`
-        : `dentro del rango del formato (${DURACION_MIN}-${DURACION_MAX} s)`}>
+        ? `fuera del rango del formato (${rango.min}-${rango.max} s)`
+        : `dentro del rango del formato (${rango.min}-${rango.max} s)`}>
       {fmtDur(s)}
     </span>
   )
 }
 
-function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion }) {
+function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion }) {
   const activeJob = activeJobFor(jobs, clip.id)
   const renderJob = clip.job_id ? jobs.find((j) => j.id === clip.job_id) : null
   const meta = activeJob ? STATUS_META[activeJob.status] : (STATUS_META[clip.status] || STATUS_META.no_render)
@@ -1010,10 +1082,13 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
 
   return (
     <article className="flex flex-col gap-2.5 border-b border-line p-3.5 last:border-b-0 sm:flex-row">
-      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-md border border-line bg-canvas sm:w-40">
+      {/* La proporción sale del video real (o del formato del proyecto
+          mientras no exista): un promo vertical no se mira en una caja 16:9. */}
+      <div style={{ aspectRatio: ratioDeJob(renderJob, formato) }}
+        className="relative max-h-[210px] w-full shrink-0 overflow-hidden rounded-md border border-line bg-canvas sm:w-40">
         {renderJob?.has_thumb ? (
           <img src={thumbUrl(renderJob.id)} alt={`miniatura de ${clip.title}`} loading="lazy"
-            className="h-full w-full object-cover" />
+            className="h-full w-full object-contain" />
         ) : (
           <span className="grid h-full place-items-center text-faint"><Film className="h-6 w-6" /></span>
         )}
@@ -1030,7 +1105,7 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
           <span className={cn('flex items-center gap-1.5 rounded-md border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide', meta.text)}>
             <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} /> {meta.label}
           </span>
-          <DurationBadge s={narr?.video_s} />
+          <DurationBadge s={narr?.video_s} rango={rangoDuracion(tipo)} />
         </div>
 
         <label className="flex items-center gap-2 text-[12px] text-muted">
