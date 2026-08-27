@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 1.1 Muestrear: el espectro se repite",
+  "description": "Lección 1.1 del curso Procesamiento digital de señales (módulo 1: de lo continuo a la secuencia), en 4 clips animados —una idea por clip—: la vibración de un lanzador convertida en lista de números, el espectro que se copia cada fs, el solape medido cuando las copias se tocan, y la banda de guarda que cuesta señal. Formato mudo: la pantalla solo pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-secuencia.py",
+      "title": "1 · La curva y sus números",
+      "scene": "Clip1",
+      "final_state": "Los 64 tallos ámbar de la vibración sobre la curva azul casi apagada; panel de cifras con fs = 800 Hz, N = 64 y T = 1.25 ms; en el carril inferior la fórmula x[n] = x_c(nT_s); HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-las-replicas.py",
+      "title": "2 · El espectro se repite",
+      "scene": "Clip2",
+      "final_state": "Espectro bilateral naranja con la banda base y sus réplicas en ±800 Hz, la guarda verde entre ellas, panel con fs = 800 Hz, banda = 222.7 Hz y guarda = 354.7 Hz, y la fórmula f_s > 2B en el carril inferior."
+    },
+    {
+      "file": "clips/03-cuando-se-tocan.py",
+      "title": "3 · Cuando las copias se tocan",
+      "scene": "Clip3",
+      "final_state": "Arriba, el espectro con las réplicas de fs = 300 Hz solapadas y la zona de solape en rojo; abajo, el seno de 220 Hz con sus muestras y el alias de 80 Hz en rojo pasando por los mismos puntos; panel con los errores de reconstrucción 0.162 y 0.004."
+    },
+    {
+      "file": "clips/04-la-guarda.py",
+      "title": "4 · La banda de guarda",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Muestrear no pierde nada.' (blanca) y 'Si el espectro cabe entre replicas.' (cian)."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 1.3 Volver al mundo: reconstruir",
+  "description": "Lección 1.3 del curso Procesamiento digital de señales (módulo 1: de lo continuo a la secuencia), en 4 clips animados: el DAC que retiene y su caída de 3.92 dB, la suma de sincs que reconstruye exacto, el sobremuestreo que aleja las imágenes y vuelve trivial el filtro analógico, y el reloj que tiembla y se lleva la SNR. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-dac-retiene.py",
+      "title": "1 · El DAC retiene",
+      "scene": "Clip1",
+      "final_state": "La escalera del ZOH sobre la señal y, al lado, su respuesta sinc con la marca en fs/2 y la cifra medida -3.92 dB."
+    },
+    {
+      "file": "clips/02-la-suma-de-sincs.py",
+      "title": "2 · La suma de sincs",
+      "scene": "Clip2",
+      "final_state": "Las sincs de cada muestra sumandose hasta reproducir la curva; cifras del error rms 0.0013 (sinc) frente a 0.1228 (ZOH)."
+    },
+    {
+      "file": "clips/03-alejar-las-imagenes.py",
+      "title": "3 · Alejar las imagenes",
+      "scene": "Clip3",
+      "final_state": "Espectro con la imagen en 577 Hz y, tras sobremuestrear x4, en 2977 Hz; cifras de la atenuacion del mismo filtro: -11.7 dB frente a -39.9 dB."
+    },
+    {
+      "file": "clips/04-el-reloj-tiembla.py",
+      "title": "4 · El reloj tiembla",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La secuencia no vale nada' (blanca) y 'sin el reloj que la sostiene.' (cian)."
+    }
+  ]
+}

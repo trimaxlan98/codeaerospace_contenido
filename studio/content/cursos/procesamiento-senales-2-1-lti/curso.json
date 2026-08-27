@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 2.1 LTI: el impulso lo dice todo",
+  "description": "Lección 2.1 del curso Procesamiento digital de señales (módulo 2: el sistema que reescribe la señal), en 4 clips animados: el sistema que responde a un impulso, la linealidad comprobada con error nulo, la invarianza medida en muestras, y por qué una entrada cualquiera es una suma de impulsos pesados. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-caja-y-el-impulso.py",
+      "title": "1 · La caja y el impulso",
+      "scene": "Clip1",
+      "final_state": "El bloque del sistema con el impulso entrando y h[n] saliendo como tallos ambar; cifras de los cinco coeficientes y de suma|h| = 1.000."
+    },
+    {
+      "file": "clips/02-linealidad.py",
+      "title": "2 · Linealidad",
+      "scene": "Clip2",
+      "final_state": "Las dos entradas escaladas, sus salidas y la salida de la mezcla superpuestas; cifra del error maximo medido 2.2e-16."
+    },
+    {
+      "file": "clips/03-invarianza.py",
+      "title": "3 · Invarianza",
+      "scene": "Clip3",
+      "final_state": "La entrada retardada 7 muestras y su salida retardada exactamente 7; cifra del desplazamiento medido = 7."
+    },
+    {
+      "file": "clips/04-suma-de-impulsos.py",
+      "title": "4 · Suma de impulsos",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Un sistema LTI no guarda secretos.' (blanca) y 'Se confiesa con un impulso.' (cian)."
+    }
+  ]
+}

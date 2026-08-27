@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 1.2 Cuantizar: el ruido que fabricamos",
+  "description": "Lección 1.2 del curso Procesamiento digital de señales (módulo 1: de lo continuo a la secuencia), en 4 clips animados: la escalera de 4 bits y su error, los seis decibelios que regala cada bit medidos sobre once resoluciones, el error que deja de ser ruido y el dither que lo arregla, y el noise shaping que se lleva el ruido fuera de la banda útil. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-escalera.py",
+      "title": "1 · La escalera y su error",
+      "scene": "Clip1",
+      "final_state": "Escalera de 4 bits sobre la vibracion azul con el error rojo debajo; cifras del paso 0.125, los 16 niveles y la SQNR medida de 22.2 dB."
+    },
+    {
+      "file": "clips/02-seis-db-por-bit.py",
+      "title": "2 · Seis decibelios por bit",
+      "scene": "Clip2",
+      "final_state": "Barras de la SQNR medida de 4 a 14 bits con la recta ajustada encima y la pendiente medida de 6.01 dB/bit en el carril inferior."
+    },
+    {
+      "file": "clips/03-el-error-no-es-ruido.py",
+      "title": "3 · Cuando el error no es ruido",
+      "scene": "Clip3",
+      "final_state": "Espectro del error con dither: sin picos y piso plano; cifras del espurio -17.0 -> -22.9 dB y del piso -75.3 -> -32.8 dB."
+    },
+    {
+      "file": "clips/04-mover-el-ruido.py",
+      "title": "4 · Mover el ruido",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'El ruido de cuantizar no se borra.' (blanca) y 'Se lleva donde no molesta.' (cian)."
+    }
+  ]
+}
