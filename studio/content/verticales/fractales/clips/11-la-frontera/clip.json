@@ -21,32 +21,100 @@
   "voz": {
     "voz": "Charon",
     "secciones": [
-      {"t_inicio": 1.2, "texto": "Pintamos todo lo que está cerca del borde."},
-      {"t_inicio": 6.0, "texto": "Y afinamos: la mitad de cerca."},
-      {"t_inicio": 10.8, "texto": "Una curva perdería la mitad del área."},
-      {"t_inicio": 14.0, "texto": "Esta orla apenas adelgaza."},
-      {"t_inicio": 17.4, "texto": "Su dimensión pasa de uno coma seis."},
-      {"t_inicio": 21.6, "texto": "Y sube cada vez que miramos más fino."},
-      {"t_inicio": 25.4, "texto": "El límite, dice la teoría, es dos."}
+      {
+        "t_inicio": 1.2,
+        "texto": "Pintamos todo lo que está cerca del borde."
+      },
+      {
+        "t_inicio": 6.0,
+        "texto": "Y afinamos: la mitad de cerca."
+      },
+      {
+        "t_inicio": 10.6,
+        "texto": "Una curva perdería la mitad del área."
+      },
+      {
+        "t_inicio": 14.6,
+        "texto": "Esta orla apenas adelgaza."
+      },
+      {
+        "t_inicio": 17.6,
+        "texto": "Su dimensión pasa de uno coma seis."
+      },
+      {
+        "t_inicio": 21.4,
+        "texto": "Y sube cuanto más fino miramos."
+      },
+      {
+        "t_inicio": 26.6,
+        "texto": "El límite es dos."
+      }
     ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [29.3, 30.1],
+    "fade_out": [
+      29.3,
+      30.1
+    ],
     "eventos": [
-      ["nebulosa", 0.15, -15],
-      ["blip_hud", 0.75, -19],
-      ["aire_largo", 2.3, -17],
-      ["blip_grave", 5.4, -16],
-      ["blip_medio", 8.0, -16],
-      ["blip_agudo", 10.5, -16],
-      ["barrido", 13.1, -18],
-      ["nebulosa", 15.5, -16],
-      ["subrayado", 16.6, -14],
-      ["pulso", 21.0, -15],
-      ["aire", 24.7, -18]
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire_largo",
+        2.3,
+        -17
+      ],
+      [
+        "blip_grave",
+        5.4,
+        -16
+      ],
+      [
+        "blip_medio",
+        8.0,
+        -16
+      ],
+      [
+        "blip_agudo",
+        10.5,
+        -16
+      ],
+      [
+        "barrido",
+        13.1,
+        -18
+      ],
+      [
+        "nebulosa",
+        15.5,
+        -16
+      ],
+      [
+        "subrayado",
+        16.6,
+        -14
+      ],
+      [
+        "pulso",
+        21.0,
+        -15
+      ],
+      [
+        "aire",
+        24.7,
+        -18
+      ]
     ]
   }
 }

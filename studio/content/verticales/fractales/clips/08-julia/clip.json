@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Con c fijo, la pregunta es para cada punto de partida: ¿se queda o se va? Los presos (violeta, el color de «lo atrapado» en todo el curso) forman el conjunto de Julia lleno. Con c = -0.123+0.745i quedan 17 302 de los 90 000 puntos de la malla; con c = 0.285+0.01i, ni uno. Cuentas de prisioneros (malla 300×300, 300 pasos); el paso de un c al otro es un morph real de 40 fotogramas.",
-  "duracion_objetivo": 30.1,
+  "duracion_objetivo": 30.05,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD; ejes y la marca de c",
@@ -19,32 +19,101 @@
   "voz": {
     "voz": "Charon",
     "secciones": [
-      {"t_inicio": 1.2, "texto": "Ahora c se queda quieto."},
-      {"t_inicio": 5.5, "texto": "Y preguntamos por cada punto de partida."},
-      {"t_inicio": 11.0, "texto": "Los que no escapan son el conjunto."},
-      {"t_inicio": 16.4, "texto": "Mueve c un poquito."},
-      {"t_inicio": 22.6, "texto": "Y el conjunto se hace polvo."},
-      {"t_inicio": 26.8, "texto": "Cero presos."}
+      {
+        "t_inicio": 1.2,
+        "texto": "Ahora c se queda quieto."
+      },
+      {
+        "t_inicio": 5.5,
+        "texto": "Y preguntamos por cada punto de partida."
+      },
+      {
+        "t_inicio": 11.0,
+        "texto": "Los que no escapan son el conjunto."
+      },
+      {
+        "t_inicio": 16.4,
+        "texto": "Mueve c un poquito."
+      },
+      {
+        "t_inicio": 22.6,
+        "texto": "Y el conjunto se hace polvo."
+      },
+      {
+        "t_inicio": 26.8,
+        "texto": "Cero presos."
+      }
     ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [29.3, 30.0],
+    "fade_out": [
+      29.3,
+      30.0
+    ],
     "eventos": [
-      ["nebulosa", 0.15, -15],
-      ["blip_hud", 0.75, -19],
-      ["blip_grave", 2.1, -16],
-      ["aire", 2.5, -18],
-      ["blip_agudo", 5.4, -16],
-      ["nebulosa", 8.5, -15],
-      ["pulso", 9.2, -14],
-      ["subrayado", 11.6, -14],
-      ["barrido", 16.2, -16],
-      ["aire_largo", 17.5, -18],
-      ["sting", 22.6, -14],
-      ["pulso", 26.8, -15]
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "blip_grave",
+        2.1,
+        -16
+      ],
+      [
+        "aire",
+        2.5,
+        -18
+      ],
+      [
+        "blip_agudo",
+        5.4,
+        -16
+      ],
+      [
+        "nebulosa",
+        8.5,
+        -15
+      ],
+      [
+        "pulso",
+        9.2,
+        -14
+      ],
+      [
+        "subrayado",
+        11.6,
+        -14
+      ],
+      [
+        "barrido",
+        16.2,
+        -16
+      ],
+      [
+        "aire_largo",
+        17.5,
+        -18
+      ],
+      [
+        "sting",
+        22.6,
+        -14
+      ],
+      [
+        "pulso",
+        26.8,
+        -15
+      ]
     ]
   }
 }

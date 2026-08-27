@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una sola instrucción repetida cinco veces sobre un triángulo. El perímetro se multiplica por 4/3 cada pasada (15.59 → 65.69, ×4.21) mientras el área se estanca contra un techo dibujado: 1.590 veces el triángulo, camino de 8/5. Cifras de koch_perimetro y koch_area; el área del polígono dibujado coincide con la fórmula hasta la sexta cifra.",
-  "duracion_objetivo": 33.36,
+  "duracion_objetivo": 33.37,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",

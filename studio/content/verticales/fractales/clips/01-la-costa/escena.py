@@ -131,10 +131,14 @@ class Clip(Scene):
             num_nuevo = cifra(f"{med['longitud']:5.2f}")
             num_nuevo.move_to(UP * Y_NUMERO)
 
+            # La cifra se apaga CON la regla vieja, no despues: si se
+            # queda mientras el compas camina con la regla nueva, el pie
+            # dice "regla 1/8" debajo de la longitud que dio la de 1/4. El
+            # hueco de dos segundos es lo que se tarda en medir.
             self.play(FadeOut(cuerdas), FadeOut(punto), FadeOut(sub),
-                      run_time=0.35)
+                      FadeOut(contador, scale=0.92), run_time=0.35)
             self.play(FadeIn(sub_nuevo, scale=1.06), run_time=0.3)
-            for m in (cuerdas, punto, sub):
+            for m in (cuerdas, punto, sub, contador):
                 if m in vivos:
                     vivos.remove(m)
             sub = sub_nuevo
@@ -142,8 +146,7 @@ class Clip(Scene):
 
             self.play(Create(camino), run_time=self.DUR_PASEO[i - 1],
                       rate_func=linear)
-            cambiar(self, contador, num_nuevo)
-            vivos.remove(contador)
+            self.play(FadeIn(num_nuevo, scale=1.08), run_time=0.36)
             contador = num_nuevo
             vivos += [camino, contador]
             self.wait(0.3)

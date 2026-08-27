@@ -59,21 +59,26 @@ def pico_db(video: Path) -> float | None:
 
 def mezclar(pieza_dir: Path, video: Path, salida: Path,
             voz: Path | None) -> bool:
-    """`sfx.py promo` en el host; si el numpy no sirve, en el contenedor."""
+    """`sfx.py promo` en el host; si el numpy no sirve, en el contenedor.
+
+    El interprete es el `python3` del SISTEMA, no el venv del backend: el
+    venv no trae numpy (no lo necesita) y `sfx.py` sintetiza con numpy. Si
+    ese python tampoco sirve —el canario del propio sfx.py sale con 2, o
+    falta el modulo— la mezcla se rehace dentro del contenedor de render,
+    que siempre lo tiene.
+    """
     args = [str(pieza_dir), str(video), str(salida)]
     if voz:
         args.append(str(voz))
-    proc = subprocess.run([sys.executable, str(SFX), "promo", *args],
+    proc = subprocess.run(["python3", str(SFX), "promo", *args],
                           capture_output=True, text=True)
     if proc.returncode == 0:
         return True
-    if proc.returncode != 2:
-        print(proc.stdout.strip())
-        print(proc.stderr.strip()[-800:])
-        return False
 
-    # exit 2 = el canario del numpy del host aborto: al contenedor.
-    print("    (numpy del host no apto: mezclando en el contenedor)")
+    print("    (el python del host no sirve para sfx: al contenedor)")
+    if proc.returncode not in (2,) and "No module named" not in proc.stderr:
+        print(proc.stdout.strip())
+        print(proc.stderr.strip()[-600:])
     rel = [str(Path(a).resolve().relative_to(REPO)) for a in args]
     cmd = ["docker", "run", "--rm", "--network", "none",
            "-v", f"{REPO}:/workspace", "-w", "/workspace", IMAGEN,

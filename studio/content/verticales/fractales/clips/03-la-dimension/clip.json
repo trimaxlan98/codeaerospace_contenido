@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "D = log(copias)/log(1/factor), aplicada tres veces: la recta da 1, el cuadrado 2 y Koch —4 copias a un tercio— da 1.2619. Después la costa del clip 01 vuelve bajo una rejilla que se afina (12, 32, 72 y 161 cajas para lados 2, 1, 1/2 y 1/4) y la pendiente del ajuste da 1.2408. Las cajas dibujadas SON las contadas: el mapa a pantalla es un giro rígido más una homotecia.",
-  "duracion_objetivo": 34.06,
+  "duracion_objetivo": 34.07,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",

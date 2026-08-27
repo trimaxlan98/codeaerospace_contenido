@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La identidad CO.DE Academy recompuesta para 9:16, con la misma coreografía que la intro horizontal (escaneo, retícula, ensamblado del wordmark, el punto ámbar como cursor) y un remate propio de este curso: el título FRACTALES con su bajada. Sin narración: sólo la cama sonora.",
-  "duracion_objetivo": 12.4,
+  "duracion_objetivo": 12.48,
   "guion_visual": [
     "0.5  el escaneo barre y enciende la retícula",
     "1.9  se ensambla CO.DE y se dibujan las escuadras",
@@ -17,20 +17,71 @@
   "audio": {
     "pico_db": -4.5,
     "fade_in": 0.3,
-    "fade_out": [11.3, 12.3],
+    "fade_out": [
+      11.3,
+      12.3
+    ],
     "eventos": [
-      ["barrido", 0.50, -8],
-      ["aire_largo", 0.65, -16],
-      ["nebulosa_intro", 1.85, -13],
-      ["blip_grave", 2.30, -14],
-      ["blip_medio", 2.80, -13],
-      ["blip_agudo", 3.60, -12],
-      ["tick", 3.78, -10],
-      ["tick", 4.12, -10],
-      ["aire", 4.70, -15],
-      ["blip_hud", 6.40, -16],
-      ["subrayado", 7.70, -12],
-      ["pulso", 9.30, -12]
+      [
+        "barrido",
+        0.5,
+        -8
+      ],
+      [
+        "aire_largo",
+        0.65,
+        -16
+      ],
+      [
+        "nebulosa_intro",
+        1.85,
+        -13
+      ],
+      [
+        "blip_grave",
+        2.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        2.8,
+        -13
+      ],
+      [
+        "blip_agudo",
+        3.6,
+        -12
+      ],
+      [
+        "tick",
+        3.78,
+        -10
+      ],
+      [
+        "tick",
+        4.12,
+        -10
+      ],
+      [
+        "aire",
+        4.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        6.4,
+        -16
+      ],
+      [
+        "subrayado",
+        7.7,
+        -12
+      ],
+      [
+        "pulso",
+        9.3,
+        -12
+      ]
     ]
   }
 }

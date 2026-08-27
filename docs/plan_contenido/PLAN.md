@@ -6,10 +6,13 @@ el codigo de los clips y librerias.
 
 ## Idea central
 
-Hay dos formatos vivos. El original (cursos 1-13) desmenuza la Academy en
-cursos de 8 clips; el nuevo (familia "Aerodinamica", desde 2026-08-14) parte
+Hay TRES formatos vivos (desde 2026-08-27). El original (cursos 1-13) desmenuza la Academy en
+cursos de 8 clips; el segundo (familia "Aerodinamica", desde 2026-08-14) parte
 de un documento maestro de curso autogestivo y hace **un proyecto por
-leccion**, con un clip por subtema. Lo que NO cambia entre los dos: el tema
+leccion**, con un clip por subtema. El tercero (curso 26 "Fractales", desde
+2026-08-27) es **vertical (9:16)**: nace del formato de los promos de redes,
+no lleva subtitulos —la imagen enseña y el audio remata— y se entrega como
+un solo video de intro + clips + cierre unidos. Lo que NO cambia entre los dos: el tema
 oficial `code_brand`, la libreria por familia, el rango de 28-45 s por clip y
 la validacion visual de frames.
 
@@ -53,6 +56,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 23 | Calculo vectorial (familia, 12 lecciones) | original (divulgacion, muy visual: el espacio que fluye; secuela de Algebra lineal, cierra en Maxwell) | `calculo_vectorial.py` (sobre `algebra_lineal.py`) | publicado (PR #43): 12 lecciones, 48 qh en prod, narradas y muxeadas — PRIMER curso con el intro/cierre SONOROS (2026-08-20) |
 | 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
 | 25 | Protocolos de Internet (familia, 24 lecciones) | original (divulgacion: la capa de paquetes; del cable de cobre a Marte, cierra en DTN/CCSDS) | `protocolos.py` | **en produccion por lotes** (plan completo en `curso-23-protocolos-internet.md`; 4 lotes de 6 lecciones) |
+| 26 | Fractales: la forma del infinito (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 1, que era horizontal y solo miraba el plano complejo) | `fractales.py` ampliada | **primer curso en 9:16**: sin subtitulos, voz escrita a mano y cama de SFX; plan en `curso-26-fractales-vertical.md` |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de

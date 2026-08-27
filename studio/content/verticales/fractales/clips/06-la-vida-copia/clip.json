@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La regla de Leonardo: el tronco y la suma de sus ramas tienen la misma sección, lo que obliga a d_hija = d_madre/√2. El árbol crece ocho generaciones y la sección total no se mueve (1.000) mientras la longitud total se multiplica por 52.2. Cambiando sólo el ángulo cambia el árbol entero y la sección sigue igual. Cierra con el cuadrado del tronco repartido en 2, 4, ... 256 baldosas que lo tesela sin huecos. Todo lo calcula arbol_davinci.",
-  "duracion_objetivo": 31.3,
+  "duracion_objetivo": 31.2,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
@@ -18,41 +18,145 @@
   "voz": {
     "voz": "Charon",
     "secciones": [
-      {"t_inicio": 1.0, "texto": "Leonardo lo anotó en un cuaderno."},
-      {"t_inicio": 5.2, "texto": "El tronco y sus ramas tienen la misma sección."},
-      {"t_inicio": 10.8, "texto": "La longitud, en cambio, se dispara."},
-      {"t_inicio": 14.6, "texto": "Cambia el ángulo y cambia el árbol."},
-      {"t_inicio": 19.4, "texto": "La sección no."},
-      {"t_inicio": 22.6, "texto": "Un tronco. Doscientas cincuenta y seis ramas."},
-      {"t_inicio": 27.4, "texto": "El mismo cuadrado."}
+      {
+        "t_inicio": 1.0,
+        "texto": "Leonardo lo anotó en un cuaderno."
+      },
+      {
+        "t_inicio": 5.2,
+        "texto": "El tronco y sus ramas tienen la misma sección."
+      },
+      {
+        "t_inicio": 10.8,
+        "texto": "La longitud, en cambio, se dispara."
+      },
+      {
+        "t_inicio": 14.6,
+        "texto": "Cambia el ángulo y cambia el árbol."
+      },
+      {
+        "t_inicio": 19.4,
+        "texto": "La sección no."
+      },
+      {
+        "t_inicio": 22.6,
+        "texto": "Un tronco. Doscientas cincuenta y seis ramas."
+      },
+      {
+        "t_inicio": 27.4,
+        "texto": "El mismo cuadrado."
+      }
     ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [30.3, 31.1],
+    "fade_out": [
+      30.3,
+      31.1
+    ],
     "eventos": [
-      ["nebulosa", 0.15, -15],
-      ["blip_hud", 0.75, -19],
-      ["aire_largo", 1.7, -18],
-      ["tick", 2.4, -17],
-      ["tick", 3.6, -17],
-      ["tick", 4.8, -17],
-      ["tick", 6.0, -18],
-      ["subrayado", 7.8, -14],
-      ["blip_medio", 10.4, -15],
-      ["nebulosa", 13.4, -16],
-      ["barrido", 14.8, -18],
-      ["barrido", 16.4, -18],
-      ["barrido", 18.0, -18],
-      ["barrido", 19.6, -18],
-      ["pulso", 21.9, -14],
-      ["tick", 23.1, -16],
-      ["tick", 24.1, -16],
-      ["tick", 25.1, -16],
-      ["blip_agudo", 26.6, -14],
-      ["aire", 27.4, -18]
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire_largo",
+        1.7,
+        -18
+      ],
+      [
+        "tick",
+        2.4,
+        -17
+      ],
+      [
+        "tick",
+        3.6,
+        -17
+      ],
+      [
+        "tick",
+        4.8,
+        -17
+      ],
+      [
+        "tick",
+        6.0,
+        -18
+      ],
+      [
+        "subrayado",
+        7.8,
+        -14
+      ],
+      [
+        "blip_medio",
+        10.4,
+        -15
+      ],
+      [
+        "nebulosa",
+        13.4,
+        -16
+      ],
+      [
+        "barrido",
+        14.8,
+        -18
+      ],
+      [
+        "barrido",
+        16.4,
+        -18
+      ],
+      [
+        "barrido",
+        18.0,
+        -18
+      ],
+      [
+        "barrido",
+        19.6,
+        -18
+      ],
+      [
+        "pulso",
+        21.9,
+        -14
+      ],
+      [
+        "tick",
+        23.1,
+        -16
+      ],
+      [
+        "tick",
+        24.1,
+        -16
+      ],
+      [
+        "tick",
+        25.1,
+        -16
+      ],
+      [
+        "blip_agudo",
+        26.6,
+        -14
+      ],
+      [
+        "aire",
+        27.4,
+        -18
+      ]
     ]
   }
 }

@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Tres esquinas y un dado: sale una, saltas a la mitad de camino, marcas. Los catorce primeros saltos se ven uno a uno y la nube que viene después es su continuación literal (ifs_camino es secuencial y determinista). A los 200 000 puntos aparece el triángulo de Sierpinski, y conteo_cajas mide su dimensión: 1.5920, contra log3/log2 = 1.5850.",
-  "duracion_objetivo": 31.93,
+  "duracion_objetivo": 31.62,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
