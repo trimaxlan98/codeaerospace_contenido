@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 5.3 Cuánto cuesta un FIR",
+  "description": "Lección 5.3 del curso Procesamiento digital de señales (módulo 5: filtros FIR), en 4 clips animados: el retardo que introduce un FIR medido con un impulso, la simetría que ahorra la mitad de las multiplicaciones, la forma directa dibujada con sus cajas de retardo, y el presupuesto en multiplicaciones por segundo. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-retardo.py",
+      "title": "1 · El retardo",
+      "scene": "Clip1",
+      "final_state": "El impulso entrando en la muestra 10 y saliendo en la 30, con la flecha que marca las 20 muestras de retardo."
+    },
+    {
+      "file": "clips/02-la-simetria.py",
+      "title": "2 · La simetria",
+      "scene": "Clip2",
+      "final_state": "Los coeficientes del FIR con las parejas simetricas unidas: 21 multiplicaciones distintas de 41 coeficientes."
+    },
+    {
+      "file": "clips/03-la-forma-directa.py",
+      "title": "3 · La forma directa",
+      "scene": "Clip3",
+      "final_state": "La linea de retardos completa con sus cajas z^-1, las tomas y el sumador, y una muestra recorriendola."
+    },
+    {
+      "file": "clips/04-el-presupuesto.py",
+      "title": "4 · El presupuesto",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Un filtro no se mide en decibelios.' (blanca) y 'Se mide en multiplicaciones por segundo.' (cian)."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Procesamiento de señales · 5.1 FIR: truncar el ideal",
+  "description": "Lección 5.1 del curso Procesamiento digital de señales (módulo 5: filtros FIR), en 4 clips animados: el filtro ideal que es una sinc infinita, la oreja de Gibbs que no se va por mucho orden que se le eche, la ventana que la ablanda y lo que cuesta, y el precio de cumplir un pliego de condiciones. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-la-sinc-que-no-cabe.py", "title": "1 · La sinc que no cabe", "scene": "Clip1",
+     "final_state": "La sinc infinita con la ventana rectangular recortandola y los 41 taps que quedan como secuencia ambar; cifras orden = 40 y 41 taps."},
+    {"file": "clips/02-gibbs.py", "title": "2 · La oreja de Gibbs", "scene": "Clip2",
+     "final_state": "Las respuestas de los ordenes 20, 40, 80 y 160 superpuestas: la transicion se estrecha pero el sobrepico se queda en +0.8 dB; panel con los cuatro sobrepicos medidos."},
+    {"file": "clips/03-la-ventana.py", "title": "3 · La ventana que ablanda", "scene": "Clip3",
+     "final_state": "Las cuatro respuestas al mismo orden 40 con sus cifras: el sobrepico cae de +0.817 a +0.002 dB, pero blackman suspende el pliego con -24.1 dB de atenuacion."},
+    {"file": "clips/04-el-precio.py", "title": "4 · El precio", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos lineas: 'El filtro ideal no existe.' (blanca) y 'Solo existe su recorte.' (cian)."}
+  ]
+}

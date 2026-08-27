@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 6.2 Biquads en cascada",
+  "description": "Lección 6.2 del curso Procesamiento digital de señales (módulo 6: filtros IIR), en 4 clips animados: el filtro de orden 10 cuyos polos se salen del círculo al guardar los coeficientes con 16 bits, las secciones de segundo orden que lo arreglan, la cifra que las separa (1173 veces menos error) y en qué orden se encadenan. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-forma-directa-revienta.py",
+      "title": "1 · La forma directa revienta",
+      "scene": "Clip1",
+      "final_state": "Los polos exactos y los cuantizados a 16 bits en el plano Z: los segundos se salen del circulo unidad, con el radio maximo 1.1121 rotulado."
+    },
+    {
+      "file": "clips/02-secciones-de-segundo-orden.py",
+      "title": "2 · Secciones de segundo orden",
+      "scene": "Clip2",
+      "final_state": "El filtro partido en 5 biquads encadenados, cada uno con su par de polos marcado en el plano."
+    },
+    {
+      "file": "clips/03-la-cifra.py",
+      "title": "3 · La cifra",
+      "scene": "Clip3",
+      "final_state": "La comparacion de los desplazamientos de polos: 2.09e-01 en forma directa contra 1.78e-04 en cascada, 1173 veces mejor."
+    },
+    {
+      "file": "clips/04-el-orden-de-las-secciones.py",
+      "title": "4 · El orden importa",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Un filtro no es su ecuacion.' (blanca) y 'Es como se calcula.' (cian)."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 6.3 Peine, resonador, notch y Goertzel",
+  "description": "Lección 6.3 del curso Procesamiento digital de señales (módulo 6: filtros IIR), en 4 clips animados: el filtro peine y sus tres dientes medidos, el resonador que amplifica una sola frecuencia, el notch que mata otra sin tocar a la vecina, y Goertzel, que saca un bin con 128 multiplicaciones en vez de 448. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-peine.py",
+      "title": "1 · El peine",
+      "scene": "Clip1",
+      "final_state": "La respuesta del peine con sus tres dientes en 0.25, 0.50 y 0.75 pi marcados, y la respuesta al impulso de dos golpes que los produce."
+    },
+    {
+      "file": "clips/02-el-resonador.py",
+      "title": "2 · El resonador",
+      "scene": "Clip2",
+      "final_state": "El par de polos a radio 0.95 y el pico de la respuesta justo en 0.15 pi."
+    },
+    {
+      "file": "clips/03-el-notch.py",
+      "title": "3 · El notch",
+      "scene": "Clip3",
+      "final_state": "El cero sobre el circulo en 0.4 pi con su polo detras, el agujero en la respuesta y la cifra de lo poco que toca al vecino: 0.10 dB en 0.35 pi."
+    },
+    {
+      "file": "clips/04-goertzel.py",
+      "title": "4 · Goertzel",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'No siempre hace falta el espectro entero.' (blanca) y 'A veces basta una nota.' (cian)."
+    }
+  ]
+}
