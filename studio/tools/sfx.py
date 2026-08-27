@@ -22,7 +22,7 @@ Uso:
                           sfx.py mezclar fx.wav 32 barrido@0.5:-8 tick@4:-12
   sfx.py aplicar video.mp4 audio.wav [out.mp4]
                           pega un wav a un mp4 (aac 24k mono, -shortest)
-  sfx.py promo <promo_dir> <video.mp4> [out.mp4]
+  sfx.py promo <promo_dir> <video.mp4> [out.mp4] [voz.wav]
                           cama sonora de un promo de redes: lee el bloque
                           "audio" de promo.json, la mide contra la DURACION
                           REAL del video y la pega. Los extremos quedan en
@@ -298,7 +298,18 @@ def mezcla_cierre(total):
     ], fade_in=0.4, fade_out=(7.2, 8.5))
 
 
-def promo(promo_dir, video, salida=None):
+def lee_wav(ruta):
+    """Un wav PCM16 mono a 24 kHz como float en [-1, 1]."""
+    with wave.open(str(ruta), "rb") as w:
+        if w.getnchannels() != 1 or w.getframerate() != SR:
+            raise SystemExit(f"{ruta}: se esperaba mono a {SR} Hz "
+                             f"(es {w.getnchannels()} canales a "
+                             f"{w.getframerate()} Hz)")
+        crudo = w.readframes(w.getnframes())
+    return np.frombuffer(crudo, dtype="<i2").astype(np.float64) / 32768.0
+
+
+def promo(promo_dir, video, salida=None, voz_wav=None):
     """Cama sonora de un promo, ajustada a la duracion REAL de su video.
 
     Un promo se ve en bucle, asi que el audio tiene que empezar y terminar
@@ -322,13 +333,26 @@ def promo(promo_dir, video, salida=None):
         fin = [fin[0] * k, min(total, fin[1] * k)]
     m = mezclar(total, eventos, fade_in=float(spec.get("fade_in", 0.3)),
                 fade_out=(float(fin[0]), float(fin[1])))
-    m = _norm(m, 10 ** (float(spec.get("pico_db", -3.0)) / 20))
+    pico = float(spec.get("pico_db_con_voz", -16.0) if voz_wav
+                 else spec.get("pico_db", -3.0))
+    m = _norm(m, 10 ** (pico / 20))
+    if voz_wav:
+        # La voz ya viene alineada a los tiempos del manifiesto (la escribe
+        # narrar_promo.py): aqui solo se suma, con la cama por debajo.
+        v = lee_wav(voz_wav)
+        v = _norm(v, 10 ** (-2.0 / 20))
+        v = np.pad(v, (0, max(0, len(m) - len(v))))[:len(m)]
+        m = m + v
+        techo = 10 ** (-1.0 / 20)
+        if np.max(np.abs(m)) > techo:
+            m = _norm(m, techo)
     wav = video.with_suffix(".wav")
     escribe_wav(wav, m)
     salida = Path(salida) if salida else video.with_name(
         video.stem + "_sfx.mp4")
     aplicar(video, wav, salida)
-    print(f"{salida}  ({total:.2f} s, pico {spec.get('pico_db', -3.0)} dBFS)")
+    print(f"{salida}  ({total:.2f} s, cama a {pico} dBFS"
+          f"{', con voz' if voz_wav else ''})")
 
 
 # ------------------------------------------------------------------- ffmpeg
@@ -396,7 +420,8 @@ def main(argv):
         escribe_wav(salida, mezclar(total, eventos))
         print(salida)
     elif orden == "promo":
-        promo(argv[2], argv[3], argv[4] if len(argv) > 4 else None)
+        promo(argv[2], argv[3], argv[4] if len(argv) > 4 else None,
+              argv[5] if len(argv) > 5 else None)
     elif orden == "aplicar":
         video, audio = Path(argv[2]), Path(argv[3])
         salida = Path(argv[4]) if len(argv) > 4 else video.with_name(

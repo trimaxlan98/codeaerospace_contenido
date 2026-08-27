@@ -75,9 +75,11 @@ derecha (corazon, comentarios, compartir). Si algo IMPORTA, cabe dentro.
 |---|---|
 | `studio/content/manim_extensions/promo.py` | el lienzo (`formato()`), zonas seguras, `marca_promo()`, `guias()`, `fondo_seguro()` |
 | `studio/tools/render_promo.py` | render a cualquier formato, sin la regla de 28–45 s, y **mide la costura del bucle** |
-| `studio/tools/sfx.py promo` | cama sonora desde el bloque `audio` del manifiesto, ajustada a la duracion REAL del video |
+| `studio/tools/sfx.py promo` | cama sonora desde el bloque `audio` del manifiesto, ajustada a la duracion REAL del video; con un wav de voz, la mezcla por debajo |
+| `studio/tools/narrar_promo.py` | sintetiza el texto ESCRITO A MANO del manifiesto y lo alinea a los instantes visuales (se ejecuta en el VPS) |
 | `studio/content/promos/<slug>/` | `promo.json` + `style_block.py` + `escena.py` |
 | `naturaleza.Filotaxis.girar_a()` | recoloca las semillas existentes (aditivo; `con_angulo` sigue igual) |
+| `naturaleza.hueco_maximo()` | el circulo vacio mas grande que CABE en el disco: la medida honesta del desperdicio (aditivo) |
 
 El formato se pasa por entorno (`PROMO_FORMATO`), asi que **una escena, dos
 formatos**: `--formato vertical` y `--formato horizontal` salen del mismo
@@ -132,6 +134,69 @@ con salto visible (identico al pixel); audio AAC 24 kHz mono con pico
 - El `.animate` de un VGroup lo sube al frente: si algo tiene que quedar por
   encima, `set_z_index`, no confiar en el orden.
 
+## Promo 2 — "Por que 137.5" (curso 14)
+
+`studio/content/promos/filotaxis-por-que-137-5/`. 13.30 s, 1080x1920 @ 60 fps,
+con voz Charon. Es la pareja del promo 1: aquel enganchaba, este responde.
+
+**El encargo era que el espectador APRENDIERA algo.** La decision de diseño
+que manda sobre todas las demas: en redes mucha gente mira en silencio, asi
+que la explicacion **no puede vivir en la voz**. Entra por el contraejemplo:
+
+```
+0.00  el polo solo                       <- estado de arranque Y de cierre
+0.35  las semillas nacen con 90 grados: cuatro rayos y cuatro cuñas vacias
+2.75  se dibuja el hueco: el circulo vacio MAS GRANDE que cabe en el disco
+3.95  el angulo barre de 90 al aureo; los rayos se disuelven y el hueco se
+      cierra, con la cifra contandolo
+8.15  el hueco nuevo, 8 veces mas pequeño, junto al fantasma del viejo
+11.35 el disco se consume desde el filo hacia el polo
+12.95 el polo solo                       <- el ultimo frame ES el primero
+```
+
+La cifra del hueco **no se rotula: se dibuja**. `hueco_maximo` mide el radio
+del circulo vacio mayor (1.2239 a 90 grados, 0.1537 en el aureo: **8.0 veces**)
+y el aro que se ve en pantalla ES esa medida. La comprobacion de que la
+funcion es correcta: para cuatro rayos la geometria analitica da 1.226 y la
+malla mide 1.2239.
+
+**Voz** (3 frases, 16 palabras, alineadas a los instantes visuales):
+"Cada semilla nace girando igual." / "Con noventa grados dejan huecos." /
+"El angulo aureo no deja ninguno."
+
+**Verificado**: bucle identico al pixel; audio AAC 24 kHz mono con pico
+−2.1 dBFS, silencio en los extremos (−90 dB al principio, −42 dB al final) y
+la voz callada 0.8 s antes del ultimo frame. Salida:
+`exports/promos/filotaxis-por-que-137-5/vertical.mp4`.
+
+## Cosecha de trampas del promo 2
+
+- **La peor, y la que casi se publica sin verse:** un `updater` sobre un
+  mobject que NO participa del `play` se ejecuta pero **no se ve**. El
+  renderer cachea en una imagen estatica todo lo que no es "moving mobject",
+  asi que el disco se quedaba clavado en la cruz de 90 grados mientras la
+  cifra —esa si, animada— subia hasta 137.5. El barrido tiene que ir como
+  **animacion del propio disco** (`UpdateFromAlphaFunc`), no como updater
+  suelto. **El promo 1 tenia el mismo fallo y paso la primera revision**: su
+  patron "cambiado" era en realidad el aureo de siempre; se descubrio al
+  comparar los dos promos. Los dos estan corregidos y re-renderizados.
+- **Charon narra a ~1.7 palabras/s, no a 2.2**: 25 palabras pedian 14.5 s
+  para un video de 12. Para un promo, contar las palabras a 1.7 w/s.
+- **La voz tiene que CALLAR antes del ultimo frame.** Ajustada exacta a la
+  duracion, terminaba a −23.5 dB en el ultimo frame y el salto del bucle se
+  oia. El respiro largo antes del colapso no es estetico: es lo que hace que
+  el audio tenga cola de silencio.
+- **Una medida "del hueco mas grande" sin acotar al disco miente**: el
+  circulo se sale por el borde (daba 2.15 en vez de 1.35 a 90 grados). El
+  radio en cada punto es el menor de dos: hasta la semilla mas cercana y
+  hasta el filo.
+- **Antes de diagnosticar un defecto visual, ampliar el frame.** El aro
+  pequeño parecia una flor de seis petalos; ampliado x4 es un circulo
+  perfecto y lo que muerde son las cuatro semillas que lo tocan — que es
+  justo lo que significa "circulo vacio maximo".
+- A 90.3 grados los cuatro rayos se convierten en cuatro brazos curvos: el
+  barrido regala su propio momento visual a los pocos frames de arrancar.
+
 ## Lo que falta (cuando se valide)
 
 1. Ver el vertical en un telefono de verdad (es lo unico que no se puede
@@ -139,8 +204,9 @@ con salto visible (identico al pixel); audio AAC 24 kHz mono con pico
 2. Sacar el 16:9 en `qh`: el camino esta validado en `ql` (960x540, bucle
    limpio), pero la composicion horizontal merece una pasada de ajuste — el
    bloque de la cifra pide subir un poco.
-3. Decidir si algun promo lleva voz: la sintesis TTS **solo** se puede hacer
-   en el VPS (las credenciales no estan en local).
+3. La voz ya esta resuelta (promo 2): `narrar_promo.py` se copia al VPS, se
+   sintetiza, se baja el wav y `sfx.py promo` lo mezcla con la cama. Los
+   ficheros temporales del VPS se borran al terminar.
 4. Mas promos: un formato por curso, empezando por los mas visuales (caos,
    algebra lineal, protocolos).
 5. Cuando el formato este validado, mergear a `main` y añadir la seccion de

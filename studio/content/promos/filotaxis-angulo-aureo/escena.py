@@ -101,10 +101,18 @@ class Promo(Scene):
             lambda: cifra(angulo.get_value()).move_to(pos_lectura))
         self.remove(lectura)
         self.add(viva)
-        disco.add_updater(lambda m: m.girar_a(angulo.get_value()))
-        self.play(angulo.animate.set_value(ANGULO + DESVIO),
-                  run_time=2.6, rate_func=there_and_back)
-        disco.clear_updaters()
+        # El barrido va como ANIMACION del disco, no como updater suelto:
+        # el renderer cachea en una imagen estatica lo que no participa del
+        # play, y entonces el updater se ejecuta pero no se ve. Aqui salia
+        # bien de milagro (el play no llevaba nada mas); en cuanto se le
+        # añade otra animacion, deja de verse.
+        def barrer(m, a):
+            ang = ANGULO + DESVIO * a
+            angulo.set_value(ang)
+            m.girar_a(ang)
+
+        self.play(UpdateFromAlphaFunc(disco, barrer, rate_func=there_and_back),
+                  run_time=2.6)
         self.remove(viva)
         self.add(lectura)
 
