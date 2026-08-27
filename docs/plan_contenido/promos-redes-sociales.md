@@ -208,7 +208,7 @@ esta acabado, no a medias.
 | # | Promo | Curso | Estado |
 |---|---|---|---|
 | 3 | El efecto mariposa | 15 · Caos | **LISTO** 12.90 s · bucle 0.000 · voz |
-| 4 | La tirania del cohete | 17 · Tsiolkovsky | pendiente |
+| 4 | La tirania del cohete | 17 · Tsiolkovsky | **LISTO** 11.65 s · bucle 0.006 · voz |
 | 5 | Los 38 microsegundos del GPS | 16 · Relatividad | pendiente |
 | 6 | La constelacion con ruido | 24 · Comunicaciones | pendiente |
 | 7 | Que es un determinante | 22 · Algebra lineal | pendiente |
@@ -227,6 +227,22 @@ real paso a paso — se queda en `0.000` un buen rato y termina en **25.9**.
 - Lyapunov medido en el tramo recto: 0.807 /s.
 - Verificado: bucle identico al pixel, audio a −1.6 dBFS con los dos
   extremos a −91 dB.
+
+### Promo 4 — "La tirania del cohete" (curso 17)
+
+`studio/content/promos/cohete-la-tirania/`. 11.65 s. Empieza con el cohete
+ENTERO en cian (a dv=0 todo es carga util) y el combustible se lo va
+comiendo mientras sube el impulso. La referencia **ORBITA 9388** esta en
+pantalla desde el primer frame, asi que se ve la cifra subir hacia ella y
+**pararse en 8840**: con motor quimico y una sola etapa la carga util llega
+a cero antes de llegar. Remate en rojo: **FALTAN 548 M/S**.
+
+- Todo medido con `cohete.py`: `dv_leo` = 9388 (orbital calculada 7788 +
+  perdidas citadas 1600), `dv` de carga cero = −ve·ln(eps) = 8840.1, y las
+  tres franjas suman 1 exacto en todo el barrido.
+- El modelo da carga util NEGATIVA pasado ese punto (−1.26 % a 9388): esa
+  es la tesis del curso, pero una franja de altura negativa no se dibuja,
+  asi que el barrido se para justo en el cero y el rojo lo cuenta.
 
 ## Lo que falta (cuando se valide)
 
