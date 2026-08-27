@@ -226,7 +226,7 @@ agentes → revisión → PR → prod → narración → mux) antes de abrir el 
 | Lote | Módulos | Lecciones | Qué aporta a la librería | Estado |
 |---|---|---|---|---|
 | 1 | 1–2 | 1.1–2.3 | `Secuencia`, `Escalera`, `Deslizador`, `Barras`, `EspectroDoble`, réplicas, cuantización, convolución, correlación | ~ producción |
-| 2 | 3–4 | 3.1–4.3 | `Mariposa`, `PlanoZ`, `RespuestaFrec`, DFT/FFT, ventanas, Z, retardo de grupo | — |
+| 2 | 3–4 | 3.1–4.3 | `Mariposa`, `PlanoZ`, `RespuestaFrec`, DFT/FFT, ventanas, Z, retardo de grupo | ~ producción |
 | 3 | 5–6 | 5.1–6.3 | `LineaRetardos`, `Barras`, diseño FIR/IIR, biquads | — |
 | 4 | 7–8 | 7.1–8.3 | Q15, ciclos límite, overlap-add, polifase, CIC, Farrow | — |
 | 5 | 9–10 | 9.1–10.3 | `Espectrograma`, Welch, LMS, PLL, Kalman, Hilbert, STFT, filtro aprendido | — |
@@ -254,16 +254,27 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 
 | Lección | plan | libr. | clips | ql✔frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ | ✔ 32/33/30/33 s | — | — | — | — | — |
-| 1.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 1.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 3.1–4.3 | — | — | — | — | — | — | — | — | — |
-| 5.1–6.3 | — | — | — | — | — | — | — | — | — |
-| 7.1–8.3 | — | — | — | — | — | — | — | — | — |
-| 9.1–10.3 | — | — | — | — | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ | ✔ 32/33/30/33 s | ✔ #54 | ✔ | ✔ | ✔ | — |
+| 1.2 | ✔ | ✔ | ✔ | ✔ 37/37/35/36 s | ✔ #54 | ✔ | ✔ | ✔ | — |
+| 1.3 | ✔ | ✔ | ✔ | ✔ 32/28/29/34 s | ✔ #54 | ✔ | ✔ | ~ | — |
+| 2.1 | ✔ | ✔ | ✔ | ✔ 28/30/30/28 s | ✔ #54 | ✔ | ✔ | — | — |
+| 2.2 | ✔ | ✔ | ✔ | ✔ 39/35/34/37 s | ✔ #54 | ✔ | ✔ | — | — |
+| 2.3 | ✔ | ✔ | ✔ | ✔ 40/34/39/40 s | ✔ #54 | ✔ | ✔ | — | — |
+| 3.1 | ✔ | ✔ | ✔ | ✔ 29/29/29/32 s | — | — | — | — | — |
+| 3.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 3.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 4.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 4.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 4.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 5.1–6.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+| 7.1–8.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+| 9.1–10.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+
+**Dónde está la sesión ahora mismo**: lote 1 publicado en prod con sus 24 `qh`
+adoptados y narrándose (serial, en el VPS); lote 2 con la librería ampliada y
+validada, el molde 3.1 aprobado y 5 subagentes produciendo sus lecciones. El
+solape es deliberado: la narración ocupa el VPS y los renders de validación son
+locales, así que las dos cosas avanzan a la vez sin estorbarse.
 
 ## 13. Storyboard
 

@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 4.2 Del plano a la respuesta",
+  "description": "Lección 4.2 del curso Procesamiento digital de señales (módulo 4: el plano Z), en 4 clips animados: el punto que recorre el círculo unidad, |H| como producto de distancias a ceros entre distancias a polos (idéntico a la fórmula, medido), el polo que se acerca al círculo y afila el pico, y un filtro diseñado a mano colocando puntos. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-punto-que-recorre.py",
+      "title": "1 · El punto que recorre",
+      "scene": "Clip1",
+      "final_state": "El punto avanzando por el circulo unidad mientras la respuesta se dibuja al lado, sincronizados."
+    },
+    {
+      "file": "clips/02-los-radios.py",
+      "title": "2 · Las distancias",
+      "scene": "Clip2",
+      "final_state": "Los segmentos desde los polos hasta el punto del circulo, con |H| calculado por distancias (9.199) e identico al de la formula."
+    },
+    {
+      "file": "clips/03-mover-el-polo.py",
+      "title": "3 · Acercar el polo",
+      "scene": "Clip3",
+      "final_state": "Las tres respuestas del resonador para radio 0.70, 0.92 y 0.98 superpuestas, con los picos medidos 8.9, 19.3 y 31.0 dB."
+    },
+    {
+      "file": "clips/04-un-filtro-a-mano.py",
+      "title": "4 · Un filtro a mano",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Diseñar un filtro' (blanca) y 'es colocar puntos en un plano.' (cian)."
+    }
+  ]
+}

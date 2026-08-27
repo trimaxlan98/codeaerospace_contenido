@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 4.1 La transformada Z: polos y ceros",
+  "description": "Lección 4.1 del curso Procesamiento digital de señales (módulo 4: el plano Z), en 4 clips animados: z⁻¹ como el operador de retraso que vuelve polinomio la ecuación en diferencias, las raíces de ese polinomio dibujadas en el plano, la región de convergencia, y el círculo unidad como frontera de lo estable. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-de-la-suma-a-z.py",
+      "title": "1 · De la suma a z",
+      "scene": "Clip1",
+      "final_state": "La ecuacion en diferencias convertida en polinomio, con z^-1 marcado como una muestra de retraso y los coeficientes del FIR."
+    },
+    {
+      "file": "clips/02-polos-y-ceros.py",
+      "title": "2 · Polos y ceros",
+      "scene": "Clip2",
+      "final_state": "El plano Z con los dos ceros del FIR en radio 0.949 y angulo 32.5 grados, y al lado la respuesta con su valle en esa frecuencia."
+    },
+    {
+      "file": "clips/03-la-region.py",
+      "title": "3 · Donde converge",
+      "scene": "Clip3",
+      "final_state": "La region de convergencia dibujada fuera del polo de mayor radio, con la respuesta al impulso que la justifica."
+    },
+    {
+      "file": "clips/04-estabilidad.py",
+      "title": "4 · La frontera",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'El circulo unidad no es un dibujo.' (blanca) y 'Es la frontera de lo estable.' (cian)."
+    }
+  ]
+}

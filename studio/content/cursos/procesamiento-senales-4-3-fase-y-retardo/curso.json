@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 4.3 Fase, retardo y fase mínima",
+  "description": "Lección 4.3 del curso Procesamiento digital de señales (módulo 4: el plano Z), en 4 clips animados: la fase lineal de un FIR simétrico (pendiente −4.0000 medida), el retardo de grupo, dos filtros con el mismo |H| y distinta fase, y el eco que solo se puede deshacer si es de fase mínima. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-fase-lineal.py",
+      "title": "1 · Fase lineal",
+      "scene": "Clip1",
+      "final_state": "La fase del FIR simetrico ajustada a una recta dentro de la banda de paso, con la pendiente medida -4.0000 y el residuo de 1.3e-15 rad."
+    },
+    {
+      "file": "clips/02-retardo-de-grupo.py",
+      "title": "2 · Retardo de grupo",
+      "scene": "Clip2",
+      "final_state": "El retardo de grupo plano en 4.0000 muestras dentro de la banda, y el pulso que sale intacto."
+    },
+    {
+      "file": "clips/03-fase-minima.py",
+      "title": "3 · El mismo modulo, otra fase",
+      "scene": "Clip3",
+      "final_state": "Los dos filtros con |H| identico (diferencia 1.2e-14 dB) y distinta reparticion de energia: 12.1 % frente a 48.5 % en la primera muestra."
+    },
+    {
+      "file": "clips/04-el-eco.py",
+      "title": "4 · El eco que se deshace",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'El modulo no cuenta toda la historia.' (blanca) y 'La fase dice cuando llega cada cosa.' (cian)."
+    }
+  ]
+}

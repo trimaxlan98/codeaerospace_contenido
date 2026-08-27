@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 3.2 La FFT: partir en dos",
+  "description": "Lección 3.2 del curso Procesamiento digital de señales (módulo 3: la frecuencia), en 4 clips animados: la suma de N que se parte en dos de N/2, la mariposa que combina las mitades, el precio contado sobre el propio grafo (204.8× para N = 1024) y el orden bit-reverso de la entrada. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-partir-en-dos.py",
+      "title": "1 · Partir en dos",
+      "scene": "Clip1",
+      "final_state": "Las dos DFT de 4 (pares e impares) recombinadas en la DFT de 8, con el error de la recomposicion medido en 2.2e-15."
+    },
+    {
+      "file": "clips/02-la-mariposa.py",
+      "title": "2 · La mariposa",
+      "scene": "Clip2",
+      "final_state": "El grafo radix-2 de 8 puntos completo, con las tres etapas encendidas y las cuatro mariposas de la ultima marcadas."
+    },
+    {
+      "file": "clips/03-n-log-n.py",
+      "title": "3 · El precio, contado",
+      "scene": "Clip3",
+      "final_state": "La tabla de multiplicaciones contadas sobre el grafo para N = 8, 64, 1024 y 4096, con la razon 204.8x destacada para N = 1024."
+    },
+    {
+      "file": "clips/04-bit-reverso.py",
+      "title": "4 · El orden bit-reverso",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La FFT no es otra transformada.' (blanca) y 'Es la misma cuenta sin repetirla.' (cian)."
+    }
+  ]
+}
