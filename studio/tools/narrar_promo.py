@@ -42,7 +42,8 @@ def main() -> int:
     p = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("promo_dir", type=Path)
+    p.add_argument("promo_dir", type=Path,
+                   help="directorio con promo.json o clip.json")
     p.add_argument("salida", type=Path, help="wav de destino")
     p.add_argument("--video", type=Path, default=None)
     p.add_argument("--limite", type=float, default=None,
@@ -50,10 +51,17 @@ def main() -> int:
     p.add_argument("--voz", default=None)
     args = p.parse_args()
 
-    manifiesto = json.loads((args.promo_dir / "promo.json").read_text())
+    manifiesto = ruta = None
+    for nombre in ("promo.json", "clip.json"):
+        candidato = args.promo_dir / nombre
+        if candidato.is_file():
+            manifiesto, ruta = json.loads(candidato.read_text()), candidato
+            break
+    if manifiesto is None:
+        sys.exit(f"{args.promo_dir}: no hay promo.json ni clip.json")
     spec = manifiesto.get("voz")
     if not spec or not spec.get("secciones"):
-        sys.exit(f"{args.promo_dir}/promo.json no tiene bloque 'voz'")
+        sys.exit(f"{ruta} no tiene bloque 'voz'")
 
     secciones = [{"texto": s["texto"], "t_inicio": float(s["t_inicio"])}
                  for s in spec["secciones"]]
@@ -86,9 +94,13 @@ def main() -> int:
     # Si la voz sale pegada al limite es que hubo que comprimir los
     # silencios: el audio llega al ultimo frame y el bucle SUENA. Hace
     # falta cola de silencio, no solo que quepa.
-    if limite and dur > float(limite) - 0.6:
+    cola = float(manifiesto.get("cola_silencio", 0.6))
+    if limite and dur > float(limite) - cola:
         print(f"AVISO: la voz ({dur:.2f} s) llega al final del video "
-              f"({float(limite):.2f} s) y el bucle se oira. Separa mas los "
+              f"({float(limite):.2f} s) sin dejar {cola:.1f} s de cola. "
+              "En un promo eso hace que el bucle suene; en una pieza de "
+              "curso, que la union con la siguiente se atropelle. "
+              "Separa mas los "
               "t_inicio o acorta el texto: Charon va a 2.3-2.6 silabas/s y "
               "cada frase empuja a la siguiente si se solapan.")
         return 1

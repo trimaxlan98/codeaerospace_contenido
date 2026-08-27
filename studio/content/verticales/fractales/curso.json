@@ -1,0 +1,34 @@
+{
+  "name": "Fractales · la forma del infinito",
+  "slug": "fractales",
+  "formato": "vertical",
+  "curso": 26,
+  "description": "Curso vertical (9:16) de 14 clips más intro y cierre, pensado para verse en el teléfono: sin subtítulos, todo lo enseña la imagen y el audio (voz alineada a mano + cama de efectos). Releva al curso 1 de la colección, «Fractales: la belleza de los números complejos», que era horizontal y sólo miraba el plano complejo. Aquí el arco va de una costa que no se deja medir a las antenas fractales, pasando por la dimensión que no es entera, el juego del caos, Julia y Mandelbrot, la frontera de dimensión 2 y las cuencas de Newton. Todas las cifras en pantalla las calcula fractales.py con numpy y semilla fija.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "modulos": [
+    "M1 · La medida que se rompe (1-3)",
+    "M2 · Una instrucción repetida (4-6)",
+    "M3 · El país de los números complejos (7-11)",
+    "M4 · Fractales que trabajan (12-14)"
+  ],
+  "piezas": [
+    {"dir": "clips/00-intro", "tipo": "marca"},
+    {"dir": "clips/01-la-costa"},
+    {"dir": "clips/02-el-copo"},
+    {"dir": "clips/03-la-dimension"},
+    {"dir": "clips/04-el-juego-del-caos"},
+    {"dir": "clips/05-el-helecho"},
+    {"dir": "clips/06-la-vida-copia"},
+    {"dir": "clips/07-girar-y-estirar"},
+    {"dir": "clips/08-julia"},
+    {"dir": "clips/09-mandelbrot"},
+    {"dir": "clips/10-el-zoom"},
+    {"dir": "clips/11-la-frontera"},
+    {"dir": "clips/12-newton"},
+    {"dir": "clips/13-el-caos-tiene-forma"},
+    {"dir": "clips/14-la-regla-corta"},
+    {"dir": "clips/15-cierre", "tipo": "marca"}
+  ]
+}
