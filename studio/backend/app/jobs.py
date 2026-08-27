@@ -113,6 +113,12 @@ class JobManager:
         """
         return await self.runner.postproceso(job_id, con_voz)
 
+    async def verificar_promo(self, job_id: str, frames: int = 6,
+                              dur_min: float = 8.0, dur_max: float = 15.0) -> dict:
+        """Mide el promo sobre el archivo que sirve la app. Tampoco pasa por
+        la cola: son ffmpeg y aritmetica, no un render."""
+        return await self.runner.verificar(job_id, frames, dur_min, dur_max)
+
     def invalidate_storage(self) -> None:
         """La mezcla añade un mp4 al directorio del job: la cuota cambió."""
         self._invalidate_storage()

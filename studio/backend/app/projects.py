@@ -190,6 +190,7 @@ class ProjectService:
             entrada = {**clip_public(clip), "stale": stale, "status": status}
             if es_promo:
                 entrada["audio"] = self.estado_audio(clip)
+                entrada["verificacion"] = self.estado_verificacion(clip)
             clips.append(entrada)
         # `specs` viaja con el detalle para que la interfaz sepa la
         # proporcion del lienzo antes de que exista el primer render (y no
@@ -260,6 +261,34 @@ class ProjectService:
         al_dia = job.get("audio_hash") == esperado
         return {"estado": "al_dia" if al_dia else "desactualizado",
                 "has_audio": True}
+
+    def informe_verificacion(self, clip: dict) -> dict | None:
+        """El ultimo informe medido del clip, o None."""
+        job_id = clip.get("job_id")
+        job = self.db.get_job(job_id) if job_id else None
+        if not job or not job.get("verify_json"):
+            return None
+        try:
+            return json.loads(job["verify_json"])
+        except ValueError:
+            return None
+
+    def estado_verificacion(self, clip: dict) -> dict:
+        """'sin_render' | 'sin_verificar' | 'desactualizada' | 'al_dia'.
+
+        Un informe medido sobre otro archivo (otro render, u otra mezcla) no
+        vale: se marca desactualizado en vez de enseñar numeros viejos.
+        """
+        job_id = clip.get("job_id")
+        job = self.db.get_job(job_id) if job_id else None
+        if not job or job.get("status") != "done":
+            return {"estado": "sin_render", "ok": None}
+        if not job.get("verify_json"):
+            return {"estado": "sin_verificar", "ok": None}
+        informe = self.informe_verificacion(clip) or {}
+        al_dia = job.get("verify_hash") == audio_promo.hash_verificacion(job)
+        return {"estado": "al_dia" if al_dia else "desactualizada",
+                "ok": bool(informe.get("ok"))}
 
     def update_project(self, pid: str, **fields) -> dict:
         # Calidad y formato definen el archivo que sale del render: si ya

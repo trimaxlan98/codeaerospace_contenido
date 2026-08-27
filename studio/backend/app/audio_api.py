@@ -98,7 +98,7 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
 
     def _vista(project: dict, clip: dict) -> dict:
         m = service.manifiesto_audio(clip, cfg.tts_voice)
-        _job, dur = _video(clip)
+        job, dur = _video(clip)
         return {
             "clip_id": clip["id"],
             "manifiesto": m,
@@ -108,7 +108,29 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
             "sonidos": list(audio_promo.SONIDOS),
             "voz_disponible": narracion.enabled,
             "silabas_por_s": audio_promo.SILABAS_POR_S,
+            "verificacion": service.estado_verificacion(clip)
+            | {"informe": service.informe_verificacion(clip)},
+            "job_id": job["id"] if job else None,
         }
+
+    async def _verificar(clip: dict) -> dict | None:
+        """Mide el promo y guarda el informe. Devuelve el informe o None.
+
+        No es fatal: una mezcla buena no se invalida porque la medicion no
+        se pueda hacer (se vera como «sin verificar», que es la verdad).
+        """
+        job_id = clip.get("job_id")
+        job = db.get_job(job_id) if job_id else None
+        if not job or job.get("status") != "done":
+            return None
+        informe = await manager.verificar_promo(
+            job_id, frames=6, dur_min=audio_promo.DUR_MIN,
+            dur_max=audio_promo.DUR_MAX)
+        db.update_job(job_id,
+                      verify_json=json.dumps(informe, ensure_ascii=False),
+                      verify_hash=audio_promo.hash_verificacion(db.get_job(job_id)))
+        manager.invalidate_storage()  # los PNG de la verificacion ocupan
+        return informe
 
     @router.get("/{pid}/clips/{cid}/audio")
     async def leer(pid: str, cid: str, _=Depends(require_auth)):
@@ -125,6 +147,22 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         if errores:
             raise HTTPException(status_code=422, detail="; ".join(errores))
         service.update_clip(cid, audio_json=json.dumps(m, ensure_ascii=False))
+        return _vista(project, db.get_clip(cid))
+
+    @router.post("/{pid}/clips/{cid}/verificar")
+    async def verificar(pid: str, cid: str, _=Depends(require_auth)):
+        project = _promo(pid)
+        clip = _clip(pid, cid)
+        job, _dur = _video(clip)
+        if not job:
+            raise HTTPException(
+                status_code=409,
+                detail="El clip no tiene un video vigente que medir")
+        try:
+            await _verificar(clip)
+        except (RunnerError, asyncio.TimeoutError) as e:
+            raise HTTPException(status_code=502,
+                                detail=f"La verificación falló: {e}")
         return _vista(project, db.get_clip(cid))
 
     @router.post("/{pid}/clips/{cid}/audio/mezclar")
@@ -174,6 +212,13 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
                       audio_hash=audio_promo.hash_mezcla(m, job["id"]),
                       size_bytes=salida.stat().st_size)
         manager.invalidate_storage()
+        # Recien mezclado es cuando toca medir: el informe anterior (si lo
+        # habia) es de otro archivo. Si la medicion falla, la mezcla sigue
+        # siendo buena y el estado dira «sin verificar».
+        try:
+            await _verificar(db.get_clip(cid))
+        except (RunnerError, asyncio.TimeoutError):
+            pass
         return _vista(project, db.get_clip(cid))
 
     async def _voz(m: dict, job_dir: Path, dur: float | None) -> None:

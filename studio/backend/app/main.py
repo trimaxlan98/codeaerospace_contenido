@@ -314,6 +314,29 @@ async def get_thumb(job_id: str, _=Depends(require_auth)):
     return FileResponse(thumb, media_type="image/jpeg")
 
 
+# Nombre de archivo de la verificacion: un conjunto cerrado, no una ruta.
+# Los escribe promo_verifica.py dentro de <job>/verificacion/.
+RE_FRAME = re.compile(r"^(primero|ultimo|costura|f[0-9]{2})\.png$")
+
+
+@app.get("/api/jobs/{job_id}/verificacion/{archivo}")
+async def get_frame_verificacion(job_id: str, archivo: str,
+                                 _=Depends(require_auth)):
+    """Frames del informe: la tira de revisión y el par primero|último.
+
+    Mirar los frames es la costumbre que caza lo que ningún número dice (un
+    elemento fuera del lienzo, dos cifras que se leen pegadas).
+    """
+    _get_job_or_404(job_id)
+    if not RE_FRAME.match(archivo):
+        raise HTTPException(status_code=404, detail="Frame no disponible")
+    job_dir = (cfg.render_jobs_dir / job_id).resolve()
+    png = (job_dir / "verificacion" / archivo).resolve()
+    if not png.is_file() or job_dir not in png.parents:
+        raise HTTPException(status_code=404, detail="Frame no disponible")
+    return FileResponse(png, media_type="image/png")
+
+
 @app.delete("/api/jobs/failed")
 async def delete_failed_jobs(_=Depends(require_auth)):
     """Borra en lote todos los jobs error/timeout/cancelled."""

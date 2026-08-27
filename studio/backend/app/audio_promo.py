@@ -46,6 +46,11 @@ SILABAS_POR_S = 2.45
 # Si la voz termina a menos de esto del final, el salto del bucle se oye.
 COLA_SILENCIO_S = 0.6
 
+# Duracion del formato: mas corto no cuenta nada, mas largo se cae de redes.
+# Los mismos numeros que usa `studio/tools/promo_verifica.py` al medir (un
+# test compara las dos parejas leyendo el archivo).
+DUR_MIN, DUR_MAX = 8.0, 15.0
+
 PICO_DB = -3.0            # cama sola
 PICO_DB_CON_VOZ = -16.0   # cama por debajo de la voz
 FADE_IN = 0.35
@@ -211,6 +216,15 @@ def hash_voz(m: dict) -> str:
 def hash_mezcla(m: dict, job_id: str) -> str:
     """Cambia si cambia el manifiesto O el video: la mezcla queda vieja."""
     return _digest({"m": m, "job": job_id})
+
+
+def hash_verificacion(job: dict) -> str:
+    """Cambia si cambia el ARCHIVO que se mide: otro render, u otra mezcla.
+
+    Un informe medido sobre el mp4 mudo no vale una vez montado el sonido
+    (la mitad de lo que comprueba es el audio), y uno de otro render no vale
+    nunca."""
+    return _digest({"job": job.get("id"), "audio": job.get("audio_hash") or ""})
 
 
 def para_sfx(m: dict) -> dict:

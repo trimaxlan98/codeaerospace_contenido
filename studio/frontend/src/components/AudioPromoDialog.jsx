@@ -13,8 +13,8 @@
 //     ven hasta escuchar el resultado.
 
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2, Mic, Music, Plus, Trash2, Volume2 } from 'lucide-react'
-import { api } from '../api.js'
+import { CheckCircle2, Loader2, Mic, Music, Plus, Trash2, Volume2 } from 'lucide-react'
+import { api, frameVerificacionUrl } from '../api.js'
 import { Button } from './ui/button.jsx'
 import { Input } from './ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog.jsx'
@@ -22,6 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { cn } from '@/lib/utils'
 
 const textareaCls = 'w-full resize-y rounded-md border border-line bg-canvas px-2.5 py-1.5 text-[13px] text-ink placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan'
+
+export const VERIF_META = {
+  sin_render: { label: 'sin render', text: 'text-muted' },
+  sin_verificar: { label: 'sin verificar', text: 'text-muted' },
+  desactualizada: { label: 'verificación vieja', text: 'text-warn' },
+  al_dia: { label: 'verificado', text: 'text-ok' },
+}
 
 export const AUDIO_META = {
   sin_manifiesto: { label: 'sin audio', text: 'text-muted' },
@@ -98,6 +105,18 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
     try {
       const d = await api.mezclarAudioPromo(projectId, clip.id)
       setDatos(d)
+      onSaved?.()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy('')
+    }
+  }
+
+  const verificar = async () => {
+    setBusy('verificar'); setError('')
+    try {
+      setDatos(await api.verificarPromo(projectId, clip.id))
       onSaved?.()
     } catch (err) {
       setError(err.message)
@@ -261,6 +280,9 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
               </span>
             </section>
 
+            {/* — verificación medida — */}
+            <Verificacion datos={datos} busy={busy} onVerificar={verificar} />
+
             {/* — avisos calculados — */}
             {datos.avisos?.length > 0 && (
               <ul className="flex flex-col gap-1 rounded-md border border-warn/40 bg-warn/10 p-2.5">
@@ -290,5 +312,106 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/** Una comprobación: verde o ámbar, SIEMPRE con el número al lado. Un
+ *  semáforo sin cifra no deja aprender nada de lo que salió mal. */
+function Check({ ok, label, valor, detalle }) {
+  return (
+    <div className="flex min-w-[150px] flex-1 flex-col gap-0.5 rounded-md border border-line bg-canvas/40 px-2.5 py-1.5">
+      <span className="flex items-center gap-1.5">
+        <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', ok ? 'bg-ok' : 'bg-warn')} />
+        <span className="eyebrow">{label}</span>
+      </span>
+      <span className={cn('font-mono text-[13px]', ok ? 'text-ink' : 'text-warn')}>{valor}</span>
+      {detalle && <span className="font-mono text-[10.5px] text-faint">{detalle}</span>}
+    </div>
+  )
+}
+
+function Verificacion({ datos, busy, onVerificar }) {
+  const v = datos.verificacion || {}
+  const informe = v.informe
+  const meta = VERIF_META[v.estado] || VERIF_META.sin_verificar
+  return (
+    <section className="flex flex-col gap-2 border-t border-line pt-3">
+      <div className="flex items-center gap-2">
+        <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
+        <span className="eyebrow">Verificación</span>
+        <span className={cn('font-mono text-[11px]', meta.text)}>{meta.label}</span>
+        <Button size="xs" variant="default" className="ml-auto" onClick={onVerificar}
+          disabled={Boolean(busy) || !datos.duracion_video}
+          title={!datos.duracion_video
+            ? 'el clip necesita un render vigente'
+            : 'mide el archivo que sirve la app'}>
+          {busy === 'verificar'
+            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Midiendo…</>
+            : 'Verificar'}
+        </Button>
+      </div>
+
+      {!informe ? (
+        <p className="text-[12px] text-faint">
+          Sin medir. La costura del bucle no se juzga a ojo: el h264 deja hasta un
+          0.18 % de píxeles distintos entre dos frames que en la escena son idénticos,
+          así que se mide contra ese suelo.
+        </p>
+      ) : (
+        <>
+          {v.estado === 'desactualizada' && (
+            <p className="text-[12px] text-warn">
+              Este informe es de otro archivo (se renderizó o se mezcló después).
+              Vuelve a medir.
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Check ok={informe.bucle?.ok} label="Bucle"
+              valor={informe.bucle?.sobre_piso_pct != null
+                ? `${informe.bucle.sobre_piso_pct.toFixed(3)} %`
+                : '—'}
+              detalle={informe.bucle?.piso_pct != null
+                ? `sobre el suelo del códec (${informe.bucle.piso_pct.toFixed(3)} %)`
+                : null} />
+            <Check ok={informe.duracion?.ok} label="Duración"
+              valor={`${informe.duracion?.s} s`}
+              detalle={`formato: ${informe.duracion?.min}-${informe.duracion?.max} s`} />
+            {informe.audio?.tiene_audio ? (
+              <Check ok={informe.audio.ok} label="Audio"
+                valor={`pico ${informe.audio.pico_db} dBFS`}
+                detalle={`extremos ${informe.audio.entrada_db} / ${informe.audio.salida_db} dBFS`} />
+            ) : (
+              <Check ok={false} label="Audio" valor="sin pista"
+                detalle="un promo sin sonido no comunica" />
+            )}
+            <Check ok label="Archivo" valor={informe.video?.resolucion}
+              detalle={`${informe.video?.fps} fps · ${informe.archivo}`} />
+          </div>
+
+          {/* El par primero|último, uno al lado del otro: el bucle se ve. */}
+          {datos.job_id && informe.costura && (
+            <figure className="flex flex-col gap-1">
+              <img src={frameVerificacionUrl(datos.job_id, informe.costura)}
+                alt="primer y último frame, uno al lado del otro"
+                className="max-h-[42vh] w-full rounded-md border border-line bg-canvas object-contain" />
+              <figcaption className="text-[11px] text-faint">
+                Primer frame · último frame. En un bucle cerrado son el mismo dibujo.
+              </figcaption>
+            </figure>
+          )}
+
+          {/* La tira: mirar los frames caza lo que ningún número dice. */}
+          {datos.job_id && informe.frames?.length > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
+              {informe.frames.map((f) => (
+                <img key={f} src={frameVerificacionUrl(datos.job_id, f)} alt={`frame ${f}`}
+                  loading="lazy"
+                  className="h-[120px] shrink-0 rounded border border-line bg-canvas object-contain" />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </section>
   )
 }

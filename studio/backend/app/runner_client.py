@@ -73,6 +73,16 @@ class RunnerClient:
             raise RunnerError(resp.get("error", "la mezcla de audio fallo"))
         return resp.get("audio", "")
 
+    async def verificar(self, job_id: str, frames: int = 6,
+                        dur_min: float = 8.0, dur_max: float = 15.0) -> dict:
+        """Informe medido del promo (bucle, duracion, audio, frames)."""
+        resp = await self._request_one(
+            {"cmd": "verificar", "job_id": job_id, "frames": frames,
+             "dur_min": dur_min, "dur_max": dur_max}, timeout=360)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la verificacion fallo"))
+        return resp.get("informe") or {}
+
     async def render(
         self, job_id: str, scene: str, quality: str, timeout: int,
         formato: str = "horizontal", corto: int = 1080, largo: int = 1920,

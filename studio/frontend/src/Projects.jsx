@@ -22,7 +22,7 @@ import { PLANTILLAS, plantillaPorId } from './plantillas.js'
 import { FORMATOS, formatoPorId, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
-import AudioPromoDialog, { AUDIO_META } from './components/AudioPromoDialog.jsx'
+import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -1113,6 +1113,14 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
   // El promo dice en el propio boton como esta su mezcla: sin audio, sin
   // mezclar, desactualizada o al dia.
   const audioMeta = tipo === 'promo' ? AUDIO_META[clip.audio?.estado] : null
+  // El distintivo de verificacion dice lo MEDIDO: si el informe esta al dia,
+  // pasa o no pasa; si no, en que estado esta la medicion.
+  const verif = tipo === 'promo' ? clip.verificacion : null
+  const verifMeta = !verif || verif.estado === 'sin_render' ? null
+    : verif.estado === 'al_dia'
+      ? (verif.ok ? { label: 'verificado', text: 'text-ok' }
+                  : { label: 'no pasa', text: 'text-err' })
+      : VERIF_META[verif.estado]
   const renderJob = clip.job_id ? jobs.find((j) => j.id === clip.job_id) : null
   const meta = activeJob ? STATUS_META[activeJob.status] : (STATUS_META[clip.status] || STATUS_META.no_render)
   const canRender = !activeJob && Boolean(clip.scene?.trim())
@@ -1144,6 +1152,12 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
             <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} /> {meta.label}
           </span>
           <DurationBadge s={narr?.video_s} rango={rangoDuracion(tipo)} />
+          {verifMeta && (
+            <span className={cn('rounded-md border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide', verifMeta.text)}
+              title="bucle, duración y audio, medidos sobre el archivo que sirve la app">
+              {verifMeta.label}
+            </span>
+          )}
         </div>
 
         <label className="flex items-center gap-2 text-[12px] text-muted">

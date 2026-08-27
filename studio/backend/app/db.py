@@ -86,6 +86,10 @@ MIGRATIONS = {
         # correspondiendo al manifiesto y al video actuales.
         ("audio_path", "ALTER TABLE jobs ADD COLUMN audio_path TEXT"),
         ("audio_hash", "ALTER TABLE jobs ADD COLUMN audio_hash TEXT"),
+        # Informe de verificacion del promo (costura del bucle, duracion,
+        # audio y frames), medido sobre el archivo que la app sirve.
+        ("verify_json", "ALTER TABLE jobs ADD COLUMN verify_json TEXT"),
+        ("verify_hash", "ALTER TABLE jobs ADD COLUMN verify_hash TEXT"),
     ),
     "clips": (
         # Manifiesto de audio del promo (misma forma que el promo.json de

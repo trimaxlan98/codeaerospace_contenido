@@ -3,7 +3,8 @@
 Escrita el 2026-08-27, después de producir a mano los 10 primeros promos (rama
 `exp/promos-redes`, ver `docs/plan_contenido/promos-redes-sociales.md`).
 
-Estado: **P1 hecho** (el lienzo) y **P2 hecho** (el sonido). P3 (verificación), propuesto.
+Estado: **P1, P2 y P3 hechos** (lienzo, sonido y verificación). Queda el importador de los
+diez promos existentes (sección 8) y desplegar.
 
 ---
 
@@ -159,12 +160,42 @@ dentro del contenedor, tarde y con un `KeyError`.
 
 ---
 
-## 6. Sprint P3 — La verificación
+## 6. Sprint P3 — La verificación · **HECHO** (2026-08-27)
 
 **Entregable:** la app dice, con números, si el promo está listo para publicar.
 
-- `medir_bucle` sale de `render_promo.py` a un módulo compartido, y lo ejecuta el mismo
-  comando `postproceso` (necesita ffmpeg → contenedor). Se guarda en `jobs.verify_json`.
+**Lo que se hizo:**
+
+- **`studio/tools/promo_verifica.py`** — la medición, en **una sola implementación** (solo
+  stdlib): la usan el CLI local (`render_promo.py` la importa) y el runner dentro del
+  contenedor (comando `verificar`). Mide costura del bucle sobre el suelo del códec,
+  duración, audio (pico y extremos, **en las muestras**) y extrae la tira de frames y el par
+  primero|último.
+- **El informe caduca solo** — `jobs.verify_json` + `verify_hash`: si se vuelve a renderizar
+  o a mezclar, el estado pasa a «verificación vieja» en vez de enseñar números de otro
+  archivo. Mezclar dispara la verificación al terminar.
+- **Frames servidos** por `GET /api/jobs/{id}/verificacion/{archivo}`, con el nombre contra un
+  conjunto cerrado (`primero`, `ultimo`, `costura`, `fNN`).
+- **La tarjeta de verificación** en el diálogo del promo: cuatro comprobaciones **siempre con
+  la cifra al lado** (un semáforo sin número no deja aprender nada), el par primero|último a
+  tamaño real y la tira de frames. Distintivo «verificado / no pasa» en la tarjeta del clip.
+
+**Verificado** contra los promos ya publicados, midiendo dentro del contenedor con la misma
+línea que arma el runner: *determinante* sale bucle 0.000 % sobre el suelo, 12.2 s, audio aac
+24 kHz con pico −1.1 dBFS y extremos a −120 dBFS; *gps-38-microsegundos* enseña su costura
+conocida (0.0496 % sobre el suelo, por debajo del umbral) en vez de esconderla. Interfaz
+mirada en un navegador real.
+
+**Un fallo que la propia verificación destapó** (y que llevaba ahí desde el primer promo):
+`render_promo.py` elegía el mp4 con `sorted(...)[0]`, y como «1920p60» ordena antes que
+«960p60», un render nuevo en `ql` **medía el archivo viejo en `qh`** y decía que era el
+nuevo. Ahora coge el más reciente por fecha.
+
+Lo que se propuso y así quedó:
+
+- `medir_bucle` sale de `render_promo.py` a un módulo compartido, y lo ejecuta el runner en
+  el contenedor (comando propio `verificar`, no `postproceso`). Se guarda en
+  `jobs.verify_json`.
 - **La sutileza que hay que conservar**: la costura se juzga **sobre el suelo del códec**.
   Comparar el primer frame con el último a secas acusa de sucio a un bucle perfecto: h264
   sobre fondos planos oscuros da hasta 0.18 % de subpíxeles distintos entre dos frames que en
@@ -228,7 +259,7 @@ en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifi
 |---|---|---|
 | ~~**P1 · Lienzo**~~ | ~~Autoría de promos en la app, sin sonido~~ · **hecho** | 1 sesión |
 | ~~**P2 · Sonido**~~ | ~~El promo se termina dentro de la app~~ · **hecho** | 2 sesiones |
-| **P3 · Verificación** | Publicar sin abrir la terminal | 1 sesión |
+| ~~**P3 · Verificación**~~ | ~~Publicar sin abrir la terminal~~ · **hecho** | 1 sesión |
 | **Importador** | Los 10 promos existentes entran al catálogo | media sesión |
 
 P1 tiene valor por sí solo y no rompe nada: hasta que llegue P2 se descarga el mp4 mudo y se

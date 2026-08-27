@@ -253,6 +253,38 @@ mano, con `studio/tools/sfx.py`).
 Los tres responden 409 en un proyecto que no sea `tipo='promo'`: un curso se narra desde
 «Generar narración», que es otro camino y otro formato.
 
+### Verificación de un promo (botón «Verificar»)
+
+Un promo se juzga por cuatro cosas y ninguna se ve mirando el vídeo una vez. La app las
+**mide sobre el archivo que sirve** (el sonorizado si ya se mezcló) y enseña los números:
+
+- **La costura del bucle** — el último frame tiene que ser el primero, y se compara **contra
+  el suelo del códec**: dos frames que en la escena son el mismo dibujo no salen idénticos
+  del h264 (en fondo plano y oscuro la cuantización llega al 0.18 % de los subpíxeles). Sin
+  descontar ese suelo, un bucle perfecto parece sucio. Se enseña el exceso sobre el suelo.
+- **La duración** — 8-15 s (`audio_promo.DUR_MIN/MAX`, los mismos números que usa la
+  herramienta; un test compara las dos parejas leyendo el archivo).
+- **El audio** — que exista, a qué pico suena y que los dos extremos estén en silencio. Los
+  extremos se miden **en las muestras**, no con `volumedetect`: una ventana de 50 ms arrastra
+  el frame AAC entero y acusa de ruidoso un arranque que en las muestras es cero exacto.
+- **Los frames** — una tira equiespaciada y el par primero|último uno al lado del otro.
+  Mirarlos es la costumbre que caza lo que ningún número dice (un elemento fuera del lienzo,
+  dos cifras que se leen pegadas).
+
+La medición vive en `studio/tools/promo_verifica.py` — **una sola implementación**, que usan
+tanto el CLI local (`render_promo.py`) como el runner dentro del contenedor (comando
+`verificar`). El informe se guarda en `jobs.verify_json` y **caduca solo**: si se vuelve a
+renderizar o a mezclar, el estado pasa a «verificación vieja» en vez de enseñar números de
+otro archivo.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/projects/{pid}/clips/{cid}/verificar` | mide y guarda el informe (409 sin render vigente) |
+| GET | `/api/jobs/{job_id}/verificacion/{archivo}` | PNG del informe; el nombre va contra un conjunto cerrado (`primero`, `ultimo`, `costura`, `fNN`) |
+
+Mezclar el audio dispara la verificación al terminar: recién mezclado es cuando el informe
+anterior deja de valer.
+
 ### Asistente IA (Vertex AI · Gemini 2.5 · us-central1)
 
 - Feature-flag: si no existe `studio/backend/gcp-key.json` (service account GCP, chmod 600,
