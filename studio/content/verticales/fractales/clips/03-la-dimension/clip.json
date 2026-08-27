@@ -1,7 +1,57 @@
 {
-  "name": "03 · La dimension",
+  "name": "03 · La dimensión",
+  "modulo": "M1 · La medida que se rompe",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "D = log(copias)/log(1/factor), aplicada tres veces: la recta da 1, el cuadrado 2 y Koch —4 copias a un tercio— da 1.2619. Después la costa del clip 01 vuelve bajo una rejilla que se afina (12, 32, 72 y 161 cajas para lados 2, 1, 1/2 y 1/4) y la pendiente del ajuste da 1.2408. Las cajas dibujadas SON las contadas: el mapa a pantalla es un giro rígido más una homotecia.",
+  "duracion_objetivo": 33.5,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.7  una recta se parte en dos mitades → 1.0000",
+    "5.6  un cuadrado se parte en cuatro cuartos → 2.0000",
+    "10.4 Koch se parte en cuatro copias a un tercio → 1.2619 (destello)",
+    "18.1 vuelve la costa del clip 01",
+    "20.0 rejilla de lado 2 → 12 cajas",
+    "21.9 lado 1 → 32 · lado 1/2 → 72 · lado 1/4 → 161",
+    "28.2 la pendiente del ajuste: DIMENSION 1.2408",
+    "31.9 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.0, "texto": "¿Cuántas copias, y de qué tamaño?"},
+      {"t_inicio": 6.4, "texto": "Un cuadrado: cuatro copias a la mitad."},
+      {"t_inicio": 11.6, "texto": "Koch: cuatro copias a un tercio."},
+      {"t_inicio": 15.6, "texto": "Una dimensión entre la línea y el plano."},
+      {"t_inicio": 20.4, "texto": "La costa no tiene copias exactas."},
+      {"t_inicio": 24.6, "texto": "Se cuentan cajas, y sale lo mismo."},
+      {"t_inicio": 29.5, "texto": "Uno coma dos cuatro."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [32.6, 33.4],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["blip_grave", 2.4, -16],
+      ["tick", 3.6, -14],
+      ["blip_medio", 7.2, -16],
+      ["tick", 8.4, -14],
+      ["blip_agudo", 12.0, -15],
+      ["tick", 13.2, -13],
+      ["subrayado", 15.8, -14],
+      ["aire_largo", 18.1, -17],
+      ["blip_hud", 20.0, -17],
+      ["tick", 21.9, -15],
+      ["tick", 23.8, -15],
+      ["tick", 25.7, -15],
+      ["nebulosa", 26.5, -16],
+      ["pulso", 28.2, -13],
+      ["sting", 29.1, -16]
+    ]
+  }
 }

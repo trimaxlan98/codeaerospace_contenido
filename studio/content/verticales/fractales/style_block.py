@@ -82,6 +82,12 @@ X_SEGURO = FMT.ancho / 2 - FMT.margen["der"]      # 2.88: columna de botones
 ALTO_ESCENA = 8.2                     # alto tipico de una imagen a pantalla
 ANCHO_UTIL = FMT.ancho - 0.9          # 7.1: margen de aire a los lados
 
+# Ancho maximo de una pieza CENTRADA que no puede taparse. El margen
+# derecho (la columna de botones) es mas ancho que el izquierdo, asi que
+# manda el, y va doblado porque el texto se centra en x=0.
+ANCHO_SEGURO = 2.0 * min(FMT.ancho / 2 - FMT.margen["izq"],
+                         FMT.ancho / 2 - FMT.margen["der"])   # 5.76
+
 # --- Paleta por ROL (un color = un significado en TODO el curso) -----
 C_MEDIDO = fr.COLOR_MEDIDO        # #22d3ee cian: TODA cifra calculada aqui
 C_REGLA = fr.COLOR_REGLA          # #f59e0b ambar: la regla, el instrumento
@@ -94,15 +100,31 @@ C_TINTA = CODE_INK
 
 
 # --- Piezas de texto (las UNICAS permitidas) -------------------------
+def cabe(mob, que="texto"):
+    """Aborta el render si la pieza se sale de la zona que la app no tapa.
+
+    En vertical la columna derecha se la comen los botones de la app, y un
+    rotulo de 6.7 unidades centrado se mete ahi sin que se note en el
+    frame de validacion (paso en el clip 02: "VECES EL TRIANGULO"). Mejor
+    que el render falle con el ancho medido que publicar texto tapado.
+    """
+    if mob.width > ANCHO_SEGURO + 1e-6:
+        raise ValueError(
+            f"{que} mide {mob.width:.2f} de ancho y la zona segura son "
+            f"{ANCHO_SEGURO:.2f}: acortalo o baja el font_size")
+    return mob
+
+
 def hud(texto, font_size=19, color=CODE_MUTED):
     """Etiqueta de telemetria: Space Mono, MAYUSCULAS con aire.
 
     SOLO ASCII: Space Mono no trae acentos ni superindices, y un glifo que
     falta sale como caja. Los acentos viven en el clip.json, que nadie
-    renderiza.
+    renderiza. El ancho se comprueba contra la zona segura.
     """
-    return Text(" ".join(str(texto).upper()), font=FUENTE_HUD,
-                font_size=font_size, color=color)
+    t = Text(" ".join(str(texto).upper()), font=FUENTE_HUD,
+             font_size=font_size, color=color)
+    return cabe(t, f'HUD "{texto}"')
 
 
 def hud_pieza(texto, color=CODE_MUTED):
@@ -115,7 +137,8 @@ def hud_pieza(texto, color=CODE_MUTED):
 
 def cifra(texto, font_size=104, color=C_MEDIDO):
     """LA cifra. Monoespaciada para que no baile al cambiar de valor."""
-    return Text(str(texto), font=FUENTE_HUD, font_size=font_size, color=color)
+    t = Text(str(texto), font=FUENTE_HUD, font_size=font_size, color=color)
+    return cabe(t, f'cifra "{texto}"')
 
 
 def bloque_cifra(valor, etiqueta, font_size=104, color=C_MEDIDO,
@@ -143,7 +166,7 @@ def bloque_cifra(valor, etiqueta, font_size=104, color=C_MEDIDO,
 # clips se lee como otro numero.
 Y_ETIQUETA = -2.55       # que se esta midiendo (gris)
 Y_NUMERO = -3.22         # LA cifra (cian si la calculo la libreria)
-Y_SUB = -3.96            # la condicion de la medida (ambar: el instrumento)
+Y_SUB = -4.02            # la condicion de la medida (ambar: el instrumento)
 
 
 def medida(valor, etiqueta=None, sub=None, color=C_MEDIDO,
@@ -175,6 +198,31 @@ def medida(valor, etiqueta=None, sub=None, color=C_MEDIDO,
         g.add(sb)
     g.set_z_index(800)
     return g
+
+
+def cambiar(escena, fuera, dentro, salida=0.30, entrada=0.36):
+    """Relevo LIMPIO de rotulos: lo viejo se apaga ANTES de que entre lo
+    nuevo, nunca a la vez.
+
+    Un fundido cruzado en el mismo sitio deja los dos textos superpuestos
+    medio segundo. En un curso con pies de texto eso se perdona; en uno SIN
+    subtitulos, ese medio segundo es justo el que el espectador esta usando
+    para leer la cifra. Se vio en el clip 05: "24" y "200000" encimados.
+    """
+    def lista(x):
+        if x is None:
+            return []
+        if isinstance(x, (list, tuple)):
+            return [m for m in x if m is not None]
+        return [x]
+
+    fuera, dentro = lista(fuera), lista(dentro)
+    if fuera:
+        escena.play(*[FadeOut(m, scale=0.92) for m in fuera],
+                    run_time=salida)
+    if dentro:
+        escena.play(*[FadeIn(m, scale=1.06) for m in dentro],
+                    run_time=entrada)
 
 
 def relevo(escena, viejo, nuevo, run_time=0.4):

@@ -131,9 +131,9 @@ class Clip(Scene):
             num_nuevo = cifra(f"{med['longitud']:5.2f}")
             num_nuevo.move_to(UP * Y_NUMERO)
 
-            self.play(FadeOut(cuerdas), FadeOut(punto),
-                      FadeOut(sub, shift=DOWN * 0.1),
-                      FadeIn(sub_nuevo, shift=DOWN * 0.1), run_time=0.4)
+            self.play(FadeOut(cuerdas), FadeOut(punto), FadeOut(sub),
+                      run_time=0.35)
+            self.play(FadeIn(sub_nuevo, scale=1.06), run_time=0.3)
             for m in (cuerdas, punto, sub):
                 if m in vivos:
                     vivos.remove(m)
@@ -142,8 +142,7 @@ class Clip(Scene):
 
             self.play(Create(camino), run_time=self.DUR_PASEO[i - 1],
                       rate_func=linear)
-            self.play(FadeOut(contador, scale=0.92),
-                      FadeIn(num_nuevo, scale=1.08), run_time=0.4)
+            cambiar(self, contador, num_nuevo)
             vivos.remove(contador)
             contador = num_nuevo
             vivos += [camino, contador]

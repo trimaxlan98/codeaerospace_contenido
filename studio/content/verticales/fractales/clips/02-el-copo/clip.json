@@ -1,7 +1,60 @@
 {
   "name": "02 · El copo",
+  "modulo": "M1 · La medida que se rompe",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "Una sola instrucción repetida cinco veces sobre un triángulo. El perímetro se multiplica por 4/3 cada pasada (15.59 → 65.69, ×4.21) mientras el área se estanca contra un techo dibujado: 1.590 veces el triángulo, camino de 8/5. Cifras de koch_perimetro y koch_area; el área del polígono dibujado coincide con la fórmula hasta la sexta cifra.",
+  "duracion_objetivo": 31.8,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.7  se dibuja el triángulo (nivel 0) y aparecen el perímetro y el aforo de área",
+    "4.5  nivel 1: los picos crecen a la vista; 20.79",
+    "7.8  nivel 2: 27.71",
+    "10.9 nivel 3: 36.95",
+    "13.8 nivel 4: 49.27",
+    "16.5 nivel 5: 65.69",
+    "20.6 el subtítulo pasa a ×4.21 y la cifra destella",
+    "23.6 el copo se rellena de violeta; el aforo del área señala su techo",
+    "25.6 la cifra cambia a ÁREA 1.590",
+    "30.2 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.1, "texto": "Un triángulo."},
+      {"t_inicio": 4.4, "texto": "Una regla: un pico en cada tercio."},
+      {"t_inicio": 10.4, "texto": "Otra vez. Y otra."},
+      {"t_inicio": 15.8, "texto": "El perímetro se multiplica sin parar."},
+      {"t_inicio": 23.3, "texto": "El área, en cambio, se para."},
+      {"t_inicio": 27.5, "texto": "Nunca pasa de ocho quintos."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [30.9, 31.7],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["aire_largo", 0.9, -17],
+      ["blip_grave", 3.9, -16],
+      ["barrido", 4.5, -18],
+      ["blip_medio", 7.1, -16],
+      ["barrido", 7.8, -18],
+      ["blip_medio", 10.2, -16],
+      ["barrido", 10.9, -18],
+      ["blip_medio", 13.1, -16],
+      ["barrido", 13.8, -19],
+      ["blip_medio", 15.8, -16],
+      ["barrido", 16.5, -19],
+      ["blip_agudo", 18.5, -14],
+      ["subrayado", 20.6, -14],
+      ["nebulosa", 23.4, -16],
+      ["pulso", 23.6, -14],
+      ["blip_hud", 25.6, -16],
+      ["aire", 26.2, -18]
+    ]
+  }
 }

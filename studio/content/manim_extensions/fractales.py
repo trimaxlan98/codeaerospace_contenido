@@ -359,8 +359,21 @@ def costa(nivel=10, H=0.75, semilla=7, largo=10.0, amplitud=1.9):
     return np.stack([xs, ys], axis=1)
 
 
-def _koch_segmento(a, b, nivel):
-    """Los 4 hijos de un segmento, recursivamente hasta `nivel`."""
+_ROT60 = np.array([[math.cos(math.radians(60.0)), -math.sin(math.radians(60.0))],
+                   [math.sin(math.radians(60.0)), math.cos(math.radians(60.0))]])
+
+
+def _koch_segmento(a, b, nivel, altura=1.0):
+    """Los 4 hijos de un segmento, recursivamente hasta `nivel`.
+
+    `altura` (0..1) escala el pico SOLO de la ultima subdivision, la que se
+    acaba de aplicar: a 0 el pico esta aplanado sobre el segmento (misma
+    figura que el nivel anterior, pero con el numero de puntos del nuevo) y
+    a 1 esta en su sitio. Animar altura de 0 a 1 hace crecer los picos
+    nuevos sin tocar los viejos — y como el numero de puntos NO cambia
+    durante el barrido, la curva se puede reconstruir frame a frame sin que
+    manim tenga que casar estructuras distintas.
+    """
     if nivel == 0:
         return [a]
     a = np.asarray(a, dtype=np.float64)
@@ -368,18 +381,17 @@ def _koch_segmento(a, b, nivel):
     d = (b - a) / 3.0
     p1 = a + d
     p3 = a + 2.0 * d
-    # el pico: girar d +60 grados alrededor de p1
-    ang = math.radians(60.0)
-    rot = np.array([[math.cos(ang), -math.sin(ang)],
-                    [math.sin(ang), math.cos(ang)]])
-    p2 = p1 + rot @ d
+    # el pico: girar d +60 grados alrededor de p1. Aplanado, el pico cae en
+    # el punto medio del tercio central (p1 + d/2), o sea sobre el segmento.
+    h = 1.0 if nivel > 1 else float(altura)
+    p2 = p1 + (1.0 - h) * (0.5 * d) + h * (_ROT60 @ d)
     salida = []
     for u, v in ((a, p1), (p1, p2), (p2, p3), (p3, b)):
-        salida.extend(_koch_segmento(u, v, nivel - 1))
+        salida.extend(_koch_segmento(u, v, nivel - 1, altura))
     return salida
 
 
-def curva_koch(nivel=5, largo=8.0, inicio=(0.0, 0.0)):
+def curva_koch(nivel=5, largo=8.0, inicio=(0.0, 0.0), altura=1.0):
     """Curva de Koch abierta: (4**nivel + 1, 2) puntos.
 
     El generador es siempre el mismo: partir en tres, levantar un pico
@@ -388,12 +400,12 @@ def curva_koch(nivel=5, largo=8.0, inicio=(0.0, 0.0)):
     nivel = _validar("curva_koch.nivel", nivel, NIVEL_KOCH_MAX)
     a = np.array([float(inicio[0]), float(inicio[1])])
     b = a + np.array([float(largo), 0.0])
-    pts = _koch_segmento(a, b, nivel)
+    pts = _koch_segmento(a, b, nivel, altura)
     pts.append(b)
     return np.array(pts)
 
 
-def copo_koch(nivel=4, radio=3.0, centro=(0.0, 0.0)):
+def copo_koch(nivel=4, radio=3.0, centro=(0.0, 0.0), altura=1.0):
     """Copo de nieve cerrado: Koch sobre los tres lados de un equilatero."""
     nivel = _validar("copo_koch.nivel", nivel, NIVEL_KOCH_MAX)
     c = np.array([float(centro[0]), float(centro[1])])
@@ -406,7 +418,7 @@ def copo_koch(nivel=4, radio=3.0, centro=(0.0, 0.0)):
     v = c + float(radio) * np.stack([np.cos(angs), np.sin(angs)], axis=1)
     pts = []
     for i in range(3):
-        pts.extend(_koch_segmento(v[i], v[(i + 1) % 3], nivel))
+        pts.extend(_koch_segmento(v[i], v[(i + 1) % 3], nivel, altura))
     pts.append(v[0])
     return np.array(pts)
 
@@ -685,6 +697,83 @@ def ifs_puntos(spec, n=120_000, semilla=3, con_eleccion=False):
     return salida
 
 
+def ifs_camino(spec, n=200_000, semilla=4, z0=(0.0, 0.0), quema=12):
+    """El juego del caos TAL CUAL se juega: UN punto que salta, n veces.
+
+    `ifs_puntos` mueve 500 particulas a la vez (es mas rapido y da un
+    prefijo estable), pero eso no es lo que se enseña en pantalla: en el
+    clip hay **un solo punto** dando saltos, y los primeros doce saltos
+    tienen que ser los primeros doce de la nube que aparece despues. Por
+    eso esta version es secuencial, y por eso los clips que muestran el
+    juego usan `orden="camino"`.
+
+    Devuelve (puntos (n,2), eleccion (n,)). El bucle es de floats sueltos,
+    no de arrays de numpy: para 200 000 saltos sale ~10 veces mas rapido.
+    """
+    n = _validar("ifs_camino.n", n, IFS_PUNTOS_MAX)
+    mats, tras, probs = _mapas(spec)
+    rng = np.random.default_rng(int(semilla))
+    total = int(quema) + n
+    eleccion = rng.choice(len(probs), size=total, p=probs)
+    m = [(float(M[0, 0]), float(M[0, 1]), float(M[1, 0]), float(M[1, 1]),
+          float(t[0]), float(t[1])) for M, t in zip(mats, tras)]
+    x, y = float(z0[0]), float(z0[1])
+    xs = np.empty(n, dtype=np.float64)
+    ys = np.empty(n, dtype=np.float64)
+    for i, k in enumerate(eleccion):
+        a, b, c, d, e, f = m[k]
+        x, y = a * x + b * y + e, c * x + d * y + f
+        j = i - quema
+        if j >= 0:
+            xs[j] = x
+            ys[j] = y
+    return np.stack([xs, ys], axis=1), eleccion[quema:]
+
+
+def arbol_davinci(niveles=8, angulo_deg=30.0, razon=None, largo0=1.0,
+                  grosor0=0.36, origen=(0.0, 0.0)):
+    """Arbol binario con la regla de Leonardo: la seccion se conserva.
+
+    Da Vinci anoto que el tronco de un arbol y la suma de sus ramas tienen
+    la MISMA seccion. Con dos hijas por rama eso obliga a
+    d_hija = d_madre / raiz(2), y esa es toda la regla de grosores. La misma
+    razon se usa para el largo, que es lo que hace que el arbol se lea como
+    un arbol y no como una escoba.
+
+    Devuelve dict con:
+      ramas       lista por generacion de (inicio, fin, grosor)
+      seccion     seccion total por generacion (constante: LA cifra)
+      largo       longitud total por generacion
+      largo_total longitud acumulada / la del tronco
+    """
+    niveles = _validar("arbol_davinci.niveles", niveles, 12)
+    razon = float(razon) if razon else 1.0 / math.sqrt(2.0)
+    ang = math.radians(float(angulo_deg))
+    frentes = [(np.array([float(origen[0]), float(origen[1])]),
+                math.pi / 2.0, float(largo0), float(grosor0))]
+    ramas, seccion, largo = [], [], []
+    for _ in range(niveles + 1):
+        capa, siguientes = [], []
+        s = 0.0
+        L = 0.0
+        for base, rumbo, lar, gro in frentes:
+            punta = base + lar * np.array([math.cos(rumbo), math.sin(rumbo)])
+            capa.append((base, punta, gro))
+            s += math.pi * (gro / 2.0) ** 2
+            L += lar
+            siguientes.append((punta, rumbo + ang, lar * razon, gro * razon))
+            siguientes.append((punta, rumbo - ang, lar * razon, gro * razon))
+        ramas.append(capa)
+        seccion.append(s)
+        largo.append(L)
+        frentes = siguientes
+    acumulado = np.cumsum(largo)
+    return {"ramas": ramas, "seccion": seccion, "largo": largo,
+            "seccion_relativa": [x / seccion[0] for x in seccion],
+            "largo_total": [x / largo[0] for x in acumulado],
+            "razon": razon, "angulo_deg": float(angulo_deg)}
+
+
 def ifs_reparto(spec, n=120_000, semilla=3):
     """Cuantos puntos puso CADA mapa (contados, no las probabilidades).
 
@@ -699,35 +788,36 @@ def ifs_reparto(spec, n=120_000, semilla=3):
             "probabilidades": probs.tolist()}
 
 
-def caja_ifs(spec, semilla=3, n=60_000, holgura=0.04):
+def caja_ifs(spec, semilla=3, n=60_000, holgura=0.04, orden="enjambre"):
     """Caja envolvente ESTABLE del atractor (x0, x1, y0, y1).
 
     Se calcula siempre con el mismo n y la misma semilla para que la imagen
     de 400 puntos y la de 200 000 compartan encuadre: si la caja se sacara
     de los puntos pedidos, el relevo de imagenes daria un salto.
     """
-    p = ifs_puntos(spec, n, semilla)
+    p = (ifs_camino(spec, n, semilla)[0] if orden == "camino"
+         else ifs_puntos(spec, n, semilla))
     x0, x1 = float(p[:, 0].min()), float(p[:, 0].max())
     y0, y1 = float(p[:, 1].min()), float(p[:, 1].max())
     mx, my = (x1 - x0) * holgura, (y1 - y0) * holgura
     return (x0 - mx, x1 + mx, y0 - my, y1 + my)
 
 
-def imagen_ifs(spec, puntos=120_000, res=(720, 900), color=COLOR_VIDA,
-               alto_escena=6.0, semilla=3, caja=None, fondo=None,
-               piso=0.55, ganancia=1.35):
-    """El atractor como imagen por densidad (brillo logaritmico).
+def imagen_nube(pts, caja, res=(720, 900), color=COLOR_VIDA,
+                alto_escena=6.0, fondo=None, piso=0.55, ganancia=1.35):
+    """Una nube de puntos como imagen por densidad (brillo logaritmico).
 
-    Un mobject por punto seria inviable: 120 000 Dots cuelgan el render.
-    Con `puntos` chico (400, 4 000) sale la nube rala del MISMO prefijo:
-    relevar imagenes con puntos crecientes ES la animacion del juego.
+    Un mobject por punto es inviable (200 000 Dots cuelgan el render), asi
+    que la nube se pinta en un histograma 2D y se muestra como imagen. La
+    `caja` se pasa desde fuera a proposito: relevar imagenes con mas y mas
+    puntos solo empalma sin saltos si TODAS comparten encuadre.
     """
     res_x, res_y = int(res[0]), int(res[1])
     if max(res_x, res_y) > RES_MAX:
-        raise ValueError(f"imagen_ifs: res {res} > {RES_MAX}")
-    pts = ifs_puntos(spec, puntos, semilla)
-    x0, x1, y0, y1 = caja if caja else caja_ifs(spec, semilla)
-    hist, _, _ = np.histogram2d(pts[:, 0], pts[:, 1], bins=[res_x, res_y],
+        raise ValueError(f"imagen_nube: res {res} > {RES_MAX}")
+    p = np.asarray(pts, dtype=np.float64)
+    x0, x1, y0, y1 = caja
+    hist, _, _ = np.histogram2d(p[:, 0], p[:, 1], bins=[res_x, res_y],
                                 range=[[x0, x1], [y0, y1]])
     dens = np.log1p(hist.T[::-1])          # fila 0 = y alto (imagen)
     if dens.max() > 0:
@@ -749,8 +839,26 @@ def imagen_ifs(spec, puntos=120_000, res=(720, 900), color=COLOR_VIDA,
     return _imagen(rgba, alto_escena)
 
 
+def imagen_ifs(spec, puntos=120_000, res=(720, 900), color=COLOR_VIDA,
+               alto_escena=6.0, semilla=3, caja=None, fondo=None,
+               piso=0.55, ganancia=1.35, orden="enjambre"):
+    """El atractor de un IFS como imagen por densidad.
+
+    Con `puntos` chico (400, 4 000) sale la nube rala del MISMO prefijo:
+    relevar imagenes con puntos crecientes ES la animacion del juego del
+    caos. `orden="camino"` usa el juego secuencial (un punto que salta),
+    que es el que se ve en pantalla en el clip 04.
+    """
+    pts = (ifs_camino(spec, puntos, semilla)[0] if orden == "camino"
+           else ifs_puntos(spec, puntos, semilla))
+    caja = caja if caja else caja_ifs(spec, semilla, orden=orden)
+    return imagen_nube(pts, caja, res=res, color=color,
+                       alto_escena=alto_escena, fondo=fondo, piso=piso,
+                       ganancia=ganancia)
+
+
 def marcos_ifs(spec, alto_escena=6.0, colores=None, caja=None, semilla=3,
-               grosor=2.2, opacidad=0.9):
+               grosor=2.2, opacidad=0.9, orden="enjambre"):
     """Un marco por mapa: DONDE cada regla mete una copia entera del todo.
 
     Es la imagen que explica un IFS sin una sola palabra: la figura esta
@@ -759,7 +867,7 @@ def marcos_ifs(spec, alto_escena=6.0, colores=None, caja=None, semilla=3,
     ambos con el mismo centro los alinea.
     """
     mats, tras, _ = _mapas(spec)
-    x0, x1, y0, y1 = caja if caja else caja_ifs(spec, semilla)
+    x0, x1, y0, y1 = caja if caja else caja_ifs(spec, semilla, orden=orden)
     esquinas = np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]])
     escala = float(alto_escena) / (y1 - y0)
     centro = np.array([(x0 + x1) / 2.0, (y0 + y1) / 2.0])
