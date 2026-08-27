@@ -209,7 +209,7 @@ esta acabado, no a medias.
 |---|---|---|---|
 | 3 | El efecto mariposa | 15 · Caos | **LISTO** 12.90 s · bucle 0.000 · voz |
 | 4 | La tirania del cohete | 17 · Tsiolkovsky | **LISTO** 11.65 s · bucle 0.006 · voz |
-| 5 | Los 38 microsegundos del GPS | 16 · Relatividad | pendiente |
+| 5 | Los 38 microsegundos del GPS | 16 · Relatividad | **LISTO** 11.70 s · bucle 0.026 · voz |
 | 6 | La constelacion con ruido | 24 · Comunicaciones | pendiente |
 | 7 | Que es un determinante | 22 · Algebra lineal | pendiente |
 
@@ -243,6 +243,23 @@ a cero antes de llegar. Remate en rojo: **FALTAN 548 M/S**.
 - El modelo da carga util NEGATIVA pasado ese punto (−1.26 % a 9388): esa
   es la tesis del curso, pero una franja de altura negativa no se dibuja,
   asi que el barrido se para justo en el cero y el rojo lo cuenta.
+
+### Promo 5 — "Los 38 microsegundos del GPS" (curso 16)
+
+`studio/content/promos/gps-38-microsegundos/`. 11.70 s. La cadena completa
+en una pantalla: arriba la CAUSA (**ADELANTA 38.5 MICROSEGUNDOS**, que es
+−7.21 de relatividad especial +45.72 de general), en medio el satelite
+dando su dia de trabajo, y abajo la CONSECUENCIA subiendo hasta
+**11.5 KM** de error de posicion sin corregir (cada microsegundo son 300 m
+de tiempo de vuelo de la luz).
+
+- El bucle lo cierra la fisica: un dia de GPS son **dos orbitas exactas**,
+  asi que el satelite termina donde empezo.
+- Trampa cazada a tiempo: `f"{38.50:.0f}"` escribe **39**, justo la cifra
+  que delata un rotulo mal hecho. Un decimal y a la vista.
+- El satelite de fabrica es un punto de dos pixeles en un telefono: se
+  escala x2 y se le pone una estela de cometa (0.22 de vuelta) para que en
+  la segunda vuelta, con la orbita ya pisada, se siga viendo avanzar.
 
 ## Lo que falta (cuando se valide)
 

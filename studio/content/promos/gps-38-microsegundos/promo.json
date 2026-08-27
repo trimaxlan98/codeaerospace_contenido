@@ -1,0 +1,40 @@
+{
+  "name": "Los 38 microsegundos del GPS",
+  "curso": "Relatividad y el GPS",
+  "description": "Promo del curso 16. El reloj de un satelite GPS adelanta 38.5 microsegundos al dia (relatividad especial -7.21, general +45.72). Como el GPS mide distancias con el tiempo de vuelo de la luz, cada microsegundo son 300 metros: sin corregir, en un dia el error de posicion llega a 11.5 km. El satelite da dos vueltas exactas, que es un dia de GPS, y termina donde empezo.",
+  "scene": "Promo",
+  "file": "escena.py",
+  "style_block": "style_block.py",
+  "formatos": ["vertical", "horizontal"],
+  "duracion_objetivo": 11.7,
+  "guion_visual": [
+    "0.00 la Tierra, la orbita y el satelite en su sitio; 0.0 KM",
+    "0.35 pasa un dia: dos vueltas y el error sube a 11.5 km",
+    "7.85 respiro con la cifra arriba",
+    "10.25 la cifra vuelve a 0.0: empieza otro dia",
+    "11.35 el satelite esta donde empezo"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 0.8, "texto": "Arriba el tiempo corre más."},
+      {"t_inicio": 4.0, "texto": "Treinta y ocho microsegundos."},
+      {"t_inicio": 7.6, "texto": "Once kilómetros de error."}
+    ]
+  },
+  "audio": {
+    "pico_db": -3.0,
+    "pico_db_con_voz": -16.0,
+    "fade_in": 0.35,
+    "fade_out": [10.80, 11.50],
+    "eventos": [
+      ["nebulosa", 0.10, -14],
+      ["aire_largo", 0.40, -18],
+      ["tick", 2.60, -20],
+      ["tick", 5.35, -20],
+      ["nebulosa", 6.00, -15],
+      ["pulso", 7.90, -14],
+      ["aire", 10.20, -17]
+    ]
+  }
+}
