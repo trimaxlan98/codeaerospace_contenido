@@ -259,6 +259,23 @@ class Filotaxis(VGroup):
         return LaggedStart(*[GrowFromCenter(d) for d in dots],
                            lag_ratio=lag, run_time=run_time)
 
+    def girar_a(self, angulo_deg):
+        """Recoloca las semillas QUE YA EXISTEN con otro giro, sin
+        reconstruir el disco.
+
+        `con_angulo` devuelve un disco gemelo para Transform (un salto entre
+        dos angulos); esto mueve los puntos actuales, que es lo que permite
+        BARRER el angulo de forma continua desde un updater sin rehacer
+        cientos de Dots en cada frame.
+        """
+        pts = _puntos_filotaxis(self.n, float(angulo_deg),
+                                self._params["escala"])
+        polo = self.polo()
+        for d, p in zip(self.puntos, pts):
+            d.move_to(polo + np.append(p, 0.0))
+        self.angulo = float(angulo_deg)
+        return self
+
     def con_angulo(self, angulo_deg):
         """El mismo disco con otro giro por semilla, anclado en el polo:
         Transform semilla a semilla (mismo numero de puntos)."""
