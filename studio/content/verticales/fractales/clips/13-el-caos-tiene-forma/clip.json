@@ -1,7 +1,51 @@
 {
   "name": "13 · El caos tiene forma",
+  "modulo": "M4 · Fractales que trabajan",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "x → r x (1−x) dibuja el diagrama de bifurcaciones. El número de finales se CUENTA sobre la propia órbita (2, 4, 8 según r). Ampliando ×160 la ventana de periodo 3 aparece el diagrama entero otra vez. Cierra con el atractor de Lorenz y la dimensión de su traza dibujada, 1.6861, medida con conteo_cajas. Diagrama y trayectoria salen de caos.py (curso 15); aquí sólo se miden.",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; el diagrama de bifurcaciones (r de 2.8 a 4)",
+    "3.9  la aguja en r = 3.2 → FINALES 2",
+    "6.4  r = 3.5 → 4 · r = 3.556 → 8",
+    "13.0 se marca la ventana de periodo 3 dentro del caos",
+    "15.9 ampliación ×160: el diagrama entero, otra vez",
+    "23.6 el atractor de Lorenz se dibuja",
+    "28.2 DIMENSION 1.6861 de la traza",
+    "33.3 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.4, "texto": "Una ecuación de una línea."},
+      {"t_inicio": 4.4, "texto": "Dos finales. Luego cuatro. Luego ocho."},
+      {"t_inicio": 9.6, "texto": "Y después, caos."},
+      {"t_inicio": 13.4, "texto": "Pero dentro del caos hay una ventana."},
+      {"t_inicio": 18.4, "texto": "Y dentro está el dibujo entero, otra vez."},
+      {"t_inicio": 24.2, "texto": "Esta trayectoria nunca se repite."},
+      {"t_inicio": 29.2, "texto": "Y su forma tampoco es una curva."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [34.1, 34.9],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["aire_largo", 2.0, -17],
+      ["blip_grave", 4.5, -16],
+      ["blip_medio", 7.2, -16],
+      ["blip_agudo", 9.9, -16],
+      ["barrido", 13.9, -18],
+      ["pulso", 15.9, -14],
+      ["sting", 18.1, -16],
+      ["nebulosa", 23.0, -15],
+      ["aire_largo", 23.6, -17],
+      ["subrayado", 28.9, -14]
+    ]
+  }
 }

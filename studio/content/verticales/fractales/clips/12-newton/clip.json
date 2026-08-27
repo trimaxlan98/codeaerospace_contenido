@@ -1,7 +1,51 @@
 {
   "name": "12 · Newton",
+  "modulo": "M4 · Fractales que trabajan",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "El método de Newton para z³ = 1: desde cualquier punto se cae hacia una de las tres raíces, y el color dice a cuál. Dos partidas separadas 0.020 caen en raíces distintas. Al ampliar la frontera ×8.6 y ×67 se ve por qué: no hay una línea que separe dos cuencas, porque en cualquier punto del borde se tocan las tres (propiedad de Wada). 6.73 pasos de media, medidos por newton_reparto sobre la malla dibujada.",
+  "duracion_objetivo": 31.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; las tres raíces y el círculo unidad",
+    "2.7  una partida y su camino de Newton → 11 pasos, raíz cian",
+    "7.0  otra partida 0.020 más allá → otra raíz",
+    "12.4 todos los puntos a la vez: las tres cuencas",
+    "14.7 PASOS MEDIOS 6.73",
+    "17.3 ampliación ×9 sobre la frontera",
+    "21.5 ampliación ×67: el mismo trenzado de tres colores",
+    "26.4 «ninguna separa dos»",
+    "29.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.2, "texto": "Tres raíces, y un método para encontrarlas."},
+      {"t_inicio": 6.6, "texto": "Mueve la partida dos centésimas."},
+      {"t_inicio": 9.6, "texto": "Y acaba en otra raíz."},
+      {"t_inicio": 13.0, "texto": "Pintemos de qué raíz es cada punto."},
+      {"t_inicio": 18.2, "texto": "Ampliamos el borde."},
+      {"t_inicio": 22.0, "texto": "Y siguen estando los tres colores."},
+      {"t_inicio": 26.6, "texto": "No hay frontera entre dos: están las tres."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [30.1, 30.9],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["blip_grave", 2.0, -17],
+      ["blip_medio", 5.2, -16],
+      ["blip_agudo", 10.0, -15],
+      ["aire_largo", 12.4, -17],
+      ["pulso", 14.7, -14],
+      ["barrido", 17.3, -18],
+      ["barrido", 21.5, -18],
+      ["nebulosa", 24.0, -15],
+      ["subrayado", 26.4, -14]
+    ]
+  }
 }

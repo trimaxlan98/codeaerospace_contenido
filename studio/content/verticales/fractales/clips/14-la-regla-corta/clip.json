@@ -1,7 +1,52 @@
 {
   "name": "14 · La regla corta",
+  "modulo": "M4 · Fractales que trabajan",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "Dos oficios de la misma idea. Doblando un hilo con la regla de Koch caben 12.64 de hilo en un vano de 4.00: 3.16 veces menos ancho para la misma longitud eléctrica (medido por antena_koch sobre la curva dibujada; que la resonancia dependa del hilo es física de manual y va en gris). Y el mismo programa de la costa del clip 01 —parte por la mitad y desplaza— dibuja una cordillera de dimensión 1.1420, medida sobre el perfil que se ve.",
+  "duracion_objetivo": 30.8,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; un hilo recto dentro de un vano marcado",
+    "2.8  el hilo se dobla cuatro veces: 5.33, 7.11, 9.48, 12.64",
+    "10.7 el mismo hilo estirado se sale del cuadro por los dos lados",
+    "12.7 VECES MAS CORTA 3.16",
+    "15.4 en gris: manda el hilo",
+    "18.5 el mismo programa de la costa, hecho cordillera",
+    "25.1 DIMENSION 1.1420 · destello",
+    "29.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.2, "texto": "Una antena es un hilo."},
+      {"t_inicio": 4.0, "texto": "Y lo que manda es su largo."},
+      {"t_inicio": 8.0, "texto": "Dóblalo, y cabe el triple en el mismo sitio."},
+      {"t_inicio": 12.9, "texto": "Por eso existen las antenas fractales."},
+      {"t_inicio": 19.2, "texto": "Y con la misma regla de la costa..."},
+      {"t_inicio": 22.4, "texto": "...sale una cordillera."},
+      {"t_inicio": 25.6, "texto": "Una regla corta que dibuja un mundo."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [29.9, 30.7],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["tick", 2.8, -16],
+      ["tick", 4.6, -16],
+      ["tick", 6.3, -16],
+      ["tick", 8.0, -16],
+      ["barrido", 10.7, -17],
+      ["pulso", 12.7, -14],
+      ["aire", 15.4, -18],
+      ["nebulosa", 18.5, -16],
+      ["aire_largo", 19.2, -17],
+      ["subrayado", 25.1, -14],
+      ["sting", 26.0, -16]
+    ]
+  }
 }
