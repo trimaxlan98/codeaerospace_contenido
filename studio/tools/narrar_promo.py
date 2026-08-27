@@ -83,6 +83,15 @@ def main() -> int:
         print(f"AVISO: la voz ({dur:.2f} s) no cabe en el video "
               f"({float(limite):.2f} s): acorta el texto del manifiesto")
         return 1
+    # Si la voz sale pegada al limite es que hubo que comprimir los
+    # silencios: el audio llega al ultimo frame y el bucle SUENA. Hace
+    # falta cola de silencio, no solo que quepa.
+    if limite and dur > float(limite) - 0.6:
+        print(f"AVISO: la voz ({dur:.2f} s) llega al final del video "
+              f"({float(limite):.2f} s) y el bucle se oira. Separa mas los "
+              "t_inicio o acorta el texto: Charon va a 2.3-2.6 silabas/s y "
+              "cada frase empuja a la siguiente si se solapan.")
+        return 1
     return 0
 
 

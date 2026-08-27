@@ -213,6 +213,7 @@ esta acabado, no a medias.
 | 6 | Cuando el ruido se come el simbolo | 24 · Comunicaciones | **LISTO** 11.10 s · bucle 0.000 · voz |
 | 7 | Que es un determinante | 22 · Algebra lineal | **LISTO** 12.20 s · bucle 0.014 · voz |
 | 8 | El muro del sonido | 10 · Aerodinamica | **LISTO** 11.70 s · bucle 0.010 · voz |
+| 9 | El secreto que se grita en publico | 19 · Criptografia | **LISTO** 12.50 s · bucle 0.001 · voz |
 
 ### Promo 3 — "El efecto mariposa" (curso 15)
 
@@ -315,6 +316,30 @@ de Mach, con su semiangulo medido (**34 grados a Mach 1.8**).
   Con 0.8 / 4.0 / 7.4 cada frase empujaba a la siguiente y la cadena
   terminaba pegada al ultimo frame — es decir, el bucle sonaba. Con
   0.8 / 4.5 / 8.0 la voz acaba 1.3 s antes del final.
+
+### Promo 9 — "El secreto que se grita en publico" (curso 19)
+
+`studio/content/promos/secreto-en-publico/`. 12.50 s. Diffie-Hellman con los
+numeros de juguete REALES del curso (p=23, g=5): Ana guarda un **6**, Beto un
+**15**, se gritan un **8** y un **19** por un canal que ve todo el mundo, y
+los dos acaban con el mismo **2**. El color lo cuenta sin palabras: ambar lo
+privado (no se mueve nunca), cian lo publico (lo unico que cruza la linea),
+verde el secreto. Pie: **EL VERDE NUNCA CRUZO**.
+
+- Tres columnas por persona (privado / recibido / secreto): en la primera
+  version el "19" y el "2" quedaban a 1.1 u y se leian como **192**.
+- Los dos numeros publicos cruzan por carriles distintos para no pisarse.
+
+### Calibracion de la voz (vale para todos los promos)
+
+Charon narra a **2.3–2.6 silabas por segundo, contando pausas** — no a
+2.2 palabras/s, que es lo que yo suponia el primer dia. Y hay una trampa
+peor que quedarse largo: **si dos `t_inicio` se solapan, el ensamblador
+empuja la frase siguiente**, la cadena se pega al ultimo frame y entonces
+el bucle SUENA. Regla: ≥ 4.5 s entre `t_inicio` para una frase de ~10
+silabas, y si la duracion que reporta la herramienta es casi el limite, es
+que se comprimieron los silencios. `narrar_promo.py` ahora **avisa** de ese
+caso (antes solo avisaba si no cabia).
 
 ## Lo que falta (cuando se valide)
 
