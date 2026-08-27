@@ -149,17 +149,28 @@ def _imagen(rgba, alto_escena):
 
 def imagen_mandelbrot(centro=-0.6 + 0j, ancho=3.4, res=(1280, 720),
                       max_iter=250, paleta="nebulosa", ciclo=28.0,
-                      alto_escena=8.0):
-    """ImageMobject del conjunto de Mandelbrot listo para la escena."""
+                      alto_escena=8.0, interior=COLOR_INTERIOR, desfase=0.0):
+    """ImageMobject del conjunto de Mandelbrot listo para la escena.
+
+    `interior` pinta lo que NO escapa. En el curso 26 se le pasa el violeta
+    del rol "atrapado": asi el conjunto se lee como una pieza solida y el
+    color dice lo mismo que la cifra.
+    """
     campo = campo_escape(res[0], res[1], centro, ancho, max_iter)
-    return _imagen(colorear(campo, paleta, ciclo), alto_escena)
+    return _imagen(colorear(campo, paleta, ciclo, desfase, interior),
+                   alto_escena)
 
 
 def imagen_julia(c, centro=0j, ancho=3.6, res=(1280, 720), max_iter=250,
-                 paleta="nebulosa", ciclo=28.0, alto_escena=8.0):
-    """ImageMobject del conjunto de Julia de parametro `c`."""
+                 paleta="nebulosa", ciclo=28.0, alto_escena=8.0,
+                 interior=COLOR_INTERIOR, desfase=0.0):
+    """ImageMobject del conjunto de Julia lleno de parametro `c`.
+
+    `interior` pinta a los prisioneros (los que NO escapan).
+    """
     campo = campo_escape(res[0], res[1], centro, ancho, max_iter, c=c)
-    return _imagen(colorear(campo, paleta, ciclo), alto_escena)
+    return _imagen(colorear(campo, paleta, ciclo, desfase, interior),
+                   alto_escena)
 
 
 def _tasa_exponencial(factor):
@@ -224,7 +235,8 @@ def camino_cardioide(alpha, radio=0.985):
 
 def morph_julia(escena, camino_c, duracion=8.0, frames=96, res=(640, 360),
                 centro=0j, ancho=3.6, max_iter=180, paleta="nebulosa",
-                ciclo=28.0, alto_escena=8.0, imagen=None):
+                ciclo=28.0, alto_escena=8.0, imagen=None,
+                interior=COLOR_INTERIOR):
     """Julia cuyo parametro c recorre `camino_c` (callable alpha 0..1 -> c).
 
     Precalcula `frames` fotogramas RGBA (todos de la misma forma) y los
@@ -237,7 +249,8 @@ def morph_julia(escena, camino_c, duracion=8.0, frames=96, res=(640, 360),
     for k in range(frames):
         c = camino_c(k / (frames - 1))
         campo = campo_escape(res[0], res[1], centro, ancho, max_iter, c=c)
-        lote.append(np.ascontiguousarray(colorear(campo, paleta, ciclo)))
+        lote.append(np.ascontiguousarray(
+            colorear(campo, paleta, ciclo, interior=interior)))
     if imagen is None:
         imagen = _imagen(lote[0], alto_escena)
         escena.add(imagen)
@@ -267,10 +280,11 @@ def orbita(c, z0=0j, n=12, exponente=2):
 
 
 def miniatura_julia(c, lado=200, ancho=3.4, max_iter=120, paleta="nebulosa",
-                    ciclo=28.0, alto_escena=1.6):
+                    ciclo=28.0, alto_escena=1.6, interior=COLOR_INTERIOR):
     """Julia pequenito y barato (para mosaicos 'el Mandelbrot como mapa')."""
     campo = campo_escape(lado, lado, 0j, ancho, max_iter, c=c)
-    return _imagen(colorear(campo, paleta, ciclo), alto_escena)
+    return _imagen(colorear(campo, paleta, ciclo, interior=interior),
+                   alto_escena)
 
 
 # =====================================================================

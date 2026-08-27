@@ -1,7 +1,53 @@
 {
   "name": "09 · Mandelbrot",
+  "modulo": "M3 · El país de los números complejos",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "42 conjuntos de Julia colgados cada uno en el sitio de su c. Los que son de una sola pieza se quedan encendidos (12 de 42, criterio en_mandelbrot: la órbita de cero no escapa) y los demás se apagan: lo que queda dibujado es la silueta del conjunto de Mandelbrot. Al final el mosaico funde a la imagen de M calculada en el MISMO encuadre, y la cifra recuerda que cada píxel del cuadro es un Julia entero.",
+  "duracion_objetivo": 30.4,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.7  se cuelgan los 42 Julia, cada uno en su c",
+    "5.1  JULIAS 42, uno por cada c",
+    "8.1  se enmarcan los que son de una pieza → 12",
+    "14.4 los que son polvo se apagan y aparece la silueta",
+    "19.8 funde al conjunto de Mandelbrot, mismo encuadre",
+    "22.6 JULIAS 444 240 · uno por píxel",
+    "28.8 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.4, "texto": "Cada c tiene su propio Julia."},
+      {"t_inicio": 5.6, "texto": "Aquí hay cuarenta y dos, cada uno en su sitio."},
+      {"t_inicio": 11.0, "texto": "¿Cuáles son de una sola pieza?"},
+      {"t_inicio": 15.0, "texto": "Se apagan los demás."},
+      {"t_inicio": 17.6, "texto": "Y la silueta ya se reconoce."},
+      {"t_inicio": 22.8, "texto": "Ese es el conjunto de Mandelbrot."},
+      {"t_inicio": 26.4, "texto": "El mapa de todos los Julia."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [29.5, 30.3],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["tick", 1.2, -18],
+      ["tick", 2.2, -18],
+      ["tick", 3.2, -18],
+      ["blip_grave", 5.1, -16],
+      ["barrido", 8.1, -18],
+      ["blip_medio", 9.5, -17],
+      ["blip_agudo", 11.4, -15],
+      ["aire_largo", 14.4, -17],
+      ["nebulosa", 18.0, -15],
+      ["pulso", 19.8, -13],
+      ["subrayado", 22.6, -14],
+      ["aire", 26.4, -18]
+    ]
+  }
 }

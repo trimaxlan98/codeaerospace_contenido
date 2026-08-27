@@ -1,7 +1,52 @@
 {
   "name": "11 · La frontera",
+  "modulo": "M3 · El país de los números complejos",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "ESQUELETO — pendiente de escribir.",
-  "duracion_objetivo": 1.0
+  "description": "La orla de grosor ε alrededor del conjunto. Para una curva normal su área se parte por la mitad al partir ε por dos; aquí queda el 0.75, el 0.77 y el 0.79 del área anterior. De esa terquedad sale la dimensión: A(ε) ~ ε^(2−D), y sobre una malla de 1400×1400 con 1200 iteraciones da 1.6170, subiendo cada vez que se afina la malla. El 2 exacto es de Shishikura (1991) y va en gris: no lo mide esta librería.",
+  "duracion_objetivo": 30.2,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; el conjunto solo",
+    "2.8  la orla más gruesa (ε = 16 px)",
+    "5.4  ε a la mitad → QUEDA DEL AREA 0.755",
+    "8.0  ε a la mitad → 0.768",
+    "10.5 ε a la mitad → 0.786",
+    "13.1 en gris: una curva daría 0.500",
+    "16.6 DIMENSION 1.6170 · destello",
+    "21.0 «y sube al afinar»",
+    "24.7 en gris: Shishikura 1991 : 2",
+    "28.5 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 1.2, "texto": "Pintamos todo lo que está cerca del borde."},
+      {"t_inicio": 6.0, "texto": "Y afinamos: la mitad de cerca."},
+      {"t_inicio": 10.8, "texto": "Una curva perdería la mitad del área."},
+      {"t_inicio": 14.0, "texto": "Esta orla apenas adelgaza."},
+      {"t_inicio": 17.4, "texto": "Su dimensión pasa de uno coma seis."},
+      {"t_inicio": 21.6, "texto": "Y sube cada vez que miramos más fino."},
+      {"t_inicio": 25.4, "texto": "El límite, dice la teoría, es dos."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [29.3, 30.1],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.75, -19],
+      ["aire_largo", 2.3, -17],
+      ["blip_grave", 5.4, -16],
+      ["blip_medio", 8.0, -16],
+      ["blip_agudo", 10.5, -16],
+      ["barrido", 13.1, -18],
+      ["nebulosa", 15.5, -16],
+      ["subrayado", 16.6, -14],
+      ["pulso", 21.0, -15],
+      ["aire", 24.7, -18]
+    ]
+  }
 }
