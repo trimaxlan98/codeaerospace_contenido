@@ -7,7 +7,7 @@
 // recodifica (segundos); cualquier otra cosa recodifica la pelicula entera y
 // eso hay que decirlo ANTES, no despues de media hora de espera.
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Clapperboard, Download, Film, Play, Square, Trash2 } from 'lucide-react'
 import { api, peliculaVideoUrl } from '../api.js'
 import { cursoDeJob, useCatalogo } from '../catalogo.js'
@@ -38,8 +38,10 @@ const TRANSICION_LABEL = {
 function fmtDur(s) {
   if (!s && s !== 0) return '—'
   const m = Math.floor(s / 60)
-  const r = Math.round(s % 60)
-  return m > 0 ? `${m} min ${String(r).padStart(2, '0')} s` : `${r} s`
+  // Por debajo del minuto se enseña un decimal: en una pieza de 8,7 s
+  // redondear a «9 s» borra justo lo que se está mirando.
+  if (m === 0) return `${s.toFixed(1)} s`
+  return `${m} min ${String(Math.round(s % 60)).padStart(2, '0')} s`
 }
 
 function fmtMB(bytes) {
@@ -47,7 +49,54 @@ function fmtMB(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-export default function PeliculaPanel({ projectId, projectName, jobs }) {
+// La regleta: una pieza por segmento, ancho proporcional a su duración.
+//
+// Es lo que convierte una lista de clips en una película que se puede mirar de
+// un vistazo: dónde está el clip largo, cuáles llevan voz, dónde caen los
+// empalmes. Antes de montar se dibuja con las duraciones que ya conoce la
+// narración; después, con las MEDIDAS del informe, que son la verdad.
+function Regleta({ piezas, transicion, duracionTransicion, onIr }) {
+  const total = piezas.reduce((a, p) => a + (p.duracion || 0), 0)
+  if (!total) return null
+  // Cada empalme que no es corte se come `d` segundos del total.
+  const recorte = transicion === 'corte' ? 0
+    : duracionTransicion * Math.max(piezas.length - 1, 0)
+  let acumulado = 0
+  const conInicio = piezas.map((p) => {
+    const inicio = acumulado
+    acumulado += (p.duracion || 0) - (transicion === 'corte' ? 0 : duracionTransicion)
+    return { ...p, inicio: Math.max(inicio, 0) }
+  })
+
+  return (
+    <div className="space-y-1">
+      <div className="flex h-7 w-full gap-px overflow-hidden rounded border border-line bg-canvas">
+        {conInicio.map((p, i) => (
+          <button key={i} type="button"
+            onClick={() => onIr?.(p.inicio)}
+            title={`${p.titulo} · ${fmtDur(p.duracion)}${p.voz ? ' · con voz' : ''}${p.cama ? ' · con cama' : ''}`}
+            style={{ width: `${((p.duracion || 0) / total) * 100}%` }}
+            className={cn(
+              'min-w-[2px] transition-opacity hover:opacity-70',
+              p.marca ? 'bg-accent'
+                : p.voz ? 'bg-ink/70'
+                  : 'bg-muted/40')} />
+        ))}
+      </div>
+      <p className="font-mono text-[10.5px] text-faint">
+        {piezas.length} piezas · {fmtDur(total - recorte)}
+        {recorte > 0 && ` (los ${piezas.length - 1} empalmes se comen ${recorte.toFixed(1)} s)`}
+        {' · '}
+        <span className="text-ink/70">■</span> con voz{' '}
+        <span className="text-accent">■</span> marca{' '}
+        <span className="text-muted">■</span> mudo
+      </p>
+    </div>
+  )
+}
+
+export default function PeliculaPanel({ projectId, projectName, jobs, clips, duraciones, narrarConVoz }) {
+  const videoRef = useRef(null)
   const [estado, setEstado] = useState(null)
   const [error, setError] = useState('')
   const [transicion, setTransicion] = useState('corte')
@@ -122,6 +171,22 @@ export default function PeliculaPanel({ projectId, projectName, jobs }) {
   const puedeMontar = estado.piezas > 0 && !montando
   const recodifica = transicion !== 'corte'
   const runError = estado.run?.estado === 'error' ? estado.run.error : ''
+
+  // Las piezas de la regleta: las MEDIDAS del informe si ya se montó (son la
+  // verdad), y si no las previstas con lo que la narración ya midió de cada
+  // clip. Antes de montar puede faltar alguna: la regleta se dibuja con las
+  // que haya, no se esconde.
+  const piezasRegleta = informe?.detalle?.length
+    ? informe.detalle.map((d) => ({ ...d, marca: /marca/i.test(d.titulo) }))
+    : (clips || [])
+      .filter((c) => c.status === 'rendered' || c.status === 'stale')
+      .map((c) => ({
+        titulo: c.title,
+        duracion: duraciones?.[c.id] || 0,
+        voz: Boolean(narrarConVoz?.[c.id]),
+        cama: c.audio?.has_audio,
+        marca: false,
+      }))
 
   return (
     <section className="rounded-lg border border-line bg-surface-2 p-3 space-y-3">
@@ -248,6 +313,21 @@ export default function PeliculaPanel({ projectId, projectName, jobs }) {
 
       {(error || runError) && (
         <p className="text-xs text-danger">{error || runError}</p>
+      )}
+
+      {piezasRegleta.length > 0 && (
+        <Regleta piezas={piezasRegleta} transicion={transicion}
+          duracionTransicion={Number(duracion)}
+          onIr={(t) => { if (videoRef.current) videoRef.current.currentTime = t }} />
+      )}
+
+      {hayVideo && (
+        // El curso montado se ve AQUI, no descargándolo: hacer clic en un
+        // tramo de la regleta salta a ese punto.
+        <video ref={videoRef} controls preload="metadata"
+          src={peliculaVideoUrl(projectId)}
+          className="max-h-[320px] w-full rounded border border-line bg-black object-contain"
+          aria-label={`película de ${projectName || 'el curso'}`} />
       )}
 
       {informe && (

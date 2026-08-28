@@ -1056,7 +1056,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
       {/* Un promo es UN clip en bucle: no hay nada que montar. La pelicula es
           cosa de los cursos. */}
       {!esPromo && (
-        <PeliculaPanel projectId={project.id} projectName={project.name} jobs={jobs} />
+        <PeliculaPanel projectId={project.id} projectName={project.name} jobs={jobs}
+          clips={clips}
+          duraciones={Object.fromEntries(clips.map((c) => [c.id, narrByClip[c.id]?.video_s]))}
+          narrarConVoz={Object.fromEntries(clips.map((c) => [c.id, narrByClip[c.id]?.has_audio]))} />
       )}
 
       <section className="panel flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="clips del proyecto">

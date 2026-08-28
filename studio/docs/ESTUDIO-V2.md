@@ -45,7 +45,7 @@ Lo que le falta para ser un estudio, en orden de cuánto duele:
 | E2 | Transiciones | empalmes reales entre clips + catálogo en escena | **hecho** |
 | E3 | Sonido de cursos | cama de SFX en cursos + banco audible | **hecho** |
 | E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | **hecho** |
-| E5 | Movimiento | transiciones de vista y micro-animaciones en la consola | pendiente |
+| E5 | La regleta | ver la película montada dentro de la app | **hecho** |
 
 ---
 
@@ -374,3 +374,51 @@ sembrado (no se commitea; vive en el scratchpad). Ocho comprobaciones en verde:
 Nota del arnés: Playwright headless no arranca el *drag and drop nativo* de
 Chromium; el reordenamiento se comprueba despachando los eventos de arrastre a
 mano, que es lo que prueba los manejadores y su cableado.
+
+---
+
+## E5 — La regleta y el reproductor (hecho)
+
+E1 dejó la película montada, pero para verla había que descargarla, y la lista
+de clips no decía nada de cómo se reparte el tiempo. El panel «La película»
+ahora enseña **la obra**, no solo su botón.
+
+### La regleta
+
+Un segmento por pieza, ancho proporcional a su duración. Ámbar la marca, tinta
+las que llevan voz, apagado las mudas. Debajo, el total **descontando lo que se
+comen los empalmes** (cada `xfade` recorta su duración del resultado).
+
+Antes de montar se dibuja con las duraciones que la narración ya midió de cada
+clip; después, con las **medidas del informe**, que son la verdad. Hacer clic en
+un tramo salta a ese punto del reproductor.
+
+### El reproductor
+
+El curso montado se ve en el propio panel (`<video>` con soporte de Range del
+backend), con la altura acotada: sin tope, un 1080p ocupaba la pantalla entera y
+empujaba fuera el informe medido.
+
+### Nota de formato
+
+Por debajo del minuto la duración lleva un decimal: en una pieza de 8,7 s,
+redondear a «9 s» borra justo lo que se está mirando.
+
+### Verificación de punta a punta
+
+Esta vez con el **runner real** (no solo el contenedor a mano): backend y
+`manim_runner.py` locales contra el workspace del repo, tres clips sembrados de
+3,0 / 4,0 / 2,5 s y `POST /api/projects/{pid}/pelicula` con `fundido` de 0,5 s.
+
+- El runner registra `[pelicula] pid=… ok piezas=3 dur=8.667`.
+- `exports/peliculas/<pid>/` queda con `plan.json`, `pelicula.mp4` y
+  `pelicula.json`; el estado pasa a `al_dia`.
+- `GET …/pelicula/video` sirve los 378 620 bytes y `ffprobe` mide **8,667 s**
+  sobre los 8,5 previstos (la diferencia es el re-encode a los 15 fps del
+  proyecto desde fuentes de 30).
+- La interfaz enseña la regleta, el reproductor con la película dentro y el
+  informe medido (duración, resolución, tamaño, empalme).
+
+De paso quedó comprobado el arranque del runner en **modo desarrollo** (el que
+entró en la consolidación E0): sin grupo `manimstudio` ni root para el `chown`,
+deja el socket a 0600 y avisa, en vez de caerse.
