@@ -159,12 +159,12 @@ de escribir clips).
 | 4 · Molde: curso.json, style_block, intro, clip 01, cierre | **hecho**: clip 01 34.87 s (frames revisados); intro 17.03 s con el titulo naciendo de un enjambre (`em.converger`); cierre 8.90 s |
 | 5 · Esqueletos de las 16 piezas | **hecho** |
 | 6 · Produccion clips 02-14 (subagentes) | **hecho** (12:05): 13 clips entregados por 6 Sonnet + 7 Opus, todos entre 31.4 y 39.9 s en ql; 3 bugs de libreria cazados por agentes (tabla de Ising, franja del LBM, alfa de Pelicula tras zoom) y corregidos |
-| 7 · Revision de frames + pytest | frames ql revisados; **190 tests en verde**; revision final sobre los frames qh |
-| 8 · Commit, push, PR (sin merge) | commits 89516c2 + el de cierre de clips; PR pendiente |
+| 7 · Revision de frames + pytest | **hecho**: frames ql y qh revisados uno a uno, **190 tests en verde** |
+| 8 · Commit, push, PR (sin merge) | **hecho**: **PR #63**, sin mergear a proposito (lo revisa el dueño) |
 | 9 · qh (3 frentes) + duraciones a los manifiestos | **hecho** (11:57): 16/16 en 1080x1920 @60, 0 fallos; duraciones medidas escritas en los manifiestos. **502.76 s = 8 min 23 s** de curso |
-| 10 · Voz (VPS, serial, alinear_voz.py) | en curso (11:57): 14 piezas con voz, intro y cierre sin ella |
-| 11 · unir_vertical: piezas sueltas + montaje + verificacion | pendiente |
-| 12 · PLAN.md, catalogo, memoria | pendiente |
+| 10 · Voz (VPS, serial, alinear_voz.py) | **hecho** (12:07): 14 piezas narradas; 6 avisaron de voz larga y se acorto el texto (02, 03, 06, 07, 11, 13), re-narrando solo esas. **Desfase maximo verificado: 0.40 s** |
+| 11 · unir_vertical: piezas sueltas + montaje + verificacion | **hecho** (12:13): 16 piezas sonorizadas (picos −1.5 a −4.5 dB) y `emergencia_vertical.mp4`, **502.8 s = 8 min 23 s**, pico del montaje −1.5 dB |
+| 12 · PLAN.md, catalogo, memoria | **hecho**: fila 29 en PLAN.md, seccion en CATALOGO-CURSOS.md y memoria `curso-29-emergencia-vertical.md` |
 
 ## Al retomar (10:31 del 28-08): que hacer, en orden
 
@@ -274,3 +274,49 @@ fundido corto al unir (re-encodeando: `unir_vertical.py` concatena con
   solo degradado largo se quedaba en 0.4 de opacidad a la altura del HUD.
 - **Orbita parabolica => E0 = 0**: la deriva relativa "62 %" era dividir por
   ruido. Se normaliza con G·mA·mB/pericentro y se declara la escala.
+
+## Entrega (2026-08-28, 12:13)
+
+- `exports/verticales/emergencia/piezas/*.mp4` — **las 16 piezas sueltas,
+  sonorizadas**: es el producto para Instagram (cada una se sube sola).
+- `exports/verticales/emergencia/emergencia_vertical.mp4` — el montaje,
+  1080x1920 @60, **502.8 s = 8 min 23 s**, pico −1.5 dB.
+- Ninguno se versiona (`exports/` esta en .gitignore).
+
+| Pieza | Entra en | Dura | Pico |
+|---|---|---|---|
+| 00 intro | 0:00.00 | 17.08 | −4.5 dB |
+| 01 la bandada | 0:17.08 | 34.82 | −1.6 |
+| 02 el moho | 0:51.90 | 33.37 | −2.0 |
+| 03 la pila de arena | 1:25.27 | 33.10 | −1.8 |
+| 04 el cañon | 1:58.37 | 32.78 | −1.7 |
+| 05 manchas y rayas | 2:31.15 | 31.57 | −1.7 |
+| 06 el tanque de ondas | 3:02.72 | 31.32 | −1.8 |
+| 07 la placa que canta | 3:34.03 | 32.28 | −1.6 |
+| 08 el iman que decide | 4:06.32 | 35.03 | −1.6 |
+| 09 doscientos pendulos | 4:41.35 | 32.23 | −1.8 |
+| 10 las cuencas | 5:13.58 | 37.83 | −2.0 |
+| 11 los epiciclos | 5:51.42 | 31.37 | −2.0 |
+| 12 el rio | 6:22.78 | 39.85 | −2.0 |
+| 13 dos galaxias | 7:02.63 | 34.90 | −2.1 |
+| 14 el mundo en una regla | 7:37.53 | 36.30 | −1.5 |
+| 15 cierre | 8:13.83 | 8.93 | −4.5 |
+
+**Verificaciones que valen** (las que a ojo no se hacen):
+
+- **Alineacion de la voz: 0.40 s de desfase maximo** (envolvente RMS en
+  ventanas de 100 ms contra los `t_inicio`, sobre el wav de VOZ SOLA).
+  Medirla sobre la pieza ya sonorizada da falsas alarmas de hasta 2.3 s: los
+  blips y barridos de la cama disparan arranques que el detector cuenta como
+  voz. Se cazo esa falsa alarma antes de "corregir" nada.
+- Costuras: ver la tabla de arriba (cortes secos buscados).
+- Picos por pieza y del montaje: ninguno toca 0 dB.
+- Un frame del centro de cada pieza, sacado del montaje final y mirado.
+
+## Lo que falta
+
+- **Verlo en un telefono.** Nadie lo ha visto todavia en el sitio donde va a
+  vivir.
+- Decidir el PR #63 (arrastra `chore/consolidar-todo`: los cursos 26 y 28).
+- Si se quiere en la app: el curso vertical no pasa por `subir_curso.py`
+  (eso es para cursos de la DB); estas piezas son archivos para publicar.
