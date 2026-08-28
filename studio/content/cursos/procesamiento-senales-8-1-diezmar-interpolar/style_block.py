@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Procesamiento de señales · 2.3 Correlacion: hallar lo conocido".
+# CO.DE Academy - "Procesamiento de señales · 8.1 Diezmar e interpolar".
 # Bloque de estilo del proyecto: se antepone al script de
 # CADA clip; los clips NO repiten imports, solo definen su ClipN(Scene).
 #
@@ -69,7 +69,29 @@ from comunicaciones import (Onda, EspectroArea, alias_de,  # noqa: E402
 _com.Text = Text
 
 import dsp as _dsp  # noqa: E402
-from dsp import (C_APREND, C_BANDA, C_CALCULO, C_DATO,  # noqa: E402
+from dsp import (LineaRetardos, Mariposa, PlanoZ,  # noqa: E402
+                 Q15_ESCALA, banco_haar, banco_qmf, banda_muerta,
+                 caida_cic, cic, ciclo_limite, coste_directo, coste_fft,
+                 cruce_fft, diezmar, envuelve, error_farrow, error_q15,
+                 error_reconstruccion, farrow, filtrar_punto_fijo,
+                 interpolar_ceros, latencia_bloque, macs_diezmado,
+                 margen, overlap_add, polifase, q15, remuestrear,
+                 respuesta_cic, satura, snr_q15,
+                 RespuestaFrec, alternancias, bilineal, es_simetrico,
+                 fir_equirriple, fir_ventana, gibbs_db, goertzel,
+                 ideal_truncado, iir_butter, iir_cheby1, iir_elip,
+                 linea_retardos, macs_fir, macs_goertzel,
+                 orden_necesario, peine, polos_butter_analogico,
+                 polos_cuantizados, rizado_db, secciones, warp,
+                 warp_inverso,
+                 bin_de, bit_reverso, dft, dft_matriz, dos_tonos, enbw,
+                 es_estable, es_fase_minima, f_de_bin, fft_por_etapas,
+                 fuga_db, giro, h_en, lateral_db, lobulo_principal,
+                 mariposa_dibujo, mariposas, notch, ops_dft, ops_fft,
+                 ortogonales, plano_z, por_distancias, reflejar_ceros,
+                 resonador, respuesta_dibujo, respuesta_frec,
+                 retardo_grupo, scalloping_db, zpk,
+                 C_APREND, C_BANDA, C_CALCULO, C_DATO,
                  C_IDEAL, C_MUESTRA, C_RUIDO, C_SALIDA, C_SENAL,
                  Barras, Deslizador, Escalera, EspectroDoble, Secuencia,
                  ancho_pico, autocorr_circular, banda_ocupada, barras,
@@ -156,41 +178,39 @@ def _vigilar(texto, maximo, quien):
 
 
 # --- Numeros de la leccion --------------------------------------------
-FS_RADAR = 2e6                       # Hz del receptor
-DUR_CHIRP = 120e-6                   # s
-B_CHIRP = 400e3                      # Hz de barrido
-T_CHIRP = np.arange(int(DUR_CHIRP * FS_RADAR)) / FS_RADAR      # 240 m
-CHIRP = chirp(T_CHIRP, -B_CHIRP / 2, B_CHIRP / 2, DUR_CHIRP)
-OFFSET, N_REGISTRO, SNR_ENTRADA = 421, 900, -10.0
-RX, SNR_MEDIDA = enterrar(CHIRP, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS, R_CORR = correlacion(RX, CHIRP)
-GANANCIA, RETARDO = ganancia_proceso_db(RX, CHIRP, OFFSET)     # 21.5 dB, 421
-COMPRESION, ANCHO_MUESTRAS = compresion(CHIRP, LAGS, R_CORR)   # 60x, 4
-ANCHO_US = ANCHO_MUESTRAS / FS_RADAR * 1e6                     # 2.0 us
-INV_B_US = 1e6 / B_CHIRP                                       # 2.5 us
-LARGO_US = DUR_CHIRP * 1e6                                     # 120 us
+FS_M = 8000.0
+N_M = 1024
+T_M = np.arange(N_M) / FS_M
+F_BAJA, F_ALTA_M = 300.0, 2600.0
+X_M = np.sin(2 * np.pi * F_BAJA * T_M) + 0.5 * np.sin(2 * np.pi * F_ALTA_M * T_M)
+M_DIEZ = 4
+FS_NUEVA = FS_M / M_DIEZ                   # 2000 Hz
+F_EJE_M, DB_M = espectro(X_M, FS_M)
 
-PULSO = np.ones(len(CHIRP))          # el mismo largo, sin barrido
-RX_PULSO, _ = enterrar(PULSO, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS_P, R_PULSO = correlacion(RX_PULSO, PULSO)
-COMPRESION_P, ANCHO_P = compresion(PULSO, LAGS_P, R_PULSO)     # 2.8x, 85
-ANCHO_P_US = ANCHO_P / FS_RADAR * 1e6                          # 42.5 us
-GANANCIA_P, RETARDO_P = ganancia_proceso_db(RX_PULSO, PULSO, OFFSET)
-# RETARDO_P = 419: el pulso llano se equivoca de 2 muestras
+# diezmar SIN filtrar: el tono rapido se disfraza
+X_DIEZ = diezmar(X_M, M_DIEZ)
+F_EJE_D, DB_D = espectro(X_DIEZ, FS_NUEVA)
+F_ALIAS_M = alias_de(F_ALTA_M, FS_NUEVA)   # 600 Hz
 
-PN = pn_larga(127)
-R_PN = autocorr_circular(PN)
-PICO_PN = float(R_PN[0])                                       # 127
-LATERAL_PN = float(np.abs(R_PN[1:]).max())                     # 1
-RUIDO = np.random.default_rng(2).normal(0.0, 1.0, 400)
-R_RUIDO = autocorr_circular(RUIDO)
-PICO_RUIDO = float(R_RUIDO[0])
-LATERAL_RUIDO = float(np.abs(R_RUIDO[1:]).max())
-OFFSET_PN, SNR_PN = 233, -6.0
-RX_PN, _ = enterrar(PN, SNR_PN, 500, OFFSET_PN, semilla=9)
-LAGS_PN, R_PN_RX = correlacion(RX_PN, PN)
-GANANCIA_PN, RETARDO_PN = ganancia_proceso_db(RX_PN, PN, OFFSET_PN)
-# GANANCIA_PN = 22.2 dB, RETARDO_PN = 233 (el real)
+# el filtro va ANTES
+ORDEN_AA, FC_AA = 60, 0.9 * FS_NUEVA / 2
+H_AA = fir_ventana(ORDEN_AA, FC_AA, "hamming", FS_M)
+W_AA, MAG_AA, _ = respuesta_frec(H_AA, [1.0], 2048)
+ATEN_AA = float(MAG_AA[int(np.argmin(np.abs(W_AA / np.pi * FS_M / 2
+                                            - F_ALTA_M)))])   # -67.5 dB
+X_FILTRADA = convolucion(X_M, H_AA)
+X_DIEZ_OK = diezmar(X_FILTRADA, M_DIEZ)
+F_EJE_OK, DB_OK = espectro(X_DIEZ_OK[:256], FS_NUEVA)
+
+# interpolar: los ceros no cambian la señal, pero llenan de IMAGENES
+L_INT = 4
+X_CORTA = X_M[:64]
+X_CEROS = interpolar_ceros(X_CORTA, L_INT)
+F_EJE_I, DB_I = espectro(X_CEROS, FS_M * L_INT)
+F_IMAGEN_1 = FS_M - F_BAJA                 # la primera imagen
+H_INT = fir_ventana(60, 0.9 * FS_M / 2, "hamming", FS_M * L_INT)
+X_INTERP = convolucion(X_CEROS, H_INT * L_INT)
+F_EJE_I2, DB_I2 = espectro(X_INTERP[:256], FS_M * L_INT)
 
 
 # --- Rotulos ----------------------------------------------------------

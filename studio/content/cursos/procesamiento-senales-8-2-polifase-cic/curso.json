@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 8.2 Polifase y CIC",
+  "description": "Lección 8.2 del curso Procesamiento digital de señales (módulo 8: multitasa), en 4 clips animados: las tres cuartas partes del trabajo que se tiran al diezmar, las ramas polifase que hacen lo mismo con la cuarta parte de las cuentas, el CIC que diezma sin un solo multiplicador, y lo que ese ahorro cuesta en banda. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-lo-que-se-tira.py",
+      "title": "1 · Lo que se tira",
+      "scene": "Clip1",
+      "final_state": "El filtro de 61 taps calculando cuatro salidas de las que solo una sobrevive al diezmado, con las tres tiradas marcadas."
+    },
+    {
+      "file": "clips/02-las-ramas.py",
+      "title": "2 · Las ramas polifase",
+      "scene": "Clip2",
+      "final_state": "Las cuatro ramas del mismo filtro con sus taps (16, 15, 15 y 15) y la cifra del ahorro: 61 contra 15.25 multiplicaciones."
+    },
+    {
+      "file": "clips/03-el-cic.py",
+      "title": "3 · El CIC",
+      "scene": "Clip3",
+      "final_state": "La cadena de integradores, el diezmado y los peines, con la cifra de multiplicadores usados: cero."
+    },
+    {
+      "file": "clips/04-lo-que-cuesta.py",
+      "title": "4 · Lo que cuesta",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Lo barato no es gratis.' (blanca) y 'El CIC se paga en banda.' (cian)."
+    }
+  ]
+}

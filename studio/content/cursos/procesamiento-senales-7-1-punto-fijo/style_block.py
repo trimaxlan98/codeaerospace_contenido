@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Procesamiento de señales · 2.3 Correlacion: hallar lo conocido".
+# CO.DE Academy - "Procesamiento de señales · 7.1 Punto fijo Q15".
 # Bloque de estilo del proyecto: se antepone al script de
 # CADA clip; los clips NO repiten imports, solo definen su ClipN(Scene).
 #
@@ -69,7 +69,29 @@ from comunicaciones import (Onda, EspectroArea, alias_de,  # noqa: E402
 _com.Text = Text
 
 import dsp as _dsp  # noqa: E402
-from dsp import (C_APREND, C_BANDA, C_CALCULO, C_DATO,  # noqa: E402
+from dsp import (LineaRetardos, Mariposa, PlanoZ,  # noqa: E402
+                 Q15_ESCALA, banco_haar, banco_qmf, banda_muerta,
+                 caida_cic, cic, ciclo_limite, coste_directo, coste_fft,
+                 cruce_fft, diezmar, envuelve, error_farrow, error_q15,
+                 error_reconstruccion, farrow, filtrar_punto_fijo,
+                 interpolar_ceros, latencia_bloque, macs_diezmado,
+                 margen, overlap_add, polifase, q15, remuestrear,
+                 respuesta_cic, satura, snr_q15,
+                 RespuestaFrec, alternancias, bilineal, es_simetrico,
+                 fir_equirriple, fir_ventana, gibbs_db, goertzel,
+                 ideal_truncado, iir_butter, iir_cheby1, iir_elip,
+                 linea_retardos, macs_fir, macs_goertzel,
+                 orden_necesario, peine, polos_butter_analogico,
+                 polos_cuantizados, rizado_db, secciones, warp,
+                 warp_inverso,
+                 bin_de, bit_reverso, dft, dft_matriz, dos_tonos, enbw,
+                 es_estable, es_fase_minima, f_de_bin, fft_por_etapas,
+                 fuga_db, giro, h_en, lateral_db, lobulo_principal,
+                 mariposa_dibujo, mariposas, notch, ops_dft, ops_fft,
+                 ortogonales, plano_z, por_distancias, reflejar_ceros,
+                 resonador, respuesta_dibujo, respuesta_frec,
+                 retardo_grupo, scalloping_db, zpk,
+                 C_APREND, C_BANDA, C_CALCULO, C_DATO,
                  C_IDEAL, C_MUESTRA, C_RUIDO, C_SALIDA, C_SENAL,
                  Barras, Deslizador, Escalera, EspectroDoble, Secuencia,
                  ancho_pico, autocorr_circular, banda_ocupada, barras,
@@ -156,41 +178,43 @@ def _vigilar(texto, maximo, quien):
 
 
 # --- Numeros de la leccion --------------------------------------------
-FS_RADAR = 2e6                       # Hz del receptor
-DUR_CHIRP = 120e-6                   # s
-B_CHIRP = 400e3                      # Hz de barrido
-T_CHIRP = np.arange(int(DUR_CHIRP * FS_RADAR)) / FS_RADAR      # 240 m
-CHIRP = chirp(T_CHIRP, -B_CHIRP / 2, B_CHIRP / 2, DUR_CHIRP)
-OFFSET, N_REGISTRO, SNR_ENTRADA = 421, 900, -10.0
-RX, SNR_MEDIDA = enterrar(CHIRP, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS, R_CORR = correlacion(RX, CHIRP)
-GANANCIA, RETARDO = ganancia_proceso_db(RX, CHIRP, OFFSET)     # 21.5 dB, 421
-COMPRESION, ANCHO_MUESTRAS = compresion(CHIRP, LAGS, R_CORR)   # 60x, 4
-ANCHO_US = ANCHO_MUESTRAS / FS_RADAR * 1e6                     # 2.0 us
-INV_B_US = 1e6 / B_CHIRP                                       # 2.5 us
-LARGO_US = DUR_CHIRP * 1e6                                     # 120 us
+# Q15: 16 bits con signo para el rango [-1, 1). Es el formato de casi todo
+# DSP de vuelo.
+BITS_Q = 16
+PASO_Q = 1.0 / Q15_ESCALA                  # 3.052e-05
+MAYOR = (Q15_ESCALA - 1) / Q15_ESCALA      # 0.99997: el 1.0 NO existe
+NIVELES = int(2 * Q15_ESCALA)              # 65536
 
-PULSO = np.ones(len(CHIRP))          # el mismo largo, sin barrido
-RX_PULSO, _ = enterrar(PULSO, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS_P, R_PULSO = correlacion(RX_PULSO, PULSO)
-COMPRESION_P, ANCHO_P = compresion(PULSO, LAGS_P, R_PULSO)     # 2.8x, 85
-ANCHO_P_US = ANCHO_P / FS_RADAR * 1e6                          # 42.5 us
-GANANCIA_P, RETARDO_P = ganancia_proceso_db(RX_PULSO, PULSO, OFFSET)
-# RETARDO_P = 419: el pulso llano se equivoca de 2 muestras
+FS_Q = 4000.0
+N_Q = 512
+T_Q = np.arange(N_Q) / FS_Q
+X_Q = vibracion(T_Q)                       # la señal del modulo 1
+ERR_RMS, ERR_MAX = error_q15(X_Q)          # 8.86e-06 / 1.52e-05
+SNR_Q = snr_q15(X_Q)                       # 94.4 dB
+MARGEN_Q = margen(X_Q)                     # 0.16 dB: casi sin cabecera
 
-PN = pn_larga(127)
-R_PN = autocorr_circular(PN)
-PICO_PN = float(R_PN[0])                                       # 127
-LATERAL_PN = float(np.abs(R_PN[1:]).max())                     # 1
-RUIDO = np.random.default_rng(2).normal(0.0, 1.0, 400)
-R_RUIDO = autocorr_circular(RUIDO)
-PICO_RUIDO = float(R_RUIDO[0])
-LATERAL_RUIDO = float(np.abs(R_RUIDO[1:]).max())
-OFFSET_PN, SNR_PN = 233, -6.0
-RX_PN, _ = enterrar(PN, SNR_PN, 500, OFFSET_PN, semilla=9)
-LAGS_PN, R_PN_RX = correlacion(RX_PN, PN)
-GANANCIA_PN, RETARDO_PN = ganancia_proceso_db(RX_PN, PN, OFFSET_PN)
-# GANANCIA_PN = 22.2 dB, RETARDO_PN = 233 (el real)
+# --- lo que pasa al pasarse ------------------------------------------
+PICOS = np.array([0.6, 0.9, 1.3, -1.4, 0.2])
+SATURADO = satura(PICOS)                   # 1.3 -> 0.99997
+ENVUELTO = envuelve(PICOS)                 # 1.3 -> -0.7 (!!)
+PICO_MALO = float(PICOS[2])
+SAT_MALO = float(SATURADO[2])
+ENV_MALO = float(ENVUELTO[2])
+
+# una señal que se pasa, para verlo en una onda entera
+X_GRANDE = 1.35 * X_Q
+Y_SAT = satura(X_GRANDE)
+Y_ENV = envuelve(X_GRANDE)
+N_PASADAS = int(np.sum(np.abs(X_GRANDE) > 1.0))
+
+# --- el escalado: margen contra ruido ---------------------------------
+ESCALAS = (1.0, 0.5, 0.25)
+X_ESC = {e: X_Q * e for e in ESCALAS}
+MARGEN_ESC = {e: margen(X_ESC[e]) for e in ESCALAS}   # 0.16 / 6.18 / 12.20
+SNR_ESC = {e: snr_q15(X_ESC[e]) for e in ESCALAS}     # 94.4 / 88.2 / 82.2
+# cada division por dos regala 6 dB de cabecera y cuesta 6 dB de SNR:
+# el escalado no crea margen, lo compra
+TEORICA_Q = 6.02 * (BITS_Q - 1) + 1.76     # 92.1 dB para señal a fondo
 
 
 # --- Rotulos ----------------------------------------------------------

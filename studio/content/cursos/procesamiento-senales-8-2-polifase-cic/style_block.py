@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Procesamiento de señales · 2.3 Correlacion: hallar lo conocido".
+# CO.DE Academy - "Procesamiento de señales · 8.2 Polifase y CIC".
 # Bloque de estilo del proyecto: se antepone al script de
 # CADA clip; los clips NO repiten imports, solo definen su ClipN(Scene).
 #
@@ -69,7 +69,29 @@ from comunicaciones import (Onda, EspectroArea, alias_de,  # noqa: E402
 _com.Text = Text
 
 import dsp as _dsp  # noqa: E402
-from dsp import (C_APREND, C_BANDA, C_CALCULO, C_DATO,  # noqa: E402
+from dsp import (LineaRetardos, Mariposa, PlanoZ,  # noqa: E402
+                 Q15_ESCALA, banco_haar, banco_qmf, banda_muerta,
+                 caida_cic, cic, ciclo_limite, coste_directo, coste_fft,
+                 cruce_fft, diezmar, envuelve, error_farrow, error_q15,
+                 error_reconstruccion, farrow, filtrar_punto_fijo,
+                 interpolar_ceros, latencia_bloque, macs_diezmado,
+                 margen, overlap_add, polifase, q15, remuestrear,
+                 respuesta_cic, satura, snr_q15,
+                 RespuestaFrec, alternancias, bilineal, es_simetrico,
+                 fir_equirriple, fir_ventana, gibbs_db, goertzel,
+                 ideal_truncado, iir_butter, iir_cheby1, iir_elip,
+                 linea_retardos, macs_fir, macs_goertzel,
+                 orden_necesario, peine, polos_butter_analogico,
+                 polos_cuantizados, rizado_db, secciones, warp,
+                 warp_inverso,
+                 bin_de, bit_reverso, dft, dft_matriz, dos_tonos, enbw,
+                 es_estable, es_fase_minima, f_de_bin, fft_por_etapas,
+                 fuga_db, giro, h_en, lateral_db, lobulo_principal,
+                 mariposa_dibujo, mariposas, notch, ops_dft, ops_fft,
+                 ortogonales, plano_z, por_distancias, reflejar_ceros,
+                 resonador, respuesta_dibujo, respuesta_frec,
+                 retardo_grupo, scalloping_db, zpk,
+                 C_APREND, C_BANDA, C_CALCULO, C_DATO,
                  C_IDEAL, C_MUESTRA, C_RUIDO, C_SALIDA, C_SENAL,
                  Barras, Deslizador, Escalera, EspectroDoble, Secuencia,
                  ancho_pico, autocorr_circular, banda_ocupada, barras,
@@ -156,41 +178,27 @@ def _vigilar(texto, maximo, quien):
 
 
 # --- Numeros de la leccion --------------------------------------------
-FS_RADAR = 2e6                       # Hz del receptor
-DUR_CHIRP = 120e-6                   # s
-B_CHIRP = 400e3                      # Hz de barrido
-T_CHIRP = np.arange(int(DUR_CHIRP * FS_RADAR)) / FS_RADAR      # 240 m
-CHIRP = chirp(T_CHIRP, -B_CHIRP / 2, B_CHIRP / 2, DUR_CHIRP)
-OFFSET, N_REGISTRO, SNR_ENTRADA = 421, 900, -10.0
-RX, SNR_MEDIDA = enterrar(CHIRP, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS, R_CORR = correlacion(RX, CHIRP)
-GANANCIA, RETARDO = ganancia_proceso_db(RX, CHIRP, OFFSET)     # 21.5 dB, 421
-COMPRESION, ANCHO_MUESTRAS = compresion(CHIRP, LAGS, R_CORR)   # 60x, 4
-ANCHO_US = ANCHO_MUESTRAS / FS_RADAR * 1e6                     # 2.0 us
-INV_B_US = 1e6 / B_CHIRP                                       # 2.5 us
-LARGO_US = DUR_CHIRP * 1e6                                     # 120 us
+FS_M = 8000.0
+M_DIEZ = 4
+ORDEN_P = 60
+H_P = fir_ventana(ORDEN_P, 0.9 * (FS_M / M_DIEZ) / 2, "hamming", FS_M)
+N_TAPS_P = len(H_P)                        # 61
+RAMAS = polifase(H_P, M_DIEZ)              # 4 ramas
+TAPS_RAMA = [len(r) for r in RAMAS]        # [16, 15, 15, 15]
+MACS_DIRECTO = macs_diezmado(H_P, M_DIEZ, True)    # 61 por muestra
+MACS_POLIFASE = macs_diezmado(H_P, M_DIEZ, False)  # 15.25
+AHORRO = MACS_DIRECTO / MACS_POLIFASE      # 4x exacto
+TIRADAS = M_DIEZ - 1                       # 3 de cada 4 salidas se tiran
 
-PULSO = np.ones(len(CHIRP))          # el mismo largo, sin barrido
-RX_PULSO, _ = enterrar(PULSO, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS_P, R_PULSO = correlacion(RX_PULSO, PULSO)
-COMPRESION_P, ANCHO_P = compresion(PULSO, LAGS_P, R_PULSO)     # 2.8x, 85
-ANCHO_P_US = ANCHO_P / FS_RADAR * 1e6                          # 42.5 us
-GANANCIA_P, RETARDO_P = ganancia_proceso_db(RX_PULSO, PULSO, OFFSET)
-# RETARDO_P = 419: el pulso llano se equivoca de 2 muestras
-
-PN = pn_larga(127)
-R_PN = autocorr_circular(PN)
-PICO_PN = float(R_PN[0])                                       # 127
-LATERAL_PN = float(np.abs(R_PN[1:]).max())                     # 1
-RUIDO = np.random.default_rng(2).normal(0.0, 1.0, 400)
-R_RUIDO = autocorr_circular(RUIDO)
-PICO_RUIDO = float(R_RUIDO[0])
-LATERAL_RUIDO = float(np.abs(R_RUIDO[1:]).max())
-OFFSET_PN, SNR_PN = 233, -6.0
-RX_PN, _ = enterrar(PN, SNR_PN, 500, OFFSET_PN, semilla=9)
-LAGS_PN, R_PN_RX = correlacion(RX_PN, PN)
-GANANCIA_PN, RETARDO_PN = ganancia_proceso_db(RX_PN, PN, OFFSET_PN)
-# GANANCIA_PN = 22.2 dB, RETARDO_PN = 233 (el real)
+R_CIC, N_CIC = 8, 3
+T_C = np.arange(512) / FS_M
+X_C = np.sin(2 * np.pi * 200 * T_C) + 0.4 * np.sin(2 * np.pi * 2900 * T_C)
+Y_CIC, MULT_CIC = cic(X_C, R_CIC, N_CIC)   # MULT_CIC = 0 multiplicadores
+F_CIC, DB_CIC = respuesta_cic(R_CIC, N_CIC)
+FRACCIONES = (0.1, 0.25, 0.5)
+CAIDA = {f: caida_cic(R_CIC, N_CIC, 1, f / R_CIC) for f in FRACCIONES}
+# -0.42 / -2.70 / -11.61 dB: la caida del CIC depende de cuanta banda uses
+NULOS_CIC = [float(k / R_CIC) for k in range(1, 4)]   # donde se anula
 
 
 # --- Rotulos ----------------------------------------------------------

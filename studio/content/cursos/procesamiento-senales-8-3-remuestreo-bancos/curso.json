@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 8.3 Remuestreo racional y bancos de filtros",
+  "description": "Lección 8.3 del curso Procesamiento digital de señales (módulo 8: multitasa), en 4 clips animados: el remuestreo por una fracción, el retardo fraccionario de Farrow y dónde deja de valer, el banco de dos canales que reconstruye exacto, y por qué la longitud de sus filtros tiene que ser par. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-l-sobre-m.py",
+      "title": "1 · L sobre M",
+      "scene": "Clip1",
+      "final_state": "La señal remuestreada de 8000 a 6000 Hz con la cadena interpolar-filtrar-diezmar dibujada."
+    },
+    {
+      "file": "clips/02-farrow.py",
+      "title": "2 · El retardo fraccionario",
+      "scene": "Clip2",
+      "final_state": "La curva del error de Farrow contra la frecuencia: 8.5e-05 a 300 Hz y 4.9e-01 cerca de Nyquist."
+    },
+    {
+      "file": "clips/03-dos-canales.py",
+      "title": "3 · Dos canales",
+      "scene": "Clip3",
+      "final_state": "El banco de Haar separando y volviendo a juntar la señal, con el error de reconstruccion 4.4e-16."
+    },
+    {
+      "file": "clips/04-la-paridad.py",
+      "title": "4 · La longitud importa",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Partir en bandas y volver a juntarlas' (blanca) y 'solo cuadra si los filtros encajan.' (cian)."
+    }
+  ]
+}

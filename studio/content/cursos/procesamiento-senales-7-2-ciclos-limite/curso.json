@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 7.2 La banda muerta y los ciclos límite",
+  "description": "Lección 7.2 del curso Procesamiento digital de señales (módulo 7: aritmética finita y tiempo real), en 4 clips animados: el filtro que debería apagarse y se queda atrapado, la oscilación que no se acaba nunca sin entrada, cuánto vale esa amplitud en función de los bits, y qué se hace al respecto. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-banda-muerta.py",
+      "title": "1 · La banda muerta",
+      "scene": "Clip1",
+      "final_state": "La respuesta ideal decayendo a cero junto a la cuantizada que se queda clavada en 0.03125, con la cota teorica 0.0391 marcada."
+    },
+    {
+      "file": "clips/02-el-ciclo-limite.py",
+      "title": "2 · El ciclo que no acaba",
+      "scene": "Clip2",
+      "final_state": "La secuencia con a = -0.9 alternando de signo indefinidamente con periodo 2 y amplitud 0.03125, sin ninguna entrada."
+    },
+    {
+      "file": "clips/03-cuantos-bits.py",
+      "title": "3 · Cuantos bits",
+      "scene": "Clip3",
+      "final_state": "Las tres amplitudes atrapadas para 6, 8 y 10 bits (0.125, 0.03125 y 0.0078) y la comprobacion de que escalan con el paso."
+    },
+    {
+      "file": "clips/04-la-cura.py",
+      "title": "4 · La cura",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Un filtro estable en el papel' (blanca) y 'puede no apagarse nunca.' (cian)."
+    }
+  ]
+}

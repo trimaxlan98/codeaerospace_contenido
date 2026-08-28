@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Procesamiento de señales · 2.3 Correlacion: hallar lo conocido".
+# CO.DE Academy - "Procesamiento de señales · 8.3 Remuestreo y bancos".
 # Bloque de estilo del proyecto: se antepone al script de
 # CADA clip; los clips NO repiten imports, solo definen su ClipN(Scene).
 #
@@ -69,7 +69,29 @@ from comunicaciones import (Onda, EspectroArea, alias_de,  # noqa: E402
 _com.Text = Text
 
 import dsp as _dsp  # noqa: E402
-from dsp import (C_APREND, C_BANDA, C_CALCULO, C_DATO,  # noqa: E402
+from dsp import (LineaRetardos, Mariposa, PlanoZ,  # noqa: E402
+                 Q15_ESCALA, banco_haar, banco_qmf, banda_muerta,
+                 caida_cic, cic, ciclo_limite, coste_directo, coste_fft,
+                 cruce_fft, diezmar, envuelve, error_farrow, error_q15,
+                 error_reconstruccion, farrow, filtrar_punto_fijo,
+                 interpolar_ceros, latencia_bloque, macs_diezmado,
+                 margen, overlap_add, polifase, q15, remuestrear,
+                 respuesta_cic, satura, snr_q15,
+                 RespuestaFrec, alternancias, bilineal, es_simetrico,
+                 fir_equirriple, fir_ventana, gibbs_db, goertzel,
+                 ideal_truncado, iir_butter, iir_cheby1, iir_elip,
+                 linea_retardos, macs_fir, macs_goertzel,
+                 orden_necesario, peine, polos_butter_analogico,
+                 polos_cuantizados, rizado_db, secciones, warp,
+                 warp_inverso,
+                 bin_de, bit_reverso, dft, dft_matriz, dos_tonos, enbw,
+                 es_estable, es_fase_minima, f_de_bin, fft_por_etapas,
+                 fuga_db, giro, h_en, lateral_db, lobulo_principal,
+                 mariposa_dibujo, mariposas, notch, ops_dft, ops_fft,
+                 ortogonales, plano_z, por_distancias, reflejar_ceros,
+                 resonador, respuesta_dibujo, respuesta_frec,
+                 retardo_grupo, scalloping_db, zpk,
+                 C_APREND, C_BANDA, C_CALCULO, C_DATO,
                  C_IDEAL, C_MUESTRA, C_RUIDO, C_SALIDA, C_SENAL,
                  Barras, Deslizador, Escalera, EspectroDoble, Secuencia,
                  ancho_pico, autocorr_circular, banda_ocupada, barras,
@@ -156,41 +178,43 @@ def _vigilar(texto, maximo, quien):
 
 
 # --- Numeros de la leccion --------------------------------------------
-FS_RADAR = 2e6                       # Hz del receptor
-DUR_CHIRP = 120e-6                   # s
-B_CHIRP = 400e3                      # Hz de barrido
-T_CHIRP = np.arange(int(DUR_CHIRP * FS_RADAR)) / FS_RADAR      # 240 m
-CHIRP = chirp(T_CHIRP, -B_CHIRP / 2, B_CHIRP / 2, DUR_CHIRP)
-OFFSET, N_REGISTRO, SNR_ENTRADA = 421, 900, -10.0
-RX, SNR_MEDIDA = enterrar(CHIRP, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS, R_CORR = correlacion(RX, CHIRP)
-GANANCIA, RETARDO = ganancia_proceso_db(RX, CHIRP, OFFSET)     # 21.5 dB, 421
-COMPRESION, ANCHO_MUESTRAS = compresion(CHIRP, LAGS, R_CORR)   # 60x, 4
-ANCHO_US = ANCHO_MUESTRAS / FS_RADAR * 1e6                     # 2.0 us
-INV_B_US = 1e6 / B_CHIRP                                       # 2.5 us
-LARGO_US = DUR_CHIRP * 1e6                                     # 120 us
+FS_R = 8000.0
+L_R, M_R = 3, 4                            # remuestreo racional 3/4
+T_R = np.arange(256) / FS_R
+X_R = np.sin(2 * np.pi * 300 * T_R) + 0.3 * np.sin(2 * np.pi * 900 * T_R)
+Y_R = remuestrear(X_R, L_R, M_R)
+FS_SALIDA = FS_R * L_R / M_R               # 6000 Hz
+RAZON = f"{L_R}/{M_R}"
 
-PULSO = np.ones(len(CHIRP))          # el mismo largo, sin barrido
-RX_PULSO, _ = enterrar(PULSO, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS_P, R_PULSO = correlacion(RX_PULSO, PULSO)
-COMPRESION_P, ANCHO_P = compresion(PULSO, LAGS_P, R_PULSO)     # 2.8x, 85
-ANCHO_P_US = ANCHO_P / FS_RADAR * 1e6                          # 42.5 us
-GANANCIA_P, RETARDO_P = ganancia_proceso_db(RX_PULSO, PULSO, OFFSET)
-# RETARDO_P = 419: el pulso llano se equivoca de 2 muestras
+# Farrow: el retardo fraccionario, y donde deja de valer
+MU = 0.5
+FRECS_F = (300.0, 1000.0, 2000.0, 3000.0)
+ERR_FARROW = {f: error_farrow(f, FS_R, MU) for f in FRECS_F}
+RMS_FARROW = {f: ERR_FARROW[f][0] for f in FRECS_F}
+# 8.5e-05 / 9.9e-03 / ~1e-1 / 4.9e-01: se degrada al acercarse a Nyquist
+T_F = np.arange(64) / FS_R
+X_F = np.sin(2 * np.pi * 300 * T_F)
+Y_F = farrow(X_F, MU)
+X_EXACTO = np.sin(2 * np.pi * 300 * (T_F - MU / FS_R))
 
-PN = pn_larga(127)
-R_PN = autocorr_circular(PN)
-PICO_PN = float(R_PN[0])                                       # 127
-LATERAL_PN = float(np.abs(R_PN[1:]).max())                     # 1
-RUIDO = np.random.default_rng(2).normal(0.0, 1.0, 400)
-R_RUIDO = autocorr_circular(RUIDO)
-PICO_RUIDO = float(R_RUIDO[0])
-LATERAL_RUIDO = float(np.abs(R_RUIDO[1:]).max())
-OFFSET_PN, SNR_PN = 233, -6.0
-RX_PN, _ = enterrar(PN, SNR_PN, 500, OFFSET_PN, semilla=9)
-LAGS_PN, R_PN_RX = correlacion(RX_PN, PN)
-GANANCIA_PN, RETARDO_PN = ganancia_proceso_db(RX_PN, PN, OFFSET_PN)
-# GANANCIA_PN = 22.2 dB, RETARDO_PN = 233 (el real)
+# el banco de dos canales
+X_B = (np.sin(2 * np.pi * np.arange(400) * 0.07)
+       + 0.4 * np.sin(2 * np.pi * np.arange(400) * 0.31))
+BANCO_HAAR = banco_haar()
+BANCO_QMF = banco_qmf()
+ERR_HAAR, Y_HAAR = error_reconstruccion(X_B, BANCO_HAAR)   # 4.4e-16
+ERR_QMF, Y_QMF = error_reconstruccion(X_B, BANCO_QMF)      # 1.99e-02
+TAPS_HAAR = len(BANCO_HAAR[0])             # 2
+TAPS_QMF = len(BANCO_QMF[0])               # 32
+W_H, MAG_H0, _ = respuesta_frec(BANCO_HAAR[0], [1.0], 512)
+_, MAG_H1, _ = respuesta_frec(BANCO_HAAR[1], [1.0], 512)
+W_Q, MAG_Q0, _ = respuesta_frec(BANCO_QMF[0], [1.0], 512)
+_, MAG_Q1, _ = respuesta_frec(BANCO_QMF[1], [1.0], 512)
+
+# la longitud TIENE que ser par: no es un capricho
+H_IMPAR = fir_ventana(30, 0.25, "hamming", 1.0)            # 31 taps
+ERR_IMPAR, _ = error_reconstruccion(X_B, banco_qmf(H_IMPAR))   # 0.967
+RAZON_PARIDAD = ERR_IMPAR / ERR_QMF        # ~49x peor
 
 
 # --- Rotulos ----------------------------------------------------------

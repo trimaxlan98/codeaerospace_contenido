@@ -1797,3 +1797,347 @@ class LineaRetardos(_Anclada):
 def linea_retardos(coefs, ancho=9.0, alto=2.4, color=C_MUESTRA, dec=2):
     """Ver `LineaRetardos`."""
     return LineaRetardos(coefs, ancho, alto, color, dec)
+
+
+# =====================================================================
+# 14. Aritmetica finita y tiempo real (modulo 7)
+# =====================================================================
+Q15_ESCALA = 32768.0
+
+
+def q15(x):
+    """Redondeo al formato Q15: 16 bits con signo, rango [-1, 1).
+
+    Es el formato de casi todo DSP de vuelo: un entero de 16 bits que
+    representa una fraccion. El 1.0 exacto NO existe (el mayor es
+    32767/32768 = 0.99997).
+    """
+    x = np.asarray(x, dtype=float)
+    return np.round(x * Q15_ESCALA) / Q15_ESCALA
+
+
+def satura(x, lim=1.0):
+    """Lo que hace un DSP decente al pasarse: se queda en el tope."""
+    return np.clip(np.asarray(x, dtype=float), -float(lim),
+                   float(lim) - 1.0 / Q15_ESCALA)
+
+
+def envuelve(x, lim=1.0):
+    """Lo que hace un acumulador tonto: da la vuelta. Un pico positivo se
+    convierte en uno negativo — el fallo mas feo del punto fijo."""
+    x = np.asarray(x, dtype=float)
+    rango = 2.0 * float(lim)
+    return (x + lim) % rango - lim
+
+
+def error_q15(x):
+    """Error MEDIDO de representar x en Q15 (rms y maximo)."""
+    x = np.asarray(x, dtype=float)
+    e = q15(x) - x
+    return float(np.sqrt(np.mean(e ** 2))), float(np.max(np.abs(e)))
+
+
+def snr_q15(x):
+    """SNR de la representacion Q15, medida sobre esta señal."""
+    x = np.asarray(x, dtype=float)
+    e = q15(x) - x
+    return 10.0 * math.log10(float(np.mean(x ** 2) /
+                                   max(np.mean(e ** 2), 1e-30)))
+
+
+def margen(x):
+    """Cuantos dB de cabecera quedan antes de tocar el 1.0 (headroom)."""
+    pico = float(np.max(np.abs(np.asarray(x, float))))
+    return 20.0 * math.log10(1.0 / pico) if pico > 0 else np.inf
+
+
+def filtrar_punto_fijo(b, a, x, bits=15, modo="satura"):
+    """La ecuacion en diferencias con TODO cuantizado a cada paso: los
+    coeficientes, el estado y la salida. `modo` decide que pasa al
+    desbordar: 'satura' o 'envuelve'. -> y"""
+    paso = 2.0 ** -int(bits)
+    q = lambda v: np.round(np.asarray(v, float) / paso) * paso
+    b, a = q(np.atleast_1d(b)), q(np.atleast_1d(a))
+    x = np.asarray(x, float)
+    y = np.zeros(len(x))
+    for n in range(len(x)):
+        acc = 0.0
+        for i in range(len(b)):
+            if n - i >= 0:
+                acc += b[i] * x[n - i]
+        for j in range(1, len(a)):
+            if n - j >= 0:
+                acc -= a[j] * y[n - j]
+        acc = float(q(acc))
+        y[n] = satura(acc)[()] if modo == "satura" else envuelve(acc)[()]
+    return y
+
+
+def ciclo_limite(a, bits=6, n=200, x0=0.5):
+    """El ciclo limite de un IIR de PRIMER orden: y[n] = Q(a y[n-1]).
+
+    Sin cuantizar, y[n] -> 0 siempre que |a| < 1. Cuantizando, hay una
+    "banda muerta" cerca del cero donde el redondeo devuelve el mismo
+    valor de siempre: el filtro se queda oscilando (o clavado) para
+    siempre, sin entrada. Es un fallo que NO existe en coma flotante.
+
+    -> (y, amplitud_final, periodo)  amplitud 0 = se apago de verdad.
+    La amplitud escala con el paso de cuantizacion: es ruido de
+    redondeo atrapado, no señal.
+    """
+    paso = 2.0 ** -(int(bits) - 1)
+    y = np.zeros(int(n))
+    v = float(x0)
+    for k in range(int(n)):
+        v = float(np.round(float(a) * v / paso) * paso)
+        y[k] = v
+    cola = y[int(n) // 2:]
+    amplitud = float(np.max(np.abs(cola)))
+    periodo = 0
+    if amplitud > 0:
+        signos = np.sign(cola[cola != 0])
+        cambios = int(np.sum(signos[1:] != signos[:-1])) if len(signos) > 1 else 0
+        periodo = int(round(2 * len(cola) / cambios)) if cambios else 1
+    return y, amplitud, periodo
+
+
+def banda_muerta(a, bits=6, n=200):
+    """La banda muerta: teorica paso/(2(1-|a|)) frente a la amplitud en la
+    que el filtro se queda ATRAPADO, medida.
+
+    Con |a| < 1 cualquier arranque acaba dentro, asi que lo que se mide es
+    donde para, no desde donde sale. -> (teorica, atrapada, paso)
+    """
+    paso = 2.0 ** -(int(bits) - 1)
+    teorica = paso / (2.0 * (1.0 - abs(float(a))))
+    _, atrapada, _ = ciclo_limite(a, bits, n, 0.5)
+    return float(teorica), float(atrapada), float(paso)
+
+
+def overlap_add(x, h, largo_bloque):
+    """Convolucion por bloques con FFT (overlap-add). Devuelve la salida y
+    el error MEDIDO contra la convolucion directa."""
+    x = np.asarray(x, float)
+    h = np.asarray(h, float)
+    L = int(largo_bloque)
+    M = len(h)
+    n_fft = 1
+    while n_fft < L + M - 1:
+        n_fft *= 2
+    H = np.fft.rfft(h, n_fft)
+    y = np.zeros(len(x) + M - 1)
+    for i in range(0, len(x), L):
+        bloque = x[i:i + L]
+        trozo = np.fft.irfft(np.fft.rfft(bloque, n_fft) * H, n_fft)
+        y[i:i + len(trozo)] += trozo[:len(y) - i]
+    directa = convolucion(x, h)
+    return y, float(np.max(np.abs(y - directa)))
+
+
+def coste_directo(n_x, m_h):
+    """Multiplicaciones reales de convolucionar directo."""
+    return int(n_x) * int(m_h)
+
+
+def coste_fft(n_x, m_h, largo_bloque=None):
+    """Multiplicaciones REALES de convolucionar por bloques con FFT.
+
+    Se cuentan reales, igual que en `coste_directo`: comparar
+    multiplicaciones complejas con reales infla la FFT por cuatro y da un
+    cruce falso (medido: M = 16 en vez de M = 64). Por bloque hay una FFT
+    real de ida, una de vuelta y el producto punto a punto; una FFT real
+    de N cuesta la mitad que una compleja, y cada multiplicacion compleja
+    son cuatro reales.
+    """
+    L = int(largo_bloque or max(m_h, 64))
+    n_fft = 1
+    while n_fft < L + int(m_h) - 1:
+        n_fft *= 2
+    bloques = int(math.ceil(int(n_x) / L))
+    fft_real = 4 * (ops_fft(n_fft) / 2.0)      # reales por FFT de N reales
+    producto = 4 * (n_fft // 2 + 1)            # H[k] * X[k], complejos
+    por_bloque = 2 * fft_real + producto
+    return int(bloques * por_bloque + fft_real)
+
+
+def cruce_fft(n_x, tope=1024):
+    """La longitud de filtro a partir de la cual sale mas barato hacerlo
+    por FFT. Se halla PROBANDO, no con una regla. -> (m, directo, fft)"""
+    for m in range(4, int(tope) + 1, 2):
+        d = coste_directo(n_x, m)
+        f = coste_fft(n_x, m, max(4 * m, 64))
+        # (los dos en multiplicaciones REALES: ver coste_fft)
+        if f < d:
+            return m, d, f
+    return None, None, None
+
+
+def latencia_bloque(largo_bloque, fs):
+    """Los milisegundos que un bloque mete de retraso: hay que esperar a
+    tenerlo entero antes de empezar."""
+    return 1000.0 * float(largo_bloque) / float(fs)
+
+
+# =====================================================================
+# 15. Multitasa (modulo 8)
+# =====================================================================
+def diezmar(x, m):
+    """Quedarse con una de cada M muestras (sin filtrar: se ve el alias)."""
+    return np.asarray(x, float)[::int(m)]
+
+
+def interpolar_ceros(x, l):
+    """Meter L-1 ceros entre muestras: la señal no cambia, pero su
+    espectro se llena de IMAGENES."""
+    x = np.asarray(x, float)
+    y = np.zeros(len(x) * int(l))
+    y[::int(l)] = x
+    return y
+
+
+def polifase(h, m):
+    """Las M ramas polifase de h: h[k], h[k+M], h[k+2M]...
+
+    Es el mismo filtro, reordenado. Su gracia: al diezmar, cada rama
+    trabaja a fs/M, asi que se hacen las MISMAS cuentas que antes pero
+    M veces menos a menudo.
+    """
+    h = np.asarray(h, float)
+    m = int(m)
+    return [h[k::m] for k in range(m)]
+
+
+def macs_diezmado(h, m, directo=True):
+    """Multiplicaciones POR MUESTRA DE ENTRADA, contadas: filtrar y luego
+    tirar (directo) frente a polifase."""
+    n = len(np.asarray(h))
+    return n if directo else n / float(m)
+
+
+def cic(x, r, n_etapas=1, m=1):
+    """Filtro CIC (integrador-peine): diezma sin UN SOLO multiplicador.
+
+    N integradores a la entrada, diezmado por R, N peines a la salida.
+    -> (y, num_multiplicaciones)  -- el segundo siempre es 0.
+    """
+    x = np.asarray(x, float)
+    v = x.copy()
+    for _ in range(int(n_etapas)):
+        v = np.cumsum(v)
+    v = v[::int(r)]
+    for _ in range(int(n_etapas)):
+        v = np.concatenate([v[:int(m)], v[int(m):] - v[:-int(m)]])
+    return v, 0
+
+
+def respuesta_cic(r, n_etapas=1, m=1, n=1024):
+    """|H| del CIC en dB (normalizada), sobre f = 0..0.5 de la entrada.
+    La caida dentro de la banda util (el 'estatismo') se mide aparte."""
+    f = np.linspace(1e-6, 0.5, int(n))
+    num = np.sin(np.pi * f * int(r) * int(m))
+    den = np.sin(np.pi * f)
+    h = np.abs((num / den) ** int(n_etapas))
+    h = h / h.max()
+    return f, 20.0 * np.log10(np.maximum(h, 1e-12))
+
+
+def caida_cic(r, n_etapas=1, m=1, f_util=None):
+    """La caida MEDIDA del CIC en el borde de la banda util (por defecto,
+    el borde de la banda que sobrevive al diezmado)."""
+    f_util = f_util if f_util is not None else 0.5 / float(r)
+    f, db = respuesta_cic(r, n_etapas, m, 4096)
+    return float(db[int(np.argmin(np.abs(f - f_util)))])
+
+
+def farrow(x, mu, orden=3):
+    """Retardo FRACCIONARIO de mu muestras por interpolacion de Lagrange
+    (la estructura de Farrow): el remuestreo cuando los relojes no cuadran.
+    -> y (mismo largo que x)"""
+    x = np.asarray(x, float)
+    mu = float(mu)
+    n = len(x)
+    y = np.zeros(n)
+    xs = np.arange(-(orden // 2), orden // 2 + 2)
+    for k in range(n):
+        acc = 0.0
+        for j, d in enumerate(xs):
+            li = 1.0
+            for i, di in enumerate(xs):
+                if i != j:
+                    # se evalua en -mu: y[k] = x(k - mu), un RETRASO
+                    li *= (-mu - di) / (d - di)
+            idx = k + d
+            if 0 <= idx < n:
+                acc += li * x[idx]
+        y[k] = acc
+    return y
+
+
+def error_farrow(f_hz, fs, mu, n=400):
+    """Cuanto se equivoca el interpolador de Farrow con un tono: se
+    compara con el tono retrasado de verdad. -> (rms, pico) medidos."""
+    t = np.arange(int(n)) / float(fs)
+    x = np.sin(2 * np.pi * float(f_hz) * t)
+    exacto = np.sin(2 * np.pi * float(f_hz) * (t - float(mu) / fs))
+    y = farrow(x, mu)
+    i0, i1 = 4, int(n) - 4
+    e = y[i0:i1] - exacto[i0:i1]
+    return float(np.sqrt(np.mean(e ** 2))), float(np.max(np.abs(e)))
+
+
+def remuestrear(x, l, m, h=None):
+    """Remuestreo racional L/M: interpolar, filtrar, diezmar."""
+    x = np.asarray(x, float)
+    if h is None:
+        h = fir_ventana(64, 0.5 / max(int(l), int(m)), "hann", 1.0)
+    return diezmar(convolucion(interpolar_ceros(x, int(l)), h * int(l)),
+                   int(m))
+
+
+def banco_qmf(h0=None):
+    """Banco de dos canales (paso bajo / paso alto) con reconstruccion.
+
+    -> (h0, h1, g0, g1) — los cuatro filtros del banco QMF clasico:
+    h1[n] = (-1)^n h0[n], g0 = h0, g1 = -h1.
+    """
+    if h0 is None:
+        # 32 taps: la longitud tiene que ser PAR. Con longitud impar la
+        # cancelacion del alias del QMF no se cumple y el error de
+        # reconstruccion se dispara (medido: 0.97 con 31 taps, 0.06 con 32).
+        h0 = fir_ventana(31, 0.25, "hamming", 1.0)
+    h0 = np.asarray(h0, float)
+    signos = (-1.0) ** np.arange(len(h0))
+    h1 = h0 * signos
+    return h0, h1, h0.copy(), -h1
+
+
+def banco_haar():
+    """El banco ortogonal mas simple: media y diferencia, normalizadas.
+
+    Es el unico de los dos que reconstruye EXACTO (error ~1e-16 medido):
+    sirve para enseñar que la reconstruccion perfecta existe, antes de
+    contar lo que cuesta que ademas separe bien las bandas.
+    """
+    r = 1.0 / math.sqrt(2.0)
+    h0 = np.array([r, r])
+    h1 = np.array([r, -r])
+    return h0, h1, h0[::-1].copy(), h1[::-1].copy()
+
+
+def error_reconstruccion(x, banco=None):
+    """Analisis + sintesis de un banco de dos canales: cuanto se parece
+    lo que sale a lo que entro (medido, tras alinear el retardo)."""
+    x = np.asarray(x, float)
+    h0, h1, g0, g1 = banco or banco_qmf()
+    v0 = diezmar(convolucion(x, h0), 2)
+    v1 = diezmar(convolucion(x, h1), 2)
+    y = (convolucion(interpolar_ceros(v0, 2), g0)
+         + convolucion(interpolar_ceros(v1, 2), g1))
+    retardo = len(h0) - 1
+    n = len(x) - retardo
+    if n <= 0:
+        return np.inf, y
+    a = x[:n]
+    b = y[retardo:retardo + n]
+    escala = float(np.dot(a, b) / max(np.dot(b, b), 1e-30))
+    return float(np.max(np.abs(a - escala * b))), y

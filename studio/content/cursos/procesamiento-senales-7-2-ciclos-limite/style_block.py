@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Procesamiento de señales · 2.3 Correlacion: hallar lo conocido".
+# CO.DE Academy - "Procesamiento de señales · 7.2 Ciclos limite".
 # Bloque de estilo del proyecto: se antepone al script de
 # CADA clip; los clips NO repiten imports, solo definen su ClipN(Scene).
 #
@@ -69,7 +69,29 @@ from comunicaciones import (Onda, EspectroArea, alias_de,  # noqa: E402
 _com.Text = Text
 
 import dsp as _dsp  # noqa: E402
-from dsp import (C_APREND, C_BANDA, C_CALCULO, C_DATO,  # noqa: E402
+from dsp import (LineaRetardos, Mariposa, PlanoZ,  # noqa: E402
+                 Q15_ESCALA, banco_haar, banco_qmf, banda_muerta,
+                 caida_cic, cic, ciclo_limite, coste_directo, coste_fft,
+                 cruce_fft, diezmar, envuelve, error_farrow, error_q15,
+                 error_reconstruccion, farrow, filtrar_punto_fijo,
+                 interpolar_ceros, latencia_bloque, macs_diezmado,
+                 margen, overlap_add, polifase, q15, remuestrear,
+                 respuesta_cic, satura, snr_q15,
+                 RespuestaFrec, alternancias, bilineal, es_simetrico,
+                 fir_equirriple, fir_ventana, gibbs_db, goertzel,
+                 ideal_truncado, iir_butter, iir_cheby1, iir_elip,
+                 linea_retardos, macs_fir, macs_goertzel,
+                 orden_necesario, peine, polos_butter_analogico,
+                 polos_cuantizados, rizado_db, secciones, warp,
+                 warp_inverso,
+                 bin_de, bit_reverso, dft, dft_matriz, dos_tonos, enbw,
+                 es_estable, es_fase_minima, f_de_bin, fft_por_etapas,
+                 fuga_db, giro, h_en, lateral_db, lobulo_principal,
+                 mariposa_dibujo, mariposas, notch, ops_dft, ops_fft,
+                 ortogonales, plano_z, por_distancias, reflejar_ceros,
+                 resonador, respuesta_dibujo, respuesta_frec,
+                 retardo_grupo, scalloping_db, zpk,
+                 C_APREND, C_BANDA, C_CALCULO, C_DATO,
                  C_IDEAL, C_MUESTRA, C_RUIDO, C_SALIDA, C_SENAL,
                  Barras, Deslizador, Escalera, EspectroDoble, Secuencia,
                  ancho_pico, autocorr_circular, banda_ocupada, barras,
@@ -156,41 +178,29 @@ def _vigilar(texto, maximo, quien):
 
 
 # --- Numeros de la leccion --------------------------------------------
-FS_RADAR = 2e6                       # Hz del receptor
-DUR_CHIRP = 120e-6                   # s
-B_CHIRP = 400e3                      # Hz de barrido
-T_CHIRP = np.arange(int(DUR_CHIRP * FS_RADAR)) / FS_RADAR      # 240 m
-CHIRP = chirp(T_CHIRP, -B_CHIRP / 2, B_CHIRP / 2, DUR_CHIRP)
-OFFSET, N_REGISTRO, SNR_ENTRADA = 421, 900, -10.0
-RX, SNR_MEDIDA = enterrar(CHIRP, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS, R_CORR = correlacion(RX, CHIRP)
-GANANCIA, RETARDO = ganancia_proceso_db(RX, CHIRP, OFFSET)     # 21.5 dB, 421
-COMPRESION, ANCHO_MUESTRAS = compresion(CHIRP, LAGS, R_CORR)   # 60x, 4
-ANCHO_US = ANCHO_MUESTRAS / FS_RADAR * 1e6                     # 2.0 us
-INV_B_US = 1e6 / B_CHIRP                                       # 2.5 us
-LARGO_US = DUR_CHIRP * 1e6                                     # 120 us
+# Un IIR de primer orden y[n] = Q(a y[n-1]): sin cuantizar se apaga
+# siempre que |a| < 1; cuantizando, se queda atrapado.
+A_POS, A_NEG = 0.9, -0.9
+BITS_CL = (6, 8, 10)
+BITS_DEMO = 8
+N_CL = 200
+X0 = 0.5
 
-PULSO = np.ones(len(CHIRP))          # el mismo largo, sin barrido
-RX_PULSO, _ = enterrar(PULSO, SNR_ENTRADA, N_REGISTRO, OFFSET, semilla=5)
-LAGS_P, R_PULSO = correlacion(RX_PULSO, PULSO)
-COMPRESION_P, ANCHO_P = compresion(PULSO, LAGS_P, R_PULSO)     # 2.8x, 85
-ANCHO_P_US = ANCHO_P / FS_RADAR * 1e6                          # 42.5 us
-GANANCIA_P, RETARDO_P = ganancia_proceso_db(RX_PULSO, PULSO, OFFSET)
-# RETARDO_P = 419: el pulso llano se equivoca de 2 muestras
+Y_POS = {b: ciclo_limite(A_POS, b, N_CL, X0) for b in BITS_CL}
+Y_NEG = {b: ciclo_limite(A_NEG, b, N_CL, X0) for b in BITS_CL}
+ATRAPADA_POS = {b: Y_POS[b][1] for b in BITS_CL}   # 0.125 / 0.03125 / 0.0078
+ATRAPADA_NEG = {b: Y_NEG[b][1] for b in BITS_CL}
+PERIODO_POS = {b: Y_POS[b][2] for b in BITS_CL}    # 1: se queda clavado
+PERIODO_NEG = {b: Y_NEG[b][2] for b in BITS_CL}    # 2: alterna de signo
+BANDA = {b: banda_muerta(A_POS, b) for b in BITS_CL}   # (teorica, atrapada, paso)
+TEORICA_BM = BANDA[BITS_DEMO][0]      # 0.0391
+ATRAPADA_BM = BANDA[BITS_DEMO][1]     # 0.03125
+PASO_BM = BANDA[BITS_DEMO][2]         # 0.0078
+PASOS_ATRAPADOS = ATRAPADA_BM / PASO_BM            # 4 pasos
 
-PN = pn_larga(127)
-R_PN = autocorr_circular(PN)
-PICO_PN = float(R_PN[0])                                       # 127
-LATERAL_PN = float(np.abs(R_PN[1:]).max())                     # 1
-RUIDO = np.random.default_rng(2).normal(0.0, 1.0, 400)
-R_RUIDO = autocorr_circular(RUIDO)
-PICO_RUIDO = float(R_RUIDO[0])
-LATERAL_RUIDO = float(np.abs(R_RUIDO[1:]).max())
-OFFSET_PN, SNR_PN = 233, -6.0
-RX_PN, _ = enterrar(PN, SNR_PN, 500, OFFSET_PN, semilla=9)
-LAGS_PN, R_PN_RX = correlacion(RX_PN, PN)
-GANANCIA_PN, RETARDO_PN = ganancia_proceso_db(RX_PN, PN, OFFSET_PN)
-# GANANCIA_PN = 22.2 dB, RETARDO_PN = 233 (el real)
+# la version sin cuantizar, para comparar: esa SI se apaga
+Y_IDEAL = np.array([X0 * A_POS ** (k + 1) for k in range(N_CL)])
+COLA_IDEAL = float(np.abs(Y_IDEAL[N_CL // 2:]).max())   # ~1e-6: cero
 
 
 # --- Rotulos ----------------------------------------------------------
