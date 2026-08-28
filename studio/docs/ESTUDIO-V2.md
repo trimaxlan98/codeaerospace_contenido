@@ -61,10 +61,21 @@ Auditoría de las 40 ramas del repo. Tres cosas vivían fuera de `main`:
   producción) y las cuatro herramientas del formato 9:16.
 - El **entorno de desarrollo local** (`studio/dev.sh`, runner parametrizable).
 
-Nueve ramas resultaron obsoletas (su contenido ya estaba en `main` por otra vía):
-`curso/agentes-de-ia`, `curso/apuntado`, `curso/control`, `curso/espectro`,
-`curso/materiales`, `curso/redes-neuronales`, `curso/sdr`,
-`curso/protocolos-internet` y `fix/mux-locale`. Se pueden borrar sin pérdida.
+Nueve ramas parecían obsoletas y **ocho lo eran**: `curso/agentes-de-ia`,
+`curso/apuntado`, `curso/control`, `curso/espectro`, `curso/materiales`,
+`curso/redes-neuronales`, `curso/sdr` y `fix/mux-locale`. Borradas el
+2026-08-28, ya sin remoto.
+
+**`curso/protocolos-internet` NO lo era.** La auditoría de la primera noche
+comparó solo `studio/`, y su commit vivía en `docs/`: era el **cierre del curso
+25**, y sin él `main` seguía diciendo que el lote 4 estaba «esperando merge» —
+con las seis lecciones 7.1–8.3 en blanco en el tablero— y conservaba un
+`ESTADO-AL-APAGAR.md` que pedía mergear un PR mergeado dos días antes. Se
+rescató con un `cherry-pick` antes de borrar la rama.
+
+La lección para la próxima limpieza: **`git cherry origin/main <rama>` es la
+prueba**, no un diff de un subdirectorio. Un solo `+` significa que ahí hay algo
+que solo vive en esa rama.
 
 ---
 
