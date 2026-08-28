@@ -34,28 +34,24 @@
         "texto": "De Nueva York a Londres."
       },
       {
-        "t_inicio": 4.4,
-        "texto": "Por cable, treinta y nueve milisegundos."
-      },
-      {
-        "t_inicio": 8.6,
-        "texto": "O por arriba, saltando de satélite en satélite."
+        "t_inicio": 7.0,
+        "texto": "Por cable, treinta y nueve."
       },
       {
         "t_inicio": 12.0,
-        "texto": "Cuatro saltos."
+        "texto": "O por arriba, saltando."
       },
       {
-        "t_inicio": 15.0,
-        "texto": "Más kilómetros que en línea recta."
+        "t_inicio": 16.0,
+        "texto": "Más kilómetros que en recto."
       },
       {
-        "t_inicio": 19.0,
+        "t_inicio": 21.0,
         "texto": "Y aun así llega antes."
       },
       {
-        "t_inicio": 25.2,
-        "texto": "Quince milisegundos de ventaja."
+        "t_inicio": 25.5,
+        "texto": "Quince milisegundos."
       }
     ]
   },

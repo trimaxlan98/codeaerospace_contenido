@@ -27,31 +27,23 @@
     "secciones": [
       {
         "t_inicio": 1.9,
-        "texto": "Esto es el cielo entero, visto en planta."
+        "texto": "Esto es el cielo, visto en planta."
       },
       {
-        "t_inicio": 4.3,
-        "texto": "El borde es el horizonte."
+        "t_inicio": 8.0,
+        "texto": "El centro es tu cabeza."
       },
       {
-        "t_inicio": 6.6,
-        "texto": "Y el centro, justo encima de ti."
-      },
-      {
-        "t_inicio": 10.6,
-        "texto": "Casi noventa grados."
-      },
-      {
-        "t_inicio": 14.2,
+        "t_inicio": 13.0,
         "texto": "Ocho minutos y cuarto."
       },
       {
-        "t_inicio": 20.4,
-        "texto": "La vuelta siguiente cae más lejos de lo que alcanza."
+        "t_inicio": 18.0,
+        "texto": "La vuelta siguiente cae más lejos."
       },
       {
-        "t_inicio": 25.2,
-        "texto": "Lo ves el ocho por ciento del tiempo."
+        "t_inicio": 24.0,
+        "texto": "Lo ves el ocho por ciento."
       }
     ]
   },

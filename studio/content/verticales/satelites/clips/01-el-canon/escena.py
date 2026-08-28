@@ -171,8 +171,4 @@ class Clip(Scene):
         self.wait(1.10)
 
         # --- fundido a fondo limpio ---------------------------------
-        for mob in self.mobjects:
-            mob.clear_updaters()
-        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.9)
-        self.remove(*self.mobjects)
-        self.wait(0.5)
+        fundido_final(self, run_time=0.9, cola=0.5)

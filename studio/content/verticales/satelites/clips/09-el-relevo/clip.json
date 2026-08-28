@@ -27,26 +27,22 @@
     "secciones": [
       {
         "t_inicio": 1.5,
-        "texto": "Cada satélite sube, culmina y se pone."
+        "texto": "Cada satélite sube y se pone."
       },
       {
-        "t_inicio": 5.3,
-        "texto": "Esta es la envolvente: el más alto en cada momento."
+        "t_inicio": 7.0,
+        "texto": "Esta es la envolvente."
       },
       {
-        "t_inicio": 10.9,
+        "t_inicio": 11.5,
         "texto": "Catorce saltos en hora y media."
       },
       {
-        "t_inicio": 14.1,
-        "texto": "Uno cada seis minutos."
+        "t_inicio": 17.0,
+        "texto": "Mira cuánto tiempo no hay nadie."
       },
       {
-        "t_inicio": 17.9,
-        "texto": "Pero mira cuánto tiempo no hay nadie arriba."
-      },
-      {
-        "t_inicio": 24.4,
+        "t_inicio": 23.0,
         "texto": "Con doscientos cuarenta, ya no se cae."
       }
     ]

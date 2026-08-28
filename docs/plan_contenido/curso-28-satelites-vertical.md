@@ -198,10 +198,48 @@ unico que cambia es el directorio: `studio/content/verticales/satelites/`.
 | 4 · Esqueletos de las 16 piezas (`curso.json` + stubs) | **hecho**: las 16 componen; el cierre (heredado) renderiza a 8.90 s |
 | 5 · Produccion de los clips 02-14 | **hecho**: las 13 escritas, renderizadas y revisadas |
 | 6 · Revision de frames uno a uno + `pytest -q` del Studio | **hecho**: 151 tests en verde |
-| 7 · `qh` de las 16 (3 en paralelo, desde un `.sh`) | en curso |
-| 8 · Voz (VPS, SERIAL, `alinear_voz.py`) | pendiente |
-| 9 · Mux + union + picos + costuras | pendiente |
-| 10 · PLAN.md, catalogo, cosecha de trampas y memoria | pendiente |
+| 7 · `qh` de las 16 (3 en paralelo, desde un `.sh`) | **hecho** |
+| 8 · Voz (VPS, SERIAL, `alinear_voz.py`) | **hecho**: dos pasadas + una tercera por un 429 |
+| 9 · Mux + union + picos + costuras | **hecho** |
+| 10 · PLAN.md, cosecha de trampas y memoria | **hecho** |
+
+**CURSO TERMINADO el 2026-08-28.**
+
+## La entrega
+
+`exports/verticales/satelites/satelites_vertical.mp4` — 1080x1920 @60,
+**7 min 30 s** (450.14 s), 16 piezas, 23 MB, pico -1.4 dB. No se versiona
+(`exports/` esta en .gitignore).
+
+El catalogo de la app (`studio/docs/CATALOGO-CURSOS.md`) NO se toca: describe
+como se agrupan los proyectos del indice de la app, y un curso vertical no
+entra en la DB.
+
+### Verificaciones que se pasaron
+
+- **Sonda de la libreria** en el contenedor: 0 fallos sobre 20 cifras, cada
+  una contrastada contra algo sabido por otro lado.
+- **Guardian de zona segura**: activo en `hud()`, `cifra()` y `hud_pieza()`;
+  aborto seis renders y ninguno de esos rotulos llego al montaje.
+- **Costuras**: ultimo frame de cada pieza contra el primero de la
+  siguiente. Las catorce uniones de leccion, **0.0048/255** (13 de maximo).
+  Las dos de marca se quedan en 0.055 a proposito: la intro y el cierre no
+  llevan esquinas HUD ni marca de agua.
+- **Alineacion de la voz**: envolvente RMS en ventanas de 100 ms contra los
+  `t_inicio`. **Desfase maximo 0.40 s** en todo el curso (el curso 26 cerro
+  con 0.90). Ninguna pieza deja menos de 1.4 s de cola de silencio.
+- **Picos**: entre -1.3 y -4.5 dB por pieza, -1.4 dB el montaje. Sin recorte
+  y sin necesidad de re-muxear.
+- `pytest -q` del Studio: 151 en verde.
+
+### Lo que falta y no puede hacerse aqui
+
+- **Verlo en un telefono.** El juicio final de un vertical es el pulgar.
+- **Decidir el PR**: la rama sale de `curso/fractales-vertical`, que sale de
+  `exp/promos-redes`. Un PR a `main` arrastraria los promos y el curso 26.
+- Cuando se mergee, la fila 27 de `PLAN.md` la pone la rama de Procesamiento
+  de señales y la 28 esta: el conflicto es de una linea y se resuelve
+  quedandose con las dos.
 
 **Decision abierta que hereda del curso 26**: la rama sale de
 `curso/fractales-vertical`, que a su vez sale de `exp/promos-redes`. Un PR a
@@ -319,3 +357,31 @@ Especificas de este curso, previstas:
 - **En equirrectangular la recta no es el camino corto.** El "cable" del
   clip 10 se dibuja con un slerp de verdad entre los dos vectores unitarios;
   una recta sobre el mapa plano enseñaria una ruta que nadie recorre.
+
+**Cosechadas en el qh, la voz y el montaje**
+
+- **El redondeo a frame a 60 fps no es el de 30**: cuatro piezas que en `ql`
+  daban 30.03-30.16 s cayeron a 29.90-29.95 en `qh`, por debajo del suelo
+  duro. Hay que comprobar el rango OTRA VEZ despues del `qh`.
+- **El fundido final se llevaba el mobiliario de marca.** `FadeOut` sobre
+  `self.mobjects` incluye las esquinas HUD y la marca de agua que pone
+  `setup()`: la pieza acababa desnuda y la siguiente las encendia de golpe.
+  Parpadeo en las catorce uniones, invisible a ojo en un corte, evidente al
+  medir (0.055/255 IDENTICO en las catorce: cuando el numero se repite
+  exacto, el culpable es siempre el mismo objeto). Lo arregla
+  `fundido_final()`.
+- **Charon lee estas frases a 1.2-1.7 palabras/s**, no a 2. Estimar antes de
+  narrar con 2 palabras/s dio verde a un guion que luego se desfaso hasta
+  2.75 s. La regla util es **1.3 palabras/s + 0.4 s de aire**, y aun asi la
+  ultima palabra la tiene `alinear_voz`.
+- **Una frase de UNA palabra no es barata**: "Seis." ocupo ~5.5 s. El TTS le
+  pone entrada y cola propias, asi que el coste de una frase NO es
+  proporcional a su longitud y las frases telegraficas necesitan tanto hueco
+  como las largas.
+- **La cuota de Vertex es por MINUTO y por modelo**, y se agota narrando en
+  SERIE si las frases son cortas: un 429 se llevo la pieza 11 entera en la
+  segunda pasada. Al reintentar, `sleep 45` entre piezas.
+- **`ssh` dentro de un `while read` se come el stdin** y el bucle solo hace
+  la primera vuelta: `ssh -n` o `</dev/null`.
+- El VPS tenia `narrar_promo.py` pero **no** `alinear_voz.py`: hay que
+  copiarla antes de narrar un vertical.

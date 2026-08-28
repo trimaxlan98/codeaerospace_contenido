@@ -27,31 +27,27 @@
     "secciones": [
       {
         "t_inicio": 2.3,
-        "texto": "Esto es todo lo que ve un satélite."
+        "texto": "Esto es lo que ve."
       },
       {
-        "t_inicio": 5.2,
+        "t_inicio": 7.0,
         "texto": "Quince grados de planeta."
       },
       {
-        "t_inicio": 8.2,
-        "texto": "Mil seiscientos kilómetros de radio."
+        "t_inicio": 11.0,
+        "texto": "Mil seiscientos kilómetros."
       },
       {
-        "t_inicio": 12.7,
+        "t_inicio": 14.5,
         "texto": "Sobre el mapa, esto."
       },
       {
-        "t_inicio": 15.9,
+        "t_inicio": 18.5,
         "texto": "Menos del dos por ciento."
       },
       {
-        "t_inicio": 19.2,
+        "t_inicio": 23.5,
         "texto": "Y no se queda quieto."
-      },
-      {
-        "t_inicio": 25.2,
-        "texto": "Siete kilómetros y medio cada segundo."
       }
     ]
   },

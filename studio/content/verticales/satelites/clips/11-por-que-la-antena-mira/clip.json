@@ -26,31 +26,27 @@
     "secciones": [
       {
         "t_inicio": 1.9,
-        "texto": "Lo que sale de ahí arriba no se pierde."
-      },
-      {
-        "t_inicio": 4.5,
-        "texto": "Se reparte."
+        "texto": "Lo que sale no se pierde."
       },
       {
         "t_inicio": 7.0,
-        "texto": "A quinientos cincuenta kilómetros, ciento sesenta y nueve decibelios."
+        "texto": "Se reparte."
       },
       {
-        "t_inicio": 13.3,
+        "t_inicio": 10.0,
+        "texto": "Ciento sesenta y nueve decibelios."
+      },
+      {
+        "t_inicio": 15.0,
         "texto": "Desde la geoestacionaria, doscientos cinco."
       },
       {
-        "t_inicio": 16.4,
-        "texto": "Treinta y seis decibelios más."
+        "t_inicio": 20.0,
+        "texto": "Cuatro mil veces menos."
       },
       {
-        "t_inicio": 19.8,
-        "texto": "Cuatro mil veces menos señal."
-      },
-      {
-        "t_inicio": 24.6,
-        "texto": "O una antena sesenta y cinco veces más ancha."
+        "t_inicio": 24.0,
+        "texto": "O una antena mucho más ancha."
       }
     ]
   },
