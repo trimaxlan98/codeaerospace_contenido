@@ -1,0 +1,124 @@
+{
+  "name": "09 · Doscientos péndulos",
+  "modulo": "M3 · El caos con forma",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Doscientos péndulos dobles, iguales salvo una diferencia de una millonésima de radián en el ángulo de arriba. Se ven como uno solo hasta que, a los 8.97 segundos, la separación angular máxima entre dos cualesquiera cruza 1 radián: el abanico de colores se abre delante de la cámara, que hace zoom lento al pivote (1.0 -> 1.6). Rápido por el resto, ya disperso del todo, y cierra el exponente de Lyapunov medido sobre la propia corrida: 1.19 por segundo, o duplicar el error cada 0.58 s.",
+  "duracion_objetivo": 32.23,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; el pendulo ya oscila (gancho)",
+    "0.6  regla: 200 pendulos",
+    "2.1  regla: iguales",
+    "3.6  regla: salvo 0.000001",
+    "5.1  el pie: separacion 0.000 radianes, contador vivo",
+    "13.3 camara lenta y zoom al pivote (1.0 -> 1.6): el abanico empieza a abrirse",
+    "18.1 la separacion cruza 1 rad: el sub cambia a 'en 8.97 s'",
+    "23.6 rapido por el ultimo tercio: el abanico ya disperso",
+    "25.7 la cifra: lyapunov 1.19 por segundo",
+    "28.4 la cifra: duplica en 0.58 segundos",
+    "30.8 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.0,
+        "texto": "Doscientos péndulos. Casi idénticos."
+      },
+      {
+        "t_inicio": 13.6,
+        "texto": "Una millonésima de radián de diferencia."
+      },
+      {
+        "t_inicio": 18.3,
+        "texto": "Y el error se dispara."
+      },
+      {
+        "t_inicio": 26.0,
+        "texto": "Así se mide el caos."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      31.3,
+      31.95
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.6,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.9,
+        -16
+      ],
+      [
+        "blip_medio",
+        2.3,
+        -15
+      ],
+      [
+        "blip_agudo",
+        3.8,
+        -14
+      ],
+      [
+        "tick",
+        5.3,
+        -18
+      ],
+      [
+        "pad",
+        8.0,
+        -20
+      ],
+      [
+        "barrido",
+        13.3,
+        -16
+      ],
+      [
+        "sting",
+        18.1,
+        -12
+      ],
+      [
+        "subrayado",
+        18.5,
+        -14
+      ],
+      [
+        "aire",
+        23.6,
+        -17
+      ],
+      [
+        "pulso",
+        25.7,
+        -13
+      ],
+      [
+        "cuerda_la2",
+        28.4,
+        -15
+      ]
+    ]
+  }
+}

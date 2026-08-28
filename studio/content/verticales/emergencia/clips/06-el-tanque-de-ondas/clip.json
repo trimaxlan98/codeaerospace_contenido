@@ -1,0 +1,133 @@
+{
+  "name": "06 · El tanque de ondas",
+  "modulo": "M2 · Campos que se organizan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La ecuación de onda 2D por diferencias finitas: una fuente puntual emite frentes circulares y, al llegar a una pared con dos rendijas, nacen del otro lado las franjas de interferencia. La cámara hace zoom 1.6 justo cuando el patrón nace (con cámara lenta en ese instante) y se abre otra vez cuando las franjas llegan a la línea de detección; ahí se traza en cian la curva de intensidad medida y se releva la cifra medida (46.1 píxeles entre franjas) a la predicción teórica de Fresnel (45.6, en gris).",
+  "duracion_objetivo": 31.37,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el frente circular ya se mueve; entra el HUD 06 . tanque",
+    "0.6  regla 1: cada punto empuja al vecino",
+    "1.45 regla 2: al vecino",
+    "2.3  regla 3: dos rendijas",
+    "3.15 la pared entra en cuadro; dos circulos ambar marcan las rendijas un instante",
+    "4.45 nace el patron de interferencia: camara lenta en el instante justo, zoom continuo a 1.6",
+    "11.45 las franjas ya formadas viajan hacia la linea de deteccion (zoom sostenido en 1.6)",
+    "19.45 la linea de deteccion se enciende (entre franjas, 46.1 pixeles); la camara se abre de vuelta a 1.0",
+    "26.05 se traza la curva de intensidad medida, en cian, alineada con las franjas reales",
+    "28.05 relevo: la cifra medida cede a la prediccion de Fresnel (45.6, gris)",
+    "29.9  fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.9,
+        "texto": "Ningún jefe. Solo vecinos que empujan."
+      },
+      {
+        "t_inicio": 3.3,
+        "texto": "Dos rendijas. Ninguna sola basta."
+      },
+      {
+        "t_inicio": 8.3,
+        "texto": "Ahí. Nace el patrón."
+      },
+      {
+        "t_inicio": 20.0,
+        "texto": "Se mide justo donde llega la onda."
+      },
+      {
+        "t_inicio": 28.3,
+        "texto": "El libro se queda corto. La física, no."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      30.6,
+      31.3
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.9,
+        -17
+      ],
+      [
+        "tick",
+        0.6,
+        -13
+      ],
+      [
+        "tick",
+        1.45,
+        -13
+      ],
+      [
+        "tick",
+        2.3,
+        -13
+      ],
+      [
+        "blip_medio",
+        3.15,
+        -14
+      ],
+      [
+        "barrido",
+        4.45,
+        -18
+      ],
+      [
+        "subrayado",
+        8.3,
+        -13
+      ],
+      [
+        "aire",
+        11.45,
+        -18
+      ],
+      [
+        "barrido",
+        19.45,
+        -17
+      ],
+      [
+        "blip_agudo",
+        20.0,
+        -14
+      ],
+      [
+        "pulso",
+        26.05,
+        -13
+      ],
+      [
+        "blip_medio",
+        28.05,
+        -14
+      ],
+      [
+        "nebulosa",
+        29.9,
+        -16
+      ]
+    ]
+  }
+}

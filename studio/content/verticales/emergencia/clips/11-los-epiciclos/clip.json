@@ -1,0 +1,116 @@
+{
+  "name": "11 · Los epiciclos",
+  "modulo": "M3 · El caos con forma",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un unico contorno cerrado (la palabra CO.DE, geometria pura) reconstruido por su transformada de Fourier: circulos que giran uno sobre la punta del anterior, cada uno a su propia frecuencia fija. Ocho vueltas suman mas circulos (1, 2, 5, 10, 25, 50, 100, 200) y el error RMS de la reconstruccion cae de 53.9 a 0.325 px; en la vuelta de 100 circulos el trazo cierra sobre si mismo y la camara va a camara lenta justo ahi. Cifra final: 100 circulos bastan para bajar de 1 pixel de error.",
+  "duracion_objetivo": 31.43,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el contorno ya gira con 1 circulo; entran el HUD y la cifra (1 . circulos . error 53.9 px)",
+    "0.55 regla 1 . circulos sobre",
+    "1.10 regla 2 . circulos",
+    "1.65 regla 3 . cada uno gira fijo",
+    "2.20 relevo a 2 circulos, error 41.5 px",
+    "4.30 relevo a 5 circulos, error 29.8 px",
+    "6.70 relevo a 10 circulos, error 19.5 px",
+    "9.40 relevo a 25 circulos, error 8.48 px",
+    "12.70 relevo a 50 circulos, error 2.50 px",
+    "16.30 relevo a 100 circulos, error 0.99 px; camara lenta al cerrar el trazo",
+    "22.60 relevo a 200 circulos, error 0.33 px",
+    "27.10 cambia a la cifra de la pieza: para 1 pixel . 100 . circulos",
+    "29.96 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.6,
+        "texto": "Un circulo."
+      },
+      {
+        "t_inicio": 9.6,
+        "texto": "Sumale otro. Y otro mas."
+      },
+      {
+        "t_inicio": 16.6,
+        "texto": "Cien, y el trazo cierra."
+      },
+      {
+        "t_inicio": 28.0,
+        "texto": "Ese es el precio de un pixel."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      30.6,
+      31.1
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.5,
+        -18
+      ],
+      [
+        "tick",
+        2.2,
+        -17
+      ],
+      [
+        "tick",
+        4.3,
+        -17
+      ],
+      [
+        "tick",
+        6.7,
+        -17
+      ],
+      [
+        "blip_medio",
+        9.4,
+        -16
+      ],
+      [
+        "blip_medio",
+        12.7,
+        -16
+      ],
+      [
+        "barrido",
+        16.3,
+        -15
+      ],
+      [
+        "blip_agudo",
+        22.6,
+        -14
+      ],
+      [
+        "subrayado",
+        27.1,
+        -13
+      ],
+      [
+        "aire",
+        27.9,
+        -17
+      ],
+      [
+        "nebulosa",
+        29.6,
+        -16
+      ]
+    ]
+  }
+}

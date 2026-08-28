@@ -1,0 +1,110 @@
+{
+  "name": "07 · La placa que canta",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Chladni: 40 000 granos de arena sobre una placa cuadrada que vibra en cuatro modos crecientes (1,2) -> (2,3) -> (2,5) -> (5,7); el grano huye de donde la placa tiembla y se queda donde está quieta, dibujando solo las líneas nodales. Cámara lenta en el primer salto de frecuencia (cuando la arena brinca y vuelve a organizarse) y zoom 1.5x al centro de la placa durante el tercer modo. Cifras medidas en este render: la frecuencia relativa de cada modo y, al final, la fracción de arena sobre el nodo del último modo.",
+  "duracion_objetivo": 32.23,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD sobre la arena ya en movimiento (modo 1)",
+    "0.7  regla 1: LA PLACA VIBRA, con el marco ambar de la placa",
+    "2.5  regla 2: LA ARENA HUYE",
+    "4.4  regla 3: DEL MOVIMIENTO; se apaga el marco",
+    "6.3  entra el pie de cifra: frecuencia 1.0X",
+    "7.1  camara lenta hacia el primer cambio de modo",
+    "8.5  relevo: frecuencia 2.6X (modo 2)",
+    "10.9 el modo 2 respira a ritmo normal",
+    "16.6 relevo: frecuencia 5.8X (modo 3)",
+    "17.0 zoom 1.5x al centro de la placa durante el modo 3",
+    "22.5 relevo: frecuencia 14.8X (modo 4), aun con zoom",
+    "22.9 se sostiene el acercamiento",
+    "26.2 la camara se abre otra vez",
+    "29.3 remate: fraccion de arena en el nodo del ultimo modo",
+    "30.9 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.3,
+        "texto": "Tres reglas, y la arena dibuja sola."
+      },
+      {
+        "t_inicio": 29.4,
+        "texto": "Cuanto más vibra la placa, menos se queda quieta."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      31.4,
+      32.0
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "tick",
+        0.75,
+        -14
+      ],
+      [
+        "tick",
+        2.6,
+        -14
+      ],
+      [
+        "tick",
+        4.5,
+        -14
+      ],
+      [
+        "aire",
+        6.3,
+        -16
+      ],
+      [
+        "blip_grave",
+        8.5,
+        -13
+      ],
+      [
+        "blip_medio",
+        16.6,
+        -13
+      ],
+      [
+        "aire",
+        16.95,
+        -16
+      ],
+      [
+        "blip_agudo",
+        22.5,
+        -12
+      ],
+      [
+        "subrayado",
+        26.2,
+        -14
+      ],
+      [
+        "blip_hud",
+        29.3,
+        -15
+      ],
+      [
+        "pulso",
+        30.9,
+        -14
+      ]
+    ]
+  },
+  "modulo": "M2 · Campos que se organizan"
+}

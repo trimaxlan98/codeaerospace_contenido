@@ -1,0 +1,70 @@
+{
+  "name": "02 · El moho",
+  "modulo": "M1 · Reglas que caminan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Physarum: 60 000 agentes puntuales que sólo saben oler la estela en tres puntos, girar hacia el olor más fuerte y dejar rastro al avanzar. El fotograma entero es la simulación (emergencia.moho, 750 pasos a 270×480): una malla finísima que se engrosa y se poda sola hasta dejar una red que une los diez puntos de comida. Al final se enciende en cian la red medida —la máscara de caminos que produce red_px— y encima, en gris, el árbol mínimo euclídeo con el que se compara: el moho gasta 950 px donde el cable recto gastaría 806, un 18 % más, y a cambio mantiene una malla seis veces más larga alrededor.",
+  "libreria": [
+    "moho.simular"
+  ],
+  "duracion_objetivo": 33.37,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  la malla ya está tendida y moviéndose (frames 36-140 en 1.5 s); entra el HUD",
+    "1.5  regla 1: OLER ADELANTE",
+    "2.9  regla 2: GIRAR AL RASTRO; la película baja a cámara lenta sobre la poda (frames 170-225)",
+    "5.9  regla 3: DEJAR RASTRO; sigue la cámara lenta (225-280), el tramo donde el esqueleto adelgaza más deprisa",
+    "8.9  vuelve el ritmo: las celdas crecen y los filamentos engordan",
+    "10.5 zoom 1.6 hacia la ventana con más bifurcaciones del esqueleto",
+    "13.1 el encuadre se queda ahí: los nudos en Y y la comida de nodo",
+    "15.7 la cámara se abre otra vez a plano completo",
+    "17.9 los diez anillos ámbar marcan los puntos de comida",
+    "20.5 último tramo de la película, hasta el frame 749",
+    "23.9 se enciende en cian la red medida y entra el pie: 950 px de longitud",
+    "25.9 se dibuja en gris el árbol mínimo euclídeo, recto entre las mismas diez comidas",
+    "28.7 relevo del pie: 1.18 veces el árbol mínimo",
+    "32.0 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 9.2,
+        "texto": "Nadie manda: cada uno sigue el rastro que dejó."
+      },
+      {
+        "t_inicio": 29.5,
+        "texto": "Un dieciocho por ciento más que el cable recto."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      32.37,
+      33.07
+    ],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.35, -19],
+      ["aire_largo", 0.9, -17],
+      ["blip_grave", 1.6, -15],
+      ["blip_medio", 3.0, -15],
+      ["blip_agudo", 6.0, -14],
+      ["pad", 8.9, -19],
+      ["barrido", 10.5, -17],
+      ["aire", 15.8, -16],
+      ["nebulosa", 15.5, -18],
+      ["tick", 18.0, -13],
+      ["tick", 18.6, -13],
+      ["tick", 19.2, -13],
+      ["pulso", 23.9, -13],
+      ["subrayado", 24.6, -14],
+      ["cuerda_mi3", 26.0, -16],
+      ["sting", 29.4, -12],
+      ["nebulosa_cierre", 28.6, -15]
+    ]
+  }
+}

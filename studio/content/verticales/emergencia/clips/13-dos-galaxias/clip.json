@@ -1,0 +1,30 @@
+{
+  "name": "13 · Dos galaxias",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "(esqueleto)",
+  "duracion_objetivo": 30.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.2,
+      29.9
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ]
+    ]
+  },
+  "modulo": "M4 · Mundos enteros"
+}

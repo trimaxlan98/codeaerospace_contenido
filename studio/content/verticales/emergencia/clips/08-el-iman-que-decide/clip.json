@@ -1,0 +1,53 @@
+{
+  "name": "08 · El imán que decide",
+  "modulo": "M2 · Campos que se organizan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Ising 2D sobre un toro de 32 400 espines (240×135), enfriado de T=3.50 a T=1.20 con Metropolis en tablero de ajedrez: el fotograma entero es la malla. Empieza en ruido caliente; al llegar a la temperatura crítica la película se va a cámara lenta con un zoom 1.8 y se ven los dominios de todos los tamaños; por debajo, uno de los dos signos se come la malla. Dos cifras relevadas, nunca a la vez: la temperatura del temple (cian, medida en este render) contra el Tc = 2.269 de Onsager (gris, literatura), y después la magnetización |M|, que sube de 0.844 a 0.997 mientras su curva |M|(T) se dibuja arriba con la marca de Tc. Remate: |M| = 0.997 medido frente al 0.9970 exacto de Onsager a T = 1.2. Se llama con periodica=True porque la tabla de aceptación de la librería se indexa con (s*nb+4)>>1, que solo es exacta con 4 vecinas: en el toro el modelo sale bien (con la frontera abierta el perímetro queda anormalmente caliente y |M| pega saltos no físicos por debajo de Tc). Ver el informe.",
+  "libreria": ["ising.simular", "ritmo_por_tramos", "Pelicula.animacion"],
+  "duracion_objetivo": 35.03,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el ruido caliente ya se mueve; entran el HUD y la temperatura 3.50",
+    "2.3  se encienden las tres reglas: mira a las 4 vecinas y copia si puede",
+    "6.8  el grano engorda mientras T baja de 2.75 a 2.45",
+    "13.2 CAMARA LENTA (frames 400-440) y zoom 1.8: la cifra pasa por 2.27 al lado del Tc 2.269 en gris; manchas de todos los tamaños",
+    "18.0 la cámara se abre otra vez; el violeta va ganando",
+    "19.9 relevo: la temperatura deja paso a la magnetización, y entra arriba la curva |M|(T) con la marca de Tc",
+    "20.6 |M| sube de 0.844 a 0.959 y la curva la va dibujando",
+    "25.8 |M| de 0.959 a 0.997: pantalla violeta con motas naranjas",
+    "31.4 el pie cambia a ONSAGER 0.9970, en gris, bajo el 0.997 medido",
+    "33.6 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {"t_inicio": 14.2, "texto": "Justo aquí: manchas de todos los tamaños."},
+      {"t_inicio": 28.4, "texto": "Un poco más frío, y uno se lo come todo."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [34.0, 34.72],
+    "eventos": [
+      ["nebulosa", 0.15, -15],
+      ["blip_hud", 0.4, -19],
+      ["aire_largo", 0.9, -18],
+      ["blip_grave", 2.35, -17],
+      ["blip_medio", 3.85, -17],
+      ["blip_agudo", 5.35, -17],
+      ["nebulosa", 9.2, -17],
+      ["barrido", 13.2, -16],
+      ["pulso", 15.3, -13],
+      ["aire", 18.0, -18],
+      ["subrayado", 19.9, -14],
+      ["tick", 21.4, -17],
+      ["tick", 23.6, -17],
+      ["tick", 25.8, -17],
+      ["pad", 27.0, -18],
+      ["sting", 31.6, -15]
+    ]
+  }
+}

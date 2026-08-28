@@ -1,0 +1,131 @@
+{
+  "name": "12 · El río",
+  "modulo": "M4 · Mundos enteros",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un río de verdad, celda a celda. Todo el fotograma es lattice-Boltzmann D2Q9 (emergencia/rio.py): 32 400 celdas y 7790 pasos calculados en el render, sin resolver ninguna ecuación de fluidos. Las poblaciones se mueven por nueve direcciones, chocan y se relajan hacia el equilibrio local, y lo que rebota en el cilindro se devuelve por donde vino: nada más. De esas tres reglas sale sola la calle de vórtices de von Kármán, violeta a un lado y naranja al otro. Un anillo gris marca el único obstáculo; la cámara baja el ritmo y hace zoom 1.8 justo en el paso en que la sonda —tres diámetros aguas abajo— marca su pico, con un vórtice cruzándola. Al final se dibuja en cian la serie completa de esa sonda, plana al principio y periódica después, con el Strouhal medido aquí (0.205, 16 vórtices desprendidos) frente al 0.19 de la literatura para un cilindro libre, en gris: este canal mide sólo 6.75 diámetros de ancho y el bloqueo sube el número.",
+  "duracion_objetivo": 39.93,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el río ya baja: los 130 frames de arranque acelerado (17 pasos cada uno); entra el HUD de la pieza",
+    "3.4  un anillo gris se dibuja sobre el cilindro: el único obstáculo del canal",
+    "7.4  se apaga el anillo y entra la primera regla: 9 DIRECCIONES",
+    "9.2  la releva CHOCAN Y SE RELAJAN, en el mismo renglón",
+    "10.8 la releva NADA MAS, que se queda hasta el final",
+    "11.9 entra el pie de cifra: Reynolds 180, en unidades de red",
+    "15.9 la cámara se acerca a la estela (zoom 1.8, centrado en 0.34 del alto)",
+    "17.9 cámara lenta 3x sobre el paso en que la sonda marca su pico: un vórtice se desprende y la cruza",
+    "22.4 la cámara vuelve a abrirse",
+    "24.4 el río entero otra vez, con la calle ya establecida",
+    "28.4 relevo: se apagan la regla y Reynolds",
+    "29.2 se enciende el punto cian de la sonda, en el centro del canal",
+    "29.7 se traza la serie de la sonda: plana al principio, periódica después",
+    "32.8 pie de cifra: Strouhal 0.205 medido, 16 vórtices",
+    "35.3 en gris, el dato externo: cilindro libre 0.19",
+    "38.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 12.3,
+        "texto": "Nadie le dijo al agua que girara."
+      },
+      {
+        "t_inicio": 33.3,
+        "texto": "Y aun así, los remolinos se turnan."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      38.9,
+      39.6
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "aire_largo",
+        0.35,
+        -17
+      ],
+      [
+        "blip_medio",
+        3.45,
+        -14
+      ],
+      [
+        "blip_hud",
+        7.45,
+        -16
+      ],
+      [
+        "blip_hud",
+        9.25,
+        -16
+      ],
+      [
+        "blip_hud",
+        10.85,
+        -16
+      ],
+      [
+        "pulso",
+        11.95,
+        -13
+      ],
+      [
+        "aire",
+        15.95,
+        -15
+      ],
+      [
+        "cuerda_la2",
+        17.95,
+        -14
+      ],
+      [
+        "cuerda_mi3",
+        22.45,
+        -15
+      ],
+      [
+        "aire",
+        24.45,
+        -16
+      ],
+      [
+        "tick",
+        28.45,
+        -12
+      ],
+      [
+        "barrido",
+        29.25,
+        -13
+      ],
+      [
+        "pad",
+        30.0,
+        -18
+      ],
+      [
+        "sting",
+        32.85,
+        -13
+      ],
+      [
+        "blip_grave",
+        35.35,
+        -15
+      ]
+    ]
+  }
+}

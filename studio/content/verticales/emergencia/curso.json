@@ -1,0 +1,68 @@
+{
+  "name": "Emergencia · reglas simples, mundos enteros",
+  "slug": "emergencia",
+  "formato": "vertical",
+  "curso": 29,
+  "description": "Curso vertical (9:16) experimental: cada clip parte de dos o tres reglas que caben en una etiqueta y, delante del espectador, esas reglas producen un mundo entero —una bandada, una red, una mandala de arena, franjas, dominios magnéticos, una calle de vórtices, dos galaxias—. Todo el fotograma es una simulación numpy calculada en el render (paquete emergencia); sin subtítulos: la imagen enseña, la cifra medida remata y la voz apunta. Cada clip está hecho para subirse solo a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "modulos": [
+    "M1 · Reglas que caminan (1-4)",
+    "M2 · Campos que se organizan (5-8)",
+    "M3 · El caos con forma (9-11)",
+    "M4 · Mundos enteros (12-14)"
+  ],
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-la-bandada"
+    },
+    {
+      "dir": "clips/02-el-moho"
+    },
+    {
+      "dir": "clips/03-la-pila-de-arena"
+    },
+    {
+      "dir": "clips/04-el-canon"
+    },
+    {
+      "dir": "clips/05-manchas-y-rayas"
+    },
+    {
+      "dir": "clips/06-el-tanque-de-ondas"
+    },
+    {
+      "dir": "clips/07-la-placa-que-canta"
+    },
+    {
+      "dir": "clips/08-el-iman-que-decide"
+    },
+    {
+      "dir": "clips/09-doscientos-pendulos"
+    },
+    {
+      "dir": "clips/10-las-cuencas"
+    },
+    {
+      "dir": "clips/11-los-epiciclos"
+    },
+    {
+      "dir": "clips/12-el-rio"
+    },
+    {
+      "dir": "clips/13-dos-galaxias"
+    },
+    {
+      "dir": "clips/14-el-mundo-en-una-regla"
+    },
+    {
+      "dir": "clips/15-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

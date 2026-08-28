@@ -1,0 +1,127 @@
+{
+  "name": "05 · Manchas y rayas",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Gray-Scott en la malla 270x480 entera: de una semilla central nace un frente de manchas que crece desde el primer segundo. Al final de la fase de manchas se cuentan 186; la regla (f, k) se releva por la de rayas y la camara entra en camara lenta mientras el patron se reorganiza en un laberinto, sin volver a empezar. Zoom moderado al centro para ver el detalle: la longitud de onda medida por el pico del espectro baja de 15.3 a 13.3 pixeles. Todas las cifras las mide turing.simular sobre esta misma corrida (semilla 1).",
+  "duracion_objetivo": 31.57,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; la semilla ya crece",
+    "0.7  ritmo rapido de la mancha inicial (hasta 2.3)",
+    "2.3  regla 1: A SE GASTA",
+    "4.9  regla 2: B SE COPIA",
+    "7.5  regla 3: AMBOS SE MUEVEN",
+    "11.2 cifra: 186 manchas (fin de la fase 1)",
+    "12.2 se apagan reglas y cifra",
+    "12.86 releva la regla: f 0.030 k 0.057 (ambar)",
+    "12.86 camara lenta: el patron se hace laberinto (hasta 19.36)",
+    "19.36 cifra: longitud de onda 15.3, pixeles",
+    "19.76 avance rapido con zoom al centro (1.6x)",
+    "22.56 se sostiene el zoom sobre el detalle",
+    "23.96 la cifra pasa a 13.3",
+    "24.36 el zoom se abre de vuelta",
+    "27.36 avance final hasta el patron completo",
+    "28.96 respiro con el laberinto entero",
+    "30.16 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.6,
+        "texto": "De una mancha, nacen manchas."
+      },
+      {
+        "t_inicio": 13.0,
+        "texto": "La regla cambia y salen rayas."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      30.9,
+      31.3
+    ],
+    "eventos": [
+      [
+        "nebulosa_intro",
+        0.05,
+        -14
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -18
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -16
+      ],
+      [
+        "tick",
+        2.3,
+        -15
+      ],
+      [
+        "tick",
+        4.9,
+        -15
+      ],
+      [
+        "tick",
+        7.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        11.2,
+        -14
+      ],
+      [
+        "barrido",
+        12.5,
+        -16
+      ],
+      [
+        "pulso",
+        12.9,
+        -14
+      ],
+      [
+        "pad",
+        13.2,
+        -20
+      ],
+      [
+        "blip_agudo",
+        19.76,
+        -14
+      ],
+      [
+        "aire",
+        19.9,
+        -17
+      ],
+      [
+        "subrayado",
+        23.96,
+        -14
+      ],
+      [
+        "sting",
+        27.4,
+        -15
+      ],
+      [
+        "nebulosa_cierre",
+        30.2,
+        -16
+      ]
+    ]
+  },
+  "modulo": "M2 · Campos que se organizan"
+}
