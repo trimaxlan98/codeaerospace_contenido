@@ -190,9 +190,9 @@ unico que cambia es el directorio: `studio/content/verticales/satelites/`.
 | 2 · Libreria ampliada + sonda de validacion en contenedor | **hecho**: `studio/tools/sonda_satelites.py`, **0 fallos** |
 | 3 · Molde: intro + clip 01 escritos, renderizados y revisados | **hecho**: intro 12.43 s, clip 01 35.43 s (ql), frames revisados |
 | 4 · Esqueletos de las 16 piezas (`curso.json` + stubs) | **hecho**: las 16 componen; el cierre (heredado) renderiza a 8.90 s |
-| 5 · Produccion de los clips 02-14 | pendiente (13 piezas) |
-| 6 · Revision de frames uno a uno + `pytest -q` del Studio | pendiente |
-| 7 · `qh` de las 16 (3 en paralelo, desde un `.sh`) | pendiente |
+| 5 · Produccion de los clips 02-14 | **hecho**: las 13 escritas, renderizadas y revisadas |
+| 6 · Revision de frames uno a uno + `pytest -q` del Studio | **hecho**: 151 tests en verde |
+| 7 · `qh` de las 16 (3 en paralelo, desde un `.sh`) | en curso |
 | 8 · Voz (VPS, SERIAL, `alinear_voz.py`) | pendiente |
 | 9 · Mux + union + picos + costuras | pendiente |
 | 10 · PLAN.md, catalogo, cosecha de trampas y memoria | pendiente |
@@ -201,6 +201,15 @@ unico que cambia es el directorio: `studio/content/verticales/satelites/`.
 `curso/fractales-vertical`, que a su vez sale de `exp/promos-redes`. Un PR a
 `main` arrastraria los promos Y el curso de fractales. Hay que decidirlo con
 el dueño antes del paso 7 (no bloquea nada hasta entonces).
+
+## Duraciones medidas en `ql` (las de `qh` se corrigen en el paso 7)
+
+intro 12.43 · 01 35.43 · 02 30.43 · 03 31.43 · 04 30.43 · 05 30.16 ·
+06 30.20 · 07 30.16 · 08 30.03 · 09 30.33 · 10 30.16 · 11 30.10 ·
+12 30.03 · 13 30.03 · 14 30.06 · cierre 8.90.
+
+**Total: 450.31 s = 7 min 30 s.** Las 14 piezas de leccion caen entre 30.03
+y 35.43 s, dentro del rango duro de 30-45.
 
 ## Cifras ya medidas (sonda del 2026-08-27, 0 fallos)
 
@@ -226,6 +235,12 @@ la imprime. Se anotan para poder escribir el storyboard sin adivinar.
 | 12 | tiempo-satelite sobre agua | **70.7 %** |
 | 13 | demanda servida, fijo -> aprendido | 1.09 % -> **7.59 %** (x6.94), techo 7.59 % |
 | 14 | sobre CDMX con 240 satelites | **4** por encima de 10 grados (Svalbard, 78N: 0) |
+| 06 | pases de las vueltas +1, +2, +3, -1 y -2 | **ninguno**: la traza se corre 2662 km y la huella alcanza 1664 |
+| 08 | inclinacion minima para tocar el polo | **75.03 grados** (90 menos la huella) |
+| 11 | antena equivalente para recuperar 36.27 dB | **65 veces mas ancha** (la ganancia va con el diametro al cuadrado) |
+| 12 | satelites sobre tierra segun el instante | entre **32 y 40** de 120 |
+| 13 | techo del asignador perfecto | 7.59 %: el aprendido **lo alcanza**, margen 0.00 |
+| 14 | extrapolacion a la flota de hoy | **102** sobre tu horizonte (6000 es dato externo; el 102 se calcula) |
 
 ## Cosecha de trampas
 
@@ -267,3 +282,34 @@ Especificas de este curso, previstas:
   **0.292 unidades por caracter a font_size 18**, o sea un tope de
   **19 caracteres contando los espacios**. Escribir los rotulos con esa
   regla ahorra una vuelta de render por clip.
+
+**Cosechadas escribiendo los 14 clips**
+
+- **La CIFRA tiene un tope de ancho mucho mas estrecho que el HUD.** A
+  `font_size` 104 son **0.873 unidades por caracter**: seis caracteres y se
+  acabo ("32 a 40" medía 6.11 de las 5.76 utiles). El HUD, a 18, admite 19.
+  Dos reglas distintas para dos piezas que se escriben en la misma linea.
+- **El identificador de pieza tambien pasa por el guardian**: "14 . sobre tu
+  cabeza" no cabia. Los HUD de pieza se quedan en 13-16 caracteres.
+- **El bloque de estilo importa el MODULO, no los nombres**: `AnimarWalker`
+  sin `sa.` delante es un `NameError` en pleno render.
+- **`heatmap_q` colorea de azul a CIAN a dorado**, y en este curso el cian
+  significa "medido en este render". Cualquier imagen de la libreria que
+  traiga cian propio necesita `paleta=` a medida; el clip 13 usa una rampa
+  violeta para la demanda y verde para el haz que ya apunta bien.
+- **El mapa equirrectangular es 2:1**: `alto_escena` es la MITAD del ancho
+  que se quiere. Con 2.88/2 el mundo entero salio del tamaño de un sello y
+  el frame parecia correcto.
+- **Un sector barrido desde el foco incluye el disco del planeta.** Dibujarlo
+  por debajo deja asomando solo una uña y la igualdad de areas no se lee:
+  va encima y translucido.
+- **Relevar solo una parte del pie deja la otra debajo del siguiente.** En
+  el clip 03 se cambiaron etiqueta y numero pero no el sub, y "km / s" se
+  quedo bajo dos rotulos mas ("MISKM / SIEMPO" en el frame). Se lleva una
+  lista `vivos` con lo que de verdad esta en pantalla y se releva SOBRE ella.
+- **Una cifra emparejada con un pie que habla de otra cosa miente sin que
+  nadie lo note.** En el clip 02, durante el giro se quedaba el periodo de
+  la GEO con el pie "a la vez". Si cambia lo que se enseña, cambia la cifra.
+- **En equirrectangular la recta no es el camino corto.** El "cable" del
+  clip 10 se dibuja con un slerp de verdad entre los dos vectores unitarios;
+  una recta sobre el mapa plano enseñaria una ruta que nadie recorre.
