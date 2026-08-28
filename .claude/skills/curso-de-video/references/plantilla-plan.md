@@ -12,7 +12,12 @@ número del **curso** es el de `PLAN.md` — no siempre coinciden; decláralo.
    está el tablero, y la frase con la que el dueño reanuda ("continuamos con
    el curso de X").
 2. **Formato**: familia o curso de 8 clips; módulos × lecciones = proyectos y
-   clips; patrón de nombre y de slug.
+   clips; patrón de nombre y de slug. **Y si el curso lleva subtítulos o no**:
+   el defecto es que NO (formato mudo). Si el dueño los pidió, se dice aquí,
+   porque es lo que leen los subagentes. Si no los pidió, esta sección lleva
+   la tabla de lo que puede aparecer en pantalla y la nota de que el guardián
+   del `style_block` aborta el render — ver la §2 del plan del curso 27
+   (`curso-24-procesamiento-senales.md`), que sirve de plantilla.
 3. **Ángulo editorial**: la idea que hilvana el curso entero, en dos frases.
    Y el arco: dónde empieza y dónde termina.
 4. **Público y qué asume**: qué cursos previos da por sabidos.
@@ -38,7 +43,8 @@ número del **curso** es el de `PLAN.md` — no siempre coinciden; decláralo.
     leyenda `— / ~ / ✔`. **Se actualiza tras cada hito, no al final.**
 13. **Storyboard por módulo**: por lección, un párrafo de intención y los 4
     clips numerados, cada uno con lo que se ve, la función de la librería que
-    da sus cifras, y el pie. El clip 4 lleva el cierre literal, dos líneas.
+    da sus cifras, y las cifras que se rotulan (o el pie, si el curso lleva
+    subtítulos). El clip 4 lleva el cierre literal, dos líneas.
 14. **Cosecha heredada**: las trampas de las familias vecinas que más riesgo
     tienen en ésta.
 15. **Cosecha de trampas del lote N**: se escribe DURANTE la producción, con

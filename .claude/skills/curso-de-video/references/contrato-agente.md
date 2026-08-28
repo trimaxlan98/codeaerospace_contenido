@@ -34,8 +34,17 @@ NO toques: curso.json, style_block.py, la librería, git.
 - Trampas: la cosecha del plan + `.claude/skills/curso-de-video/references/trampas.md`.
 
 ## Reglas duras
-- 28–45 s por clip (tope duro por ambos lados). Pies ≥ 5 s; el pie cambia
-  ANTES de la animación que ilustra; los rótulos viejos se apagan antes.
+- 28–45 s por clip (tope duro por ambos lados).
+- **FORMATO MUDO (por defecto): no hay pie narrativo.** La palabra la pone la
+  voz; la pantalla pone la cosa y su cifra. Solo pueden aparecer: título del
+  clip (≤ 6 palabras), etiqueta del módulo, rótulos de mobiliario (≤ 4),
+  cifras medidas (≤ 5), fórmulas y el cierre del clip 4. `pie_curso` NO existe
+  y los helpers ABORTAN el render si escribes una frase — no intentes
+  rodearlo con `Text(...)` a mano: si el render pasa pero hay prosa en
+  pantalla, el clip se rechaza igual.
+  *(Solo si el encargo pidió subtítulos: entonces sí hay `pie_curso`, con pies
+  de ≥ 5 s, el pie cambia ANTES de la animación que ilustra y los rótulos
+  viejos se apagan antes.)*
 - TODA cifra en pantalla sale de la librería (numpy, semilla fija). Cero
   números escritos a mano. Si mides una ventana, la estadística es de la
   ventana.
@@ -48,8 +57,8 @@ NO toques: curso.json, style_block.py, la librería, git.
     studio/backend/venv/bin/python studio/tools/render_local.py \
       <worktree>/studio/content/cursos/<slug> --clip K --frames 8
 Revisa los 8 frames **uno a uno** con Read. Un frame con dos cosas encimadas,
-un rótulo cortado o un pie que no corresponde = no aprobado, se corrige y se
-re-renderiza. Comprueba la duración que reporta la herramienta.
+un rótulo cortado, una cifra que no corresponde o una frase de prosa = no
+aprobado, se corrige y se re-renderiza. Comprueba la duración que reporta la herramienta.
 
 ## Informe final
 Una línea por clip: duración, qué se ve en el último frame, y las cifras que

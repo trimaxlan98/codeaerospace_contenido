@@ -1,6 +1,6 @@
 # Cosecha de trampas
 
-Acumulada a lo largo de 25 cursos. **Todas siguen vigentes**: cada familia
+Acumulada a lo largo de 27 cursos. **Todas siguen vigentes**: cada familia
 nueva vuelve a tropezar con las mismas si no se leen antes de escribir clips.
 La cosecha específica de cada familia está en la sección final de su
 `docs/plan_contenido/curso-NN-*.md`; lee también la de la familia vecina más
@@ -73,10 +73,30 @@ parecida a la que vas a producir.
   es lo que distingue.
 - `Rotulos.mostrar` cobra ~0.25 s extra de salida en cada relevo: contarlo al
   estimar duraciones.
-- Un pie mostrado **antes** de dibujar una rejilla o una tabla queda debajo de
-  ella.
-- Los rótulos del momento anterior se apagan **antes** del pie nuevo, o el
-  frame muestreado enseña pie nuevo + rótulo viejo.
+- Un rótulo del carril inferior mostrado **antes** de dibujar una rejilla o una
+  tabla queda debajo de ella.
+- Los rótulos del momento anterior se apagan **antes** del relevo, o el frame
+  muestreado enseña la cifra nueva con el rótulo viejo. (Con subtítulos, lo
+  mismo con el pie.)
+- **Un resalte que entra con `FadeIn` mientras el anterior sale con `FadeOut`
+  deja DOS en pantalla medio segundo**, justo el que se usa para mirar:
+  `Transform` sobre UN único mobject.
+- **`Transform(pieza, gemela)` sobre una `_Anclada` cuyos submobjects entraron
+  sueltos** (`FadeIn(pz.ejes)`, `Create(pz.circulo)`) mete la pieza ENTERA en
+  escena y **por encima de todo**: hay que volver a poner los rótulos delante
+  con `self.add(rotulo)` justo después.
+- **`cierre_leccion` solo apaga lo que se le pasa**: si dibujaste `.curva` y
+  `.area` de una pieza suelta, pasa TAMBIÉN `.ejes`, o la línea del eje
+  sobrevive cruzando las dos frases del cierre.
+- **Dos piezas solo son gemelas si comparten EJE.** Dos espectros de Welch con
+  trozos distintos tienen 129 y 257 bins: no se puede `Transform` una en otra,
+  se dibujan como dos piezas sobre el mismo rango.
+- Una curva **sin techo natural** sale como un segmento horizontal pegado al
+  borde si te fías del `np.clip` de la pieza (se lee como saturación, que es lo
+  contrario de lo que hace): recorta los PUNTOS antes de dibujar.
+- Un contador de cifras dentro de una animación larga deja dígitos a medio
+  morfar: `Succession(Wait(0.55), Transform(cont, nuevo, run_time=0.02))`, en
+  ese orden y con el Transform corto.
 - Un clip que sale en 26–27 s se engorda con `wait`, no con más contenido.
 
 ## Tipografía
@@ -86,10 +106,46 @@ parecida a la que vas a producir.
 - Rajdhani y Space Mono no traen superíndices, ni griegas, ni `⁻¹`, ni `≈`:
   `10^-3`, `λ`, `Σ`, `φ`, `σ` van en `MathTex`. Space Mono escribe `10⁶` como
   `10'`. `tag_hud` solo ASCII.
+- **Rajdhani tiene DOS defectos de tamaño, los dos medidos en el contenedor y
+  ninguno visible a ojo en un frame suelto:**
+  1. **parte palabras a 16–17 px** — "retardada" sale "ret ardada";
+  2. **junta las palabras por debajo de 22 px** — "por separado" salió
+     **"porseparado"** en el `qh` de una lección ya publicada.
+  Space Mono no tiene ninguno de los dos a ningún tamaño del curso. Por eso los
+  helpers imponen **dos suelos**: 18 px para un rótulo de una palabra y **22 si
+  tiene más**. Para etiquetas de varias palabras, mejor `tag_hud` directamente.
+- El ancho de `Text` **no escala continuo** con `font_size`: 11 y 13 miden lo
+  mismo. Bajar un punto no reduce nada; hay que acortar la cadena.
+- Se caza con una sonda que renderice los rótulos REALES a varios tamaños y se
+  mire el PNG (`texto2.py` del curso 27). Medir el bbox no basta: el problema
+  está en los avances entre glifos, no en la caja.
 
 ## Honestidad con las cifras
 
 Esta es la categoría que **no detecta el render**: solo se caza midiendo.
+
+- **LA MALLA DECIDE, y por eso hay cifras que NO se rotulan.** La profundidad
+  de un nulo, de un notch o de los ceros de un CIC depende de cuántos puntos
+  tenga la rejilla: −119 dB con 4096 y −141 con 16384; −39.7 con 2048 y −240
+  con 4096. Se rotula lo que **no se mueve** al cambiar la malla — la posición
+  del nulo, el nivel de los lóbulos, el ancho del hueco. Por lo mismo, el
+  "margen desperdiciado" de un diseño por ventanas no se mide de pico a nulo
+  (91 dB, inflado) sino contra los lóbulos (27.2 dB).
+- **Una cifra puede ser cero por casualidad.** `h[79]` de un resonador vale 0
+  para radio 0.92, 1.00 y 1.05 (cae en un cruce por cero del seno): rotularlo
+  junto a la palabra "inestable" habría enseñado un 0.0. Usa el máximo de la
+  cola, no una muestra suelta.
+- **Una magnitud puede ser recta solo en un tramo.** La fase de un FIR
+  simétrico es una recta DENTRO de la banda de paso; ajustarla entera da 1.7
+  rad de residuo y una conclusión falsa.
+- **Una cifra sin su condición miente.** La caída de un CIC no es un número:
+  −0.42, −2.70 o −11.61 dB según cuánta banda uses. Se rotulan las tres con la
+  condición dentro del propio rótulo.
+- **Comparar unidades distintas infla un lado.** El coste de una FFT en
+  multiplicaciones complejas contra el de la convolución directa en reales
+  multiplica la FFT por cuatro y da un cruce falso (M = 16 en vez de 24).
+- **Una demo que solo funciona con tu semilla no es una demo**: barre semillas
+  (y duración, y SNR) hasta un caso que acierte en todas, y si no lo hay, dilo.
 
 - Si se dibuja una **ventana** de una simulación más larga, la estadística se
   mide sobre la ventana dibujada. Citar la corrida entera mientras se ve un

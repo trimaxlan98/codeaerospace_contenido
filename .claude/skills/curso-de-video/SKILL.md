@@ -1,14 +1,17 @@
 ---
 name: curso-de-video
-description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Covers both formats (familia = one project per lesson, and the old 8-clip single course).
+description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Courses are MUTE by default (no narrative subtitles on screen: only titles, short labels and measured figures); subtitles are opt-in and only if the owner asks for them. Covers both formats (familia = one project per lesson, and the old 8-clip single course).
 ---
 
 # Curso de video CO.DE Academy
 
 Cómo se produce un curso completo de punta a punta. Es el proceso destilado
-de 25 cursos publicados (el 25, Protocolos de Internet, son 24 lecciones y
-96 clips). Complementa la skill `manimstudio` (esa explica la app; ésta, el
-contenido).
+de 27 cursos publicados; el más extenso es el 27, Procesamiento de señales:
+30 lecciones, 120 clips y 74 minutos de vídeo. Complementa la skill
+`manimstudio` (esa explica la app; ésta, el contenido).
+
+**Lo primero que hay que saber**: desde el curso 27 los cursos se hacen **sin
+subtítulos** salvo que el dueño los pida (ver "Formato mudo" más abajo).
 
 **Antes de tocar nada**: invoca la skill `manimstudio`, lee las memorias
 `manimstudio-pipeline-cursos`, `plan-contenido-academy` y la de la familia
@@ -26,8 +29,8 @@ idea     (4N)  →   clip, HUD "MODULO 0K"              clips
 ```
 
 - **Formato vigente (familias, desde 2026-08-14)**: un proyecto = una
-  **lección de 4 clips**, un clip = una idea. Tamaños ya usados: 9, 12, 18 y
-  24 lecciones. Slugs `<familia>-N-M-<tema>`, nombre `Familia · N.M <título>`
+  **lección de 4 clips**, un clip = una idea. Tamaños ya usados: 9, 12, 18,
+  24 y **30** lecciones (el 27 es el mayor: 30 lecciones en 5 lotes de 6). Slugs `<familia>-N-M-<tema>`, nombre `Familia · N.M <título>`
   (el nombre es la clave de emparejamiento de `subir_curso.py`: no lo cambies
   después de subir).
 - **Formato antiguo (cursos 1–21)**: un proyecto = un curso de 8 clips. Solo
@@ -35,6 +38,54 @@ idea     (4N)  →   clip, HUD "MODULO 0K"              clips
 - Fuente del temario: un hilo conceptual propio, un documento maestro, o el
   desmenuzado de `code-academy-platform`. Un curso nuevo **no re-explica** lo
   que ya cubrió otro: declara explícitamente qué capa ocupa y qué asume.
+
+## Formato mudo: SIN SUBTÍTULOS por defecto
+
+**Desde el curso 27 (Procesamiento de señales), un curso nuevo se hace sin pie
+narrativo salvo que el dueño pida lo contrario.** La palabra la pone la voz;
+la pantalla pone la **cosa** y su **cifra**. Razón del dueño, con sus palabras
+al ver el curso terminado: *"me gustó mucho más sin subtítulos, así no me
+pierdo tanto"* — leer y mirar a la vez reparte la atención. El vertical
+(curso 26) ya nacía así; desde el 27 el horizontal también.
+
+Lo que puede haber en pantalla:
+
+| Elemento | Helper | Límite |
+|---|---|---|
+| Título del clip (arriba) | `titulo_curso()` | ≤ 6 palabras |
+| Etiqueta del módulo (UL) | `hud_modulo("Modulo 0N")` | fija |
+| Rótulo de mobiliario (ejes, `x[n]`, `dB`) | `tag_junto()` | ≤ 4 palabras |
+| **Cifra medida** (carril inferior) | `cifra_pie()` | ≤ 5 palabras |
+| Cifra flotante | `tag_hud()` | ≤ 5 palabras |
+| Columna de cifras (UR) | `panel_cifras()` | ≤ 5 por línea |
+| Fórmula | `formula_pie()` | una línea |
+| Dato NO calculado aquí | `dato_pie()` | ≤ 5 palabras, gris |
+| Cierre del clip 4 | `cierre_leccion()` | 2 líneas |
+
+**No se deja a la disciplina**: `pie_curso` **no se define** en el
+`style_block`, y los helpers pasan por un `_vigilar()` que **aborta el render**
+si un rótulo se convierte en frase. Con 30 lecciones y ~25 subagentes fue la
+única forma de que la regla llegara viva al final; un agente que copie
+`pie_curso` de otra familia revienta en el primer render, que es justo lo que
+tiene que pasar.
+
+**Consecuencia de ritmo**: el tiempo que antes sostenía la lectura del pie
+(≥ 5 s) ahora lo sostiene la **animación**. Más `Create`/`Transform`/updaters y
+menos `wait` largo y vacío. La duración sigue en 28–45 s.
+
+**Implementación de referencia**, para copiar tal cual:
+`studio/content/cursos/procesamiento-senales-1-1-muestreo/style_block.py`
+(helpers, guardián y suelos tipográficos) y sus cuatro clips.
+
+### Si el dueño SÍ pide subtítulos
+
+Entonces vuelve la regla clásica, que sigue siendo válida: `pie_curso()` en la
+zona `abajo`, **pies de ≥ 5 s legibles**, **el pie cambia ANTES** de la
+animación que ilustra y los rótulos del momento anterior se apagan antes del
+pie nuevo. Los cursos 1–26 son el modelo (p. ej.
+`studio/content/cursos/comunicaciones-digitales-1-1-muestreo/`). En ese caso
+se quita el guardián o se le sube el límite, y se declara en el §2 del plan
+para que los subagentes lo sepan.
 
 ## Los 10 pasos
 
@@ -82,16 +133,22 @@ Comandos exactos de los pasos 2 y 8–10: `references/comandos.md`.
 **Contenido**
 - Clips de **28–45 s** (tope duro por ambos lados). Un clip de 26 s se
   engorda con `wait`, no metiendo más contenido.
-- Pies de ≥ 5 s legibles; **el pie cambia ANTES** de la animación que
-  ilustra; los rótulos del momento anterior se apagan antes del pie nuevo.
+- **Sin pie narrativo** (ver "Formato mudo"): la zona de abajo es el carril de
+  la cifra. Si el dueño pidió subtítulos, entonces sí: pies de ≥ 5 s legibles,
+  el pie cambia ANTES de la animación que ilustra, y los rótulos del momento
+  anterior se apagan antes del pie nuevo.
 - Un solo cierre a pantalla limpia por lección (clip 4), dos líneas, la
   segunda en cian.
 - **Todo número en pantalla se calcula** en la librería con numpy y semilla
   fija. Cero cifras inventadas. Si se dibuja una ventana de una simulación
   más larga, la estadística se mide **sobre la ventana dibujada**. Lo que la
-  librería no calcula (datos públicos) se declara como tal en el pie y en
-  otro color, para que el cian siga significando "medido aquí".
-- Si algo se exagera de escala, se declara en el pie.
+  librería no calcula (datos públicos) se declara como tal **en gris**
+  (`dato_pie`), para que el cian siga significando "medido aquí".
+- **Lo que depende de la malla no se rotula.** La profundidad de un nulo, de un
+  notch o de los ceros de un CIC cambia con el número de puntos de la rejilla
+  (−119 dB con 4096, −141 con 16384). Se rotula lo que NO se mueve al cambiar
+  la malla: la posición del nulo, el nivel de los lóbulos, el ancho del hueco.
+- Si algo se exagera de escala, se declara con una etiqueta corta.
 
 **Forma**
 - Tema oficial `code_brand` en todos los clips (branding automático salvo que
