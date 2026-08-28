@@ -229,7 +229,7 @@ lecciones en producción aunque el resto no se haga nunca.
 | 1 | 1 y 2 | 1.1–2.3 | núcleo: Paquete/Nodo/Enlace/Cola/Pila/Cabecera + IP/CIDR | **PUBLICADO** (PR #47; 24 qh, narrado y muxeado) |
 | 2 | 3 y 4 | 3.1–4.3 | Topologia, grafos, Dijkstra/BF/BGP, Escalera, Sierra, TCP | **PUBLICADO** (PR #48; 24 qh, narrado y muxeado) |
 | 3 | 5 y 6 | 5.1–6.3 | Arbol, Tabla, DNS/NAT/traceroute, TLS/HTTP/QUIC | **PUBLICADO** (PR #49; 24 qh, narrado y muxeado) |
-| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **escrito, validado y con los 24 qh hechos; PR #50 esperando merge** |
+| 4 | 7 y 8 | 7.1–8.3 | anycast/CDN, colas AQM, ABR, órbita, DTN, CCSDS | **PUBLICADO** (PR #50; 24 qh, narrado y muxeado) |
 
 ## Receta de lote (la misma en los cuatro)
 
@@ -283,12 +283,12 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 6.1 | ✔ | ✔ | ✔ | ✔ 29/29/32/37 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 6.2 | ✔ | ✔ | ✔ | ✔ 30/29/30/31 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 | 6.3 | ✔ | ✔ | ✔ | ✔ 33/31/34/39 s | PR #49 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
-| 7.1 | ✔ | ✔ | ✔ | ✔ 30/30/31/31 s | — | — | — | — | — |
-| 7.2 | ✔ | ✔ | ✔ | ✔ 29/30/29/29 s | — | — | — | — | — |
-| 7.3 | ✔ | ✔ | ✔ | ✔ 32/30/30/30 s | — | — | — | — | — |
-| 8.1 | ✔ | ✔ | ✔ | ✔ 32/36/35/31 s | — | — | — | — | — |
-| 8.2 | ✔ | ✔ | ✔ | ✔ 31/30/30/31 s | — | — | — | — | — |
-| 8.3 | ✔ | ✔ | ✔ | ✔ 30/30/33/32 s | — | — | — | — | — |
+| 7.1 | ✔ | ✔ | ✔ | ✔ 30/30/31/31 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 7.2 | ✔ | ✔ | ✔ | ✔ 29/30/29/29 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 7.3 | ✔ | ✔ | ✔ | ✔ 32/30/30/30 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 8.1 | ✔ | ✔ | ✔ | ✔ 32/36/35/31 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 8.2 | ✔ | ✔ | ✔ | ✔ 31/30/30/31 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
+| 8.3 | ✔ | ✔ | ✔ | ✔ 30/30/33/32 s | PR #50 (main) | ✔ | ✔ adoptado | ✔ | ✔ exports/ |
 
 ## Módulo 1 — La red de redes
 
@@ -1000,6 +1000,15 @@ Propias de esta familia; se suman a la cosecha heredada de arriba.
   correctas y la pantalla miente. La escala va en `ancho_viaje`.
 
 ## Hitos globales
+
+- **2026-08-26**: **CURSO COMPLETO Y PUBLICADO DE PUNTA A PUNTA.** PR #50
+  mergeado (`4209090`); **24 proyectos en producción con 96/96 `qh`
+  adoptados**; narración Charon **serial 24/24 lecciones a la primera** en
+  los cuatro lotes (96 wavs, cero reintentos); **24
+  `exports/protocolos-internet-*/curso_narrado.mp4`** de 2:14–2:41, todos
+  con pico ≤ −0.5 dB y la marca sonora a −6.0 dB exacto medida dentro de
+  las salidas. El lote 4 necesitó 8 clips re-muxeados (cuatro lecciones
+  tocaban 0.0 dB).
 
 - **2026-08-26**: **LAS 24 LECCIONES ESCRITAS Y VALIDADAS.** El lote 4
   (módulos 7 y 8) cierra el curso: 24 clips en `ql` entre 28.5 y 35.3 s,
