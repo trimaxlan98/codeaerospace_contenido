@@ -1,0 +1,28 @@
+{
+  "name": "11 · Por que la antena mira",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La esfera de energia que crece: la misma potencia repartida en una superficie cada vez mayor. La cifra: la perdida de camino a 550 km y a 35786 km en 12 GHz (168.84 y 205.11 dB) y la diferencia, 36.27 dB, que son 4234 veces.",
+  "libreria": [
+    "fspl_db"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "03 · La elipse",
+  "modulo": "M1 · Caerse sin llegar al suelo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La orbita no tiene por que ser un circulo. Una elipse muestreada en TIEMPOS iguales (no en angulos iguales) apelotona los puntos en el apogeo y los separa en el perigeo: corre abajo y se arrastra arriba. La cifra: las dos areas barridas en la misma fraccion de periodo, medidas sobre la trayectoria dibujada, y su cociente 1.000.",
+  "libreria": [
+    "elipse_kepler",
+    "areas_barridas"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "14 · Sobre tu cabeza",
+  "modulo": "M4 · La red que se gobierna sola",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Se apaga el mapa y queda el cielo de un patio: los satelites que en ESTE instante estan sobre el horizonte de un punto del suelo, con su elevacion y su azimut. La cifra: cuantos hay sobre tu cabeza ahora mismo, contados con la propagacion del enjambre.",
+  "libreria": [
+    "sobre_el_horizonte"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

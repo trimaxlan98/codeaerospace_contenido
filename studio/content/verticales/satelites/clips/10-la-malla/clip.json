@@ -1,0 +1,30 @@
+{
+  "name": "10 · La malla",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un paquete cruza el oceano saltando de satelite en satelite; al lado, la ruta por fibra. La cifra: la longitud del camino por la malla (Dijkstra sobre saltos reales, con la atmosfera bloqueando los rayos rasantes) y su latencia frente a la de la fibra. El rodeo del cable y los 2c/3 son SUPUESTOS: se declaran.",
+  "libreria": [
+    "ruta_malla",
+    "latencia_fibra",
+    "gran_circulo_km"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

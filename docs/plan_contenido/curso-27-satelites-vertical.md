@@ -187,10 +187,10 @@ unico que cambia es el directorio: `studio/content/verticales/satelites/`.
 | Paso | Estado |
 |---|---|
 | 1 · Plan maestro | **hecho** (2026-08-27) |
-| 2 · Libreria ampliada + sonda de validacion en contenedor | pendiente |
-| 3 · Molde: intro + clip 01 escritos, renderizados y revisados | pendiente |
-| 4 · Esqueletos de las 16 piezas (`curso.json` + stubs) | pendiente |
-| 5 · Produccion de los clips 02-14 | pendiente |
+| 2 · Libreria ampliada + sonda de validacion en contenedor | **hecho**: `studio/tools/sonda_satelites.py`, **0 fallos** |
+| 3 · Molde: intro + clip 01 escritos, renderizados y revisados | **hecho**: intro 12.43 s, clip 01 35.43 s (ql), frames revisados |
+| 4 · Esqueletos de las 16 piezas (`curso.json` + stubs) | **hecho**: las 16 componen; el cierre (heredado) renderiza a 8.90 s |
+| 5 · Produccion de los clips 02-14 | pendiente (13 piezas) |
 | 6 · Revision de frames uno a uno + `pytest -q` del Studio | pendiente |
 | 7 · `qh` de las 16 (3 en paralelo, desde un `.sh`) | pendiente |
 | 8 · Voz (VPS, SERIAL, `alinear_voz.py`) | pendiente |
@@ -201,6 +201,31 @@ unico que cambia es el directorio: `studio/content/verticales/satelites/`.
 `curso/fractales-vertical`, que a su vez sale de `exp/promos-redes`. Un PR a
 `main` arrastraria los promos Y el curso de fractales. Hay que decidirlo con
 el dueño antes del paso 7 (no bloquea nada hasta entonces).
+
+## Cifras ya medidas (sonda del 2026-08-27, 0 fallos)
+
+Ninguna de estas se vuelve a calcular a mano: el clip llama a la libreria y
+la imprime. Se anotan para poder escribir el storyboard sin adivinar.
+
+| Clip | Cifra | Valor medido |
+|---|---|---|
+| 01 | velocidad de circularizacion a 400 km | **7.673 km/s** |
+| 01 | caida en 1 s / curvatura bajo esa cuerda | **4.347 m / 4.347 m** |
+| 01 | alcance de los disparos (50/65/80/92 %) | 11.8 / 17.5 / 27.4 / 49.2 grados |
+| 02 | periodos a 550 / 2000 / 20200 / 35786 km | 95.50 min / 127.04 min / 11.973 h / **23.928 h** (dia sidereo) |
+| 03 | cociente de areas barridas (e=0.65) | **1.0000**; v_peri/v_apo = 4.7143 |
+| 04 | huella a 550 km con 10 grados | radio **1664 km**, **1.70 %** de la Tierra |
+| 04 | GEO a 10 grados / a 0 grados | 34.09 % / 42.44 % (nunca medio planeta) |
+| 05 | corrimiento de la traza a 550 km | **23.94 grados = 2662 km** por vuelta; 15.04 vueltas/dia |
+| 06 | pase sobre CDMX (550 km, 53 grados) | **8.24 min**, elevacion maxima 88.9 grados |
+| 07 | cobertura con 1 / 6 / 24 / 66 / 240 | 1.70 / 8.46 / 37.33 / 74.36 / **91.99 %** |
+| 08 | latitud maxima con inclinacion 53 | **68.0 grados**: los polos fuera (86.4 si los cubre) |
+| 09 | relevos sobre CDMX con 66 satelites | **14 en 90 min**, uno cada 6.43 min; 71 % del tiempo sin servicio a 25 grados |
+| 10 | Nueva York - Londres | malla **4 saltos, 6977 km, 23.27 ms**; fibra 7802 km, 39.04 ms |
+| 11 | FSPL a 12 GHz, 550 km y GEO | **168.84 y 205.11 dB** (36.27 dB = **4234 veces**) |
+| 12 | tiempo-satelite sobre agua | **70.7 %** |
+| 13 | demanda servida, fijo -> aprendido | 1.09 % -> **7.59 %** (x6.94), techo 7.59 % |
+| 14 | sobre CDMX con 240 satelites | **4** por encima de 10 grados (Svalbard, 78N: 0) |
 
 ## Cosecha de trampas
 
@@ -218,3 +243,23 @@ Especificas de este curso, previstas:
   mapa plano sin pesar por `cos(lat)`.
 - La traza se parte en el antimeridiano (`traza_terrestre` ya lo hace): una
   polilinea sin partir cruza la pantalla de lado a lado.
+- **La fase de una orbita NO mueve su traza.** `pase()` barria `fase0` y
+  ninguna fase acercaba el satelite a la estacion: desplazar el arranque
+  recorre la MISMA curva desde otro punto, porque la rotacion terrestre se
+  resta desde el instante inicial. Medido: la latitud sobre el meridiano de
+  la estacion no se movia ni un grado en 72 fases. El knob es el **RAAN**.
+- **Una ventana que cae en el borde del muestreo es media ventana.** El
+  perigeo esta en t=0, o sea en el extremo del array: `areas_barridas` tomaba
+  media ventana alli y entera en el apogeo, y el cociente salia 0.9958 con la
+  fisica perfecta. Envolviendo la ventana da 1.0000.
+- **Ambar y naranja son el mismo color a grosor 2.** El satelite (`C_SAT`
+  `#f59e0b`) y lo que se pierde (`C_PERDIDO` `#ea580c`) no se distinguen en
+  una linea fina sobre fondo oscuro. La diferencia la tiene que hacer el
+  PESO: el disparo que falla va fino y al 50 % de opacidad; el que se queda
+  arriba, grueso y opaco.
+- **Dos rotulos HUD cortos en el mismo renglon se leen como una frase.**
+  "CAE" y "SUELO", separados 0.80 unidades sobre sus barras, se leian "CAE
+  SUELO". A 2.70 cada uno sobre su barra, ya no.
+- `hud()` **espacia todos los caracteres**: una etiqueta de 16 letras ocupa
+  el doble de lo que parece al escribirla. El limite practico son ~16
+  caracteres CON los espacios, o sea 1-3 palabras cortas de verdad.

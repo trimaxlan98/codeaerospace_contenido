@@ -1,0 +1,28 @@
+{
+  "name": "09 · El relevo",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un punto en el suelo y el enjambre encima: la linea salta de un satelite al siguiente antes de que el primero se ponga. La cifra: cuantos relevos hay en 90 minutos y cada cuanto, mirando instante a instante cual es el satelite mas alto. Los huecos sin servicio se cuentan aparte y se declaran.",
+  "libreria": [
+    "relevos"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

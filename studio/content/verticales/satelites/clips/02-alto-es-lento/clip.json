@@ -1,0 +1,28 @@
+{
+  "name": "02 · Alto es lento",
+  "modulo": "M1 · Caerse sin llegar al suelo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cuatro alturas compitiendo en la misma columna: LEO a 550 km, los 2000 km, los 20200 de GPS y la GEO a 35786. El de arriba parece parado. La cifra: el periodo orbital de cada uno, resuelto con la tercera de Kepler por satelites.periodo_orbital — y la GEO cae en el dia sidereo, 23 h 56 min, no en 24 h.",
+  "libreria": [
+    "periodo_orbital"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

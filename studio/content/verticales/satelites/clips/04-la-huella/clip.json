@@ -1,0 +1,30 @@
+{
+  "name": "04 · La huella",
+  "modulo": "M2 · La Tierra gira debajo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El casquete que un satelite ve: el cono baja al mapa y pinta una tapa, con 10 grados de elevacion minima. La cifra: el radio de la huella en km y el porcentaje de la SUPERFICIE terrestre que ve uno solo — calculado sobre la esfera, nunca contando pixeles del mapa plano.",
+  "libreria": [
+    "radio_huella_km",
+    "fraccion_visible",
+    "angulo_cobertura"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

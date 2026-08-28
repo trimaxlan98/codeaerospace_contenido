@@ -1,0 +1,29 @@
+{
+  "name": "13 · La red aprende",
+  "modulo": "M4 · La red que se gobierna sola",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El asignador de haces: primero reparte a ciegas, luego va moviendo cada haz a donde mas sube la demanda servida. La cifra: la demanda servida antes y despues, medida sobre la matriz de cobertura REAL del enjambre. La matriz de demanda es sintetica y se declara en gris: lo que se mide es la MEJORA.",
+  "libreria": [
+    "asignar_haces",
+    "demanda_por_celda"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

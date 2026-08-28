@@ -1,0 +1,29 @@
+{
+  "name": "06 · El pase",
+  "modulo": "M2 · La Tierra gira debajo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Desde el suelo: la boveda polar, el satelite entra por el horizonte, culmina y se va. La cifra: cuanto dura el pase y cuanto sube, medidas de la ventana de visibilidad. Ojo con el knob: lo que decide si te pasa por encima es el RAAN de su plano, no la fase.",
+  "libreria": [
+    "pase",
+    "ventana_visibilidad"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}

@@ -14,7 +14,55 @@
     "M4 · La red que se gobierna sola (12-14)"
   ],
   "piezas": [
-    {"dir": "clips/00-intro", "tipo": "marca"},
-    {"dir": "clips/01-el-canon"}
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-el-canon"
+    },
+    {
+      "dir": "clips/02-alto-es-lento"
+    },
+    {
+      "dir": "clips/03-la-elipse"
+    },
+    {
+      "dir": "clips/04-la-huella"
+    },
+    {
+      "dir": "clips/05-la-traza"
+    },
+    {
+      "dir": "clips/06-el-pase"
+    },
+    {
+      "dir": "clips/07-uno-no-basta"
+    },
+    {
+      "dir": "clips/08-los-planos"
+    },
+    {
+      "dir": "clips/09-el-relevo"
+    },
+    {
+      "dir": "clips/10-la-malla"
+    },
+    {
+      "dir": "clips/11-por-que-la-antena-mira"
+    },
+    {
+      "dir": "clips/12-el-trafico-no-esta-repartido"
+    },
+    {
+      "dir": "clips/13-la-red-aprende"
+    },
+    {
+      "dir": "clips/14-sobre-tu-cabeza"
+    },
+    {
+      "dir": "clips/15-cierre",
+      "tipo": "marca"
+    }
   ]
 }

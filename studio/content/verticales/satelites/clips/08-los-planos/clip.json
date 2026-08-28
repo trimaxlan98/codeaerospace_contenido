@@ -1,0 +1,30 @@
+{
+  "name": "08 · Los planos",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La Walker-delta por dentro: los planos con su RAAN repartido y la fase entre planos, girando la camara. La cifra: hasta que latitud llega una constelacion inclinada 53 grados (68 grados) — los polos se quedan fuera, y por eso Iridium va a 86.",
+  "libreria": [
+    "latitud_maxima_cubierta",
+    "ConstelacionWalker",
+    "AnimarWalker"
+  ],
+  "estado": "esqueleto",
+  "duracion_objetivo": 35.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.2,
+      35.0
+    ],
+    "eventos": []
+  }
+}
