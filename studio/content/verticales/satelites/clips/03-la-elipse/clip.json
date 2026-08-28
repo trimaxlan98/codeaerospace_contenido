@@ -28,31 +28,27 @@
     "secciones": [
       {
         "t_inicio": 1.9,
-        "texto": "Una órbita no tiene por qué ser un círculo."
+        "texto": "Una órbita puede ser una elipse."
       },
       {
-        "t_inicio": 4.6,
+        "t_inicio": 7.0,
         "texto": "Abajo va lanzado."
       },
       {
-        "t_inicio": 11.2,
+        "t_inicio": 11.3,
         "texto": "Arriba se arrastra."
       },
       {
-        "t_inicio": 14.6,
+        "t_inicio": 15.0,
         "texto": "Cuatro veces y media más rápido."
       },
       {
-        "t_inicio": 18.4,
-        "texto": "Un punto por cada tramo igual de tiempo."
+        "t_inicio": 20.5,
+        "texto": "Un punto por cada minuto igual."
       },
       {
-        "t_inicio": 23.4,
-        "texto": "Y barre la misma área."
-      },
-      {
-        "t_inicio": 25.8,
-        "texto": "Larga y estrecha, o corta y ancha. La misma."
+        "t_inicio": 26.0,
+        "texto": "Barre la misma área."
       }
     ]
   },

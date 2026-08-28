@@ -31,28 +31,16 @@
         "texto": "Uno solo tapa esto."
       },
       {
-        "t_inicio": 5.7,
+        "t_inicio": 8.5,
         "texto": "Seis."
       },
       {
-        "t_inicio": 9.4,
-        "texto": "Veinticuatro."
+        "t_inicio": 14.0,
+        "texto": "Sesenta y seis. Tres cuartas partes."
       },
       {
-        "t_inicio": 12.2,
-        "texto": "Sesenta y seis: tres cuartas partes."
-      },
-      {
-        "t_inicio": 16.9,
-        "texto": "Doscientos cuarenta."
-      },
-      {
-        "t_inicio": 19.0,
+        "t_inicio": 20.5,
         "texto": "Pero los polos se quedan fuera."
-      },
-      {
-        "t_inicio": 23.4,
-        "texto": "Y donde se pisan dos, puedes saltar de uno a otro."
       }
     ]
   },

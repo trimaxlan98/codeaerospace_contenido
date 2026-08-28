@@ -32,19 +32,19 @@
         "texto": "No es una nube. Son planos."
       },
       {
-        "t_inicio": 5.6,
-        "texto": "Cada uno cruza el ecuador por su sitio."
+        "t_inicio": 7.5,
+        "texto": "Cada uno cruza por su sitio."
       },
       {
-        "t_inicio": 11.6,
-        "texto": "Con cincuenta y tres grados, el techo son sesenta y ocho."
+        "t_inicio": 13.0,
+        "texto": "El techo son sesenta y ocho grados."
       },
       {
-        "t_inicio": 15.8,
-        "texto": "Harían falta setenta y cinco para tocar el polo."
+        "t_inicio": 19.0,
+        "texto": "Harían falta setenta y cinco."
       },
       {
-        "t_inicio": 21.4,
+        "t_inicio": 24.0,
         "texto": "Iridium va a ochenta y seis."
       }
     ]

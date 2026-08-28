@@ -90,8 +90,4 @@ class Clip(Scene):
         self.play(sa.AnimarWalker(cons_b), run_time=4.5)
         self.wait(3.10)
 
-        for mob in self.mobjects:
-            mob.clear_updaters()
-        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.9)
-        self.remove(*self.mobjects)
-        self.wait(0.5)
+        fundido_final(self, run_time=0.9, cola=0.5)

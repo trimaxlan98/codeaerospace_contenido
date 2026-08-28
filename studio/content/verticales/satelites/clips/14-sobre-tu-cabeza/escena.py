@@ -95,8 +95,4 @@ class Clip(Scene):
         self.play(todos.animate.set_opacity(1.0), run_time=1.6)
         self.wait(4.6)
 
-        for mob in self.mobjects:
-            mob.clear_updaters()
-        self.play(*[FadeOut(m) for m in self.mobjects], run_time=1.3)
-        self.remove(*self.mobjects)
-        self.wait(0.5)
+        fundido_final(self, run_time=1.3, cola=0.5)

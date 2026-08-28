@@ -29,24 +29,20 @@
         "texto": "Esto es tu cielo."
       },
       {
-        "t_inicio": 6.0,
+        "t_inicio": 6.5,
         "texto": "Con doscientos cuarenta arriba, ves cuatro."
       },
       {
-        "t_inicio": 9.9,
-        "texto": "Cada uno ve el uno y medio por ciento de la Tierra."
+        "t_inicio": 12.0,
+        "texto": "Cada uno ve muy poco."
       },
       {
-        "t_inicio": 14.1,
-        "texto": "Pero arriba ya no hay doscientos cuarenta."
+        "t_inicio": 17.0,
+        "texto": "Pero ahí arriba hay miles."
       },
       {
-        "t_inicio": 18.3,
-        "texto": "Hay unos cien sobre tu cabeza. Ahora mismo."
-      },
-      {
-        "t_inicio": 24.2,
-        "texto": "Y siguen ahí cuando dejas de mirar."
+        "t_inicio": 22.0,
+        "texto": "Cien sobre tu cabeza. Ahora mismo."
       }
     ]
   },

@@ -28,35 +28,27 @@
     "secciones": [
       {
         "t_inicio": 2.6,
-        "texto": "Dispara un cañón desde muy alto."
+        "texto": "Dispara muy alto."
       },
       {
-        "t_inicio": 5.5,
+        "t_inicio": 6.5,
         "texto": "La bala cae."
       },
       {
-        "t_inicio": 8.6,
-        "texto": "Dispara más fuerte. Cae más lejos."
+        "t_inicio": 9.5,
+        "texto": "Más fuerte. Cae más lejos."
       },
       {
-        "t_inicio": 12.6,
-        "texto": "Más fuerte todavía."
-      },
-      {
-        "t_inicio": 16.6,
+        "t_inicio": 14.2,
         "texto": "Y ahora falla el suelo."
       },
       {
-        "t_inicio": 21.9,
+        "t_inicio": 20.0,
         "texto": "Un satélite no deja de caer."
       },
       {
-        "t_inicio": 25.0,
+        "t_inicio": 25.5,
         "texto": "Cae lo mismo que se aleja la Tierra."
-      },
-      {
-        "t_inicio": 29.5,
-        "texto": "Por eso se queda."
       }
     ]
   },

@@ -27,27 +27,27 @@
     "secciones": [
       {
         "t_inicio": 2.2,
-        "texto": "Aquí está la demanda. Es una simulación."
+        "texto": "Esta es la demanda. Simulada."
       },
       {
-        "t_inicio": 5.4,
+        "t_inicio": 7.0,
         "texto": "Ocho haces, repartidos a ojo."
       },
       {
-        "t_inicio": 9.0,
-        "texto": "Ahora déjalos moverse a donde más suben el total."
+        "t_inicio": 12.0,
+        "texto": "Ahora déjalos moverse."
       },
       {
-        "t_inicio": 15.6,
+        "t_inicio": 16.0,
         "texto": "Siete veces más servido."
       },
       {
-        "t_inicio": 19.8,
+        "t_inicio": 20.5,
         "texto": "Con los mismos ocho haces."
       },
       {
-        "t_inicio": 23.6,
-        "texto": "Y ese es el techo: no se puede hacer mejor."
+        "t_inicio": 25.0,
+        "texto": "Y es el techo."
       }
     ]
   },

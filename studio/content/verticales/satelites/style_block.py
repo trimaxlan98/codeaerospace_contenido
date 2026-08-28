@@ -347,13 +347,39 @@ class Scene(_SceneBase):
     def setup(self):
         super().setup()
         self.camera.background_color = CODE_BG
-        self.add(_promo.fondo_seguro(FMT))
+        self.mobiliario = []
+        fondo = _promo.fondo_seguro(FMT)
+        self.add(fondo)
+        self.mobiliario.append(fondo)
         if self.esquinas:
-            self.add(esquinas_hud(opacidad=0.14))
+            esq = esquinas_hud(opacidad=0.14)
+            self.add(esq)
+            self.mobiliario.append(esq)
         if self.marca_chica:
-            self.add(_promo.marca_promo(FMT, opacidad=0.34))
+            marca = _promo.marca_promo(FMT, opacidad=0.34)
+            self.add(marca)
+            self.mobiliario.append(marca)
         if GUIAS:
             self.add(_promo.guias(FMT))
+
+
+def fundido_final(escena, run_time=0.9, cola=0.5):
+    """Apaga el CONTENIDO y deja el mobiliario de marca puesto.
+
+    Si el fundido final se lleva tambien las esquinas HUD y la marca de agua,
+    la pieza acaba con el lienzo desnudo y la siguiente los enciende de
+    golpe en su primer frame: un parpadeo en cada corte. Se midio comparando
+    el ultimo frame de cada pieza con el primero de la siguiente — 0.055/255
+    de media y 95 de maximo en los pixeles de la marca, identico en las 14
+    uniones, que es la firma de que el culpable es siempre el mismo.
+    """
+    for mob in escena.mobjects:
+        mob.clear_updaters()
+    fuera = [m for m in escena.mobjects if m not in escena.mobiliario]
+    if fuera:
+        escena.play(*[FadeOut(m) for m in fuera], run_time=run_time)
+        escena.remove(*fuera)
+    escena.wait(cola)
 
 
 def reticula(paso=0.9, opacidad=0.10, color=C_EJE):
