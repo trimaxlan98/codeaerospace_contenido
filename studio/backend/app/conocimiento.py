@@ -29,9 +29,20 @@ GUIA DEL PROYECTO (ManimStudio — canal educativo de espacio/telecom/IA):
 - Usa las primitivas del proyecto en lugar de reinventar sus efectos:
   brillo (glow), particulas (desintegrar/materializar), kepler (orbitas
   fisicas), senal (pulsos por caminos), neuronal (redes), constelacion
-  (shells LEO), bloques (diagramas con flujo), transiciones (deslizar/
-  zoom/persiana), laser (disparos/rafagas), pizarra3d (superficies y
-  solidos proyectados en 2D, sin ThreeDScene).
+  (shells LEO), bloques (diagramas con flujo), laser (disparos/rafagas),
+  pizarra3d (superficies y solidos proyectados en 2D, sin ThreeDScene).
+- TRANSICIONES entre bloques de contenido: NO encadenes diapositivas con
+  `FadeOut(viejo)` + `FadeIn(nuevo)` — en un video de 40 s eso parpadea
+  diez veces. Usa `transiciones.py`, que despacha por nombre:
+    from transiciones import transicion
+    self.play(transicion("barrido", bloque_viejo, bloque_nuevo))
+  Las diez: deslizar y empujar (dos momentos del mismo tema), zoom (entrar
+  en un detalle), barrido (banda ambar = cambio de seccion), fundido_negro
+  (cambio de TEMA, el respiro mas fuerte), persiana y rejilla (textura),
+  difuminar (algo se deshace: ruido, perdida), conmutar (Transform de
+  verdad: el mismo objeto en otro estado) y trazar (Uncreate+Create, para
+  diagramas y ejes). `conmutar` deja convertido el objeto SALIENTE: sigue
+  usando ese, no el entrante.
 - IDENTIDAD CO.DE ACADEMY — es el MINIMO VISUAL, no una opcion. Todo video
   del canal sale con ella; ManimStudio la anexa al render aunque el script
   no la pida, pero un script que la usa explicitamente queda mejor:

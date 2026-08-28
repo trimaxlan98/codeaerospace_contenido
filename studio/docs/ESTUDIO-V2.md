@@ -42,7 +42,7 @@ Lo que le falta para ser un estudio, en orden de cuánto duele:
 |---|---|---|---|
 | E0 | Consolidación de ramas | todo lo nuevo, en `main` | **hecho** (PR #61) |
 | E1 | La película | monta el curso completo dentro de la app | **hecho** |
-| E2 | Transiciones | empalmes reales entre clips + catálogo en escena | pendiente |
+| E2 | Transiciones | empalmes reales entre clips + catálogo en escena | **hecho** |
 | E3 | Sonido de cursos | cama de SFX en cursos + banco audible | pendiente |
 | E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | pendiente |
 | E5 | Movimiento | transiciones de vista y micro-animaciones en la consola | pendiente |
@@ -163,3 +163,72 @@ directorio ajeno — verificado en la imagen real, donde el montaje falla con
 - Montaje real **dentro de la imagen `codeaerospace_contenido-manim`**: dos
   piezas (una con voz) con `corte` → 5,54 s, y con `fundido` de 0,5 s → 5,17 s
   sobre 3,0 + 2,5. Tres piezas con `negro` de 0,5 s → 8,50 s exactos.
+
+---
+
+## E2 — Transiciones (hecho)
+
+Dos capas distintas, y conviene no confundirlas:
+
+- **Entre clips** (E1): las hace ffmpeg al montar la película. Son empalmes de
+  archivos.
+- **Dentro de una escena** (esto): las hace Manim entre dos bloques de
+  contenido de un mismo clip. `transiciones.py` pasa de **3 funciones a 10**.
+
+### Por qué importaba
+
+Manim no trae transiciones entre bloques: lo único disponible es
+`FadeOut(viejo)` + `FadeIn(nuevo)`. En un clip de 40 segundos eso parpadea diez
+veces, siempre igual. Y las tres que ya existían **no salían en ninguna
+pantalla**: había que leer el archivo para saber que estaban.
+
+### Las diez
+
+| Nombre | Qué hace | Cuándo |
+|---|---|---|
+| `deslizar` | el viejo sale, el nuevo entra por el lado opuesto | dos momentos del mismo tema |
+| `empujar` | el nuevo empuja al viejo fuera del cuadro | igual, pero se nota |
+| `zoom` | el viejo atraviesa la cámara, el nuevo emerge del fondo | entrar en un detalle |
+| `barrido` | una **banda ámbar** cruza el cuadro | cambio de sección (es la marca) |
+| `fundido_negro` | todo va a `CODE_BG` y vuelve | cambio de **tema** |
+| `persiana` | franjas horizontales tapan y se retiran | textura |
+| `rejilla` | celdas que se cierran en diagonal | textura, aire de pantalla de control |
+| `difuminar` | el viejo se deshace, el nuevo se recompone | ruido, pérdida, olvido |
+| `conmutar` | `Transform` de verdad | el mismo objeto en otro estado |
+| `trazar` | `Uncreate` + `Create` | diagramas y ejes, donde el trazo cuenta |
+
+`transicion(nombre, saliente, entrante, **kw)` despacha por nombre y levanta
+`KeyError` **con el catálogo** si el nombre no existe: un typo no debe fallar a
+mitad de render.
+
+### La trampa que costó encontrar
+
+`mobject.animate.shift(v)` **copia el mobject en el momento en que se construye
+la animación**, no cuando se reproduce. En una `Succession` las tres partes se
+construyen antes de que se reproduzca ninguna, así que dos `.animate.shift()`
+seguidos calculan su destino desde la **misma** posición inicial: la banda del
+barrido entraba al centro y se quedaba ahí, tapando la escena. La solución es
+usar destinos **absolutos** (`move_to`, `scale_to_fit_height`, `set_opacity`),
+que dan el mismo resultado sin importar cuándo se tomó la copia. Afecta a
+`barrido` y a `rejilla`.
+
+(`persiana` se quedó **byte a byte** como estaba: lleva 27 cursos en producción
+y su segundo `stretch` relativo acaba en 1e-6 en vez de 1e-3 — invisible
+igual. No se toca lo que ya salió al aire.)
+
+### Cómo se ven
+
+`animations/experimentacion/29-transiciones.py` las enseña **las diez seguidas**
+sobre el mismo par de bloques, cada una con su nombre y su línea de
+`DESCRIPCIONES`. Aparece sola en la pestaña Aprender. Renderizada y verificada
+en la imagen real: 42 animaciones, 17,6 s, y ninguna transición deja nada
+tapando la pantalla al terminar.
+
+El asistente IA las tiene en `conocimiento.py` como regla, con el cuándo-usar-
+cuál y el aviso de que `conmutar` deja convertido el objeto **saliente**.
+
+### Verificación
+
+Tres tests de deriva (`tests/test_transiciones.py`, por AST porque la librería
+importa manim): cada entrada del catálogo apunta a una función que existe, cada
+una tiene descripción, y el demo las enseña todas sin repetir ninguna.
