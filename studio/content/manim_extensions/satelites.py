@@ -930,7 +930,8 @@ def relevos(lat_est, lon_est, planos=6, por_plano=11, altitud_km=550.0,
             "fraccion_sin_servicio": huecos,
             "periodo_orbital_s": float(per),
             "elevacion_min_deg": float(elevacion_min_deg),
-            "servidor": servidor, "el_max": el_max, "t_s": t}
+            "servidor": servidor, "el_max": el_max, "t_s": t,
+            "elevaciones": elevs}
 
 
 def _eci_de_lonlat(lonlat, altitud_km):
