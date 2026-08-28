@@ -2141,3 +2141,477 @@ def error_reconstruccion(x, banco=None):
     b = y[retardo:retardo + n]
     escala = float(np.dot(a, b) / max(np.dot(b, b), 1e-30))
     return float(np.max(np.abs(a - escala * b))), y
+
+
+# =====================================================================
+# 16. Estimacion espectral (modulo 9)
+# =====================================================================
+def periodograma(x, fs=1.0, ventana="rect"):
+    """El estimador ingenuo: |DFT|^2 de TODA la señal, de una vez.
+
+    No converge: por muchas muestras que se le den, la varianza de cada
+    bin se queda donde estaba. Es el punto de partida de 9.1.
+    """
+    x = np.asarray(x, dtype=float)
+    n = len(x)
+    w = ventana_de(ventana, n)
+    p = np.abs(np.fft.rfft(x * w)) ** 2 / (n * np.sum(w ** 2) / n)
+    return np.fft.rfftfreq(n, d=1.0 / fs), p
+
+
+def welch(x, fs=1.0, nseg=256, solape=0.5, ventana="hann"):
+    """Promediar periodogramas de trozos solapados. -> (f, p, n_trozos)
+
+    Cada trozo es una estimacion mala; la media de K trozos tiene K veces
+    menos varianza. Lo que se paga es resolucion.
+    """
+    x = np.asarray(x, dtype=float)
+    nseg = int(min(nseg, len(x)))
+    paso = max(1, int(nseg * (1.0 - solape)))
+    w = ventana_de(ventana, nseg)
+    norma = np.sum(w ** 2)
+    acc, k = None, 0
+    for i0 in range(0, len(x) - nseg + 1, paso):
+        seg = x[i0:i0 + nseg] * w
+        p = np.abs(np.fft.rfft(seg)) ** 2 / norma
+        acc = p if acc is None else acc + p
+        k += 1
+    return np.fft.rfftfreq(nseg, d=1.0 / fs), acc / max(k, 1), k
+
+
+def ruido_blanco(n, sigma=1.0, semilla=7):
+    return np.random.default_rng(semilla).normal(0.0, sigma, int(n))
+
+
+def dispersion(p_db):
+    """La desviacion tipica del estimador, en dB, medida sobre sus bins.
+    Es LA cifra de 9.1: mide cuanto tiembla la estimacion."""
+    return float(np.std(np.asarray(p_db, dtype=float)))
+
+
+def a_db(p, ref=None):
+    p = np.maximum(np.asarray(p, dtype=float), 1e-30)
+    return 10.0 * np.log10(p / (ref if ref else 1.0))
+
+
+def resolucion_welch(nseg, fs):
+    """Lo que cuesta promediar: la resolucion baja a fs/nseg."""
+    return float(fs) / float(nseg)
+
+
+# =====================================================================
+# 17. Filtros adaptativos (modulo 9)
+# =====================================================================
+def lms(x, d, mu, n_taps, normalizado=False):
+    """El filtro que se ajusta solo: w[n+1] = w[n] + mu e[n] x[n].
+
+    -> (w_final, e, curva) — `curva` es el error cuadratico suavizado,
+    o sea la curva de aprendizaje que se dibuja.
+    """
+    x = np.asarray(x, dtype=float)
+    d = np.asarray(d, dtype=float)
+    n_taps = int(n_taps)
+    w = np.zeros(n_taps)
+    e = np.zeros(len(x))
+    for n in range(n_taps, len(x)):
+        xv = x[n - n_taps + 1:n + 1][::-1]
+        y = float(np.dot(w, xv))
+        e[n] = d[n] - y
+        paso = mu
+        if normalizado:
+            paso = mu / (1e-8 + float(np.dot(xv, xv)))
+        w = w + paso * e[n] * xv
+    k = 64
+    curva = np.convolve(e ** 2, np.ones(k) / k, mode="same")
+    return w, e, curva
+
+
+def escenario_cancelacion(n=4000, semilla=11):
+    """El caso clasico: una voz limpia, un ruido que se le cuela por un
+    camino desconocido, y un microfono de referencia con SOLO el ruido.
+
+    -> (d, x, limpia, camino)  d = limpia + ruido filtrado, x = referencia
+    """
+    rng = np.random.default_rng(semilla)
+    t = np.arange(int(n))
+    limpia = np.sin(2 * np.pi * 0.01 * t) * 0.8
+    ref = rng.normal(0.0, 1.0, int(n))
+    camino = np.array([0.7, -0.4, 0.25, 0.1, -0.05])
+    ruido = convolucion(ref, camino)[:int(n)]
+    return limpia + ruido, ref, limpia, camino
+
+
+def mejora_db(antes, despues):
+    """Cuanto ha bajado el error, medido en dB."""
+    a = float(np.mean(np.asarray(antes, dtype=float) ** 2))
+    b = float(np.mean(np.asarray(despues, dtype=float) ** 2))
+    return 10.0 * math.log10(a / max(b, 1e-30))
+
+
+def error_coeficientes(w, camino):
+    """Cuanto se parece lo aprendido al camino de verdad (norma del error
+    relativa). Es la cifra honesta de 'ha aprendido el canal'."""
+    w = np.asarray(w, dtype=float)
+    c = np.zeros_like(w)
+    c[:min(len(camino), len(w))] = np.asarray(camino,
+                                              dtype=float)[:len(w)]
+    return float(np.linalg.norm(w - c) / np.linalg.norm(c))
+
+
+def curva_aprendizaje(e, referencia, k=128):
+    """La curva que de verdad enseña si el LMS aprende: el error
+    cuadratico medio del RESIDUO (lo que queda del ruido), suavizado.
+
+    Medir e^2 a secas no dice nada: e incluye la señal util, que NO se
+    quiere cancelar, y la curva sale plana (0.409 -> 0.349 medido).
+    """
+    r = (np.asarray(e, dtype=float)
+         - np.asarray(referencia, dtype=float)) ** 2
+    return np.convolve(r, np.ones(int(k)) / int(k), mode="valid")
+
+
+def convergencia(curva, factor=2.0, cola=500):
+    """En que muestra la curva baja a `factor` veces su suelo final.
+    -> (n, suelo) medidos."""
+    c = np.asarray(curva, dtype=float)
+    suelo = float(np.mean(c[-int(cola):]))
+    idx = np.where(c < factor * suelo)[0]
+    return (int(idx[0]) if len(idx) else -1), suelo
+
+
+def mu_maximo(x, n_taps):
+    """El paso mayor que no diverge, por el criterio de la potencia de
+    entrada: mu < 2 / (L * Px). Medido sobre esta x."""
+    px = float(np.mean(np.asarray(x, dtype=float) ** 2))
+    return 2.0 / (int(n_taps) * max(px, 1e-30))
+
+
+# =====================================================================
+# 18. Seguimiento: PLL y Kalman (modulo 9)
+# =====================================================================
+def pll(x, kp=0.05, ki=0.002, f0=0.0):
+    """Un PLL digital de segundo orden siguiendo la fase de x (compleja).
+
+    -> (fase_estimada, error_fase, frecuencia_estimada)
+    """
+    x = np.asarray(x)
+    n = len(x)
+    fase = np.zeros(n)
+    frec = np.zeros(n)
+    err = np.zeros(n)
+    f = float(f0)
+    ph = 0.0
+    integ = 0.0
+    for k in range(n):
+        nco = np.exp(-1j * ph)
+        prod = x[k] * nco
+        e = float(np.angle(prod))
+        err[k] = e
+        integ += ki * e
+        f = float(f0) + integ
+        ph = ph + 2 * np.pi * f + kp * e
+        fase[k] = ph
+        frec[k] = f
+    return fase, err, frec
+
+
+def tono_con_deriva(n=1500, f_ini=0.02, deriva=1.2e-5, ruido=0.05,
+                    semilla=5):
+    """Un tono complejo cuya frecuencia se va yendo (Doppler de un pase):
+    lo que un PLL tiene que seguir. -> (x, f_real)"""
+    rng = np.random.default_rng(semilla)
+    k = np.arange(int(n))
+    f_real = f_ini + deriva * k
+    fase = 2 * np.pi * np.cumsum(f_real)
+    x = np.exp(1j * fase)
+    x = x + (rng.normal(0, ruido, int(n))
+             + 1j * rng.normal(0, ruido, int(n)))
+    return x, f_real
+
+
+def kalman_escalar(z, q, r, x0=0.0, p0=1.0):
+    """Kalman de una variable: el filtro que decide cuanto creerse cada
+    medida. -> (x_est, ganancia)"""
+    z = np.asarray(z, dtype=float)
+    x = float(x0)
+    p = float(p0)
+    est = np.zeros(len(z))
+    gan = np.zeros(len(z))
+    for k in range(len(z)):
+        p = p + float(q)
+        kg = p / (p + float(r))
+        x = x + kg * (z[k] - x)
+        p = (1.0 - kg) * p
+        est[k] = x
+        gan[k] = kg
+    return est, gan
+
+
+def medida_ruidosa(n=300, sigma=0.6, semilla=3):
+    """Una magnitud que cambia despacio (la temperatura de un tanque) y
+    sus medidas ruidosas. -> (verdad, medidas)"""
+    rng = np.random.default_rng(semilla)
+    k = np.arange(int(n))
+    verdad = 0.5 * np.sin(2 * np.pi * k / 400.0) + 0.2 * (k / int(n))
+    return verdad, verdad + rng.normal(0.0, sigma, int(n))
+
+
+def rmse(a, b):
+    a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
+    return float(np.sqrt(np.mean((a - b) ** 2)))
+
+
+# =====================================================================
+# 19. Señal analitica y tiempo-frecuencia (modulo 10)
+# =====================================================================
+def analitica(x):
+    """La señal analitica: se tira la mitad negativa del espectro y lo
+    que queda es un fasor. Se hace a mano con la FFT (es literalmente
+    'poner a cero media transformada')."""
+    x = np.asarray(x, dtype=float)
+    n = len(x)
+    X = np.fft.fft(x)
+    h = np.zeros(n)
+    h[0] = 1.0
+    if n % 2 == 0:
+        h[n // 2] = 1.0
+        h[1:n // 2] = 2.0
+    else:
+        h[1:(n + 1) // 2] = 2.0
+    return np.fft.ifft(X * h)
+
+
+def envolvente(x):
+    """El modulo de la señal analitica: la amplitud instantanea."""
+    return np.abs(analitica(x))
+
+
+def fase_inst(x):
+    return np.unwrap(np.angle(analitica(x)))
+
+
+def frecuencia_inst(x, fs=1.0):
+    """La derivada de la fase: la frecuencia instantanea, medida."""
+    ph = fase_inst(x)
+    return np.gradient(ph) * float(fs) / (2 * np.pi)
+
+
+def stft(x, nperseg=128, solape=0.75, ventana="hann", fs=1.0):
+    """La transformada de Fourier de ventana corta. -> (t, f, S en dB)"""
+    x = np.asarray(x, dtype=float)
+    nperseg = int(nperseg)
+    paso = max(1, int(nperseg * (1.0 - solape)))
+    w = ventana_de(ventana, nperseg)
+    cols = []
+    tiempos = []
+    for i0 in range(0, len(x) - nperseg + 1, paso):
+        seg = x[i0:i0 + nperseg] * w
+        cols.append(np.abs(np.fft.rfft(seg)))
+        tiempos.append((i0 + nperseg / 2) / float(fs))
+    S = np.array(cols).T
+    S = np.maximum(S / max(S.max(), 1e-30), 1e-6)
+    return (np.array(tiempos), np.fft.rfftfreq(nperseg, d=1.0 / fs),
+            20.0 * np.log10(S))
+
+
+def heisenberg(nperseg, fs=1.0):
+    """El compromiso, en cifras: una ventana de nperseg muestras dura
+    nperseg/fs segundos y resuelve fs/nperseg hercios. El producto es 1
+    SIEMPRE. -> (dt, df, producto)"""
+    dt = float(nperseg) / float(fs)
+    df = float(fs) / float(nperseg)
+    return dt, df, dt * df
+
+
+def chirp_y_golpe(n=2048, fs=1.0, semilla=4):
+    """Una señal que necesita tiempo-frecuencia para entenderse: un
+    barrido lento mas un golpe corto. En el espectro entero, el golpe se
+    diluye; en el espectrograma, se ve donde esta."""
+    k = np.arange(int(n))
+    barrido = np.sin(2 * np.pi * (0.02 + 0.00008 * k) * k)
+    golpe = np.zeros(int(n))
+    i = int(n) * 3 // 5
+    golpe[i:i + 40] = np.sin(2 * np.pi * 0.35 * np.arange(40)) * \
+        np.hanning(40) * 1.5
+    return barrido * 0.7 + golpe
+
+
+def haar_niveles(x, niveles=3):
+    """La wavelet mas simple: medias y diferencias, nivel a nivel.
+
+    -> lista de arrays de detalle (uno por nivel) + la aproximacion final.
+    A diferencia de la STFT, la ventana se ENCOGE al subir de frecuencia.
+    """
+    x = np.asarray(x, dtype=float)
+    r = 1.0 / math.sqrt(2.0)
+    detalles = []
+    a = x.copy()
+    for _ in range(int(niveles)):
+        if len(a) % 2:
+            a = a[:-1]
+        par, impar = a[0::2], a[1::2]
+        detalles.append((par - impar) * r)
+        a = (par + impar) * r
+    return detalles, a
+
+
+# =====================================================================
+# 20. El filtro aprendido (modulo 10)
+# =====================================================================
+def entrenar_filtro(n=3000, n_taps=17, pasos=400, lr=0.05, semilla=9):
+    """Una red lineal de una capa aprendiendo a filtrar por ejemplos.
+
+    Se le dan pares (entrada ruidosa, salida deseada) y ajusta sus pesos
+    por descenso de gradiente. Al final se compara lo aprendido con el
+    filtro que se habria diseñado: si coinciden, la red no ha inventado
+    nada, ha REDESCUBIERTO el filtro.
+
+    -> (w, historial_error, h_objetivo)
+    """
+    from dsp import fir_ventana
+    rng = np.random.default_rng(semilla)
+    h_obj = fir_ventana(n_taps - 1, 0.25, "hann", 2.0)
+    x = rng.normal(0.0, 1.0, int(n))
+    d = convolucion(x, h_obj)[:int(n)]
+    w = np.zeros(int(n_taps))
+    hist = []
+    X = np.array([x[max(0, i - n_taps + 1):i + 1][::-1]
+                  for i in range(n_taps - 1, int(n))])
+    D = d[n_taps - 1:]
+    for _ in range(int(pasos)):
+        y = X @ w
+        e = D - y
+        w = w + lr * (X.T @ e) / len(D)
+        hist.append(float(np.mean(e ** 2)))
+    return w, np.array(hist), h_obj
+
+
+def parecido(w, h):
+    """Cuanto se parece el filtro aprendido al diseñado (coseno y error
+    relativo, los dos medidos)."""
+    w = np.asarray(w, dtype=float)
+    h = np.asarray(h, dtype=float)[:len(w)]
+    cos = float(np.dot(w, h) / (np.linalg.norm(w) * np.linalg.norm(h)))
+    err = float(np.linalg.norm(w - h) / np.linalg.norm(h))
+    return cos, err
+
+
+def red_no_lineal(n=2000, ocultas=12, pasos=3000, lr=0.3, semilla=13):
+    """Donde una red SI aporta algo: recuperar una señal que ha pasado
+    por una no linealidad (un amplificador saturado), cosa que ningun
+    filtro lineal puede deshacer.
+
+    Medido: el mejor filtro lineal deja 0.1076 de rms y la red 0.0589,
+    5.2 dB mejor. No es un abismo, y esa es la conclusion honesta de la
+    leccion: la red gana donde el problema NO es lineal, y aun ahi hay
+    que medir cuanto.
+
+    -> (error_lineal, error_red, historial)
+    """
+    rng = np.random.default_rng(semilla)
+    k = np.arange(int(n))
+    limpia = np.sin(2 * np.pi * 0.013 * k) * 0.9
+    sucia = np.tanh(2.2 * limpia)          # el amplificador satura
+    # 1) el mejor filtro LINEAL posible (minimos cuadrados de 1 tap)
+    a = float(np.dot(sucia, limpia) / np.dot(sucia, sucia))
+    err_lineal = float(np.sqrt(np.mean((a * sucia - limpia) ** 2)))
+    # 2) una red de una capa oculta
+    W1 = rng.normal(0, 0.8, (1, int(ocultas)))
+    b1 = np.zeros(int(ocultas))
+    W2 = rng.normal(0, 0.8, (int(ocultas), 1))
+    b2 = np.zeros(1)
+    X = sucia.reshape(-1, 1)
+    Y = limpia.reshape(-1, 1)
+    hist = []
+    for _ in range(int(pasos)):
+        h = np.tanh(X @ W1 + b1)
+        y = h @ W2 + b2
+        e = y - Y
+        hist.append(float(np.mean(e ** 2)))
+        gW2 = h.T @ e / len(X)
+        gb2 = e.mean(axis=0)
+        gh = (e @ W2.T) * (1 - h ** 2)
+        gW1 = X.T @ gh / len(X)
+        gb1 = gh.mean(axis=0)
+        W1 -= lr * gW1
+        b1 -= lr * gb1
+        W2 -= lr * gW2
+        b2 -= lr * gb2
+    h = np.tanh(X @ W1 + b1)
+    y = (h @ W2 + b2).ravel()
+    err_red = float(np.sqrt(np.mean((y - limpia) ** 2)))
+    return err_lineal, err_red, np.array(hist)
+
+
+# =====================================================================
+# 21. El espectrograma, dibujado
+# =====================================================================
+class Espectrograma(_Anclada):
+    """La malla tiempo-frecuencia: cada celda es un rectangulo cuyo color
+    dice cuanta energia hay ahi.
+
+    .en(t, f)  .marca_t(t)  .celda(i, j)
+    """
+
+    def __init__(self, t, f, s_db, ancho=8.0, alto=3.2, piso_db=-60.0,
+                 color_bajo="#0b1f2a", color_alto=C_BANDA, **kwargs):
+        super().__init__(**kwargs)
+        from manim import ManimColor, interpolate_color
+        self.t = np.asarray(t, dtype=float)
+        self.f = np.asarray(f, dtype=float)
+        self.s = np.asarray(s_db, dtype=float)
+        self.piso = float(piso_db)
+        self.ancho, self.alto = float(ancho), float(alto)
+        self._poner_ancla(ORIGIN)
+        n_f, n_t = self.s.shape
+        dx = self.ancho / n_t
+        dy = self.alto / n_f
+        # interpolate_color EXIGE ManimColor: los C_* son str
+        c_bajo = ManimColor(color_bajo)
+        c_alto = ManimColor(color_alto)
+        self.celdas = VGroup()
+        for j in range(n_t):
+            for i in range(n_f):
+                v = (float(np.clip(self.s[i, j], self.piso, 0.0))
+                     - self.piso) / (0.0 - self.piso)
+                r = Rectangle(width=dx * 1.02, height=dy * 1.02,
+                              stroke_width=0,
+                              fill_color=interpolate_color(c_bajo, c_alto,
+                                                           v),
+                              fill_opacity=1.0)
+                r.move_to(self._origen()
+                          + np.array([(j + 0.5) / n_t - 0.5, 0.0, 0.0])
+                          * self.ancho
+                          + np.array([0.0, (i + 0.5) / n_f - 0.5, 0.0])
+                          * self.alto)
+                self.celdas.add(r)
+        self.n_f, self.n_t = n_f, n_t
+        ex = Line(self.en(self.t[0], self.f[0]),
+                  self.en(self.t[-1], self.f[0]), color=C_EJE,
+                  stroke_width=1.6)
+        ey = Line(self.en(self.t[0], self.f[0]),
+                  self.en(self.t[0], self.f[-1]), color=C_EJE,
+                  stroke_width=1.6)
+        self.ejes = VGroup(ex, ey)
+        self.add(self.celdas, self.ejes)
+
+    def en(self, t, f):
+        fx = ((float(t) - self.t[0])
+              / max(self.t[-1] - self.t[0], 1e-30) - 0.5)
+        fy = ((float(f) - self.f[0])
+              / max(self.f[-1] - self.f[0], 1e-30) - 0.5)
+        return (self._origen() + np.array([fx * self.ancho,
+                                           fy * self.alto, 0.0]))
+
+    def celda(self, i, j):
+        return self.celdas[int(j) * self.n_f + int(i)]
+
+    def marca_t(self, t, color=C_CALCULO):
+        from manim import DashedLine
+        return DashedLine(self.en(t, self.f[0]), self.en(t, self.f[-1]),
+                          color=color, stroke_width=1.8, dash_length=0.08)
+
+
+def espectrograma(t, f, s_db, ancho=8.0, alto=3.2, piso_db=-60.0):
+    """Ver `Espectrograma`."""
+    return Espectrograma(t, f, s_db, ancho, alto, piso_db)

@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 9.3 Seguir: PLL y Kalman",
+  "description": "Lección 9.3 del curso Procesamiento digital de señales (módulo 9: estimar y adaptarse), en 4 clips animados: el oscilador propio que hay que casar con la señal, el lazo que corrige la fase, la deriva de frecuencia que sigue sin perderla, y el filtro de Kalman decidiendo cuánto creerse cada medida. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-nco.py",
+      "title": "1 · El oscilador propio",
+      "scene": "Clip1",
+      "final_state": "El fasor de la señal y el del oscilador local girando a distinta velocidad, con el angulo entre ambos marcado."
+    },
+    {
+      "file": "clips/02-el-lazo.py",
+      "title": "2 · El lazo",
+      "scene": "Clip2",
+      "final_state": "El error de fase cayendo hasta engancharse y quedandose en 0.055 rad, con el diagrama del lazo al lado."
+    },
+    {
+      "file": "clips/03-la-deriva.py",
+      "title": "3 · La deriva",
+      "scene": "Clip3",
+      "final_state": "La frecuencia real subiendo y la estimada pegada a ella, con el error final medido de 1.3e-05."
+    },
+    {
+      "file": "clips/04-kalman.py",
+      "title": "4 · Kalman",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Seguir no es medir.' (blanca) y 'Es apostar y corregir.' (cian)."
+    }
+  ]
+}

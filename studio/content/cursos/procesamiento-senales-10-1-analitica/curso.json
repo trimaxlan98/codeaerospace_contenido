@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 10.1 La señal analítica",
+  "description": "Lección 10.1 del curso Procesamiento digital de señales (módulo 10: señales del mundo real), en 4 clips animados: poner a cero media transformada y que un seno se convierta en un fasor, la envolvente que sigue la amplitud instantánea, la frecuencia instantánea como derivada de la fase, y por qué una radio guarda dos números por muestra. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-media-transformada.py",
+      "title": "1 · Media transformada",
+      "scene": "Clip1",
+      "final_state": "El espectro con la mitad negativa puesta a cero y el fasor resultante girando con modulo constante 1.0000."
+    },
+    {
+      "file": "clips/02-la-envolvente.py",
+      "title": "2 · La envolvente",
+      "scene": "Clip2",
+      "final_state": "La señal modulada con su envolvente medida encima, pegada a la real: error rms 0.0000."
+    },
+    {
+      "file": "clips/03-la-frecuencia-instantanea.py",
+      "title": "3 · La frecuencia instantanea",
+      "scene": "Clip3",
+      "final_state": "La fase desenrollada, su pendiente y la frecuencia instantanea medida en 60.00 Hz."
+    },
+    {
+      "file": "clips/04-iq.py",
+      "title": "4 · IQ",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Una señal real esconde la mitad.' (blanca) y 'La analitica la enseña.' (cian)."
+    }
+  ]
+}
