@@ -47,6 +47,9 @@ metrics_history.json*
 studio/backend/gcp-key.json
 *.gcp-key.json
 
+# Socket del runner en desarrollo local (studio/dev.sh)
+.run/
+
 # Permisos locales de Claude Code (por máquina, puede contener rutas/credenciales)
 .claude/settings.local.json
 

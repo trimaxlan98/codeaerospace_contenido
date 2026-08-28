@@ -36,11 +36,15 @@ import re
 import signal
 import sys
 
-COMPOSE_FILE = "/var/www/codeaerospace_contenido/docker-compose.yml"
-PROJECT_DIR = "/var/www/codeaerospace_contenido"
+# Los defaults son los del VPS (systemd no pasa ninguna MS_* al runner, asi que
+# produccion los usa tal cual). Las variables existen para poder levantar el
+# runner en un clon local de desarrollo, donde no hay /var/www ni usuario
+# manimstudio.
+PROJECT_DIR = os.environ.get("MS_WORKSPACE", "/var/www/codeaerospace_contenido")
+COMPOSE_FILE = os.environ.get("MS_COMPOSE_FILE", os.path.join(PROJECT_DIR, "docker-compose.yml"))
 RENDER_JOBS_DIR = "render_jobs"  # relativo al workspace montado
-SOCKET_PATH = "/run/manimstudio/runner.sock"
-SOCKET_GROUP = "manimstudio"
+SOCKET_PATH = os.environ.get("MS_RUNNER_SOCKET", "/run/manimstudio/runner.sock")
+SOCKET_GROUP = os.environ.get("MS_RUNNER_SOCKET_GROUP", "manimstudio")
 CONTAINER_PREFIX = "manimstudio-render-"
 # Mezcla de audio de un promo: el unico script del repo que el runner
 # ejecuta ademas de manim, en ruta fija (no llega del exterior).
@@ -73,8 +77,14 @@ _stats_lock = asyncio.Lock()
 # Los contenedores de render/miniatura corren con el uid:gid de manimstudio:
 # asi los archivos que crean en render_jobs/ pueden ser limpiados/borrados por
 # el backend (que corre como ese usuario). HOME=/tmp para las caches de manim.
-_ms = pwd.getpwnam("manimstudio")
-RUN_AS_ARGS = ("--user", f"{_ms.pw_uid}:{_ms.pw_gid}", "-e", "HOME=/tmp")
+# En un clon de desarrollo ese usuario no existe: se cae al uid:gid actual, que
+# es justamente quien corre el backend ahi.
+try:
+    _ms = pwd.getpwnam(os.environ.get("MS_RUNNER_USER", "manimstudio"))
+    _run_uid, _run_gid = _ms.pw_uid, _ms.pw_gid
+except KeyError:
+    _run_uid, _run_gid = os.getuid(), os.getgid()
+RUN_AS_ARGS = ("--user", f"{_run_uid}:{_run_gid}", "-e", "HOME=/tmp")
 
 
 def log(msg: str) -> None:
@@ -528,13 +538,21 @@ async def main() -> None:
     if os.path.exists(SOCKET_PATH):
         os.unlink(SOCKET_PATH)
     server = await asyncio.start_unix_server(handle_client, path=SOCKET_PATH)
-    gid = grp.getgrnam(SOCKET_GROUP).gr_gid
-    # El grupo debe poder atravesar el directorio ademas de usar el socket.
-    os.chown(os.path.dirname(SOCKET_PATH), 0, gid)
-    os.chmod(os.path.dirname(SOCKET_PATH), 0o750)
-    os.chown(SOCKET_PATH, 0, gid)
-    os.chmod(SOCKET_PATH, 0o660)
-    log(f"manim-runner escuchando en {SOCKET_PATH} (grupo {SOCKET_GROUP})")
+    try:
+        gid = grp.getgrnam(SOCKET_GROUP).gr_gid
+        # El grupo debe poder atravesar el directorio ademas de usar el socket.
+        os.chown(os.path.dirname(SOCKET_PATH), 0, gid)
+        os.chmod(os.path.dirname(SOCKET_PATH), 0o750)
+        os.chown(SOCKET_PATH, 0, gid)
+        os.chmod(SOCKET_PATH, 0o660)
+        log(f"manim-runner escuchando en {SOCKET_PATH} (grupo {SOCKET_GROUP})")
+    except (KeyError, PermissionError) as exc:
+        # Desarrollo local: sin grupo manimstudio o sin root para el chown. El
+        # socket queda con los permisos del usuario que lo creo, que es el mismo
+        # que corre el backend. En el VPS esto NO se alcanza (runner = root).
+        os.chmod(SOCKET_PATH, 0o600)
+        log(f"manim-runner escuchando en {SOCKET_PATH} "
+            f"(modo dev, solo el usuario actual: {exc})")
 
     loop = asyncio.get_event_loop()
     stop = loop.create_future()
