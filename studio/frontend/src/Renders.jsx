@@ -356,6 +356,9 @@ function RenderCard({ job, projectName, onPlay, onAddToProject, onOpenProject, o
               (ffprobe); la calidad solo la sustituye si aún no hay video. */}
           {resolucionLegible(job) || QUALITY_LABEL[job.quality] || job.quality}
           {hasVideo && <> · {fmtSize(job.size_bytes)}</>}
+          {/* Un promo mezclado se sirve CON sonido: conviene saberlo antes
+              de darle a Ver con el volumen a tope. */}
+          {job.has_audio && <> · <span className="text-ok">con sonido</span></>}
         </p>
         {/* El motivo del fallo vivia solo en el chip del Estudio. */}
         {job.error && (

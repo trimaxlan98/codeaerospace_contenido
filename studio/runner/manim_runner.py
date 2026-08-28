@@ -11,6 +11,12 @@ Superficie deliberadamente minima — no es un proxy generico de Docker:
              El lienzo (formato/lado corto/fps) entra como variables
              PROMO_* validadas contra un conjunto y rangos cerrados; las
              lee la escena, no el runner.
+  - postproceso : `studio/tools/sfx.py promo` en el MISMO contenedor, sobre
+             el directorio del job (manifiesto y voz los deja el backend
+             ahi). Ruta del script fija; solo recibe el job_id.
+  - verificar : `studio/tools/promo_verifica.py` en el MISMO contenedor:
+             mide costura del bucle, duracion, audio y frames del archivo
+             que la app sirve, y devuelve el informe JSON.
   - cancel : `docker rm -f` de un contenedor cuyo nombre coincide con el
              prefijo fijo de render de ManimStudio (no puede tocar otros).
   - stats  : lectura agregada (`docker ps` + `docker stats --no-stream`),
@@ -36,6 +42,15 @@ RENDER_JOBS_DIR = "render_jobs"  # relativo al workspace montado
 SOCKET_PATH = "/run/manimstudio/runner.sock"
 SOCKET_GROUP = "manimstudio"
 CONTAINER_PREFIX = "manimstudio-render-"
+# Mezcla de audio de un promo: el unico script del repo que el runner
+# ejecuta ademas de manim, en ruta fija (no llega del exterior).
+SFX_SCRIPT = "studio/tools/sfx.py"
+AUDIO_TIMEOUT = 300
+# Verificacion del promo (costura del bucle, duracion, audio y frames), en
+# el mismo contenedor y con la misma regla: ruta fija, solo el job_id.
+VERIFICA_SCRIPT = "studio/tools/promo_verifica.py"
+VERIFICA_TIMEOUT = 300
+FRAMES_MAX = 12
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 RE_SCENE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,127}$")
@@ -189,18 +204,12 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     log(f"[render] job={job_id} exit={exit_code} timed_out={timed_out}")
 
 
-async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
-    """Extrae 1 frame del video final del job como thumb.jpg.
+def video_del_job(job_id: str) -> str | None:
+    """Ruta (relativa al repo) del mp4 mas reciente del job, o None.
 
-    Corre DENTRO del contenedor manim-render (el backend no tiene ffmpeg).
-    Solo recibe job_id: el video se localiza en la ruta canonica del job,
-    nunca se aceptan rutas arbitrarias.
+    Siempre dentro de la ruta canonica del job: el runner no acepta rutas
+    del exterior. Ignora los parciales de manim.
     """
-    job_id = str(req.get("job_id", ""))
-    if not RE_JOB_ID.match(job_id):
-        await send(writer, {"type": "error", "error": "job_id invalido"})
-        return
-
     media_abs = os.path.join(PROJECT_DIR, RENDER_JOBS_DIR, job_id, "media", "videos")
     video_rel = None
     newest = -1.0
@@ -214,6 +223,22 @@ async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
                 if mtime > newest:
                     newest = mtime
                     video_rel = os.path.relpath(p, PROJECT_DIR)
+    return video_rel
+
+
+async def handle_thumbnail(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Extrae 1 frame del video final del job como thumb.jpg.
+
+    Corre DENTRO del contenedor manim-render (el backend no tiene ffmpeg).
+    Solo recibe job_id: el video se localiza en la ruta canonica del job,
+    nunca se aceptan rutas arbitrarias.
+    """
+    job_id = str(req.get("job_id", ""))
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+
+    video_rel = video_del_job(job_id)
     if video_rel is None:
         await send(writer, {"type": "error", "error": "video del job no encontrado"})
         return
@@ -271,6 +296,127 @@ async def _resolucion(video_rel: str, job_id: str, job_mount: str) -> str:
 
 async def force_remove(container: str) -> None:
     await run_cmd("docker", "rm", "-f", container)
+
+
+async def handle_postproceso(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Mezcla la cama de sonido (y la voz, si la hay) sobre el video del job.
+
+    Corre `studio/tools/sfx.py promo` DENTRO del contenedor manim-render: el
+    backend no tiene numpy ni ffmpeg, y el script vive en el repo montado
+    read-only. Igual que el thumbnail, solo recibe `job_id`: el manifiesto
+    (`promo.json`) y la voz (`voz.wav`) los dejo el backend en el directorio
+    del job, y la salida se escribe ahi mismo. Ninguna ruta viene de fuera.
+    """
+    job_id = str(req.get("job_id", ""))
+    con_voz = bool(req.get("con_voz"))
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+
+    video_rel = video_del_job(job_id)
+    if video_rel is None:
+        await send(writer, {"type": "error", "error": "video del job no encontrado"})
+        return
+
+    job_rel = f"{RENDER_JOBS_DIR}/{job_id}"
+    job_abs = os.path.join(PROJECT_DIR, job_rel)
+    if not os.path.isfile(os.path.join(job_abs, "promo.json")):
+        await send(writer, {"type": "error", "error": "el job no tiene promo.json"})
+        return
+    if con_voz and not os.path.isfile(os.path.join(job_abs, "voz.wav")):
+        await send(writer, {"type": "error", "error": "el job no tiene voz.wav"})
+        return
+
+    salida_rel = f"{job_rel}/promo_audio.mp4"
+    container = f"{CONTAINER_PREFIX}{job_id}-audio"
+    job_mount = f"{job_abs}:/workspace/{job_rel}:rw"
+    argv = [
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{SFX_SCRIPT}", "promo",
+        f"/workspace/{job_rel}", f"/workspace/{video_rel}",
+        f"/workspace/{salida_rel}",
+    ]
+    if con_voz:
+        argv.append(f"/workspace/{job_rel}/voz.wav")
+
+    code, out, err = await run_cmd(*argv, timeout=AUDIO_TIMEOUT)
+    if code != 0 or not os.path.isfile(os.path.join(PROJECT_DIR, salida_rel)):
+        await force_remove(container)
+        log(f"[audio] job={job_id} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"sfx.py salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    log(f"[audio] job={job_id} ok voz={con_voz}")
+    await send(writer, {"type": "ok", "audio": salida_rel,
+                        "detalle": out.strip()[-300:]})
+
+
+async def handle_verificar(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Mide el promo sobre el archivo que la app sirve y devuelve el informe.
+
+    Prefiere el mp4 CON sonido si ya se mezclo (es el que ve el publico) y
+    cae al mudo si no existe. Corre `promo_verifica.py` en el contenedor —
+    el backend no tiene ffmpeg — y deja los PNG en <job>/verificacion/.
+    """
+    job_id = str(req.get("job_id", ""))
+    frames = req.get("frames", 6)
+    dur_min = req.get("dur_min", 8.0)
+    dur_max = req.get("dur_max", 15.0)
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+    if not isinstance(frames, int) or not (1 <= frames <= FRAMES_MAX):
+        await send(writer, {"type": "error", "error": "frames fuera de rango"})
+        return
+    if not all(isinstance(v, (int, float)) and 0 < v <= 600
+               for v in (dur_min, dur_max)) or dur_min >= dur_max:
+        await send(writer, {"type": "error", "error": "rango de duracion invalido"})
+        return
+
+    job_rel = f"{RENDER_JOBS_DIR}/{job_id}"
+    job_abs = os.path.join(PROJECT_DIR, job_rel)
+    sonoro_rel = f"{job_rel}/promo_audio.mp4"
+    if os.path.isfile(os.path.join(PROJECT_DIR, sonoro_rel)):
+        video_rel = sonoro_rel
+    else:
+        video_rel = video_del_job(job_id)
+    if video_rel is None:
+        await send(writer, {"type": "error", "error": "video del job no encontrado"})
+        return
+
+    container = f"{CONTAINER_PREFIX}{job_id}-verifica"
+    job_mount = f"{job_abs}:/workspace/{job_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{VERIFICA_SCRIPT}", f"/workspace/{video_rel}",
+        f"/workspace/{job_rel}/verificacion",
+        "--frames", str(frames), "--min", str(dur_min), "--max", str(dur_max),
+        timeout=VERIFICA_TIMEOUT,
+    )
+    if code != 0:
+        await force_remove(container)
+        log(f"[verifica] job={job_id} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"la verificacion salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    try:
+        informe = json.loads(out.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        await send(writer, {"type": "error",
+                            "error": "la verificacion no devolvio un informe"})
+        return
+    log(f"[verifica] job={job_id} ok={informe.get('ok')}")
+    await send(writer, {"type": "ok", "informe": informe})
 
 
 async def handle_cancel(req: dict, writer: asyncio.StreamWriter) -> None:
@@ -355,6 +501,10 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_render(req, writer)
         elif cmd == "cancel":
             await handle_cancel(req, writer)
+        elif cmd == "postproceso":
+            await handle_postproceso(req, writer)
+        elif cmd == "verificar":
+            await handle_verificar(req, writer)
         elif cmd == "thumbnail":
             await handle_thumbnail(req, writer)
         elif cmd == "stats":

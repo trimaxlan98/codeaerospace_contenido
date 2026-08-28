@@ -3,7 +3,8 @@
 Escrita el 2026-08-27, después de producir a mano los 10 primeros promos (rama
 `exp/promos-redes`, ver `docs/plan_contenido/promos-redes-sociales.md`).
 
-Estado: **P1 hecho** (el lienzo). P2 (sonido) y P3 (verificación), propuestos.
+Estado: **completo** — P1 (lienzo), P2 (sonido), P3 (verificación) y el importador. Queda
+desplegar.
 
 ---
 
@@ -111,44 +112,90 @@ La resolución medida con ffprobe queda como comprobación, no como parche.
 
 ---
 
-## 5. Sprint P2 — El sonido
+## 5. Sprint P2 — El sonido · **HECHO** (2026-08-27)
 
-**Entregable:** el mp4 que sirve `/api/jobs/{id}/video` (`main.py:282`) ya viene con cama de
-sonido y, si hay voz, con voz. Hoy sale mudo y el `mux.sh` vive fuera de la app.
+**Entregable:** el mp4 que sirve `/api/jobs/{id}/video` ya viene con cama de sonido y, si hay
+voz, con voz. Antes salía mudo y el `mux.sh` vivía fuera de la app.
 
-- **Manifiesto por clip**: `clips.audio_json TEXT` (aditivo) con los bloques `audio` y `voz`
-  de `promo.json` tal cual. La UI lo edita con un formulario, no con un editor de JSON:
-  - *Cama*: filas `(sonido, t, dB)`. El catálogo de sonidos es cerrado y ya existe —
-    los 19 nombres de `PALETA` en `sfx.py:225` (`barrido`, `aire`, `blip_grave`, `pulso`,
-    `nebulosa`, `sting`…). Un `select`, no texto libre.
-  - *Voz*: filas `(t_inicio, texto)`. Con dos avisos calculados, no decorativos: **cuántas
-    sílabas caben** a 2.3-2.6 síl/s desde ese `t_inicio` hasta el siguiente, y si la voz
-    termina **a menos de 0.6 s del final** (el bucle chasquea). Los dos son errores que ya se
-    cometieron a mano.
-- **Runner, comando nuevo `postproceso`**: corre `sfx.py promo` dentro de la imagen
-  `manim-render`, con el directorio del job montado rw y la ruta del script fija dentro del
-  repo montado ro. Es el mismo patrón, casi línea por línea, que `handle_thumbnail`
-  (`manim_runner.py:158`): superficie mínima, sin rutas arbitrarias.
-- **Voz**: reusa `narracion.sintetizar()` (`narracion.py:358`) con las secciones escritas a
-  mano — **sin** pasar por el generador de guion de Gemini. Mismo feature-flag que hoy (sin
-  `gcp-key.json`, no hay voz), misma service account.
-- **Dos archivos por render**: se conserva el mudo y se escribe el sonorizado al lado.
-  Cambiar el manifiesto **no** obliga a re-renderizar el video: re-mezcla. Eso es importante
-  — el render en `qh` vertical es la parte cara, la mezcla cuesta segundos.
-- **Botón**: «Mezclar audio» junto a «Renderizar» en la tarjeta del promo, y se dispara solo
-  al terminar un render si el clip tiene manifiesto.
+**Verificado sobre el archivo**, montando el directorio del job como lo deja el backend y
+corriendo `sfx.py promo` con la misma línea de comandos que arma el runner:
 
-**Criterio de aceptación:** editar un evento de sonido en la UI, pulsar «Mezclar», y que el
-video que se descarga suene con ese cambio sin haber vuelto a renderizar.
+| Qué | Medido |
+|---|---|
+| Pista de audio | aac, 24 kHz, mono (la misma que el TTS) |
+| Pico | **−3.0 dBFS**, exactamente el que pide el manifiesto |
+| Extremos (100 ms) | entra a **−120 dBFS**, sale a **−64 dBFS** — el bucle no chasquea |
+| Duración | audio 10.58 s sobre video 10.67 s (el audio cierra antes, que es lo que se quiere) |
+
+**Dos cosas que costaron y quedan escritas.** La primera: `volumedetect` sobre una ventana de
+50 ms no mide 50 ms — arrastra el frame AAC entero y acusa de ruidoso un arranque que en las
+muestras es cero exacto. Los extremos se miden decodificando a wav y mirando las muestras, no
+con el medidor. La segunda: el catálogo de sonidos vive en `sfx.py` y la app lo repetía; ahora
+un test lee `PALETA` con `ast` y compara, porque un nombre inventado no falla al guardar sino
+dentro del contenedor, tarde y con un `KeyError`.
+
+**Lo que se hizo:**
+
+- **`audio_promo.py`** — módulo puro (sin Vertex, sin Docker, sin ffmpeg): manifiesto,
+  validación, sílabas y avisos. Es donde vive lo aprendido a mano.
+- **Manifiesto por clip** (`clips.audio_json`), con la forma exacta del `promo.json` de los
+  diez promos, para que el importador de la sección 8 sea copiar y pegar. La UI lo edita con
+  un formulario: los sonidos son un **desplegable** con los 19 nombres de `PALETA`, no texto
+  libre.
+- **Avisos calculados y siempre visibles**: cuánta voz cabe entre dos `t_inicio` (a 2.45
+  sílabas/s) y si la voz se pega al final. Los dos errores que ya se cometieron.
+- **Runner, comando `postproceso`** — `sfx.py promo` dentro de `manim-render`, job montado
+  rw, ruta del script fija: el mismo patrón que `handle_thumbnail`, sin rutas del exterior.
+- **Voz** — `narracion.sintetizar()` con el texto a mano, **sin** el guion de Gemini, contra
+  el límite `duración − 0.6 s`. Cacheada por el hash del bloque `voz`: retocar la cama no
+  gasta TTS.
+- **Dos archivos por render** — el mudo se conserva y el sonorizado se escribe al lado.
+  Cambiar el manifiesto re-mezcla en segundos; no re-renderiza.
+- **La app sirve el sonorizado** (`/api/jobs/{id}/video`), y la Biblioteca lo marca «con
+  sonido». Si el archivo falta, vuelve al mudo sin romperse.
+- **La interfaz deja de ofrecerle a un promo lo que no es suyo**: sin «Generar narración»
+  (ese camino escribe guiones de 28-45 s con Gemini), sin zip de curso — se descarga el mp4 —
+  y con el rango de duración del promo.
+- **16 pruebas nuevas** (`tests/test_audio_promo.py`), 178 en total en verde.
 
 ---
 
-## 6. Sprint P3 — La verificación
+## 6. Sprint P3 — La verificación · **HECHO** (2026-08-27)
 
 **Entregable:** la app dice, con números, si el promo está listo para publicar.
 
-- `medir_bucle` sale de `render_promo.py` a un módulo compartido, y lo ejecuta el mismo
-  comando `postproceso` (necesita ffmpeg → contenedor). Se guarda en `jobs.verify_json`.
+**Lo que se hizo:**
+
+- **`studio/tools/promo_verifica.py`** — la medición, en **una sola implementación** (solo
+  stdlib): la usan el CLI local (`render_promo.py` la importa) y el runner dentro del
+  contenedor (comando `verificar`). Mide costura del bucle sobre el suelo del códec,
+  duración, audio (pico y extremos, **en las muestras**) y extrae la tira de frames y el par
+  primero|último.
+- **El informe caduca solo** — `jobs.verify_json` + `verify_hash`: si se vuelve a renderizar
+  o a mezclar, el estado pasa a «verificación vieja» en vez de enseñar números de otro
+  archivo. Mezclar dispara la verificación al terminar.
+- **Frames servidos** por `GET /api/jobs/{id}/verificacion/{archivo}`, con el nombre contra un
+  conjunto cerrado (`primero`, `ultimo`, `costura`, `fNN`).
+- **La tarjeta de verificación** en el diálogo del promo: cuatro comprobaciones **siempre con
+  la cifra al lado** (un semáforo sin número no deja aprender nada), el par primero|último a
+  tamaño real y la tira de frames. Distintivo «verificado / no pasa» en la tarjeta del clip.
+
+**Verificado** contra los promos ya publicados, midiendo dentro del contenedor con la misma
+línea que arma el runner: *determinante* sale bucle 0.000 % sobre el suelo, 12.2 s, audio aac
+24 kHz con pico −1.1 dBFS y extremos a −120 dBFS; *gps-38-microsegundos* enseña su costura
+conocida (0.0496 % sobre el suelo, por debajo del umbral) en vez de esconderla. Interfaz
+mirada en un navegador real.
+
+**Un fallo que la propia verificación destapó** (y que llevaba ahí desde el primer promo):
+`render_promo.py` elegía el mp4 con `sorted(...)[0]`, y como «1920p60» ordena antes que
+«960p60», un render nuevo en `ql` **medía el archivo viejo en `qh`** y decía que era el
+nuevo. Ahora coge el más reciente por fecha.
+
+Lo que se propuso y así quedó:
+
+- `medir_bucle` sale de `render_promo.py` a un módulo compartido, y lo ejecuta el runner en
+  el contenedor (comando propio `verificar`, no `postproceso`). Se guarda en
+  `jobs.verify_json`.
 - **La sutileza que hay que conservar**: la costura se juzga **sobre el suelo del códec**.
   Comparar el primer frame con el último a secas acusa de sucio a un bucle perfecto: h264
   sobre fondos planos oscuros da hasta 0.18 % de subpíxeles distintos entre dos frames que en
@@ -177,13 +224,27 @@ nadie abra el video.
 
 ---
 
-## 8. Importar los 10 promos que ya existen
+## 8. Importar los 10 promos que ya existen · **HECHO** (2026-08-27)
 
 `studio/tools/subir_promo.py`, hermano de `subir_curso.py`: lee
 `studio/content/promos/<slug>/{promo.json, style_block.py, escena.py}` y crea el proyecto
 (`tipo='promo'`, `formato='vertical'`, `quality='qh'`), su clip y su `audio_json`. El nombre
 del promo es la clave de emparejamiento, igual que en los cursos, para que re-subir actualice
-en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifiesto.
+en vez de duplicar.
+
+**Probado sobre los diez** contra una base de usar y tirar: los diez entran, con sus 6-8
+sonidos y sus frases; la segunda pasada dice «sin cambios / al día» (idempotente); y una
+comparación evento por evento confirma que **los diez producen exactamente la misma mezcla**
+que su `promo.json` original — el manifiesto ordena los eventos por tiempo, que es un cambio
+de forma, no de sonido (`sfx.mezclar` los suma sobre la línea de tiempo).
+
+En la interfaz salen agrupados bajo la familia «Promo», con su distintivo y el curso que
+promocionan entre corchetes en la descripción.
+
+**Nota para el despliegue**: el importador se corre en el VPS, contra
+`studio/backend/manimstudio.db`, DESPUÉS de desplegar el backend (necesita las columnas
+nuevas). Los diez entran «sin render»: hay que renderizarlos desde la interfaz — o adoptar
+los mp4 que ya existen en `exports/promos/`, que es una vuelta más y no la ha pedido nadie.
 
 ---
 
@@ -211,9 +272,9 @@ en vez de duplicar. Se corre una vez y los diez aparecen en la app con su manifi
 | Sprint | Qué habilita | Tamaño |
 |---|---|---|
 | ~~**P1 · Lienzo**~~ | ~~Autoría de promos en la app, sin sonido~~ · **hecho** | 1 sesión |
-| **P2 · Sonido** | El promo se termina dentro de la app | 2 sesiones |
-| **P3 · Verificación** | Publicar sin abrir la terminal | 1 sesión |
-| **Importador** | Los 10 promos existentes entran al catálogo | media sesión |
+| ~~**P2 · Sonido**~~ | ~~El promo se termina dentro de la app~~ · **hecho** | 2 sesiones |
+| ~~**P3 · Verificación**~~ | ~~Publicar sin abrir la terminal~~ · **hecho** | 1 sesión |
+| ~~**Importador**~~ | ~~Los 10 promos existentes entran al catálogo~~ · **hecho** | media sesión |
 
 P1 tiene valor por sí solo y no rompe nada: hasta que llegue P2 se descarga el mp4 mudo y se
 sonoriza con las herramientas locales, exactamente como ahora.

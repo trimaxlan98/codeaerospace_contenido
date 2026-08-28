@@ -81,6 +81,20 @@ MIGRATIONS = {
         ("formato", "ALTER TABLE jobs ADD COLUMN formato TEXT NOT NULL"
                     " DEFAULT 'horizontal'"),
         ("resolution", "ALTER TABLE jobs ADD COLUMN resolution TEXT"),
+        # Mezcla de audio del promo: el mp4 sonorizado vive AL LADO del mudo
+        # (re-mezclar no obliga a re-renderizar) y el hash dice si sigue
+        # correspondiendo al manifiesto y al video actuales.
+        ("audio_path", "ALTER TABLE jobs ADD COLUMN audio_path TEXT"),
+        ("audio_hash", "ALTER TABLE jobs ADD COLUMN audio_hash TEXT"),
+        # Informe de verificacion del promo (costura del bucle, duracion,
+        # audio y frames), medido sobre el archivo que la app sirve.
+        ("verify_json", "ALTER TABLE jobs ADD COLUMN verify_json TEXT"),
+        ("verify_hash", "ALTER TABLE jobs ADD COLUMN verify_hash TEXT"),
+    ),
+    "clips": (
+        # Manifiesto de audio del promo (misma forma que el promo.json de
+        # los promos escritos a mano). NULL en un clip de curso.
+        ("audio_json", "ALTER TABLE clips ADD COLUMN audio_json TEXT"),
     ),
     "projects": (
         ("tipo", "ALTER TABLE projects ADD COLUMN tipo TEXT NOT NULL"
@@ -142,8 +156,8 @@ class Database:
             rows = self._conn.execute(
                 "SELECT id, scene, quality, timeout, status, video_path, error,"
                 " created_at, started_at, finished_at, size_bytes, thumb_path,"
-                " project_id, clip_id, formato, resolution,"
-                " length(script) AS script_len"
+                " project_id, clip_id, formato, resolution, audio_path,"
+                " audio_hash, length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()

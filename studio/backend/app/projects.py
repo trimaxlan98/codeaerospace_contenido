@@ -12,10 +12,12 @@ la API y el JobManager llega en el Sprint 2.
 """
 
 import hashlib
+import json
 import re
 import time
 import uuid
 
+from . import audio_promo
 from .db import Database
 
 QUALITY_SPECS = {
@@ -124,9 +126,14 @@ def project_slug(name: str) -> str:
 
 
 def clip_public(clip: dict) -> dict:
-    """Vista del clip sin el script completo (evita respuestas pesadas)."""
-    public = {k: v for k, v in clip.items() if k != "script"}
+    """Vista del clip sin el script completo (evita respuestas pesadas).
+
+    El manifiesto de audio tampoco viaja en el listado: se pide aparte
+    (`GET .../clips/{cid}/audio`), y aqui solo se dice si existe.
+    """
+    public = {k: v for k, v in clip.items() if k not in ("script", "audio_json")}
     public["script_len"] = len(clip.get("script") or "")
+    public["has_audio"] = bool(clip.get("audio_json"))
     return public
 
 
@@ -164,6 +171,10 @@ class ProjectService:
         project = self.db.get_project(pid)
         if not project:
             return None
+        # El estado del audio solo se calcula en promos: un curso no lleva
+        # cama de sonido (su voz va por Narracion) y son ~18 clips por
+        # proyecto a los que no hay que consultarles el job.
+        es_promo = (project.get("tipo") or TIPO_DEFECTO) == "promo"
         clips = []
         for clip in self.db.list_clips(pid):
             expected = content_hash(project["style_block"], clip.get("script") or "",
@@ -176,7 +187,11 @@ class ProjectService:
                 status = "stale"
             else:
                 status = "rendered"
-            clips.append({**clip_public(clip), "stale": stale, "status": status})
+            entrada = {**clip_public(clip), "stale": stale, "status": status}
+            if es_promo:
+                entrada["audio"] = self.estado_audio(clip)
+                entrada["verificacion"] = self.estado_verificacion(clip)
+            clips.append(entrada)
         # `specs` viaja con el detalle para que la interfaz sepa la
         # proporcion del lienzo antes de que exista el primer render (y no
         # tenga que repetir la tabla de calidades en JavaScript).
@@ -213,6 +228,67 @@ class ProjectService:
                 **(extra(project, clips) if extra else {}),
             })
         return summaries
+
+    # ── audio del promo ──────────────────────────────────────────────────────
+
+    def manifiesto_audio(self, clip: dict, voz_defecto: str = "Charon") -> dict:
+        """Manifiesto normalizado del clip (el vacio si aun no tiene)."""
+        crudo = clip.get("audio_json")
+        try:
+            guardado = json.loads(crudo) if crudo else None
+        except ValueError:
+            guardado = None
+        return audio_promo.normalizar(guardado, voz_defecto)
+
+    def estado_audio(self, clip: dict) -> dict:
+        """Como esta la mezcla de este clip.
+
+          sin_manifiesto  no se ha escrito nada todavia
+          sin_render      hay manifiesto pero el clip no tiene video vigente
+          sin_mezclar     hay manifiesto y video, pero nadie ha mezclado
+          desactualizado  se mezclo, pero despues cambio el manifiesto o el video
+          al_dia          el mp4 que sirve la app suena como dice el manifiesto
+        """
+        if not clip.get("audio_json"):
+            return {"estado": "sin_manifiesto", "has_audio": False}
+        job_id = clip.get("job_id")
+        job = self.db.get_job(job_id) if job_id else None
+        if not job or job.get("status") != "done":
+            return {"estado": "sin_render", "has_audio": False}
+        esperado = audio_promo.hash_mezcla(self.manifiesto_audio(clip), job_id)
+        if not job.get("audio_path"):
+            return {"estado": "sin_mezclar", "has_audio": False}
+        al_dia = job.get("audio_hash") == esperado
+        return {"estado": "al_dia" if al_dia else "desactualizado",
+                "has_audio": True}
+
+    def informe_verificacion(self, clip: dict) -> dict | None:
+        """El ultimo informe medido del clip, o None."""
+        job_id = clip.get("job_id")
+        job = self.db.get_job(job_id) if job_id else None
+        if not job or not job.get("verify_json"):
+            return None
+        try:
+            return json.loads(job["verify_json"])
+        except ValueError:
+            return None
+
+    def estado_verificacion(self, clip: dict) -> dict:
+        """'sin_render' | 'sin_verificar' | 'desactualizada' | 'al_dia'.
+
+        Un informe medido sobre otro archivo (otro render, u otra mezcla) no
+        vale: se marca desactualizado en vez de enseñar numeros viejos.
+        """
+        job_id = clip.get("job_id")
+        job = self.db.get_job(job_id) if job_id else None
+        if not job or job.get("status") != "done":
+            return {"estado": "sin_render", "ok": None}
+        if not job.get("verify_json"):
+            return {"estado": "sin_verificar", "ok": None}
+        informe = self.informe_verificacion(clip) or {}
+        al_dia = job.get("verify_hash") == audio_promo.hash_verificacion(job)
+        return {"estado": "al_dia" if al_dia else "desactualizada",
+                "ok": bool(informe.get("ok"))}
 
     def update_project(self, pid: str, **fields) -> dict:
         # Calidad y formato definen el archivo que sale del render: si ya

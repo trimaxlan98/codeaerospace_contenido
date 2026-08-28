@@ -14,14 +14,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ChevronDown, ChevronRight, ChevronUp, Download, FileJson, FileText,
-  FolderKanban, Film, Layers, Mic, Pencil, Plus, RefreshCw, Search, Square, Wand2,
+  FolderKanban, Film, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Wand2,
 } from 'lucide-react'
-import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl } from './api.js'
+import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
 import { FORMATOS, formatoPorId, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
+import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -360,6 +361,16 @@ function ProjectsList({ onOpen }) {
   )
 }
 
+/** Cómo se llama lo que hay dentro de un grupo. Una familia de promos son
+ *  promos, no «lecciones»: llamarlas así sería heredar la palabra del caso
+ *  que ya existía. */
+function contar(items, loose) {
+  const uno = items.length === 1
+  if (items.every((p) => p.tipo === 'promo')) return uno ? 'promo' : 'promos'
+  if (loose) return uno ? 'curso' : 'cursos'
+  return uno ? 'lección' : 'lecciones'
+}
+
 function FamilyGroup({ name, items, loose, showNarr, open, onToggle, onOpen, onDelete }) {
   const t = totals(items)
   return (
@@ -374,10 +385,7 @@ function FamilyGroup({ name, items, loose, showNarr, open, onToggle, onOpen, onD
           : <Layers className="h-4 w-4 shrink-0 text-accent" />}
         <span className="truncate font-display text-[14.5px] font-semibold text-ink">{name}</span>
         <span className="shrink-0 font-mono text-[11px] text-faint">
-          {items.length}{' '}
-          {loose
-            ? (items.length === 1 ? 'curso' : 'cursos')
-            : (items.length === 1 ? 'lección' : 'lecciones')}
+          {items.length} {contar(items, loose)}
         </span>
         <span className="ml-auto hidden shrink-0 text-[12px] text-muted sm:block"><CountsLine t={t} /></span>
         {showNarr && <NarrBadge narrated={t.narrated} clips={t.clips} className="hidden sm:inline-flex" />}
@@ -609,6 +617,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   // de siempre: ni el boton del asistente se monta.
   const guided = usePref('guided')
   const [guionClip, setGuionClip] = useState(null) // clip cuyo guion se lee
+  const [audioClip, setAudioClip] = useState(null) // clip cuyo audio se edita
   const savedRef = useRef({ name: '', description: '' })
   const savedClipsRef = useRef({})
   const prevJobsRef = useRef([])
@@ -855,6 +864,11 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   // "Re-renderizar desactualizados" realmente va a encolar.
   const staleCount = staleWithoutActiveJob(clips, jobs).length
   const formatoFijo = clips.some((c) => c.job_id)
+  const esPromo = (project.tipo || 'curso') === 'promo'
+  const audioAlDia = clips.filter((c) => c.audio?.estado === 'al_dia').length
+  // El promo se descarga como lo que es: un mp4 (el que sirve la app, ya
+  // mezclado si se mezclo), no como un zip de curso con concat.txt.
+  const videoPromo = esPromo && clips[0]?.status === 'rendered' ? clips[0].job_id : null
   const narrByClip = Object.fromEntries((narracion?.clips || []).map((c) => [c.clip_id, c]))
   const narrPending = (narracion?.clips || []).filter((c) => c.estado !== 'al_dia').length
   const narrAlDia = (narracion?.clips || []).filter((c) => c.estado === 'al_dia').length
@@ -925,9 +939,19 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               detail={duraciones.length < clips.length
                 ? `${duraciones.length}/${clips.length} medidos`
                 : fueraRango > 0 ? `${fueraRango} fuera de ${rango.min}-${rango.max} s` : `${rango.min}-${rango.max} s por clip`} />
-            <Stat label="Narración" value={narracion ? `${narrAlDia}/${clips.length}` : '—'}
-              tone={narracion && narrAlDia === clips.length && clips.length > 0 ? 'ok' : 'muted'}
-              detail={narracion?.voz || (narracion?.enabled === false ? 'sin Vertex' : '…')} />
+            {/* Un promo no se narra por el camino de los cursos (guion escrito
+                por Gemini a 28-45 s): su voz y su cama viven en el manifiesto
+                de audio del clip. Aqui se cuenta eso. */}
+            {esPromo ? (
+              <Stat label="Audio" value={`${audioAlDia}/${clips.length}`}
+                tone={audioAlDia === clips.length && clips.length > 0 ? 'ok' : 'muted'}
+                detail={audioAlDia === clips.length && clips.length > 0
+                  ? 'mezclado' : 'sin mezclar'} />
+            ) : (
+              <Stat label="Narración" value={narracion ? `${narrAlDia}/${clips.length}` : '—'}
+                tone={narracion && narrAlDia === clips.length && clips.length > 0 ? 'ok' : 'muted'}
+                detail={narracion?.voz || (narracion?.enabled === false ? 'sin Vertex' : '…')} />
+            )}
           </div>
 
           <div className="flex flex-wrap gap-1.5">
@@ -936,7 +960,19 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 <FileJson className="h-3.5 w-3.5" /> Exportar manifest
               </a>
             </Button>
-            {renderedCount > 0 ? (
+            {esPromo ? (
+              videoPromo ? (
+                <Button size="sm" variant="default" asChild>
+                  <a href={videoUrl(videoPromo)} download={`${project.name || 'promo'}.mp4`}>
+                    <Download className="h-3.5 w-3.5" /> Descargar promo (.mp4)
+                  </a>
+                </Button>
+              ) : (
+                <Button size="sm" variant="default" disabled title="Todavía no hay render vigente">
+                  <Download className="h-3.5 w-3.5" /> Descargar promo (.mp4)
+                </Button>
+              )
+            ) : renderedCount > 0 ? (
               <Button size="sm" variant="default" asChild>
                 <a href={projectArchiveUrl(project.id)} download={`${project.name || 'curso'}.zip`}>
                   <Download className="h-3.5 w-3.5" /> Descargar curso (.zip)
@@ -951,7 +987,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               title={staleCount === 0 ? 'no hay clips desactualizados sin un render en curso' : undefined}>
               <RefreshCw className="h-3.5 w-3.5" /> Re-renderizar desactualizados{staleCount > 0 ? ` (${staleCount})` : ''}
             </Button>
-            {narrRun ? (
+            {esPromo ? null : narrRun ? (
               <>
                 <Button size="sm" variant="default" disabled>
                   <Mic className="h-3.5 w-3.5 animate-pulse" /> Narrando {Math.min(narrRun.done + 1, narrRun.total)}/{narrRun.total}…
@@ -1023,6 +1059,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 narrando={narrRun?.current?.clip_id === clip.id}
                 narrBusy={Boolean(run)} narrEnabled={Boolean(narracion?.enabled)}
                 onVerGuion={() => setGuionClip(clip)}
+                onAudio={() => setAudioClip(clip)}
                 onNarrar={() => generarNarracion({ clips: [clip.id], force: true })} />
             ))
           )}
@@ -1033,6 +1070,11 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
         onSaved={(styleBlock, updatedAt) => setProject((p) => ({ ...p, style_block: styleBlock, updated_at: updatedAt }))} />
       <AddClipDialog open={addClipOpen} onOpenChange={setAddClipOpen} projectId={project.id}
         onCreated={() => { setAddClipOpen(false); load() }} />
+      {audioClip && (
+        <AudioPromoDialog projectId={project.id} clip={audioClip}
+          onOpenChange={(o) => !o && setAudioClip(null)} onSaved={load} />
+      )}
+
       <GuionDialog projectId={project.id} clip={guionClip}
         onOpenChange={(o) => !o && setGuionClip(null)} />
       {guided && (
@@ -1073,8 +1115,19 @@ function DurationBadge({ s, rango = DURACION.curso }) {
   )
 }
 
-function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion }) {
+function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion, onAudio }) {
   const activeJob = activeJobFor(jobs, clip.id)
+  // El promo dice en el propio boton como esta su mezcla: sin audio, sin
+  // mezclar, desactualizada o al dia.
+  const audioMeta = tipo === 'promo' ? AUDIO_META[clip.audio?.estado] : null
+  // El distintivo de verificacion dice lo MEDIDO: si el informe esta al dia,
+  // pasa o no pasa; si no, en que estado esta la medicion.
+  const verif = tipo === 'promo' ? clip.verificacion : null
+  const verifMeta = !verif || verif.estado === 'sin_render' ? null
+    : verif.estado === 'al_dia'
+      ? (verif.ok ? { label: 'verificado', text: 'text-ok' }
+                  : { label: 'no pasa', text: 'text-err' })
+      : VERIF_META[verif.estado]
   const renderJob = clip.job_id ? jobs.find((j) => j.id === clip.job_id) : null
   const meta = activeJob ? STATUS_META[activeJob.status] : (STATUS_META[clip.status] || STATUS_META.no_render)
   const canRender = !activeJob && Boolean(clip.scene?.trim())
@@ -1106,6 +1159,12 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
             <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} /> {meta.label}
           </span>
           <DurationBadge s={narr?.video_s} rango={rangoDuracion(tipo)} />
+          {verifMeta && (
+            <span className={cn('rounded-md border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide', verifMeta.text)}
+              title="bucle, duración y audio, medidos sobre el archivo que sirve la app">
+              {verifMeta.label}
+            </span>
+          )}
         </div>
 
         <label className="flex items-center gap-2 text-[12px] text-muted">
@@ -1158,13 +1217,24 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
             disabled={index === total - 1} aria-label="mover abajo">
             <ChevronDown className="h-3.5 w-3.5" />
           </Button>
+          {tipo === 'promo' && (
+            <Button size="xs" variant="default" onClick={onAudio}
+              title="cama de sonido y voz de este promo">
+              <Music className="h-3.5 w-3.5" /> Audio
+              {audioMeta && (
+                <span className={cn('ml-1 font-mono text-[10.5px]', audioMeta.text)}>
+                  · {audioMeta.label}
+                </span>
+              )}
+            </Button>
+          )}
           <span className="ml-auto"><DeleteButton onDelete={() => onDelete(clip.id)} /></span>
         </div>
 
         {/* La fila de narracion se muestra SIEMPRE que el backend sepa algo del
             clip (antes solo aparecia con audio ya generado, asi que no habia
             forma de ver desde aqui que faltaba narrar). */}
-        {narr && (
+        {narr && tipo !== 'promo' && (
           <div className="mt-1 flex flex-wrap items-center gap-2 rounded-md border border-line/60 bg-canvas/40 px-2.5 py-1.5">
             <Mic className="h-3.5 w-3.5 shrink-0 text-accent" />
             {narrando ? (

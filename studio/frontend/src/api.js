@@ -65,6 +65,10 @@ export const api = {
   renderClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/render`),
   renderStale: (pid) => request('POST', `/api/projects/${pid}/render-stale`),
   getClipScript: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/script`),
+  getAudioPromo: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/audio`),
+  putAudioPromo: (pid, cid, body) => request('PUT', `/api/projects/${pid}/clips/${cid}/audio`, body),
+  mezclarAudioPromo: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/audio/mezclar`),
+  verificarPromo: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/verificar`),
   getNarracion: (pid) => request('GET', `/api/projects/${pid}/narracion`),
   startNarracion: (pid, body = {}) => request('POST', `/api/projects/${pid}/narracion`, body),
   cancelNarracion: (pid) => request('POST', `/api/projects/${pid}/narracion/cancel`),
@@ -85,6 +89,10 @@ export function projectExportUrl(id) {
 
 export function projectArchiveUrl(id) {
   return `/api/projects/${id}/archive`
+}
+
+export function frameVerificacionUrl(jobId, archivo) {
+  return `/api/jobs/${jobId}/verificacion/${archivo}`
 }
 
 export function narracionAudioUrl(pid, cid) {
