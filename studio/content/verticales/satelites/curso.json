@@ -1,0 +1,20 @@
+{
+  "name": "Satélites · la máquina que no se cae",
+  "slug": "satelites",
+  "formato": "vertical",
+  "curso": 27,
+  "description": "Curso vertical (9:16) pensado para verse en el teléfono: sin subtítulos, todo lo enseña la imagen y el audio (voz alineada a mano + cama de efectos). Releva al curso 2 de la colección, «Satélites e IA: la red que aprende a gobernarse», y a la mitad divulgativa del 3, «Mecánica orbital». El arco va de por qué un satélite no se cae —cae 4.347 m por segundo, y el suelo se aleja otros 4.347— hasta cuántos hay ahora mismo sobre tu cabeza, pasando por la huella, la traza, el pase, el enjambre, la malla y la red que aprende a apuntar donde está la demanda. Todas las cifras en pantalla las calcula satelites.py con numpy y semilla fija.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "modulos": [
+    "M1 · Caerse sin llegar al suelo (1-3)",
+    "M2 · La Tierra gira debajo (4-6)",
+    "M3 · Por eso son muchos (7-11)",
+    "M4 · La red que se gobierna sola (12-14)"
+  ],
+  "piezas": [
+    {"dir": "clips/00-intro", "tipo": "marca"},
+    {"dir": "clips/01-el-canon"}
+  ]
+}
