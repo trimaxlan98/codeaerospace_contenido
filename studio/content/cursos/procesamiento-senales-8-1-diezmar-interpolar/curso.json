@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 8.1 Diezmar e interpolar",
+  "description": "Lección 8.1 del curso Procesamiento digital de señales (módulo 8: multitasa), en 4 clips animados: tirar muestras sin filtrar y ver reaparecer un tono donde no estaba, el filtro que va antes, los ceros que llenan el espectro de imágenes, y el filtro que va después. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-tirar-muestras.py",
+      "title": "1 · Tirar muestras",
+      "scene": "Clip1",
+      "final_state": "El espectro tras diezmar por 4 sin filtrar, con el tono de 2600 Hz reaparecido en 600 Hz marcado."
+    },
+    {
+      "file": "clips/02-el-filtro-antes.py",
+      "title": "2 · El filtro va antes",
+      "scene": "Clip2",
+      "final_state": "La respuesta del antialias con la marca en 2600 Hz y su atenuacion de -67.7 dB, y el espectro diezmado ya limpio."
+    },
+    {
+      "file": "clips/03-meter-ceros.py",
+      "title": "3 · Meter ceros",
+      "scene": "Clip3",
+      "final_state": "La secuencia con tres ceros entre cada par de muestras y su espectro lleno de imagenes."
+    },
+    {
+      "file": "clips/04-el-filtro-despues.py",
+      "title": "4 · El filtro va despues",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Cambiar de ritmo no es tirar muestras.' (blanca) y 'Es filtrar y luego tirarlas.' (cian)."
+    }
+  ]
+}

@@ -135,12 +135,17 @@ MAX_TITULO = 6               # palabras
 MAX_CIFRA = 5                # palabras, contando el numero
 MAX_TAG = 4                  # palabras de una etiqueta de mobiliario
 
-# Tamano minimo de un rotulo en Rajdhani. MEDIDO en el contenedor (sonda
-# de tipografia del lote 1): a 16-17 px la fuente redondea los avances y
-# PARTE palabras ("retardada" sale "ret ardada"); por debajo de ~24 px
-# aprieta el espacio hasta que "senal real" se lee "senalreal". Space
-# Mono (tag_hud, cifra_pie) no tiene ninguno de los dos problemas.
+# Tamanos minimos de un rotulo en Rajdhani, los dos MEDIDOS en el
+# contenedor:
+#  - a 16-17 px la fuente redondea los avances y PARTE palabras
+#    ("retardada" sale "ret ardada");
+#  - por debajo de 22 px se come el espacio ENTRE palabras: a 18 px
+#    "por separado" sale "porseparado" (comprobado en el frame qh de la
+#    leccion 2.1), a 20 queda apretado, a 22 se lee limpio.
+# Space Mono (tag_hud, cifra_pie) no tiene ninguno de los dos problemas a
+# ningun tamano de los que usa el curso.
 FS_MIN_DISPLAY = 18
+FS_MIN_MULTI = 22            # si el rotulo tiene mas de una palabra
 
 
 def _palabras(texto):
@@ -277,7 +282,9 @@ def tag_junto(mobjeto, texto, direccion=DOWN, buff=0.16, font_size=18,
     espacio y Rajdhani no lo hace hasta los 24 px.
     """
     _vigilar(texto, MAX_TAG, "tag_junto")
-    t = Text(str(texto), font_size=max(font_size, FS_MIN_DISPLAY),
+    minimo = (FS_MIN_MULTI if len(_palabras(texto)) > 1
+              else FS_MIN_DISPLAY)
+    t = Text(str(texto), font_size=max(font_size, minimo),
              color=C_TENUE if color is None else color)
     t.set_opacity(0.9)
     t.next_to(mobjeto, direccion, buff=buff)
@@ -313,8 +320,9 @@ def llave(mobjeto, texto=None, direccion=UP, font_size=22, color=None,
     if texto is None:
         return VGroup(b)
     _vigilar(texto, MAX_TAG, "llave")
-    t = Text(str(texto), font_size=max(font_size, FS_MIN_DISPLAY),
-             color=col)
+    minimo = (FS_MIN_MULTI if len(_palabras(texto)) > 1
+              else FS_MIN_DISPLAY)
+    t = Text(str(texto), font_size=max(font_size, minimo), color=col)
     t.next_to(b, direccion, buff=buff)
     return VGroup(b, t)
 

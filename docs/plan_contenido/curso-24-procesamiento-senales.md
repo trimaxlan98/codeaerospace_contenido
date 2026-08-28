@@ -228,8 +228,8 @@ agentes → revisión → PR → prod → narración → mux) antes de abrir el 
 | 1 | 1–2 | 1.1–2.3 | `Secuencia`, `Escalera`, `Deslizador`, `Barras`, `EspectroDoble`, réplicas, cuantización, convolución, correlación | ~ producción |
 | 2 | 3–4 | 3.1–4.3 | `Mariposa`, `PlanoZ`, `RespuestaFrec`, DFT/FFT, ventanas, Z, retardo de grupo | ~ producción |
 | 3 | 5–6 | 5.1–6.3 | `LineaRetardos`, diseño FIR/IIR, biquads, Goertzel | ~ producción |
-| 4 | 7–8 | 7.1–8.3 | Q15, ciclos límite, overlap-add, polifase, CIC, Farrow | — |
-| 5 | 9–10 | 9.1–10.3 | `Espectrograma`, Welch, LMS, PLL, Kalman, Hilbert, STFT, filtro aprendido | — |
+| 4 | 7–8 | 7.1–8.3 | Q15, ciclos límite, overlap-add, polifase, CIC, Farrow, bancos | ~ producción |
+| 5 | 9–10 | 9.1–10.3 | `Espectrograma`, Welch, LMS, PLL, Kalman, Hilbert, STFT, filtro aprendido | ~ librería lista |
 
 ## 11. Receta de lote (los 10 pasos con las rutas de esta familia)
 
@@ -260,30 +260,36 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 2.1 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:16 |
 | 2.2 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:43 |
 | 2.3 | ✔ | ✔ | ✔ | ✔ | ✔ #54 | ✔ | ✔ | ✔ | ✔ 2:51 |
-| 3.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ~ | — |
-| 3.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
-| 3.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
-| 4.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
-| 4.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
-| 4.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | — | — |
-| 5.1 | ✔ | ✔ | ✔ | ✔ 29/28/32/29 s | — | — | — | — | — |
-| 5.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 5.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 6.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 6.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 6.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 7.1–8.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+| 3.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:17 |
+| 3.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:35 |
+| 3.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:35 |
+| 4.1 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:17 |
+| 4.2 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:36 |
+| 4.3 | ✔ | ✔ | ✔ | ✔ | ✔ #55 | ✔ | ✔ | ✔ | ✔ 2:32 |
+| 5.1 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:15 |
+| 5.2 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:30 |
+| 5.3 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:21 |
+| 6.1 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:37 |
+| 6.2 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:36 |
+| 6.3 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:13 |
+| 7.1 | ✔ | ✔ | ✔ | ✔ 29/29/29/29 s | — | — | — | — | — |
+| 7.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 7.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 8.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 8.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 8.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
 | 9.1–10.3 | ✔ mapa | — | — | — | — | — | — | — | — |
 
-**Dónde está la sesión**: lote 1 **cerrado** (6 vídeos narrados y muxeados, con
-la marca sonora a −6.0 dB medidos dentro); lote 2 en prod con sus 24 `qh` y
-narrándose; lote 3 con la librería ampliada y validada, el molde 5.1 aprobado y
-5 subagentes produciendo. El solape es deliberado: la narración ocupa el VPS,
-los renders de validación son locales.
+**Dónde está la sesión**: lotes 1 y 2 **cerrados** (12 vídeos narrados y
+muxeados, marca sonora a −6.0 dB dentro de las salidas); lote 3 **cerrado**
+tambien; lote 4 con 5 subagentes produciendo (los mato un corte de cuota y se
+relanzaron); lote 5 con la librería ya escrita y validada en el scratchpad
+(`dsp5.py`), pendiente de pegar a `dsp.py` cuando no haya agentes importandola.
 
-**Salidas del lote 1** en `exports/procesamiento-senales-*/curso_narrado.mp4`
-(no versionadas): 2:16 a 2:51, picos entre −0.5 y −1.3 dB tras re-muxear 5
-clips a −1.5 dB.
+**Salidas** en `exports/procesamiento-senales-*/curso_narrado.mp4` (no
+versionadas): lote 1 de 2:16 a 2:51 (5 clips re-muxeados a −1.5 dB); lote 2 de
+2:17 a 2:36 (ninguno hizo falta); lote 3 de 2:13 a 2:37 (7 re-muxeados,
+uno de ellos a −2.5 dB porque tocaba 0.0).
 
 ## 13. Storyboard
 
@@ -525,8 +531,154 @@ El pliego que se usa en las seis lecciones, para poder comparar: **paso hasta
   Cierre: «No siempre hace falta el espectro entero.» / «A veces basta una
   nota.»
 
-### Lotes 4–5
-Se escriben al abrir cada lote (§11 paso 1).
+### Lote 4 — Módulos 7 y 8
+
+Hilo del lote: el filtro ya está diseñado; ahora hay que **meterlo en el
+aparato**. Módulo 7: lo que le pasa cuando los números tienen 16 bits y el
+tiempo se acaba. Módulo 8: cómo hacer lo mismo con muchas menos cuentas
+cambiando la frecuencia de muestreo.
+
+#### 7.1 «Punto fijo Q15» (molde del lote)
+- **c1 · El formato** — 16 bits con signo para el rango [−1, 1): paso
+  3.05e−05, y el **1.0 no existe** (el mayor es 0.99997).
+- **c2 · Saturar o envolver** — el mismo pico de +1.3: saturando queda en
+  0.99997; envolviendo sale **−0.7**. El fallo más feo del punto fijo.
+- **c3 · El escalado** — bajar la señal 6 dB da margen (0.16 → 6.18 dB) y
+  cuesta SNR (94.4 → 88.2 dB). Las dos cifras, medidas.
+- **c4 · Lo que queda** — SNR de Q15 medida sobre la señal: 94.4 dB.
+  Cierre: «El punto fijo no es coma flotante barata.» / «Es otro oficio.»
+
+#### 7.2 «Coeficientes cuantizados y ciclos límite»
+- **c1 · La banda muerta** — y[n] = Q(a·y[n−1]) con a = 0.9 y 8 bits: el
+  filtro no llega a cero, se queda **atrapado en 0.03125** (la cota teórica
+  es 0.0391).
+- **c2 · El ciclo límite** — con a = −0.9 no se queda quieto: **oscila con
+  periodo 2 para siempre**, sin entrada. Un fallo que en coma flotante no
+  existe.
+- **c3 · Cuántos bits** — 6 / 8 / 10 bits atrapan 0.125 / 0.03125 / 0.0078:
+  escala exactamente con el paso. Es ruido de redondeo, no señal.
+- **c4 · La cura** — más bits, o romper la realimentación exacta. Cierre:
+  «Un filtro estable en el papel» / «puede no apagarse nunca.»
+
+#### 7.3 «El presupuesto de tiempo real»
+- **c1 · MAC por segundo** — 21 multiplicaciones por muestra a 48 kHz.
+- **c2 · Bloques y latencia** — L = 64 son 1.33 ms; L = 256, 5.33 ms.
+  Procesar por bloques es gratis en cuentas y caro en espera.
+- **c3 · Overlap-add** — la convolución por bloques con FFT da **el mismo
+  resultado**: error 3.3e−16 contra la directa.
+- **c4 · El cruce** — la FFT gana a partir de **M = 24** (contando
+  multiplicaciones REALES en los dos lados); con M = 41 sobre 10 000
+  muestras, 410 000 contra 283 380. Cierre: «La FFT no siempre gana.» / «Hay
+  que contar las multiplicaciones.»
+
+#### 8.1 «Diezmar e interpolar»
+- **c1 · Tirar muestras** — diezmar por 4 sin filtrar: el tono de 2600 Hz
+  reaparece en **600 Hz**.
+- **c2 · El filtro va ANTES** — con el antialias, |H(2600)| = **−67.5 dB**.
+- **c3 · Meter ceros** — interpolar por L no cambia la señal, pero su
+  espectro se llena de **imágenes**.
+- **c4 · El filtro va DESPUÉS** — y las imágenes se van. Cierre: «Cambiar de
+  ritmo no es tirar muestras.» / «Es filtrar y luego tirarlas.»
+
+#### 8.2 «Polifase y CIC»
+- **c1 · Lo que se tira** — filtrar 61 taps y quedarse con una de cada
+  cuatro: tres cuartas partes del trabajo van a la basura.
+- **c2 · Las ramas** — polifase reordena el mismo filtro en 4 ramas de 16,
+  15, 15 y 15 taps: **61 → 15.25 multiplicaciones** por muestra de entrada.
+- **c3 · CIC** — integradores y peines: diezma con **cero multiplicadores**.
+- **c4 · Lo que cuesta el CIC** — su caída dentro de la banda: −0.42 dB si
+  se usa una décima de la banda, −2.70 dB si se usa un cuarto, −11.61 dB si
+  se usa entera. Cierre: «Lo barato no es gratis.» / «El CIC se paga en
+  banda.»
+
+#### 8.3 «Remuestreo racional y bancos»
+- **c1 · L/M** — interpolar por L, filtrar, diezmar por M.
+- **c2 · Farrow** — cuando los relojes no cuadran hace falta un retardo
+  fraccionario: error 4.8e−05 con un tono a 0.037 fs, y **0.49** con uno
+  cerca de Nyquist. El interpolador cúbico solo vale si sobra banda.
+- **c3 · Dos canales** — el banco de Haar reconstruye **exacto**: error
+  4.4e−16.
+- **c4 · Lo que cuesta separar bien** — un QMF de 32 taps separa mucho mejor
+  y deja 0.0199 de error. Y la longitud **tiene que ser par**: con 31 taps
+  el error es 0.967, cincuenta veces peor. Cierre: «Partir en bandas y
+  volver a juntarlas» / «solo cuadra si los filtros encajan.»
+
+### Lote 5 — Módulos 9 y 10
+
+Hilo del lote: hasta aquí el filtro lo diseñábamos nosotros. Ahora la señal
+trae algo que no sabemos de antemano, y el sistema tiene que **medirlo,
+seguirlo o aprenderlo**. Cierra el curso volviendo al principio: una red que
+aprende a filtrar redescubre, coeficiente a coeficiente, el filtro que
+habríamos diseñado en el módulo 5.
+
+Piezas nuevas: `Espectrograma` (la malla tiempo–frecuencia).
+
+#### 9.1 «Estimar el espectro» (molde del lote)
+- **c1 · El periodograma no converge** — con 4096 muestras sus bins tiemblan
+  **5.61 dB**; con 16384, **5.54 dB**. Más datos NO lo arreglan.
+- **c2 · Promediar** — Welch parte la señal en 31 trozos solapados y promedia:
+  la dispersión cae a **0.75 dB**.
+- **c3 · Lo que cuesta** — la resolución baja a fs/nseg = **3.91 Hz** con
+  trozos de 256, frente a 0.24 Hz usando la señal entera.
+- **c4 · Sesgo contra varianza** — trozos largos (mejor resolución, más
+  temblor) contra trozos cortos. Cierre: «Un espectro medido una vez» / «no es
+  el espectro.»
+
+#### 9.2 «LMS: el filtro que se ajusta solo»
+- **c1 · El escenario** — una voz, un ruido que se cuela por un camino
+  desconocido, y un micrófono con SOLO el ruido.
+- **c2 · El error manda** — w[n+1] = w[n] + μ·e[n]·x[n]; el ruido cae
+  **15.2 dB** y los coeficientes aprendidos ([0.734, −0.362, 0.288, 0.137,
+  −0.014]) se parecen al camino real ([0.7, −0.4, 0.25, 0.1, −0.05]) con un
+  9.6 % de error.
+- **c3 · El paso μ** — μ = 0.02 converge en **76 muestras** y se queda
+  temblando en 0.0187; μ = 0.001 tarda **2894** y baja hasta 0.00094. Rápido y
+  basto contra lento y fino, medido.
+- **c4 · Cuando se rompe** — por encima de μ_max = 0.40 diverge. Cierre: «No
+  hace falta conocer el ruido.» / «Basta con oírlo aparte.»
+
+#### 9.3 «Seguir: PLL y Kalman»
+- **c1 · El NCO** — un oscilador propio que hay que casar con la señal.
+- **c2 · El lazo** — el detector de fase, el filtro y la realimentación:
+  tras enganchar, el error de fase queda en **0.055 rad**.
+- **c3 · La deriva** — con un tono cuya frecuencia se va (Doppler de un pase),
+  el PLL la sigue: error final **1.3e−05** en frecuencia normalizada.
+- **c4 · Kalman** — cuánto creerse cada medida: el rms baja de **0.608** a
+  **0.190**. Cierre: «Seguir no es medir.» / «Es apostar y corregir.»
+
+#### 10.1 «La señal analítica»
+- **c1 · Media transformada** — poner a cero las frecuencias negativas
+  convierte un seno en un fasor: |x| = **1.0000** medido.
+- **c2 · La envolvente** — el módulo sigue la amplitud instantánea: error rms
+  **0.0000** contra la envolvente real.
+- **c3 · La frecuencia instantánea** — la derivada de la fase da **60.00 Hz**
+  medidos sobre un tono de 60.
+- **c4 · IQ** — por qué una radio guarda dos números por muestra. Cierre: «Una
+  señal real esconde la mitad.» / «La analitica la enseña.»
+
+#### 10.2 «Tiempo–frecuencia»
+- **c1 · Lo que el espectro no ve** — un barrido con un golpe corto: en el
+  espectro entero el golpe se diluye.
+- **c2 · El espectrograma** — la STFT lo pone en su sitio.
+- **c3 · Heisenberg, en cifras** — ventana de 64: Δt = 64 muestras, Δf =
+  0.0156; de 256: Δt = 256, Δf = 0.0039. **El producto es 1.00 siempre.**
+- **c4 · Wavelets** — la ventana que se encoge al subir de frecuencia. Cierre:
+  «No hay ventana buena.» / «Hay ventana elegida.»
+
+#### 10.3 «El filtro aprendido» (cierre del curso)
+- **c1 · Aprender por ejemplos** — una red lineal ve pares entrada/salida y
+  ajusta sus pesos.
+- **c2 · Lo que aprende** — al terminar, sus coeficientes son **exactamente**
+  el filtro del módulo 5: coseno **1.000000**, error relativo **1.9e−09**. No
+  ha inventado nada: ha redescubierto lo que ya sabíamos diseñar.
+- **c3 · Dónde no conviene** — y ha costado 3000 pasos de entrenamiento en vez
+  de una línea de código.
+- **c4 · Dónde sí** — con un amplificador saturado, que ningún filtro lineal
+  puede deshacer, la red saca **5.2 dB** al mejor lineal posible. Cierre del
+  curso: «Una señal es una lista de numeros.» / «Todo lo demas es que le
+  haces.»
+
+
 
 ## 14. Cosecha heredada (lo que más riesgo tiene aquí)
 
@@ -590,6 +742,77 @@ justo la animación que cuenta la lección 1.1.
 8. Un rótulo `error 0.162` junto a otro `error 0.004` **no dice cuál es cuál**:
    la etiqueta de una cifra tiene que llevar su condición dentro
    (`300 Hz: error 0.162`), que en formato mudo es lo único que la explica.
+
+
+### Lotes 2 a 4 — lo que fue apareciendo
+
+**De la librería (cazado midiendo, no mirando):**
+
+9. `LineaRetardos` usaba `LEFT` sin que `dsp.py` lo importara: **cualquier**
+   llamada reventaba con `NameError`. Mi prueba de humo de las piezas no lo
+   cubrió porque no llegué a renderizar esa. Lección: la prueba de humo tiene
+   que dibujar TODAS las piezas nuevas, no las que parecen más delicadas.
+10. El "ciclo límite" que escribí primero era la oscilación natural de un
+    filtro casi inestable: la amplitud salía **igual con 8, 10 y 12 bits**, que
+    es justo la señal de que no era ruido de redondeo. Reescrito a primer
+    orden, escala exacto con el paso (0.125 / 0.03125 / 0.0078).
+11. El coste de la FFT comparaba multiplicaciones **complejas** con **reales**:
+    inflaba la FFT por cuatro y daba un cruce falso en M = 16. Contadas todas
+    reales, el cruce está en M = 24.
+12. El interpolador de Farrow **adelantaba** en vez de retrasar, y se comparaba
+    contra un retraso: el error salía 1700 veces mayor de lo que es.
+13. El banco QMF usaba longitud **impar**, y con longitud impar la cancelación
+    del alias no se cumple: error 0.967 en vez de 0.0199. El hallazgo acabó
+    siendo el cierre de la lección 8.3.
+14. `Escalera` normalizaba el carril de error por **su propio** paso, así que
+    la gemela de 8 bits dibujaba el error igual de alto que la de 4 y el
+    momento "el error se encoge" quedaba mudo.
+15. `PlanoZ` dibuja las aspas de tamaño fijo: con `unidad` pequeña, un polo
+    **estable** a 0.994 se dibujaba cruzando el círculo. Ahora hay
+    `lado_marca`, pero el defecto no cambió (había 15 clips aprobados que
+    dependían de él).
+
+**De honestidad (lo que el render no detecta):**
+
+16. **La malla decide**. La profundidad de un nulo, de un notch o de los ceros
+    de un CIC depende de cuántos puntos tenga la rejilla (−119 dB con 4096,
+    −141 con 16384; −39.7 dB con 2048, −240 con 4096). Esas cifras **no se
+    rotulan nunca**. Lo que se rotula es lo que no se mueve al cambiar la
+    malla: la posición del nulo, el nivel de los lóbulos, el ancho del agujero.
+17. Por eso el "margen desperdiciado" de un diseño por ventanas no se mide de
+    pico a nulo (91 dB, inflado) sino contra el nivel de los lóbulos: **27.2 dB**.
+18. `h[79]` de un resonador vale **cero para los tres radios** (cae en un cruce
+    por cero del seno): rotularlo junto a la palabra "inestable" habría
+    enseñado un 0.0. Se usa el máximo de la cola.
+19. La fase de un FIR simétrico solo es una recta **dentro de la banda de
+    paso**; ajustarla entera da 1.7 rad de residuo y una conclusión falsa.
+20. La caída de un CIC **no es un número**: −0.42, −2.70 o −11.61 dB según
+    cuánta banda uses. Se rotulan las tres con su condición dentro.
+21. Un agente reportó cuatro cifras descuadradas y **una no lo estaba**: al
+    re-medirla, el valor original era el correcto. Los informes se verifican,
+    en los dos sentidos.
+
+**De tipografía (medido dos veces, la segunda con la sonda `texto2.py`):**
+
+22. Rajdhani **parte palabras** a 16–17 px ("retardada" → "ret ardada") y
+    **junta las palabras** por debajo de 22 px ("por separado" → "porseparado",
+    comprobado en el frame `qh` real de la lección 2.1). Space Mono no hace ni
+    lo uno ni lo otro a ningún tamaño del curso. Los helpers imponen ahora dos
+    suelos: 18 px para un rótulo de una palabra y **22 px si tiene más de una**.
+
+**De composición:**
+
+23. Un resalte que entra con `FadeIn` mientras el anterior sale con `FadeOut`
+    deja **dos** en pantalla medio segundo: `Transform` sobre un único mobject.
+24. `Transform(pieza, gemela)` sobre una `_Anclada` cuyos submobjects entraron
+    sueltos mete la pieza ENTERA en escena **y por encima de todo**.
+25. `cierre_leccion` solo apaga lo que se le pasa: los `.ejes` de una pieza
+    dibujada suelta sobreviven cruzando las dos frases del cierre.
+26. `RespuestaFrec.en()` recorta con `np.clip`: una curva sin techo natural (la
+    del warping, que llega a 31.8) sale como un segmento horizontal pegado al
+    borde, que se lee como saturación — lo contrario de lo que hace.
+27. Un contador de cifras dentro de una animación larga deja dígitos a medio
+    morfar: `Succession(Wait(0.55), Transform(cont, nuevo, run_time=0.02))`.
 
 ## 16. Hitos globales
 - 2026-08-27 — plan maestro escrito; rama y worktree creados.

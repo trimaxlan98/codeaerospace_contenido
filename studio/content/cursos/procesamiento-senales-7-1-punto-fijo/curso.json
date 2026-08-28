@@ -1,0 +1,16 @@
+{
+  "name": "Procesamiento de señales · 7.1 Punto fijo: el formato Q15",
+  "description": "Lección 7.1 del curso Procesamiento digital de señales (módulo 7: aritmética finita y tiempo real), en 4 clips animados: el formato Q15 donde el 1.0 no existe, lo que pasa al pasarse (saturar deja el tope, envolver convierte un pico positivo en uno negativo), el escalado que compra margen pagando ruido, y la SNR que queda medida. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-formato.py", "title": "1 · El formato", "scene": "Clip1",
+     "final_state": "La recta de niveles de Q15 con el paso 3.052e-05 y el tope 0.99997 marcado; cifras de los 65536 niveles y del 1.0 que no existe."},
+    {"file": "clips/02-saturar-o-envolver.py", "title": "2 · Saturar o envolver", "scene": "Clip2",
+     "final_state": "La señal amplificada 1.35 veces con las dos salidas superpuestas: la saturada recortada en el tope y la envuelta con los picos dados la vuelta; cifra del pico 1.3 que sale -0.7."},
+    {"file": "clips/03-el-escalado.py", "title": "3 · El escalado", "scene": "Clip3",
+     "final_state": "Las tres escalas con sus dos cifras enfrentadas: margen 0.16 / 6.18 / 12.20 dB contra SNR 94.4 / 88.2 / 82.2 dB."},
+    {"file": "clips/04-lo-que-queda.py", "title": "4 · Lo que queda", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos lineas: 'El punto fijo no es coma flotante barata.' (blanca) y 'Es otro oficio.' (cian)."}
+  ]
+}

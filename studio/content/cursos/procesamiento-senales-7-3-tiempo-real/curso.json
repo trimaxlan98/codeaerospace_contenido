@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 7.3 El presupuesto de tiempo real",
+  "description": "Lección 7.3 del curso Procesamiento digital de señales (módulo 7: aritmética finita y tiempo real), en 4 clips animados: las multiplicaciones por segundo que cuesta un filtro, la latencia que mete procesar por bloques, la convolución rápida por FFT que da exactamente el mismo resultado, y el punto en el que sale a cuenta. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-mac-por-segundo.py",
+      "title": "1 · MAC por segundo",
+      "scene": "Clip1",
+      "final_state": "El contador de multiplicaciones por segundo a 48 kHz con 1.008 MMAC/s y la ocupacion medida de dos procesadores."
+    },
+    {
+      "file": "clips/02-bloques-y-latencia.py",
+      "title": "2 · Bloques y latencia",
+      "scene": "Clip2",
+      "final_state": "Los cuatro tamaños de bloque con su latencia medida: 0.33, 1.33, 5.33 y 21.33 ms."
+    },
+    {
+      "file": "clips/03-overlap-add.py",
+      "title": "3 · La convolucion rapida",
+      "scene": "Clip3",
+      "final_state": "La salida por bloques superpuesta a la directa y la cifra del error entre ambas: 3.3e-16."
+    },
+    {
+      "file": "clips/04-el-cruce.py",
+      "title": "4 · El cruce",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'La FFT no siempre gana.' (blanca) y 'Hay que contar las multiplicaciones.' (cian)."
+    }
+  ]
+}
