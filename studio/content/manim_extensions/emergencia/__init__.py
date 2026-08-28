@@ -234,6 +234,16 @@ class Pelicula:
             cx, cy, z = encuadre(frac, self.W, self.H)
             frame = recortar(frame, cx, cy, z)
         self.mob.pixel_array = self._rgba(np.ascontiguousarray(frame))
+        # manim captura `orig_alpha_pixel_array` al construir el ImageMobject
+        # con la forma COMPLETA y `set_opacity` (lo que usa FadeOut) lo
+        # multiplica sobre el alfa actual: si la pelicula acaba recortada
+        # por un zoom, el FadeOut de cierre revienta ("could not broadcast")
+        # y el contenedor se queda colgado sin escribir el mp4 (cazado en el
+        # clip 10). Se mantiene siempre a la forma del frame mostrado.
+        if (getattr(self.mob, "orig_alpha_pixel_array", None) is None
+                or self.mob.orig_alpha_pixel_array.shape != frame.shape[:2]):
+            self.mob.orig_alpha_pixel_array = np.full(frame.shape[:2], 255,
+                                                      dtype=np.uint8)
         self.k = k
         return self
 

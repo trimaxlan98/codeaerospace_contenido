@@ -69,7 +69,11 @@ class Clip(Scene):
         cache = {}
 
         def texto_conv(k):
-            v = int(round(float(conv[min(max(k, 0), T - 1)]) * 100))
+            # TRUNCA, no redondea: al final quedan 60 pendulos de 230400 sin
+            # converger (`pixeles_sin_converger`), o sea 99.96 %. Redondear
+            # escribiria "100 %" con 60 sin decidir todavia — un rotulo
+            # falso que el render deja pasar tan campante.
+            v = int(float(conv[min(max(k, 0), T - 1)]) * 100)
             if v not in cache:
                 t = cifra(f"{v} %")
                 t.move_to(UP * Y_NUMERO)
@@ -131,6 +135,21 @@ class Clip(Scene):
               encuadre=em.zoom_hacia(zx, zy, self.ZOOM))
         self.wait(0.6)
         vivo["contador"] = False
+
+        # RODEO a un defecto de manim 0.20.1 (no de la libreria del curso,
+        # pero solo salta si una Pelicula termina RECORTADA):
+        # `ImageMobject.set_opacity` — lo que usa FadeOut — hace
+        #     pixel_array[:, :, 3] = orig_alpha_pixel_array * alpha
+        # y `orig_alpha_pixel_array` se capturo al construir, con el TAMAÑO
+        # COMPLETO. Tras un `zoom_hacia`, `recortar` deja un pixel_array mas
+        # chico y el FadeOut de `cerrar_pieza` revienta con
+        #     could not broadcast input array from shape (640,360)
+        #     into shape (213,120)
+        # y el render se cuelga con la traza, sin escribir el mp4. El molde
+        # (clip 01) no lo ve porque su ultima camara vuelve a zoom 1.0. Se
+        # vuelve a capturar el alfa con la forma del recorte final: una
+        # linea, sin tocar la libreria.
+        peli.mob.orig_alpha_pixel_array = peli.mob.pixel_array[:, :, 3].copy()
 
         # --- 5. el reparto y la dimension ----------------------------
         reparto = medida(

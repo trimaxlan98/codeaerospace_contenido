@@ -19,8 +19,8 @@ class Clip(Scene):
 
     Dos decisiones de legibilidad, tomadas mirando el render y no a ojo: (1)
     los discos pasan POR ENCIMA del pie de cifra —el A nace abajo y al final
-    el B cruza esa banda—, asi que la pieza lleva un velo en degradado sobre
-    el tercio inferior, entre la pelicula y el texto; (2) las reglas se
+    el B cruza esa banda—, y el contraste lo pone el velo del style_block
+    (`velos_de_contraste`, comun al curso); (2) las reglas se
     apagan cuando se abre la camara, o las colas de marea las cruzan de
     estrellas y no se leen.
     """
@@ -28,42 +28,8 @@ class Clip(Scene):
     ZOOM = 1.6
     PASO_TRAZA = 3          # 1 punto de la trayectoria cada 3 frames
     N_A = 2200              # particulas del disco A (las primeras de la pila)
-    VELO = (-1.00, -2.45, 0.85)   # (y donde nace, y donde ya es plena, opacidad)
-
-    def velo(self, n=64):
-        """Degradado NEGRO sobre el tercio inferior, entre la pelicula y el
-        texto: el pie de cifra vive ahi y los dos discos le pasan por encima
-        (el A nace abajo, el B acaba abajo). Sube de 0 a plena opacidad
-        entre `VELO[0]` y `VELO[1]` —justo encima del renglon de la
-        etiqueta— y de ahi al suelo va lleno.
-
-        Dos cosas medidas en el render, no supuestas:
-          - el velo va en NEGRO, no en `CODE_BG`: el fondo del video sale
-            a un valor medio de 6 y el `#0b0f14` de marca a 15, asi que un
-            velo del color del fondo ACLARA la banda en vez de oscurecerla
-            (se vio como un rectangulo gris sobre el disco);
-          - va en 64 franjas y no como un `ImageMobject` RGBA: el
-            ImageMobject no se coloco donde se le pidio (quedo centrado
-            arriba y con la rampa aplastada), y con 64 franjas el escalon
-            de alfa es de 0.013 y no se ve.
-        """
-        y0, y1, opac = self.VELO
-        suelo = -FMT.alto / 2
-        h = (y0 - y1) / n
-        g = VGroup()
-        for i in range(n):
-            r = Rectangle(width=FMT.ancho, height=h * 1.03, stroke_width=0.0,
-                          fill_color="#000000",
-                          fill_opacity=opac * (i + 0.5) / n)
-            r.move_to(np.array([0.0, y0 - (i + 0.5) * h, 0.0]))
-            g.add(r)
-        base = Rectangle(width=FMT.ancho, height=y1 - suelo, stroke_width=0.0,
-                         fill_color="#000000", fill_opacity=opac)
-        base.move_to(np.array([0.0, (y1 + suelo) / 2, 0.0]))
-        g.add(base)
-        g.set_z_index(700)
-        return g
-
+    # El contraste del pie sobre los discos lo pone velos_de_contraste()
+    # del style_block (comun a todo el curso).
     def construct(self):
         # --- lo que se mide (antes de dibujar nada) ------------------
         r = em.galaxias.simular(semilla=1, pasos=2, res=(270, 480),
@@ -77,6 +43,13 @@ class Clip(Scene):
         peri = int(cifras["frame_pericentro"])
         if not 250 < peri < T - 250:
             peri = int(np.argmin(dist))
+        # los cuatro cortes del encuentro cuelgan del pericentro MEDIDO, no
+        # de numeros a mano: si la libreria cambia el dt, la camara lenta
+        # sigue cayendo donde pasa la cosa.
+        f_cierra = peri - 41        # 345: la camara empieza a cerrarse
+        f_lenta = peri - 11         # 375: entra la camara lenta
+        f_sale = peri + 14          # 400: sale de la camara lenta
+        f_abre = peri + 92          # 478: la camara ya esta abierta del todo
 
         # deriva del integrador y trasvase de estrellas, de ESTE render
         deriva = float(cifras["deriva_energia_nucleos_pct"])
@@ -90,7 +63,6 @@ class Clip(Scene):
 
         peli = pelicula(F)
         self.add(peli.mob)
-        self.add(self.velo())
 
         marca = hud_pieza("13 . galaxias")
         regs = reglas(["4000 estrellas", "dos nucleos", "solo gravedad"])
@@ -172,37 +144,38 @@ class Clip(Scene):
         pinta_puente(196, 1.0)
         tramo(0.45, 190, 202, Create(puente))
         vivos.append(pinta_puente)
-        tramo(4.2, 202, 330)
+        tramo(4.2, 202, f_cierra - 15)
         vivos.remove(pinta_puente)
-        tramo(0.5, 330, 345, FadeOut(puente))
+        tramo(0.5, f_cierra - 15, f_cierra, FadeOut(puente))
 
         # --- 4. camara lenta en el pericentro, zoom al punto medio ---
         def acercar(frac, W_, H_):
-            cx, cy = medio(int(round(345 + frac * 30)))
+            cx, cy = medio(int(round(f_cierra + frac * (f_lenta - f_cierra))))
             return (0.5 + (cx - 0.5) * frac, 0.5 + (cy - 0.5) * frac,
                     1.0 + (self.ZOOM - 1.0) * frac)
-        tramo(2.0, 345, 375, encuadre=acercar)
+        tramo(2.0, f_cierra, f_lenta, encuadre=acercar)
 
         def quieto(frac, W_, H_):
-            cx, cy = medio(int(round(375 + frac * 25)))
+            cx, cy = medio(int(round(f_lenta + frac * (f_sale - f_lenta))))
             return cx, cy, self.ZOOM
-        tramo(3.2, 375, 400, encuadre=quieto)     # el frame 386 cae aqui
+        # 25 frames en 3.2 s: ~8 fps, el pericentro a un cuarto de velocidad
+        tramo(3.2, f_lenta, f_sale, encuadre=quieto)
 
         # --- 5. se abre y salen los brazos de marea -----------------
         def abrir(frac, W_, H_):
-            cx, cy = medio(int(round(400 + frac * 78)))
+            cx, cy = medio(int(round(f_sale + frac * (f_abre - f_sale))))
             return (cx + (0.5 - cx) * frac, cy + (0.5 - cy) * frac,
                     self.ZOOM + (1.0 - self.ZOOM) * frac)
-        tramo(2.6, 400, 478, encuadre=abrir,
+        tramo(2.6, f_sale, f_abre, encuadre=abrir,
               ritmo=em.ritmo_por_tramos([(0, 0), (0.3, 0.10), (1, 1)]))
 
         # --- 6. las reglas ya hicieron su trabajo; los brazos, no ---
-        tramo(0.5, 478, 493, FadeOut(regs, scale=0.94))
+        tramo(0.5, f_abre, f_abre + 15, FadeOut(regs, scale=0.94))
 
         # --- 7. las trayectorias de los nucleos, tenues -------------
         self.add(rastro)
         vivos.append(pinta_rastro)
-        tramo(5.1, 493, 700, rev=(0.0, 1.0))
+        tramo(5.1, f_abre + 15, 700, rev=(0.0, 1.0))
 
         # --- 8. remate 1: la energia que el integrador conserva -----
         energia = medida(txt_deriva, "deriva de energia", "por ciento")

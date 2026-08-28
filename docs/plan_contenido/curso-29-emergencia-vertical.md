@@ -158,10 +158,10 @@ de escribir clips).
 | 3 · Simuladores (13 modulos) + sonda 0 fallos | **hecho**: 13 modulos, sonda **36 ok, 0 fallos** (08:05) |
 | 4 · Molde: curso.json, style_block, intro, clip 01, cierre | **hecho**: clip 01 34.87 s (frames revisados); intro 17.03 s con el titulo naciendo de un enjambre (`em.converger`); cierre 8.90 s |
 | 5 · Esqueletos de las 16 piezas | **hecho** |
-| 6 · Produccion clips 02-14 (subagentes) | en curso (PAUSA por cupo a las 08:20 del 28-08; se retoma a las 10:31). Entregados y con informe: **04** (32.80 s), **05** (31.57 s), **11** (31.43 s). Con video en disco pero sin informe final: 09 (re-render por quedar en 27 s). Lanzados y sin terminar: 02, 03, 06, 07, 08, 10, 12, 13, 14. |
-| 7 · Revision de frames + pytest | pendiente |
-| 8 · Commit, push, PR (sin merge) | pendiente |
-| 9 · qh (3 frentes) + duraciones a los manifiestos | pendiente |
+| 6 · Produccion clips 02-14 (subagentes) | **hecho** (12:05): 13 clips entregados por 6 Sonnet + 7 Opus, todos entre 31.4 y 39.9 s en ql; 3 bugs de libreria cazados por agentes (tabla de Ising, franja del LBM, alfa de Pelicula tras zoom) y corregidos |
+| 7 · Revision de frames + pytest | frames ql revisados; **190 tests en verde**; revision final sobre los frames qh |
+| 8 · Commit, push, PR (sin merge) | commits 89516c2 + el de cierre de clips; PR pendiente |
+| 9 · qh (3 frentes) + duraciones a los manifiestos | en curso desde las 11:00 (frentes A/B/C + D para 10 y 13) |
 | 10 · Voz (VPS, serial, alinear_voz.py) | pendiente |
 | 11 · unir_vertical: piezas sueltas + montaje + verificacion | pendiente |
 | 12 · PLAN.md, catalogo, memoria | pendiente |
