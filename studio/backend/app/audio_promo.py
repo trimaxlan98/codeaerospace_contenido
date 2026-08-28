@@ -1,4 +1,4 @@
-"""Audio de un promo: la cama de sonido y la voz, dentro de la app.
+"""Audio de una pieza: la cama de sonido y (solo en un promo) la voz.
 
 Un promo no lleva subtitulos: si no suena, no comunica. Hasta el sprint P2
 el mp4 que servia ManimStudio era el que sale de manim — mudo — y el sonido
@@ -12,6 +12,14 @@ Aqui vive lo que la app necesita saber para hacerlo sola:
   - la VALIDACION, que rechaza lo que sfx.py no sabria interpretar;
   - los AVISOS, que son la parte cara de aprender: cuanta voz cabe y si la
     voz se pega al final (y entonces el bucle chasquea).
+
+Desde el sprint E3 esto tambien sirve a los clips de un CURSO, con una
+diferencia que manda en todo lo demas: **un curso no lleva voz aqui**. Su
+narracion la escribe Gemini y la sintetiza el camino de «Generar narracion»,
+y la pelicula la pega al montar. Lo que un clip de curso pone en su
+manifiesto es SOLO la cama: el subrayado de un momento, el tick de una
+cuenta, el pad que sostiene una escena larga. Por eso `validar` rechaza las
+frases en un curso en vez de ignorarlas en silencio.
 
 Lo que NO vive aqui: la sintesis (narracion.sintetizar) ni la mezcla
 (sfx.py dentro del contenedor). Este modulo es puro y se puede probar sin
@@ -53,6 +61,9 @@ DUR_MIN, DUR_MAX = 8.0, 15.0
 
 PICO_DB = -3.0            # cama sola
 PICO_DB_CON_VOZ = -16.0   # cama por debajo de la voz
+# La cama de un CLIP DE CURSO nace ya por debajo de la voz: el clip se narra
+# casi siempre, y una cama a -3 dB tapa la narracion al montar la pelicula.
+PICO_DB_CURSO = PICO_DB_CON_VOZ
 FADE_IN = 0.35
 FADE_OUT_S = 0.8          # si no se fija: el fundido cubre el ultimo tramo
 
@@ -60,10 +71,11 @@ VOCALES = "aeiouáéíóúüAEIOUÁÉÍÓÚÜ"
 RE_VOZ = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,31}$")
 
 
-def vacio(voz: str = "Charon") -> dict:
+def vacio(voz: str = "Charon", tipo: str = "promo") -> dict:
     """Manifiesto en blanco: cama sin eventos y sin voz."""
+    pico = PICO_DB_CURSO if tipo == "curso" else PICO_DB
     return {
-        "audio": {"pico_db": PICO_DB, "pico_db_con_voz": PICO_DB_CON_VOZ,
+        "audio": {"pico_db": pico, "pico_db_con_voz": PICO_DB_CON_VOZ,
                   "fade_in": FADE_IN, "eventos": []},
         "voz": {"voz": voz, "secciones": []},
     }
@@ -111,8 +123,13 @@ def normalizar(manifiesto: dict | None, voz_defecto: str = "Charon") -> dict:
     return salida
 
 
-def validar(m: dict) -> list[str]:
-    """Errores duros: lo que sfx.py no sabria interpretar. Lista vacia = ok."""
+def validar(m: dict, tipo: str = "promo") -> list[str]:
+    """Errores duros: lo que sfx.py no sabria interpretar. Lista vacia = ok.
+
+    `tipo` distingue el promo (que lleva su voz aqui) del clip de curso (que
+    se narra por otro camino). Un curso con frases en el manifiesto es un
+    error, no un aviso: si se ignorara, la pelicula pegaria DOS voces encima.
+    """
     errores = []
     audio, voz = m["audio"], m["voz"]
 
@@ -135,6 +152,11 @@ def validar(m: dict) -> list[str]:
     fade_out = audio.get("fade_out")
     if fade_out is not None and not (0.0 <= fade_out[0] < fade_out[1]):
         errores.append("el fundido de salida tiene que ser [inicio, fin] con inicio < fin")
+
+    if tipo == "curso" and voz["secciones"]:
+        errores.append(
+            "un clip de curso no lleva frases en la cama de sonido: su voz sale"
+            " de «Generar narracion» y la pelicula la pega al montar")
 
     if not RE_VOZ.match(voz["voz"]):
         errores.append(f"nombre de voz invalido: «{voz['voz']}»")
@@ -171,11 +193,27 @@ def duracion_voz(texto: str) -> float:
     return silabas(texto) / SILABAS_POR_S
 
 
-def avisos(m: dict, dur_video: float | None) -> list[str]:
+def avisos(m: dict, dur_video: float | None, tipo: str = "promo") -> list[str]:
     """Avisos blandos: no impiden mezclar, pero son los errores que ya se
     cometieron a mano y no se ven hasta escuchar el resultado."""
     fuera = []
     secciones = m["voz"]["secciones"]
+
+    if tipo == "curso":
+        # Un curso no tiene bucle que chasquee ni frases que se empujen: lo
+        # unico que se puede medir sin escuchar es que la cama no tape la
+        # narracion y que ningun sonido caiga fuera del clip.
+        if m["audio"]["pico_db"] > PICO_DB_CURSO:
+            fuera.append(
+                f"la cama pica en {m['audio']['pico_db']:.0f} dB y la narracion"
+                f" pica en -1.5 dB: por encima de {PICO_DB_CURSO:.0f} dB compite"
+                " con la voz al montar la pelicula")
+        if dur_video:
+            for nombre, t, _db in m["audio"]["eventos"]:
+                if t >= dur_video:
+                    fuera.append(f"«{nombre}» empieza en {t:.1f} s, despues del"
+                                 f" final ({dur_video:.1f} s): no se oira")
+        return fuera
 
     for i, s in enumerate(secciones):
         habla = duracion_voz(s["texto"])

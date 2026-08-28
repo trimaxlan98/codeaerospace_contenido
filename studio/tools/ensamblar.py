@@ -90,6 +90,20 @@ def duracion(ruta) -> float:
     return float(r.stdout.strip())
 
 
+def tiene_audio(ruta) -> bool:
+    """¿El mp4 ya trae pista de audio?
+
+    Desde el sprint E3 un clip de curso puede llegar con su CAMA DE SONIDO ya
+    mezclada (`sfx.py` sobre el mp4 mudo). Si ademas hay narracion, hay que
+    MEZCLAR las dos: mapear solo la voz tiraba la cama por la borda sin que
+    nada fallara.
+    """
+    r = _corre("ffprobe", "-v", "error", "-select_streams", "a",
+               "-show_entries", "stream=index", "-of", "csv=p=0",
+               str(ruta), timeout=60)
+    return r.returncode == 0 and bool(r.stdout.strip())
+
+
 def resolucion(ruta) -> str:
     r = _corre("ffprobe", "-v", "error", "-select_streams", "v:0",
                "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x",
@@ -137,16 +151,36 @@ def lee_plan(ruta) -> dict:
 # ── paso 1: cada pieza con su audio ───────────────────────────────────────────
 
 def args_pieza(video: str, voz: str | None, salida: str,
-               ratio: float = 1.0) -> list[str]:
-    """Argumentos de ffmpeg para dejar una pieza con pista de audio.
+               ratio: float = 1.0, cama: bool = False) -> list[str]:
+    """Argumentos de ffmpeg para dejar una pieza con UNA pista de audio.
 
     El video se COPIA siempre (`-c:v copy`): este paso solo toca el audio, asi
-    que cuesta segundos aunque el clip dure minutos.
+    que cuesta segundos aunque el clip dure minutos. Cuatro casos:
+
+        voz + cama   se mezclan (amix). El nivel de la cama es cosa del
+                     manifiesto —nace en -16 dB para un clip de curso— y aqui
+                     no se toca: una ganancia escondida haria que el nivel que
+                     se eligio en la interfaz no fuera el que se oye.
+        voz sola     apad + -shortest, como mux.sh.
+        cama sola    se re-codifica al formato comun (24 kHz mono) para que
+                     el `concat -c copy` no encuentre dos audios distintos.
+        ninguna      pista de silencio: un concat que mezcla clips con y sin
+                     audio sale mudo desde el primero que no la tiene.
     """
+    af = "apad" if ratio == 1.0 else f"atempo={ratio:.4f},apad"
+    if voz and cama:
+        filtro = (f"[1:a]{af}[v];"
+                  f"[0:a][v]amix=inputs=2:duration=first:normalize=0[a]")
+        return ["ffmpeg", "-y", "-nostdin", "-i", video, "-i", voz,
+                "-filter_complex", filtro, "-map", "0:v", "-map", "[a]",
+                "-c:v", "copy", *AUDIO_ARGS, "-shortest", salida]
     if voz:
-        af = "apad" if ratio == 1.0 else f"atempo={ratio:.4f},apad"
         return ["ffmpeg", "-y", "-nostdin", "-i", video, "-i", voz,
                 "-c:v", "copy", *AUDIO_ARGS, "-af", af, "-shortest", salida]
+    if cama:
+        return ["ffmpeg", "-y", "-nostdin", "-i", video,
+                "-map", "0:v", "-map", "0:a",
+                "-c:v", "copy", *AUDIO_ARGS, salida]
     return ["ffmpeg", "-y", "-nostdin", "-i", video,
             "-f", "lavfi", "-i", SILENCIO,
             "-c:v", "copy", *AUDIO_ARGS, "-shortest", salida]
@@ -232,8 +266,9 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
             if voz is not None:
                 ratio = ratio_atempo(duracion(voz), dur_v)
             destino = tmp / f"{i:03d}.mp4"
+            cama = tiene_audio(video)
             argv = args_pieza(str(video), str(voz) if voz else None,
-                              str(destino), ratio)
+                              str(destino), ratio, cama)
             r = _corre(*argv, timeout=1800)
             if r.returncode != 0 or not destino.is_file():
                 raise ErrorPlan(f"pieza {i + 1}: ffmpeg salio con "
@@ -243,12 +278,13 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
                 "titulo": p.get("titulo", f"pieza {i + 1}"),
                 "duracion": round(dur_v, 3),
                 "voz": bool(voz),
+                "cama": cama,
                 "atempo": round(ratio, 4) if ratio != 1.0 else None,
             })
             if verbose:
                 print(f"[{i + 1}/{len(piezas)}] {p.get('titulo', '')} "
-                      f"{dur_v:.1f}s voz={'si' if voz else 'no'}",
-                      file=sys.stderr)
+                      f"{dur_v:.1f}s voz={'si' if voz else 'no'} "
+                      f"cama={'si' if cama else 'no'}", file=sys.stderr)
 
         salida = Path(salida)
         salida.parent.mkdir(parents=True, exist_ok=True)
@@ -274,6 +310,7 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
             "proyecto": plan.get("proyecto", ""),
             "piezas": len(montadas),
             "con_voz": sum(1 for d in detalle if d["voz"]),
+            "con_cama": sum(1 for d in detalle if d["cama"]),
             "transicion": tipo,
             "duracion": round(duracion(salida), 3),
             "resolucion": resolucion(salida),

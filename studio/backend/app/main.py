@@ -31,6 +31,7 @@ from .pelicula_api import make_router as make_pelicula_router
 from .projects import FORMATO_DEFECTO, ProjectService
 from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
+from .sfx_api import make_router as make_sfx_router
 from .scenes import detect_scenes
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
@@ -76,6 +77,7 @@ app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
 app.include_router(make_narracion_router(cfg, db, narracion_service))
 app.include_router(make_pelicula_router(cfg, db, pelicula_service))
+app.include_router(make_sfx_router(cfg, runner))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))
 

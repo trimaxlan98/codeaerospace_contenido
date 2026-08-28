@@ -11,7 +11,8 @@ El reparto de trabajo:
     asistente IA; sin credenciales, el promo se mezcla mudo de voz);
   - el runner corre `sfx.py promo` en el contenedor.
 
-Solo se ofrece en proyectos de tipo `promo`. Un curso narra por otro camino
+Se ofrece en promos y, desde el sprint E3, en clips de CURSO — con una
+diferencia que manda: un curso no lleva voz aqui, solo la cama. Su narracion
 (Narracion, guion escrito por Gemini) y no lleva cama de sonido.
 """
 
@@ -71,16 +72,28 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
                 narracion: NarracionService) -> APIRouter:
     router = APIRouter(prefix="/api/projects", tags=["audio"])
 
-    def _promo(pid: str) -> dict:
+    def _proyecto(pid: str) -> dict:
+        """Cualquier proyecto: la cama de sonido sirve a promos y a cursos.
+
+        El `tipo` no cierra la puerta, pero SI cambia las reglas — quien lo
+        necesita se lo pasa a `audio_promo.validar/avisos`.
+        """
         project = db.get_project(pid)
         if not project:
             raise HTTPException(status_code=404, detail="Proyecto no encontrado")
-        if (project.get("tipo") or "curso") != "promo":
+        return project
+
+    def _tipo(project: dict) -> str:
+        return project.get("tipo") or "curso"
+
+    def _solo_promo(project: dict, que: str) -> None:
+        """La verificacion mide la costura del BUCLE y una duracion de 8-15 s:
+        las dos cosas son del formato promo. En un curso no significan nada."""
+        if _tipo(project) != "promo":
             raise HTTPException(
                 status_code=409,
-                detail="El audio de promo solo se monta en proyectos de tipo promo;"
-                       " un curso se narra desde «Generar narración».")
-        return project
+                detail=f"{que} solo tiene sentido en un promo: mide la costura"
+                       " del bucle y el rango de duración de redes.")
 
     def _clip(pid: str, cid: str) -> dict:
         clip = db.get_clip(cid)
@@ -97,15 +110,20 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         return job, duracion_mp4(Path(job["video_path"]))
 
     def _vista(project: dict, clip: dict) -> dict:
-        m = service.manifiesto_audio(clip, cfg.tts_voice)
+        tipo = _tipo(project)
+        m = service.manifiesto_audio(clip, cfg.tts_voice, tipo)
         job, dur = _video(clip)
         return {
             "clip_id": clip["id"],
+            "tipo": tipo,
             "manifiesto": m,
             "estado": service.estado_audio(clip),
-            "avisos": audio_promo.avisos(m, dur),
+            "avisos": audio_promo.avisos(m, dur, tipo),
             "duracion_video": dur,
             "sonidos": list(audio_promo.SONIDOS),
+            # En un curso la voz NO se escribe aqui: sale de «Generar
+            # narracion» y la pelicula la pega al montar.
+            "voz_aqui": tipo == "promo",
             "voz_disponible": narracion.enabled,
             "silabas_por_s": audio_promo.SILABAS_POR_S,
             "verificacion": service.estado_verificacion(clip)
@@ -134,16 +152,16 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
 
     @router.get("/{pid}/clips/{cid}/audio")
     async def leer(pid: str, cid: str, _=Depends(require_auth)):
-        project = _promo(pid)
+        project = _proyecto(pid)
         return _vista(project, _clip(pid, cid))
 
     @router.put("/{pid}/clips/{cid}/audio")
     async def guardar(pid: str, cid: str, body: ManifiestoBody,
                       _=Depends(require_auth)):
-        project = _promo(pid)
+        project = _proyecto(pid)
         clip = _clip(pid, cid)
         m = audio_promo.normalizar(body.a_manifiesto(), cfg.tts_voice)
-        errores = audio_promo.validar(m)
+        errores = audio_promo.validar(m, _tipo(project))
         if errores:
             raise HTTPException(status_code=422, detail="; ".join(errores))
         service.update_clip(cid, audio_json=json.dumps(m, ensure_ascii=False))
@@ -151,7 +169,8 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
 
     @router.post("/{pid}/clips/{cid}/verificar")
     async def verificar(pid: str, cid: str, _=Depends(require_auth)):
-        project = _promo(pid)
+        project = _proyecto(pid)
+        _solo_promo(project, "La verificación")
         clip = _clip(pid, cid)
         job, _dur = _video(clip)
         if not job:
@@ -167,13 +186,13 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
 
     @router.post("/{pid}/clips/{cid}/audio/mezclar")
     async def mezclar(pid: str, cid: str, _=Depends(require_auth)):
-        project = _promo(pid)
+        project = _proyecto(pid)
         clip = _clip(pid, cid)
-        m = service.manifiesto_audio(clip, cfg.tts_voice)
+        m = service.manifiesto_audio(clip, cfg.tts_voice, _tipo(project))
         if not clip.get("audio_json"):
             raise HTTPException(status_code=422,
                                 detail="Este clip no tiene manifiesto de audio")
-        errores = audio_promo.validar(m)
+        errores = audio_promo.validar(m, _tipo(project))
         if errores:
             raise HTTPException(status_code=422, detail="; ".join(errores))
 
@@ -214,11 +233,13 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         manager.invalidate_storage()
         # Recien mezclado es cuando toca medir: el informe anterior (si lo
         # habia) es de otro archivo. Si la medicion falla, la mezcla sigue
-        # siendo buena y el estado dira «sin verificar».
-        try:
-            await _verificar(db.get_clip(cid))
-        except (RunnerError, asyncio.TimeoutError):
-            pass
+        # siendo buena y el estado dira «sin verificar». Solo en un promo:
+        # lo que mide (bucle y 8-15 s) no existe en un curso.
+        if _tipo(project) == "promo":
+            try:
+                await _verificar(db.get_clip(cid))
+            except (RunnerError, asyncio.TimeoutError):
+                pass
         return _vista(project, db.get_clip(cid))
 
     async def _voz(m: dict, job_dir: Path, dur: float | None) -> None:

@@ -188,8 +188,12 @@ class ProjectService:
             else:
                 status = "rendered"
             entrada = {**clip_public(clip), "stale": stale, "status": status}
+            # El estado de la cama de sonido es de los dos tipos desde el
+            # sprint E3 (un curso tambien la lleva, sin voz). La VERIFICACION
+            # sigue siendo solo del promo: mide la costura del bucle y el
+            # rango 8-15 s, que en un curso no significan nada.
+            entrada["audio"] = self.estado_audio(clip)
             if es_promo:
-                entrada["audio"] = self.estado_audio(clip)
                 entrada["verificacion"] = self.estado_verificacion(clip)
             clips.append(entrada)
         # `specs` viaja con el detalle para que la interfaz sepa la
@@ -231,13 +235,20 @@ class ProjectService:
 
     # ── audio del promo ──────────────────────────────────────────────────────
 
-    def manifiesto_audio(self, clip: dict, voz_defecto: str = "Charon") -> dict:
-        """Manifiesto normalizado del clip (el vacio si aun no tiene)."""
+    def manifiesto_audio(self, clip: dict, voz_defecto: str = "Charon",
+                         tipo: str = "promo") -> dict:
+        """Manifiesto normalizado del clip (el vacio si aun no tiene).
+
+        `tipo` solo decide el pico por defecto de una cama nueva: la de un
+        clip de curso nace por debajo de la voz, porque ese clip se narra.
+        """
         crudo = clip.get("audio_json")
         try:
             guardado = json.loads(crudo) if crudo else None
         except ValueError:
             guardado = None
+        if guardado is None and tipo == "curso":
+            return audio_promo.vacio(voz_defecto, "curso")
         return audio_promo.normalizar(guardado, voz_defecto)
 
     def estado_audio(self, clip: dict) -> dict:

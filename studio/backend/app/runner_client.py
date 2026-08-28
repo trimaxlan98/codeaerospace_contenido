@@ -87,6 +87,13 @@ class RunnerClient:
             raise RunnerError(resp.get("error", "el montaje fallo"))
         return resp.get("informe") or {}
 
+    async def paleta(self) -> list[str]:
+        """Sintetiza el banco de sonidos (wavs sueltos) para poder oirlo."""
+        resp = await self._request_one({"cmd": "paleta"}, timeout=660)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la sintesis del banco fallo"))
+        return resp.get("sonidos") or []
+
     async def verificar(self, job_id: str, frames: int = 6,
                         dur_min: float = 8.0, dur_max: float = 15.0) -> dict:
         """Informe medido del promo (bucle, duracion, audio, frames)."""

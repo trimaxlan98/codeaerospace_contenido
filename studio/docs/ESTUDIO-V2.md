@@ -43,7 +43,7 @@ Lo que le falta para ser un estudio, en orden de cuánto duele:
 | E0 | Consolidación de ramas | todo lo nuevo, en `main` | **hecho** (PR #61) |
 | E1 | La película | monta el curso completo dentro de la app | **hecho** |
 | E2 | Transiciones | empalmes reales entre clips + catálogo en escena | **hecho** |
-| E3 | Sonido de cursos | cama de SFX en cursos + banco audible | pendiente |
+| E3 | Sonido de cursos | cama de SFX en cursos + banco audible | **hecho** |
 | E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | pendiente |
 | E5 | Movimiento | transiciones de vista y micro-animaciones en la consola | pendiente |
 
@@ -232,3 +232,72 @@ cuál y el aviso de que `conmutar` deja convertido el objeto **saliente**.
 Tres tests de deriva (`tests/test_transiciones.py`, por AST porque la librería
 importa manim): cada entrada del catálogo apunta a una función que existe, cada
 una tiene descripción, y el demo las enseña todas sin repetir ninguna.
+
+---
+
+## E3 — Sonido de cursos (hecho)
+
+El sonido de ManimStudio estaba encerrado en los promos: los tres endpoints de
+`audio` respondían **409** en cualquier proyecto `tipo='curso'`. Un curso solo
+podía tener voz. Y los 18 efectos de `sfx.py` se elegían **a ciegas**, de un
+desplegable de nombres, sin forma de oírlos antes.
+
+### 1. La cama llega a los cursos, sin traerse la voz
+
+Un clip de curso ahora puede llevar cama de sonido — un acento en el momento
+que importa, un pad que sostiene una escena larga — con **una regla que manda
+sobre todo lo demás: aquí no hay voz**. La narración de un curso la escribe
+Gemini y la sintetiza «Generar narración»; la película la pega al montar.
+
+Un manifiesto de curso con frases es un **error (422)**, no un aviso: aceptarlo
+en silencio pegaría dos voces sobre el mismo clip, y después no se separan.
+
+Lo que cambia por tipo:
+
+| | promo | curso |
+|---|---|---|
+| voz en el manifiesto | sí | **no** (422) |
+| pico por defecto de la cama | −3 dB | **−16 dB** (nace bajo la voz) |
+| avisos | bucle, frases que se empujan, cola de silencio | cama que compite con la voz, sonidos fuera del clip |
+| verificación | sí | **409** — mide la costura del bucle y 8-15 s, que en un curso no existen |
+
+### 2. La película mezcla, no reemplaza
+
+Dos cambios que solo se ven juntos:
+
+- El plan usa **el mp4 que la app sirve** (`audio_path` si existe, el mudo si
+  no). Montar con el mudo daría un curso que suena distinto a sus propios clips
+  en la Biblioteca.
+- `ensamblar.py` detecta si la pieza ya trae pista (`tiene_audio`) y, cuando
+  además hay narración, las **mezcla** (`amix=inputs=2:normalize=0`). Mapear
+  solo la voz tiraba la cama por la borda **sin que nada fallara**.
+
+El nivel de la cama no se toca al mezclar: es el que se eligió en la interfaz.
+Una ganancia escondida haría que lo que se oye no fuera lo que se puso.
+
+Verificado midiendo: una pieza con cama a 440 Hz y voz a 880 Hz sale con
+**ambas** bandas a ≈ −21 dB y una banda de control a 1500 Hz en −53,7 dB.
+
+### 3. El banco de sonidos se puede oír
+
+`sfx.py paleta` sintetiza los 18 efectos como wavs sueltos en `exports/sfx/`,
+lanzado por el nuevo comando `paleta` del runner (el backend no tiene numpy).
+La síntesis es determinista: se generan una vez y no caducan.
+
+- `GET /api/sfx` — la paleta, cuáles están listos y si está completa.
+- `POST /api/sfx` — sintetiza (409 si ya se está sintetizando).
+- `GET /api/sfx/{nombre}` — el wav. El nombre va contra el **conjunto cerrado**
+  de la paleta antes de construir ninguna ruta.
+
+En el diálogo de audio, cada línea tiene un ▶ que reproduce su efecto, y un
+solo `<audio>` para todo el diálogo: dos efectos a la vez no se distinguen.
+
+**Hallazgo**: `exports/sfx/` sobrevive a los cambios de `PALETA`. Una corrida
+vieja dejó `pad_intro.wav` y `pad_cierre.wav`, efectos que ya no existen.
+Enumerar el directorio sin filtrar ofrecería en la interfaz sonidos que la
+mezcla no sabe sintetizar — el listado los cruza con la paleta viva.
+
+### Verificación
+
+223 tests en verde (10 nuevos), el banco sintetizado de verdad en el contenedor
+(18 efectos) y la mezcla medida banda a banda.

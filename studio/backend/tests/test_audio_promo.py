@@ -178,15 +178,42 @@ def test_guardar_y_leer_el_manifiesto(authed):
     assert "audio_json" not in detalle["clips"][0]
 
 
-def test_un_curso_no_lleva_cama_de_sonido(authed):
+def test_un_curso_lleva_cama_pero_no_voz(authed):
+    """Sprint E3: la cama de sonido dejo de ser exclusiva de los promos.
+
+    Lo que un curso NO puede llevar aqui es voz: su narracion sale de
+    «Generar narracion» y la pelicula la pega al montar. Aceptar las frases
+    en silencio pegaria DOS voces sobre el mismo clip.
+    """
     r = authed.post("/api/projects", json={"name": "Curso", "quality": "ql"})
     pid = r.json()["id"]
     clip = authed.post(f"/api/projects/{pid}/clips",
                        json={"title": "Uno", "script": VALID_SCRIPT,
                              "scene": "Promo"}).json()
+
     r = authed.put(f"/api/projects/{pid}/clips/{clip['id']}/audio", json=MANIFIESTO)
+    assert r.status_code == 422
+    assert "narracion" in r.json()["detail"]
+
+    solo_cama = {k: v for k, v in MANIFIESTO.items() if k != "secciones"}
+    r = authed.put(f"/api/projects/{pid}/clips/{clip['id']}/audio", json=solo_cama)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["tipo"] == "curso"
+    assert body["voz_aqui"] is False
+    assert [e[0] for e in body["manifiesto"]["audio"]["eventos"]] == ["nebulosa", "pulso"]
+
+
+def test_la_verificacion_es_cosa_de_promos(authed):
+    """Mide la costura del bucle y 8-15 s: en un curso no significa nada."""
+    pid = authed.post("/api/projects",
+                      json={"name": "Curso V", "quality": "ql"}).json()["id"]
+    clip = authed.post(f"/api/projects/{pid}/clips",
+                       json={"title": "Uno", "script": VALID_SCRIPT,
+                             "scene": "Promo"}).json()
+    r = authed.post(f"/api/projects/{pid}/clips/{clip['id']}/verificar")
     assert r.status_code == 409
-    assert "narración" in r.json()["detail"]
+    assert "bucle" in r.json()["detail"]
 
 
 def test_manifiesto_invalido(authed):

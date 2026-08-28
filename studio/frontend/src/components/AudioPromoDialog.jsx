@@ -1,4 +1,4 @@
-// Audio de un promo — la cama de sonido y la voz, sin salir de la app.
+// Audio de una pieza — la cama de sonido y, en un promo, la voz.
 //
 // Un promo no lleva subtítulos: si no suena, no comunica. Hasta el sprint P2
 // el sonido se montaba fuera, a mano, con `studio/tools/sfx.py`.
@@ -11,15 +11,37 @@
 //   - los avisos se calculan y se enseñan SIEMPRE (cuánta voz cabe, si la voz
 //     se pega al final). Son los dos errores que ya se cometieron y que no se
 //     ven hasta escuchar el resultado.
+//
+// Sprint E3: la cama también es de los CURSOS, y ahí no hay voz — la narración
+// sale de «Generar narración» y la película la pega al montar. Y los sonidos
+// se pueden OÍR antes de elegirlos (botón ▶ en cada línea): elegir «sting» o
+// «subrayado» por el nombre era adivinar.
 
-import { useCallback, useEffect, useState } from 'react'
-import { CheckCircle2, Loader2, Mic, Music, Plus, Trash2, Volume2 } from 'lucide-react'
-import { api, frameVerificacionUrl } from '../api.js'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { CheckCircle2, Loader2, Mic, Music, Play, Plus, Trash2, Volume2 } from 'lucide-react'
+import { api, frameVerificacionUrl, sfxUrl } from '../api.js'
 import { Button } from './ui/button.jsx'
 import { Input } from './ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.jsx'
 import { cn } from '@/lib/utils'
+
+// Un solo <audio> para todo el diálogo: dos efectos sonando a la vez no se
+// distinguen, y crear uno por línea deja objetos vivos al cerrar.
+function useAudicion() {
+  const [sonando, setSonando] = useState('')
+  const ref = useRef(null)
+  useEffect(() => () => { ref.current?.pause() }, [])
+  const oir = useCallback((nombre) => {
+    ref.current?.pause()
+    const a = new Audio(sfxUrl(nombre))
+    ref.current = a
+    a.addEventListener('ended', () => setSonando(''))
+    a.addEventListener('error', () => setSonando(''))
+    a.play().then(() => setSonando(nombre)).catch(() => setSonando(''))
+  }, [])
+  return { sonando, oir }
+}
 
 const textareaCls = 'w-full resize-y rounded-md border border-line bg-canvas px-2.5 py-1.5 text-[13px] text-ink placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan'
 
@@ -56,6 +78,8 @@ function aFormulario(m) {
 }
 
 export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSaved }) {
+  const { sonando, oir } = useAudicion()
+  const [banco, setBanco] = useState(null)
   const [datos, setDatos] = useState(null)   // respuesta completa del backend
   const [form, setForm] = useState(null)
   const [error, setError] = useState('')
@@ -72,6 +96,10 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
   }, [projectId, clip.id])
 
   useEffect(() => { cargar() }, [cargar])
+
+  // Que efectos se pueden OIR. Es un estado del servidor, no del clip: se
+  // sintetizan una vez y valen para siempre (la sintesis es determinista).
+  useEffect(() => { api.getSfx().then(setBanco).catch(() => setBanco(null)) }, [])
 
   const guardar = async () => {
     setBusy('guardar'); setError('')
@@ -155,8 +183,9 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
               </div>
               {form.eventos.length === 0 && (
                 <p className="text-[12px] text-faint">
-                  Sin sonidos todavía. Un promo suele llevar 4-7: una entrada, un par de
-                  acentos en los momentos que importan y un cierre.
+                  {datos.tipo === 'curso'
+                    ? 'Sin sonidos todavía. Un clip de curso pide poco: un acento en el momento que importa y, si la escena es larga, un pad que la sostenga por debajo de la voz.'
+                    : 'Sin sonidos todavía. Un promo suele llevar 4-7: una entrada, un par de acentos en los momentos que importan y un cierre.'}
                 </p>
               )}
               {form.eventos.map((ev, i) => (
@@ -170,6 +199,16 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                       {datos.sonidos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <Button size="xs" variant="ghost" onClick={() => oir(ev.sonido)}
+                    disabled={banco ? !banco.listos.includes(ev.sonido) : false}
+                    aria-label={`oír ${ev.sonido}`}
+                    title={banco && !banco.listos.includes(ev.sonido)
+                      ? 'el banco todavía no está sintetizado'
+                      : `oír ${ev.sonido}`}>
+                    {sonando === ev.sonido
+                      ? <Volume2 className="h-3.5 w-3.5 text-accent" />
+                      : <Play className="h-3.5 w-3.5" />}
+                  </Button>
                   <label className="flex items-center gap-1 text-[11.5px] text-muted">
                     en
                     <Input value={ev.t} inputMode="decimal" aria-label="instante en segundos"
@@ -196,7 +235,7 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                   </Button>
                 </div>
               ))}
-              <div>
+              <div className="flex flex-wrap items-center gap-1.5">
                 <Button size="xs" variant="default"
                   onClick={() => setForm((f) => ({
                     ...f,
@@ -204,10 +243,32 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                   }))}>
                   <Plus className="h-3.5 w-3.5" /> Añadir sonido
                 </Button>
+                {banco && !banco.completo && (
+                  <Button size="xs" variant="ghost" disabled={banco.generando}
+                    onClick={async () => {
+                      setBanco({ ...banco, generando: true })
+                      try { await api.generarSfx() } catch { /* se ve en el estado */ }
+                      api.getSfx().then(setBanco).catch(() => {})
+                    }}
+                    title="sintetiza los wavs de la paleta para poder oírlos">
+                    {banco.generando
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Volume2 className="h-3.5 w-3.5" />}
+                    Sintetizar el banco de sonidos
+                  </Button>
+                )}
               </div>
             </section>
 
-            {/* — la voz — */}
+            {/* — la voz — solo en un promo: un curso narra por otro camino y
+                dos voces sobre el mismo clip no se pueden separar despues. */}
+            {datos.voz_aqui === false ? (
+              <p className="border-t border-line pt-3 text-[12px] text-muted">
+                La voz de un clip de curso no se escribe aquí: sale de
+                «Generar narración» y la película la pega sobre esta cama al
+                montar. Por eso la cama nace en −16 dB, por debajo de la voz.
+              </p>
+            ) : (
             <section className="flex flex-col gap-2 border-t border-line pt-3">
               <div className="flex items-center gap-2">
                 <Mic className="h-3.5 w-3.5 text-accent" />
@@ -253,6 +314,7 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                 </Button>
               </div>
             </section>
+            )}
 
             {/* — niveles — */}
             <section className="flex flex-wrap items-center gap-3 border-t border-line pt-3">
@@ -274,14 +336,19 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                 s
               </label>
               <span className="text-[11.5px] text-faint">
-                {conVoz
-                  ? 'Con voz, la cama baja para no taparla.'
-                  : 'La salida se funde sola al final: el bucle no puede chasquear.'}
+                {datos.tipo === 'curso'
+                  ? 'La narración pica en −1.5 dB: por encima de −16 la cama compite con ella.'
+                  : conVoz
+                    ? 'Con voz, la cama baja para no taparla.'
+                    : 'La salida se funde sola al final: el bucle no puede chasquear.'}
               </span>
             </section>
 
-            {/* — verificación medida — */}
-            <Verificacion datos={datos} busy={busy} onVerificar={verificar} />
+            {/* — verificación medida — solo del promo: mide la costura del
+                bucle y el rango 8-15 s de redes. */}
+            {datos.tipo !== 'curso' && (
+              <Verificacion datos={datos} busy={busy} onVerificar={verificar} />
+            )}
 
             {/* — avisos calculados — */}
             {datos.avisos?.length > 0 && (

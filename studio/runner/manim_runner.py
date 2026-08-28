@@ -61,6 +61,11 @@ FRAMES_MAX = 12
 # backend.
 ENSAMBLAR_SCRIPT = "studio/tools/ensamblar.py"
 PELICULAS_DIR = "exports/peliculas"
+# Banco de sonidos audible: `sfx.py paleta` sintetiza los 18 efectos como wavs
+# sueltos para que se puedan OIR antes de elegirlos. Sin argumentos del
+# exterior: destino fijo.
+SFX_DIR = "exports/sfx"
+SFX_TIMEOUT = 600
 # 4 h + margen: con transiciones se recodifica la pelicula entera y el
 # contenedor esta capado a 1.5 vCPU. Sin transiciones son segundos.
 ENSAMBLAR_TIMEOUT = 14400
@@ -493,6 +498,37 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
     await send(writer, {"type": "ok", "informe": informe})
 
 
+async def handle_paleta(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Sintetiza el banco de sonidos como wavs sueltos (`sfx.py paleta`).
+
+    El backend no tiene numpy: la sintesis vive donde vive todo lo demas que
+    necesita librerias, en el contenedor. No recibe NADA del exterior — ni
+    siquiera un id: el destino es una ruta fija.
+    """
+    destino_abs = os.path.join(PROJECT_DIR, SFX_DIR)
+    os.makedirs(destino_abs, exist_ok=True)
+    container = f"{CONTAINER_PREFIX}paleta"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", f"{destino_abs}:/workspace/{SFX_DIR}:rw",
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{SFX_SCRIPT}", "paleta", f"/workspace/{SFX_DIR}",
+        timeout=SFX_TIMEOUT,
+    )
+    if code != 0:
+        await force_remove(container)
+        log(f"[paleta] fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"sfx.py paleta salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    wavs = sorted(f[:-4] for f in os.listdir(destino_abs) if f.endswith(".wav"))
+    log(f"[paleta] ok {len(wavs)} efectos")
+    await send(writer, {"type": "ok", "sonidos": wavs})
+
+
 async def handle_cancel(req: dict, writer: asyncio.StreamWriter) -> None:
     job_id = str(req.get("job_id", ""))
     if not RE_JOB_ID.match(job_id):
@@ -581,6 +617,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_verificar(req, writer)
         elif cmd == "ensamblar":
             await handle_ensamblar(req, writer)
+        elif cmd == "paleta":
+            await handle_paleta(req, writer)
         elif cmd == "thumbnail":
             await handle_thumbnail(req, writer)
         elif cmd == "stats":

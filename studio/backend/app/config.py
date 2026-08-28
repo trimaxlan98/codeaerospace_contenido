@@ -76,6 +76,10 @@ class Settings:
         # ("exports/peliculas"): si una cambia, la otra tambien.
         self.peliculas_dir = Path(os.environ.get(
             "MS_PELICULAS_DIR", str(self.workspace / "exports" / "peliculas")))
+        # Banco de sonidos audible: los wavs sueltos de la paleta de sfx.py.
+        # El runner tiene esta misma ruta como constante ("exports/sfx").
+        self.sfx_dir = Path(os.environ.get(
+            "MS_SFX_DIR", str(self.workspace / "exports" / "sfx")))
 
         # Biblioteca curada de primitivas de Manim (solo lectura: la consume
         # el asistente via conocimiento.py y los demos de Animaciones).

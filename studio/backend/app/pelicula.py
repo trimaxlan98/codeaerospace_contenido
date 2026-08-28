@@ -98,7 +98,16 @@ class PeliculaService:
     # ── el plan ──────────────────────────────────────────────────────────────
 
     def _pieza_de_job(self, job: dict, titulo: str) -> dict:
-        return {"titulo": titulo, "video": self._rel(Path(job["video_path"]))}
+        """La pieza usa el mp4 que la app SIRVE, no siempre el que salio de
+        manim.
+
+        Desde el sprint E3 un clip puede tener su cama de sonido mezclada al
+        lado del mudo (`audio_path`), y es esa la que ve quien reproduce el
+        clip en la Biblioteca. Montar la pelicula con el mudo daria un curso
+        que suena distinto a sus propios clips.
+        """
+        video = job.get("audio_path") or job["video_path"]
+        return {"titulo": titulo, "video": self._rel(Path(video))}
 
     def _job_marca(self, job_id: str, cual: str, esperada: str) -> dict:
         job = self.db.get_job(job_id)

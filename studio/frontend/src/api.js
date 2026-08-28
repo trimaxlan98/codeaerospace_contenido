@@ -78,6 +78,9 @@ export const api = {
   montarPelicula: (pid, body = {}) => request('POST', `/api/projects/${pid}/pelicula`, body),
   cancelarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/cancel`),
   borrarPelicula: (pid) => request('DELETE', `/api/projects/${pid}/pelicula`),
+  // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
+  getSfx: () => request('GET', '/api/sfx'),
+  generarSfx: () => request('POST', '/api/sfx'),
 }
 
 export function videoUrl(id) {
@@ -104,6 +107,12 @@ export function frameVerificacionUrl(jobId, archivo) {
 // dentro de una pelicula de media hora sin descargarla entera.
 export function peliculaVideoUrl(pid) {
   return `/api/projects/${pid}/pelicula/video`
+}
+
+// Un efecto de la paleta, para audicion. El nombre va contra el conjunto
+// cerrado en el backend: aqui no hace falta escaparlo mas alla de la URL.
+export function sfxUrl(nombre) {
+  return `/api/sfx/${encodeURIComponent(nombre)}`
 }
 
 export function narracionAudioUrl(pid, cid) {

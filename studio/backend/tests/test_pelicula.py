@@ -96,6 +96,32 @@ def test_la_pieza_sin_voz_igual_lleva_pista_de_audio():
     assert "-c:v" in argv and argv[argv.index("-c:v") + 1] == "copy"
 
 
+def test_la_voz_se_MEZCLA_sobre_la_cama_de_sonido():
+    """Sprint E3: un clip de curso puede llegar con su cama ya mezclada.
+
+    Mapear solo la voz (`-map 1:a`) tiraba la cama por la borda sin que nada
+    fallara: la pelicula salia con narracion y sin los efectos que se habian
+    elegido clip a clip.
+    """
+    mod = _ensamblar_mod()
+    argv = mod.args_pieza("a.mp4", "v.wav", "out.mp4", ratio=1.0, cama=True)
+    filtro = argv[argv.index("-filter_complex") + 1]
+    assert "amix=inputs=2" in filtro
+    assert "[0:a]" in filtro and "[1:a]" in filtro   # cama Y voz
+    assert "normalize=0" in filtro                   # sin ganancia escondida
+    assert argv[argv.index("-c:v") + 1] == "copy"
+
+
+def test_la_cama_sola_se_recodifica_al_formato_comun():
+    """Sin re-codificar, el `concat -c copy` puede encontrarse dos audios de
+    formatos distintos (el de sfx.py y el del silencio) y salir roto."""
+    mod = _ensamblar_mod()
+    argv = mod.args_pieza("a.mp4", None, "out.mp4", cama=True)
+    assert "anullsrc" not in " ".join(argv)
+    assert argv[argv.index("-ar") + 1] == "24000"
+    assert argv[argv.index("-c:v") + 1] == "copy"
+
+
 def test_la_pieza_con_voz_copia_el_video():
     mod = _ensamblar_mod()
     argv = mod.args_pieza("a.mp4", "v.wav", "out.mp4", ratio=1.1)
@@ -170,6 +196,23 @@ def test_plan_ordena_las_piezas_y_lista_lo_que_falta(authed):
     # Las rutas son relativas al workspace: dentro del contenedor son /workspace/...
     assert all(not p["video"].startswith("/") for p in plan["piezas"])
     assert plan["raiz"] == "/workspace"
+
+
+def test_el_plan_usa_el_video_que_la_app_sirve(authed):
+    """Si el clip tiene su cama mezclada al lado del mudo, la pelicula usa
+    ESA: montar con el mudo daria un curso que suena distinto a sus propios
+    clips en la Biblioteca."""
+    pel = _peli()
+    from app.main import cfg, db, pelicula_service
+
+    pid = _create_project(authed)["id"]
+    _rendered_clip(authed, db, cfg, pid, "Uno", "aaaa00001111bbbb")
+    sonoro = cfg.render_jobs_dir / "aaaa00001111bbbb" / "promo_audio.mp4"
+    sonoro.write_bytes(b"con-cama")
+    db.update_job("aaaa00001111bbbb", audio_path=str(sonoro))
+
+    plan = pelicula_service.plan(db.get_project(pid), pel.normaliza_opciones(None))
+    assert plan["piezas"][0]["video"].endswith("promo_audio.mp4")
 
 
 def test_el_plan_engancha_la_narracion_que_exista(authed):

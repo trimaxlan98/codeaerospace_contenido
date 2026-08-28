@@ -1126,7 +1126,9 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
   const activeJob = activeJobFor(jobs, clip.id)
   // El promo dice en el propio boton como esta su mezcla: sin audio, sin
   // mezclar, desactualizada o al dia.
-  const audioMeta = tipo === 'promo' ? AUDIO_META[clip.audio?.estado] : null
+  // Desde el sprint E3 la cama de sonido tambien es de los cursos (sin voz:
+  // esa sale de «Generar narracion»). El estado se enseña igual en los dos.
+  const audioMeta = AUDIO_META[clip.audio?.estado] || null
   // El distintivo de verificacion dice lo MEDIDO: si el informe esta al dia,
   // pasa o no pasa; si no, en que estado esta la medicion.
   const verif = tipo === 'promo' ? clip.verificacion : null
@@ -1224,17 +1226,17 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
             disabled={index === total - 1} aria-label="mover abajo">
             <ChevronDown className="h-3.5 w-3.5" />
           </Button>
-          {tipo === 'promo' && (
-            <Button size="xs" variant="default" onClick={onAudio}
-              title="cama de sonido y voz de este promo">
+          <Button size="xs" variant="default" onClick={onAudio}
+              title={tipo === 'promo'
+                ? 'cama de sonido y voz de este promo'
+                : 'cama de sonido de este clip (la voz sale de la narración)'}>
               <Music className="h-3.5 w-3.5" /> Audio
               {audioMeta && (
                 <span className={cn('ml-1 font-mono text-[10.5px]', audioMeta.text)}>
                   · {audioMeta.label}
                 </span>
               )}
-            </Button>
-          )}
+          </Button>
           <span className="ml-auto"><DeleteButton onDelete={() => onDelete(clip.id)} /></span>
         </div>
 
