@@ -73,6 +73,11 @@ export const api = {
   startNarracion: (pid, body = {}) => request('POST', `/api/projects/${pid}/narracion`, body),
   cancelNarracion: (pid) => request('POST', `/api/projects/${pid}/narracion/cancel`),
   getNarracionTexto: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/texto`),
+  // La pelicula del curso (clips + narracion + marca en un solo archivo).
+  getPelicula: (pid) => request('GET', `/api/projects/${pid}/pelicula`),
+  montarPelicula: (pid, body = {}) => request('POST', `/api/projects/${pid}/pelicula`, body),
+  cancelarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/cancel`),
+  borrarPelicula: (pid) => request('DELETE', `/api/projects/${pid}/pelicula`),
 }
 
 export function videoUrl(id) {
@@ -93,6 +98,12 @@ export function projectArchiveUrl(id) {
 
 export function frameVerificacionUrl(jobId, archivo) {
   return `/api/jobs/${jobId}/verificacion/${archivo}`
+}
+
+// El mp4 montado se sirve con soporte de Range: el navegador puede saltar
+// dentro de una pelicula de media hora sin descargarla entera.
+export function peliculaVideoUrl(pid) {
+  return `/api/projects/${pid}/pelicula/video`
 }
 
 export function narracionAudioUrl(pid, cid) {

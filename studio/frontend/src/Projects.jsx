@@ -23,6 +23,7 @@ import { FORMATOS, formatoPorId, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
 import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
+import PeliculaPanel from './components/PeliculaPanel.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -1028,6 +1029,12 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
           <p role="alert" className="border-t border-line bg-warn/10 px-3 py-1.5 text-[13px] text-warn">{error}</p>
         )}
       </section>
+
+      {/* Un promo es UN clip en bucle: no hay nada que montar. La pelicula es
+          cosa de los cursos. */}
+      {!esPromo && (
+        <PeliculaPanel projectId={project.id} projectName={project.name} jobs={jobs} />
+      )}
 
       <section className="panel flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="clips del proyecto">
         <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">

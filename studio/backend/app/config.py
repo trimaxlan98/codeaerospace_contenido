@@ -68,6 +68,15 @@ class Settings:
             "MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts")
         self.tts_voice = os.environ.get("MS_TTS_VOICE", "Charon")
 
+        # Peliculas montadas (los clips de un curso unidos en un archivo). Van
+        # bajo exports/, que ya era el sitio de los cursos muxeados a mano y
+        # esta en .gitignore. Requiere ReadWritePaths sobre exports/ en la
+        # unidad systemd, igual que guiones/.
+        # El runner tiene esta MISMA ruta como constante relativa
+        # ("exports/peliculas"): si una cambia, la otra tambien.
+        self.peliculas_dir = Path(os.environ.get(
+            "MS_PELICULAS_DIR", str(self.workspace / "exports" / "peliculas")))
+
         # Biblioteca curada de primitivas de Manim (solo lectura: la consume
         # el asistente via conocimiento.py y los demos de Animaciones).
         self.manim_extensions_dir = Path(os.environ.get(

@@ -21,7 +21,11 @@ ProtectHome=yes
 PrivateTmp=yes
 # animations y lessons: alta web de secciones/animaciones (escribe
 # <categoria>/<NN>-<slug>.py y categories.yaml). manim_extensions solo se lee.
-ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospace_contenido/studio/backend /var/www/codeaerospace_contenido/studio/content/animations /var/www/codeaerospace_contenido/studio/content/lessons
+# guiones: narracion (md/txt/wav + estado.json). exports: las peliculas
+# montadas (exports/peliculas/<project_id>/). Los dos directorios deben ser
+# del usuario `manimstudio`: el contenedor de montaje corre con ese uid y
+# escribe ahi el mp4.
+ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospace_contenido/studio/backend /var/www/codeaerospace_contenido/studio/content/animations /var/www/codeaerospace_contenido/studio/content/lessons /var/www/codeaerospace_contenido/guiones /var/www/codeaerospace_contenido/exports
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictSUIDSGID=yes

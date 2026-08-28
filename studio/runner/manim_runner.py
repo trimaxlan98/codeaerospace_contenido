@@ -55,6 +55,15 @@ AUDIO_TIMEOUT = 300
 VERIFICA_SCRIPT = "studio/tools/promo_verifica.py"
 VERIFICA_TIMEOUT = 300
 FRAMES_MAX = 12
+# Montaje de la pelicula de un curso: mismo patron que los dos de arriba (ruta
+# fija del script, solo llega el project_id). El directorio de salida se deriva
+# aqui, nunca viene del exterior; es la MISMA ruta que cfg.peliculas_dir del
+# backend.
+ENSAMBLAR_SCRIPT = "studio/tools/ensamblar.py"
+PELICULAS_DIR = "exports/peliculas"
+# 4 h + margen: con transiciones se recodifica la pelicula entera y el
+# contenedor esta capado a 1.5 vCPU. Sin transiciones son segundos.
+ENSAMBLAR_TIMEOUT = 14400
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 RE_SCENE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,127}$")
@@ -429,6 +438,61 @@ async def handle_verificar(req: dict, writer: asyncio.StreamWriter) -> None:
     await send(writer, {"type": "ok", "informe": informe})
 
 
+async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Monta la pelicula de un proyecto con `ensamblar.py` en el contenedor.
+
+    Igual que `postproceso` y `verificar`: del exterior solo llega un id
+    validado con regex. El plan (que clips, en que orden, con que voz y que
+    empalme) lo escribio el backend en <peliculas>/<pid>/plan.json, y sus rutas
+    apuntan dentro de /workspace, que el contenedor ve read-only. Lo unico
+    montado con escritura es el directorio de la pelicula.
+    """
+    pid = str(req.get("project_id", ""))
+    if not RE_JOB_ID.match(pid):
+        await send(writer, {"type": "error", "error": "project_id invalido"})
+        return
+
+    peli_rel = f"{PELICULAS_DIR}/{pid}"
+    peli_abs = os.path.join(PROJECT_DIR, peli_rel)
+    if not os.path.isfile(os.path.join(peli_abs, "plan.json")):
+        await send(writer, {"type": "error", "error": "no hay plan que montar"})
+        return
+
+    container = f"{CONTAINER_PREFIX}{pid}-pelicula"
+    peli_mount = f"{peli_abs}:/workspace/{peli_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", peli_mount,
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{ENSAMBLAR_SCRIPT}",
+        f"/workspace/{peli_rel}/plan.json",
+        f"/workspace/{peli_rel}/pelicula.mp4",
+        timeout=ENSAMBLAR_TIMEOUT,
+    )
+    if code != 0:
+        await force_remove(container)
+        log(f"[pelicula] pid={pid} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"el montaje salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    try:
+        informe = json.loads(out.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        await send(writer, {"type": "error",
+                            "error": "el montaje no devolvio un informe"})
+        return
+    if not informe.get("ok"):
+        await send(writer, {"type": "error",
+                            "error": informe.get("error", "montaje fallido")})
+        return
+    log(f"[pelicula] pid={pid} ok piezas={informe.get('piezas')} "
+        f"dur={informe.get('duracion')}")
+    await send(writer, {"type": "ok", "informe": informe})
+
+
 async def handle_cancel(req: dict, writer: asyncio.StreamWriter) -> None:
     job_id = str(req.get("job_id", ""))
     if not RE_JOB_ID.match(job_id):
@@ -515,6 +579,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_postproceso(req, writer)
         elif cmd == "verificar":
             await handle_verificar(req, writer)
+        elif cmd == "ensamblar":
+            await handle_ensamblar(req, writer)
         elif cmd == "thumbnail":
             await handle_thumbnail(req, writer)
         elif cmd == "stats":

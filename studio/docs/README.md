@@ -207,8 +207,43 @@ crea un clip en el proyecto elegido a partir de ese job (`from_job_id`). Al borr
 que es el render vigente de un clip, la confirmación avisa de que el clip se queda sin video
 (el clip en sí no se borra, solo pierde su render).
 
-**Flujo de unión externa** (cuando se quiere el curso completo como un solo archivo, algo que
-ManimStudio no hace en el servidor para no sumar otro paso de render):
+### La película del curso (panel «La película» en un proyecto)
+
+Desde el sprint E1 el curso completo se monta **dentro de la app**: los clips en orden, su
+narración pegada y, si se quieren, el intro y el cierre de marca, en un solo `pelicula.mp4`.
+Detalle completo y decisiones en `ESTUDIO-V2.md`.
+
+- **Quién monta**: `studio/tools/ensamblar.py` dentro del contenedor manim (el único sitio con
+  ffmpeg), disparado por el comando `ensamblar` del runner. Del exterior solo llega un
+  `project_id` validado con regex — mismo patrón que `postproceso` y `verificar`. El plan lo
+  escribe el backend en `exports/peliculas/<project_id>/plan.json`, y ese directorio es lo
+  único montado con escritura.
+- **Empalme**: `corte` (por defecto) une con `concat -c copy` y tarda **segundos**, porque el
+  vídeo se copia. `fundido`, `negro`, `blanco`, `deslizar`, `barrido` y `disolver` pasan por
+  `xfade` y **recodifican la película entera**: en el VPS, decenas de minutos para un curso de
+  media hora. La interfaz lo avisa antes de montar.
+- **La voz** usa la misma lógica que `mux.sh`: `apad` + `-shortest` si cabe, `atempo` con tope
+  1.15 si no. Una pieza sin narración recibe pista de silencio — un `concat` que mezcla clips
+  con y sin audio sale mudo desde el primero sin pista, sin fallar.
+- **La marca** son dos renders más del proyecto «Marca…»; se valida que su resolución medida
+  coincida con la del curso.
+- **Caducidad**: `pelicula.json` guarda el hash del plan (nombre, resolución, fps, empalme y el
+  **mtime** de cada vídeo y wav). Estados: `sin_clips` · `faltan_renders` · `sin_montar` ·
+  `desactualizada` · `al_dia` · `montando`.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/projects/{pid}/pelicula` | estado, opciones, piezas e informe medido |
+| POST | `/api/projects/{pid}/pelicula` | monta en segundo plano (202); 409 sin material o con otro montaje en curso |
+| POST | `/api/projects/{pid}/pelicula/cancel` | corta el montaje |
+| GET | `/api/projects/{pid}/pelicula/video` | el mp4, con soporte de Range |
+| DELETE | `/api/projects/{pid}/pelicula` | borra la película, no el material |
+
+Operación: `exports/` necesita `ReadWritePaths` en la unidad del backend y `exports/peliculas/`
+debe ser del usuario `manimstudio` — el contenedor corre con ese uid y `cap_drop: ALL` le quita
+a root el `CAP_DAC_OVERRIDE` que le dejaría escribir en un directorio ajeno.
+
+**Flujo de unión externa** (sigue disponible; es lo que hace el ZIP, y no necesita el servidor):
 
 1. Renderizar todos los clips del proyecto (individualmente o con «Re-renderizar
    desactualizados»).

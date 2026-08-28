@@ -73,6 +73,20 @@ class RunnerClient:
             raise RunnerError(resp.get("error", "la mezcla de audio fallo"))
         return resp.get("audio", "")
 
+    async def ensamblar(self, project_id: str) -> dict:
+        """Monta la pelicula del proyecto (ensamblar.py en el contenedor).
+
+        El timeout es largo a proposito: con transiciones se recodifica la
+        pelicula entera y en el VPS (1.5 vCPU) un curso de media hora tarda
+        decenas de minutos. Sin transiciones son segundos, porque el video se
+        copia. El plan ya esta escrito en exports/peliculas/<pid>/plan.json.
+        """
+        resp = await self._request_one(
+            {"cmd": "ensamblar", "project_id": project_id}, timeout=14700)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "el montaje fallo"))
+        return resp.get("informe") or {}
+
     async def verificar(self, job_id: str, frames: int = 6,
                         dur_min: float = 8.0, dur_max: float = 15.0) -> dict:
         """Informe medido del promo (bucle, duracion, audio, frames)."""

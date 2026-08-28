@@ -26,6 +26,8 @@ from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
 from .narracion import NarracionService
 from .narracion_api import make_router as make_narracion_router
+from .pelicula import PeliculaService
+from .pelicula_api import make_router as make_pelicula_router
 from .projects import FORMATO_DEFECTO, ProjectService
 from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
@@ -47,6 +49,7 @@ manager = JobManager(cfg, db, runner, bus)
 service = ProjectService(db)
 manager.on_job_done = service.handle_job_done
 narracion_service = NarracionService(cfg, db)
+pelicula_service = PeliculaService(cfg, db, runner, narracion_service)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
@@ -72,6 +75,7 @@ app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=No
 app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
 app.include_router(make_narracion_router(cfg, db, narracion_service))
+app.include_router(make_pelicula_router(cfg, db, pelicula_service))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))
 
