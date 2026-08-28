@@ -422,3 +422,50 @@ Esta vez con el **runner real** (no solo el contenedor a mano): backend y
 De paso quedó comprobado el arranque del runner en **modo desarrollo** (el que
 entró en la consolidación E0): sin grupo `manimstudio` ni root para el `chown`,
 deja el socket a 0600 y avisa, en vez de caerse.
+
+---
+
+## Despliegue (pendiente: ejecutar en el VPS)
+
+Todo lo anterior está en `main` y verificado en local, pero **no desplegado**:
+en esta corrida automática el clasificador de permisos bloqueó el `ssh` al VPS.
+Estos son los pasos exactos, en orden. Los tres primeros son los de siempre; el
+cuarto y el quinto son **nuevos** y hacen falta para que la película funcione.
+
+```bash
+# 1. Traer el código
+ssh triage-vps
+cd /var/www/codeaerospace_contenido && git pull
+
+# 2. Frontend (el build ES el despliegue: nginx sirve dist/ del disco)
+export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # node no está en el PATH de una sesión no interactiva
+cd studio/frontend && node_modules/.bin/vite build
+
+# 3. Backend y runner
+systemctl restart manimstudio-backend manimstudio-runner
+
+# 4. NUEVO — el directorio de las películas, del usuario que monta
+#    El contenedor corre con el uid de `manimstudio` y `cap_drop: ALL` le quita
+#    a root el CAP_DAC_OVERRIDE: si el directorio es de otro, el montaje falla
+#    con "Permission denied" y nada más lo explica.
+install -d -o manimstudio -g manimstudio /var/www/codeaerospace_contenido/exports/peliculas
+install -d -o manimstudio -g manimstudio /var/www/codeaerospace_contenido/exports/sfx
+
+# 5. NUEVO — ReadWritePaths de la unidad del backend
+#    El unit del repo (studio/deploy/manimstudio-backend.service) ya trae
+#    `exports` y `guiones`; el desplegado NO los tenía (guiones/ funcionaba por
+#    una deriva entre los dos). Copiar y recargar:
+cp studio/deploy/manimstudio-backend.service /etc/systemd/system/
+systemctl daemon-reload && systemctl restart manimstudio-backend
+```
+
+Comprobación después (con la cookie firmada del método E2E de la skill):
+
+```bash
+curl -s https://coderesearch.space | grep -o 'index-[a-z0-9]*\.js'   # bundle nuevo
+curl -sb "ms_session=…" https://coderesearch.space/api/sfx | head -c 200
+curl -sb "ms_session=…" https://coderesearch.space/api/projects/<pid>/pelicula
+```
+
+Y una película de verdad: montar un curso corto con `corte` (segundos), mirar
+que `exports/peliculas/<pid>/` tenga `pelicula.mp4` y que el panel la reproduzca.
