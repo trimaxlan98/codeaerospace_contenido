@@ -267,6 +267,34 @@ a root el `CAP_DAC_OVERRIDE` que le dejaría escribir en un directorio ajeno.
    `concat.txt` ya trae los archivos en el orden del proyecto; `-c copy` es posible porque
    todos los clips de un proyecto comparten calidad (mismo códec/resolución).
 
+### Piezas de simulación (plantilla «Pieza de simulación»)
+
+Al crear un proyecto, la plantilla **«Pieza de simulación»** deja listo un clip donde
+**el fotograma entero lo calcula numpy en el render**: miles de agentes o una malla de
+cientos de miles de celdas, presentados a pantalla completa, con la cámara siguiendo a un
+agente y la cifra medida abajo. Nace en `vertical` y calidad `qh`, pero el lienzo lo elige
+el proyecto: el mismo código sale en 9:16 y en 16:9 sin tocar una línea.
+
+Lo sostiene el paquete `studio/content/manim_extensions/emergencia/` — el núcleo
+`Pelicula` (la pila de fotogramas como `ImageMobject` animado) y **trece simuladores**:
+bandada, moho, arena, vida, turing, ondas, chladni, ising, pendulos, cuencas, epiciclos,
+rio y galaxias. Todos devuelven lo mismo (`frames`, `cifras`, `extra`), así que cambiar
+`em.bandada` por `em.rio` en el clip es una línea.
+
+Dos cosas que conviene saber antes de darle a Render:
+
+- **Cuesta.** La simulación va aparte del render (la plantilla arranca con `pasos=420`
+  para que la vista previa sea rápida) y el render de una pieza larga en `qh` va a
+  ~0.29 s/frame. En el VPS eso son horas: **los `qh` de piezas con película se hacen en
+  local** con `studio/tools/render_vertical.py`, como los cursos verticales.
+- **La cifra no se inventa.** Lo que aparece en cian sale de `cifras`/`extra` de ese
+  render; lo que venga de literatura va en gris. La sonda `studio/tools/sonda_emergencia.py`
+  comprueba los invariantes físicos de los trece simuladores (hoy: 36 ok, 0 fallos).
+
+La guía completa de la librería, con la API y las trampas medidas, está en
+[`studio/docs/EMERGENCIA.md`](EMERGENCIA.md). El curso 29 «Emergencia» es el ejemplo
+grande: 16 piezas en `studio/content/verticales/emergencia/`.
+
 ### Cama de sonido (botón «Audio» en cualquier clip)
 
 Un promo de redes no lleva subtítulos: si no suena, no comunica. Este camino monta la
