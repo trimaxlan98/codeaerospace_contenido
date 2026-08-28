@@ -514,7 +514,7 @@ def heatmap_q(matriz, paleta=None, alto_escena=3.0):
 
 
 # =============================================================================
-# Ampliacion para el curso 27 "Satelites: la maquina que no se cae" (VERTICAL)
+# Ampliacion para el curso 28 "Satelites: la maquina que no se cae" (VERTICAL)
 #
 # Todo lo de abajo se añade SIN tocar nada de arriba: los clips del curso 2 y
 # del 9, que ya estan en la DB de produccion, siguen valiendo igual.

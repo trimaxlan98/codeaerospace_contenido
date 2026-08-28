@@ -57,7 +57,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
 | 25 | Protocolos de Internet (familia, 24 lecciones) | original (divulgacion: la capa de paquetes; del cable de cobre a Marte, cierra en DTN/CCSDS) | `protocolos.py` | **en produccion por lotes** (plan completo en `curso-23-protocolos-internet.md`; 4 lotes de 6 lecciones) |
 | 26 | Fractales: la forma del infinito (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 1, que era horizontal y solo miraba el plano complejo) | `fractales.py` ampliada | **primer curso en 9:16**: sin subtitulos, voz escrita a mano y cama de SFX; plan en `curso-26-fractales-vertical.md` |
-| 27 | Satelites: la maquina que no se cae (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 2 "Satelites e IA" y a la mitad divulgativa del 3, ambos horizontales y solo en la DB) | `satelites.py` ampliada | **en produccion**: segundo curso en 9:16; plan en `curso-27-satelites-vertical.md` |
+| 28 | Satelites: la maquina que no se cae (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 2 "Satelites e IA" y a la mitad divulgativa del 3, ambos horizontales y solo en la DB) | `satelites.py` ampliada | **en produccion**: segundo curso en 9:16; plan en `curso-28-satelites-vertical.md` |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de

@@ -1,4 +1,4 @@
-# Curso 27 — Satelites: la maquina que no se cae (FORMATO VERTICAL)
+# Curso 28 — Satelites: la maquina que no se cae (FORMATO VERTICAL)
 
 Rama `curso/satelites-vertical` (worktree
 `~/Documentos/github/codeaerospace_contenido-satelites`), basada en
@@ -8,6 +8,12 @@ las cuatro herramientas del formato (`render_vertical.py`, `alinear_voz.py`,
 
 Encargo (2026-08-27, 18:00): *"un nuevo curso en vertical, este sera sobre
 satelites"*.
+
+**Numeracion**: nacio como "curso 27" y se renumero a **28** al descubrir que
+el 27 ya estaba tomado por *Procesamiento digital de señales* (30 lecciones,
+terminado en la rama `curso/procesamiento-senales`). La colision no se ve
+desde aqui porque cada curso lleva su fila de `PLAN.md` en su propia rama:
+al mergear, la fila 27 la pone esa rama y la 28 esta.
 
 ## Que es este curso y en que se diferencia
 

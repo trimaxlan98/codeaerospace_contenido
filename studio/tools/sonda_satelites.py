@@ -1,4 +1,4 @@
-"""Sonda del curso 27 (satelites verticales): exige a cada funcion nueva de satelites.py que
+"""Sonda del curso 28 (satelites verticales): exige a cada funcion nueva de satelites.py que
 devuelva un numero, y lo contrasta contra algo que se sepa por otro lado.
 
 Un fallo aqui es una cifra que habria salido en pantalla siendo mentira.
