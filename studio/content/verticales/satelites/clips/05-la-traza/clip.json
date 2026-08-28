@@ -9,22 +9,114 @@
     "subsatelites_walker",
     "traza_terrestre"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.16,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el mapa del mundo",
+    "1.5  la cifra: 15.04 vueltas al dia",
+    "2.0  primera vuelta: la traza se dibuja (4.2 s) y marca su cruce del ecuador",
+    "7.5  segunda vuelta: cae al oeste de la primera",
+    "13.0 tercera vuelta, el mismo hueco otra vez",
+    "18.5 la flecha entre los dos primeros cruces",
+    "19.8 la cifra: 23.94 grados al oeste por vuelta",
+    "24.2 lo mismo en km de ecuador: 2662",
+    "29.6 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 2.2,
+        "texto": "El punto que tiene justo debajo dibuja esto."
+      },
+      {
+        "t_inicio": 7.8,
+        "texto": "Una vuelta."
+      },
+      {
+        "t_inicio": 13.2,
+        "texto": "Otra. Y no cae encima de la anterior."
+      },
+      {
+        "t_inicio": 19.9,
+        "texto": "La Tierra se ha girado debajo."
+      },
+      {
+        "t_inicio": 24.5,
+        "texto": "Dos mil seiscientos kilómetros al oeste."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.7,
+      30.4
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -17
+      ],
+      [
+        "barrido",
+        2.0,
+        -17
+      ],
+      [
+        "tick",
+        6.3,
+        -13
+      ],
+      [
+        "barrido",
+        7.5,
+        -17
+      ],
+      [
+        "tick",
+        11.8,
+        -13
+      ],
+      [
+        "barrido",
+        13.0,
+        -17
+      ],
+      [
+        "tick",
+        17.3,
+        -13
+      ],
+      [
+        "subrayado",
+        18.5,
+        -14
+      ],
+      [
+        "blip_agudo",
+        19.9,
+        -12
+      ],
+      [
+        "blip_medio",
+        24.2,
+        -13
+      ]
+    ]
   }
 }

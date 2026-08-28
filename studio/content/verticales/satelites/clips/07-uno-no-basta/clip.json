@@ -9,22 +9,122 @@
     "conteo_cobertura",
     "fraccion_cubierta"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.16,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el mapa con la huella de UN satelite: 1.70 %",
+    "4.4  seis: 8.5 %",
+    "8.1  veinticuatro: 37 %",
+    "11.8 sesenta y seis: tres cuartas partes",
+    "15.6 doscientos cuarenta: 92 %",
+    "17.3 las dos rayas del limite de latitud",
+    "18.6 la cifra: 68 grados, y mas arriba nada",
+    "22.5 el solape: donde ven dos o mas, que es donde hay relevo",
+    "29.0 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 2.3,
+        "texto": "Uno solo tapa esto."
+      },
+      {
+        "t_inicio": 5.7,
+        "texto": "Seis."
+      },
+      {
+        "t_inicio": 9.4,
+        "texto": "Veinticuatro."
+      },
+      {
+        "t_inicio": 12.2,
+        "texto": "Sesenta y seis: tres cuartas partes."
+      },
+      {
+        "t_inicio": 16.9,
+        "texto": "Doscientos cuarenta."
+      },
+      {
+        "t_inicio": 19.0,
+        "texto": "Pero los polos se quedan fuera."
+      },
+      {
+        "t_inicio": 23.4,
+        "texto": "Y donde se pisan dos, puedes saltar de uno a otro."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.0,
+      29.7
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -17
+      ],
+      [
+        "blip_grave",
+        2.0,
+        -16
+      ],
+      [
+        "blip_medio",
+        4.8,
+        -15
+      ],
+      [
+        "blip_medio",
+        8.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        12.2,
+        -14
+      ],
+      [
+        "blip_agudo",
+        16.0,
+        -12
+      ],
+      [
+        "barrido",
+        17.3,
+        -17
+      ],
+      [
+        "subrayado",
+        18.6,
+        -14
+      ],
+      [
+        "aire",
+        22.5,
+        -18
+      ],
+      [
+        "pulso",
+        23.1,
+        -13
+      ]
+    ]
   }
 }

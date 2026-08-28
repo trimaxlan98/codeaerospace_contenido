@@ -116,6 +116,16 @@ check("un pase LEO dura entre 3 y 15 min",
       3.0 < p["duracion_min"] < 15.0, f"{p['duracion_min']:.2f} min")
 check("la elevacion maxima es alta en el mejor pase",
       p["el_max_deg"] > 45.0, f"{p['el_max_deg']:.1f} grados")
+i, j, k = p["indices"]
+az = p["azimut"]
+print(f"    azimut: entra por {az[i]:.0f}, culmina en {az[k]:.0f}, "
+      f"sale por {az[j]:.0f} grados; el pase es el "
+      f"{100*p['fraccion_del_periodo']:.1f}% de la orbita")
+check("el satelite entra y sale por lados opuestos del cielo",
+      abs(((az[j] - az[i] + 180) % 360) - 180) > 90.0,
+      f"{az[i]:.0f} -> {az[j]:.0f}")
+check("azimut en rango", float(az.min()) >= 0.0 and float(az.max()) < 360.0,
+      f"[{az.min():.1f}, {az.max():.1f}]")
 
 print()
 print("=" * 66)

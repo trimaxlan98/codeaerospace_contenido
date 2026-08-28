@@ -261,5 +261,9 @@ Especificas de este curso, previstas:
   "CAE" y "SUELO", separados 0.80 unidades sobre sus barras, se leian "CAE
   SUELO". A 2.70 cada uno sobre su barra, ya no.
 - `hud()` **espacia todos los caracteres**: una etiqueta de 16 letras ocupa
-  el doble de lo que parece al escribirla. El limite practico son ~16
-  caracteres CON los espacios, o sea 1-3 palabras cortas de verdad.
+  el doble de lo que parece al escribirla. Medido tres veces con lo que el
+  guardian rechazo ("por cada 1.50 del bajo" 6.42, "de horizonte a
+  horizonte" 7.01, "y de ahi para arriba, nada" 7.64), sale
+  **0.292 unidades por caracter a font_size 18**, o sea un tope de
+  **19 caracteres contando los espacios**. Escribir los rotulos con esa
+  regla ahorra una vuelta de render por clip.

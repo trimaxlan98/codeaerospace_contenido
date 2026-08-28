@@ -758,6 +758,21 @@ def _subsat_uno(t_s, altitud_km=550.0, inclinacion_deg=53.0, raan_deg=0.0,
     return np.stack([lon, lat], axis=1)
 
 
+def azimut(lat_est, lon_est, lonlat_sat):
+    """Azimut (grados desde el norte, horario) del satelite desde la estacion.
+
+    Con la elevacion de `ventana_visibilidad` completa la coordenada del
+    cielo: (azimut, elevacion) es lo que apunta una antena y lo que dibuja
+    una boveda polar.
+    """
+    lonlat_sat = np.atleast_2d(np.asarray(lonlat_sat, dtype=np.float64))
+    la, lo = np.radians(lat_est), np.radians(lon_est)
+    ls, cs = np.radians(lonlat_sat[:, 1]), np.radians(lonlat_sat[:, 0])
+    y = np.sin(cs - lo) * np.cos(ls)
+    x = np.cos(la) * np.sin(ls) - np.sin(la) * np.cos(ls) * np.cos(cs - lo)
+    return (np.degrees(np.arctan2(y, x)) + 360.0) % 360.0
+
+
 def pase(lat_est, lon_est, altitud_km=550.0, inclinacion_deg=53.0,
          elevacion_min_deg=10.0, raan_deg=None, muestras=4000, fase0=0.0):
     """El pase visto desde una estacion: cuanto dura y cuanto sube.
@@ -815,6 +830,8 @@ def pase(lat_est, lon_est, altitud_km=550.0, inclinacion_deg=53.0,
         raise ValueError("ningun pase sobre esa estacion con esos parametros")
     mejor["duracion_min"] = mejor["duracion_s"] / 60.0
     mejor["periodo_s"] = float(per)
+    mejor["azimut"] = azimut(lat_est, lon_est, mejor["lonlat"])
+    mejor["fraccion_del_periodo"] = float(mejor["duracion_s"] / per)
     return mejor
 
 

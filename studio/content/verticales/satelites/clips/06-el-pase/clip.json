@@ -8,22 +8,122 @@
     "pase",
     "ventana_visibilidad"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.2,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  la boveda: horizonte, 30 y 60 grados, la estacion en el centro",
+    "2.5  N E S O",
+    "3.3  el pase entra por el horizonte y cruza (6.5 s)",
+    "9.9  la cifra: 88.9 grados de altura",
+    "13.9 la duracion: 8.24 minutos",
+    "17.6 se va la boveda; dos barras: lo que se corre y lo que alcanza",
+    "20.1 la cifra: 2662 km al oeste contra 1664 de huella",
+    "25.7 y por eso lo ves el 8.6 % de su orbita",
+    "29.2 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.9,
+        "texto": "Esto es el cielo entero, visto en planta."
+      },
+      {
+        "t_inicio": 4.3,
+        "texto": "El borde es el horizonte."
+      },
+      {
+        "t_inicio": 6.6,
+        "texto": "Y el centro, justo encima de ti."
+      },
+      {
+        "t_inicio": 10.6,
+        "texto": "Casi noventa grados."
+      },
+      {
+        "t_inicio": 14.2,
+        "texto": "Ocho minutos y cuarto."
+      },
+      {
+        "t_inicio": 20.4,
+        "texto": "La vuelta siguiente cae más lejos de lo que alcanza."
+      },
+      {
+        "t_inicio": 26.0,
+        "texto": "Lo ves el ocho por ciento del tiempo."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.3,
+      30.0
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -17
+      ],
+      [
+        "blip_grave",
+        1.5,
+        -15
+      ],
+      [
+        "blip_hud",
+        2.5,
+        -17
+      ],
+      [
+        "barrido",
+        3.3,
+        -17
+      ],
+      [
+        "blip_agudo",
+        9.9,
+        -12
+      ],
+      [
+        "blip_medio",
+        13.9,
+        -13
+      ],
+      [
+        "aire",
+        17.6,
+        -18
+      ],
+      [
+        "subrayado",
+        19.6,
+        -14
+      ],
+      [
+        "blip_medio",
+        20.2,
+        -13
+      ],
+      [
+        "pulso",
+        25.8,
+        -13
+      ]
+    ]
   }
 }
