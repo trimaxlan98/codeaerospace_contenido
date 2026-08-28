@@ -7,22 +7,123 @@
   "libreria": [
     "sobre_el_horizonte"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.06,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  la boveda del cielo y tu, en el centro",
+    "3.2  los cuatro que hay ahora con 240 arriba",
+    "5.9  la cifra: 4 sobre tu horizonte",
+    "9.6  por que son cuatro: cada uno ve el 1.696 %",
+    "13.6 el dato externo en gris: hoy hay unos 6000",
+    "14.2 el cielo se llena (3.8 s)",
+    "18.0 la cifra calculada: 102 sobre tu horizonte",
+    "20.4 laten y se quedan",
+    "28.2 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.8,
+        "texto": "Esto es tu cielo."
+      },
+      {
+        "t_inicio": 6.0,
+        "texto": "Con doscientos cuarenta arriba, ves cuatro."
+      },
+      {
+        "t_inicio": 9.9,
+        "texto": "Cada uno ve el uno y medio por ciento de la Tierra."
+      },
+      {
+        "t_inicio": 14.1,
+        "texto": "Pero arriba ya no hay doscientos cuarenta."
+      },
+      {
+        "t_inicio": 18.3,
+        "texto": "Hay unos cien sobre tu cabeza. Ahora mismo."
+      },
+      {
+        "t_inicio": 24.2,
+        "texto": "Y siguen ahí cuando dejas de mirar."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.0,
+      29.9
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.9,
+        -17
+      ],
+      [
+        "tick",
+        3.3,
+        -14
+      ],
+      [
+        "tick",
+        3.9,
+        -14
+      ],
+      [
+        "tick",
+        4.5,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.9,
+        -14
+      ],
+      [
+        "blip_hud",
+        9.6,
+        -16
+      ],
+      [
+        "aire",
+        13.6,
+        -18
+      ],
+      [
+        "barrido",
+        14.2,
+        -17
+      ],
+      [
+        "blip_agudo",
+        18.0,
+        -11
+      ],
+      [
+        "pad",
+        20.4,
+        -19
+      ],
+      [
+        "sting",
+        24.0,
+        -14
+      ]
+    ]
   }
 }

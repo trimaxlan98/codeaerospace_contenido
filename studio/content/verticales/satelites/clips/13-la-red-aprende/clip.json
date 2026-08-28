@@ -8,22 +8,118 @@
     "asignar_haces",
     "demanda_por_celda"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.03,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el mapa de demanda (violeta; el cian es solo de las cifras)",
+    "1.5  el aviso en gris: DEMANDA SIMULADA",
+    "3.2  los ocho haces, repartidos a ojo",
+    "5.3  la cifra: 1.09 % servido",
+    "7.9  los haces se mueven a donde mas sube el total (7 s)",
+    "15.4 la cifra: 7.59 % tras 39 movimientos",
+    "19.6 la mejora: 6.94 veces con los mismos haces",
+    "23.3 y ese es el techo: no se puede hacer mejor",
+    "29.1 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 2.2,
+        "texto": "Aquí está la demanda. Es una simulación."
+      },
+      {
+        "t_inicio": 5.4,
+        "texto": "Ocho haces, repartidos a ojo."
+      },
+      {
+        "t_inicio": 9.0,
+        "texto": "Ahora déjalos moverse a donde más suben el total."
+      },
+      {
+        "t_inicio": 15.6,
+        "texto": "Siete veces más servido."
+      },
+      {
+        "t_inicio": 19.8,
+        "texto": "Con los mismos ocho haces."
+      },
+      {
+        "t_inicio": 23.6,
+        "texto": "Y ese es el techo: no se puede hacer mejor."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.2,
+      29.9
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.8,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.6,
+        -18
+      ],
+      [
+        "tick",
+        3.3,
+        -14
+      ],
+      [
+        "tick",
+        3.9,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.3,
+        -14
+      ],
+      [
+        "barrido",
+        7.9,
+        -18
+      ],
+      [
+        "pad",
+        8.4,
+        -20
+      ],
+      [
+        "blip_agudo",
+        15.4,
+        -12
+      ],
+      [
+        "subrayado",
+        19.6,
+        -14
+      ],
+      [
+        "pulso",
+        23.3,
+        -13
+      ]
+    ]
   }
 }

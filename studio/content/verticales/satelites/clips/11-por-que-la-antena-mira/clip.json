@@ -7,22 +7,117 @@
   "libreria": [
     "fspl_db"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.1,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el satelite arriba y la parabolica abajo",
+    "2.2  los frentes de onda salen y crecen (4 s)",
+    "6.2  la cifra: 168.84 dB a 550 km",
+    "11.3 el satelite se aleja a la GEO (escala NO real, se declara con la distancia)",
+    "13.0 la cifra: 205.11 dB",
+    "16.2 la resta: 36.27 dB mas",
+    "19.5 lo que significa: 4234 veces menos",
+    "23.4 el plato crece: 65 veces mas ancho",
+    "29.1 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.9,
+        "texto": "Lo que sale de ahí arriba no se pierde."
+      },
+      {
+        "t_inicio": 4.5,
+        "texto": "Se reparte."
+      },
+      {
+        "t_inicio": 7.0,
+        "texto": "A quinientos cincuenta kilómetros, ciento sesenta y nueve decibelios."
+      },
+      {
+        "t_inicio": 13.3,
+        "texto": "Desde la geoestacionaria, doscientos cinco."
+      },
+      {
+        "t_inicio": 16.4,
+        "texto": "Treinta y seis decibelios más."
+      },
+      {
+        "t_inicio": 19.8,
+        "texto": "Cuatro mil veces menos señal."
+      },
+      {
+        "t_inicio": 25.6,
+        "texto": "O una antena sesenta y cinco veces más ancha."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.2,
+      29.9
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.8,
+        -17
+      ],
+      [
+        "barrido",
+        2.2,
+        -18
+      ],
+      [
+        "pad",
+        2.4,
+        -20
+      ],
+      [
+        "blip_agudo",
+        6.2,
+        -12
+      ],
+      [
+        "barrido",
+        11.3,
+        -17
+      ],
+      [
+        "blip_medio",
+        13.0,
+        -13
+      ],
+      [
+        "subrayado",
+        16.2,
+        -14
+      ],
+      [
+        "blip_agudo",
+        19.5,
+        -12
+      ],
+      [
+        "pulso",
+        23.4,
+        -13
+      ]
+    ]
   }
 }

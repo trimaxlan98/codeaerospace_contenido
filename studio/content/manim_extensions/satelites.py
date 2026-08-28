@@ -1143,7 +1143,8 @@ def asignar_haces(conteo, demanda, n_haces, modo="fijo", semilla=5,
     if modo == "demanda":
         servida = float(valor[orden[:k]].sum())
         return {"servida": servida / total, "haces": k, "capacidad": capacidad,
-                "curva": np.array([servida / total])}
+                "curva": np.array([servida / total]),
+                "celdas": celdas[orden[:k]]}
 
     rng = np.random.default_rng(int(semilla))
     elegidas = rng.choice(len(celdas), size=k, replace=False)
@@ -1151,7 +1152,8 @@ def asignar_haces(conteo, demanda, n_haces, modo="fijo", semilla=5,
     curva = [servida / total]
     if modo == "fijo":
         return {"servida": servida / total, "haces": k,
-                "capacidad": capacidad, "curva": np.array(curva)}
+                "capacidad": capacidad, "curva": np.array(curva),
+                "celdas": celdas[elegidas]}
     if modo != "aprendido":
         raise ValueError(f"modo desconocido: {modo}")
 
@@ -1170,7 +1172,9 @@ def asignar_haces(conteo, demanda, n_haces, modo="fijo", semilla=5,
         dentro.add(mejor)
         curva.append(float(valor[list(dentro)].sum()) / total)
     return {"servida": curva[-1], "haces": k, "capacidad": capacidad,
-            "curva": np.array(curva), "pasos": len(curva) - 1}
+            "curva": np.array(curva), "pasos": len(curva) - 1,
+            "celdas": celdas[sorted(dentro)],
+            "celdas_inicio": celdas[elegidas]}
 
 
 def sobre_el_horizonte(lat_est, lon_est, planos=24, por_plano=10,
