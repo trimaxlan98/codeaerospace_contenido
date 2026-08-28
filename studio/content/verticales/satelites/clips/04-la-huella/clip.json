@@ -9,22 +9,121 @@
     "fraccion_visible",
     "angulo_cobertura"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 30.43,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el planeta de perfil y el satelite a 550 km",
+    "2.5  los dos rayos de 10 grados de elevacion",
+    "3.5  la tapa que queda dentro; cifra: 14.97 grados",
+    "7.7  la misma tapa en km: 1664 de radio",
+    "11.0 se cambia al mapa del mundo con la tapa pintada",
+    "12.5 la cifra que duele: el 1.70 % de la Tierra",
+    "16.0 y la tapa barre el mapa a 7.59 km/s (8.5 s)",
+    "29.8 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 2.3,
+        "texto": "Esto es todo lo que ve un satélite."
+      },
+      {
+        "t_inicio": 5.2,
+        "texto": "Quince grados de planeta."
+      },
+      {
+        "t_inicio": 8.2,
+        "texto": "Mil seiscientos kilómetros de radio."
+      },
+      {
+        "t_inicio": 12.7,
+        "texto": "Sobre el mapa, esto."
+      },
+      {
+        "t_inicio": 15.9,
+        "texto": "Menos del dos por ciento."
+      },
+      {
+        "t_inicio": 19.2,
+        "texto": "Y no se queda quieto."
+      },
+      {
+        "t_inicio": 25.2,
+        "texto": "Siete kilómetros y medio cada segundo."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      29.7,
+      30.3
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -17
+      ],
+      [
+        "blip_grave",
+        1.9,
+        -15
+      ],
+      [
+        "barrido",
+        2.5,
+        -17
+      ],
+      [
+        "blip_medio",
+        4.3,
+        -14
+      ],
+      [
+        "subrayado",
+        7.8,
+        -14
+      ],
+      [
+        "aire",
+        11.0,
+        -18
+      ],
+      [
+        "blip_agudo",
+        12.5,
+        -12
+      ],
+      [
+        "barrido",
+        16.0,
+        -17
+      ],
+      [
+        "pad",
+        16.5,
+        -20
+      ],
+      [
+        "pulso",
+        24.6,
+        -14
+      ]
+    ]
   }
 }

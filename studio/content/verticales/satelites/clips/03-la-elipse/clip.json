@@ -8,22 +8,123 @@
     "elipse_kepler",
     "areas_barridas"
   ],
-  "estado": "esqueleto",
-  "duracion_objetivo": 35.0,
+  "duracion_objetivo": 31.43,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  se dibuja la elipse (Kepler, foco en el planeta)",
+    "2.2  el planeta en el foco",
+    "3.3  el satelite la recorre entera: se lanza abajo (8.67 km/s)",
+    "10.3 segunda vuelta, ahora mirando el apogeo (1.84 km/s)",
+    "17.7 48 puntos, uno por cada tramo IGUAL de tiempo: se apelotonan arriba",
+    "20.2 el cociente de rapideces: 4.71 veces",
+    "22.8 el sector del perigeo (corto y ancho)",
+    "24.4 el del apogeo (largo y estrecho)",
+    "25.9 la cifra: cociente de areas 1.000",
+    "30.8 fundido a fondo limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.9,
+        "texto": "Una órbita no tiene por qué ser un círculo."
+      },
+      {
+        "t_inicio": 4.6,
+        "texto": "Abajo va lanzado."
+      },
+      {
+        "t_inicio": 11.2,
+        "texto": "Arriba se arrastra."
+      },
+      {
+        "t_inicio": 14.6,
+        "texto": "Cuatro veces y media más rápido."
+      },
+      {
+        "t_inicio": 18.4,
+        "texto": "Un punto por cada tramo igual de tiempo."
+      },
+      {
+        "t_inicio": 23.4,
+        "texto": "Y barre la misma área."
+      },
+      {
+        "t_inicio": 26.4,
+        "texto": "Larga y estrecha, o corta y ancha. La misma."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      35.0
+      30.6,
+      31.3
     ],
-    "eventos": []
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "barrido",
+        0.6,
+        -17
+      ],
+      [
+        "aire_largo",
+        2.2,
+        -17
+      ],
+      [
+        "pulso",
+        3.4,
+        -14
+      ],
+      [
+        "aire",
+        10.4,
+        -18
+      ],
+      [
+        "pad",
+        11.0,
+        -20
+      ],
+      [
+        "blip_medio",
+        17.8,
+        -15
+      ],
+      [
+        "subrayado",
+        20.2,
+        -14
+      ],
+      [
+        "blip_medio",
+        22.9,
+        -14
+      ],
+      [
+        "blip_medio",
+        24.5,
+        -14
+      ],
+      [
+        "blip_agudo",
+        25.9,
+        -12
+      ]
+    ]
   }
 }
