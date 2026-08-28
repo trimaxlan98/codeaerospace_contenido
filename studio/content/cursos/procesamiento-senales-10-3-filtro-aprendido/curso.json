@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 10.3 El filtro aprendido",
+  "description": "Lección 10.3 del curso Procesamiento digital de señales (módulo 10: señales del mundo real), cierre del curso, en 4 clips animados: una red que aprende a filtrar por ejemplos, el descubrimiento de que sus coeficientes son exactamente el filtro del módulo 5, lo que ha costado llegar ahí, y el único sitio donde de verdad aporta. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-aprender-por-ejemplos.py",
+      "title": "1 · Aprender por ejemplos",
+      "scene": "Clip1",
+      "final_state": "La red ajustando sus pesos paso a paso con el error del entrenamiento cayendo de 0.1979 a 7.5e-19."
+    },
+    {
+      "file": "clips/02-lo-que-aprende.py",
+      "title": "2 · Lo que aprende",
+      "scene": "Clip2",
+      "final_state": "Los coeficientes aprendidos superpuestos a los del filtro diseñado: identicos, coseno 1.000000 y error relativo 1.9e-09."
+    },
+    {
+      "file": "clips/03-lo-que-cuesta.py",
+      "title": "3 · Lo que ha costado",
+      "scene": "Clip3",
+      "final_state": "Los 400 pasos de entrenamiento frente a la unica linea de codigo que diseña el mismo filtro."
+    },
+    {
+      "file": "clips/04-donde-si.py",
+      "title": "4 · Donde si aporta",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre del curso en dos lineas: 'Una señal es una lista de numeros.' (blanca) y 'Todo lo demas es que le haces.' (cian)."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 10.2 Tiempo–frecuencia",
+  "description": "Lección 10.2 del curso Procesamiento digital de señales (módulo 10: señales del mundo real), en 4 clips animados: el golpe corto que el espectro entero no ve, el espectrograma que lo pone en su sitio, el producto tiempo-ancho de banda que vale 1 siempre, y las wavelets con su ventana que se encoge. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-lo-que-no-se-ve.py",
+      "title": "1 · Lo que el espectro no ve",
+      "scene": "Clip1",
+      "final_state": "La señal con el barrido y el golpe, y su espectro entero donde el golpe queda diluido sin posicion."
+    },
+    {
+      "file": "clips/02-el-espectrograma.py",
+      "title": "2 · El espectrograma",
+      "scene": "Clip2",
+      "final_state": "El espectrograma con la rampa del barrido y la columna vertical del golpe marcada en su instante."
+    },
+    {
+      "file": "clips/03-heisenberg.py",
+      "title": "3 · Heisenberg, en cifras",
+      "scene": "Clip3",
+      "final_state": "Los dos espectrogramas, de ventana 64 y 256, con sus dt y df medidos y el producto igual a 1.00 en los dos."
+    },
+    {
+      "file": "clips/04-wavelets.py",
+      "title": "4 · Wavelets",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'No hay ventana buena.' (blanca) y 'Hay ventana elegida.' (cian)."
+    }
+  ]
+}

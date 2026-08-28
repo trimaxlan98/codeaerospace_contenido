@@ -1,0 +1,32 @@
+{
+  "name": "Procesamiento de señales · 9.2 LMS: el filtro que se ajusta solo",
+  "description": "Lección 9.2 del curso Procesamiento digital de señales (módulo 9: estimar y adaptarse), en 4 clips animados: el escenario de cancelación de ruido, el error que ajusta los coeficientes, el paso μ que decide entre rápido y basto o lento y fino, y el punto en el que el filtro revienta. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-escenario.py",
+      "title": "1 · El escenario",
+      "scene": "Clip1",
+      "final_state": "La señal contaminada, la referencia con solo el ruido y el camino desconocido de cinco coeficientes que los une."
+    },
+    {
+      "file": "clips/02-el-error-manda.py",
+      "title": "2 · El error manda",
+      "scene": "Clip2",
+      "final_state": "Los coeficientes aprendidos junto a los reales y la señal recuperada, con la mejora medida de 14.9 dB."
+    },
+    {
+      "file": "clips/03-el-paso-mu.py",
+      "title": "3 · El paso mu",
+      "scene": "Clip3",
+      "final_state": "Las tres curvas de aprendizaje superpuestas: mu grande converge en 76 muestras y se queda temblando, mu pequeño tarda 2894 y baja veinte veces mas."
+    },
+    {
+      "file": "clips/04-cuando-se-rompe.py",
+      "title": "4 · Cuando se rompe",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'No hace falta conocer el ruido.' (blanca) y 'Basta con oirlo aparte.' (cian)."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Procesamiento de señales · 9.1 Estimar el espectro",
+  "description": "Lección 9.1 del curso Procesamiento digital de señales (módulo 9: estimar y adaptarse), en 4 clips animados: el periodograma que no converge por muchas muestras que se le den, promediar trozos para que deje de temblar, lo que ese promedio cuesta en resolución, y el compromiso entre sesgo y varianza. Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-no-converge.py", "title": "1 · El periodograma tiembla", "scene": "Clip1",
+     "final_state": "El periodograma de 4096 muestras con su piso lleno de dientes y la cifra de la dispersion medida: 5.61 dB."},
+    {"file": "clips/02-mas-datos-no-vale.py", "title": "2 · Más datos no bastan", "scene": "Clip2",
+     "final_state": "Los dos periodogramas, el de 4096 y el de 16384 muestras, con sus dispersiones practicamente iguales: 5.61 y 5.54 dB."},
+    {"file": "clips/03-promediar.py", "title": "3 · Promediar", "scene": "Clip3",
+     "final_state": "El espectro de Welch con 31 trozos promediados, liso, y la cifra de la dispersion: 0.75 dB frente a 5.61."},
+    {"file": "clips/04-lo-que-cuesta.py", "title": "4 · Lo que cuesta", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos lineas: 'Un espectro medido una vez' (blanca) y 'no es el espectro.' (cian)."}
+  ]
+}

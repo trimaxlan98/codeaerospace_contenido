@@ -627,10 +627,11 @@ Piezas nuevas: `Espectrograma` (la malla tiempo–frecuencia).
 #### 9.2 «LMS: el filtro que se ajusta solo»
 - **c1 · El escenario** — una voz, un ruido que se cuela por un camino
   desconocido, y un micrófono con SOLO el ruido.
-- **c2 · El error manda** — w[n+1] = w[n] + μ·e[n]·x[n]; el ruido cae
-  **15.2 dB** y los coeficientes aprendidos ([0.734, −0.362, 0.288, 0.137,
-  −0.014]) se parecen al camino real ([0.7, −0.4, 0.25, 0.1, −0.05]) con un
-  9.6 % de error.
+- **c2 · El error manda** — w[n+1] = w[n] + μ·e[n]·x[n]; con μ = 0.005 el ruido
+  cae **14.9 dB** y los coeficientes aprendidos se parecen al camino real
+  ([0.7, −0.4, 0.25, 0.1, −0.05]) con un **4.9 %** de error. (Con μ = 0.02
+  serían 15.2 dB y 9.6 %: más rápido y más basto.) Y restar la referencia a
+  secas, sin aprender el camino, solo da **3.5 dB**.
 - **c3 · El paso μ** — μ = 0.02 converge en **76 muestras** y se queda
   temblando en 0.0187; μ = 0.001 tarda **2894** y baja hasta 0.00094. Rápido y
   basto contra lento y fino, medido.
