@@ -511,3 +511,668 @@ def heatmap_q(matriz, paleta=None, alto_escena=3.0):
     rgba[..., :3] = lut[idx].astype(np.uint8)
     rgba[..., 3] = 255
     return _imagen(rgba, alto_escena, pixelado=True)
+
+
+# =============================================================================
+# Ampliacion para el curso 27 "Satelites: la maquina que no se cae" (VERTICAL)
+#
+# Todo lo de abajo se añade SIN tocar nada de arriba: los clips del curso 2 y
+# del 9, que ya estan en la DB de produccion, siguen valiendo igual.
+#
+# Disciplina de la casa: numpy puro, determinista, sin red ni disco, y **cero
+# cifras inventadas** — lo que sale en pantalla lo calcula una de estas
+# funciones durante el render. Las constantes fisicas (MU_TIERRA, R_TIERRA_KM,
+# el dia sidereo) NO son cifras medidas aqui: en pantalla van en gris.
+# =============================================================================
+
+MU_TIERRA = 398600.4418          # km^3/s^2, WGS-84 (constante: en pantalla, gris)
+C_LUZ_KM_S = 299792.458          # km/s (constante)
+KM_POR_GRADO = 2.0 * np.pi * R_TIERRA_KM / 360.0     # 111.19 km/grado de arco
+
+# Margen sobre la superficie para dar por buena una linea de vista entre dos
+# satelites: por debajo de ~80 km el rayo rasa la atmosfera densa y no sirve.
+H_ATMOSFERA_KM = 80.0
+
+
+# ── M1 · caerse sin llegar al suelo ──────────────────────────────────────────
+
+def velocidad_circular(altitud_km):
+    """Rapidez (km/s) de una orbita circular a esa altura."""
+    r = R_TIERRA_KM + float(altitud_km)
+    return float(np.sqrt(MU_TIERRA / r))
+
+
+def periodo_orbital(altitud_km):
+    """Periodo (3a de Kepler) de una orbita circular, en varias unidades."""
+    r = R_TIERRA_KM + float(altitud_km)
+    seg = 2.0 * np.pi * np.sqrt(r ** 3 / MU_TIERRA)
+    return {"segundos": float(seg), "minutos": float(seg / 60.0),
+            "horas": float(seg / 3600.0), "radio_km": float(r),
+            "velocidad_km_s": velocidad_circular(altitud_km)}
+
+
+def caida_vs_curvatura(altitud_km=400.0, t_s=1.0):
+    """La cuenta de Newton: en `t_s` el satelite CAE tanto como se aleja el
+    suelo por la curvatura de la Tierra. Por eso no llega nunca.
+
+    Devuelve la caida en metros, la distancia recorrida en ese tiempo a la
+    velocidad circular, y cuanto se hunde la superficie esferica bajo esa
+    cuerda (la "curvatura"). Las dos ultimas cifras tienen que coincidir:
+    eso ES la orbita.
+    """
+    r = R_TIERRA_KM + float(altitud_km)
+    g = MU_TIERRA / r ** 2                      # km/s^2 a esa altura
+    v = velocidad_circular(altitud_km)
+    d = v * float(t_s)                          # km recorridos
+    caida_km = 0.5 * g * float(t_s) ** 2
+    # Cuanto baja la circunferencia de radio r bajo una cuerda de largo d.
+    curva_km = r - np.sqrt(max(r ** 2 - d ** 2, 0.0))
+    return {"altitud_km": float(altitud_km), "t_s": float(t_s),
+            "velocidad_km_s": float(v), "distancia_km": float(d),
+            "caida_m": float(caida_km * 1000.0),
+            "curvatura_m": float(curva_km * 1000.0),
+            "g_m_s2": float(g * 1000.0)}
+
+
+def canon_newton(v0_km_s, altitud_km=300.0, dt_s=2.0, pasos=6000,
+                 vueltas_max=1.02):
+    """El cañon de Newton: dispara HORIZONTAL desde una montaña y deja que la
+    gravedad haga el resto (dos cuerpos, integrado con RK4).
+
+    Devuelve la trayectoria en RADIOS TERRESTRES (para dibujarla sobre un
+    circulo de radio 1) y si acabo en el suelo o dio la vuelta entera.
+    """
+    r0 = R_TIERRA_KM + float(altitud_km)
+    y = np.array([r0, 0.0, 0.0, float(v0_km_s)])       # x, y, vx, vy
+
+    def deriv(s):
+        rr = np.hypot(s[0], s[1])
+        a = -MU_TIERRA / rr ** 3
+        return np.array([s[2], s[3], a * s[0], a * s[1]])
+
+    pts = [y[:2].copy()]
+    impacto = False
+    ang = 0.0
+    pasos = int(min(pasos, 20000))
+    for _ in range(pasos):
+        k1 = deriv(y)
+        k2 = deriv(y + 0.5 * dt_s * k1)
+        k3 = deriv(y + 0.5 * dt_s * k2)
+        k4 = deriv(y + dt_s * k3)
+        nuevo = y + (dt_s / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        # angulo recorrido (para cortar cuando cierra la vuelta)
+        a0 = np.arctan2(y[1], y[0])
+        a1 = np.arctan2(nuevo[1], nuevo[0])
+        d = (a1 - a0 + np.pi) % (2 * np.pi) - np.pi
+        ang += d
+        y = nuevo
+        pts.append(y[:2].copy())
+        if np.hypot(y[0], y[1]) <= R_TIERRA_KM:
+            impacto = True
+            break
+        if abs(ang) >= 2.0 * np.pi * vueltas_max:
+            break
+    pts = np.array(pts) / R_TIERRA_KM
+    return {"puntos": pts, "impacto": bool(impacto),
+            "v0_km_s": float(v0_km_s),
+            "altitud_km": float(altitud_km),
+            "vueltas": float(abs(ang) / (2.0 * np.pi)),
+            "alcance_grados": float(np.degrees(abs(ang))),
+            "r_min_km": float(np.hypot(pts[:, 0], pts[:, 1]).min()
+                              * R_TIERRA_KM),
+            "r_max_km": float(np.hypot(pts[:, 0], pts[:, 1]).max()
+                              * R_TIERRA_KM)}
+
+
+def _kepler_E(M, e, iteraciones=60, tol=1e-13):
+    """Resuelve M = E - e sen E por Newton-Raphson (vectorizado)."""
+    M = np.asarray(M, dtype=np.float64)
+    E = M + e * np.sin(M)
+    for _ in range(iteraciones):
+        f = E - e * np.sin(E) - M
+        paso = f / (1.0 - e * np.cos(E))
+        E = E - paso
+        if np.max(np.abs(paso)) < tol:
+            break
+    return E
+
+
+def elipse_kepler(a_km, e, muestras=720, t0_s=0.0, fraccion=1.0):
+    """Orbita eliptica muestreada en TIEMPOS IGUALES (no en angulos iguales).
+
+    Esa es toda la gracia: al repartir los puntos por tiempo, se ven juntos
+    en el apogeo (va lento) y separados en el perigeo (va rapido).
+
+    Devuelve puntos (n,2) en km, rapidez por punto, radio y el tiempo.
+    """
+    a = float(a_km)
+    e = float(e)
+    if not 0.0 <= e < 1.0:
+        raise ValueError(f"excentricidad {e} fuera de [0,1)")
+    T = 2.0 * np.pi * np.sqrt(a ** 3 / MU_TIERRA)
+    t = t0_s + np.linspace(0.0, fraccion * T, int(muestras))
+    M = 2.0 * np.pi * t / T
+    E = _kepler_E(M, e)
+    x = a * (np.cos(E) - e)
+    y = a * np.sqrt(1.0 - e ** 2) * np.sin(E)
+    r = np.hypot(x, y)
+    v = np.sqrt(MU_TIERRA * (2.0 / r - 1.0 / a))
+    return {"puntos": np.stack([x, y], axis=1), "r_km": r, "v_km_s": v,
+            "t_s": t, "periodo_s": float(T), "a_km": a, "e": e,
+            "perigeo_km": float(a * (1 - e) - R_TIERRA_KM),
+            "apogeo_km": float(a * (1 + e) - R_TIERRA_KM)}
+
+
+def _area_barrida(puntos):
+    """Area del sector barrido: triangulos desde el foco (formula del cordon)."""
+    x, y = puntos[:, 0], puntos[:, 1]
+    return float(0.5 * np.abs(np.sum(x[:-1] * y[1:] - x[1:] * y[:-1])))
+
+
+def areas_barridas(a_km, e, ventana=0.06, muestras=4000):
+    """La 2a de Kepler MEDIDA, no supuesta.
+
+    Toma la MISMA fraccion de periodo en el perigeo y en el apogeo, e integra
+    el area de los dos sectores sobre la trayectoria dibujada. El cociente
+    tiene que dar 1.000: areas iguales en tiempos iguales.
+    """
+    # Una muestra de mas y se descarta la ultima: linspace(0,T,n) repite el
+    # perigeo en los dos extremos, y con el duplicado el `roll` de abajo
+    # dejaria dos puntos identicos dentro de la ventana.
+    orb = elipse_kepler(a_km, e, muestras=muestras + 1)
+    pts = orb["puntos"][:-1]
+    n = len(pts)
+    ancho = max(3, int(ventana * n))
+    # El perigeo cae en t=0, o sea en el BORDE del muestreo: hay que envolver
+    # para tomar media ventana de antes y media de despues. Si se toman los
+    # primeros `ancho` puntos a secas, la ventana del perigeo es media
+    # ventana y la del apogeo entera, y el cociente sale 0.4% corto sin que
+    # nada este mal en la fisica.
+    peri = np.roll(pts, ancho // 2, axis=0)[:ancho]
+    k = n // 2
+    apo = pts[k - ancho // 2: k - ancho // 2 + ancho]
+    a_peri, a_apo = _area_barrida(peri), _area_barrida(apo)
+    v_peri = float(orb["v_km_s"][0])
+    v_apo = float(orb["v_km_s"][k])
+    return {"area_perigeo_km2": a_peri, "area_apogeo_km2": a_apo,
+            "cociente_areas": float(a_peri / a_apo) if a_apo else float("nan"),
+            "v_perigeo_km_s": v_peri, "v_apogeo_km_s": v_apo,
+            "cociente_v": float(v_peri / v_apo),
+            "cociente_v_teorico": float((1 + e) / (1 - e)),
+            "ventana_s": float(ventana * orb["periodo_s"]),
+            "periodo_s": orb["periodo_s"]}
+
+
+# ── M2 · la Tierra gira debajo ───────────────────────────────────────────────
+
+def radio_huella_km(altitud_km, elevacion_min_deg=10.0):
+    """Radio de la huella MEDIDO SOBRE LA SUPERFICIE (arco, no cuerda)."""
+    psi = angulo_cobertura(altitud_km, elevacion_min_deg)
+    return float(np.radians(psi) * R_TIERRA_KM)
+
+
+def fraccion_visible(altitud_km, elevacion_min_deg=10.0):
+    """Fraccion de la ESFERA que ve un solo satelite: (1 - cos psi)/2.
+
+    Se calcula sobre la esfera a proposito: contar celdas del mapa
+    equirrectangular sin pesar por cos(lat) infla los casquetes polares.
+    """
+    psi = np.radians(angulo_cobertura(altitud_km, elevacion_min_deg))
+    return float((1.0 - np.cos(psi)) / 2.0)
+
+
+def corrimiento_traza(altitud_km):
+    """Cuanto se corre la traza hacia el OESTE en cada vuelta.
+
+    La Tierra no espera: mientras el satelite da una vuelta, el planeta ha
+    girado bajo el. Por eso la traza nunca cierra sobre si misma.
+    """
+    per = periodo_orbital(altitud_km)
+    grados = float(np.degrees(OMEGA_TIERRA * per["segundos"]))
+    return {"periodo_min": per["minutos"], "grados_por_vuelta": grados,
+            "km_ecuador": float(grados * KM_POR_GRADO),
+            "vueltas_por_dia": float(86164.0 / per["segundos"])}
+
+
+def _subsat_uno(t_s, altitud_km=550.0, inclinacion_deg=53.0, raan_deg=0.0,
+                fase0=0.0, con_rotacion=True):
+    """Punto subsatelital (T,2) lon/lat de UN satelite en los tiempos `t_s`.
+
+    Propagador propio, sin el tope de FRAMES_MAX de `posiciones_walker`: ese
+    cap protege las ANIMACIONES (memoria), pero una cifra medida necesita
+    resolucion temporal fina (un pase dura 9 min de una orbita de 95).
+    """
+    t = np.asarray(t_s, dtype=np.float64)
+    r = 1.0 + float(altitud_km) / R_TIERRA_KM
+    per = periodo_orbital(altitud_km)["segundos"]
+    u = 2.0 * np.pi * (t / per + float(fase0))
+    en_plano = np.stack([np.cos(u), np.sin(u), np.zeros_like(u)], axis=-1) * r
+    m = _rot_z(np.radians(raan_deg)) @ _rot_x(np.radians(inclinacion_deg))
+    pos = en_plano @ m.T
+    lat = np.degrees(np.arcsin(np.clip(pos[:, 2] / np.linalg.norm(pos, axis=1),
+                                       -1, 1)))
+    lon = np.degrees(np.arctan2(pos[:, 1], pos[:, 0]))
+    if con_rotacion:
+        lon = lon - np.degrees(OMEGA_TIERRA * t)
+    lon = (lon + 180.0) % 360.0 - 180.0
+    return np.stack([lon, lat], axis=1)
+
+
+def pase(lat_est, lon_est, altitud_km=550.0, inclinacion_deg=53.0,
+         elevacion_min_deg=10.0, raan_deg=None, muestras=4000, fase0=0.0):
+    """El pase visto desde una estacion: cuanto dura y cuanto sube.
+
+    Con `raan_deg=None` barre el NODO del plano orbital (grueso y luego fino)
+    y se queda con el pase MAS ALTO, el que un espectador reconoceria como
+    "el bueno". Devuelve tambien la traza para dibujarla.
+
+    Ojo: el knob es el RAAN, **no la fase**. Desplazar `fase0` recorre la
+    MISMA traza desde otro punto de partida (la rotacion terrestre se resta
+    desde el instante inicial), asi que no acerca ni aleja el satelite de la
+    estacion: se midio y la latitud sobre el meridiano de la estacion no se
+    movia ni un grado en 72 fases. Lo que decide si te pasa por encima es
+    por donde cruza el ecuador su plano.
+    """
+    per = periodo_orbital(altitud_km)["segundos"]
+    t = np.linspace(0.0, per, int(muestras))
+    if raan_deg is not None:
+        nodos = [float(raan_deg)]
+    else:
+        grueso = np.linspace(0.0, 360.0, 72, endpoint=False)
+        alturas = []
+        for r in grueso:
+            ll = _subsat_uno(t, altitud_km, inclinacion_deg, r, fase0)
+            _, e = ventana_visibilidad(lat_est, lon_est, ll, altitud_km)
+            alturas.append(e.max())
+        centro = float(grueso[int(np.argmax(alturas))])
+        nodos = list(np.linspace(centro - 5.0, centro + 5.0, 41))
+    mejor = None
+    for r in nodos:
+        lonlat = _subsat_uno(t, altitud_km, inclinacion_deg, r, fase0)
+        _, elev = ventana_visibilidad(lat_est, lon_est, lonlat, altitud_km)
+        visible = elev >= elevacion_min_deg
+        if not visible.any():
+            continue
+        # segmento contiguo que contiene el maximo
+        k = int(np.argmax(elev))
+        if not visible[k]:
+            continue
+        i = k
+        while i > 0 and visible[i - 1]:
+            i -= 1
+        j = k
+        while j < len(visible) - 1 and visible[j + 1]:
+            j += 1
+        cand = {"raan_deg": float(r), "fase0": float(fase0),
+                "duracion_s": float(t[j] - t[i]),
+                "el_max_deg": float(elev[k]), "t_entrada_s": float(t[i]),
+                "t_salida_s": float(t[j]), "t_culminacion_s": float(t[k]),
+                "elevacion": elev, "t_s": t, "lonlat": lonlat,
+                "indices": (i, j, k)}
+        if mejor is None or cand["el_max_deg"] > mejor["el_max_deg"]:
+            mejor = cand
+    if mejor is None:
+        raise ValueError("ningun pase sobre esa estacion con esos parametros")
+    mejor["duracion_min"] = mejor["duracion_s"] / 60.0
+    mejor["periodo_s"] = float(per)
+    return mejor
+
+
+# ── M3 · por eso son muchos ──────────────────────────────────────────────────
+
+def _pesos_area(res_y):
+    """Peso de cada FILA del mapa equirrectangular: cos(lat).
+
+    Sin esto, una celda junto al polo pesa lo mismo que una del ecuador y
+    cualquier porcentaje de cobertura sale mal. Es la trampa numero uno de
+    trabajar sobre un mapa plano.
+    """
+    lats = np.radians(np.linspace(90.0, -90.0, int(res_y)))
+    w = np.cos(lats)
+    return w / w.sum()
+
+
+def fraccion_cubierta(conteo, minimo=1):
+    """Fraccion de la SUPERFICIE terrestre con al menos `minimo` satelites."""
+    conteo = np.asarray(conteo)
+    w = _pesos_area(conteo.shape[0])[:, None]
+    cubierto = (conteo >= minimo).astype(np.float64)
+    return float((cubierto * w).sum() / (np.ones_like(cubierto) * w).sum())
+
+
+def cobertura_vs_n(configuraciones, altitud_km=550.0, elevacion_min_deg=10.0,
+                   inclinacion_deg=53.0, res=(480, 240), instantes=8):
+    """% de la Tierra cubierta por cada constelacion de la lista.
+
+    `configuraciones` = [(planos, sats_por_plano), ...]. Se promedia sobre
+    varios instantes de una orbita: una foto sola puede pillar la
+    constelacion en su mejor o su peor momento.
+    """
+    psi = angulo_cobertura(altitud_km, elevacion_min_deg)
+    salida = []
+    for planos, por_plano in configuraciones:
+        fracs = []
+        for k in range(int(instantes)):
+            lonlat = subsatelites_walker(2, planos, por_plano, inclinacion_deg,
+                                         altitud_km, vueltas=0.0,
+                                         fase0=k / float(instantes))[0]
+            fracs.append(fraccion_cubierta(conteo_cobertura(res, lonlat, psi)))
+        salida.append({"n": planos * por_plano, "planos": planos,
+                       "por_plano": por_plano,
+                       "fraccion": float(np.mean(fracs)),
+                       "fraccion_min": float(np.min(fracs)),
+                       "fraccion_max": float(np.max(fracs))})
+    return salida
+
+
+def latitud_maxima_cubierta(inclinacion_deg=53.0, altitud_km=550.0,
+                            elevacion_min_deg=10.0):
+    """Hasta que latitud llega una constelacion inclinada: incl + psi.
+
+    Un satelite a 53 grados nunca pasa por encima de los 53: lo que salva a
+    las latitudes altas es su huella. Por encima de esa suma, nada.
+    """
+    psi = angulo_cobertura(altitud_km, elevacion_min_deg)
+    return {"inclinacion_deg": float(inclinacion_deg), "psi_deg": float(psi),
+            "lat_max_deg": float(min(90.0, inclinacion_deg + psi)),
+            "cubre_polo": bool(inclinacion_deg + psi >= 90.0)}
+
+
+def relevos(lat_est, lon_est, planos=6, por_plano=11, altitud_km=550.0,
+            inclinacion_deg=53.0, elevacion_min_deg=25.0, duracion_s=5400.0,
+            muestras=1200):
+    """Cuantas veces salta el enlace de un satelite a otro en `duracion_s`.
+
+    Se mira, instante a instante, cual es el satelite MAS ALTO sobre la
+    estacion: cada vez que cambia, hay un relevo. Los huecos (ningun
+    satelite por encima del minimo) se cuentan aparte y se declaran.
+    """
+    t = np.linspace(0.0, float(duracion_s), int(muestras))
+    per = periodo_orbital(altitud_km)["segundos"]
+    n = planos * por_plano
+    elevs = np.empty((len(t), n))
+    col = 0
+    for p in range(planos):
+        for j in range(por_plano):
+            fase = j / por_plano + p / float(n)
+            lonlat = _subsat_uno(t, altitud_km, inclinacion_deg,
+                                 360.0 * p / planos, fase)
+            _, e = ventana_visibilidad(lat_est, lon_est, lonlat, altitud_km)
+            elevs[:, col] = e
+            col += 1
+    mejor = np.argmax(elevs, axis=1)
+    el_max = elevs[np.arange(len(t)), mejor]
+    hay = el_max >= elevacion_min_deg
+    servidor = np.where(hay, mejor, -1)
+    cambios = int(np.sum(servidor[1:] != servidor[:-1]))
+    huecos = float(np.mean(~hay))
+    return {"n_satelites": n, "relevos": cambios,
+            "duracion_s": float(duracion_s),
+            "intervalo_medio_s": float(duracion_s / cambios) if cambios else
+            float("nan"),
+            "fraccion_sin_servicio": huecos,
+            "periodo_orbital_s": float(per),
+            "elevacion_min_deg": float(elevacion_min_deg),
+            "servidor": servidor, "el_max": el_max, "t_s": t}
+
+
+def _eci_de_lonlat(lonlat, altitud_km):
+    """(N,2) lon/lat -> (N,3) km en un marco fijo a la Tierra."""
+    lonlat = np.atleast_2d(np.asarray(lonlat, dtype=np.float64))
+    r = R_TIERRA_KM + float(altitud_km)
+    lo, la = np.radians(lonlat[:, 0]), np.radians(lonlat[:, 1])
+    return np.stack([r * np.cos(la) * np.cos(lo),
+                     r * np.cos(la) * np.sin(lo),
+                     r * np.sin(la)], axis=1)
+
+
+def _linea_de_vista(p, q, radio_bloqueo):
+    """True si el segmento p-q no atraviesa la esfera de `radio_bloqueo`."""
+    d = q - p
+    dd = float(d @ d)
+    if dd == 0.0:
+        return True
+    s = float(np.clip(-(p @ d) / dd, 0.0, 1.0))       # punto mas cercano al centro
+    return bool(np.linalg.norm(p + s * d) >= radio_bloqueo)
+
+
+def ruta_malla(origen_lonlat, destino_lonlat, lonlat_sats, altitud_km=550.0,
+               elevacion_min_deg=25.0, isl_max_km=5000.0):
+    """El camino mas corto de un punto del suelo a otro SALTANDO por la malla.
+
+    Grafo: suelo -> satelites visibles (elevacion suficiente) -> satelites
+    entre si (si el rayo no roza la atmosfera y el salto cabe en `isl_max_km`)
+    -> suelo. Dijkstra sobre distancias reales en km.
+    """
+    sats = _eci_de_lonlat(lonlat_sats, altitud_km)
+    a = _eci_de_lonlat(origen_lonlat, 0.0)[0]
+    b = _eci_de_lonlat(destino_lonlat, 0.0)[0]
+    n = len(sats)
+    bloqueo = R_TIERRA_KM + H_ATMOSFERA_KM
+
+    def visible_desde_suelo(estacion, lonlat_est):
+        _, e = ventana_visibilidad(lonlat_est[1], lonlat_est[0],
+                                   np.atleast_2d(lonlat_sats), altitud_km)
+        return np.where(e >= elevacion_min_deg)[0]
+
+    ini = visible_desde_suelo(a, np.asarray(origen_lonlat, dtype=float))
+    fin = visible_desde_suelo(b, np.asarray(destino_lonlat, dtype=float))
+    if len(ini) == 0 or len(fin) == 0:
+        raise ValueError("el origen o el destino no ven ningun satelite")
+
+    INF = float("inf")
+    dist = np.full(n + 2, INF)          # n = origen, n+1 = destino
+    prev = np.full(n + 2, -1, dtype=int)
+    dist[n] = 0.0
+    for k in ini:
+        d = float(np.linalg.norm(sats[k] - a))
+        if d < dist[k]:
+            dist[k], prev[k] = d, n
+    visto = np.zeros(n + 2, dtype=bool)
+    visto[n] = True
+    fin_set = set(int(k) for k in fin)
+    for _ in range(n + 1):
+        cand = np.where(~visto & np.isfinite(dist))[0]
+        if len(cand) == 0:
+            break
+        u = int(cand[np.argmin(dist[cand])])
+        visto[u] = True
+        if u == n + 1:
+            break
+        if u < n:
+            if u in fin_set:
+                d = dist[u] + float(np.linalg.norm(b - sats[u]))
+                if d < dist[n + 1]:
+                    dist[n + 1], prev[n + 1] = d, u
+            for v in range(n):
+                if visto[v] or v == u:
+                    continue
+                salto = float(np.linalg.norm(sats[v] - sats[u]))
+                if salto > isl_max_km:
+                    continue
+                if not _linea_de_vista(sats[u], sats[v], bloqueo):
+                    continue
+                if dist[u] + salto < dist[v]:
+                    dist[v], prev[v] = dist[u] + salto, u
+    if not np.isfinite(dist[n + 1]):
+        raise ValueError("la malla no conecta origen y destino")
+    camino = []
+    k = n + 1
+    while k != n:
+        camino.append(k)
+        k = int(prev[k])
+    camino = list(reversed(camino))[:-1]        # indices de satelite del camino
+    km = float(dist[n + 1])
+    return {"saltos": len(camino) + 1, "satelites": camino, "km": km,
+            "latencia_ms": float(km / C_LUZ_KM_S * 1000.0),
+            "puntos_eci": np.array([a] + [sats[k] for k in camino] + [b]),
+            "lonlat_saltos": np.atleast_2d(lonlat_sats)[camino]}
+
+
+def gran_circulo_km(origen_lonlat, destino_lonlat):
+    """Distancia sobre la superficie entre dos puntos (haversine)."""
+    lo1, la1 = np.radians(origen_lonlat)
+    lo2, la2 = np.radians(destino_lonlat)
+    h = (np.sin((la2 - la1) / 2) ** 2
+         + np.cos(la1) * np.cos(la2) * np.sin((lo2 - lo1) / 2) ** 2)
+    return float(2 * R_TIERRA_KM * np.arcsin(np.sqrt(h)))
+
+
+def latencia_fibra(origen_lonlat, destino_lonlat, rodeo=1.4,
+                   fraccion_c=2.0 / 3.0):
+    """Latencia por fibra: el cable no va en linea recta y la luz va lenta.
+
+    `rodeo` (el cable mide mas que el gran circulo) y `fraccion_c` (indice
+    de refraccion ~1.47) son SUPUESTOS de ingenieria, no medidas: quien use
+    esta cifra en pantalla tiene que declararlos.
+    """
+    gc = gran_circulo_km(origen_lonlat, destino_lonlat)
+    km = gc * float(rodeo)
+    return {"gran_circulo_km": gc, "km": float(km), "rodeo": float(rodeo),
+            "fraccion_c": float(fraccion_c),
+            "latencia_ms": float(km / (C_LUZ_KM_S * fraccion_c) * 1000.0)}
+
+
+def fspl_db(d_km, f_ghz):
+    """Perdida de camino en espacio libre (dB). Misma formula que enlace.py."""
+    return float(92.45 + 20.0 * np.log10(float(d_km))
+                 + 20.0 * np.log10(float(f_ghz)))
+
+
+# ── M4 · la red que se gobierna sola ─────────────────────────────────────────
+
+def tiempo_sobre_mar(planos=6, por_plano=11, altitud_km=550.0,
+                     inclinacion_deg=53.0, instantes=64, res=(480, 240)):
+    """Que fraccion del tiempo-satelite se pasa el enjambre sobre el agua.
+
+    Se cuenta con la mascara de continentes de esta misma libreria (poligonos
+    propios, no datos externos), muestreando el punto subsatelital de todos
+    los satelites en varios instantes de una orbita.
+    """
+    mask = mascara_tierra(res)
+    res_y, res_x = mask.shape
+    total = 0
+    en_tierra = 0
+    for k in range(int(instantes)):
+        lonlat = subsatelites_walker(2, planos, por_plano, inclinacion_deg,
+                                     altitud_km, vueltas=0.0,
+                                     fase0=k / float(instantes))[0]
+        ix = np.clip(((lonlat[:, 0] + 180.0) / 360.0 * (res_x - 1)).astype(int),
+                     0, res_x - 1)
+        iy = np.clip(((90.0 - lonlat[:, 1]) / 180.0 * (res_y - 1)).astype(int),
+                     0, res_y - 1)
+        en_tierra += int(mask[iy, ix].sum())
+        total += len(lonlat)
+    return {"muestras": total, "sobre_tierra": en_tierra,
+            "fraccion_mar": float(1.0 - en_tierra / total),
+            "fraccion_tierra": float(en_tierra / total)}
+
+
+def demanda_por_celda(res=(96, 48), semilla=11, focos=9, fondo=0.04):
+    """Mapa de demanda SINTETICO (declarado): nucleos de trafico sobre tierra.
+
+    NO es un dato real de mercado. Se construye con semilla fija colocando
+    focos gaussianos sobre celdas de tierra firme de la mascara propia. Lo
+    que el curso mide con esto no es "cuanta demanda hay" sino **cuanto
+    mejora** un asignador frente a otro sobre la MISMA demanda.
+    """
+    rng = np.random.default_rng(int(semilla))
+    mask = mascara_tierra(res)
+    res_y, res_x = mask.shape
+    d = np.full((res_y, res_x), float(fondo))
+    tierra = np.argwhere(mask)
+    if len(tierra) == 0:
+        return d
+    elegidos = tierra[rng.choice(len(tierra), size=int(focos), replace=False)]
+    yy, xx = np.mgrid[0:res_y, 0:res_x]
+    for (cy, cx) in elegidos:
+        sigma = 2.0 + 4.0 * rng.random()
+        peso = 0.5 + rng.random()
+        d += peso * np.exp(-0.5 * (((yy - cy) / sigma) ** 2
+                                   + ((xx - cx) / sigma) ** 2))
+    d *= _pesos_area(res_y)[:, None] * res_y      # celdas polares pesan menos
+    return d / d.max()
+
+
+def asignar_haces(conteo, demanda, n_haces, modo="fijo", semilla=5,
+                  pasos=400):
+    """Reparte `n_haces` haces por satelite entre las celdas que ve.
+
+    - `fijo`: los haces apuntan a celdas repartidas por igual (rejilla), sin
+      mirar la demanda. Es lo que hace un satelite de haces fijos.
+    - `demanda`: apunta a las celdas de mas demanda que tenga a la vista.
+    - `aprendido`: parte del reparto ciego y va moviendo haces a la celda
+      vecina que mas sube la demanda servida (ascenso por coordenadas con
+      semilla fija). Devuelve ademas la curva de mejora, MEDIDA.
+
+    La cifra que devuelve es demanda servida (0..1 del total posible).
+    """
+    conteo = np.asarray(conteo)
+    demanda = np.asarray(demanda, dtype=np.float64)
+    if conteo.shape != demanda.shape:
+        raise ValueError(f"conteo {conteo.shape} y demanda {demanda.shape} "
+                         "tienen que ser del mismo tamaño")
+    visible = conteo > 0
+    capacidad = int(n_haces) * int(conteo.max()) if conteo.max() else 0
+    total = float(demanda.sum())
+    celdas = np.argwhere(visible)
+    if len(celdas) == 0 or capacidad == 0:
+        return {"servida": 0.0, "curva": np.array([0.0])}
+    valor = demanda[visible]
+    orden = np.argsort(valor)[::-1]
+    k = min(capacidad, len(celdas))
+
+    if modo == "demanda":
+        servida = float(valor[orden[:k]].sum())
+        return {"servida": servida / total, "haces": k, "capacidad": capacidad,
+                "curva": np.array([servida / total])}
+
+    rng = np.random.default_rng(int(semilla))
+    elegidas = rng.choice(len(celdas), size=k, replace=False)
+    servida = float(valor[elegidas].sum())
+    curva = [servida / total]
+    if modo == "fijo":
+        return {"servida": servida / total, "haces": k,
+                "capacidad": capacidad, "curva": np.array(curva)}
+    if modo != "aprendido":
+        raise ValueError(f"modo desconocido: {modo}")
+
+    dentro = set(int(i) for i in elegidas)
+    fuera = [i for i in range(len(celdas)) if i not in dentro]
+    for _ in range(int(pasos)):
+        if not fuera:
+            break
+        peor = min(dentro, key=lambda i: valor[i])
+        mejor = max(fuera, key=lambda i: valor[i])
+        if valor[mejor] <= valor[peor]:
+            break
+        dentro.remove(peor)
+        fuera.remove(mejor)
+        fuera.append(peor)
+        dentro.add(mejor)
+        curva.append(float(valor[list(dentro)].sum()) / total)
+    return {"servida": curva[-1], "haces": k, "capacidad": capacidad,
+            "curva": np.array(curva), "pasos": len(curva) - 1}
+
+
+def sobre_el_horizonte(lat_est, lon_est, planos=24, por_plano=10,
+                       altitud_km=550.0, inclinacion_deg=53.0,
+                       elevacion_min_deg=10.0, fase0=0.0):
+    """Cuantos satelites del enjambre estan AHORA sobre tu horizonte.
+
+    Devuelve tambien sus elevaciones y azimuts, para dibujar el cielo del
+    patio en una vista polar.
+    """
+    lonlat = subsatelites_walker(2, planos, por_plano, inclinacion_deg,
+                                 altitud_km, vueltas=0.0, fase0=fase0)[0]
+    _, elev = ventana_visibilidad(lat_est, lon_est, lonlat, altitud_km)
+    arriba = elev >= float(elevacion_min_deg)
+    la, lo = np.radians(lat_est), np.radians(lon_est)
+    ls, cs = np.radians(lonlat[:, 1]), np.radians(lonlat[:, 0])
+    y = np.sin(cs - lo) * np.cos(ls)
+    x = np.cos(la) * np.sin(ls) - np.sin(la) * np.cos(ls) * np.cos(cs - lo)
+    azim = (np.degrees(np.arctan2(y, x)) + 360.0) % 360.0
+    return {"n_total": int(len(lonlat)), "n_visibles": int(arriba.sum()),
+            "elevaciones": elev[arriba], "azimuts": azim[arriba],
+            "lonlat": lonlat[arriba], "indices": np.where(arriba)[0],
+            "elevacion_min_deg": float(elevacion_min_deg)}
