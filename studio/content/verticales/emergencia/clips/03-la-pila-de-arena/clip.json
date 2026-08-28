@@ -1,0 +1,152 @@
+{
+  "name": "03 · La pila de arena",
+  "modulo": "M1 · Reglas que caminan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La pila abeliana de Bak-Tang-Wiesenfeld: cae un grano SIEMPRE en la misma celda del centro y toda celda con 4 reparte uno a cada vecino. Nadie coordina nada y la pila se organiza sola en una mandala fractal. El fotograma entero es arena.simular (rejilla 179×179, 50 000 granos, 750 frames); el contador de granos sube en vivo desde el primer segundo, la cámara entra a zoom 2.0 sobre el punto de caída para ver la textura de celda y se va a cámara lenta justo en el frame de la avalancha mayor: 21 533 celdas volcadas por un solo grano. Cierra con la distribución de tamaños en log-log dibujada con vectores sobre la mandala apagada: la recta del ajuste da exponente 1.28.",
+  "duracion_objetivo": 33.1,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  la mandala ya crece en el centro; entran el HUD de la pieza y el pie (400 granos)",
+    "0.7  regla 1 . un grano al centro, con el foco ambar sobre la celda de caida",
+    "2.1  regla 2 . 4 granos: se caen",
+    "3.5  regla 3 . uno a cada vecino",
+    "4.9  ritmo normal: la mandala se abre y el contador sube a miles",
+    "8.3  zoom 2.0 hacia el punto de caida; las reglas se retiran antes de que la mandala llegue a su renglon",
+    "10.9 pegado al centro: la textura de celda y los anillos naranja de cada avalancha",
+    "13.9 la camara se abre otra vez",
+    "16.3 la pila casi completa; el contador llega a 50 000 granos",
+    "20.2 sale el contador de granos",
+    "20.7 entra la cifra de la avalancha mayor (21 533 celdas)",
+    "21.2 camara lenta EN el frame de la avalancha mayor",
+    "24.8 la mandala final, quieta",
+    "25.6 la mandala baja al 20 % de opacidad",
+    "26.3 nace el eje del log-log",
+    "26.8 caen los puntos de la distribucion de tamanos",
+    "28.5 se traza la recta del ajuste",
+    "29.4 relevo del pie: exponente 1.28, ley de potencias",
+    "31.7 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.0,
+        "texto": "Un grano. Siempre en el mismo punto."
+      },
+      {
+        "t_inicio": 8.7,
+        "texto": "Nadie dibuja esta mandala. Se dibuja sola."
+      },
+      {
+        "t_inicio": 21.4,
+        "texto": "Y un grano cualquiera tumba veintiún mil celdas."
+      },
+      {
+        "t_inicio": 30.1,
+        "texto": "Sin tamano tipico."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      32.2,
+      32.83
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "tick",
+        0.7,
+        -13
+      ],
+      [
+        "tick",
+        2.1,
+        -13
+      ],
+      [
+        "tick",
+        3.5,
+        -13
+      ],
+      [
+        "aire",
+        4.9,
+        -18
+      ],
+      [
+        "barrido",
+        8.3,
+        -17
+      ],
+      [
+        "pad",
+        11.0,
+        -18
+      ],
+      [
+        "barrido",
+        13.9,
+        -17
+      ],
+      [
+        "aire_largo",
+        16.3,
+        -18
+      ],
+      [
+        "blip_medio",
+        20.7,
+        -15
+      ],
+      [
+        "subrayado",
+        21.2,
+        -13
+      ],
+      [
+        "sting",
+        22.6,
+        -14
+      ],
+      [
+        "aire",
+        25.6,
+        -18
+      ],
+      [
+        "blip_grave",
+        26.3,
+        -17
+      ],
+      [
+        "blip_agudo",
+        28.5,
+        -14
+      ],
+      [
+        "pulso",
+        30.0,
+        -14
+      ],
+      [
+        "nebulosa_cierre",
+        31.7,
+        -16
+      ]
+    ]
+  }
+}

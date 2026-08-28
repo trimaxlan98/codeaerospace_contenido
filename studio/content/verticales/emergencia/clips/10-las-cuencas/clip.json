@@ -1,0 +1,144 @@
+{
+  "name": "10 · Las cuencas",
+  "modulo": "M3 · El caos con forma",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un péndulo magnético sobre tres imanes en triángulo, integrado 230400 veces a la vez: uno por píxel, cada uno soltado en reposo justo ahí. El fotograma entero es la simulación (cuencas.simular a 360x640, 600 frames, 6000 pasos de RK explícito); el color de cada píxel dice a qué imán se acerca más EN ESE INSTANTE y el brillo baja con la velocidad, así que el mapa se ve nacer en tres actos: a t=0 un Voronoi limpio de tres sectores, luego un revoltijo de anillos de interferencia con el mapa casi negro hirviendo, y al final cuaja a color pleno con la frontera fractal ya dibujada. Encima, poco y vectorial: los tres imanes marcados en su color, la trayectoria de UN péndulo soltado en un punto triple de la frontera (dibujada con Create en violeta, el imán donde acaba) y el contador de los que ya decidieron, truncado —al final quedan 60 sin converger, o sea 99.96 %, y redondear habría escrito un 100 % falso—. Cámara lenta sobre el frame 477, el de la mitad convergida, y zoom continuo hasta 3.0 sobre el mismo punto del que salió el péndulo. Remate: el reparto 34/33/33 % y la dimensión de la frontera por conteo de cajas, 1.63.",
+  "duracion_objetivo": 37.83,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el Voronoi limpio de tres sectores empieza a revolverse; entra el HUD de la pieza",
+    "0.8  regla 1 . tres imanes",
+    "1.8  regla 2 . un pendulo",
+    "2.8  regla 3 . por cada pixel; el mapa hierve en anillos de interferencia",
+    "4.6  se apagan las reglas y se encienden los tres imanes, cada uno en su color",
+    "5.8  se dibuja la trayectoria de UN pendulo, que acaba enroscada en el iman violeta",
+    "9.2  entra el pie: ya decidieron, sobre 230400 pendulos",
+    "10.7 el mapa cuaja y el contador sube (19 %, 42 %)",
+    "17.3 camara lenta sobre el frame 477: la mitad ya decidio (50 %)",
+    "21.3 se apagan los imanes; el mapa acaba de cuajar (92 %)",
+    "24.9 zoom continuo hasta 3.0 sobre el punto triple del que salio el pendulo",
+    "31.5 el contador se para en 99 % y releva al reparto 34/33/33 % (violeta, ambar, verde)",
+    "33.8 dimension de la frontera: 1.63",
+    "36.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 5.9,
+        "texto": "Un péndulo, tres imanes. ¿Con cuál se queda?"
+      },
+      {
+        "t_inicio": 25.6,
+        "texto": "Amplía cuanto quieras: los tres siguen ahí."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      36.6,
+      37.5
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "tick",
+        0.9,
+        -13
+      ],
+      [
+        "tick",
+        1.9,
+        -13
+      ],
+      [
+        "tick",
+        2.9,
+        -13
+      ],
+      [
+        "aire_largo",
+        3.8,
+        -17
+      ],
+      [
+        "blip_medio",
+        4.75,
+        -14
+      ],
+      [
+        "barrido",
+        5.85,
+        -17
+      ],
+      [
+        "blip_agudo",
+        8.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        9.3,
+        -18
+      ],
+      [
+        "pad",
+        10.8,
+        -18
+      ],
+      [
+        "subrayado",
+        17.3,
+        -13
+      ],
+      [
+        "pulso",
+        19.0,
+        -14
+      ],
+      [
+        "aire",
+        21.3,
+        -18
+      ],
+      [
+        "barrido",
+        24.9,
+        -16
+      ],
+      [
+        "cuerda_la3",
+        28.2,
+        -16
+      ],
+      [
+        "blip_medio",
+        31.6,
+        -14
+      ],
+      [
+        "blip_agudo",
+        33.9,
+        -13
+      ],
+      [
+        "nebulosa_cierre",
+        34.6,
+        -16
+      ]
+    ]
+  }
+}

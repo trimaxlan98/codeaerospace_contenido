@@ -1,0 +1,142 @@
+{
+  "name": "13 · Dos galaxias",
+  "modulo": "M4 · Mundos enteros",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "N cuerpos en el modelo restringido de Toomre (galaxias.simular, 900 frames, 4000 partículas de prueba y dos núcleos con softening de Plummer): dos discos que ya se acercan desde el primer fotograma en una órbita parabólica prógrada. La cifra viva es la distancia entre los núcleos, medida frame a frame sobre lo que se ve (42 → 13 → 52 unidades), y mientras dura la aproximación un puente cian une los dos núcleos para enseñar qué se está midiendo. En el pericentro (frame 386, distancia mínima 13.013 unidades = 59.5 px) la película baja a ~8 fotogramas por segundo y la cámara hace zoom 1.6 al punto medio entre los núcleos; después se abre y salen los brazos y las dos colas de marea, con la trayectoria de cada núcleo dibujada tenue (verde la A, ámbar la B). Remate doble, las dos cifras calculadas en este render: el integrador leapfrog conserva la energía de los núcleos con una deriva de 0.0003 % (normalizada con G·mA·mB/rp, porque la órbita es parabólica y E0 vale cero) y el 8.3 % de las 4000 estrellas termina ligado a la otra galaxia. Ninguna regla dice «haz un brazo espiral»: sólo hay 1/r².",
+  "duracion_objetivo": 34.9,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  los dos discos ya se acercan; entra el HUD de la pieza",
+    "1.0  el pie de cifra: distancia entre nucleos, 38 unidades y bajando",
+    "2.4  regla 1 . 4000 estrellas",
+    "3.7  regla 2 . dos nucleos",
+    "5.0  regla 3 . solo gravedad",
+    "6.3  se traza el puente cian entre los dos nucleos: eso es lo que mide",
+    "6.7  la aproximacion a ritmo real; el contador cae de 36 a 16",
+    "10.9 se apaga el puente antes de que la camara recorte",
+    "11.4 zoom 1.6 al punto medio entre los nucleos",
+    "13.4 camara lenta en el pericentro (frame 386): distancia minima 13",
+    "16.6 la camara se abre y aparecen los brazos de marea",
+    "19.2 se apagan las reglas",
+    "19.7 las colas se estiran; se dibujan las trayectorias de los dos nucleos",
+    "24.8 relevo de cifra: deriva de energia 0.0003 por ciento",
+    "29.2 relevo de cifra: 8.3 por ciento cambian de galaxia",
+    "32.4 las dos galaxias separadas, cada una con estrellas de la otra",
+    "33.5 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 13.7,
+        "texto": "Nadie dibuja los brazos. Sólo se atraen."
+      },
+      {
+        "t_inicio": 30.3,
+        "texto": "Ocho de cada cien cambian de galaxia."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.15,
+      34.85
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        1.05,
+        -17
+      ],
+      [
+        "tick",
+        2.4,
+        -13
+      ],
+      [
+        "tick",
+        3.7,
+        -13
+      ],
+      [
+        "tick",
+        5.0,
+        -13
+      ],
+      [
+        "blip_medio",
+        6.3,
+        -16
+      ],
+      [
+        "aire",
+        6.9,
+        -18
+      ],
+      [
+        "pulso",
+        11.4,
+        -14
+      ],
+      [
+        "subrayado",
+        13.4,
+        -13
+      ],
+      [
+        "cuerda_la2",
+        13.9,
+        -16
+      ],
+      [
+        "barrido",
+        16.6,
+        -17
+      ],
+      [
+        "aire_largo",
+        19.7,
+        -18
+      ],
+      [
+        "nebulosa",
+        22.5,
+        -17
+      ],
+      [
+        "blip_agudo",
+        25.2,
+        -15
+      ],
+      [
+        "blip_medio",
+        29.6,
+        -14
+      ],
+      [
+        "pulso",
+        32.5,
+        -14
+      ],
+      [
+        "nebulosa_cierre",
+        33.6,
+        -15
+      ]
+    ]
+  }
+}

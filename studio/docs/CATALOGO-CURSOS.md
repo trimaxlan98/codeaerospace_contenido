@@ -162,3 +162,33 @@ Es también el primer curso horizontal **sin subtítulos**: sus `style_block`
 no definen `pie_curso` y llevan un guardián que aborta el render si un rótulo
 pasa de cinco o seis palabras. Si algún día se copia uno de esos bloques para
 una familia que sí quiera pie narrativo, hay que volver a añadirlo a mano.
+
+## Curso 29 — Emergencia (vertical, experimental)
+
+El tercer curso en 9:16 y el primero en el que **el fotograma entero es una
+simulación**: no hay objetos vectoriales sobre un fondo, el fondo *es* el
+sistema. Catorce clips, cada uno con dos o tres reglas que caben en una
+etiqueta HUD y que producen un mundo delante del espectador: una bandada de
+2500 agentes, un moho que tiende una red, una pila de arena de 50 000 granos,
+el cañón de Gosper, Gray-Scott, la doble rendija, Chladni, Ising, doscientos
+péndulos dobles, las cuencas de tres imanes, los epiciclos de Fourier, una
+calle de vórtices y dos galaxias que chocan.
+
+Lo sostiene un paquete nuevo, `manim_extensions/emergencia/`: el núcleo
+`Pelicula` presenta una pila de frames uint8 como `ImageMobject` a pantalla
+completa y la anima con `UpdateFromAlphaFunc`, con cámara (seguir un agente,
+zoom) y ritmo (cámara lenta en el instante en que nace el patrón); trece
+módulos numpy puros producen esas pilas, cada uno con `medir()` para la sonda
+`studio/tools/sonda_emergencia.py`.
+
+Dos cosas que este curso hace distinto y conviene saber antes de copiarlo:
+
+- **Cada clip está hecho para subirse solo.** Por eso todos arrancan con la
+  simulación ya en movimiento, y por eso las uniones del montaje son cortes
+  secos y no empalmes invisibles (medido: hasta 66/255 entre piezas, frente a
+  los 0.003/255 del curso 26, que nacía y moría en negro).
+- **El texto va sobre un fondo que a veces es claro.** `velos_de_contraste()`
+  en el `style_block` pone una banda oscura con degradado detrás del HUD y del
+  pie de cifra; es lo que hace legible el gris sobre el laberinto de
+  Gray-Scott o la mandala de arena. Si se baja su opacidad, el clip 03 es el
+  primero que lo acusa.

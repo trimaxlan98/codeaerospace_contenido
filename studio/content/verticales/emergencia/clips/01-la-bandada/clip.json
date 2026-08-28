@@ -1,0 +1,138 @@
+{
+  "name": "01 · La bandada",
+  "modulo": "M1 · Reglas que caminan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El gancho del curso y el molde del formato: 2500 agentes con tres reglas locales (separarse, alinearse, juntarse) y ningún jefe. El fotograma entero es la simulación (bandada.simular, boids con rejilla espacial, 900 frames). Del ruido inicial (polarización 0.03) nace una bandada que ondula; la cifra es la polarización del enjambre frame a frame, medida sobre lo que se ve; cuando cruza 0.8 (frame 351, 11.7 s simulados) la película va a cámara lenta, la cámara se pega al agente ámbar (zoom 2.2) y vuelve a abrirse: polarización final 0.93.",
+  "duracion_objetivo": 34.82,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el ruido ya se mueve; entran el HUD de la pieza y el pie (polarizacion 0.03)",
+    "2.0  regla 1 . separarse",
+    "3.4  regla 2 . alinearse",
+    "4.7  regla 3 . juntarse",
+    "6.1  la bandada se va formando a ritmo real; el contador sube",
+    "11.3 camara lenta: la polarizacion cruza 0.8",
+    "14.5 la camara se acerca al agente ambar (zoom 2.2)",
+    "17.0 pegado al agente: la ola desde dentro",
+    "25.0 la camara se abre",
+    "28.0 la bandada entera, polarizacion 0.93",
+    "33.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.9,
+        "texto": "Dos mil quinientos. Nadie manda."
+      },
+      {
+        "t_inicio": 6.3,
+        "texto": "Tres reglas. Ninguna dice: vuela en bandada."
+      },
+      {
+        "t_inicio": 11.8,
+        "texto": "Ahí. Nace sola."
+      },
+      {
+        "t_inicio": 17.4,
+        "texto": "Desde dentro."
+      },
+      {
+        "t_inicio": 28.4,
+        "texto": "Reglas simples. Un mundo entero."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.07,
+      34.77
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.9,
+        -17
+      ],
+      [
+        "tick",
+        2.0,
+        -13
+      ],
+      [
+        "tick",
+        3.35,
+        -13
+      ],
+      [
+        "tick",
+        4.7,
+        -13
+      ],
+      [
+        "aire",
+        6.1,
+        -18
+      ],
+      [
+        "subrayado",
+        11.3,
+        -13
+      ],
+      [
+        "blip_agudo",
+        12.6,
+        -14
+      ],
+      [
+        "pulso",
+        14.5,
+        -13
+      ],
+      [
+        "barrido",
+        17.0,
+        -18
+      ],
+      [
+        "aire_largo",
+        21.0,
+        -18
+      ],
+      [
+        "barrido",
+        25.0,
+        -17
+      ],
+      [
+        "blip_medio",
+        28.0,
+        -14
+      ],
+      [
+        "nebulosa",
+        29.0,
+        -16
+      ],
+      [
+        "pulso",
+        32.4,
+        -14
+      ]
+    ]
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "04 · El cañón",
+  "modulo": "M1 · Reglas que caminan",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El Juego de la Vida de Conway con el cañón de Gosper: dos reglas de vecindad (nace con 3, vive con 2 o 3) bastan para que un patrón dispare proyectiles para siempre. El fotograma entero es la simulación (vida.simular, pixel duro, 700 pasos); en el nacimiento del planeador seguido (frame 138) la película va a cámara lenta y luego la cámara se pega a él (zoom 2.0) mientras cruza en diagonal y baja hasta salir. La cifra pasa de periodo del cañón (30 pasos, medido) a planeadores por minuto (30.0) y planeadores emitidos (22); el periodo teórico de la literatura (30) coincide y se cita en gris.",
+  "duracion_objetivo": 32.78,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  el canon ya dispara; entra el HUD de pieza",
+    "0.6  regla 1 . nace con 3",
+    "1.2  regla 2 . vive con 2 o 3",
+    "1.8  regla 3 . muere si no",
+    "2.35 se acerca el nacimiento; entra la cifra periodo",
+    "4.15 camara lenta: nace el planeador seguido (frame 138)",
+    "5.55 sigue lento hasta el frame 150; nota teoria 30 en gris",
+    "7.55 la camara se acerca al planeador (zoom 2.0)",
+    "16.55 pegado al planeador: cruza en diagonal y envuelve el borde",
+    "17.2  relevo de cifra: planeadores por minuto, 30.0",
+    "26.2  el planeador baja hacia el borde de abajo",
+    "26.2  la camara se abre de nuevo",
+    "29.0  relevo de cifra: planeadores emitidos, 22",
+    "31.4  fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.7,
+        "texto": "Dos reglas. Dispara para siempre."
+      },
+      {
+        "t_inicio": 17.6,
+        "texto": "Cada treinta pasos, otro planeador."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      31.9,
+      32.5
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.2,
+        -18
+      ],
+      [
+        "tick",
+        0.75,
+        -13
+      ],
+      [
+        "tick",
+        1.35,
+        -13
+      ],
+      [
+        "tick",
+        1.95,
+        -13
+      ],
+      [
+        "blip_medio",
+        2.5,
+        -14
+      ],
+      [
+        "blip_grave",
+        4.15,
+        -13
+      ],
+      [
+        "sting",
+        5.6,
+        -13
+      ],
+      [
+        "pulso",
+        9.0,
+        -15
+      ],
+      [
+        "cuerda_la2",
+        16.6,
+        -14
+      ],
+      [
+        "blip_agudo",
+        17.0,
+        -12
+      ],
+      [
+        "aire",
+        26.3,
+        -14
+      ],
+      [
+        "cuerda_mi3",
+        28.75,
+        -14
+      ],
+      [
+        "blip_agudo",
+        29.05,
+        -12
+      ]
+    ]
+  }
+}

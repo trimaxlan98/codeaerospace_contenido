@@ -1,0 +1,176 @@
+{
+  "name": "14 · El mundo en una regla",
+  "modulo": "M4 · Mundos enteros",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El cierre del arco: las TRECE simulaciones del curso corriendo a la vez en el mismo fotograma. En el render se llama a los trece simuladores del paquete emergencia con los parámetros recortados (2500 boids, 40 000 agentes de moho, 18 000 granos, Ising con celda 3, ondas con malla simple, 240-480 frames por sistema), cada pila se encoge a una celda de 90x160 px por media de bloques y se suelta antes de simular la siguiente: 125 s de simulación y 689 MB de pico medidos en el contenedor, con el mosaico de 480 frames pesando 311 MB. Las trece celdas se encienden de una en una (un tick cada 0.66 s), corren juntas, y la cámara se mete a zoom 2.5 en cuatro de ellas con la cifra que cada una midió en ESTA corrida: la placa que canta (77.5 % de la arena a menos de 3 px del nodo), la pila de arena (mayor avalancha 7913 celdas de 18 000 granos), dos galaxias (8.9 % de las partículas de A acaban ligadas a B) y los 120 péndulos (9.30 s hasta separarse 1 rad). Remata contando las reglas HUD que ha usado el curso, leídas en el propio render sobre el código de las trece piezas: 39 con las trece a tres reglas.",
+  "duracion_objetivo": 36.3,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  la primera celda se enciende ya en movimiento (la bandada) y entra el HUD de la pieza",
+    "0.6  las celdas se encienden de una en una, un tick por celda (moho, arena, canon, Turing, ondas, placa, iman, pendulos, cuencas, epiciclos, rio, galaxias)",
+    "8.5  las trece corriendo a la vez; entra la regla 1 . REGLAS SIMPLES",
+    "9.5  regla 2 . MUNDOS ENTEROS",
+    "11.7 la camara se mete en la placa que canta (zoom 2.5): 77.5 % de arena en el nodo",
+    "16.2 viaje a la pila de arena: avalancha mayor de 7913 celdas",
+    "20.2 viaje a las dos galaxias: 8.9 % de particulas robadas",
+    "24.2 viaje a los 120 pendulos, con el abanico abriendose: 9.30 s hasta 1 rad",
+    "27.7 la camara se abre y vuelve el mosaico entero",
+    "30.9 la cifra final: las reglas HUD del curso contadas en el render",
+    "34.8 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 8.8,
+        "texto": "Trece mundos. Ninguna regla sabía adónde iba."
+      },
+      {
+        "t_inicio": 31.2,
+        "texto": "Reglas simples. Mundos enteros."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      35.3,
+      36.0
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.1,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.3,
+        -19
+      ],
+      [
+        "tick",
+        0.12,
+        -15
+      ],
+      [
+        "tick",
+        0.66,
+        -15
+      ],
+      [
+        "tick",
+        1.32,
+        -15
+      ],
+      [
+        "tick",
+        1.98,
+        -15
+      ],
+      [
+        "tick",
+        2.64,
+        -15
+      ],
+      [
+        "tick",
+        3.3,
+        -15
+      ],
+      [
+        "tick",
+        3.96,
+        -14
+      ],
+      [
+        "tick",
+        4.62,
+        -14
+      ],
+      [
+        "tick",
+        5.28,
+        -14
+      ],
+      [
+        "tick",
+        5.94,
+        -14
+      ],
+      [
+        "tick",
+        6.6,
+        -13
+      ],
+      [
+        "tick",
+        7.26,
+        -13
+      ],
+      [
+        "tick",
+        7.92,
+        -13
+      ],
+      [
+        "aire_largo",
+        8.5,
+        -17
+      ],
+      [
+        "blip_medio",
+        8.6,
+        -15
+      ],
+      [
+        "blip_agudo",
+        9.6,
+        -15
+      ],
+      [
+        "pulso",
+        11.8,
+        -13
+      ],
+      [
+        "barrido",
+        16.3,
+        -17
+      ],
+      [
+        "barrido",
+        20.3,
+        -17
+      ],
+      [
+        "barrido",
+        24.3,
+        -17
+      ],
+      [
+        "barrido",
+        27.8,
+        -16
+      ],
+      [
+        "aire",
+        29.9,
+        -18
+      ],
+      [
+        "sting",
+        31.0,
+        -12
+      ],
+      [
+        "nebulosa_cierre",
+        32.4,
+        -15
+      ]
+    ]
+  }
+}

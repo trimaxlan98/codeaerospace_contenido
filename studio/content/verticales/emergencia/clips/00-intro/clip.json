@@ -1,0 +1,129 @@
+{
+  "name": "00 · Intro",
+  "tipo": "marca",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La identidad CO.DE Academy recompuesta para 9:16 (escaneo, retícula, ensamblado del wordmark, el punto ámbar como cursor) con el remate propio de este curso: el título EMERGENCIA no entra por fundido, NACE de una bandada de 2400 agentes (emergencia.converger) que vuela suelta y se posa letra a letra sobre el contorno del título, y entonces releva al texto nítido. Sin narración: sólo la cama sonora.",
+  "duracion_objetivo": 17.08,
+  "guion_visual": [
+    "0.5  el escaneo barre y enciende la retícula",
+    "1.9  se ensambla CO.DE y se dibujan las escuadras",
+    "3.7  llega el punto ámbar y parpadea como cursor",
+    "4.6  ACADEMY, letra a letra",
+    "6.4  la etiqueta HUD",
+    "6.8  un enjambre verde vuela suelto por la pantalla",
+    "8.9  se posa sobre las letras: EMERGENCIA",
+    "11.8 releva al título nítido; subrayado en degradado y la bajada",
+    "15.5 fundido a fondo limpio"
+  ],
+  "audio": {
+    "pico_db": -4.5,
+    "fade_in": 0.3,
+    "fade_out": [
+      16.2,
+      16.9
+    ],
+    "eventos": [
+      [
+        "barrido",
+        0.5,
+        -8
+      ],
+      [
+        "aire_largo",
+        0.65,
+        -16
+      ],
+      [
+        "nebulosa_intro",
+        1.85,
+        -13
+      ],
+      [
+        "blip_grave",
+        2.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        2.8,
+        -13
+      ],
+      [
+        "blip_agudo",
+        3.6,
+        -12
+      ],
+      [
+        "tick",
+        3.78,
+        -10
+      ],
+      [
+        "tick",
+        4.12,
+        -10
+      ],
+      [
+        "aire",
+        4.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        6.4,
+        -16
+      ],
+      [
+        "aire_largo",
+        6.8,
+        -15
+      ],
+      [
+        "nebulosa",
+        7.2,
+        -15
+      ],
+      [
+        "tick",
+        8.9,
+        -14
+      ],
+      [
+        "tick",
+        9.4,
+        -14
+      ],
+      [
+        "tick",
+        9.9,
+        -14
+      ],
+      [
+        "blip_medio",
+        11.8,
+        -13
+      ],
+      [
+        "subrayado",
+        12.3,
+        -12
+      ],
+      [
+        "cuerda_la3",
+        12.6,
+        -16
+      ],
+      [
+        "sting",
+        13.2,
+        -14
+      ],
+      [
+        "pulso",
+        13.9,
+        -14
+      ]
+    ]
+  }
+}
