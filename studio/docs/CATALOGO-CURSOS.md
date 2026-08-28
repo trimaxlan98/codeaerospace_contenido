@@ -136,3 +136,29 @@ parte del título que ve el espectador. No hay que re-renderizar nada.
 Renombrar toca `updated_at`, así que con el orden *por actividad* los 16 suben
 al principio una vez. Con el orden *por nombre* el índice queda como se diseñó.
 No toca clips, jobs ni renders: los videos ya renderizados siguen vigentes.
+
+---
+
+## Familias añadidas despues del reordenado (2026-08-19 a 2026-08-27)
+
+El reordenado de arriba tocó los 16 cursos monográficos. Las familias que han
+ido llegando desde entonces **ya nacen agrupadas**, porque su nombre lleva el
+prefijo delante del `·` y son más de una:
+
+| Familia | Lecciones | Curso |
+|---|---|---|
+| Álgebra lineal | 18 | 22 |
+| Cálculo vectorial | 12 | 23 |
+| Comunicaciones digitales | 18 | 24 |
+| Protocolos de Internet | 24 | 25 |
+| **Procesamiento de señales** | **30** | **27** |
+
+`Procesamiento de señales` es la familia más grande del índice: 30 proyectos
+numerados de 1.1 a 10.3, que la vista de Proyectos ordena por etiqueta y por
+tanto en el orden de lectura del curso. No hace falta tocar
+`ordenar_cursos.py`: el prefijo ya está en el nombre desde que se sube.
+
+Es también el primer curso horizontal **sin subtítulos**: sus `style_block`
+no definen `pie_curso` y llevan un guardián que aborta el render si un rótulo
+pasa de cinco o seis palabras. Si algún día se copia uno de esos bloques para
+una familia que sí quiera pie narrativo, hay que volver a añadirlo a mano.
