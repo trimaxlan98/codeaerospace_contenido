@@ -480,47 +480,62 @@ Además, 12 tests nuevos sobre la función pura y sobre la caducidad del informe
 
 ---
 
-## Despliegue (pendiente: ejecutar en el VPS)
+## Despliegue (hecho: 2026-08-28)
 
-Todo lo anterior está en `main` y verificado en local, pero **no desplegado**:
-en esta corrida automática el clasificador de permisos bloqueó el `ssh` al VPS.
-Estos son los pasos exactos, en orden. Los tres primeros son los de siempre; el
-cuarto y el quinto son **nuevos** y hacen falta para que la película funcione.
+Desplegado y verificado en `https://coderesearch.space`. Estos son los pasos que
+se ejecutaron; los dos últimos son **nuevos** respecto al despliegue de siempre.
 
 ```bash
-# 1. Traer el código
-ssh triage-vps
-cd /var/www/codeaerospace_contenido && git pull
+ssh root@187.124.55.225
+cd /var/www/codeaerospace_contenido && git pull --ff-only
 
-# 2. Frontend (el build ES el despliegue: nginx sirve dist/ del disco)
+# Frontend: el build ES el despliegue (nginx sirve dist/ del disco).
 export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # node no está en el PATH de una sesión no interactiva
 cd studio/frontend && node_modules/.bin/vite build
 
-# 3. Backend y runner
-systemctl restart manimstudio-backend manimstudio-runner
+# NUEVO 1 — el directorio de las películas, del usuario que monta. El contenedor
+# corre con el uid de `manimstudio` y `cap_drop: ALL` le quita a root el
+# CAP_DAC_OVERRIDE: si el directorio es de otro, el montaje falla con
+# "Permission denied" y nada más lo explica.
+install -d -o manimstudio -g manimstudio exports/peliculas exports/sfx
 
-# 4. NUEVO — el directorio de las películas, del usuario que monta
-#    El contenedor corre con el uid de `manimstudio` y `cap_drop: ALL` le quita
-#    a root el CAP_DAC_OVERRIDE: si el directorio es de otro, el montaje falla
-#    con "Permission denied" y nada más lo explica.
-install -d -o manimstudio -g manimstudio /var/www/codeaerospace_contenido/exports/peliculas
-install -d -o manimstudio -g manimstudio /var/www/codeaerospace_contenido/exports/sfx
-
-# 5. NUEVO — ReadWritePaths de la unidad del backend
-#    El unit del repo (studio/deploy/manimstudio-backend.service) ya trae
-#    `exports` y `guiones`; el desplegado NO los tenía (guiones/ funcionaba por
-#    una deriva entre los dos). Copiar y recargar:
+# NUEVO 2 — ReadWritePaths con `exports`
 cp studio/deploy/manimstudio-backend.service /etc/systemd/system/
-systemctl daemon-reload && systemctl restart manimstudio-backend
+systemctl daemon-reload
+
+systemctl restart manimstudio-backend manimstudio-runner
 ```
 
-Comprobación después (con la cookie firmada del método E2E de la skill):
+Dos cosas que aparecieron al desplegar y conviene recordar:
 
-```bash
-curl -s https://coderesearch.space | grep -o 'index-[a-z0-9]*\.js'   # bundle nuevo
-curl -sb "ms_session=…" https://coderesearch.space/api/sfx | head -c 200
-curl -sb "ms_session=…" https://coderesearch.space/api/projects/<pid>/pelicula
-```
+- El `git pull` **abortó** por un `studio/tools/alinear_voz.py` sin commitear en
+  el VPS (copiado a mano durante la producción de los cursos verticales). Era
+  **byte a byte igual** al que entraba: se comprobó antes de borrarlo.
+- La deriva del unit era **al revés de lo que parecía**: el desplegado ya tenía
+  `guiones` y el del repo no. Ahora los dos tienen `guiones` y `exports`.
 
-Y una película de verdad: montar un curso corto con `corte` (segundos), mirar
-que `exports/peliculas/<pid>/` tenga `pelicula.mp4` y que el panel la reproduzca.
+### Verificación en producción
+
+- El runner arrancó por la ruta de siempre —`escuchando en
+  /run/manimstudio/runner.sock (grupo manimstudio)`—, así que la
+  parametrización del sprint E0 no cambió nada en el VPS.
+- **Banco de sonidos**: `POST /api/sfx` sintetizó los **18 efectos en 3,4 s**.
+- **Película de un curso real** («Procesamiento de señales · 9.1 Estimar el
+  espectro», 4 clips narrados), montada con `corte` en **~8 s**:
+
+  ```
+  [pelicula] pid=9077c6e93ba94c52 montar    ok=True piezas=4 dur=115.244
+  [pelicula] pid=9077c6e93ba94c52 verificar ok=True piezas=4
+  ```
+
+  1 min 55 s · 1920×1080 · 7,7 MB. Dos de las cuatro voces no cabían y se
+  ajustaron con `atempo` **1.0497** — la lógica de `mux.sh`, funcionando.
+- **La medición automática pasó**: +0,36 s sobre lo previsto (tolerancia ±0,5) y
+  las cuatro piezas con su sonido, entre **−0,6 y −1,4 dBFS**. Ninguna lo perdió
+  en la unión.
+- **Entrega**: `GET …/pelicula/video` devuelve 200 con los 8 038 407 bytes en
+  0,26 s, y **206 con 100 000 bytes exactos** ante un `Range` — se puede saltar
+  dentro de una película de dos horas sin descargarla.
+- **Interfaz**, con sesión firmada contra el sitio real: la paleta resuelve
+  «senales 91» → «Procesamiento de señales · 9.1», y el panel enseña «al día»,
+  la regleta, el reproductor con la película dentro y la línea de la medición.
