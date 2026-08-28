@@ -280,6 +280,103 @@ def test_el_hash_caduca_la_pelicula_al_re_renderizar(authed):
     assert otra != despues
 
 
+# ── verificacion de la pelicula ──────────────────────────────────────────────
+
+def test_una_pelicula_sana_no_tiene_nada_que_decir():
+    mod = _ensamblar_mod()
+    assert mod.diagnostico(8.67, 8.5, [], "1920x1080", "1920x1080") == []
+
+
+def test_la_duracion_que_no_cuadra_delata_material_perdido():
+    """Si un offset de xfade deja la ultima pieza fuera, el video sale bien
+    formado y mas corto. Es el unico sintoma."""
+    mod = _ensamblar_mod()
+    p = mod.diagnostico(6.0, 8.5, [], "", "")
+    assert len(p) == 1 and "-2.50 s" in p[0]
+
+
+def test_la_tolerancia_absorbe_el_cuadre_a_frames():
+    """El re-encode cuadra a frames enteros y a los fps del proyecto: exigir
+    la duracion exacta marcaria como rota una pelicula sana."""
+    mod = _ensamblar_mod()
+    assert 0 < mod.TOLERANCIA_S <= 1.0
+    assert mod.diagnostico(8.5 + mod.TOLERANCIA_S - 0.01, 8.5, [], "", "") == []
+    assert mod.diagnostico(8.5 + mod.TOLERANCIA_S + 0.01, 8.5, [], "", "") != []
+
+
+def test_las_piezas_que_perdieron_su_sonido_se_nombran():
+    mod = _ensamblar_mod()
+    p = mod.diagnostico(8.5, 8.5, ["Uno", "Dos"], "", "")
+    assert "2 piezas" in p[0] and "Uno, Dos" in p[0]
+    # Con muchas, se nombran las primeras y se corta: el aviso es para leerlo.
+    largo = mod.diagnostico(8.5, 8.5, [f"C{i}" for i in range(9)], "", "")
+    assert "…" in largo[0]
+
+
+def test_solo_se_acusa_a_las_piezas_que_TRAIAN_sonido(tmp_path):
+    """Un curso sin narrar es mudo A PROPOSITO. Acusarlo cada vez convertiria
+    la medicion en ruido que se aprende a ignorar."""
+    mod = _ensamblar_mod()
+    inexistente = tmp_path / "no-esta.mp4"
+    assert mod.espera_sonido({"voz": "guiones/x.wav"}, inexistente) is True
+    assert mod.espera_sonido({}, inexistente) is False
+
+
+def test_el_silencio_digital_esta_muy_por_debajo_del_suelo_del_codec():
+    mod = _ensamblar_mod()
+    assert mod.SILENCIO_DB <= -50
+
+
+def test_la_resolucion_que_no_es_la_del_curso_se_delata():
+    mod = _ensamblar_mod()
+    p = mod.diagnostico(8.5, 8.5, [], "1080x1920", "1920x1080")
+    assert len(p) == 1 and "1080x1920" in p[0]
+
+
+def test_el_estado_de_la_medicion_caduca_con_la_pelicula(authed):
+    pel = _peli()
+    from app.main import cfg, db, pelicula_service
+
+    pid = _create_project(authed)["id"]
+    _rendered_clip(authed, db, cfg, pid, "Uno", "aaaa00001111bbbb")
+    project = db.get_project(pid)
+    destino = pelicula_service.destino(project)
+    destino.mkdir(parents=True, exist_ok=True)
+    (destino / pel.NOMBRE_VIDEO).write_bytes(b"pelicula")
+
+    h = pelicula_service._hash_plan(
+        pelicula_service.plan(project, pel.normaliza_opciones(None)))
+    escribir = lambda d: (destino / pel.NOMBRE_INFORME).write_text(  # noqa: E731
+        __import__("json").dumps(d))
+
+    escribir({"ok": True, "hash": h})
+    assert pelicula_service.estado_verificacion(
+        pelicula_service.informe(project)) == "sin_verificar"
+
+    escribir({"ok": True, "hash": h, "verificacion": {"ok": True, "hash": h}})
+    assert pelicula_service.estado_verificacion(
+        pelicula_service.informe(project)) == "pasa"
+
+    escribir({"ok": True, "hash": h, "verificacion": {"ok": False, "hash": h}})
+    assert pelicula_service.estado_verificacion(
+        pelicula_service.informe(project)) == "no_pasa"
+
+    # Se volvio a montar: la medicion es de OTRA pelicula y no vale.
+    escribir({"ok": True, "hash": "otro", "verificacion": {"ok": True, "hash": h}})
+    assert pelicula_service.estado_verificacion(
+        pelicula_service.informe(project)) == "vieja"
+
+
+def test_medir_sin_pelicula_es_409(authed):
+    from app.main import cfg, db
+
+    pid = _create_project(authed)["id"]
+    _rendered_clip(authed, db, cfg, pid, "Uno", "aaaa00001111bbbb")
+    r = authed.post(f"/api/projects/{pid}/pelicula/verificar")
+    assert r.status_code == 409
+    assert "medir" in r.json()["detail"]
+
+
 # ── API ──────────────────────────────────────────────────────────────────────
 
 def test_estado_sin_material(authed):

@@ -8,7 +8,7 @@
 // eso hay que decirlo ANTES, no despues de media hora de espera.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Clapperboard, Download, Film, Play, Square, Trash2 } from 'lucide-react'
+import { CheckCircle2, Clapperboard, Download, Film, Play, Ruler, Square, Trash2 } from 'lucide-react'
 import { api, peliculaVideoUrl } from '../api.js'
 import { cursoDeJob, useCatalogo } from '../catalogo.js'
 import { Button } from './ui/button.jsx'
@@ -23,6 +23,14 @@ export const PELI_META = {
   desactualizada: { label: 'desactualizada', tone: 'text-warn' },
   al_dia: { label: 'al día', tone: 'text-ok' },
   montando: { label: 'montando…', tone: 'text-accent' },
+}
+
+// Estado de la medicion de la pelicula (app/pelicula.py::estado_verificacion).
+const VERIF_META = {
+  sin_verificar: { label: 'sin medir', tone: 'text-muted' },
+  vieja: { label: 'medición vieja', tone: 'text-warn' },
+  pasa: { label: 'medida ✓', tone: 'text-ok' },
+  no_pasa: { label: 'no pasa', tone: 'text-err' },
 }
 
 const TRANSICION_LABEL = {
@@ -104,6 +112,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
   const [narrar, setNarrar] = useState(true)
   const [marcaIntro, setMarcaIntro] = useState('')
   const [marcaCierre, setMarcaCierre] = useState('')
+  const [midiendo, setMidiendo] = useState(false)
 
   const load = useCallback(() => {
     api.getPelicula(projectId).then((e) => {
@@ -155,6 +164,14 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
 
   const cancelar = async () => {
     try { await api.cancelarPelicula(projectId) } catch (err) { setError(err.message) }
+    load()
+  }
+
+  const verificar = async () => {
+    setError('')
+    setMidiendo(true)
+    try { await api.verificarPelicula(projectId) } catch (err) { setError(err.message) }
+    setMidiendo(false)
     load()
   }
 
@@ -304,6 +321,10 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
                 <Download className="h-3.5 w-3.5" /> Descargar (.mp4)
               </a>
             </Button>
+            <Button size="sm" variant="default" onClick={verificar} disabled={midiendo}>
+              <Ruler className="h-3.5 w-3.5" />
+              {midiendo ? 'Midiendo…' : 'Medir la película'}
+            </Button>
             <Button size="sm" variant="ghost" onClick={borrar} disabled={montando}>
               <Trash2 className="h-3.5 w-3.5" /> Borrar película
             </Button>
@@ -342,6 +363,34 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
             <dd className="font-mono">{informe.transicion || 'corte'}</dd></div>
         </dl>
       )}
+
+      {hayVideo && (() => {
+        const vm = VERIF_META[estado.verificacion] || VERIF_META.sin_verificar
+        const v = informe?.verificacion
+        return (
+          <div className="space-y-1 border-t border-line pt-2">
+            <p className="flex flex-wrap items-center gap-2 text-xs">
+              <CheckCircle2 className={cn('h-3.5 w-3.5', vm.tone)} />
+              <span className="text-muted">La medición:</span>
+              <span className={vm.tone}>{vm.label}</span>
+              {v && estado.verificacion !== 'sin_verificar' && (
+                <span className="font-mono text-[11px] text-faint">
+                  dura {v.duracion_medida} s sobre {v.duracion_prevista} previstos
+                  ({v.desfase >= 0 ? '+' : ''}{v.desfase} s, tolerancia ±{v.tolerancia})
+                  {v.mudas > 0 && ` · ${v.mudas} piezas sin su sonido`}
+                </span>
+              )}
+            </p>
+            {v?.problemas?.length > 0 && estado.verificacion === 'no_pasa' && (
+              <ul className="rounded border border-err/40 bg-err/10 p-2">
+                {v.problemas.map((x, i) => (
+                  <li key={i} className="text-[12.5px] text-err">· {x}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )
+      })()}
 
       {estado.estado === 'desactualizada' && (
         <p className="text-xs text-warn">

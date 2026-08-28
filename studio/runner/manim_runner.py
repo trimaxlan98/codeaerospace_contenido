@@ -453,8 +453,12 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
     montado con escritura es el directorio de la pelicula.
     """
     pid = str(req.get("project_id", ""))
+    modo = str(req.get("modo") or "montar")
     if not RE_JOB_ID.match(pid):
         await send(writer, {"type": "error", "error": "project_id invalido"})
+        return
+    if modo not in ("montar", "verificar"):
+        await send(writer, {"type": "error", "error": "modo invalido"})
         return
 
     peli_rel = f"{PELICULAS_DIR}/{pid}"
@@ -463,7 +467,7 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
         await send(writer, {"type": "error", "error": "no hay plan que montar"})
         return
 
-    container = f"{CONTAINER_PREFIX}{pid}-pelicula"
+    container = f"{CONTAINER_PREFIX}{pid}-pelicula-{modo}"
     peli_mount = f"{peli_abs}:/workspace/{peli_rel}:rw"
     code, out, err = await run_cmd(
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
@@ -471,16 +475,16 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
         "-v", peli_mount,
         "--name", container,
         "--entrypoint", "python3", "manim-render",
-        f"/workspace/{ENSAMBLAR_SCRIPT}",
+        f"/workspace/{ENSAMBLAR_SCRIPT}", modo,
         f"/workspace/{peli_rel}/plan.json",
         f"/workspace/{peli_rel}/pelicula.mp4",
-        timeout=ENSAMBLAR_TIMEOUT,
+        timeout=ENSAMBLAR_TIMEOUT if modo == "montar" else VERIFICA_TIMEOUT,
     )
     if code != 0:
         await force_remove(container)
-        log(f"[pelicula] pid={pid} fallo (code={code})")
+        log(f"[pelicula] pid={pid} modo={modo} fallo (code={code})")
         await send(writer, {"type": "error",
-                            "error": f"el montaje salio con codigo {code}:"
+                            "error": f"{modo} salio con codigo {code}:"
                                      f" {(err or out)[-300:]}"})
         return
     try:
@@ -489,12 +493,14 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
         await send(writer, {"type": "error",
                             "error": "el montaje no devolvio un informe"})
         return
-    if not informe.get("ok"):
+    # En `verificar`, `ok:false` NO es un fallo del comando: es el resultado
+    # (la pelicula tiene problemas). Solo el montaje puede fallar de verdad.
+    if modo == "montar" and not informe.get("ok"):
         await send(writer, {"type": "error",
                             "error": informe.get("error", "montaje fallido")})
         return
-    log(f"[pelicula] pid={pid} ok piezas={informe.get('piezas')} "
-        f"dur={informe.get('duracion')}")
+    log(f"[pelicula] pid={pid} {modo} ok={informe.get('ok')} "
+        f"piezas={informe.get('piezas')} dur={informe.get('duracion')}")
     await send(writer, {"type": "ok", "informe": informe})
 
 

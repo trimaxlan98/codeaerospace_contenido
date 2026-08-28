@@ -247,6 +247,7 @@ class PeliculaService:
             "con_voz": con_voz,
             "faltan": faltan,
             "informe": informe,
+            "verificacion": self.estado_verificacion(informe),
             "run": corriendo,
             "transiciones": list(TRANSICIONES),
         }
@@ -290,6 +291,14 @@ class PeliculaService:
             informe["opciones"] = op
             informe["montada"] = time.time()
             (destino / NOMBRE_INFORME).write_text(json.dumps(informe, indent=1))
+            # Recien montada es cuando toca medir: la union puede salir mal SIN
+            # fallar (una pieza que se pierde, el audio que se cae) y nadie lo
+            # ve mirando el mp4 una vez. Si la medicion falla, la pelicula sigue
+            # siendo buena y el panel dira «sin verificar».
+            try:
+                await self.verificar(project)
+            except Exception:  # noqa: BLE001
+                pass
             if self._run:
                 self._run["estado"] = "listo"
         except Exception as exc:  # noqa: BLE001 - el error va a la UI tal cual
@@ -299,6 +308,34 @@ class PeliculaService:
         finally:
             if self._run:
                 self._run["terminado"] = time.time()
+
+    async def verificar(self, project: dict) -> dict:
+        """Mide la pelicula montada contra su plan y guarda el informe.
+
+        El resultado vive DENTRO de `pelicula.json`, junto al informe del
+        montaje y con el mismo hash: asi caduca sola. Una medicion de otra
+        pelicula no vale, y ensenar sus numeros seria peor que no ensenar
+        ninguno.
+        """
+        destino = self.destino(project)
+        informe = self.informe(project) or {}
+        if not (destino / NOMBRE_VIDEO).is_file():
+            raise PeliculaError("no hay pelicula que medir")
+        medida = await self.runner.ensamblar(project["id"], modo="verificar")
+        informe["verificacion"] = dict(medida or {})
+        informe["verificacion"]["medida"] = time.time()
+        informe["verificacion"]["hash"] = informe.get("hash")
+        (destino / NOMBRE_INFORME).write_text(json.dumps(informe, indent=1))
+        return informe["verificacion"]
+
+    def estado_verificacion(self, informe: dict | None) -> str:
+        """'sin_verificar' | 'vieja' | 'pasa' | 'no_pasa'."""
+        v = (informe or {}).get("verificacion")
+        if not v:
+            return "sin_verificar"
+        if v.get("hash") != (informe or {}).get("hash"):
+            return "vieja"
+        return "pasa" if v.get("ok") else "no_pasa"
 
     def cancel(self) -> bool:
         if not self.running:

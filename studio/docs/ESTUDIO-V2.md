@@ -46,6 +46,7 @@ Lo que le falta para ser un estudio, en orden de cuánto duele:
 | E3 | Sonido de cursos | cama de SFX en cursos + banco audible | **hecho** |
 | E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | **hecho** |
 | E5 | La regleta | ver la película montada dentro de la app | **hecho** |
+| E6 | Medir la película | la unión puede salir mal sin fallar | **hecho** |
 
 ---
 
@@ -422,6 +423,60 @@ Esta vez con el **runner real** (no solo el contenedor a mano): backend y
 De paso quedó comprobado el arranque del runner en **modo desarrollo** (el que
 entró en la consolidación E0): sin grupo `manimstudio` ni root para el `chown`,
 deja el socket a 0600 y avisa, en vez de caerse.
+
+
+---
+
+## E6 — Medir la película (hecho)
+
+La unión puede salir mal **sin fallar**: un offset de `xfade` que deja la última
+pieza fuera produce un mp4 perfectamente formado y más corto; un `concat` que
+mezcla clips con y sin pista de audio produce uno que enmudece a partir del
+tercero. En los dos casos ffmpeg sale con 0 y el archivo se abre. Nadie lo ve
+mirando el vídeo una vez.
+
+`ensamblar.py` gana un segundo verbo — `ensamblar.py verificar <plan> <mp4>` —
+que mide la película **contra el plan del que salió**. Tres comprobaciones,
+todas objetivas:
+
+| Qué | Cómo | Qué caza |
+|---|---|---|
+| **Duración** | medida vs. suma de piezas − empalmes, con **±0,5 s** de tolerancia | material perdido o duplicado |
+| **Sonido, pieza a pieza** | `volumedetect` sobre cada tramo de la película montada | el `concat` que enmudece a mitad — un pico global sano convive con media película muda |
+| **Resolución** | medida vs. la del proyecto | material de otro tamaño colado en el curso |
+
+Tres decisiones que evitan que la medición se vuelva ruido:
+
+- **Solo se acusa a las piezas que traían sonido.** Un curso sin narrar es mudo
+  a propósito; marcarlo en rojo cada vez enseña a ignorar el aviso.
+- **La tolerancia no es cero.** El re-encode cuadra a frames enteros y a los fps
+  del proyecto: exigir la duración exacta marcaría como rota una película sana.
+- **La decisión es una función pura** (`diagnostico`), aparte de la medición: lo
+  que dice si una película está bien tiene que poder probarse sin montar nada.
+
+**Se mide sola al terminar de montar** — recién montada es cuando el informe
+anterior deja de valer — y el resultado vive dentro de `pelicula.json` con el
+**mismo hash** que el montaje, así que caduca solo: volver a montar deja la
+medición en «vieja» en vez de enseñar números de otra película.
+
+`POST /api/projects/{pid}/pelicula/verificar` la repite a mano.
+
+### Verificación (de la verificación)
+
+De punta a punta con el runner real, montando tres clips con `corte`:
+
+```
+[pelicula] pid=… montar    ok=True  piezas=3 dur=9.529
+[pelicula] pid=… verificar ok=False piezas=3
+```
+
+La medición automática saltó sola y **cazó algo de verdad**: «la película es
+640x360 y el curso es 854x480» — los clips de prueba se habían sembrado a otra
+resolución que la `ql` del proyecto. La duración (9,529 sobre 9,5 previstos)
+entró en tolerancia y las tres piezas mudas **no** se acusaron, que es
+exactamente lo que se buscaba.
+
+Además, 12 tests nuevos sobre la función pura y sobre la caducidad del informe.
 
 ---
 

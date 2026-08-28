@@ -8,7 +8,8 @@ ffmpeg) y deja un solo archivo. La logica de la voz es la misma de `mux.sh`
 monta la app y la que monta el zip suenen igual.
 
 Uso:
-    ensamblar.py <plan.json> <salida.mp4>
+    ensamblar.py montar    <plan.json> <salida.mp4>
+    ensamblar.py verificar <plan.json> <pelicula.mp4>
 
 El plan lo escribe el backend; todas sus rutas son relativas al workspace:
 
@@ -31,8 +32,10 @@ El plan lo escribe el backend; todas sus rutas son relativas al workspace:
            (1.5 vCPU) un curso de 30 min tarda decenas de minutos. Es opt-in y la
            interfaz avisa del coste.
 
-La ultima linea de stdout es un JSON con el informe (duracion medida, resolucion,
-tamano y que se hizo con cada pieza).
+La ultima linea de stdout es un JSON con el informe. `montar` devuelve lo que se
+hizo (duracion medida, resolucion, tamano y que llevaba cada pieza); `verificar`
+mide la pelicula ya montada contra su plan — duracion, sonido pieza a pieza y
+resolucion — porque la union puede salir mal SIN fallar.
 """
 
 from __future__ import annotations
@@ -323,12 +326,155 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
             shutil.rmtree(tmp, ignore_errors=True)
 
 
+# ── verificacion ──────────────────────────────────────────────────────────────
+
+# Por debajo de esto un tramo es silencio digital, no "bajito": el suelo de
+# ruido del AAC a 24 kHz mono queda muy por encima.
+SILENCIO_DB = -60.0
+# Cuanto puede desviarse la duracion medida de la prevista sin que sea un
+# sintoma. El re-encode cuadra a frames enteros y a los fps del proyecto, asi
+# que medio segundo de margen es normal; dos son otra cosa.
+TOLERANCIA_S = 0.5
+
+
+def pico_db(video, inicio: float, dur: float) -> float | None:
+    """Pico en dBFS de un tramo del archivo, o None si no hay audio.
+
+    Se mide con `volumedetect` sobre el TRAMO (`-ss`/`-t`), no sobre el archivo
+    entero: lo que interesa es si una pieza concreta se quedo muda, y un solo
+    numero global no lo dice.
+    """
+    # `-v info`, no `error`: volumedetect escribe su resumen en stderr a nivel
+    # INFO, y con `-v error` la medicion sale vacia y toda pieza parece muda.
+    r = _corre("ffmpeg", "-nostdin", "-hide_banner", "-nostats", "-v", "info",
+               "-ss", f"{inicio:.3f}", "-t", f"{max(dur, 0.05):.3f}",
+               "-i", str(video),
+               "-map", "0:a?", "-af", "volumedetect", "-f", "null", "-",
+               timeout=600)
+    for linea in (r.stderr or "").splitlines():
+        if "max_volume:" in linea:
+            try:
+                return float(linea.split("max_volume:")[1].strip().split()[0])
+            except (IndexError, ValueError):
+                return None
+    return None
+
+
+def diagnostico(medida: float, prevista: float, mudos: list[str],
+                res_medida: str, res_plan: str) -> list[str]:
+    """De las medidas a los problemas. Funcion pura: se prueba sin ffmpeg.
+
+    Vive aparte de `verificar` a proposito — lo que decide si una pelicula
+    esta bien es esta lista de reglas, y tiene que poder cambiarse y probarse
+    sin montar nada.
+    """
+    problemas = []
+    desfase = medida - prevista
+    if abs(desfase) > TOLERANCIA_S:
+        problemas.append(
+            f"la pelicula dura {medida:.2f} s y deberia durar {prevista:.2f} s"
+            f" ({desfase:+.2f} s): falta o sobra material")
+    if mudos:
+        problemas.append(f"{len(mudos)} piezas perdieron su sonido al montar: "
+                         + ", ".join(mudos[:4])
+                         + ("…" if len(mudos) > 4 else ""))
+    if res_plan and res_medida and res_plan != res_medida:
+        problemas.append(f"la pelicula es {res_medida} y el curso es {res_plan}")
+    return problemas
+
+
+def espera_sonido(pieza: dict, video) -> bool:
+    """¿Esta pieza TRAIA sonido que la pelicula pueda perder?
+
+    Un curso sin narrar es mudo a proposito: acusarlo cada vez convertiria la
+    medicion en ruido que se aprende a ignorar. Solo cuenta como perdida el
+    silencio de una pieza que llevaba voz o cama.
+    """
+    return bool(pieza.get("voz")) or (video.is_file() and tiene_audio(video))
+
+
+def verificar(plan_path, pelicula) -> dict:
+    """Mide la pelicula montada contra el plan del que salio.
+
+    Tres comprobaciones, todas objetivas, y cada una caza un fallo que la
+    union puede producir SIN fallar:
+
+      duracion     si falta una pieza, o si el offset de un xfade la dejo
+                   fuera, el total no cuadra con la suma menos los empalmes.
+      audio        un `concat` que mezcla clips con y sin pista sale mudo
+                   desde el primero que no la tiene. Se mide pieza a pieza (un
+                   pico global sano puede convivir con media pelicula muda) y
+                   solo se acusa a las que TRAIAN sonido: un curso sin narrar
+                   es mudo a proposito.
+      resolucion   la que dice el plan es la del proyecto; si no coincide, se
+                   colo material de otro tamano.
+    """
+    plan = lee_plan(plan_path)
+    pelicula = Path(pelicula)
+    if not pelicula.is_file():
+        raise ErrorPlan("no hay pelicula que medir")
+
+    raiz = Path(plan.get("raiz", "."))
+    tr = plan.get("transicion") or {}
+    tipo = tr.get("tipo", "corte")
+    d_tr = float(tr.get("duracion", 0.6)) if tipo != "corte" else 0.0
+
+    duraciones, esperaba = [], []
+    for p in plan["piezas"]:
+        video = raiz / p["video"]
+        existe = video.is_file()
+        duraciones.append(duracion(video) if existe else 0.0)
+        esperaba.append(espera_sonido(p, video))
+    prevista = sum(duraciones) - d_tr * max(len(duraciones) - 1, 0)
+    medida = duracion(pelicula)
+
+    # Los tramos se recorren sobre la pelicula YA montada: cada empalme la
+    # acorta, asi que el inicio de cada pieza no es la suma de las anteriores.
+    tramos, t = [], 0.0
+    for p, dur, con_sonido in zip(plan["piezas"], duraciones, esperaba):
+        pico = pico_db(pelicula, t + 0.05, max(dur - 0.1, 0.1))
+        callado = pico is None or pico <= SILENCIO_DB
+        tramos.append({
+            "titulo": p.get("titulo", ""),
+            "inicio": round(t, 3),
+            "duracion": round(dur, 3),
+            "pico_db": pico,
+            "esperaba_sonido": con_sonido,
+            "mudo": callado,
+            "perdio_sonido": con_sonido and callado,
+        })
+        t += dur - d_tr
+
+    res_medida = resolucion(pelicula)
+    res_plan = plan.get("resolucion", "")
+    mudos = [x["titulo"] for x in tramos if x["perdio_sonido"]]
+    desfase = medida - prevista
+    problemas = diagnostico(medida, prevista, mudos, res_medida, res_plan)
+
+    return {
+        "ok": not problemas,
+        "problemas": problemas,
+        "duracion_medida": round(medida, 3),
+        "duracion_prevista": round(prevista, 3),
+        "desfase": round(desfase, 3),
+        "tolerancia": TOLERANCIA_S,
+        "resolucion": res_medida,
+        "resolucion_esperada": res_plan,
+        "piezas": len(tramos),
+        "mudas": len(mudos),
+        "tramos": tramos,
+    }
+
+
 def main(argv):
-    if len(argv) != 3:
+    if len(argv) != 4 or argv[1] not in ("montar", "verificar"):
         print(__doc__.strip(), file=sys.stderr)
         return 2
     try:
-        informe = ensamblar(argv[1], argv[2])
+        if argv[1] == "montar":
+            informe = ensamblar(argv[2], argv[3])
+        else:
+            informe = verificar(argv[2], argv[3])
     except ErrorPlan as exc:
         print(json.dumps({"ok": False, "error": str(exc)}))
         return 1

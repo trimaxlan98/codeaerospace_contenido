@@ -77,6 +77,7 @@ export const api = {
   getPelicula: (pid) => request('GET', `/api/projects/${pid}/pelicula`),
   montarPelicula: (pid, body = {}) => request('POST', `/api/projects/${pid}/pelicula`, body),
   cancelarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/cancel`),
+  verificarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/verificar`),
   borrarPelicula: (pid) => request('DELETE', `/api/projects/${pid}/pelicula`),
   // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
   getSfx: () => request('GET', '/api/sfx'),

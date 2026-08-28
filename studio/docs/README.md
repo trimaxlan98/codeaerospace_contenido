@@ -239,6 +239,14 @@ Detalle completo y decisiones en `ESTUDIO-V2.md`.
 | GET | `/api/projects/{pid}/pelicula/video` | el mp4, con soporte de Range |
 | DELETE | `/api/projects/{pid}/pelicula` | borra la película, no el material |
 
+**Medición**: la unión puede salir mal **sin fallar** (un offset de `xfade` que deja una pieza
+fuera da un mp4 bien formado y más corto; un `concat` con audios distintos enmudece a mitad).
+`POST /api/projects/{pid}/pelicula/verificar` mide la película contra su plan —duración con
+±0,5 s de tolerancia, sonido **pieza a pieza** y resolución— y se dispara sola al terminar de
+montar. Solo se acusa a las piezas que **traían** sonido: un curso sin narrar es mudo a
+propósito. El informe vive en `pelicula.json` con el mismo hash que el montaje, así que
+volver a montar lo deja en «medición vieja» en vez de enseñar números de otra película.
+
 Operación: `exports/` necesita `ReadWritePaths` en la unidad del backend y `exports/peliculas/`
 debe ser del usuario `manimstudio` — el contenedor corre con ese uid y `cap_drop: ALL` le quita
 a root el `CAP_DAC_OVERRIDE` que le dejaría escribir en un directorio ajeno.

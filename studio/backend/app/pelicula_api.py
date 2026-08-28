@@ -54,6 +54,21 @@ def make_router(cfg, db: Database, pelicula: PeliculaService) -> APIRouter:
                                 detail="No hay ningun montaje en curso")
         return {"ok": True}
 
+    @router.post("/{pid}/pelicula/verificar")
+    async def verificar(pid: str, _=Depends(require_auth)):
+        project = _require_project(pid)
+        if pelicula.running:
+            raise HTTPException(status_code=409,
+                                detail="Hay un montaje en curso")
+        try:
+            await pelicula.verificar(project)
+        except PeliculaError as e:
+            raise HTTPException(status_code=409, detail=str(e))
+        except Exception as e:  # noqa: BLE001 - runner caido, timeout…
+            raise HTTPException(status_code=502,
+                                detail=f"La verificación falló: {e}")
+        return pelicula.estado(project)
+
     @router.get("/{pid}/pelicula/video")
     async def video(pid: str, _=Depends(require_auth)):
         project = _require_project(pid)
