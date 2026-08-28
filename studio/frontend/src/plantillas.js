@@ -616,6 +616,10 @@ export const PLANTILLAS = [
     id: 'simulacion',
     nombre: 'Pieza de simulación',
     resumen: '1 clip donde el fotograma ENTERO es una simulación numpy (paquete emergencia): miles de agentes o una malla, con cámara y cifra medida. Vertical por defecto; sirve igual en 16:9.',
+    // El render de una película va a ~0.29 s/frame: en esta máquina (1.5 vCPU)
+    // una pieza de 35 s en qh son horas. Se dice ANTES de crear el proyecto,
+    // no cuando el job lleve media tarde en la cola.
+    aviso: 'El render final se hace en local (render_vertical.py): aquí una pieza larga en qh tarda horas.',
     quality: 'qh',
     formato: 'vertical',
     tipo: 'curso',

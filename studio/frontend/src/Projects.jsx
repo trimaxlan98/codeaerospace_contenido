@@ -13,7 +13,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ChevronDown, ChevronRight, ChevronUp, Download, FileJson, FileText,
+  ChevronDown, ChevronRight, ChevronUp, Cpu, Download, FileJson, FileText,
   FolderKanban, Film, GripVertical, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Wand2,
 } from 'lucide-react'
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
@@ -531,6 +531,9 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                           {p.nombre}
                         </span>
                         <span className="text-[11.5px] leading-snug text-muted">{p.resumen}</span>
+                        {p.aviso && (
+                          <span className="text-[11px] leading-snug text-warn">{p.aviso}</span>
+                        )}
                       </button>
                     )
                   })}
@@ -585,7 +588,9 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                   <span className="text-[11.5px] text-faint">
                     {tpl.id === 'promo'
                       ? 'La plantilla pondrá el tema CO.DE Academy sobre el lienzo del formato elegido, con la marca donde la app no la tapa, y creará 1 clip («Promo») que ya renderiza y cierra el bucle.'
-                      : `La plantilla pondrá el tema oficial CO.DE Academy y creará ${tpl.clips} clips («Clip1…Clip${tpl.clips}») con un arranque que ya renderiza.`}
+                      : tpl.id === 'simulacion'
+                        ? 'La plantilla pondrá el tema CO.DE Academy y creará 1 clip («Simulación») que ya renderiza: la simulación (paquete emergencia) es el fondo a pantalla completa y encima van la cifra medida, el HUD y las reglas.'
+                        : `La plantilla pondrá el tema oficial CO.DE Academy y creará ${tpl.clips} clips («Clip1…Clip${tpl.clips}») con un arranque que ya renderiza.`}
                     {' '}Todo es editable después.
                   </span>
                 )}
@@ -889,6 +894,13 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   const staleCount = staleWithoutActiveJob(clips, jobs).length
   const formatoFijo = clips.some((c) => c.job_id)
   const esPromo = (project.tipo || 'curso') === 'promo'
+  // Una pieza cuyo fondo es una simulacion (paquete `emergencia`) no cuesta
+  // lo que un clip normal: la pila de fotogramas se calcula en el render y
+  // luego cada frame se compone a 1080x1920. Medido: ~0.29 s/frame en qh, o
+  // sea HORAS por pieza en este VPS (1.5 vCPU). Se detecta por el codigo —no
+  // por la plantilla— porque el clip se puede escribir a mano.
+  const usaSimulacion = /(^|\n)\s*(import\s+emergencia|from\s+emergencia[\s.])|emergencia\.\w|em\.(Pelicula|bandada|moho|arena|vida|turing|ondas|chladni|ising|pendulos|cuencas|epiciclos|rio|galaxias)\b/
+    .test([project.style_block || '', ...clips.map((c) => c.script || '')].join('\n'))
   const audioAlDia = clips.filter((c) => c.audio?.estado === 'al_dia').length
   // El promo se descarga como lo que es: un mp4 (el que sirve la app, ya
   // mezclado si se mezclo), no como un zip de curso con concat.txt.
@@ -952,6 +964,20 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               </Select>
             </div>
           </div>
+
+          {usaSimulacion && (
+            <p className="flex items-start gap-2 rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-[12px] leading-snug text-warn">
+              <Cpu className="mt-px size-3.5 shrink-0" aria-hidden="true" />
+              <span>
+                <strong className="font-semibold">El render final de esta pieza se hace en local.</strong>{' '}
+                El fotograma entero es una simulación (paquete <code>emergencia</code>): en este
+                servidor va a ~0.29 s por frame, así que una pieza de 35 s en <code>qh</code> son
+                horas. Aquí conviene previsualizar en <code>ql</code>; el render bueno, con{' '}
+                <code>studio/tools/render_vertical.py</code> en tu máquina. Guía:{' '}
+                <code>studio/docs/EMERGENCIA.md</code>.
+              </span>
+            </p>
+          )}
 
           {/* Panel de estado del curso: lo que hay que mirar antes de exportar. */}
           <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2">
