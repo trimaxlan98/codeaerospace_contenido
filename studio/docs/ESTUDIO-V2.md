@@ -77,6 +77,24 @@ La lección para la próxima limpieza: **`git cherry origin/main <rama>` es la
 prueba**, no un diff de un subdirectorio. Un solo `+` significa que ahí hay algo
 que solo vive en esa rama.
 
+### Segunda pasada (2026-08-28)
+
+De 40 ramas a **dos en el remoto**: `main` y `curso/emergencia-vertical` (la
+rama de la sesión que estaba trabajando el curso 29 en paralelo, mergeando a
+`main` cada pocos minutos). En local queda además `curso/satelites-vertical`.
+
+Dos decisiones que conviene recordar:
+
+- **Los worktreees muertos se desengancharon, no se borraron.** Sus directorios
+  guardan **5,7 GB de artefactos no versionados** —`-algebra` solo tiene 3,8 GB
+  con los 96 `qh` de Protocolos, y `-fractales`/`-promos` tienen `exports/`—.
+  Borrar la rama no debe costar horas de re-render, así que quedaron en
+  `detached HEAD` sobre su último commit. Para recuperar el disco:
+  `git worktree remove ../codeaerospace_contenido-<nombre>`.
+- **`curso/satelites-vertical` nunca se empujó.** Sus dos commits —el curso 28
+  terminado, 16 piezas narradas y muxeadas— existen **solo en el disco local**,
+  en su worktree. Es la única rama viva sin copia en el remoto.
+
 ---
 
 ## E1 — La película (hecho)
