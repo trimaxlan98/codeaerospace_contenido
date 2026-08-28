@@ -54,7 +54,15 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
 | 25 | Protocolos de Internet (familia, 24 lecciones) | original (divulgacion: la capa de paquetes; del cable de cobre a Marte, cierra en DTN/CCSDS) | `protocolos.py` | **en produccion por lotes** (plan completo en `curso-23-protocolos-internet.md`; 4 lotes de 6 lecciones) |
 | 26 | Fractales: la forma del infinito (vertical) | original (primer curso en 9:16, 16 piezas, sin subtitulos) | `promo.py` + `fractales.py` | terminado; plan en su rama `curso/fractales-vertical` |
-| 27 | Procesamiento digital de señales (familia, 30 lecciones) | original (la capa DEBAJO de Comunicaciones digitales: que se le hace a los numeros y cuanto cuesta hacerlo en el aparato) | `dsp.py` | **en produccion por lotes** (plan en `curso-24-procesamiento-senales.md`; 5 lotes de 6 lecciones). Es el curso mas extenso: 30 lecciones, 120 clips. **Primer curso horizontal sin subtitulos** (formato mudo: la pantalla solo pone la cosa y su cifra medida) |
+| 27 | Procesamiento digital de señales (familia, 30 lecciones) | original (la capa DEBAJO de Comunicaciones digitales: que se le hace a los numeros y cuanto cuesta hacerlo en el aparato) | `dsp.py` (2617 lineas, 11 piezas) | publicado (PRs #54, #55, #56, #57 y #58): **el curso mas extenso de la coleccion**, 30 lecciones y 120 clips en 5 lotes, con 120/120 qh en produccion. **Primer curso horizontal SIN SUBTITULOS** (formato mudo: la pantalla solo pone la cosa y su cifra medida, y un guardian en el style_block aborta el render si un rotulo se convierte en frase) |
+
+
+> **Aviso de numeracion (2026-08-27)**: el curso vertical de **Satelites**, que
+> se empezo el mismo dia en otra sesion (rama `curso/satelites-vertical`, plan
+> en `curso-27-satelites-vertical.md`), tambien se apunto el numero 27. El 27
+> ya estaba tomado y mergeado por Procesamiento de señales (PR #54), asi que
+> **Satelites deberia pasar a ser el 28** cuando se publique: hay que
+> renumerarlo en su plan, en su memoria y aqui.
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de

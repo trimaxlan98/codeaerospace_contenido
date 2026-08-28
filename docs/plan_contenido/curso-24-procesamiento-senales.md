@@ -272,24 +272,29 @@ Leyenda: `—` no empezado · `~` en curso · `✔` hecho.
 | 6.1 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:37 |
 | 6.2 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:36 |
 | 6.3 | ✔ | ✔ | ✔ | ✔ | ✔ #56 | ✔ | ✔ | ✔ | ✔ 2:13 |
-| 7.1 | ✔ | ✔ | ✔ | ✔ 29/29/29/29 s | — | — | — | — | — |
-| 7.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 7.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 8.1 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 8.2 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 8.3 | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 9.1–10.3 | ✔ mapa | — | — | — | — | — | — | — | — |
+| 7.1 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:13 |
+| 7.2 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:42 |
+| 7.3 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:21 |
+| 8.1 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:24 |
+| 8.2 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:40 |
+| 8.3 | ✔ | ✔ | ✔ | ✔ | ✔ #57 | ✔ | ✔ | ✔ | ✔ 2:42 |
+| 9.1 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:14 |
+| 9.2 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:30 |
+| 9.3 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:16 |
+| 10.1 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:16 |
+| 10.2 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:28 |
+| 10.3 | ✔ | ✔ | ✔ | ✔ | ✔ #58 | ✔ | ✔ | ✔ | ✔ 2:38 |
 
-**Dónde está la sesión**: lotes 1 y 2 **cerrados** (12 vídeos narrados y
-muxeados, marca sonora a −6.0 dB dentro de las salidas); lote 3 **cerrado**
-tambien; lote 4 con 5 subagentes produciendo (los mato un corte de cuota y se
-relanzaron); lote 5 con la librería ya escrita y validada en el scratchpad
-(`dsp5.py`), pendiente de pegar a `dsp.py` cuando no haya agentes importandola.
+**CURSO TERMINADO DE PUNTA A PUNTA.** 30 de 30 lecciones en producción con
+**120/120 `qh` adoptados**, narradas (120 wavs, narración serial en el VPS) y
+muxeadas con la marca: **30 vídeos, 74 min 20 s en total**, de 2:13 a 2:51 cada
+uno.
 
 **Salidas** en `exports/procesamiento-senales-*/curso_narrado.mp4` (no
-versionadas): lote 1 de 2:16 a 2:51 (5 clips re-muxeados a −1.5 dB); lote 2 de
-2:17 a 2:36 (ninguno hizo falta); lote 3 de 2:13 a 2:37 (7 re-muxeados,
-uno de ellos a −2.5 dB porque tocaba 0.0).
+versionadas): de 2:13 a 2:51 por leccion. Picos siempre por debajo de
+−0.5 dB tras re-muxear los que venian calientes (5 en el lote 1, 0 en el 2,
+7 en el 3 — uno a −2.5 dB porque tocaba 0.0 —, 1 en el 4). Marca sonora a
+**−6.0 dB exactos** medidos dentro de las salidas de los cuatro lotes.
 
 ## 13. Storyboard
 
@@ -823,3 +828,13 @@ justo la animación que cuenta la lección 1.1.
 - 2026-08-27 — molde 1.1 escrito, renderizado y aprobado frame a frame
   (32.3 / 32.8 / 30.0 / 33.3 s). Esqueletos + `style_block` con las cifras
   medidas de las 6 lecciones del lote 1; 5 subagentes en producción.
+- 2026-08-27 — **CURSO TERMINADO**: 30 lecciones, 120 clips, 74 min 20 s de
+  vídeo narrado y muxeado. Peor pico de las 30 salidas: −0.5 dB. Marca sonora
+  a −6.0 dB exactos verificada en los cinco lotes.
+- 2026-08-27 — las 30 lecciones escritas y en producción: PRs #54, #55,
+  #56, #57 y #58 mergeados; 30 proyectos con **120/120 `qh` adoptados**;
+  lotes 1 a 4 narrados y muxeados (24 vídeos de 2:13 a 2:51). Librería
+  `dsp.py` en 2617 líneas con 11 piezas de dibujo. Un corte de cuota mató la
+  primera ola de agentes del lote 4 nada más arrancar: se relanzaron con el
+  mismo contrato más «hay trabajo parcial en disco, re-valida todo», y las
+  seis lecciones salieron limpias.
