@@ -6,10 +6,13 @@ el codigo de los clips y librerias.
 
 ## Idea central
 
-Hay dos formatos vivos. El original (cursos 1-13) desmenuza la Academy en
-cursos de 8 clips; el nuevo (familia "Aerodinamica", desde 2026-08-14) parte
+Hay TRES formatos vivos (desde 2026-08-27). El original (cursos 1-13) desmenuza la Academy en
+cursos de 8 clips; el segundo (familia "Aerodinamica", desde 2026-08-14) parte
 de un documento maestro de curso autogestivo y hace **un proyecto por
-leccion**, con un clip por subtema. Lo que NO cambia entre los dos: el tema
+leccion**, con un clip por subtema. El tercero (curso 26 "Fractales", desde
+2026-08-27) es **vertical (9:16)**: nace del formato de los promos de redes,
+no lleva subtitulos —la imagen enseña y el audio remata— y se entrega como
+un solo video de intro + clips + cierre unidos. Lo que NO cambia entre los dos: el tema
 oficial `code_brand`, la libreria por familia, el rango de 28-45 s por clip y
 la validacion visual de frames.
 
@@ -53,16 +56,9 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 23 | Calculo vectorial (familia, 12 lecciones) | original (divulgacion, muy visual: el espacio que fluye; secuela de Algebra lineal, cierra en Maxwell) | `calculo_vectorial.py` (sobre `algebra_lineal.py`) | publicado (PR #43): 12 lecciones, 48 qh en prod, narradas y muxeadas — PRIMER curso con el intro/cierre SONOROS (2026-08-20) |
 | 24 | Comunicaciones digitales (familia, 18 lecciones) | original (divulgacion espacial/satelital: de la sonda muestreada al enlace cognitivo con IA) | `comunicaciones.py` | publicado (PR #45): 18 lecciones, 72 qh en prod, narradas y muxeadas con la marca sonora (2026-08-21) |
 | 25 | Protocolos de Internet (familia, 24 lecciones) | original (divulgacion: la capa de paquetes; del cable de cobre a Marte, cierra en DTN/CCSDS) | `protocolos.py` | **en produccion por lotes** (plan completo en `curso-23-protocolos-internet.md`; 4 lotes de 6 lecciones) |
-| 26 | Fractales: la forma del infinito (vertical) | original (primer curso en 9:16, 16 piezas, sin subtitulos) | `promo.py` + `fractales.py` | terminado; plan en su rama `curso/fractales-vertical` |
+| 26 | Fractales: la forma del infinito (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 1, que era horizontal y solo miraba el plano complejo) | `fractales.py` ampliada | **primer curso en 9:16**: sin subtitulos, voz escrita a mano y cama de SFX; plan en `curso-26-fractales-vertical.md` |
 | 27 | Procesamiento digital de señales (familia, 30 lecciones) | original (la capa DEBAJO de Comunicaciones digitales: que se le hace a los numeros y cuanto cuesta hacerlo en el aparato) | `dsp.py` (2617 lineas, 11 piezas) | publicado (PRs #54, #55, #56, #57 y #58): **el curso mas extenso de la coleccion**, 30 lecciones y 120 clips en 5 lotes, con 120/120 qh en produccion. **Primer curso horizontal SIN SUBTITULOS** (formato mudo: la pantalla solo pone la cosa y su cifra medida, y un guardian en el style_block aborta el render si un rotulo se convierte en frase) |
-
-
-> **Aviso de numeracion (2026-08-27)**: el curso vertical de **Satelites**, que
-> se empezo el mismo dia en otra sesion (rama `curso/satelites-vertical`, plan
-> en `curso-27-satelites-vertical.md`), tambien se apunto el numero 27. El 27
-> ya estaba tomado y mergeado por Procesamiento de señales (PR #54), asi que
-> **Satelites deberia pasar a ser el 28** cuando se publique: hay que
-> renumerarlo en su plan, en su memoria y aqui.
+| 28 | Satelites: la maquina que no se cae (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 2 "Satelites e IA" y a la mitad divulgativa del 3, ambos horizontales y solo en la DB) | `satelites.py` ampliada | **en produccion**: segundo curso en 9:16; plan en `curso-28-satelites-vertical.md` |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de

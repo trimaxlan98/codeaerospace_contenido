@@ -1,0 +1,129 @@
+{
+  "name": "07 · Girar y estirar",
+  "modulo": "M3 · El país de los números complejos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Elevar al cuadrado un número complejo dobla su ángulo y eleva al cuadrado su módulo. Eso convierte el círculo de radio 1 en una frontera: por fuera todo se dispara (137.8 tras seis pasos), por dentro todo se hunde (0.005) y encima todo gira para siempre (1.000). Módulos medidos con traza_orbita sobre las órbitas dibujadas. Cierra con la regla del resto del curso: z → z² + c.",
+  "duracion_objetivo": 30.17,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD; ejes y círculo unidad",
+    "2.5  un punto con su radio y su ángulo dibujados",
+    "4.2  un paso: el ángulo se dobla y el módulo se eleva al cuadrado",
+    "6.0  otro paso",
+    "9.0  semilla de fuera: la órbita se va del cuadro → 137.8",
+    "13.6 semilla de dentro: cae al origen → 0.005",
+    "18.3 semilla en el círculo: gira y se queda → 1.000",
+    "23.7 se apaga todo y entra z → z² + c",
+    "28.5 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.5,
+        "texto": "Multiplicar un complejo es girar y estirar."
+      },
+      {
+        "t_inicio": 5.8,
+        "texto": "Al cuadrado: el ángulo se dobla."
+      },
+      {
+        "t_inicio": 9.6,
+        "texto": "El radio se eleva al cuadrado."
+      },
+      {
+        "t_inicio": 13.6,
+        "texto": "Fuera del círculo, todo se dispara."
+      },
+      {
+        "t_inicio": 18.0,
+        "texto": "Dentro, todo se hunde."
+      },
+      {
+        "t_inicio": 21.0,
+        "texto": "Encima, gira para siempre."
+      },
+      {
+        "t_inicio": 25.2,
+        "texto": "Súmale un número y empieza el juego."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.4,
+      30.2
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire",
+        1.4,
+        -18
+      ],
+      [
+        "blip_grave",
+        3.5,
+        -16
+      ],
+      [
+        "barrido",
+        4.2,
+        -18
+      ],
+      [
+        "barrido",
+        6.0,
+        -18
+      ],
+      [
+        "blip_agudo",
+        9.5,
+        -15
+      ],
+      [
+        "blip_grave",
+        14.1,
+        -15
+      ],
+      [
+        "blip_medio",
+        18.8,
+        -15
+      ],
+      [
+        "nebulosa",
+        22.5,
+        -15
+      ],
+      [
+        "aire_largo",
+        23.7,
+        -17
+      ],
+      [
+        "sting",
+        25.4,
+        -15
+      ],
+      [
+        "pulso",
+        27.0,
+        -15
+      ]
+    ]
+  }
+}

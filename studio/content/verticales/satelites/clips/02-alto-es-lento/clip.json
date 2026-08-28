@@ -1,0 +1,128 @@
+{
+  "name": "02 · Alto es lento",
+  "modulo": "M1 · Caerse sin llegar al suelo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cuatro alturas compitiendo en la misma columna: LEO a 550 km, los 2000 km, los 20200 de GPS y la GEO a 35786. El de arriba parece parado. La cifra: el periodo orbital de cada uno, resuelto con la tercera de Kepler por satelites.periodo_orbital — y la GEO cae en el dia sidereo, 23 h 56 min, no en 24 h.",
+  "libreria": [
+    "periodo_orbital"
+  ],
+  "duracion_objetivo": 30.27,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el planeta",
+    "1.4  anillo de 550 km (casi pegado) y su periodo: 95.5 min",
+    "3.5  anillo de 2000 km: 127.0 min",
+    "5.6  anillo de 20200 km (GPS): 11.97 h",
+    "7.7  anillo de 35786 km (GEO): 23.93 h",
+    "9.8  los cuatro giran A LA VEZ a su ritmo real (11 s)",
+    "21.6 el remate: el de arriba es 15.03 veces mas lento",
+    "26.2 y su periodo es el dia sidereo",
+    "29.5 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.6,
+        "texto": "Cuanto más alto, más despacio."
+      },
+      {
+        "t_inicio": 3.7,
+        "texto": "Abajo, una vuelta cada hora y media."
+      },
+      {
+        "t_inicio": 7.9,
+        "texto": "Arriba, una vuelta al día."
+      },
+      {
+        "t_inicio": 10.6,
+        "texto": "Míralos a la vez."
+      },
+      {
+        "t_inicio": 17.0,
+        "texto": "El de arriba casi no se mueve."
+      },
+      {
+        "t_inicio": 22.4,
+        "texto": "Quince veces más lento."
+      },
+      {
+        "t_inicio": 25.6,
+        "texto": "Un día justo. Tu antena no se mueve."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.42,
+      30.12
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.7,
+        -17
+      ],
+      [
+        "blip_grave",
+        1.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        3.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        5.7,
+        -15
+      ],
+      [
+        "blip_agudo",
+        7.8,
+        -14
+      ],
+      [
+        "barrido",
+        9.8,
+        -17
+      ],
+      [
+        "pad",
+        10.5,
+        -19
+      ],
+      [
+        "pulso",
+        21.6,
+        -13
+      ],
+      [
+        "subrayado",
+        22.2,
+        -14
+      ],
+      [
+        "blip_agudo",
+        26.3,
+        -12
+      ]
+    ]
+  }
+}

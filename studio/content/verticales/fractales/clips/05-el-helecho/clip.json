@@ -1,0 +1,148 @@
+{
+  "name": "05 · El helecho",
+  "modulo": "M2 · Una instrucción repetida",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El mismo juego del clip 04 con cuatro reglas afines en vez de tres: sale el helecho de Barnsley. Después se encienden los cuatro marcos —cada regla mete un helecho entero dentro del helecho— y se cuentan los coeficientes sobre fr.MAPAS[\"helecho\"]: 24. El reparto real de los saltos lo mide ifs_reparto: 85.01 %, 7.05 %, 6.97 % y 0.97 %.",
+  "duracion_objetivo": 30.53,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.7  la nube se acumula: 150 → 1 200 → 10 000 → 60 000 → 200 000",
+    "12.8 se encienden los cuatro marcos, uno por regla",
+    "17.4 la cifra pasa a NUMEROS 24 y destella",
+    "22.1 los marcos se apagan y crecen las cuatro barras del reparto",
+    "25.3 la cifra pasa a POR CIENTO 85.05",
+    "28.9 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.2,
+        "texto": "Otro dado, cuatro caras."
+      },
+      {
+        "t_inicio": 5.0,
+        "texto": "Las mismas reglas del juego."
+      },
+      {
+        "t_inicio": 9.5,
+        "texto": "Y sale un helecho."
+      },
+      {
+        "t_inicio": 13.5,
+        "texto": "Cada regla mete un helecho entero dentro."
+      },
+      {
+        "t_inicio": 18.4,
+        "texto": "Veinticuatro números. Eso es toda la planta."
+      },
+      {
+        "t_inicio": 24.0,
+        "texto": "Ochenta y cinco de cada cien saltos, a una sola."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.7,
+      30.5
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire_largo",
+        1.0,
+        -18
+      ],
+      [
+        "tick",
+        2.9,
+        -15
+      ],
+      [
+        "tick",
+        5.1,
+        -15
+      ],
+      [
+        "tick",
+        7.3,
+        -15
+      ],
+      [
+        "tick",
+        9.5,
+        -15
+      ],
+      [
+        "nebulosa",
+        11.0,
+        -16
+      ],
+      [
+        "barrido",
+        12.8,
+        -17
+      ],
+      [
+        "blip_grave",
+        13.4,
+        -17
+      ],
+      [
+        "blip_medio",
+        14.4,
+        -17
+      ],
+      [
+        "blip_agudo",
+        15.4,
+        -17
+      ],
+      [
+        "blip_hud",
+        16.2,
+        -17
+      ],
+      [
+        "subrayado",
+        17.6,
+        -14
+      ],
+      [
+        "pulso",
+        22.1,
+        -14
+      ],
+      [
+        "tick",
+        23.0,
+        -16
+      ],
+      [
+        "tick",
+        23.6,
+        -16
+      ],
+      [
+        "sting",
+        25.4,
+        -16
+      ]
+    ]
+  }
+}

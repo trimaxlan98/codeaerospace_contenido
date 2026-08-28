@@ -22,12 +22,14 @@ Uso:
                           sfx.py mezclar fx.wav 32 barrido@0.5:-8 tick@4:-12
   sfx.py aplicar video.mp4 audio.wav [out.mp4]
                           pega un wav a un mp4 (aac 24k mono, -shortest)
-  sfx.py promo <promo_dir> <video.mp4> [out.mp4] [voz.wav]
-                          cama sonora de un promo de redes: lee el bloque
-                          "audio" de promo.json, la mide contra la DURACION
-                          REAL del video y la pega. Los extremos quedan en
-                          silencio: al repetirse el video, el corte del
-                          bucle no suena.
+  sfx.py promo <dir> <video.mp4> [out.mp4] [voz.wav]
+                          cama sonora de una pieza de redes: lee el bloque
+                          "audio" de su manifiesto (promo.json de un promo o
+                          clip.json de una pieza de curso vertical), la mide
+                          contra la DURACION REAL del video y la pega. Los
+                          extremos quedan en silencio: en un promo eso hace
+                          invisible el corte del bucle, y en un curso hace
+                          que el `concat -c copy` no chasquee en la union.
 
 Corre en el host o dentro del contenedor manim; en ambos casos el canario
 de main() verifica el numpy antes de sintetizar. Historia: el numpy del
@@ -309,6 +311,22 @@ def lee_wav(ruta):
     return np.frombuffer(crudo, dtype="<i2").astype(np.float64) / 32768.0
 
 
+# Los promos guardan su manifiesto en promo.json y las piezas de un curso
+# vertical en clip.json; el bloque "audio" es el mismo, asi que una sola
+# funcion sirve a los dos formatos.
+MANIFIESTOS = ("promo.json", "clip.json")
+
+
+def _manifiesto(directorio):
+    """(dict, ruta) del manifiesto de una pieza de redes."""
+    d = Path(directorio)
+    for nombre in MANIFIESTOS:
+        ruta = d / nombre
+        if ruta.is_file():
+            return json.loads(ruta.read_text()), ruta
+    raise SystemExit(f"{d}: no hay ninguno de {' / '.join(MANIFIESTOS)}")
+
+
 def promo(promo_dir, video, salida=None, voz_wav=None):
     """Cama sonora de un promo, ajustada a la duracion REAL de su video.
 
@@ -316,10 +334,10 @@ def promo(promo_dir, video, salida=None, voz_wav=None):
     en silencio: el fade_out del manifiesto es lo que hace que el salto del
     final al principio no se oiga como un chasquido.
     """
-    manifiesto = json.loads((Path(promo_dir) / "promo.json").read_text())
+    manifiesto, ruta = _manifiesto(promo_dir)
     spec = manifiesto.get("audio")
     if not spec:
-        raise SystemExit(f"{promo_dir}/promo.json no tiene bloque 'audio'")
+        raise SystemExit(f"{ruta} no tiene bloque 'audio'")
     video = Path(video)
     total = dur_video(video)
     eventos = [(n, float(t), float(db)) for n, t, db in spec["eventos"]]

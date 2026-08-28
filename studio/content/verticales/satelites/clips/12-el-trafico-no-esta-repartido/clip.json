@@ -1,0 +1,114 @@
+{
+  "name": "12 · El trafico no esta repartido",
+  "modulo": "M4 · La red que se gobierna sola",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La constelacion pasa y la mayor parte del tiempo esta sobre agua; los haces fijos riegan el oceano. La cifra: el porcentaje del tiempo-satelite sobre el mar, contado con la mascara de continentes de la propia libreria.",
+  "libreria": [
+    "tiempo_sobre_mar",
+    "mascara_tierra"
+  ],
+  "duracion_objetivo": 30.25,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el mapa",
+    "1.5  los 120 satelites: verdes los que estan sobre tierra",
+    "3.3  la cifra del instante",
+    "6.5  la constelacion da una vuelta entera (11 s)",
+    "18.9 la cifra: 29.3 % del tiempo sobre tierra",
+    "22.9 el reverso: 70.7 % apuntando al mar",
+    "23.4 y ni siquiera es constante: entre 32 y 40 sobre tierra",
+    "29.1 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 2.1,
+        "texto": "Ciento veinte satélites, ahora mismo."
+      },
+      {
+        "t_inicio": 4.1,
+        "texto": "Sólo estos están sobre tierra."
+      },
+      {
+        "t_inicio": 7.2,
+        "texto": "Míralos dar la vuelta."
+      },
+      {
+        "t_inicio": 15.0,
+        "texto": "La órbita no sabe dónde vive la gente."
+      },
+      {
+        "t_inicio": 19.8,
+        "texto": "Siete de cada diez, apuntando al mar."
+      },
+      {
+        "t_inicio": 23.9,
+        "texto": "Y ni siquiera es constante."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.4,
+      30.1
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.8,
+        -17
+      ],
+      [
+        "blip_grave",
+        1.6,
+        -16
+      ],
+      [
+        "blip_medio",
+        3.4,
+        -15
+      ],
+      [
+        "barrido",
+        6.5,
+        -18
+      ],
+      [
+        "pad",
+        7.0,
+        -20
+      ],
+      [
+        "blip_agudo",
+        18.9,
+        -12
+      ],
+      [
+        "subrayado",
+        22.9,
+        -14
+      ],
+      [
+        "blip_medio",
+        23.5,
+        -13
+      ]
+    ]
+  }
+}

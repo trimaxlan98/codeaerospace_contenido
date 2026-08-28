@@ -1,0 +1,163 @@
+{
+  "name": "04 · El juego del caos",
+  "modulo": "M2 · Una instrucción repetida",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Tres esquinas y un dado: sale una, saltas a la mitad de camino, marcas. Los catorce primeros saltos se ven uno a uno y la nube que viene después es su continuación literal (ifs_camino es secuencial y determinista). A los 200 000 puntos aparece el triángulo de Sierpinski, y conteo_cajas mide su dimensión: 1.5920, contra log3/log2 = 1.5850.",
+  "duracion_objetivo": 31.62,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.7  las tres esquinas y el punto de partida",
+    "2.9  catorce saltos, uno a uno, con el dado marcando la esquina",
+    "14.6 el mismo camino sigue: 60 -> 400 -> 3 000 -> 25 000 -> 200 000",
+    "23.8 las esquinas se apagan; queda Sierpinski",
+    "26.3 la cifra pasa a DIMENSION 1.5920 y destella",
+    "29.8 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.9,
+        "texto": "Tres esquinas y un dado."
+      },
+      {
+        "t_inicio": 5.4,
+        "texto": "Sale una, saltas a la mitad, marcas."
+      },
+      {
+        "t_inicio": 10.5,
+        "texto": "Otra vez. Cien mil veces."
+      },
+      {
+        "t_inicio": 15.5,
+        "texto": "Del puro azar sale una figura exacta."
+      },
+      {
+        "t_inicio": 21.5,
+        "texto": "El triángulo de Sierpinski."
+      },
+      {
+        "t_inicio": 26.4,
+        "texto": "Con dimensión uno coma cincuenta y nueve."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      31.0,
+      31.8
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire",
+        1.8,
+        -18
+      ],
+      [
+        "tick",
+        3.0,
+        -13
+      ],
+      [
+        "tick",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        5.0,
+        -14
+      ],
+      [
+        "tick",
+        6.0,
+        -15
+      ],
+      [
+        "tick",
+        7.0,
+        -15
+      ],
+      [
+        "tick",
+        8.0,
+        -16
+      ],
+      [
+        "tick",
+        9.0,
+        -16
+      ],
+      [
+        "tick",
+        10.0,
+        -17
+      ],
+      [
+        "tick",
+        11.0,
+        -17
+      ],
+      [
+        "tick",
+        12.0,
+        -18
+      ],
+      [
+        "barrido",
+        14.6,
+        -17
+      ],
+      [
+        "blip_grave",
+        16.4,
+        -16
+      ],
+      [
+        "blip_medio",
+        18.3,
+        -16
+      ],
+      [
+        "blip_agudo",
+        20.1,
+        -15
+      ],
+      [
+        "nebulosa",
+        21.0,
+        -15
+      ],
+      [
+        "pulso",
+        22.0,
+        -13
+      ],
+      [
+        "subrayado",
+        26.3,
+        -14
+      ],
+      [
+        "sting",
+        27.2,
+        -16
+      ]
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "00 · Intro",
+  "tipo": "marca",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La identidad CO.DE Academy recompuesta para 9:16, con la coreografía del curso 26 (escaneo, retícula, ensamblado del wordmark, el punto ámbar como cursor) y el remate propio de este curso: el título SATELITES con su bajada. Sin narración: sólo la cama sonora.",
+  "duracion_objetivo": 12.48,
+  "guion_visual": [
+    "0.5  el escaneo barre y enciende la retícula",
+    "1.9  se ensambla CO.DE y se dibujan las escuadras",
+    "3.7  llega el punto ámbar y parpadea como cursor",
+    "4.6  ACADEMY, letra a letra",
+    "6.4  la etiqueta HUD",
+    "6.8  SATELITES, su subrayado en degradado y la bajada",
+    "10.9 fundido a fondo limpio"
+  ],
+  "audio": {
+    "pico_db": -4.5,
+    "fade_in": 0.3,
+    "fade_out": [
+      11.63,
+      12.33
+    ],
+    "eventos": [
+      [
+        "barrido",
+        0.5,
+        -8
+      ],
+      [
+        "aire_largo",
+        0.65,
+        -16
+      ],
+      [
+        "nebulosa_intro",
+        1.85,
+        -13
+      ],
+      [
+        "blip_grave",
+        2.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        2.8,
+        -13
+      ],
+      [
+        "blip_agudo",
+        3.6,
+        -12
+      ],
+      [
+        "tick",
+        3.78,
+        -10
+      ],
+      [
+        "tick",
+        4.12,
+        -10
+      ],
+      [
+        "aire",
+        4.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        6.4,
+        -16
+      ],
+      [
+        "subrayado",
+        7.7,
+        -12
+      ],
+      [
+        "pulso",
+        9.3,
+        -12
+      ]
+    ]
+  }
+}

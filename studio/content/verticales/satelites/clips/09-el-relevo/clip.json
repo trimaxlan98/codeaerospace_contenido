@@ -1,0 +1,130 @@
+{
+  "name": "09 · El relevo",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un punto en el suelo y el enjambre encima: la linea salta de un satelite al siguiente antes de que el primero se ponga. La cifra: cuantos relevos hay en 90 minutos y cada cuanto, mirando instante a instante cual es el satelite mas alto. Los huecos sin servicio se cuentan aparte y se declaran.",
+  "libreria": [
+    "relevos"
+  ],
+  "duracion_objetivo": 30.25,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el suelo del grafico (tiempo x elevacion)",
+    "1.2  una curva por satelite que asoma sobre el horizonte",
+    "5.0  la envolvente: el mas alto en cada instante",
+    "7.6  la mascara de 25 grados",
+    "8.5  los saltos, uno por cada cambio de satelite",
+    "10.3 la cifra: 14 saltos en 90 minutos",
+    "13.7 uno cada 6.43 minutos",
+    "16.9 la banda sin servicio y su cifra: 71 %",
+    "21.3 la misma cuenta con 240 satelites",
+    "29.4 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.5,
+        "texto": "Cada satélite sube, culmina y se pone."
+      },
+      {
+        "t_inicio": 5.3,
+        "texto": "Esta es la envolvente: el más alto en cada momento."
+      },
+      {
+        "t_inicio": 10.9,
+        "texto": "Catorce saltos en hora y media."
+      },
+      {
+        "t_inicio": 14.1,
+        "texto": "Uno cada seis minutos."
+      },
+      {
+        "t_inicio": 17.9,
+        "texto": "Pero mira cuánto tiempo no hay nadie arriba."
+      },
+      {
+        "t_inicio": 24.4,
+        "texto": "Con doscientos cuarenta, ya no se cae."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.4,
+      30.1
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire",
+        1.2,
+        -18
+      ],
+      [
+        "barrido",
+        5.0,
+        -17
+      ],
+      [
+        "blip_grave",
+        7.6,
+        -16
+      ],
+      [
+        "tick",
+        8.6,
+        -14
+      ],
+      [
+        "tick",
+        9.2,
+        -14
+      ],
+      [
+        "tick",
+        9.8,
+        -14
+      ],
+      [
+        "blip_agudo",
+        10.3,
+        -12
+      ],
+      [
+        "blip_medio",
+        13.7,
+        -13
+      ],
+      [
+        "nebulosa",
+        16.9,
+        -16
+      ],
+      [
+        "barrido",
+        21.3,
+        -17
+      ],
+      [
+        "pulso",
+        24.2,
+        -13
+      ]
+    ]
+  }
+}

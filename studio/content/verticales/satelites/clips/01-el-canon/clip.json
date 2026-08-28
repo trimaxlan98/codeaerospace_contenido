@@ -1,0 +1,184 @@
+{
+  "name": "01 · El cañón de Newton",
+  "modulo": "M1 · Caerse sin llegar al suelo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El gancho del curso. El mismo disparo horizontal desde una montaña de 400 km, cada vez más rápido: las balas caen a 11.8, 17.5, 27.4 y 49.2 grados de distancia, y la quinta —a 7.67 km/s— falla el suelo y da la vuelta entera. Después, la cuenta: en un segundo cae 4.347 m y el suelo se aleja 4.347 m. Todo lo mide satelites.canon_newton (RK4 sobre dos cuerpos) y caida_vs_curvatura durante el render; la escala del anillo de 400 km es real.",
+  "duracion_objetivo": 35.3,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD de la pieza",
+    "0.9  se dibuja la Tierra (radio real; el anillo de 400 km casi la roza)",
+    "2.0  la montaña de 400 km y el cañón",
+    "3.4  aparece el pie de cifra con la primera velocidad",
+    "3.9  disparo 1 (3.84 km/s): cae a 11.8 grados",
+    "6.4  disparo 2 (4.99): cae a 17.5",
+    "8.9  disparo 3 (6.14): cae a 27.4",
+    "11.4 disparo 4 (7.06): cae a 49.2",
+    "13.9 disparo 5 (7.67): da la vuelta entera; entra el anillo punteado",
+    "19.0 se apagan los disparos fallidos; respiro con la órbita",
+    "21.6 la cuenta: dos barras, la caída y el suelo que se aleja",
+    "23.7 se igualan y entra el signo igual; pie 4.347 metros en 1 s",
+    "27.9 vuelve el planeta con su satélite dando la vuelta",
+    "29.2 pie de cierre: 7.673 km por segundo a 400 km",
+    "34.6 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 2.6,
+        "texto": "Dispara un cañón desde muy alto."
+      },
+      {
+        "t_inicio": 5.5,
+        "texto": "La bala cae."
+      },
+      {
+        "t_inicio": 8.6,
+        "texto": "Dispara más fuerte. Cae más lejos."
+      },
+      {
+        "t_inicio": 12.6,
+        "texto": "Más fuerte todavía."
+      },
+      {
+        "t_inicio": 16.6,
+        "texto": "Y ahora falla el suelo."
+      },
+      {
+        "t_inicio": 21.9,
+        "texto": "Un satélite no deja de caer."
+      },
+      {
+        "t_inicio": 25.0,
+        "texto": "Cae lo mismo que se aleja la Tierra."
+      },
+      {
+        "t_inicio": 29.5,
+        "texto": "Por eso se queda."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.45,
+      35.15
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.9,
+        -17
+      ],
+      [
+        "blip_grave",
+        2.1,
+        -16
+      ],
+      [
+        "aire",
+        3.4,
+        -18
+      ],
+      [
+        "barrido",
+        3.9,
+        -17
+      ],
+      [
+        "tick",
+        5.0,
+        -13
+      ],
+      [
+        "barrido",
+        6.4,
+        -17
+      ],
+      [
+        "tick",
+        7.5,
+        -13
+      ],
+      [
+        "barrido",
+        8.9,
+        -17
+      ],
+      [
+        "tick",
+        10.0,
+        -13
+      ],
+      [
+        "barrido",
+        11.4,
+        -17
+      ],
+      [
+        "tick",
+        12.5,
+        -13
+      ],
+      [
+        "barrido",
+        13.9,
+        -16
+      ],
+      [
+        "blip_agudo",
+        16.0,
+        -12
+      ],
+      [
+        "pulso",
+        16.5,
+        -13
+      ],
+      [
+        "nebulosa",
+        20.8,
+        -16
+      ],
+      [
+        "subrayado",
+        23.7,
+        -14
+      ],
+      [
+        "blip_medio",
+        24.2,
+        -13
+      ],
+      [
+        "aire",
+        27.9,
+        -17
+      ],
+      [
+        "blip_medio",
+        29.2,
+        -14
+      ],
+      [
+        "pulso",
+        32.6,
+        -14
+      ]
+    ]
+  }
+}

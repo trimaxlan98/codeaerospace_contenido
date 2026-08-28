@@ -1,0 +1,143 @@
+{
+  "name": "10 · La malla",
+  "modulo": "M3 · Por eso son muchos",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un paquete cruza el oceano saltando de satelite en satelite; al lado, la ruta por fibra. La cifra: la longitud del camino por la malla (Dijkstra sobre saltos reales, con la atmosfera bloqueando los rayos rasantes) y su latencia frente a la de la fibra. El rodeo del cable y los 2c/3 son SUPUESTOS: se declaran.",
+  "libreria": [
+    "ruta_malla",
+    "latencia_fibra",
+    "gran_circulo_km"
+  ],
+  "duracion_objetivo": 30.05,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "0.6  el mapa",
+    "1.5  Nueva York y Londres",
+    "2.1  el gran circulo del cable (slerp de verdad, no una recta sobre el plano)",
+    "3.7  la cifra de la fibra, en GRIS: lleva supuestos",
+    "6.8  aparece el enjambre (216 satelites)",
+    "8.4  la ruta salta de satelite en satelite",
+    "11.8 la cifra: 4 saltos",
+    "14.8 los km: 6977 por la malla contra 5573 en recto",
+    "18.3 la latencia por la malla",
+    "22.4 las dos barras: 23.3 ms contra 39.0",
+    "24.9 la ventaja: 15.8 ms",
+    "29.2 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 2.3,
+        "texto": "De Nueva York a Londres."
+      },
+      {
+        "t_inicio": 4.4,
+        "texto": "Por cable, treinta y nueve milisegundos."
+      },
+      {
+        "t_inicio": 8.6,
+        "texto": "O por arriba, saltando de satélite en satélite."
+      },
+      {
+        "t_inicio": 12.0,
+        "texto": "Cuatro saltos."
+      },
+      {
+        "t_inicio": 15.0,
+        "texto": "Más kilómetros que en línea recta."
+      },
+      {
+        "t_inicio": 19.0,
+        "texto": "Y aun así llega antes."
+      },
+      {
+        "t_inicio": 25.2,
+        "texto": "Quince milisegundos de ventaja."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.2,
+      29.9
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.8,
+        -17
+      ],
+      [
+        "blip_grave",
+        2.1,
+        -16
+      ],
+      [
+        "barrido",
+        2.2,
+        -18
+      ],
+      [
+        "blip_medio",
+        3.9,
+        -15
+      ],
+      [
+        "aire",
+        6.8,
+        -18
+      ],
+      [
+        "tick",
+        8.6,
+        -13
+      ],
+      [
+        "tick",
+        9.4,
+        -13
+      ],
+      [
+        "tick",
+        10.2,
+        -13
+      ],
+      [
+        "blip_agudo",
+        11.6,
+        -12
+      ],
+      [
+        "blip_medio",
+        14.8,
+        -13
+      ],
+      [
+        "subrayado",
+        22.4,
+        -14
+      ],
+      [
+        "pulso",
+        24.9,
+        -13
+      ]
+    ]
+  }
+}

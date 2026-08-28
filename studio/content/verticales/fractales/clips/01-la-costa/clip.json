@@ -1,0 +1,168 @@
+{
+  "name": "01 · La costa",
+  "modulo": "M1 · La medida que se rompe",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El gancho del curso. Un compás camina una costa a zancadas de largo fijo y la longitud sube; al partir la regla por la mitad cuatro veces sigue subiendo (21.81 → 41.36) en vez de converger. Todas las cifras las mide fractales.medir_con_regla sobre esa misma costa (semilla 17) durante el render.",
+  "duracion_objetivo": 35.57,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  entra el HUD",
+    "1.1  la costa se dibuja de arriba abajo (4 s)",
+    "5.5  aparece el pie de cifra",
+    "6.2  21 zancadas de regla 1: la cifra sube con cada una",
+    "11.2 destello sobre 21.81",
+    "13.1 la cifra se apaga con la regla vieja; regla 1/2 -> 26.24 a los 16.0",
+    "16.6 regla 1/4 -> 30.73",
+    "20.2 regla 1/8 -> 36.21",
+    "23.5 regla 1/16 -> 41.36",
+    "27.9 la costa se apaga; suelo y cinco barras",
+    "31.5 respiro con la escalera entera",
+    "33.9 fundido a fondo limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.6,
+        "texto": "Esto es una costa."
+      },
+      {
+        "t_inicio": 6.6,
+        "texto": "Con una regla larga mide veintidós."
+      },
+      {
+        "t_inicio": 13.4,
+        "texto": "Parte la regla por la mitad."
+      },
+      {
+        "t_inicio": 20.3,
+        "texto": "Y otra vez. Y otra."
+      },
+      {
+        "t_inicio": 27.4,
+        "texto": "La costa no tiene una longitud."
+      },
+      {
+        "t_inicio": 31.6,
+        "texto": "Tiene una que crece."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      34.6,
+      35.4
+    ],
+    "eventos": [
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.75,
+        -19
+      ],
+      [
+        "aire_largo",
+        1.1,
+        -17
+      ],
+      [
+        "aire",
+        5.5,
+        -18
+      ],
+      [
+        "tick",
+        6.3,
+        -14
+      ],
+      [
+        "tick",
+        7.5,
+        -15
+      ],
+      [
+        "tick",
+        8.7,
+        -15
+      ],
+      [
+        "tick",
+        9.9,
+        -16
+      ],
+      [
+        "tick",
+        11.0,
+        -16
+      ],
+      [
+        "blip_medio",
+        12.0,
+        -13
+      ],
+      [
+        "barrido",
+        13.1,
+        -17
+      ],
+      [
+        "blip_medio",
+        16.3,
+        -15
+      ],
+      [
+        "barrido",
+        16.6,
+        -18
+      ],
+      [
+        "blip_medio",
+        19.9,
+        -15
+      ],
+      [
+        "barrido",
+        20.2,
+        -18
+      ],
+      [
+        "blip_medio",
+        23.2,
+        -15
+      ],
+      [
+        "barrido",
+        23.5,
+        -18
+      ],
+      [
+        "blip_agudo",
+        26.3,
+        -13
+      ],
+      [
+        "nebulosa",
+        27.3,
+        -16
+      ],
+      [
+        "subrayado",
+        28.4,
+        -14
+      ],
+      [
+        "pulso",
+        31.5,
+        -14
+      ]
+    ]
+  }
+}
