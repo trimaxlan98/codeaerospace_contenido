@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El Juego de la Vida de Conway con el cañón de Gosper: dos reglas de vecindad (nace con 3, vive con 2 o 3) bastan para que un patrón dispare proyectiles para siempre. El fotograma entero es la simulación (vida.simular, pixel duro, 700 pasos); en el nacimiento del planeador seguido (frame 138) la película va a cámara lenta y luego la cámara se pega a él (zoom 2.0) mientras cruza en diagonal y baja hasta salir. La cifra pasa de periodo del cañón (30 pasos, medido) a planeadores por minuto (30.0) y planeadores emitidos (22); el periodo teórico de la literatura (30) coincide y se cita en gris.",
-  "duracion_objetivo": 32.8,
+  "duracion_objetivo": 32.78,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  el canon ya dispara; entra el HUD de pieza",

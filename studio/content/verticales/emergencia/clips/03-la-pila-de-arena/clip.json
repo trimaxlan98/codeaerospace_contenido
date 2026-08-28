@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La pila abeliana de Bak-Tang-Wiesenfeld: cae un grano SIEMPRE en la misma celda del centro y toda celda con 4 reparte uno a cada vecino. Nadie coordina nada y la pila se organiza sola en una mandala fractal. El fotograma entero es arena.simular (rejilla 179×179, 50 000 granos, 750 frames); el contador de granos sube en vivo desde el primer segundo, la cámara entra a zoom 2.0 sobre el punto de caída para ver la textura de celda y se va a cámara lenta justo en el frame de la avalancha mayor: 21 533 celdas volcadas por un solo grano. Cierra con la distribución de tamaños en log-log dibujada con vectores sobre la mandala apagada: la recta del ajuste da exponente 1.28.",
-  "duracion_objetivo": 33.13,
+  "duracion_objetivo": 33.1,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  la mandala ya crece en el centro; entran el HUD de la pieza y el pie (400 granos)",
@@ -44,7 +44,7 @@
       },
       {
         "t_inicio": 30.1,
-        "texto": "Avalanchas sin tamaño típico."
+        "texto": "Sin tamano tipico."
       }
     ]
   },
@@ -57,24 +57,96 @@
       32.83
     ],
     "eventos": [
-      ["nebulosa", 0.15, -15],
-      ["blip_hud", 0.35, -19],
-      ["tick", 0.7, -13],
-      ["tick", 2.1, -13],
-      ["tick", 3.5, -13],
-      ["aire", 4.9, -18],
-      ["barrido", 8.3, -17],
-      ["pad", 11.0, -18],
-      ["barrido", 13.9, -17],
-      ["aire_largo", 16.3, -18],
-      ["blip_medio", 20.7, -15],
-      ["subrayado", 21.2, -13],
-      ["sting", 22.6, -14],
-      ["aire", 25.6, -18],
-      ["blip_grave", 26.3, -17],
-      ["blip_agudo", 28.5, -14],
-      ["pulso", 30.0, -14],
-      ["nebulosa_cierre", 31.7, -16]
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "tick",
+        0.7,
+        -13
+      ],
+      [
+        "tick",
+        2.1,
+        -13
+      ],
+      [
+        "tick",
+        3.5,
+        -13
+      ],
+      [
+        "aire",
+        4.9,
+        -18
+      ],
+      [
+        "barrido",
+        8.3,
+        -17
+      ],
+      [
+        "pad",
+        11.0,
+        -18
+      ],
+      [
+        "barrido",
+        13.9,
+        -17
+      ],
+      [
+        "aire_largo",
+        16.3,
+        -18
+      ],
+      [
+        "blip_medio",
+        20.7,
+        -15
+      ],
+      [
+        "subrayado",
+        21.2,
+        -13
+      ],
+      [
+        "sting",
+        22.6,
+        -14
+      ],
+      [
+        "aire",
+        25.6,
+        -18
+      ],
+      [
+        "blip_grave",
+        26.3,
+        -17
+      ],
+      [
+        "blip_agudo",
+        28.5,
+        -14
+      ],
+      [
+        "pulso",
+        30.0,
+        -14
+      ],
+      [
+        "nebulosa_cierre",
+        31.7,
+        -16
+      ]
     ]
   }
 }

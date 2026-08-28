@@ -33,8 +33,8 @@
         "texto": "Nadie manda: cada uno sigue el rastro que dejó."
       },
       {
-        "t_inicio": 29.5,
-        "texto": "Un dieciocho por ciento más que el cable recto."
+        "t_inicio": 28.0,
+        "texto": "Dieciocho por ciento mas."
       }
     ]
   },
@@ -47,24 +47,96 @@
       33.07
     ],
     "eventos": [
-      ["nebulosa", 0.15, -15],
-      ["blip_hud", 0.35, -19],
-      ["aire_largo", 0.9, -17],
-      ["blip_grave", 1.6, -15],
-      ["blip_medio", 3.0, -15],
-      ["blip_agudo", 6.0, -14],
-      ["pad", 8.9, -19],
-      ["barrido", 10.5, -17],
-      ["aire", 15.8, -16],
-      ["nebulosa", 15.5, -18],
-      ["tick", 18.0, -13],
-      ["tick", 18.6, -13],
-      ["tick", 19.2, -13],
-      ["pulso", 23.9, -13],
-      ["subrayado", 24.6, -14],
-      ["cuerda_mi3", 26.0, -16],
-      ["sting", 29.4, -12],
-      ["nebulosa_cierre", 28.6, -15]
+      [
+        "nebulosa",
+        0.15,
+        -15
+      ],
+      [
+        "blip_hud",
+        0.35,
+        -19
+      ],
+      [
+        "aire_largo",
+        0.9,
+        -17
+      ],
+      [
+        "blip_grave",
+        1.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        3.0,
+        -15
+      ],
+      [
+        "blip_agudo",
+        6.0,
+        -14
+      ],
+      [
+        "pad",
+        8.9,
+        -19
+      ],
+      [
+        "barrido",
+        10.5,
+        -17
+      ],
+      [
+        "aire",
+        15.8,
+        -16
+      ],
+      [
+        "nebulosa",
+        15.5,
+        -18
+      ],
+      [
+        "tick",
+        18.0,
+        -13
+      ],
+      [
+        "tick",
+        18.6,
+        -13
+      ],
+      [
+        "tick",
+        19.2,
+        -13
+      ],
+      [
+        "pulso",
+        23.9,
+        -13
+      ],
+      [
+        "subrayado",
+        24.6,
+        -14
+      ],
+      [
+        "cuerda_mi3",
+        26.0,
+        -16
+      ],
+      [
+        "sting",
+        29.4,
+        -12
+      ],
+      [
+        "nebulosa_cierre",
+        28.6,
+        -15
+      ]
     ]
   }
 }

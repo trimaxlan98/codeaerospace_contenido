@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un río de verdad, celda a celda. Todo el fotograma es lattice-Boltzmann D2Q9 (emergencia/rio.py): 32 400 celdas y 7790 pasos calculados en el render, sin resolver ninguna ecuación de fluidos. Las poblaciones se mueven por nueve direcciones, chocan y se relajan hacia el equilibrio local, y lo que rebota en el cilindro se devuelve por donde vino: nada más. De esas tres reglas sale sola la calle de vórtices de von Kármán, violeta a un lado y naranja al otro. Un anillo gris marca el único obstáculo; la cámara baja el ritmo y hace zoom 1.8 justo en el paso en que la sonda —tres diámetros aguas abajo— marca su pico, con un vórtice cruzándola. Al final se dibuja en cian la serie completa de esa sonda, plana al principio y periódica después, con el Strouhal medido aquí (0.205, 16 vórtices desprendidos) frente al 0.19 de la literatura para un cilindro libre, en gris: este canal mide sólo 6.75 diámetros de ancho y el bloqueo sube el número.",
-  "duracion_objetivo": 39.93,
+  "duracion_objetivo": 39.85,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  el río ya baja: los 130 frames de arranque acelerado (17 pasos cada uno); entra el HUD de la pieza",

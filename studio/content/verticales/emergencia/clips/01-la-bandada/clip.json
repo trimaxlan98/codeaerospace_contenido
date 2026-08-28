@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El gancho del curso y el molde del formato: 2500 agentes con tres reglas locales (separarse, alinearse, juntarse) y ningún jefe. El fotograma entero es la simulación (bandada.simular, boids con rejilla espacial, 900 frames). Del ruido inicial (polarización 0.03) nace una bandada que ondula; la cifra es la polarización del enjambre frame a frame, medida sobre lo que se ve; cuando cruza 0.8 (frame 351, 11.7 s simulados) la película va a cámara lenta, la cámara se pega al agente ámbar (zoom 2.2) y vuelve a abrirse: polarización final 0.93.",
-  "duracion_objetivo": 34.87,
+  "duracion_objetivo": 34.82,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  el ruido ya se mueve; entran el HUD de la pieza y el pie (polarizacion 0.03)",
@@ -49,8 +49,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.2,
-      34.8
+      34.07,
+      34.77
     ],
     "eventos": [
       [

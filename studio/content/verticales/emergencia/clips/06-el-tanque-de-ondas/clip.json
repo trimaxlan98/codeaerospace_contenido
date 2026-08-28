@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La ecuación de onda 2D por diferencias finitas: una fuente puntual emite frentes circulares y, al llegar a una pared con dos rendijas, nacen del otro lado las franjas de interferencia. La cámara hace zoom 1.6 justo cuando el patrón nace (con cámara lenta en ese instante) y se abre otra vez cuando las franjas llegan a la línea de detección; ahí se traza en cian la curva de intensidad medida y se releva la cifra medida (46.1 píxeles entre franjas) a la predicción teórica de Fresnel (45.6, en gris).",
-  "duracion_objetivo": 31.37,
+  "duracion_objetivo": 31.32,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  el frente circular ya se mueve; entra el HUD 06 . tanque",
@@ -24,11 +24,11 @@
     "secciones": [
       {
         "t_inicio": 0.9,
-        "texto": "Ningún jefe. Solo vecinos que empujan."
+        "texto": "Ningun jefe. Solo vecinos."
       },
       {
         "t_inicio": 3.3,
-        "texto": "Dos rendijas. Ninguna sola basta."
+        "texto": "Dos rendijas."
       },
       {
         "t_inicio": 8.3,
@@ -40,7 +40,7 @@
       },
       {
         "t_inicio": 28.3,
-        "texto": "El libro se queda corto. La física, no."
+        "texto": "El libro se queda corto."
       }
     ]
   },
@@ -49,8 +49,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      30.6,
-      31.3
+      30.57,
+      31.27
     ],
     "eventos": [
       [

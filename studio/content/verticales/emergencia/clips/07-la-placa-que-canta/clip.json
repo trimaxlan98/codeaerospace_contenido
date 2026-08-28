@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Chladni: 40 000 granos de arena sobre una placa cuadrada que vibra en cuatro modos crecientes (1,2) -> (2,3) -> (2,5) -> (5,7); el grano huye de donde la placa tiembla y se queda donde está quieta, dibujando solo las líneas nodales. Cámara lenta en el primer salto de frecuencia (cuando la arena brinca y vuelve a organizarse) y zoom 1.5x al centro de la placa durante el tercer modo. Cifras medidas en este render: la frecuencia relativa de cada modo y, al final, la fracción de arena sobre el nodo del último modo.",
-  "duracion_objetivo": 32.23,
+  "duracion_objetivo": 32.28,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD sobre la arena ya en movimiento (modo 1)",
@@ -30,8 +30,8 @@
         "texto": "Tres reglas, y la arena dibuja sola."
       },
       {
-        "t_inicio": 29.4,
-        "texto": "Cuanto más vibra la placa, menos se queda quieta."
+        "t_inicio": 27.6,
+        "texto": "Mas vibra, menos quieta."
       }
     ]
   },

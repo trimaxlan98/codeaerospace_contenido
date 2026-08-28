@@ -161,8 +161,8 @@ de escribir clips).
 | 6 · Produccion clips 02-14 (subagentes) | **hecho** (12:05): 13 clips entregados por 6 Sonnet + 7 Opus, todos entre 31.4 y 39.9 s en ql; 3 bugs de libreria cazados por agentes (tabla de Ising, franja del LBM, alfa de Pelicula tras zoom) y corregidos |
 | 7 · Revision de frames + pytest | frames ql revisados; **190 tests en verde**; revision final sobre los frames qh |
 | 8 · Commit, push, PR (sin merge) | commits 89516c2 + el de cierre de clips; PR pendiente |
-| 9 · qh (3 frentes) + duraciones a los manifiestos | en curso desde las 11:00 (frentes A/B/C + D para 10 y 13) |
-| 10 · Voz (VPS, serial, alinear_voz.py) | pendiente |
+| 9 · qh (3 frentes) + duraciones a los manifiestos | **hecho** (11:57): 16/16 en 1080x1920 @60, 0 fallos; duraciones medidas escritas en los manifiestos. **502.76 s = 8 min 23 s** de curso |
+| 10 · Voz (VPS, serial, alinear_voz.py) | en curso (11:57): 14 piezas con voz, intro y cierre sin ella |
 | 11 · unir_vertical: piezas sueltas + montaje + verificacion | pendiente |
 | 12 · PLAN.md, catalogo, memoria | pendiente |
 
@@ -185,6 +185,34 @@ de escribir clips).
 4. Revision de frames de TODAS las piezas (paso 7), pytest, commit, PR sin
    merge, qh en 3 frentes, voz en el VPS (serial), unir_vertical,
    verificacion, PLAN.md/catalogo/memoria (pasos 8-12).
+
+## Costuras del montaje (medidas sobre los qh, 2026-08-28)
+
+Ultimo frame de cada pieza contra el primero de la siguiente, en 1080x1920:
+
+| Union | Diferencia |
+|---|---|
+| 14 -> cierre | **0.000**/255 |
+| 03->04, 02->03, 13->14 | 4.8-5.0 |
+| intro->01, 10->11, 04->05, 11->12 | 5.2-5.7 |
+| 08->09, 12->13, 05->06 | 6.5-7.8 |
+| 06->07 | 30.6 |
+| 07->08 | 46.3 |
+| 01->02 | 56.8 |
+| 09->10 | **66.4** (la peor) |
+
+**Es una consecuencia buscada, no un defecto**: el encargo manda que cada
+clip se pueda subir SOLO a Instagram, y para eso el contrato exige
+movimiento en los dos primeros segundos. Una pieza que arranca con su
+simulacion ya viva no arranca en negro, asi que la union con la anterior es
+un **corte seco de montaje**, no el empalme invisible del curso 26 (que
+media 0.003/255 porque todas sus piezas nacian y morian en fondo limpio).
+Todas las piezas SI terminan en fondo limpio (`cerrar_pieza`), que es lo que
+evita el chasquido dentro de cada pieza.
+
+Si algun dia se quiere el montaje con empalmes invisibles, la via es un
+fundido corto al unir (re-encodeando: `unir_vertical.py` concatena con
+`-c copy`), no quitarle el gancho a las piezas.
 
 ## Cifras medidas (informes de los simuladores, contenedor, 2026-08-28)
 
