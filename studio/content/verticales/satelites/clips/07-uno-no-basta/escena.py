@@ -92,7 +92,7 @@ class Clip(Scene):
         nuevos = [solape.etiqueta, solape.numero, solape.sub]
         self.play(FadeOut(raya_n), FadeOut(raya_s), run_time=0.5)
         cambiar(self, vivos, nuevos, salida=0.24, entrada=0.30)
-        self.wait(5.3)
+        self.wait(5.60)
 
         for mob in self.mobjects:
             mob.clear_updaters()

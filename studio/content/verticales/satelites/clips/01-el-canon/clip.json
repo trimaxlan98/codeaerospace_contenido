@@ -4,7 +4,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El gancho del curso. El mismo disparo horizontal desde una montaña de 400 km, cada vez más rápido: las balas caen a 11.8, 17.5, 27.4 y 49.2 grados de distancia, y la quinta —a 7.67 km/s— falla el suelo y da la vuelta entera. Después, la cuenta: en un segundo cae 4.347 m y el suelo se aleja 4.347 m. Todo lo mide satelites.canon_newton (RK4 sobre dos cuerpos) y caida_vs_curvatura durante el render; la escala del anillo de 400 km es real.",
-  "duracion_objetivo": 35.43,
+  "duracion_objetivo": 35.3,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD de la pieza",
@@ -65,8 +65,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.6,
-      35.3
+      34.45,
+      35.15
     ],
     "eventos": [
       [

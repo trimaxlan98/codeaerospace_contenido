@@ -9,7 +9,7 @@
     "latencia_fibra",
     "gran_circulo_km"
   ],
-  "duracion_objetivo": 30.16,
+  "duracion_objetivo": 30.05,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
@@ -64,8 +64,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      29.3,
-      30.0
+      29.2,
+      29.9
     ],
     "eventos": [
       [

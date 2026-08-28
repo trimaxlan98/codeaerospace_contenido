@@ -95,7 +95,7 @@ class Clip(Scene):
                         color_sub=C_TIERRA)
         nuevos = [vaiven.etiqueta, vaiven.numero, vaiven.sub]
         cambiar(self, vivos, nuevos, salida=0.24, entrada=0.30)
-        self.wait(5.1)
+        self.wait(5.40)
 
         for mob in self.mobjects:
             mob.clear_updaters()

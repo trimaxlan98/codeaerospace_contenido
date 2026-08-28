@@ -9,7 +9,7 @@
     "fraccion_visible",
     "angulo_cobertura"
   ],
-  "duracion_objetivo": 30.43,
+  "duracion_objetivo": 30.35,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
@@ -60,8 +60,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      29.7,
-      30.3
+      29.5,
+      30.2
     ],
     "eventos": [
       [

@@ -88,7 +88,7 @@ class Clip(Scene):
         self.add(cons_b.sats)
         cambiar(self, vivos, nuevos, salida=0.24, entrada=0.30)
         self.play(sa.AnimarWalker(cons_b), run_time=4.5)
-        self.wait(2.8)
+        self.wait(3.10)
 
         for mob in self.mobjects:
             mob.clear_updaters()

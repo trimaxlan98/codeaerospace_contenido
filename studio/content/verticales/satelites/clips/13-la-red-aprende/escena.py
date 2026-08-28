@@ -115,7 +115,7 @@ class Clip(Scene):
                         color_sub=C_SAT)
         nuevos = [cierre.etiqueta, cierre.numero, cierre.sub]
         cambiar(self, vivos, nuevos, salida=0.24, entrada=0.30)
-        self.wait(5.2)
+        self.wait(5.50)
 
         for mob in self.mobjects:
             mob.clear_updaters()

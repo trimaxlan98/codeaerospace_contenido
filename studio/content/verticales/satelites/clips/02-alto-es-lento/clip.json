@@ -7,7 +7,7 @@
   "libreria": [
     "periodo_orbital"
   ],
-  "duracion_objetivo": 30.43,
+  "duracion_objetivo": 30.27,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
@@ -49,8 +49,8 @@
         "texto": "Quince veces más lento."
       },
       {
-        "t_inicio": 26.6,
-        "texto": "Un día justo. Por eso tu antena no se mueve."
+        "t_inicio": 25.6,
+        "texto": "Un día justo. Tu antena no se mueve."
       }
     ]
   },
@@ -59,8 +59,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      29.6,
-      30.3
+      29.42,
+      30.12
     ],
     "eventos": [
       [

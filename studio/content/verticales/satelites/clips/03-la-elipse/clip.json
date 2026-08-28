@@ -8,7 +8,7 @@
     "elipse_kepler",
     "areas_barridas"
   ],
-  "duracion_objetivo": 31.43,
+  "duracion_objetivo": 31.32,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  entra el HUD",
@@ -51,7 +51,7 @@
         "texto": "Y barre la misma área."
       },
       {
-        "t_inicio": 26.4,
+        "t_inicio": 25.8,
         "texto": "Larga y estrecha, o corta y ancha. La misma."
       }
     ]
@@ -61,8 +61,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      30.6,
-      31.3
+      30.47,
+      31.17
     ],
     "eventos": [
       [

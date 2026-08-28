@@ -17,20 +17,71 @@
   "audio": {
     "pico_db": -4.5,
     "fade_in": 0.3,
-    "fade_out": [11.3, 12.3],
+    "fade_out": [
+      11.63,
+      12.33
+    ],
     "eventos": [
-      ["barrido", 0.5, -8],
-      ["aire_largo", 0.65, -16],
-      ["nebulosa_intro", 1.85, -13],
-      ["blip_grave", 2.3, -14],
-      ["blip_medio", 2.8, -13],
-      ["blip_agudo", 3.6, -12],
-      ["tick", 3.78, -10],
-      ["tick", 4.12, -10],
-      ["aire", 4.7, -15],
-      ["blip_hud", 6.4, -16],
-      ["subrayado", 7.7, -12],
-      ["pulso", 9.3, -12]
+      [
+        "barrido",
+        0.5,
+        -8
+      ],
+      [
+        "aire_largo",
+        0.65,
+        -16
+      ],
+      [
+        "nebulosa_intro",
+        1.85,
+        -13
+      ],
+      [
+        "blip_grave",
+        2.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        2.8,
+        -13
+      ],
+      [
+        "blip_agudo",
+        3.6,
+        -12
+      ],
+      [
+        "tick",
+        3.78,
+        -10
+      ],
+      [
+        "tick",
+        4.12,
+        -10
+      ],
+      [
+        "aire",
+        4.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        6.4,
+        -16
+      ],
+      [
+        "subrayado",
+        7.7,
+        -12
+      ],
+      [
+        "pulso",
+        9.3,
+        -12
+      ]
     ]
   }
 }
