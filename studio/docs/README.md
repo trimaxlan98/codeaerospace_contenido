@@ -259,7 +259,7 @@ a root el `CAP_DAC_OVERRIDE` que le dejaría escribir en un directorio ajeno.
    `concat.txt` ya trae los archivos en el orden del proyecto; `-c copy` es posible porque
    todos los clips de un proyecto comparten calidad (mismo códec/resolución).
 
-### Audio de los promos (botón «Audio» en un proyecto de tipo promo)
+### Cama de sonido (botón «Audio» en cualquier clip)
 
 Un promo de redes no lleva subtítulos: si no suena, no comunica. Este camino monta la
 **cama de sonido** y la **voz** sobre el video, dentro de la app (antes se hacía fuera, a
@@ -290,8 +290,36 @@ mano, con `studio/tools/sfx.py`).
 | PUT | `/api/projects/{pid}/clips/{cid}/audio` | guarda el manifiesto (422 si un sonido no existe o un nivel se sale de rango) |
 | POST | `/api/projects/{pid}/clips/{cid}/audio/mezclar` | sintetiza la voz si hace falta y mezcla (409 sin render, 503 sin Vertex si hay frases) |
 
-Los tres responden 409 en un proyecto que no sea `tipo='promo'`: un curso se narra desde
-«Generar narración», que es otro camino y otro formato.
+**Desde el sprint E3 la cama también es de los cursos**, con una regla que manda sobre todo
+lo demás: **un clip de curso no lleva voz aquí**. Su narración sale de «Generar narración» y
+la película la pega al montar; un manifiesto de curso con frases es un **error 422**, no un
+aviso — aceptarlo pegaría dos voces sobre el mismo clip. Lo que cambia por tipo:
+
+| | promo | curso |
+|---|---|---|
+| voz en el manifiesto | sí | no (422) |
+| pico por defecto de la cama | −3 dB | **−16 dB** (nace bajo la voz) |
+| avisos | bucle, frases que se empujan, cola de silencio | cama que compite con la voz, sonidos fuera del clip |
+| verificación | sí | 409 (mide la costura del bucle y 8-15 s, que en un curso no existen) |
+
+La película usa el mp4 **que la app sirve** (el sonorizado si existe) y, cuando además hay
+narración, **mezcla** las dos pistas (`amix`) en vez de reemplazar la cama por la voz.
+
+### Banco de sonidos audible (`/api/sfx`)
+
+Los 18 efectos de `sfx.py` se elegían a ciegas, por su nombre. `sfx.py paleta` los sintetiza
+como wavs sueltos en `exports/sfx/` (comando `paleta` del runner: el backend no tiene numpy),
+y el diálogo de audio los reproduce con un ▶ por línea. La síntesis es determinista: se
+generan una vez y no caducan.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/sfx` | la paleta, cuáles están listos, si está completa |
+| POST | `/api/sfx` | sintetiza (409 si ya se está sintetizando) |
+| GET | `/api/sfx/{nombre}` | el wav; el nombre va contra el conjunto **cerrado** de la paleta |
+
+El listado cruza el directorio con la paleta viva: `exports/sfx/` sobrevive a los cambios de
+`PALETA` y una corrida vieja deja efectos que ya no existen.
 
 ### Importar los promos del repo (`subir_promo.py`)
 
@@ -344,6 +372,26 @@ otro archivo.
 
 Mezclar el audio dispara la verificación al terminar: recién mezclado es cuando el informe
 anterior deja de valer.
+
+### Atajos y paleta de comandos
+
+| Tecla | Qué hace |
+|---|---|
+| `Ctrl+K` / `⌘K` | paleta de comandos: ir a un curso o a una sección escribiendo |
+| `g` + `p`/`e`/`r`/`a`/`d`/`c` | Proyectos · Estudio · Renders · Aprender · Admin · Configuración |
+| `Ctrl+Enter` | renderizar, desde el editor del Estudio |
+| `?` | la hoja con todo esto |
+
+La tabla `ATAJOS` de `components/Atajos.jsx` es a la vez la implementación y la hoja de ayuda.
+Las teclas sueltas **no actúan mientras se escribe** (input, textarea, `contenteditable` o
+CodeMirror); `Ctrl+K` sí funciona siempre, porque es el atajo para *salir* de donde estás.
+
+La paleta no pide nada al servidor (usa el store del catálogo) y **puntúa** en vez de filtrar:
+`alg 42` encuentra «Álgebra lineal · 4.2 Diagonalizar» — ignora tildes y reintenta cada palabra
+contra el texto sin puntuación, porque nadie teclea el punto de «4.2».
+
+Los clips de un proyecto se **reordenan arrastrando** por su asa (el `draggable` es el asa, no
+la tarjeta: dentro hay campos de texto).
 
 ### Asistente IA (Vertex AI · Gemini 2.5 · us-central1)
 
