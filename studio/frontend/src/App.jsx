@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { api, setUnauthorizedHandler } from './api.js'
 import { useRoute } from './router.js'
+import CommandPalette from './components/CommandPalette.jsx'
+import { AtajosDialog, useAtajos } from './components/Atajos.jsx'
 import { getPrefs } from './prefs.js'
 import { cursoDeJob, useCatalogo } from './catalogo.js'
 import { cn } from '@/lib/utils'
@@ -30,6 +32,8 @@ export default function App() {
   const [aiEnabled, setAiEnabled] = useState(false)
   const [user, setUser] = useState('')
   const [route, navigate] = useRoute()
+  // Atajos globales (Ctrl+K, g+tecla, ?) y los dos dialogos que abren.
+  const { paleta, setPaleta, ayuda, setAyuda } = useAtajos(navigate)
   const view = route.view
   // Nombres de curso: los avisos de fin de render decian solo la escena
   // (`Clip3`), que con ~300 clips en catalogo no identifica nada.
@@ -216,9 +220,13 @@ export default function App() {
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:border focus:border-accent focus:bg-surface focus:px-3 focus:py-2 focus:text-[13px] focus:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
         Saltar al contenido
       </button>
+      <CommandPalette open={paleta} onOpenChange={setPaleta}
+        onNavigate={(v, p) => navigate(v, p)} />
+      <AtajosDialog open={ayuda} onOpenChange={setAyuda} />
       <Header
         view={view}
         onView={navigate}
+        onPaleta={() => setPaleta(true)}
         metrics={metrics}
         orbitState={orbitState}
         staleSince={staleSince}

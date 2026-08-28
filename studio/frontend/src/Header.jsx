@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Activity, FileCode, Film, FolderKanban, GraduationCap,
-  Settings as SettingsIcon, WifiOff,
+  Settings as SettingsIcon, WifiOff, Search,
 } from 'lucide-react'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
 import { Wordmark } from './components/Brand.jsx'
@@ -44,7 +44,7 @@ function MeterChip({ label, pct }) {
   )
 }
 
-export default function Header({ view, onView, metrics, orbitState, staleSince }) {
+export default function Header({ view, onView, metrics, orbitState, staleSince, onPaleta }) {
   const clock = useUtcClock() // ademas re-renderiza cada segundo: el contador de "sin señal" avanza solo
   const telemetry = usePref('telemetry')
   return (
@@ -106,6 +106,18 @@ export default function Header({ view, onView, metrics, orbitState, staleSince }
           <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted md:inline">
             {clock} <span className="text-faint">UTC</span>
           </span>
+        )}
+        {/* La puerta visible a la paleta de comandos: un atajo que no se ve
+            no existe para quien no lee la hoja de atajos. */}
+        {onPaleta && (
+          <button
+            onClick={onPaleta}
+            title="Buscar e ir (Ctrl+K)"
+            className="hidden h-9 items-center gap-2 rounded-md border border-line px-2.5 text-sm text-muted transition-colors hover:border-line-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan sm:flex">
+            <Search className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden lg:inline">Buscar</span>
+            <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint lg:inline">Ctrl K</kbd>
+          </button>
         )}
         {/* La barra ya no lleva ajustes (encargo 8): ni selector de tema ni
             "Salir". Solo la puerta a Configuracion, que es navegacion. */}

@@ -44,7 +44,7 @@ Lo que le falta para ser un estudio, en orden de cuánto duele:
 | E1 | La película | monta el curso completo dentro de la app | **hecho** |
 | E2 | Transiciones | empalmes reales entre clips + catálogo en escena | **hecho** |
 | E3 | Sonido de cursos | cama de SFX en cursos + banco audible | **hecho** |
-| E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | pendiente |
+| E4 | Formas de uso | paleta de comandos, atajos, arrastrar clips | **hecho** |
 | E5 | Movimiento | transiciones de vista y micro-animaciones en la consola | pendiente |
 
 ---
@@ -301,3 +301,76 @@ mezcla no sabe sintetizar — el listado los cruza con la paleta viva.
 
 223 tests en verde (10 nuevos), el banco sintetizado de verdad en el contenedor
 (18 efectos) y la mezcla medida banda a banda.
+
+---
+
+## E4 — Formas de uso (hecho)
+
+La consola tenía **un** atajo en toda la app (`Ctrl+Enter` para renderizar) y no
+estaba escrito en ninguna parte salvo el `title` de un botón. Y con ~80 cursos
+en catálogo, llegar a «Álgebra lineal · 4.2 Diagonalizar» eran cuatro gestos:
+Proyectos → desplegar la familia → buscar la lección → abrirla.
+
+### Paleta de comandos (`Ctrl+K` / `⌘K`)
+
+Escribir para ir a cualquier sitio. **No pide nada al servidor**: las fuentes
+son el store compartido del catálogo (`catalogo.js`) y la tabla de vistas del
+router, así que se abre instantánea.
+
+Se **puntúa**, no se filtra: todas las palabras de la consulta tienen que
+aparecer, en cualquier orden, y las que empiezan palabra puntúan mejor.
+Escribir `alg 42` encuentra «Álgebra lineal · 4.2 Diagonalizar y las
+potencias» — la comparación ignora tildes y, cuando una palabra no aparece tal
+cual, se reintenta contra el texto **compactado** (sin puntuación), que es lo
+que hace que `42` encuentre `4.2`. Nadie teclea el punto.
+
+La familia va **delante** del título, no en la columna derecha: «1.1 El vector»
+existe en Álgebra lineal y en Cálculo vectorial, y sin la familia las dos filas
+son la misma. (Se vio en la primera captura de QA, no en el código.)
+
+### Atajos
+
+Una sola tabla (`ATAJOS` en `components/Atajos.jsx`) es a la vez la
+implementación y la hoja de ayuda (`?`): no pueden separarse.
+
+`Ctrl+K` la paleta · `g p/e/r/a/d/c` ir a cada sección (acorde de 1,2 s, como
+GitHub) · `Ctrl+Enter` renderizar · `?` la hoja.
+
+Dos reglas que evitan los errores clásicos de un atajo global:
+
+- **Nada se dispara mientras se escribe** — input, textarea, `contenteditable`
+  o el editor CodeMirror. Sin esto, teclear «gp» en el título de un clip te
+  saca a Proyectos.
+- **`Ctrl+K` sí funciona siempre**, incluso dentro del editor: es el atajo para
+  *salir* de donde estás, y exigir soltar el foco primero lo haría inútil.
+
+### Reordenar clips arrastrando
+
+Mover un clip del final al principio eran seis clics de flecha. Ahora se
+arrastra por el asa.
+
+**Quien es `draggable` es el asa, no la tarjeta**: dentro de la tarjeta hay
+inputs y un textarea, y un contenedor arrastrable se pelea con la selección de
+texto. La tarjeta solo hace de destino, y se le pasa como imagen de arrastre
+(`setDragImage`) para que lo que viaja se vea.
+
+**Qué se arrastra vive en un `ref`, no en el estado.** El estado de React se
+aplica en el siguiente render, y `dragstart` y `drop` pueden ocurrir sin que
+haya habido uno en medio: entonces el `drop` leía `null` y el clip no se movía.
+El estado se queda solo para atenuar la tarjeta que viaja, donde llegar un
+render tarde no rompe nada. **Este bug lo encontró el QA, no la lectura.**
+
+### Verificación
+
+Arnés Playwright contra la app construida, con backend local y catálogo
+sembrado (no se commitea; vive en el scratchpad). Ocho comprobaciones en verde:
+
+- `Ctrl+K` abre la paleta; `alg 42` la resuelve a «4.2 Diagonalizar»; `↵` abre
+  el curso (`#/proyectos/<id>`).
+- `?` abre la hoja; `g r` va a Renders.
+- Teclear «gp» **dentro del editor** no navega; `Ctrl+K` **sí** funciona ahí.
+- Arrastrar el tercer clip sobre el primero deja `Tres, Uno, Dos`.
+
+Nota del arnés: Playwright headless no arranca el *drag and drop nativo* de
+Chromium; el reordenamiento se comprueba despachando los eventos de arrastre a
+mano, que es lo que prueba los manejadores y su cableado.

@@ -14,7 +14,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ChevronDown, ChevronRight, ChevronUp, Download, FileJson, FileText,
-  FolderKanban, Film, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Wand2,
+  FolderKanban, Film, GripVertical, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Wand2,
 } from 'lucide-react'
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
@@ -742,6 +742,29 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
     }
   }
 
+  // Arrastrar y soltar clips: soltar sobre una tarjeta es moverse a su
+  // posicion, con el MISMO endpoint que las flechas.
+  //
+  // Que se arrastra vive en un REF, no en el estado. El estado de React se
+  // aplica en el siguiente render, y `dragstart` y `drop` pueden ocurrir sin
+  // que haya habido uno en medio: entonces `soltar` leia `null` y el clip no
+  // se movia. El estado se queda solo para lo visual (atenuar la tarjeta que
+  // viaja), donde llegar un render tarde no rompe nada.
+  const arrastrandoRef = useRef(null)
+  const [arrastrando, setArrastrando] = useState(null)
+  const arrastre = {
+    activo: arrastrando,
+    enCurso: () => arrastrandoRef.current,
+    iniciar: (cid) => { arrastrandoRef.current = cid; setArrastrando(cid) },
+    terminar: () => { arrastrandoRef.current = null; setArrastrando(null) },
+    soltar: (position) => {
+      const cid = arrastrandoRef.current
+      arrastrandoRef.current = null
+      setArrastrando(null)
+      if (cid) move(cid, position)
+    },
+  }
+
   const move = async (cid, position) => {
     setError('')
     try {
@@ -1059,7 +1082,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               <ClipCard key={clip.id} clip={clip} index={i} total={clips.length}
                 prevClip={i > 0 ? clips[i - 1] : null} jobs={jobs}
                 onFieldChange={onFieldChange} onFieldBlur={onFieldBlur}
-                onMove={move} onDelete={removeClip} onRender={renderClip}
+                onMove={move} onDelete={removeClip} onRender={renderClip} arrastre={arrastre}
                 onOpenInStudio={openInStudio}
                 projectId={project.id} formato={project.formato} tipo={project.tipo}
                 narr={narrByClip[clip.id]}
@@ -1122,7 +1145,13 @@ function DurationBadge({ s, rango = DURACION.curso }) {
   )
 }
 
-function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion, onAudio }) {
+function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion, onAudio, arrastre }) {
+  // Reordenar arrastrando. Quien es `draggable` es EL ASA, no la tarjeta:
+  // dentro de la tarjeta hay inputs y un textarea, y un contenedor arrastrable
+  // se pelea con la seleccion de texto. La tarjeta solo hace de destino. Para
+  // que lo que se arrastra se vea (el asa sola es un icono de 14 px), se le
+  // pasa la tarjeta como imagen de arrastre.
+  const tarjetaRef = useRef(null)
   const activeJob = activeJobFor(jobs, clip.id)
   // El promo dice en el propio boton como esta su mezcla: sin audio, sin
   // mezclar, desactualizada o al dia.
@@ -1143,7 +1172,20 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
   const narrMeta = narr ? (NARR_META[narr.estado] || NARR_META.sin_narracion) : null
 
   return (
-    <article className="flex flex-col gap-2.5 border-b border-line p-3.5 last:border-b-0 sm:flex-row">
+    <article
+      ref={tarjetaRef}
+      onDragOver={(e) => {
+        // Se acepta cualquier arrastre propio en curso; el ref es la verdad.
+        if (arrastre?.enCurso() && arrastre.enCurso() !== clip.id) {
+          e.preventDefault()
+          e.dataTransfer.dropEffect = 'move'
+        }
+      }}
+      onDrop={(e) => { e.preventDefault(); arrastre?.soltar(clip.position) }}
+      className={cn(
+        'flex flex-col gap-2.5 border-b border-line p-3.5 last:border-b-0 sm:flex-row',
+        arrastre?.activo === clip.id && 'opacity-40',
+        arrastre?.activo && arrastre.activo !== clip.id && 'hover:border-accent')}>
       {/* La proporción sale del video real (o del formato del proyecto
           mientras no exista): un promo vertical no se mira en una caja 16:9. */}
       <div style={{ aspectRatio: ratioDeJob(renderJob, formato) }}
@@ -1218,6 +1260,22 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
             title={activeJob ? 'ya hay un render en curso para este clip' : (!clip.scene?.trim() ? 'asigna una escena primero' : undefined)}>
             Render
           </Button>
+          <span
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = 'move'
+              // Firefox no inicia el arrastre si no hay datos.
+              e.dataTransfer.setData('text/plain', clip.id)
+              if (tarjetaRef.current) {
+                e.dataTransfer.setDragImage(tarjetaRef.current, 24, 24)
+              }
+              arrastre?.iniciar(clip.id)
+            }}
+            onDragEnd={() => arrastre?.terminar()}
+            title="arrastrar para reordenar"
+            className="cursor-grab select-none px-1 text-faint hover:text-muted active:cursor-grabbing">
+            <GripVertical className="h-3.5 w-3.5" />
+          </span>
           <Button size="xs" variant="ghost" onClick={() => onMove(clip.id, clip.position - 1)}
             disabled={index === 0} aria-label="mover arriba">
             <ChevronUp className="h-3.5 w-3.5" />
