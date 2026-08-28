@@ -91,9 +91,17 @@ Dos decisiones que conviene recordar:
   Borrar la rama no debe costar horas de re-render, así que quedaron en
   `detached HEAD` sobre su último commit. Para recuperar el disco:
   `git worktree remove ../codeaerospace_contenido-<nombre>`.
-- **`curso/satelites-vertical` nunca se empujó.** Sus dos commits —el curso 28
-  terminado, 16 piezas narradas y muxeadas— existen **solo en el disco local**,
-  en su worktree. Es la única rama viva sin copia en el remoto.
+- **`curso/satelites-vertical` nunca se empujó**: sus dos commits —el curso 28
+  terminado— existían solo en el disco local. Se mergearon a `main` el mismo día
+  (conflicto en `PLAN.md` resuelto conservando las filas 27 y 29 de `main`) y la
+  rama se retiró. El fix que traía vale la pena recordarlo: cada clip acababa con
+  `FadeOut` sobre **todos** sus mobjects, incluidas las esquinas HUD y la marca de
+  agua, así que la pieza terminaba con el lienzo desnudo y la siguiente los
+  encendía de golpe — un parpadeo en las catorce uniones, que la comprobación de
+  costuras delató con **0,0552/255 idéntico en las catorce** (la firma de que el
+  culpable es siempre el mismo objeto). Con `fundido_final()` bajan a 0,0048.
+
+Estado final: **`main` y `curso/emergencia-vertical`**, en local y en el remoto.
 
 ---
 
