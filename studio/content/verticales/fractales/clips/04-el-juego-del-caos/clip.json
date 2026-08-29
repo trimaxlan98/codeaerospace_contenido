@@ -24,7 +24,7 @@
       },
       {
         "t_inicio": 5.4,
-        "texto": "Sale una, saltas a la mitad, marcas."
+        "texto": "Sale una: mitad y marca."
       },
       {
         "t_inicio": 10.5,
@@ -32,15 +32,15 @@
       },
       {
         "t_inicio": 15.5,
-        "texto": "Del puro azar sale una figura exacta."
+        "texto": "Del azar sale una figura exacta."
       },
       {
         "t_inicio": 21.5,
-        "texto": "El triángulo de Sierpinski."
+        "texto": "Sierpinski."
       },
       {
         "t_inicio": 26.4,
-        "texto": "Con dimensión uno coma cincuenta y nueve."
+        "texto": "Uno punto cinco nueve."
       }
     ]
   },

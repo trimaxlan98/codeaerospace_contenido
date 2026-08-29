@@ -94,7 +94,7 @@ def renderizar(promo: dict, slug: str, args) -> bool:
     cmd += ["-v", f"{REPO}:/workspace:ro", "-v", f"{trabajo}:/media",
             IMAGEN, "manim", "render", "-qh", "--disable_caching",
             "--media_dir", "/media",
-            f"/workspace/{scene_py.relative_to(REPO)}", promo["scene"]]
+            "/media/scene.py", promo["scene"]]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         cola = "\n".join(proc.stderr.strip().splitlines()[-15:])
