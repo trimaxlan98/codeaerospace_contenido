@@ -192,3 +192,31 @@ Dos cosas que este curso hace distinto y conviene saber antes de copiarlo:
   pie de cifra; es lo que hace legible el gris sobre el laberinto de
   Gray-Scott o la mandala de arena. Si se baja su opacidad, el clip 03 es el
   primero que lo acusa.
+
+
+## Curso 30 — Sistemas ATP: apuntamiento y seguimiento de satelites
+
+Familia horizontal de **9 lecciones / 36 clips** (3 modulos x 3), formato
+mudo, 20.4 min. Libreria `atp.py` sobre el sustrato de dibujo de
+`apuntado.py` (curso 9). Publicado en PR #67 el 2026-08-29.
+
+El arco: *una antena que persigue es una cadena de eslabones, y cada
+eslabon tiene su cifra*. De un TLE a una prediccion, de la prediccion a
+una trayectoria, de la trayectoria a un lazo, del lazo a una campaña que
+acota su cola, y de ahi a un numero de decibelios. Lo tensa una paradoja
+— el mejor pase para el enlace es el peor para la mecanica — y cierra
+respondiendo por que el objetivo es 0.1 grados: no es un numero de
+mecanica, es un numero de radio.
+
+**Que NO pisa** (cuatro cursos vecinos tocan el tema): el 9 conto la
+divulgacion del mismo asunto, el 11 la teoria de control generica, el 13
+el link budget completo y el modulo 3 del 20 el ATP **optico** entre
+satelites. Esta familia ocupa la ingenieria del ATP de radiofrecuencia
+desde tierra.
+
+- Modulo 1, **donde mirar**: el cielo que se mueve · de dos lineas a dos
+  angulos · la ventana y el keyhole.
+- Modulo 2, **los dos seguimientos** (angulo y frecuencia): la frecuencia
+  que se mueve · la montura es un robot · el lazo sobre una rampa.
+- Modulo 3, **del lazo nominal al sistema real**: LQR · la campaña Monte
+  Carlo · por que una decima de grado.

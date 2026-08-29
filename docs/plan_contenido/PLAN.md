@@ -1,6 +1,6 @@
 # Plan de contenido: de la Academia a los cursos de video
 
-Fecha: 2026-08-06 (ultima actualizacion: 2026-08-25). Responsable de
+Fecha: 2026-08-06 (ultima actualizacion: 2026-08-29). Responsable de
 arquitectura: Fable (guiones, diseño de curso); agentes sonnet/opus escriben
 el codigo de los clips y librerias.
 
@@ -60,6 +60,7 @@ narrados con TTS y con su video final en `exports/<slug>/curso_narrado.mp4`.
 | 27 | Procesamiento digital de señales (familia, 30 lecciones) | original (la capa DEBAJO de Comunicaciones digitales: que se le hace a los numeros y cuanto cuesta hacerlo en el aparato) | `dsp.py` (2617 lineas, 11 piezas) | publicado (PRs #54, #55, #56, #57 y #58): **el curso mas extenso de la coleccion**, 30 lecciones y 120 clips en 5 lotes, con 120/120 qh en produccion. **Primer curso horizontal SIN SUBTITULOS** (formato mudo: la pantalla solo pone la cosa y su cifra medida, y un guardian en el style_block aborta el render si un rotulo se convierte en frase) |
 | 28 | Satelites: la maquina que no se cae (**VERTICAL**, 14 clips + intro y cierre) | original (releva al curso 2 "Satelites e IA" y a la mitad divulgativa del 3, ambos horizontales y solo en la DB) | `satelites.py` ampliada | **TERMINADO** (2026-08-28): segundo curso en 9:16, 16 piezas, 7 min 30 s, narrado y muxeado; plan en `curso-28-satelites-vertical.md` |
 | 29 | Emergencia: reglas simples, mundos enteros (**VERTICAL**, 14 clips + intro y cierre) | original (experimental: cada clip parte de 2-3 reglas que caben en una etiqueta y esas reglas producen un mundo entero; el FOTOGRAMA ENTERO es una simulacion numpy calculada en el render) | **`emergencia/`** (paquete nuevo: nucleo `Pelicula` + 13 simuladores) | **terminado 2026-08-28** (PR #63, sin mergear): 8 min 23 s, 16 piezas en 1080x1920@60, cada una sonorizada y subible por separado a Instagram. Plan en `curso-29-emergencia-vertical.md` |
+| 30 | Sistemas ATP: apuntamiento y seguimiento de satelites (familia, 9 lecciones) | Academy: curso `sistemas-apt` (9 lecciones), desmenuzado a la capa de INGENIERIA | `atp.py` (sobre el sustrato de `apuntado.py` del curso 9) | **publicado (PR #67)**: 9 lecciones, 36 clips y 36/36 `qh` en produccion, 20.4 min. Horizontal SIN SUBTITULOS. Es la capa de ingenieria de lo que el curso 9 conto como divulgacion: presupuesto de error medido, keyhole cuantificado, LQR y Monte Carlo. Plan en `curso-30-sistemas-atp.md` |
 
 Los storyboards de los cursos 5-12 estan en `curso-01-*.md` .. `curso-08-*.md`
 (la numeracion del archivo es la prioridad en la cola original, no el # de
