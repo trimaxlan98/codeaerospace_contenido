@@ -19,11 +19,12 @@ import {
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
-import { FORMATOS, formatoPorId, ratioDeJob } from './formatos.js'
+import { formatoPorId, formatosDe, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
 import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
 import PeliculaPanel from './components/PeliculaPanel.jsx'
+import PresentacionPanel from './components/PresentacionPanel.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -33,6 +34,16 @@ import { cn } from '@/lib/utils'
 
 const QUALITY_LABEL = { ql: '480p', qm: '720p', qh: '1080p' }
 
+// Fondos de una presentación. Los ids y los hex son los de
+// `app/projects.py::FONDOS` (y los de manim_extensions/presentacion.py, quien
+// los pinta). La paleta de textos VOLTEA con el fondo: sobre blanco, el ambar
+// de la marca da 2.15:1 de contraste y seria ilegible.
+const FONDOS = [
+  { id: 'marca', label: 'Marca · casi negro', hex: '#05070a' },
+  { id: 'blanco', label: 'Blanco · plantilla de tesis', hex: '#ffffff' },
+  { id: 'pizarra', label: 'Pizarra · azul muy oscuro', hex: '#0f172a' },
+]
+
 // Rango de duracion por tipo de proyecto. En un curso es el que valida
 // `studio/tools/render_local.py`: un clip mas corto no alcanza a contar nada
 // y uno mas largo se cae del formato. Un promo de redes juega otro juego
@@ -41,6 +52,10 @@ const QUALITY_LABEL = { ql: '480p', qm: '720p', qh: '1080p' }
 const DURACION = {
   curso: { min: 28, max: 45 },
   promo: { min: 8, max: 15 },
+  // Una presentacion no tiene rango: dura lo que el ponente necesite
+  // contar. El semaforo solo avisaria de nada. Se deja abierto en
+  // vez de esconder la duracion, que sigue siendo util para ensayar.
+  presentacion: { min: 0, max: 3600 },
 }
 
 function rangoDuracion(tipo) {
@@ -454,6 +469,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
   const [description, setDescription] = useState('')
   const [quality, setQuality] = useState('qm')
   const [formato, setFormato] = useState('horizontal')
+  const [fondo, setFondo] = useState('marca')
   const [styleBlock, setStyleBlock] = useState('')
   const [plantilla, setPlantilla] = useState('blanco')
   const [error, setError] = useState('')
@@ -462,7 +478,8 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
   useEffect(() => {
     if (open) {
       setName(''); setDescription(''); setQuality('qm'); setStyleBlock('')
-      setFormato('horizontal'); setPlantilla('blanco'); setError(''); setBusy('')
+      setFormato('horizontal'); setFondo('marca'); setPlantilla('blanco')
+      setError(''); setBusy('')
     }
   }, [open])
 
@@ -472,6 +489,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
     // campos siguen editables.
     setQuality(plantillaPorId(id).quality)
     setFormato(plantillaPorId(id).formato || 'horizontal')
+    setFondo(plantillaPorId(id).fondo || 'marca')
   }
 
   const tpl = plantillaPorId(plantilla)
@@ -488,6 +506,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
         description,
         quality,
         formato,
+        fondo,
         tipo: tpl.tipo || 'curso',
         // El textarea manda si el usuario escribio algo en el.
         style_block: styleBlock || built.styleBlock,
@@ -567,7 +586,7 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                 <Select value={formato} onValueChange={setFormato}>
                   <SelectTrigger className="max-w-[220px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {FORMATOS.map((f) => (
+                    {formatosDe(tpl.tipo || 'curso').map((f) => (
                       <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
                     ))}
                   </SelectContent>
@@ -577,6 +596,23 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
                   «1080p» son 1920×1080 en horizontal y 1080×1920 en vertical.
                 </span>
               </label>
+              {(tpl.tipo || 'curso') === 'presentacion' && (
+                <label className="flex flex-col gap-1">
+                  <span className="eyebrow">Fondo del slide</span>
+                  <Select value={fondo} onValueChange={setFondo}>
+                    <SelectTrigger className="max-w-[280px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {FONDOS.map((f) => (
+                        <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-[11.5px] text-faint">
+                    El texto y los acentos se voltean solos: sobre blanco, el
+                    ámbar de la marca daría 2.15:1 de contraste y no se leería.
+                  </span>
+                </label>
+              )}
               <label className="flex flex-col gap-1">
                 <span className="eyebrow">Estilo compartido (opcional)</span>
                 <textarea value={styleBlock} onChange={(e) => setStyleBlock(e.target.value)} rows={5}
@@ -730,6 +766,18 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
     try {
       await api.patchProject(project.id, { formato: valor })
       await load() // `specs` lo recalcula el backend, no el navegador
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  // El fondo se bloquea con los renders vigentes por la misma razon que el
+  // formato: cambiarlo dejaria un deck con slides de dos colores distintos.
+  const saveFondo = async (valor) => {
+    setError('')
+    try {
+      await api.patchProject(project.id, { fondo: valor })
+      await load()
     } catch (err) {
       setError(err.message)
     }
@@ -894,6 +942,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   const staleCount = staleWithoutActiveJob(clips, jobs).length
   const formatoFijo = clips.some((c) => c.job_id)
   const esPromo = (project.tipo || 'curso') === 'promo'
+  const esPresentacion = (project.tipo || 'curso') === 'presentacion'
   // Una pieza cuyo fondo es una simulacion (paquete `emergencia`) no cuesta
   // lo que un clip normal: la pila de fotogramas se calcula en el render y
   // luego cada frame se compone a 1080x1920. Medido: ~0.29 s/frame en qh, o
@@ -957,11 +1006,27 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {FORMATOS.map((f) => (
+                  {formatosDe(project.tipo || 'curso').map((f) => (
                     <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {esPresentacion && (
+                <Select value={project.fondo || 'marca'} onValueChange={saveFondo}
+                  disabled={formatoFijo}>
+                  <SelectTrigger className="h-[26px] w-[196px] text-[12px]"
+                    title={formatoFijo
+                      ? 'hay clips con render vigente: el fondo queda fijo hasta borrar esos vídeos'
+                      : 'el color del slide; la paleta de textos se voltea sola para que se lea sobre él'}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FONDOS.map((f) => (
+                      <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 
@@ -1079,9 +1144,12 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
         )}
       </section>
 
-      {/* Un promo es UN clip en bucle: no hay nada que montar. La pelicula es
-          cosa de los cursos. */}
-      {!esPromo && (
+      {/* Cada tipo entrega una cosa distinta: un curso entrega su pelicula,
+          una presentación entrega el .pptx que el ponente abre en la sala, y un promo
+          es UN clip en bucle que no monta nada. */}
+      {esPresentacion ? (
+        <PresentacionPanel projectId={project.id} />
+      ) : !esPromo && (
         <PeliculaPanel projectId={project.id} projectName={project.name} jobs={jobs}
           clips={clips}
           duraciones={Object.fromEntries(clips.map((c) => [c.id, narrByClip[c.id]?.video_s]))}

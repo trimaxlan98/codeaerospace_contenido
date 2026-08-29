@@ -79,6 +79,13 @@ export const api = {
   cancelarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/cancel`),
   verificarPelicula: (pid) => request('POST', `/api/projects/${pid}/pelicula/verificar`),
   borrarPelicula: (pid) => request('DELETE', `/api/projects/${pid}/pelicula`),
+
+  // La presentacion: los renders del proyecto cortados en fragmentos (uno por
+  // clic del ponente) y armados en un .pptx.
+  getPresentacion: (pid) => request('GET', `/api/projects/${pid}/presentacion`),
+  armarPresentacion: (pid, body = {}) => request('POST', `/api/projects/${pid}/presentacion`, body),
+  cancelarPresentacion: (pid) => request('POST', `/api/projects/${pid}/presentacion/cancel`),
+  borrarPresentacion: (pid) => request('DELETE', `/api/projects/${pid}/presentacion`),
   // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
   getSfx: () => request('GET', '/api/sfx'),
   generarSfx: () => request('POST', '/api/sfx'),
@@ -112,6 +119,12 @@ export function peliculaVideoUrl(pid) {
 
 // Un efecto de la paleta, para audicion. El nombre va contra el conjunto
 // cerrado en el backend: aqui no hace falta escaparlo mas alla de la URL.
+// El .pptx de la presentacion. Es una descarga, no un reproductor: el
+// navegador no sabe abrir un PowerPoint.
+export function presentacionDeckUrl(pid) {
+  return `/api/projects/${pid}/presentacion/deck`
+}
+
 export function sfxUrl(nombre) {
   return `/api/sfx/${encodeURIComponent(nombre)}`
 }

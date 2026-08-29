@@ -453,3 +453,41 @@ def test_la_pelicula_de_otro_proyecto_no_se_ve(authed):
 
 def test_pelicula_requiere_sesion(client):
     assert client.get("/api/projects/x/pelicula").status_code == 401
+
+
+def test_un_render_jobs_enlazado_a_otro_disco_sigue_dentro_del_workspace(
+        authed, tmp_path):
+    """`render_jobs/` y `exports/` pueden ser enlaces a otro disco (ver
+    studio/docs/ARTEFACTOS-LOCALES.md). Resolver el enlace antes de comparar
+    manda la ruta fuera del workspace y la pelicula no se puede ni planear,
+    aunque el contenedor vea los videos perfectamente montados.
+    """
+    from app.main import pelicula_service
+    ws = pelicula_service.cfg.workspace
+    fuera = tmp_path.parent / "otro-disco-peli" / "render_jobs"
+    fuera.mkdir(parents=True, exist_ok=True)
+    enlace = ws / "render_jobs_enlazado"
+    if enlace.is_symlink():
+        enlace.unlink()
+    enlace.symlink_to(fuera)
+
+    assert pelicula_service._rel(enlace / "abc" / "Clip.mp4") == \
+        "render_jobs_enlazado/abc/Clip.mp4"
+
+
+def test_el_contenedor_recibe_montados_los_videos_de_los_jobs():
+    """El repo va montado read-only, pero si `render_jobs` es un enlace, dentro
+    del contenedor apunta a un destino que NO esta montado: `ensamblar.py` no
+    puede leer un solo clip. Los dos comandos que leen renders (montar la
+    pelicula y cortar una pieza) tienen que montarlo explicitamente.
+    """
+    import importlib.util
+    ruta = Path(__file__).resolve().parents[3] / "studio" / "runner" / "manim_runner.py"
+    fuente = ruta.read_text()
+    # Se lee el fuente en vez de importar el runner: importarlo abre sockets y
+    # arranca su bucle de servicio.
+    # Se cuentan los USOS como argumento de docker, no la definicion.
+    assert fuente.count('"-v", montaje_render_jobs()') == 2, (
+        "handle_ensamblar y handle_piezas tienen que montar render_jobs")
+    assert ':ro"' in fuente.split("def montaje_render_jobs")[1][:800], (
+        "el montaje de los renders tiene que ser de solo lectura")

@@ -69,6 +69,15 @@ SFX_TIMEOUT = 600
 # 4 h + margen: con transiciones se recodifica la pelicula entera y el
 # contenedor esta capado a 1.5 vCPU. Sin transiciones son segundos.
 ENSAMBLAR_TIMEOUT = 14400
+# Presentaciones: `cortar_presentacion.py` parte el render de cada clip en
+# sus fragmentos (uno por clic del ponente) y saca posters y GIF. Trabaja
+# dentro del contenedor porque el backend no tiene ffmpeg; el .pptx lo arma
+# despues el backend, que si tiene python-pptx. Misma ruta que
+# cfg.presentaciones_dir: si una cambia, la otra tambien.
+CORTAR_SCRIPT = "studio/tools/cortar_presentacion.py"
+PRESENTACIONES_DIR = "exports/presentaciones"
+# Cortar es recodificar fragmentos cortos y generar GIF: minutos, no horas.
+CORTAR_TIMEOUT = 3600
 
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 RE_SCENE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,127}$")
@@ -77,7 +86,12 @@ QUALITIES = {"ql", "qm", "qh"}
 # escena lo aplica con promo.formato(). Se valida contra un conjunto y unos
 # rangos cerrados, igual que la calidad: son valores que entran en la linea
 # de comandos de docker, no texto libre.
-FORMATOS = {"horizontal", "vertical", "cuadrado"}
+FORMATOS = {"horizontal", "vertical", "cuadrado", "clasico"}
+# El fondo solo lo lee `presentacion.lienzo()`; un curso o un promo lo
+# ignoran. Se
+# valida aqui igual que el formato porque acaba en la linea de comandos de
+# docker: nombre corto o color "#rrggbb", nunca texto libre.
+RE_FONDO = re.compile(r"^(?:[a-z]{1,16}|#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}))\Z")
 CORTO_MIN, CORTO_MAX = 240, 2160
 LARGO_MAX = 3840
 FPS_MIN, FPS_MAX = 5, 120
@@ -99,6 +113,22 @@ try:
 except KeyError:
     _run_uid, _run_gid = os.getuid(), os.getgid()
 RUN_AS_ARGS = ("--user", f"{_run_uid}:{_run_gid}", "-e", "HOME=/tmp")
+
+
+def montaje_render_jobs() -> str:
+    """El `-v` que le da al contenedor los videos ya renderizados, read-only.
+
+    El repo montado read-only NO basta: en una instalacion donde `render_jobs`
+    es un enlace simbolico a otro disco (ver studio/docs/ARTEFACTOS-LOCALES.md)
+    ese enlace, dentro del contenedor, apunta a un destino que no esta montado
+    y no se puede leer nada. Por eso se monta el destino REAL (realpath).
+
+    De solo lectura: montar la pelicula y cortar una presentacion LEEN los
+    renders,
+    no los tocan.
+    """
+    jobs_abs = os.path.join(PROJECT_DIR, RENDER_JOBS_DIR)
+    return f"{os.path.realpath(jobs_abs)}:/workspace/{RENDER_JOBS_DIR}:ro"
 
 
 def log(msg: str) -> None:
@@ -130,6 +160,7 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     quality = str(req.get("quality", ""))
     timeout = req.get("timeout", 600)
     formato = str(req.get("formato", "horizontal"))
+    fondo = str(req.get("fondo") or "marca")
     corto = req.get("corto", 1080)
     largo = req.get("largo", 1920)
     fps = req.get("fps", 60)
@@ -148,6 +179,9 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
         return
     if formato not in FORMATOS:
         await send(writer, {"type": "error", "error": "formato invalido"})
+        return
+    if not RE_FONDO.match(fondo):
+        await send(writer, {"type": "error", "error": "fondo invalido"})
         return
     if not isinstance(corto, int) or not (CORTO_MIN <= corto <= CORTO_MAX):
         await send(writer, {"type": "error", "error": "lado corto fuera de rango"})
@@ -175,9 +209,16 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
     # El flag -q sigue mandando en un render 16:9 normal. Las variables
     # PROMO_* solo las lee una escena que llame a promo.formato(): un curso
     # las ignora y renderiza exactamente igual que antes.
+    # PROMO_* las lee promo.formato(); PRESENTACION_* las lee
+    # presentacion.lienzo(), que
+    # ademas acepta las PROMO_* como respaldo. Se pasan las dos familias: una
+    # escena de curso ignora ambas y renderiza igual que siempre. Lo unico
+    # que NO tiene equivalente en promo es el fondo.
     lienzo = ("-e", f"PROMO_FORMATO={formato}", "-e", f"PROMO_CALIDAD={quality}",
               "-e", f"PROMO_CORTO={corto}", "-e", f"PROMO_LARGO={largo}",
-              "-e", f"PROMO_FPS={fps}")
+              "-e", f"PROMO_FPS={fps}",
+              "-e", f"PRESENTACION_FORMATO={formato}",
+              "-e", f"PRESENTACION_FONDO={fondo}")
     argv = [
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
         "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS, *lienzo,
@@ -189,7 +230,7 @@ async def handle_render(req: dict, writer: asyncio.StreamWriter) -> None:
         f"/workspace/{script_rel}", scene,
     ]
     log(f"[render] job={job_id} scene={scene} q={quality} fmt={formato}"
-        f" {corto}x{largo} fps={fps} timeout={timeout}s")
+        f" fondo={fondo} {corto}x{largo} fps={fps} timeout={timeout}s")
 
     proc = await asyncio.create_subprocess_exec(
         *argv,
@@ -472,7 +513,7 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
     code, out, err = await run_cmd(
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
         "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
-        "-v", peli_mount,
+        "-v", peli_mount, "-v", montaje_render_jobs(),
         "--name", container,
         "--entrypoint", "python3", "manim-render",
         f"/workspace/{ENSAMBLAR_SCRIPT}", modo,
@@ -501,6 +542,64 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
         return
     log(f"[pelicula] pid={pid} {modo} ok={informe.get('ok')} "
         f"piezas={informe.get('piezas')} dur={informe.get('duracion')}")
+    await send(writer, {"type": "ok", "informe": informe})
+
+
+async def handle_presentacion(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Parte los renders de una presentacion en sus fragmentos
+    (`cortar_presentacion.py`).
+
+    Igual que `ensamblar`: del exterior solo llega un id validado con regex.
+    El plan (que videos, en que instantes cortar, con que nombre) lo escribio
+    el backend en <presentaciones>/<pid>/plan.json y sus rutas apuntan dentro de
+    /workspace, que el contenedor ve read-only. Lo unico montado con escritura
+    es el directorio de la presentacion.
+
+    Aqui NO se arma el .pptx: eso lo hace el backend con python-pptx, que no
+    necesita ffmpeg. Partir la division asi evita meter una dependencia mas en
+    la imagen de manim (y con ella, una reconstruccion en el VPS).
+    """
+    pid = str(req.get("project_id", ""))
+    if not RE_JOB_ID.match(pid):
+        await send(writer, {"type": "error", "error": "project_id invalido"})
+        return
+
+    pres_rel = f"{PRESENTACIONES_DIR}/{pid}"
+    pres_abs = os.path.join(PROJECT_DIR, pres_rel)
+    if not os.path.isfile(os.path.join(pres_abs, "plan.json")):
+        await send(writer, {"type": "error", "error": "no hay plan que cortar"})
+        return
+
+    container = f"{CONTAINER_PREFIX}{pid}-presentacion"
+    pres_mount = f"{pres_abs}:/workspace/{pres_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", pres_mount, "-v", montaje_render_jobs(),
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{CORTAR_SCRIPT}",
+        f"/workspace/{pres_rel}/plan.json",
+        timeout=CORTAR_TIMEOUT,
+    )
+    if code != 0:
+        await force_remove(container)
+        log(f"[presentacion] pid={pid} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"el corte salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    try:
+        informe = json.loads(out.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        await send(writer, {"type": "error",
+                            "error": "el corte no devolvio un informe"})
+        return
+    if not informe.get("ok"):
+        await send(writer, {"type": "error",
+                            "error": informe.get("error", "corte fallido")})
+        return
+    log(f"[presentacion] pid={pid} ok fragmentos={informe.get('total')}")
     await send(writer, {"type": "ok", "informe": informe})
 
 
@@ -623,6 +722,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_verificar(req, writer)
         elif cmd == "ensamblar":
             await handle_ensamblar(req, writer)
+        elif cmd == "presentacion":
+            await handle_presentacion(req, writer)
         elif cmd == "paleta":
             await handle_paleta(req, writer)
         elif cmd == "thumbnail":

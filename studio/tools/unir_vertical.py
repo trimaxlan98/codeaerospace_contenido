@@ -79,7 +79,19 @@ def mezclar(pieza_dir: Path, video: Path, salida: Path,
     if proc.returncode not in (2,) and "No module named" not in proc.stderr:
         print(proc.stdout.strip())
         print(proc.stderr.strip()[-600:])
-    rel = [str(Path(a).resolve().relative_to(REPO)) for a in args]
+    # Sin resolver el enlace: `exports/` es un enlace a otro disco en esta
+    # maquina y resolverlo saca la ruta del repo (studio/backend/app/rutas.py
+    # explica el porque). Se duplican estas dos lineas a proposito: esta
+    # herramienta es de stdlib y no debe depender del paquete del backend.
+    def _rel(a):
+        for raiz, cand in ((REPO, Path(a)), (REPO.resolve(), Path(a).resolve())):
+            try:
+                return str(cand.absolute().relative_to(raiz.absolute()))
+            except ValueError:
+                continue
+        sys.exit(f"{a} vive fuera del repo y el contenedor no la ve")
+
+    rel = [_rel(a) for a in args]
     cmd = ["docker", "run", "--rm", "--network", "none",
            "-v", f"{REPO}:/workspace", "-w", "/workspace", IMAGEN,
            "python3", "studio/tools/sfx.py", "promo",

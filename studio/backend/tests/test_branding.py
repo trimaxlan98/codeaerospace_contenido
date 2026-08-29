@@ -112,3 +112,28 @@ def test_marcar_escenas_ignora_lo_que_no_es_del_script(monkeypatch):
                                "Ajena": Ajena})
     assert not getattr(fake_manim.Scene, "_code_brand", False)
     assert not getattr(Ajena, "_code_brand", False)
+
+
+def test_una_presentacion_trae_su_propia_identidad():
+    """Una presentacion aplica la marca con `presentacion.aplicar()`, que
+    voltea la paleta al fondo del slide. Anexarle encima la del canal le
+    repintaria el fondo de negro y le pondria una marca de agua clara sobre
+    blanco: invisible.
+    """
+    de_pres = ("import presentacion\n"
+               "PRES = presentacion.lienzo()\n" + SCRIPT)
+    assert branding.ya_marcado(de_pres)
+    assert branding.aplicar(de_pres) == de_pres
+    # La otra forma de importarlo cuenta igual.
+    assert branding.ya_marcado("from presentacion import lienzo\n" + SCRIPT)
+
+
+def test_la_palabra_presentacion_suelta_NO_cuenta_como_marca():
+    """«presentacion» es una palabra comun en castellano. Si bastara con
+    mencionarla, un comentario cualquiera dejaria el render sin la identidad
+    del canal — y sin que nadie se enterase hasta ver el video."""
+    con_comentario = "# presentacion de la idea principal\n" + SCRIPT
+    assert not branding.ya_marcado(con_comentario)
+    assert "code_brand" in branding.aplicar(con_comentario)
+    # Ni una variable que se llame parecido.
+    assert not branding.ya_marcado("presentacion_larga = True\n" + SCRIPT)

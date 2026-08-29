@@ -564,6 +564,125 @@ const SIMULACION_CLIP = `class Clip(Scene):
         cerrar_pieza(self)
 `
 
+// Bloque de estilo de una PRESENTACIÓN. Lo que la separa de un curso no es
+// el estilo sino DOS cosas: el fondo lo elige quien presenta (una
+// plantilla de tesis suele ser blanca, y sobre blanco la paleta del canal es
+// ilegible: el ambar da 2.15:1) y la animacion avanza cuando el ponente hace
+// clic, no cuando el reloj lo dice. Las dos las resuelve `presentacion.py`.
+const PRESENTACION = `# =====================================================================
+# CO.DE Academy - presentacion "%NOMBRE%"
+# Bloque de estilo. Una presentacion no es un clip de curso:
+#   - la narra una persona EN VIVO: no lleva voz ni subtitulos;
+#   - avanza con el clic: cada paso() cierra un slide del PowerPoint;
+#   - el fondo lo elige el proyecto, y la paleta VOLTEA con el
+#     (PRES.tinta / PRES.apoyo / PRES.acento, nunca CODE_INK a secas).
+# El lienzo y el fondo NO se escriben aqui: los elige el proyecto.
+# =====================================================================
+import math
+import sys
+
+sys.path.insert(0, "/workspace/studio/content/manim_extensions")
+
+import numpy as np
+from manim import *
+
+import presentacion as _presentacion
+from code_brand import FUENTE_DISPLAY, FUENTE_HUD, registrar_fuentes
+
+# --- Tipografia de marca ---------------------------------------------
+registrar_fuentes()
+Text.set_default(font=FUENTE_DISPLAY)
+
+_TextBase = Text
+
+
+class Text(_TextBase):
+    """Sombra de Text que descarta los glifos vacios (espacios).
+
+    Manim 0.20.1 deja el glifo del espacio anclado donde nacio el texto:
+    al mover el mobject, el bounding box se infla y rompe next_to / Brace.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.submobjects = [s for s in self.submobjects if s.has_points()]
+
+
+# --- El lienzo, tal como lo pidio el proyecto -------------------------
+# Alto del mundo = 8 unidades en los tres formatos, asi que 1 unidad son
+# 135 px con el lado corto en 1080: un font_size se ve igual de grande en
+# 16:9 que en 4:3. Cambiar de formato solo obliga a RECOLOCAR.
+PRES = _presentacion.lienzo()
+
+# --- Paleta, volteada al fondo ----------------------------------------
+# No son alias por comodidad: sobre blanco, CODE_INK da 1.18:1 de contraste
+# (invisible) y CODE_ACCENT 2.15:1 (ilegible). Usar SIEMPRE estos.
+C_TINTA = PRES.tinta
+C_APOYO = PRES.apoyo
+C_ACENTO = PRES.acento
+
+
+def titulo(texto, font_size=40):
+    return _presentacion.titulo(texto, PRES, font_size=font_size)
+
+
+def rotulo(texto, font_size=26):
+    """Etiqueta junto a una figura. Por debajo de 22 px Rajdhani JUNTA las
+    palabras (defecto medido); ahi hay que usar dato()."""
+    return _presentacion.rotulo(texto, PRES, font_size=font_size)
+
+
+def dato(texto, font_size=20):
+    """Cifra medida, en la mono de telemetria y en MAYUSCULAS."""
+    return _presentacion.dato(texto, PRES, font_size=font_size)
+
+
+def paso(escena, etiqueta):
+    """Cierra un slide: aqui el ponente hace clic para seguir."""
+    return _presentacion.paso(escena, etiqueta)
+
+
+# --- Marca de la escena (sombra de Scene) -----------------------------
+_SceneBase = Scene
+
+
+class Scene(_SceneBase):
+    def setup(self):
+        super().setup()
+        _presentacion.aplicar(self, PRES)
+`
+
+// Clip de arranque: dos pasos, es decir DOS slides. Cada paso() deja la
+// escena quieta un momento y anota el instante; el corte se hace despues sobre
+// ese unico render, de modo que el ultimo fotograma de un slide es el primero
+// del siguiente y el empalme no se ve.
+const PRESENTACION_CLIP = `class Escena(Scene):
+    def construct(self):
+        t = titulo("CAMBIA ESTE TITULO")
+        t.move_to(UP * (PRES.tope - 0.5))
+        self.play(FadeIn(t, shift=DOWN * 0.2), run_time=0.8)
+
+        # --- Primera idea -------------------------------------------
+        circulo = Circle(radius=PRES.radio_max(0.45), stroke_width=4,
+                         stroke_color=C_ACENTO)
+        et = rotulo("La idea de partida")
+        et.next_to(circulo, DOWN, buff=0.45)
+        self.play(Create(circulo), run_time=1.2)
+        self.play(FadeIn(et, shift=UP * 0.2), run_time=0.6)
+
+        # Aqui termina el primer slide: el ponente hace clic para seguir.
+        paso(self, "La idea de partida")
+
+        # --- Segunda idea -------------------------------------------
+        cifra = dato("= 42 unidades", font_size=30)
+        cifra.move_to(circulo.get_center())
+        self.play(circulo.animate.set_stroke(opacity=0.35), run_time=0.5)
+        self.play(Write(cifra), run_time=0.8)
+        self.wait(0.5)
+
+        paso(self, "La cifra")
+`
+
 export const PLANTILLAS = [
   {
     id: 'blanco',
@@ -612,7 +731,21 @@ export const PLANTILLAS = [
       clips: [{ title: '1 · Promo', scene: 'Promo', script: PROMO_CLIP }],
     }),
   },
-{
+  {
+    id: 'presentacion',
+    nombre: 'Presentación',
+    resumen: '1 escena que avanza CON EL CLIC y sale como .pptx. Para una charla de divulgación o una defensa de tesis: elige el fondo (blanco para una plantilla de tesis) y la paleta se voltea sola.',
+    quality: 'qh',
+    formato: 'horizontal',
+    tipo: 'presentacion',
+    fondo: 'blanco',
+    clips: 1,
+    build: ({ nombre }) => ({
+      styleBlock: PRESENTACION.replace('%NOMBRE%', nombre || 'Presentación nueva'),
+      clips: [{ title: '1 · Escena', scene: 'Escena', script: PRESENTACION_CLIP }],
+    }),
+  },
+  {
     id: 'simulacion',
     nombre: 'Pieza de simulación',
     resumen: '1 clip donde el fotograma ENTERO es una simulación numpy (paquete emergencia): miles de agentes o una malla, con cámara y cifra medida. Vertical por defecto; sirve igual en 16:9.',

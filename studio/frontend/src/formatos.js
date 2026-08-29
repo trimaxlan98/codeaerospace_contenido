@@ -12,9 +12,28 @@ export const FORMATOS = [
   { id: 'horizontal', label: 'Horizontal · 16:9', hint: 'Cursos, YouTube', ratio: 16 / 9 },
   { id: 'vertical', label: 'Vertical · 9:16', hint: 'Instagram, TikTok, Shorts', ratio: 9 / 16 },
   { id: 'cuadrado', label: 'Cuadrado · 1:1', hint: 'Feed', ratio: 1 },
+  { id: 'clasico', label: 'Clásico · 4:3', hint: 'Auditorio, plantilla de tesis', ratio: 4 / 3 },
 ]
 
 const POR_ID = Object.fromEntries(FORMATOS.map((f) => [f.id, f]))
+
+// Que lienzos tienen sentido en cada tipo de proyecto. No es cosmetica: la
+// escena de un promo llama a `promo.formato()`, que NO conoce 4:3 y revienta
+// el render con "formato desconocido". Ofrecer solo lo que cada tipo sabe
+// aplicar evita ese fallo en vez de explicarlo despues en un log.
+const POR_TIPO = {
+  curso: ['horizontal', 'vertical', 'cuadrado'],
+  promo: ['vertical', 'horizontal', 'cuadrado'],
+  // Una presentación vive en un slide: nunca es vertical, y 4:3 existe para
+  // los auditorios con proyector viejo y las plantillas de tesis.
+  presentacion: ['horizontal', 'clasico', 'cuadrado'],
+}
+
+/** Los formatos que ofrece un tipo de proyecto, en el orden en que se usan. */
+export function formatosDe(tipo) {
+  const ids = POR_TIPO[tipo] || POR_TIPO.curso
+  return ids.map((id) => POR_ID[id]).filter(Boolean)
+}
 
 export function formatoPorId(id) {
   return POR_ID[id] || POR_ID.horizontal

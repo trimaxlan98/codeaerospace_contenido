@@ -19,7 +19,21 @@ Como: se ANEXA un bloque al final del script, nunca al principio.
   punto de fallo de la cola.
 """
 
+import re
+
 MODULO_MARCA = "code_brand"
+# Una PRESENTACION trae su identidad en `presentacion.aplicar()`, con la paleta
+# volteada al fondo del slide. Anexarle la marca del canal encima le repintaria
+# el fondo de negro y le pondria una marca de agua clara sobre blanco:
+# invisible. Por eso importar `presentacion` cuenta como traer marca propia.
+#
+# Se busca el IMPORT y no la palabra suelta: "presentacion" es una palabra
+# comun en castellano, y un comentario cualquiera ("# presentacion de la idea")
+# habria hecho creer que el script ya trae marca, dejando el render sin ella.
+MODULOS_CON_MARCA = (MODULO_MARCA,)
+RE_IMPORTA_PRESENTACION = re.compile(
+    r"^[ \t]*(?:import[ \t]+presentacion\b|from[ \t]+presentacion[ \t]+import\b)",
+    re.MULTILINE)
 RUTA_EXTENSIONS = "/workspace/studio/content/manim_extensions"
 
 MARCADOR = "# --- identidad CO.DE Academy (anexada por ManimStudio) ---"
@@ -38,7 +52,8 @@ except Exception as _code_brand_error:  # la marca nunca tumba un render
 
 def ya_marcado(script: str) -> bool:
     """¿El script ya aplica la identidad por su cuenta?"""
-    return MODULO_MARCA in script
+    return (any(m in script for m in MODULOS_CON_MARCA)
+            or bool(RE_IMPORTA_PRESENTACION.search(script)))
 
 
 def aplicar(script: str) -> str:
