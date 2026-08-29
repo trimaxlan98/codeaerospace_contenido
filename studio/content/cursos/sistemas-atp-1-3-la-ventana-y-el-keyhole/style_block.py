@@ -181,8 +181,8 @@ ATEN_EXTRA = 20.0 * np.log10(D_HORIZ / D_CENIT)      # 12.06 dB
 
 MASCARA_ALTA = 10.0
 DUR_MASCARA_5 = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0        # 9.82 min
-DUR_MASCARA_10 = duracion_pase(H_LEO, 90.0, MASCARA_ALTA) / 60.0  # 8.20 min
-RECORTE = 1.0 - DUR_MASCARA_10 / DUR_MASCARA_5       # 0.165
+DUR_MASCARA_10 = duracion_pase(H_LEO, 90.0, MASCARA_ALTA) / 60.0  # 7.94 min
+RECORTE = 1.0 - DUR_MASCARA_10 / DUR_MASCARA_5       # 0.1911
 
 ROTOR_MAX = 6.0                        # rotor de aficionado (dato publico)
 R_KEYHOLE = radio_keyhole(H_LEO, ROTOR_MAX)          # 7.52 grados

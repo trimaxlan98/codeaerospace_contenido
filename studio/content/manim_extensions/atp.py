@@ -1227,6 +1227,18 @@ class Montura(VGroup):
     ASIMETRICA, asi que colocarla con `move_to` centra su bounding box y
     NO el pivote. Para anclarla por el pivote:
         m.shift(destino - m.pivote)
+
+    OJO, VERRUGA CONOCIDA: `pivote`, `base_izq` y `base_der` son
+    atributos FIJOS, guardados al construir, no propiedades calculadas
+    sobre la geometria actual (a diferencia de `apuntado.AgujaVelocidad`,
+    que si las calcula). Despues de un `shift` quedan desfasados, y
+    `apuntar(az)` deja la marca del anillo donde la pieza NACIO. Dos
+    salidas, las dos usadas en esta familia:
+      * llamar a `apuntar()` ANTES de mover la pieza (lo hace el molde), o
+      * arrastrar los tres atributos con el mismo delta tras el shift.
+    No se convirtieron en propiedades a mitad de la produccion del curso
+    30 porque varios clips ya compensaban a mano y el cambio los habria
+    roto en silencio. Para la familia siguiente: conviene arreglarlo.
     """
 
     def apuntar(self, az_deg=None, el_deg=None):
