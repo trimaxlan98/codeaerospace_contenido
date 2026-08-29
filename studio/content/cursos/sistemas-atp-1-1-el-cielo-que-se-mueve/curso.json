@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 1.1 El cielo que se mueve",
+  "description": "Lección 1.1 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 1: dónde mirar y cuándo), en 4 clips animados —una idea por clip—: el GEO clavado frente al LEO que cruza el cielo entero, la velocidad angular en el cénit medida con ω = v/h, el pase completo entre AOS y LOS con su reloj corriendo, y de dónde sale el objetivo de una décima de grado. Formato mudo: la pantalla solo pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-cielos.py",
+      "title": "1 · Dos cielos, dos antenas",
+      "scene": "Clip1",
+      "final_state": "Carta polar violeta a la izquierda con el punto ámbar del GEO fijo y la traza completa del pase LEO cruzándola; panel de cifras con GEO 35786 km en gris (dato), LEO 550 km y v = 7.59 km/s en cian; HUD 'MODULO 01'."
+    },
+    {
+      "file": "clips/02-cuanto-se-mueve.py",
+      "title": "2 · Cuánto se mueve en tu cielo",
+      "scene": "Clip2",
+      "final_state": "Triángulo estación-satélite en el cénit con la velocidad ámbar perpendicular a la línea de vista y su ángulo recto; aguja cian marcando 1.10 deg/s con la etiqueta h = 400 km; los dos discos lunares grises abajo a la derecha; en el carril inferior la cifra a 400 km: 1.10 deg/s."
+    },
+    {
+      "file": "clips/03-el-tiempo-que-tienes.py",
+      "title": "3 · Todo el tiempo que tienes",
+      "scene": "Clip3",
+      "final_state": "Carta polar con la máscara de 5° sombreada, la traza principal del pase con AOS verde y LOS rojo, y dos trazas más tenues de los otros pases del día; reloj detenido en 09:49; panel con arco 37.0 deg, T = 95.5 min y pase 9.8 min; en el carril inferior 'tres pases al dia'."
+    },
+    {
+      "file": "clips/04-el-objetivo.py",
+      "title": "4 · El objetivo",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Diez minutos al dia.' (blanca) y 'Una decima de grado.' (cian)."
+    }
+  ]
+}

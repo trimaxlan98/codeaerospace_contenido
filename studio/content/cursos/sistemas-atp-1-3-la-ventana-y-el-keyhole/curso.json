@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 1.3 La ventana y el keyhole",
+  "description": "Lección 1.3 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 1: dónde mirar y cuándo), en 4 clips animados: la máscara de elevación que decide cuánto dura el contacto, el rango oblicuo que se cuadruplica cerca del horizonte, el 1/cos(el) que hace divergir la velocidad de acimut en el cénit, y las cuatro salidas de ingeniería contra el ojo de cerradura.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-mascara.py",
+      "title": "1 · La mascara no es adorno",
+      "scene": "Clip1",
+      "final_state": "Carta polar con la máscara subida a 10° sombreada sobre la de 5°, la traza del pase recortada, y en el carril inferior el recorte del tiempo útil de contacto."
+    },
+    {
+      "file": "clips/02-elevacion-y-distancia.py",
+      "title": "2 · Elevacion y distancia",
+      "scene": "Clip2",
+      "final_state": "El segmento del rango oblicuo estirado hasta 2205 km a 5° junto al de 550 km en el cénit, y la barra de los 12.1 dB de atenuación extra; panel con las tres cifras."
+    },
+    {
+      "file": "clips/03-el-uno-sobre-coseno.py",
+      "title": "3 · El uno sobre coseno",
+      "scene": "Clip3",
+      "final_state": "Dos trazas paralelas sobre la misma carta, la de 30° en violeta y la de 85° en ámbar, con el cono del keyhole del rotor rápido (4.5°) en rojo sobre el cénit y su trozo ciego dentro; la aguja en zona roja marcando 9.04 deg/s con la marca fantasma de 0.51; panel enfrentando d 993 km / 0.51 deg/s contra d 552 km / 9.04 deg/s; en el carril inferior '17.87x mas exigente'."
+    },
+    {
+      "file": "clips/04-cuatro-salidas.py",
+      "title": "4 · Cuatro salidas",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El mejor pase del enlace' (blanca) y 'es el peor de la mecanica.' (cian)."
+    }
+  ]
+}

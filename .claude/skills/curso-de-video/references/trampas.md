@@ -11,6 +11,12 @@ parecida a la que vas a producir.
 - `render_local.py` **aborta si falta CUALQUIER clip** declarado en
   `curso.json`: crear stubs `class ClipN(Scene): self.wait(1)` antes de
   paralelizar agentes.
+- **`render_jobs/` y `exports/` son ENLACES SIMBÓLICOS al segundo disco**
+  desde 2026-08-28. Dentro del contenedor el enlace queda colgando (el
+  destino no está montado), así que nada puede leerse por
+  `/workspace/render_jobs/...`. `render_local.py` apunta manim a
+  `/media/scene.py`, que ya va montado; cualquier herramienta nueva que lea
+  del repo dentro del contenedor tiene el mismo problema.
 - `--frames 8` **muestrea**: puede caer justo en un relevo de pie y enseñar un
   frame casi vacío. No es un fallo; pero el `final_state` se saca del último
   frame real con ffmpeg.
@@ -30,9 +36,16 @@ parecida a la que vas a producir.
   valores** (textos de 0 glifos), un número de filas distinto (reservar con
   `filas_max` y rellenar con guiones), un resaltado que añade un `Rectangle`
   solo en una de las dos (reservarlo con un flag opt-in).
-- Un `Transform` de cifras dentro de una animación larga deja dígitos a medio
-  morfar: `Succession(Transform corto, Wait)`, y ancho fijo (`03d`) en los
-  contadores.
+- **Los kwargs de `play()` PISAN los de cada animación.** Medido en el
+  fuente de manim 0.20.1 (`Scene.compile_animations` termina con
+  `for animation in animations: for k, v in kwargs.items(): setattr(...)`).
+  Consecuencia, medida: `play(Transform(c, n, run_time=0.02), run_time=1.10)`
+  deja el Transform en **1.10**, y el contador pasa todo ese rato con los
+  dígitos a medio morfar. Un `Succession(Wait(0.55), Transform(..., 0.02))`
+  **sí** sobrevive: al Succession se le pisa el total, pero sus hijos
+  conservan sus tiempos, así que el morfeo sigue durando 0.02.
+  Lo simple y seguro es `contador.become(nuevo.move_to(contador))` **fuera**
+  de cualquier `play`. Ancho fijo (`03d`) en los contadores, siempre.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
@@ -40,6 +53,16 @@ parecida a la que vas a producir.
   son `str`.
 - Las etiquetas de `Grafica` son hijos internos: no aparecen si se animan
   `.ejes` / `.curva` por separado.
+- **`Axes` cruza los ejes por el ORIGEN.** Un panel cuyo rango no incluye el
+  cero (una fase de −190 a −85, una magnitud de −15 a 50 dB) deja una recta
+  pegada al borde o en mitad del cuadro, con su etiqueta encima de la curva.
+  Si el origen no cae en la esquina, se dibuja el marco a mano.
+- Una pieza que entró **por sus hijos** (`Create(p.ejes)`, `FadeIn(p.barras)`)
+  hay que consolidarla con `self.remove(*p.get_family()); self.add(p)` antes
+  del primer `Transform` del grupo entero.
+- Una **gemela** recién construida nace donde la fábrica la deja (casi siempre
+  centrada en ORIGIN): si se transforma sin recolocarla antes, el `Transform`
+  arrastra la pieza entera hacia el centro del cuadro.
 - Un vector de módulo cero se dibuja como `Dot` invisible.
 - `move_to` centra el **bounding box**: una figura asimétrica (un lóbulo de
   antena) hay que anclarla por su propio origen.
@@ -95,8 +118,12 @@ parecida a la que vas a producir.
   borde si te fías del `np.clip` de la pieza (se lee como saturación, que es lo
   contrario de lo que hace): recorta los PUNTOS antes de dibujar.
 - Un contador de cifras dentro de una animación larga deja dígitos a medio
-  morfar: `Succession(Wait(0.55), Transform(cont, nuevo, run_time=0.02))`, en
-  ese orden y con el Transform corto.
+  morfar. Dos formas que funcionan: `Succession(Wait(0.55), Transform(cont,
+  nuevo, run_time=0.02))` (los hijos conservan su tiempo aunque el play pise
+  el total), o `cont.become(nuevo.move_to(cont))` fuera del play. La que NO
+  funciona es pasar el `Transform` corto DIRECTAMENTE al play — ver arriba.
+  Y el contador se releva **después** del movimiento que lo justifica: antes,
+  la cifra se adelanta a la pieza.
 - Un clip que sale en 26–27 s se engorda con `wait`, no con más contenido.
 
 ## Tipografía

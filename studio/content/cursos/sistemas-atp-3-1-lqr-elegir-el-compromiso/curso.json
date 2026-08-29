@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 3.1 LQR: elegir el compromiso",
+  "description": "Lección 3.1 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 3: del lazo nominal al sistema real), en 4 clips animados: el eje descrito por su vector de estado y la comprobación de controlabilidad, las matrices Q y R como dos platillos de una balanza, la ecuación de Riccati resuelta y el amortiguamiento de regalo, y los márgenes de ganancia y fase que el método garantiza.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-estado.py",
+      "title": "1 · El estado",
+      "scene": "Clip1",
+      "final_state": "Las matrices A y B con los números del curso y la matriz de controlabilidad con su determinante -0.25 y rango 2; en el carril inferior 'rango 2: controlable'."
+    },
+    {
+      "file": "clips/02-q-contra-r.py",
+      "title": "2 · Q contra R",
+      "scene": "Clip2",
+      "final_state": "La balanza con Q castigando el error y R el par, y la curva del compromiso con wn moviéndose al cambiar q/r; panel con las ganancias de dos ajustes."
+    },
+    {
+      "file": "clips/03-riccati.py",
+      "title": "3 · Riccati, y el regalo",
+      "scene": "Clip3",
+      "final_state": "Las dos soluciones con q/r = 100 y q/r = 1, con wn 3.16 y 1.00 rad/s, y zeta clavado en 0.707 en ambas; en el carril inferior 'zeta 0.707 siempre'."
+    },
+    {
+      "file": "clips/04-margenes.py",
+      "title": "4 · Margenes",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Q y R no son ganancias' (blanca) y 'son una declaracion de prioridades.' (cian)."
+    }
+  ]
+}

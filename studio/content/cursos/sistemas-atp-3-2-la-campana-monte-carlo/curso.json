@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 3.2 La campana Monte Carlo",
+  "description": "Lección 3.2 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 3: del lazo nominal al sistema real), en 4 clips animados: el catálogo de perturbaciones con el viento aplastando al par de inercia, la suma en cuadratura donde solo el término grande mueve el total, el histograma de quinientas corridas con su percentil 95, y cuánta confianza merece ese percentil.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-catalogo.py",
+      "title": "1 · Catalogo de perturbaciones",
+      "scene": "Clip1",
+      "final_state": "Las dos barras en escala logarítmica del par de viento contra el de inercia con su aviso de escala, y las demás perturbaciones listadas; en el carril inferior la razón medida."
+    },
+    {
+      "file": "clips/02-suma-en-cuadratura.py",
+      "title": "2 · Suma en cuadratura",
+      "scene": "Clip2",
+      "final_state": "Las cuatro contribuciones y la barra del total en cian bajo la línea del objetivo, con el viento destacado en ámbar; panel con el total 0.073 deg y el margen del 27 %."
+    },
+    {
+      "file": "clips/03-el-histograma.py",
+      "title": "3 · El histograma",
+      "scene": "Clip3",
+      "final_state": "El histograma de 500 corridas con la línea del p95 en ámbar y la del umbral de 0.1° en cian; panel con p50, p95 y peor caso."
+    },
+    {
+      "file": "clips/04-la-semilla.py",
+      "title": "4 · Cuanto confias en el p95",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'La mediana no acepta un sistema' (blanca) y 'lo acepta la cola.' (cian)."
+    }
+  ]
+}

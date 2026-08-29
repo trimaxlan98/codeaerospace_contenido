@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 3.3 Por que una decima de grado",
+  "description": "Lección 3.3 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 3: del lazo nominal al sistema real), en 4 clips animados: el ancho de haz que sale del diámetro y la longitud de onda, el mismo error mecánico costando 180 veces más en banda Ka que en S, la cuenta completa del enlace que cierra con holgura, y el lazo entre el gemelo digital y la estación real que cierra el curso.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-ancho-de-haz.py",
+      "title": "1 · El ancho de haz",
+      "scene": "Clip1",
+      "final_state": "El haz sobre el plato de 3 m con su ancho a media potencia marcado y la comprobación de que a media anchura la pérdida da 3 dB exactos; en el carril inferior la fórmula del haz."
+    },
+    {
+      "file": "clips/02-s-contra-ka.py",
+      "title": "2 · S contra Ka",
+      "scene": "Clip2",
+      "final_state": "Los dos haces a la misma escala angular con el satélite holgado dentro del de S y asomando del de Ka; panel con 0.012 dB y 2.21 dB y la razón de 186 veces."
+    },
+    {
+      "file": "clips/03-la-cuenta-completa.py",
+      "title": "3 · La cuenta completa",
+      "scene": "Clip3",
+      "final_state": "La cascada de decibelios con EIRP, FSPL, pérdidas, desapuntamiento y G/T sumando 82.9 dB-Hz, y el Eb/N0 de 22.9 dB sobre el umbral de QPSK."
+    },
+    {
+      "file": "clips/04-gemelo-y-realidad.py",
+      "title": "4 · Gemelo y realidad",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Una decima de grado no describe una antena' (blanca) y 'describe una banda.' (cian)."
+    }
+  ]
+}
