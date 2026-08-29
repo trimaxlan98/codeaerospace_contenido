@@ -255,15 +255,15 @@ Leyenda: `—` sin empezar · `~` en curso · `✔` hecho.
 
 | Leccion | plan | libreria | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 El cielo que se mueve | ✔ | — | — | — | — | — | — | — | — |
-| 1.2 De dos lineas a dos angulos | ✔ | — | — | — | — | — | — | — | — |
-| 1.3 La ventana y el keyhole | ✔ | — | — | — | — | — | — | — | — |
-| 2.1 La frecuencia que se mueve | ✔ | — | — | — | — | — | — | — | — |
-| 2.2 La montura es un robot | ✔ | — | — | — | — | — | — | — | — |
-| 2.3 El lazo sobre una rampa | ✔ | — | — | — | — | — | — | — | — |
-| 3.1 LQR: elegir el compromiso | ✔ | — | — | — | — | — | — | — | — |
-| 3.2 La campana Monte Carlo | ✔ | — | — | — | — | — | — | — | — |
-| 3.3 Por que 0.1 grados | ✔ | — | — | — | — | — | — | — | — |
+| 1.1 El cielo que se mueve | ✔ | ✔ | ✔ | ✔ | — | — | — | — | — |
+| 1.2 De dos lineas a dos angulos | ✔ | ✔ | ✔ | ✔ | — | — | — | — | — |
+| 1.3 La ventana y el keyhole | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 2.1 La frecuencia que se mueve | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 2.2 La montura es un robot | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 2.3 El lazo sobre una rampa | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 3.1 LQR: elegir el compromiso | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 3.2 La campana Monte Carlo | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 3.3 Por que 0.1 grados | ✔ | ✔ | ~ | — | — | — | — | — | — |
 
 ## 13. Storyboard
 
@@ -435,9 +435,12 @@ que el escalon esconde.
 
 *Intencion*: una simulacion es UNA muestra. Lo que se acepta es una cola.
 
-1. **Catalogo de perturbaciones.** El viento como el gigante: `78 N·m`
-   frente a los `0.175 N·m` de acelerar la inercia — **450 veces**. Se
-   dibujan las dos barras a escala real y la de inercia casi no se ve.
+1. **Catalogo de perturbaciones.** El viento como el gigante: `77.9 N·m`
+   frente a los `0.183 N·m` de acelerar la inercia — **425 veces**
+   (MEDIDO; el 0.175 de la fuente es solo el termino inercial, y
+   `par_necesario` en el eje de carga suma tambien la friccion). La razon
+   pasa de 20, asi que las barras van en **escala log** y la pieza se
+   etiqueta sola.
    Luego deriva termica, sesgo de encoder, latencia, cuantizacion
    (`0.0055°` con 16 bits). → `par_viento`.
 2. **Suma en cuadratura.** Las cuatro contribuciones como catetos que se
@@ -445,9 +448,12 @@ que el escalon esconde.
    del metodo: bajar el termino GRANDE mueve el total; bajar el pequeño no.
    Se demuestra moviendo cada uno. → `presupuesto_cuadratura`.
 3. **El histograma.** 500 corridas. Barras creciendo mientras corre la
-   campaña; al final `p50 = 0.041°`, `p95 = 0.094°` (ambar), peor
-   `0.137°`. El umbral de 0.1° en cian: el p95 pasa **por 6 %**, y el peor
-   caso NO pasa. → `campana_montecarlo`, `percentiles`.
+   campaña; al final `p50 = 0.036°`, `p95 = 0.098°` (ambar), peor
+   `0.270°`. (MEDIDOS con la libreria; las cifras de la fuente -- 0.041 /
+   0.094 / 0.137 -- salian de otro modelo de perturbaciones.) El umbral de
+   0.1° en cian: el p95 pasa **por 2 %**, y el peor caso NO pasa.
+   El p95 se rotula SIEMPRE con su N al lado.
+   → `campana_montecarlo`, `percentiles`.
 4. **Cuanto confias en ese p95.** `sqrt(N p (1-p)) = 4.9` corridas, ±1
    punto percentil. Con N=2000 baja a ±0.5: cuadruplicar solo duplica la
    confianza. Y la semilla: misma semilla, histograma identico — se dibujan
@@ -506,9 +512,81 @@ a repetir si nadie avisa:
 - Los `final_state` de `curso.json` **tambien citan cifras**: si se corrige
   la libreria, se revisan.
 
-## 15. Cosecha de trampas del lote (se escribe DURANTE la produccion)
+## 15. Cosecha de trampas del lote
 
-_(pendiente)_
+### Del orquestador, escribiendo la libreria y el molde
+
+1. **Mezclar radianes y grados en el lazo.** `simular_pase` integraba la
+   planta en radianes y comparaba con una referencia en grados: el error
+   salia 57 veces mayor y nadie lo habria notado mirando un frame.
+2. **La poblacion de pases no es uniforme.** Sortear `el_max` uniforme
+   entre 10 y 89 inventa una poblacion de pases cenitales que no existe e
+   **infla el p95 al quintuple**. Lo que se reparte uniforme es el
+   desplazamiento del gran circulo, y de ahi sale una mediana de `el_max`
+   de 22 grados con solo un 10 % por encima de 68.
+3. **Escalar errores con factores inventados.** El primer Monte Carlo
+   multiplicaba todo por un `1/cos(el)` a ojo. Cada termino tiene que
+   salir de SU fisica: el viento deflecta el lazo `tau/kp` y NO escala con
+   la velocidad del pase; la latencia si, porque un retardo `dt` sobre una
+   rampa de `v` grados/s cuesta exactamente `v dt`.
+4. **EL WINDUP NO VIVE DONDE PARECE.** A esta escala de planta el par de
+   seguimiento pica en **0.108 N·m**, asi que un accionamiento sensato no
+   satura NUNCA siguiendo un pase, ni el cenital. Y una rafaga mayor que
+   el motor no da windup: da **perdida de control** (se midieron errores
+   de 14, 120 y 900 grados segun el golpe). El windup de libro vive en el
+   escalon de **adquisicion**, que ademas es la primera fase del ATP.
+5. `Sector` cambio de firma en esta version de manim y ya no acepta
+   `outer_radius`: se usa `AnnularSector` con radio interior 0.
+6. Un `Arc` vive a `radius` de SU centro: para que el plato de la montura
+   apoye en la punta del brazo y abra hacia afuera, el centro va **un
+   radio mas alla** de la punta. Puesto en la punta, cruza el brazo.
+7. **`render_local.py` estaba roto para todo el repo** desde la migracion
+   al segundo disco: `render_jobs` y `exports` son enlaces simbolicos y
+   dentro del contenedor quedan colgando. Se apunta manim a
+   `/media/scene.py`, que ya iba montado.
+8. `DashedVMobject` no tiene puntos propios: `RightAngle`, `get_start` y
+   `get_end` revientan con "Mobject with no points".
+9. `aguja.a_valor(v)` devuelve un ANGULO, no una animacion.
+10. `MoveAlongPath` reparametriza el recorrido entero en cada llamada: no
+    sirve para avanzar por tramos.
+11. **Dos textos de distinta longitud NO son gemelos**: el `Transform`
+    dejaba el haz de Ka con la etiqueta de banda S. Se relevan por
+    fundido.
+12. En el histograma, el p95 y el umbral caen casi en la misma x **justo
+    cuando el diseño pasa por los pelos**, que es siempre el caso
+    interesante: los dos rotulos se escribian uno sobre otro. La pieza los
+    reparte en dos carriles cuando estan cerca.
+13. Una comparacion en **log** presentada como lineal miente (425x sale
+    dibujado 8.5 a 1): el aviso lo pone la pieza, no la disciplina.
+
+### De los agentes
+
+14. **Las gemelas (`.gemela()`) nacen centradas en ORIGIN**: transformar
+    sin recolocarlas arrastra la pieza entera al centro del cuadro.
+15. Una pieza que entro **por sus hijos** (`Create(p.ejes)`, ...) hay que
+    consolidarla con `self.remove(*p.get_family()); self.add(p)` antes del
+    primer `Transform` del grupo.
+16. Al demostrar una variante y **volver a la base**, hay que apagar el
+    carril de la cifra antes del morfeo: si no, el frame muestreado enseña
+    la cifra de la variante con las barras ya en el valor base.
+17. `panel_cifras` de 4 lineas ocupa la esquina UR hasta y ~ 1.4.
+18. Anclar rotulos de campo al costado de una tarjeta ancha los saca del
+    cuadro: van a una posicion FIJA.
+19. **Lo invisible a escala real hay que declararlo.** 150 km sobre un
+    radio de 6800, o 0.79 grados sobre una carta polar, no se ven: se
+    exageran con una etiqueta corta que lo diga.
+
+### El hallazgo que mas vale del lote
+
+20. **EL p95 DE 500 CORRIDAS NO ES UNA PROPIEDAD DEL DISEÑO.** Un agente
+    barrio 20 semillas a N=500: el p95 va de **0.0768 a 0.1061**
+    (mediana 0.0868) y **2 de 20 NO pasan** el umbral de 0.1. Con N=4000
+    se asienta en ~0.088 (margen real ~12 %). Es decir: el "pasa por un
+    2 % de margen" de la semilla 2029 describe ESA campaña, no el sistema.
+    No es un defecto -- **es exactamente la tesis del clip 3.2.4**, y sus
+    propios datos la demuestran. Por eso el rotulo lleva su N dentro
+    (`p95 0.098 deg N=500`) y la narracion natural del cierre es que con
+    quinientas corridas ni siquiera sabes si pasa.
 
 ## 16. Hitos globales
 
