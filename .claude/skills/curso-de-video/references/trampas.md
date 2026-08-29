@@ -27,6 +27,19 @@ parecida a la que vas a producir.
 - El numpy del host ya corrompió arrays en silencio una vez (1.26.4 de sdist
   sobre Python 3.14): lo que sintetiza o mide números fuera del render corre
   **en el contenedor**, y `sfx.py` lleva un canario que aborta solo.
+- **`render_vertical.py` borra `videos/` antes de componer, también con
+  `--solo-componer`.** Si vas a comparar el `scene.py` del disco con el que
+  compone hoy la herramienta, pon el mp4 a salvo ANTES de invocarla.
+- **Un render que "no está" puede estar entero.** Si la herramienta murió
+  entre el final de manim y la copia, el vídeo bueno sigue en
+  `videos/scene/<resolucion>/<Escena>.mp4`. Comprueba que el `scene.py` del
+  disco y el que compone hoy tienen el mismo md5, y reúsalo: son 10-15 min
+  de render por pieza pesada.
+- **Nada de `exports/` ni de `render_jobs/` está versionado**, y desde
+  2026-08-28 viven en otro disco. Una migración se los puede llevar sin que
+  Git diga una palabra: el 29 apareció un curso entero con solo su `voz/`.
+  Lo único irreproducible en local es esa `voz/` (la sintetiza el VPS); todo
+  lo demás se rehace desde el fuente, y rehacerlo dio cifras idénticas.
 
 ## Animación
 
