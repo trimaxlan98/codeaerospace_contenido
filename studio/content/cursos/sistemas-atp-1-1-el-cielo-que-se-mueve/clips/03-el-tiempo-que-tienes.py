@@ -49,19 +49,20 @@ class Clip3(Scene):
 
         # MoveAlongPath reparametriza el recorrido ENTERO en cada
         # llamada, asi que no sirve para avanzar por tramos: el satelite
-        # se coloca con `punto_en` y el reloj se releva con un Transform
-        # corto (uno largo deja digitos a medio morfar).
+        # se coloca con `punto_en`. Y el reloj se releva con `become`
+        # FUERA del play: los kwargs de play() pisan los de cada
+        # animacion (manim 0.20.1), asi que un Transform con
+        # run_time=0.02 dentro de un play de 0.46 dura 0.46 y ensena los
+        # digitos a medio morfar.
         pasos = 10
         total_s = DUR_PASE_MIN * 60.0
         for k in range(1, pasos + 1):
             seg = total_s * k / pasos
             sat.move_to(traza.punto_en(k / pasos))
-            self.play(Transform(reloj,
-                                tag_hud(f"{int(seg // 60):02d}:"
-                                        f"{int(seg % 60):02d}",
-                                        font_size=30).move_to(reloj),
-                                run_time=0.02),
-                      run_time=0.46)
+            reloj.become(tag_hud(f"{int(seg // 60):02d}:"
+                                 f"{int(seg % 60):02d}",
+                                 font_size=30).move_to(reloj))
+            self.wait(0.46)
         self.wait(1.0)
 
         rot.mostrar(cifra_pie(f"pase {fmt(DUR_PASE_MIN, 1)} min"),

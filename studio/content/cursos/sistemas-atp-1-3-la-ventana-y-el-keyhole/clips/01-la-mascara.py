@@ -90,13 +90,14 @@ class Clip1(Scene):
 
         # --- se sube la mascara a 10 grados ------------------------------
         mask10 = mascara_elevacion(vista, el_min=MASCARA_ALTA, color=C_EJE)
-        self.play(Transform(mask, mask10),
-                  Transform(t_mask,
-                            tag_hud(f"mascara {fmt(MASCARA_ALTA, 0)} deg",
-                                    font_size=20,
-                                    color=C_TENUE).move_to(t_mask),
-                            run_time=0.02),
-                  run_time=1.2)
+        # El rotulo se releva con `become` DESPUES del morfeo de la
+        # mascara: los kwargs de play() pisan los de cada animacion
+        # (manim 0.20.1), asi que el run_time=0.02 no se respetaba y el
+        # texto pasaba 1.2 s a medio morfar.
+        self.play(Transform(mask, mask10), run_time=1.2)
+        t_mask.become(tag_hud(f"mascara {fmt(MASCARA_ALTA, 0)} deg",
+                              font_size=20,
+                              color=C_TENUE).move_to(t_mask))
         self.wait(0.6)
 
         # el pase cenital se acorta por los dos extremos
@@ -135,12 +136,9 @@ class Clip1(Scene):
             trozo.move_to(CENTRO_BARRA
                           + RIGHT * signo * (L_BARRA + L10) / 4.0)
             perdidos.add(trozo)
-        self.play(Transform(barra, barra10),
-                  Transform(cont,
-                            tag_hud(f"{fmt(DUR_MASCARA_10, 1)} min",
-                                    font_size=32).move_to(cont),
-                            run_time=0.02),
-                  run_time=1.1)
+        self.play(Transform(barra, barra10), run_time=1.1)
+        cont.become(tag_hud(f"{fmt(DUR_MASCARA_10, 1)} min",
+                            font_size=32).move_to(cont))
         self.play(FadeIn(perdidos), run_time=0.6)
         self.wait(1.0)
 

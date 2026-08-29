@@ -76,12 +76,14 @@ class Clip2(Scene):
         # --- mas baja, mas rapida ----------------------------------------
         rot.mostrar(cifra_pie(f"a {fmt(H_BAJA, 0)} km: "
                               f"{fmt(W_BAJA, 2)} deg/s"), zona="abajo")
-        self.play(Transform(t_h, tag_hud(f"h = {fmt(H_BAJA, 0)} km",
-                                         font_size=20).move_to(t_h),
-                            run_time=0.02),
-                  Rotate(aguja.aguja, aguja.a_valor(W_BAJA) - aguja.angulo,
+        # `become` fuera del play (ver clip 1): un Transform con run_time
+        # propio dentro de un play mas largo se lo come el play.
+        t_h.become(tag_hud(f"h = {fmt(H_BAJA, 0)} km",
+                           font_size=20).move_to(t_h))
+        self.play(Rotate(aguja.aguja, aguja.a_valor(W_BAJA) - aguja.angulo,
                          about_point=aguja.pivote), run_time=1.5)
-        self.play(Transform(t_w, tag_hud(f"{fmt(W_BAJA, 2)} deg/s",
-                                         font_size=24).move_to(t_w),
-                            run_time=0.02), run_time=0.5)
+        # la lectura se releva DESPUES del movimiento que la justifica
+        t_w.become(tag_hud(f"{fmt(W_BAJA, 2)} deg/s",
+                           font_size=24).move_to(t_w))
+        self.wait(0.5)
         self.wait(5.0)

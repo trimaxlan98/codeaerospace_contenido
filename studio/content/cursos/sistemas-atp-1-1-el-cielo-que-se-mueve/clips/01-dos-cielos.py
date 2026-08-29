@@ -28,12 +28,15 @@ class Clip1(Scene):
         reloj.move_to(RIGHT * 3.30 + UP * 1.05)
         self.add(reloj)
         # el reloj corre y el punto sigue exactamente donde estaba
+        # El relevo de una cifra va con `become` FUERA del play: los
+        # kwargs de play() pisan los de cada animacion (manim 0.20.1,
+        # Scene.compile_animations hace setattr con todos), asi que un
+        # `Transform(..., run_time=0.02)` dentro de un play mas largo NO
+        # dura 0.02 y deja los digitos a medio morfar todo el rato.
         for k in (4, 8, 12):
-            self.play(Transform(reloj,
-                                tag_hud(f"t = {k:02d} s", font_size=22,
-                                        color=C_TENUE).move_to(reloj),
-                                run_time=0.02),
-                      run_time=0.90)
+            self.wait(0.88)
+            reloj.become(tag_hud(f"t = {k:02d} s", font_size=24,
+                                 color=C_TENUE).move_to(reloj))
         estela = Circle(radius=0.30, color=C_SAT, stroke_width=2.0)
         estela.move_to(p_geo)
         self.play(Create(estela), run_time=0.5)
