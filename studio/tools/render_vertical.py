@@ -168,7 +168,7 @@ def renderizar(clip: dict, curso: dict, slug: str, args) -> bool:
     cmd += ["-v", f"{REPO}:/workspace:ro", "-v", f"{trabajo}:/media",
             IMAGEN, "manim", "render", "-qh", "--disable_caching",
             "--media_dir", "/media",
-            f"/workspace/{scene_py.relative_to(REPO)}", clip["scene"]]
+            "/media/scene.py", clip["scene"]]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         cola = "\n".join(proc.stderr.strip().splitlines()[-18:])

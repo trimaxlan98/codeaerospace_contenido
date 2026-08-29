@@ -23,9 +23,9 @@ from .auth import require_auth
 from .db import Database
 from .jobs import JobManager
 from .narracion import NarracionService
-from .projects import (FORMATO_DEFECTO, FORMATOS, QUALITIES, TIPOS,
-                       ProjectService, clip_public, compose_script,
-                       content_hash, project_slug, style_offset)
+from .projects import (FONDO_DEFECTO, FORMATO_DEFECTO, FORMATOS, QUALITIES,
+                       TIPOS, ProjectService, clip_public, compose_script,
+                       content_hash, project_slug, style_offset, valida_fondo)
 from .scenes import detect_scenes
 
 # Script incluido en el zip del curso: pega la narracion a cada clip (silencio
@@ -110,6 +110,7 @@ class ProjectCreateBody(BaseModel):
     style_block: str = ""
     tipo: str = "curso"
     formato: str = FORMATO_DEFECTO
+    fondo: str = FONDO_DEFECTO
 
 
 class ProjectUpdateBody(BaseModel):
@@ -118,6 +119,7 @@ class ProjectUpdateBody(BaseModel):
     quality: str | None = None
     style_block: str | None = None
     formato: str | None = None
+    fondo: str | None = None
 
 
 class ClipCreateBody(BaseModel):
@@ -214,15 +216,20 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         if body.quality not in QUALITIES:
             raise HTTPException(status_code=422, detail="Calidad invalida (ql/qm/qh)")
         if body.tipo not in TIPOS:
-            raise HTTPException(status_code=422, detail="Tipo invalido (curso/promo)")
+            raise HTTPException(status_code=422,
+                                detail="Tipo invalido (curso/promo/presentacion)")
         if body.formato not in FORMATOS:
             raise HTTPException(
                 status_code=422,
-                detail="Formato invalido (horizontal/vertical/cuadrado)")
+                detail=f"Formato invalido ({'/'.join(sorted(FORMATOS))})")
+        try:
+            valida_fondo(body.fondo)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
         _check_style_size(body.style_block)
         return service.create_project(body.name, body.description, body.quality,
                                       body.style_block, tipo=body.tipo,
-                                      formato=body.formato)
+                                      formato=body.formato, fondo=body.fondo)
 
     @router.get("/{pid}")
     async def get_project(pid: str, _=Depends(require_auth)):
@@ -240,11 +247,17 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         if "formato" in raw and raw["formato"] not in FORMATOS:
             raise HTTPException(
                 status_code=422,
-                detail="Formato invalido (horizontal/vertical/cuadrado)")
+                detail=f"Formato invalido ({'/'.join(sorted(FORMATOS))})")
+        if "fondo" in raw:
+            try:
+                valida_fondo(raw["fondo"])
+            except ValueError as e:
+                raise HTTPException(status_code=422, detail=str(e))
         if "style_block" in raw:
             _check_style_size(raw["style_block"])
         # Whitelist explicita (M3): nunca reenviar el body crudo a update_project.
-        allowed = {"name", "description", "style_block", "quality", "formato"}
+        allowed = {"name", "description", "style_block", "quality", "formato",
+                   "fondo"}
         fields = {k: v for k, v in raw.items() if k in allowed}
         try:
             return service.update_project(pid, **fields)
@@ -344,7 +357,9 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         return manager.create_job(composed, clip["scene"], project["quality"],
                                   timeout=cfg.default_timeout, project_id=pid,
                                   clip_id=cid, content_hash=chash,
-                                  formato=project.get("formato") or FORMATO_DEFECTO)
+                                  formato=project.get("formato") or FORMATO_DEFECTO,
+                                  fondo=project.get("fondo") or FONDO_DEFECTO,
+                                  tipo=project.get("tipo") or "curso")
 
     @router.post("/{pid}/render-stale")
     async def render_stale(pid: str, _=Depends(require_auth)):
@@ -390,7 +405,9 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
             job = manager.create_job(composed, scene, project["quality"],
                                      timeout=cfg.default_timeout, project_id=pid,
                                      clip_id=cid, content_hash=chash,
-                                     formato=project.get("formato") or FORMATO_DEFECTO)
+                                     formato=project.get("formato") or FORMATO_DEFECTO,
+                                     fondo=project.get("fondo") or FONDO_DEFECTO,
+                                     tipo=project.get("tipo") or "curso")
             queued.append(job["id"])
 
         return {"queued": queued, "skipped": skipped}

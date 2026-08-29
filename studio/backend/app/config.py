@@ -76,6 +76,12 @@ class Settings:
         # ("exports/peliculas"): si una cambia, la otra tambien.
         self.peliculas_dir = Path(os.environ.get(
             "MS_PELICULAS_DIR", str(self.workspace / "exports" / "peliculas")))
+        # Presentaciones: fragmentos, posters y el .pptx que se descarga. El
+        # runner tiene esta MISMA ruta como constante relativa
+        # ("exports/presentaciones"): si una cambia, la otra tambien.
+        self.presentaciones_dir = Path(os.environ.get(
+            "MS_PRESENTACIONES_DIR",
+            str(self.workspace / "exports" / "presentaciones")))
         # Banco de sonidos audible: los wavs sueltos de la paleta de sfx.py.
         # El runner tiene esta misma ruta como constante ("exports/sfx").
         self.sfx_dir = Path(os.environ.get(

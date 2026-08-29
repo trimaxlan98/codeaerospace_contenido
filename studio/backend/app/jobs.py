@@ -29,7 +29,7 @@ def job_public(job: dict) -> dict:
     """Vista del job para la API (sin el script completo)."""
     keys = ("id", "scene", "quality", "timeout", "status", "video_path", "error",
             "created_at", "started_at", "finished_at", "size_bytes",
-            "project_id", "clip_id", "formato", "resolution")
+            "project_id", "clip_id", "formato", "fondo", "resolution")
     # `audio_path` no viaja (es una ruta del servidor); lo que la interfaz
     # necesita saber es si el video que sirve la app lleva sonido.
     return {k: job.get(k) for k in keys} | {
@@ -79,22 +79,28 @@ class JobManager:
     def create_job(self, script: str, scene: str, quality: str, timeout: int,
                    project_id: str | None = None, clip_id: str | None = None,
                    content_hash: str | None = None,
-                   formato: str = FORMATO_DEFECTO) -> dict:
+                   formato: str = FORMATO_DEFECTO,
+                   fondo: str = "marca", tipo: str = "curso") -> dict:
         job_id = uuid.uuid4().hex[:16]
         now = time.time()
         job = {
             "id": job_id, "scene": scene, "quality": quality, "timeout": timeout,
             "status": "queued", "script": script, "created_at": now,
             "project_id": project_id, "clip_id": clip_id, "content_hash": content_hash,
-            "formato": formato,
+            "formato": formato, "fondo": fondo,
         }
         # El script se escribe en la ruta canonica que el runner espera, con
         # la identidad del canal garantizada (branding.aplicar). Lo que se
         # guarda en la DB es el script del autor, sin tocar: la marca es del
         # render, no del codigo que el usuario edita.
+        #
+        # `tipo` decide QUE se garantiza: en un curso o un promo, la marca; en
+        # una presentacion, el lienzo (formato y fondo) que pidio el proyecto,
+        # que si no se ignoraria en silencio en cualquier script que no llame a
+        # `presentacion.lienzo()`.
         job_dir = self.cfg.render_jobs_dir / job_id
         job_dir.mkdir(parents=True, exist_ok=True)
-        (job_dir / "scene.py").write_text(branding.aplicar(script),
+        (job_dir / "scene.py").write_text(branding.aplicar(script, tipo),
                                           encoding="utf-8")
 
         self.db.insert_job(job)
@@ -227,6 +233,7 @@ class JobManager:
                 job_id, job["scene"], job["quality"], job["timeout"],
                 formato=formato, corto=spec["corto"], fps=spec["fps"],
                 largo=max(spec["width"], spec["height"]),
+                fondo=job.get("fondo") or "marca",
             ):
                 etype = event.get("type")
                 if etype == "log":

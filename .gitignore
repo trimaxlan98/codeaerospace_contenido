@@ -34,7 +34,8 @@ venv/
 Thumbs.db
 
 # ManimStudio
-render_jobs/
+render_jobs
+render_jobs.pre-migration-*/
 # Guiones de audio: el texto (.md/.txt) se versiona, el audio no
 guiones/**/*.wav
 studio/backend/.env
@@ -54,4 +55,5 @@ studio/backend/gcp-key.json
 .claude/settings.local.json
 
 # Cursos montados con narracion (mux.sh) — binarios, fuera del repo
-exports/
+exports
+exports.pre-migration-*/

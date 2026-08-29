@@ -81,6 +81,11 @@ MIGRATIONS = {
         ("formato", "ALTER TABLE jobs ADD COLUMN formato TEXT NOT NULL"
                     " DEFAULT 'horizontal'"),
         ("resolution", "ALTER TABLE jobs ADD COLUMN resolution TEXT"),
+        # Fondo PEDIDO al renderizar una presentacion. Viaja con el job
+        # misma razon que el formato: un reintento tiene que producir el
+        # MISMO archivo que el intento original.
+        ("fondo", "ALTER TABLE jobs ADD COLUMN fondo TEXT NOT NULL"
+                  " DEFAULT 'marca'"),
         # Mezcla de audio del promo: el mp4 sonorizado vive AL LADO del mudo
         # (re-mezclar no obliga a re-renderizar) y el hash dice si sigue
         # correspondiendo al manifiesto y al video actuales.
@@ -101,6 +106,12 @@ MIGRATIONS = {
                  " DEFAULT 'curso'"),
         ("formato", "ALTER TABLE projects ADD COLUMN formato TEXT NOT NULL"
                     " DEFAULT 'horizontal'"),
+        # Color de fondo de una PRESENTACION: lo elige quien
+        # presenta, no la marca (una plantilla de tesis suele ser blanca).
+        # Es una columna y no parte del style_block porque el runner tiene
+        # que pasarlo por entorno al renderizar, igual que el formato.
+        ("fondo", "ALTER TABLE projects ADD COLUMN fondo TEXT NOT NULL"
+                  " DEFAULT 'marca'"),
     ),
 }
 
@@ -126,13 +137,14 @@ class Database:
         # project_id/clip_id/content_hash son opcionales (jobs sueltos de
         # /api/jobs no los traen): se completan con None si faltan.
         job = {"project_id": None, "clip_id": None, "content_hash": None,
-               "formato": "horizontal", **job}
+               "formato": "horizontal", "fondo": "marca", **job}
         with self._lock:
             self._conn.execute(
                 "INSERT INTO jobs (id, scene, quality, timeout, status, script,"
-                " created_at, project_id, clip_id, content_hash, formato)"
+                " created_at, project_id, clip_id, content_hash, formato, fondo)"
                 " VALUES (:id, :scene, :quality, :timeout, :status, :script,"
-                " :created_at, :project_id, :clip_id, :content_hash, :formato)",
+                " :created_at, :project_id, :clip_id, :content_hash, :formato,"
+                " :fondo)",
                 job,
             )
             self._conn.commit()
@@ -156,7 +168,7 @@ class Database:
             rows = self._conn.execute(
                 "SELECT id, scene, quality, timeout, status, video_path, error,"
                 " created_at, started_at, finished_at, size_bytes, thumb_path,"
-                " project_id, clip_id, formato, resolution, audio_path,"
+                " project_id, clip_id, formato, fondo, resolution, audio_path,"
                 " audio_hash, length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
@@ -229,13 +241,13 @@ class Database:
         # Los defectos repiten los de projects.py (TIPO_DEFECTO /
         # FORMATO_DEFECTO); no se importa de alli para no cerrar el ciclo
         # projects -> db -> projects.
-        p = {"tipo": "curso", "formato": "horizontal", **p}
+        p = {"tipo": "curso", "formato": "horizontal", "fondo": "marca", **p}
         with self._lock:
             self._conn.execute(
                 "INSERT INTO projects (id, name, description, quality, style_block,"
-                " tipo, formato, created_at, updated_at)"
+                " tipo, formato, fondo, created_at, updated_at)"
                 " VALUES (:id, :name, :description, :quality, :style_block,"
-                " :tipo, :formato, :created_at, :updated_at)",
+                " :tipo, :formato, :fondo, :created_at, :updated_at)",
                 p,
             )
             self._conn.commit()

@@ -67,4 +67,8 @@ cookie = TimestampSigner(SECRET, salt="manimstudio-session").sign(f"{user}:{hex}
 ## Hard rules
 
 - **NEVER commit** `.env`, `gcp-key.json`, `render_jobs/`, `manimstudio.db*`, or `metrics_history.json*` (all gitignored — keep it that way).
+- **NEVER remove a worktree based only on `git status`.** Ignored `exports/`
+  and `render_jobs/` are invisible to Git. On the development machine they
+  must be links to `/home/alanrosasp/data/codeaerospace/`; abort cleanup if a
+  worktree contains either one as a real directory.
 - One **atomic commit per sprint**; commit subject lines **sin acentos**.

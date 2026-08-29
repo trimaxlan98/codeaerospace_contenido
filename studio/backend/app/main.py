@@ -28,6 +28,8 @@ from .narracion import NarracionService
 from .narracion_api import make_router as make_narracion_router
 from .pelicula import PeliculaService
 from .pelicula_api import make_router as make_pelicula_router
+from .presentaciones import PresentacionService
+from .presentaciones_api import make_router as make_presentaciones_router
 from .projects import FORMATO_DEFECTO, ProjectService
 from .projects_api import make_router as make_projects_router
 from .runner_client import RunnerClient
@@ -51,6 +53,7 @@ service = ProjectService(db)
 manager.on_job_done = service.handle_job_done
 narracion_service = NarracionService(cfg, db)
 pelicula_service = PeliculaService(cfg, db, runner, narracion_service)
+presentacion_service = PresentacionService(cfg, db, runner)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
@@ -77,6 +80,8 @@ app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
 app.include_router(make_narracion_router(cfg, db, narracion_service))
 app.include_router(make_pelicula_router(cfg, db, pelicula_service))
+app.include_router(make_presentaciones_router(cfg, db,
+                                             presentacion_service))
 app.include_router(make_sfx_router(cfg, runner))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))
@@ -364,13 +369,19 @@ async def retry_job(job_id: str, _=Depends(require_auth)):
     if job["status"] in ("queued", "running"):
         raise HTTPException(status_code=409, detail="El job ya esta activo")
     _check_quota()
-    # El formato viaja con el job (no se vuelve a leer del proyecto): un
-    # reintento tiene que producir el MISMO archivo que el intento original.
+    # El formato y el fondo viajan con el job (no se vuelven a leer del
+    # proyecto): un reintento tiene que producir el MISMO archivo que el
+    # intento original.
+    # El tipo se relee del proyecto y no viaja con el job: es inmutable
+    # (update_project no lo acepta), asi que da siempre la misma respuesta.
+    proyecto = db.get_project(job["project_id"]) if job.get("project_id") else None
     return manager.create_job(job["script"], job["scene"], job["quality"],
                               job["timeout"], project_id=job.get("project_id"),
                               clip_id=job.get("clip_id"),
                               content_hash=job.get("content_hash"),
-                              formato=job.get("formato") or FORMATO_DEFECTO)
+                              formato=job.get("formato") or FORMATO_DEFECTO,
+                              fondo=job.get("fondo") or "marca",
+                              tipo=(proyecto or {}).get("tipo") or "curso")
 
 
 @app.delete("/api/jobs/older-than/{days}")

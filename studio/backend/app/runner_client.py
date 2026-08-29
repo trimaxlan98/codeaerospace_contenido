@@ -73,6 +73,21 @@ class RunnerClient:
             raise RunnerError(resp.get("error", "la mezcla de audio fallo"))
         return resp.get("audio", "")
 
+    async def cortar_presentacion(self, project_id: str) -> dict:
+        """Parte los renders de una presentacion en sus fragmentos
+        (cortar_presentacion.py en el contenedor). Devuelve el informe: un
+        fragmento por slide.
+
+        Timeout generoso porque cada fragmento se recodifica y ademas se
+        genera su GIF, y el contenedor esta capado a 1.5 vCPU.
+        """
+        resp = await self._request_one(
+            {"cmd": "presentacion", "project_id": project_id}, timeout=3600)
+        if resp.get("type") != "ok":
+            raise RunnerError(
+                resp.get("error", "el corte de la presentacion fallo"))
+        return resp.get("informe", {})
+
     async def ensamblar(self, project_id: str, modo: str = "montar") -> dict:
         """Monta la pelicula del proyecto (ensamblar.py en el contenedor).
 
@@ -111,7 +126,7 @@ class RunnerClient:
     async def render(
         self, job_id: str, scene: str, quality: str, timeout: int,
         formato: str = "horizontal", corto: int = 1080, largo: int = 1920,
-        fps: int = 60,
+        fps: int = 60, fondo: str = "marca",
     ) -> AsyncIterator[dict]:
         """Genera eventos {"type": "log"|"done"|"error", ...} del render.
 
@@ -124,6 +139,7 @@ class RunnerClient:
                 "cmd": "render", "job_id": job_id, "scene": scene,
                 "quality": quality, "timeout": timeout,
                 "formato": formato, "corto": corto, "largo": largo, "fps": fps,
+                "fondo": fondo,
             }) + "\n").encode())
             await writer.drain()
             # margen sobre el timeout del runner para recibir el "done"

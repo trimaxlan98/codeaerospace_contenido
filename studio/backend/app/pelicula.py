@@ -29,6 +29,7 @@ from pathlib import Path
 
 from .narracion import etiqueta_clip, slugify
 from .projects import specs
+from .rutas import relativa_al_workspace
 
 # Opciones de empalme que la API acepta. `corte` no recodifica (concat -c copy);
 # el resto pasa por xfade y recodifica la pelicula entera.
@@ -86,14 +87,16 @@ class PeliculaService:
         return self.cfg.peliculas_dir / project["id"]
 
     def _rel(self, path: Path) -> str:
-        """Ruta relativa al workspace (que dentro del contenedor es /workspace)."""
-        try:
-            return str(Path(path).resolve().relative_to(
-                self.cfg.workspace.resolve()))
-        except ValueError as exc:
+        """Ruta relativa al workspace (que dentro del contenedor es /workspace).
+
+        Ver `rutas.py`: no se puede resolver el enlace antes de comparar, o un
+        `render_jobs/` enlazado a otro disco sale "fuera del workspace".
+        """
+        rel = relativa_al_workspace(path, self.cfg.workspace)
+        if rel is None:
             raise PeliculaError(
-                f"{path} vive fuera del workspace y el contenedor no la ve"
-            ) from exc
+                f"{path} vive fuera del workspace y el contenedor no la ve")
+        return rel
 
     # ── el plan ──────────────────────────────────────────────────────────────
 

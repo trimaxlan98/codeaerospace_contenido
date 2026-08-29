@@ -41,14 +41,45 @@ PROPORCIONES = {
     "horizontal": (16, 9),
     "vertical": (9, 16),
     "cuadrado": (1, 1),
+    # 4:3 existe para las presentaciones: auditorios con proyector
+    # viejo y plantillas de tesis. Ningun curso ni promo lo usa.
+    "clasico": (4, 3),
 }
 FORMATOS = set(PROPORCIONES)
+
+# Fondos con nombre de una presentacion. Los hex son los MISMOS que en
+# `manim_extensions/presentacion.py`, que es quien los pinta: se repiten porque
+# el backend no puede importar ese modulo (vive en el contenedor, e importa
+# manim). Cualquier otro valor se acepta como color "#rrggbb" a secas.
+FONDOS = {
+    "marca": "#05070a",
+    "blanco": "#ffffff",
+    "pizarra": "#0f172a",
+}
+FONDO_DEFECTO = "marca"
+RE_COLOR = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\Z")
+
+
+def valida_fondo(fondo: str) -> str:
+    """El fondo pedido, o ValueError. Acepta un nombre o un #rrggbb."""
+    if fondo in FONDOS or RE_COLOR.match(fondo or ""):
+        return fondo
+    raise ValueError(f"fondo invalido: {fondo!r}"
+                     f" (usa {', '.join(FONDOS)} o un #rrggbb)")
 
 # Un promo de redes no es un curso: dura 8-15 s, va en bucle y no se
 # exporta como zip concatenado. El tipo solo cambia lo que la interfaz
 # ofrece; el modelo (proyecto -> clips -> jobs) es exactamente el mismo.
 TIPO_DEFECTO = "curso"
-TIPOS = {"curso", "promo"}
+# Una PRESENTACION es una animacion para una charla o una defensa de tesis:
+# se entrega como .pptx, avanza cuando el ponente hace clic y su fondo lo
+# elige quien presenta. Ver studio/docs/PRESENTACIONES.md.
+#
+# No se llama "pieza" a proposito: en este repo esa palabra ya significa el
+# SEGMENTO de una pelicula montada (`pelicula.py`, `ensamblar.py`) y tambien
+# una plantilla de curso ("Pieza de simulacion"). Un tercer significado en la
+# misma app habria sido imposible de leer.
+TIPOS = {"curso", "promo", "presentacion"}
 
 
 def specs(quality: str, formato: str = FORMATO_DEFECTO) -> dict:
@@ -145,13 +176,15 @@ class ProjectService:
 
     def create_project(self, name: str, description: str, quality: str,
                         style_block: str, tipo: str = TIPO_DEFECTO,
-                        formato: str = FORMATO_DEFECTO) -> dict:
+                        formato: str = FORMATO_DEFECTO,
+                        fondo: str = FONDO_DEFECTO) -> dict:
         if quality not in QUALITIES:
             raise ValueError(f"calidad invalida: {quality}")
         if tipo not in TIPOS:
             raise ValueError(f"tipo invalido: {tipo}")
         if formato not in FORMATOS:
             raise ValueError(f"formato invalido: {formato}")
+        valida_fondo(fondo)
         now = time.time()
         project = {
             "id": uuid.uuid4().hex[:16],
@@ -161,6 +194,7 @@ class ProjectService:
             "style_block": style_block or "",
             "tipo": tipo,
             "formato": formato,
+            "fondo": fondo,
             "created_at": now,
             "updated_at": now,
         }
@@ -305,18 +339,23 @@ class ProjectService:
         # Calidad y formato definen el archivo que sale del render: si ya
         # hay videos, cambiarlos dejaria clips de dos tamanos distintos en
         # el mismo proyecto (y un `concat -c copy` que no pega).
-        fijos = [k for k in ("quality", "formato") if k in fields]
+        # El fondo entra en la lista por la misma razon, aunque no cambie el
+        # TAMANO del archivo: cambiarlo con renders vigentes dejaria un deck
+        # con slides de dos colores distintos.
+        NOMBRES = {"quality": "la calidad", "formato": "el formato",
+                   "fondo": "el fondo"}
+        fijos = [k for k in ("quality", "formato", "fondo") if k in fields]
         if fijos:
             clips = self.db.list_clips(pid)
             if any(c.get("job_id") for c in clips):
-                que = "la calidad" if fijos == ["quality"] else (
-                    "el formato" if fijos == ["formato"] else
-                    "la calidad ni el formato")
+                que = " ni ".join(NOMBRES[k] for k in fijos)
                 raise ValueError(
                     f"no se puede cambiar {que}: hay clips con render vigente"
                 )
         if "formato" in fields and fields["formato"] not in FORMATOS:
             raise ValueError(f"formato invalido: {fields['formato']}")
+        if "fondo" in fields:
+            valida_fondo(fields["fondo"])
         fields["updated_at"] = time.time()
         self.db.update_project(pid, **fields)
         return self.db.get_project(pid)

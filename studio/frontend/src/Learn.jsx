@@ -18,9 +18,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
-import { Play, Plus } from 'lucide-react'
+import { Play, Plus, Presentation } from 'lucide-react'
 import { api } from './api.js'
 import { renderMarkdown } from './markdown.js'
+import AbrirComoPresentacion from './components/AbrirComoPresentacion.jsx'
 import CategoryBrowser from './components/CategoryBrowser.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
@@ -55,7 +56,8 @@ function readProgress() {
   catch { return {} }
 }
 
-export default function Learn({ routeId, onRoute, onOpenInStudio, active = true }) {
+export default function Learn({ routeId, onRoute, onOpenInStudio, onOpenProject,
+  active = true }) {
   const [lessonIndex, setLessonIndex] = useState(null)
   const [animIndex, setAnimIndex] = useState(null)
   const [error, setError] = useState('')
@@ -287,6 +289,7 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
           <Reader item={item} index={{ lessons: lessonIndex, anims: animIndex }} curso={curso}
             progress={progress} onScroll={onScroll} readerRef={readerRef} endRef={endRef}
             onOpenItem={openAndRoute} onOpenInStudio={onOpenInStudio}
+            onOpenProject={onOpenProject}
             onKind={(kind) => setItem((p) => ({ ...p, kind }))} />
         ) : (
           <div className="grid flex-1 place-items-center p-6 text-center">
@@ -330,7 +333,8 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, active = true 
 // ── lector ──────────────────────────────────────────────────────────────────
 
 function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onOpenItem,
-  onOpenInStudio, onKind }) {
+  onOpenInStudio, onOpenProject, onKind }) {
+  const [comoPresentacion, setComoPresentacion] = useState(false)
   const { lesson, animation, kind } = item
   const both = Boolean(lesson && animation)
   const showing = kind === 'animation' && animation ? 'animation' : 'lesson'
@@ -350,6 +354,11 @@ function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onO
           <span className="font-mono text-[13px] text-ink">{animation.id}.py</span>
           <div className="flex items-center gap-1.5">
             {both && <KindToggle kind={kind} onKind={onKind} />}
+            {/* Una animación de la Biblioteca ya es material de charla: lo que
+                costaba era el trámite de montarle un proyecto alrededor. */}
+            <Button variant="ghost" size="sm" onClick={() => setComoPresentacion(true)}>
+              <Presentation className="h-3.5 w-3.5" /> Como presentación
+            </Button>
             <Button variant="primary" size="sm" onClick={() => onOpenInStudio(animation.script)}>
               <Play className="h-3.5 w-3.5" /> Abrir en el Estudio
             </Button>
@@ -364,6 +373,8 @@ function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onO
           className="editor min-h-0 flex-1 overflow-auto text-[13px]"
           basicSetup={{ foldGutter: false, highlightActiveLine: false }}
         />
+        <AbrirComoPresentacion animation={animation} open={comoPresentacion}
+          onOpenChange={setComoPresentacion} onCreated={onOpenProject} />
       </>
     )
   }
