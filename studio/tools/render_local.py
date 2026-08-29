@@ -122,12 +122,20 @@ def renderizar(clip: dict, style: str, slug: str, calidad: str,
         return True
 
     # El repo va read-only (como en produccion); solo el dir del clip es rw.
+    #
+    # OJO: manim lee el script por /media/scene.py, NO por
+    # /workspace/render_jobs/... Desde que `render_jobs` y `exports` son
+    # ENLACES SIMBOLICOS al segundo disco (migracion 2026-08-28), la ruta
+    # dentro de /workspace es un enlace COLGANDO: el destino no esta
+    # montado y manim moria con "scene.py not found" en los cuatro clips.
+    # El propio dir de trabajo ya va montado en /media, asi que se apunta
+    # ahi y el enlace deja de importar.
     cmd = ["docker", "run", "--rm", "--network", "none",
            "--user", f"{os.getuid()}:{os.getgid()}",
            "-v", f"{REPO}:/workspace:ro", "-v", f"{trabajo}:/media",
            IMAGEN, "manim", "render", f"-{calidad}", "--disable_caching",
            "--media_dir", "/media",
-           f"/workspace/{scene_py.relative_to(REPO)}", clip["escena"]]
+           "/media/scene.py", clip["escena"]]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         cola = "\n".join(proc.stderr.strip().splitlines()[-15:])
