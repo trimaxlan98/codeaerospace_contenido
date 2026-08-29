@@ -256,14 +256,14 @@ Leyenda: `—` sin empezar · `~` en curso · `✔` hecho.
 | Leccion | plan | libreria | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
 | 1.1 El cielo que se mueve | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| 1.2 De dos lineas a dos angulos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 1.3 La ventana y el keyhole | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 2.1 La frecuencia que se mueve | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 2.2 La montura es un robot | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 2.3 El lazo sobre una rampa | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 3.1 LQR: elegir el compromiso | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 3.2 La campana Monte Carlo | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
-| 3.3 Por que 0.1 grados | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 1.2 De dos lineas a dos angulos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 1.3 La ventana y el keyhole | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 2.1 La frecuencia que se mueve | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 2.2 La montura es un robot | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 2.3 El lazo sobre una rampa | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 3.1 LQR: elegir el compromiso | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 3.2 La campana Monte Carlo | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 3.3 Por que 0.1 grados | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 
 ## 13. Storyboard
 
@@ -614,6 +614,12 @@ sola corrida autonoma (arranque a las 02:00 CST).
   contra los ejemplos resueltos de la Academy, todas en verde.
 - `pytest -q` del Studio: **275 pasan**.
 - Marca sonora medida **-6.0 dB exactos** dentro de la salida final.
+- **Narracion: 36/36 wavs** (serial, encadenada en el propio VPS).
+- **9/9 muxeadas**: `exports/sistemas-atp-*/curso_narrado.mp4`,
+  **23.2 min en total**, de 2:15 a 2:59 cada una, 1920x1080 con AAC a
+  24 kHz. **Peor pico de las nueve salidas: -0.5 dB.** Se re-muxearon 6
+  clips (uno de ellos a -2.5 dB porque tocaba 0.0, recorte real).
+- **TERMINADO 05:14 CST del 2026-08-29**, 3 h 14 min desde el arranque.
 
 Dos arreglos que trascienden el curso:
 1. `render_local.py` estaba ROTO para todo el repo desde la migracion al
