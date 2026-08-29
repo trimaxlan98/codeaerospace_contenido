@@ -612,14 +612,16 @@ def simular_adquisicion(salto_deg=60.0, kp=25.0, ki=2.0, kd=8.0, J=J_EJE,
                 integral += e * dt_lazo
             e_prev = e
 
-        alpha = (u_cmd - b * omega) / J
-        omega += alpha * float(dt)
-        theta += omega * float(dt)
-
+        # mismo criterio que en `simular_pase`: el estado de t[i] se
+        # registra ANTES de integrar el paso
         real[i] = np.degrees(theta)
         error[i] = ref[i] - real[i]
         u_hist[i] = u_cmd
         saturado[i] = abs(u_cmd) >= float(u_max) - 1e-9
+
+        alpha = (u_cmd - b * omega) / J
+        omega += alpha * float(dt)
+        theta += omega * float(dt)
 
     sobre = float(max(0.0, np.max(real) - float(salto_deg)))
     dentro = np.where(np.abs(error) <= OBJETIVO_DEG)[0]
@@ -717,6 +719,18 @@ def simular_pase(perfil=None, kp=25.0, ki=2.0, kd=8.0, J=J_EJE, b=B_EJE,
                 integral += e * dt_lazo
             e_prev = e
 
+        # Se registra el estado que hay EN t[i], antes de integrar el
+        # paso. Registrarlo despues (que era el primer intento) empareja
+        # theta(t_i + dt) con ref(t_i) y mete un sesgo de exactamente
+        # v*dt en el error: con dt=0.005 y una rampa de 5 grados/s, el
+        # arrastre salia 0.225 en vez de 0.250, un 10 % por debajo de lo
+        # que dice `error_arrastre`. Lo cazo un agente comparando lo
+        # dibujado con lo rotulable.
+        real[i] = np.degrees(theta)
+        error[i] = ref[i] - real[i]
+        u_hist[i] = u_cmd
+        saturado[i] = abs(u_cmd) >= float(u_max) - 1e-9
+
         par_ext = float(par_perturbacion)
         if rafaga is not None:
             t0, dur, p_nm = rafaga
@@ -727,11 +741,6 @@ def simular_pase(perfil=None, kp=25.0, ki=2.0, kd=8.0, J=J_EJE, b=B_EJE,
         alpha = (par - b * omega) / J
         omega += alpha * float(dt)
         theta += omega * float(dt)
-
-        real[i] = np.degrees(theta)
-        error[i] = ref[i] - real[i]
-        u_hist[i] = u_cmd
-        saturado[i] = abs(u_cmd) >= float(u_max) - 1e-9
 
     return {
         "t": t, "ref": ref, "real": real, "error": error, "u": u_hist,

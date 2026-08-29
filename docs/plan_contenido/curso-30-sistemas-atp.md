@@ -578,7 +578,20 @@ a repetir si nadie avisa:
 
 ### El hallazgo que mas vale del lote
 
-20. **EL p95 DE 500 CORRIDAS NO ES UNA PROPIEDAD DEL DISEÑO.** Un agente
+20. **`simular_pase` tenia un sesgo de discretizacion de `v·dt`.**
+    Registraba el estado DESPUES de integrar el paso pero lo emparejaba
+    con la referencia de t[i], asi que el error dibujado arrastraba
+    exactamente `v dt`: con el dt por defecto y una rampa de 5 grados/s
+    salia 0.225 en vez de los 0.250 que rotula `error_arrastre` — un
+    10 % de discrepancia entre lo que se ve y lo que se escribe. Lo cazo
+    un agente comparando ambas cosas, no fiandose. Corregido: ahora el
+    arrastre da 0.2500 exacto **y ya no depende de dt**, que es la
+    prueba de que el sesgo era de muestreo.
+21. **`traza_error(etiqueta_x=...)` mete el rotulo dentro de la banda**
+    cuando `alto/y_max > 5.6`: la etiqueta cuelga a 0.28 del cero y la
+    semibanda mide `umbral/y_max * alto/2`. Con errores muy por dentro
+    del presupuesto hay que pedirla con `etiqueta_x=None`.
+22. **EL p95 DE 500 CORRIDAS NO ES UNA PROPIEDAD DEL DISEÑO.** Un agente
     barrio 20 semillas a N=500: el p95 va de **0.0768 a 0.1061**
     (mediana 0.0868) y **2 de 20 NO pasan** el umbral de 0.1. Con N=4000
     se asienta en ~0.088 (margen real ~12 %). Es decir: el "pasa por un

@@ -26,7 +26,7 @@
       "file": "clips/04-windup.py",
       "title": "4 · Windup",
       "scene": "Clip4",
-      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El pase es una rampa' (blanca) y 'y solo la integral borra el rezago.' (cian)."
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El pase es una rampa' (blanca) y 'y solo la integral borra el rezago.' (cian). Antes del cierre: la adquisición de 60°, el par pegado a ±0.5 N·m durante el 22 % del tiempo, y el zoom final donde la curva sin clamping sigue fuera de la banda mientras la de con clamping ya entró."
     }
   ]
 }
