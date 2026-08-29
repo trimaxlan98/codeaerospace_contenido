@@ -255,15 +255,15 @@ Leyenda: `—` sin empezar · `~` en curso · `✔` hecho.
 
 | Leccion | plan | libreria | clips | ql ✔ frames | PR | subida | qh | narrada | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 El cielo que se mueve | ✔ | ✔ | ✔ | ✔ | — | — | — | — | — |
-| 1.2 De dos lineas a dos angulos | ✔ | ✔ | ✔ | ✔ | — | — | — | — | — |
-| 1.3 La ventana y el keyhole | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.1 La frecuencia que se mueve | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.2 La montura es un robot | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 2.3 El lazo sobre una rampa | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 3.1 LQR: elegir el compromiso | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 3.2 La campana Monte Carlo | ✔ | ✔ | ~ | — | — | — | — | — | — |
-| 3.3 Por que 0.1 grados | ✔ | ✔ | ~ | — | — | — | — | — | — |
+| 1.1 El cielo que se mueve | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| 1.2 De dos lineas a dos angulos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 1.3 La ventana y el keyhole | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 2.1 La frecuencia que se mueve | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 2.2 La montura es un robot | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 2.3 El lazo sobre una rampa | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 3.1 LQR: elegir el compromiso | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 3.2 La campana Monte Carlo | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
+| 3.3 Por que 0.1 grados | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ~ | — |
 
 ## 13. Storyboard
 
@@ -603,4 +603,20 @@ a repetir si nadie avisa:
 
 ## 16. Hitos globales
 
-_(pendiente)_
+**2026-08-29, de madrugada.** Curso producido de punta a punta en una
+sola corrida autonoma (arranque a las 02:00 CST).
+
+- **PR #67**, mergeado a `main`. Rama `curso/sistemas-atp`.
+- **9 lecciones / 36 clips** en produccion, con **36/36 `qh` adoptados**.
+- Duracion de los 36 clips: **1224.5 s = 20.4 min**; con intro y cierre
+  de marca, ~23.3 min de video final.
+- Libreria `atp.py` validada por `sonda_atp.py`: **96 comprobaciones**
+  contra los ejemplos resueltos de la Academy, todas en verde.
+- `pytest -q` del Studio: **275 pasan**.
+- Marca sonora medida **-6.0 dB exactos** dentro de la salida final.
+
+Dos arreglos que trascienden el curso:
+1. `render_local.py` estaba ROTO para todo el repo desde la migracion al
+   segundo disco (enlaces simbolicos colgando dentro del contenedor).
+2. La cosecha del repo daba un consejo falso sobre el `Transform` corto;
+   medido en el fuente de manim 0.20.1 y corregido en `trampas.md`.
