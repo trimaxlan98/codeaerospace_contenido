@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 3.2 La campana Monte Carlo". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,40 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
+# OJO con la comparacion viento/inercia: los dos pares estan en el EJE DE
+# CARGA (comparar con el del motor seria mentir), pero el viento se calcula
+# sobre el plato REAL de 3 m y J = 2 kg m^2 es la inercia de escala
+# didactica del curso fuente. La conclusion -- el viento manda -- es solida;
+# el 425x concreto depende de esa escala y se rotula con su condicion.
+V_RAFAGA = 10.0                        # m/s
+PAR_VIENTO = par_viento(V_RAFAGA, DIAMETRO := 3.0, 0.15)      # 77.93 N m
+AREA_PLATO = float(np.pi * (DIAMETRO / 2.0) ** 2)             # 7.07 m^2
+PAR_INERCIA = par_necesario(J_EJE, B_EJE, 5.0, 1.0)["total"]  # 0.1833 N m
+RAZON_VIENTO = PAR_VIENTO / PAR_INERCIA                       # 425
 
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
+TERMINOS = {"sesgo": 0.03, "viento": 0.05, "ruido": 0.02, "latencia": 0.04}
+PRES = presupuesto_cuadratura(TERMINOS)
+PRES_TOTAL = PRES["total"]                           # 0.0735 grados
+PRES_MARGEN = PRES["margen_rel"]                     # 0.265 -> 27 %
+PRES_BAJA_GRANDE = presupuesto_cuadratura(
+    {**TERMINOS, "viento": 0.03})["total"]           # 0.0616
+PRES_BAJA_CHICO = presupuesto_cuadratura(
+    {**TERMINOS, "ruido": 0.0})["total"]             # 0.0707
 
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
-
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+N_CORRIDAS = 500
+CAMP = campana_montecarlo(N_CORRIDAS)
+P50, P95, PEOR = CAMP["p50"], CAMP["p95"], CAMP["peor"]   # .036 .098 .270
+PASA = CAMP["pasa"]                                  # True, por los pelos
+MARGEN_P95 = (OBJETIVO_DEG - P95) / OBJETIVO_DEG     # 0.018 -> 2 %
+INC_500 = incertidumbre_percentil(N_CORRIDAS, 0.95)  # 4.87 corridas
+INC_2000 = incertidumbre_percentil(2000, 0.95)       # 9.75 corridas
+RES_ENCODER = resolucion_encoder(16, 360.0)          # 0.0055 grados
+SEMILLA_DEMO = 2029
 
 
 # --- Rotulos ----------------------------------------------------------

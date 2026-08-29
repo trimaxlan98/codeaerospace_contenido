@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 3.3 Por que una decima de grado". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,38 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
-
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
-
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
-
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
+D_PLATO = DIAMETRO_PLATO_M                           # 3.0 m
+TH3_S = ancho_haz(D_PLATO, 2.2e9)                    # 3.180 grados
+TH3_X = ancho_haz(D_PLATO, 8.4e9)                    # 0.833 grados
+TH3_KA = ancho_haz(D_PLATO, 30.0e9)                  # 0.233 grados
 ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+
+L_S = perdida_apuntamiento(OBJETIVO_DEG, TH3_S)      # 0.0119 dB
+L_X = perdida_apuntamiento(OBJETIVO_DEG, TH3_X)      # 0.1730 dB
+L_KA = perdida_apuntamiento(OBJETIVO_DEG, TH3_KA)    # 2.2071 dB
+RAZON_KA = L_KA / L_S                                # 186
+L_MEDIA = perdida_apuntamiento(TH3_S / 2.0, TH3_S)   # 3.0 dB exactos
+COMP_BANDAS = comparar_bandas(OBJETIVO_DEG, D_PLATO)
+ERR_KA_ADMISIBLE = error_admisible(0.1, TH3_KA)      # 0.0213 grados
+
+EL_ENLACE = 10.0                       # grados de elevacion del caso
+D_ENLACE = float(rango_oblicuo(H_LEO, EL_ENLACE))    # 1815.1 km
+FSPL_BAJO = fspl_db(D_ENLACE, 2.2)                   # 164.48 dB
+FSPL_CENIT = fspl_db(H_LEO, 2.2)                     # 154.11 dB
+DELTA_FSPL = FSPL_BAJO - FSPL_CENIT                  # 10.37 dB
+G_PLATO = ganancia_plato(D_PLATO, 2.2e9, 0.6)        # 34.58 dBi
+GT = g_sobre_t(D_PLATO, 2.2e9, 0.6, T_SISTEMA_K)     # 12.82 dB/K
+PB = presupuesto_cn0()
+CN0 = PB["cn0_dbhz"]                                 # 82.93 dB-Hz
+TASA_BPS = 1.0e6
+EBN0 = eb_n0(CN0, TASA_BPS)                          # 22.93 dB
+EBN0_QPSK = 10.5                       # QPSK a BER 1e-6 (dato publico)
+MARGEN_ENLACE = EBN0 - EBN0_QPSK                     # 12.4 dB
 
 
 # --- Rotulos ----------------------------------------------------------

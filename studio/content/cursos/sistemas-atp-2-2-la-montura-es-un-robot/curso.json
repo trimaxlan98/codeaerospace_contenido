@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 2.2 La montura es un robot",
+  "description": "Lección 2.2 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 2: los dos seguimientos), en 4 clips animados: la montura Az/El como manipulador de dos grados de libertad, el modelo de segundo orden con su integrador y su constante mecánica de 4 segundos, el reductor que regala par y cobra velocidad, y el backlash que se come el presupuesto entero antes de que el control opine.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-articulaciones.py",
+      "title": "1 · Dos articulaciones",
+      "scene": "Clip1",
+      "final_state": "La montura dibujada siguiendo un Az/El concreto de la traza, con los dos ejes marcados y el plato orientado; en el carril inferior '2 grados de libertad'."
+    },
+    {
+      "file": "clips/02-j-y-b.py",
+      "title": "2 · J y b",
+      "scene": "Clip2",
+      "final_state": "El plano s con el polo en el origen y el otro en -0.25, y la montura empujada que tarda en pararse; panel con J = 2, b = 0.5 y J/b = 4.0 s."
+    },
+    {
+      "file": "clips/03-el-reductor.py",
+      "title": "3 · El reductor",
+      "scene": "Clip3",
+      "final_state": "Las dos cifras de par enfrentadas, 0.183 N·m en el eje de carga contra 0.26 mN·m en el motor, y la velocidad dividida por N frente a los 9 deg/s que pedía el keyhole."
+    },
+    {
+      "file": "clips/04-el-backlash.py",
+      "title": "4 · El backlash",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'La holgura se come el presupuesto' (blanca) y 'antes de que el control opine.' (cian)."
+    }
+  ]
+}

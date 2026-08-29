@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 3.1 LQR: elegir el compromiso". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,34 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
+A_M, B_M = matrices_eje()
+CTRL = controlabilidad(A_M, B_M)
+DET_CTRL = CTRL["det"]                               # -0.25
+RANGO_CTRL = CTRL["rango"]                           # 2
 
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
+Q_ALTO, R_BAJO = 100.0, 1.0
+Q_ALTO_2, R_ALTO = 100.0, 100.0
+CF_RAPIDO = lqr_doble_integrador(Q_ALTO, R_BAJO)     # k1 10, k2 4.47
+CF_LENTO = lqr_doble_integrador(Q_ALTO_2, R_ALTO)    # k1 1, k2 1.41
+K1_R, K2_R = CF_RAPIDO["k1"], CF_RAPIDO["k2"]
+WN_R, TS_R = CF_RAPIDO["wn"], CF_RAPIDO["t_est"]     # 3.162, 1.750 s
+WN_L, TS_L = CF_LENTO["wn"], CF_LENTO["t_est"]       # 1.000, 5.533 s
+RAZON_WN = WN_R / WN_L                               # 3.162 = raiz cuarta de 100
+ZETA_LQR = CF_RAPIDO["zeta"]                         # 0.7071 SIEMPRE
 
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
-
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+K_LQR, P_LQR = lqr(A_M, B_M, np.diag([100.0, 1.0]), np.array([[1.0]]))
+MARG = margenes(A_M, B_M, K_LQR)
+MF = MARG["margen_fase_deg"]                         # 67.32 grados
+MG = MARG["margen_ganancia_db"]                      # inf
+WC = MARG["wc"]                                      # 3.314 rad/s
+RETARDO = 0.05                         # 50 ms de lazo digital
+MF_RETARDO = margen_fase_con_retardo(A_M, B_M, K_LQR, RETARDO)   # 57.8
+MF_OBJETIVO, MG_OBJETIVO = 45.0, 6.0   # objetivos clasicos (dato publico)
 
 
 # --- Rotulos ----------------------------------------------------------

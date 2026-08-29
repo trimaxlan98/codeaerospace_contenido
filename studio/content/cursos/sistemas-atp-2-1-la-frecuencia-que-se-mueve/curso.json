@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 2.1 La frecuencia que se mueve",
+  "description": "Lección 2.1 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 2: los dos seguimientos), en 4 clips animados: la curva en S del Doppler construyéndose mientras el satélite cruza el cielo, la velocidad radial real que no es la orbital entera, el corrimiento banda por banda frente al ancho de un módem, y por qué en recepción se corrige y en transmisión se precompensa.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-curva-s.py",
+      "title": "1 · La curva en S",
+      "scene": "Clip1",
+      "final_state": "La curva del Doppler completa junto a la carta polar, alta en AOS, cruzando f0 en la culminación y baja en LOS; en el carril inferior la excursión medida en UHF."
+    },
+    {
+      "file": "clips/02-cuanta-velocidad-radial.py",
+      "title": "2 · Cuanta velocidad radial",
+      "scene": "Clip2",
+      "final_state": "El vector velocidad descompuesto sobre la línea de vista con la componente radial marcada; panel con v = 7.59 km/s y vr max = 6.99 km/s."
+    },
+    {
+      "file": "clips/03-banda-por-banda.py",
+      "title": "3 · Banda por banda",
+      "scene": "Clip3",
+      "final_state": "Cuatro barras ámbar de VHF a banda X con sus corrimientos, y el ancho del módem de 9600 bd superpuesto mostrando que la portadora se sale; en el carril inferior 153 Hz/s."
+    },
+    {
+      "file": "clips/04-corregir-y-precompensar.py",
+      "title": "4 · Corregir y precompensar",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'La geometria y la frecuencia' (blanca) y 'beben del mismo reloj.' (cian)."
+    }
+  ]
+}

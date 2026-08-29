@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 2.2 La montura es un robot". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,30 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
+A_EJE, B_EJE_MAT = matrices_eje()      # A = [[0,1],[0,-0.25]], B = [0,0.5]
+TAU_MEC = constante_mecanica()                       # 4.0 s
+POLO_1, POLO_2 = 0.0, -B_EJE / J_EJE                 # 0 y -0.25
 
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
+ALFA_DEMO = 5.0                        # grados/s^2
+W_DEMO = 1.0                           # grados/s
+PAR = par_necesario(J_EJE, B_EJE, ALFA_DEMO, W_DEMO)
+PAR_INERCIAL = PAR["inercial"]                       # 0.1745 N m
+PAR_FRICCION = PAR["friccion"]                       # 0.0087 N m
+PAR_TOTAL = PAR["total"]                             # 0.1833 N m
 
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
+N_RED, ETA_RED = 1000.0, 0.7
+PAR_MOT_MNM = par_motor(PAR_TOTAL, N_RED, ETA_RED) * 1000.0   # 0.262 mN m
+AZ_KEYHOLE = tasa_acimut(H_LEO, 85.0)                # 9.04 grados/s
 
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+BACKLASH_DEG = 0.3                     # tornillo sin fin (dato publico)
+BL = traza_backlash(BACKLASH_DEG, 1.2)
+VECES_PRESUPUESTO = BACKLASH_DEG / OBJETIVO_DEG      # 3.0
+RES_ENCODER = resolucion_encoder(16, 360.0)          # 0.0055 grados
 
 
 # --- Rotulos ----------------------------------------------------------

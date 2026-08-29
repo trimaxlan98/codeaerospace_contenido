@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 2.3 El lazo sobre una rampa",
+  "description": "Lección 2.3 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 2: los dos seguimientos), en 4 clips animados: los tres términos del PID con su analogía mecánica sobre el plato, el error de arrastre que un pase en rampa revela y el escalón esconde, la derivada que amortigua sin tocar el rezago, y el windup medido en la fase de adquisición.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-tres-terminos.py",
+      "title": "1 · Tres terminos",
+      "scene": "Clip1",
+      "final_state": "El lazo cerrado dibujado con el resorte, el amortiguador y la memoria encendidos por separado sobre la montura; en el carril inferior la ley de control."
+    },
+    {
+      "file": "clips/02-el-error-de-arrastre.py",
+      "title": "2 · El error de arrastre",
+      "scene": "Clip2",
+      "final_state": "La referencia en rampa y la antena rezagada con la banda de 0.1° dibujada, rebasada a 5 deg/s; panel con 0.05 deg a 1 deg/s y 0.25 deg a 5 deg/s."
+    },
+    {
+      "file": "clips/03-d-amortigua.py",
+      "title": "3 · D amortigua, I limpia",
+      "scene": "Clip3",
+      "final_state": "Las dos respuestas superpuestas, la de zeta 0.056 con 84 % de sobreimpulso y la de zeta 0.70 con 4.6 %, y la nota de que el arrastre no cambió; panel con los dos tiempos de establecimiento."
+    },
+    {
+      "file": "clips/04-windup.py",
+      "title": "4 · Windup",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El pase es una rampa' (blanca) y 'y solo la integral borra el rezago.' (cian)."
+    }
+  ]
+}

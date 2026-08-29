@@ -1,0 +1,32 @@
+{
+  "name": "Sistemas ATP · 1.2 De dos lineas a dos angulos",
+  "description": "Lección 1.2 del curso Sistemas ATP: apuntamiento y seguimiento de satélites (módulo 1: dónde mirar y cuándo), en 4 clips animados: los dos renglones de 69 caracteres de un TLE y sus campos, la cuenta de Kepler que lleva del movimiento medio a la altitud, la cadena de marcos de referencia de TEME a Az/El, y el eslabón que más sorprende, que no es la matemática sino el reloj.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-renglones.py",
+      "title": "1 · Dos renglones de 69 caracteres",
+      "scene": "Clip1",
+      "final_state": "Tarjeta del TLE con sus dos líneas en Space Mono y los campos de época, inclinación, RAAN, excentricidad y movimiento medio resaltados en cian; en el carril inferior n = 15.5 rev/dia."
+    },
+    {
+      "file": "clips/02-de-n-a-la-altitud.py",
+      "title": "2 · De n a la altitud",
+      "scene": "Clip2",
+      "final_state": "La órbita a escala junto a la Tierra con el radio marcado; panel con T = 92.9 min, a = 6795 km y h = 424 km; en el carril inferior la fórmula de Kepler para el semieje."
+    },
+    {
+      "file": "clips/03-la-cadena-de-marcos.py",
+      "title": "3 · La cadena de marcos",
+      "scene": "Clip3",
+      "final_state": "La cadena TLE → SGP4 → ECI → ECEF → ENU → Az/El con el último eslabón encendido en cian, y el ejemplo resuelto Az 53.13, El 45.00, d 707.1 km en el panel."
+    },
+    {
+      "file": "clips/04-el-reloj-manda.py",
+      "title": "4 · El reloj manda",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'Un segundo de reloj' (blanca) y 'cuesta ocho presupuestos.' (cian)."
+    }
+  ]
+}

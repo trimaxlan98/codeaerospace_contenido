@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 1.2 De dos lineas a dos angulos". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,27 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
+N_REV_DIA = 15.5                       # el TLE de muestra
+H_TLE = altitud_de_movimiento_medio(N_REV_DIA)       # 423.9 km
+T_TLE_MIN = 86400.0 / N_REV_DIA / 60.0               # 92.90 min
+A_TLE = H_TLE + 6371.0                               # 6794.9 km
+N_REV_2 = 15.0
+H_TLE_2 = altitud_de_movimiento_medio(N_REV_2)       # 574.0 km
+DELTA_H = H_TLE_2 - H_TLE                            # 150.2 km
 
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
+E_ENU, N_ENU, U_ENU = 400.0, 300.0, 500.0            # el ejemplo resuelto
+AZ_EJ, EL_EJ, D_EJ = enu_a_azel(E_ENU, N_ENU, U_ENU)  # 53.13, 45.00, 707.1
+AZ_INVERTIDO = 36.87    # lo que saldria con atan2(n, e): el error clasico
 
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
-
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+ESLABONES = ("TLE", "SGP4", "ECI", "ECEF", "ENU", "Az/El")
+GIRO_SIDEREO = 360.9856                # grados por dia solar (dato publico)
+ERR_RELOJ = error_por_reloj(1.0, H_LEO)              # 0.7906 grados
+VECES_PRESUPUESTO = ERR_RELOJ / OBJETIVO_DEG         # 7.91
 
 
 # --- Rotulos ----------------------------------------------------------

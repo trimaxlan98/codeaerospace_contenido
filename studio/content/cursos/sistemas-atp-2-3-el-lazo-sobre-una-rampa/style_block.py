@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 2.3 El lazo sobre una rampa". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,42 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
+KP_BAJO = 10.0                         # el kp del ejemplo resuelto
+E_ARRASTRE_1 = error_arrastre(1.0, B_EJE, KP_BAJO)   # 0.050 grados
+E_ARRASTRE_5 = error_arrastre(5.0, B_EJE, KP_BAJO)   # 0.250 grados
+VECES_PRESUPUESTO = E_ARRASTRE_5 / OBJETIVO_DEG      # 2.5
+KP_NECESARIO = kp_para_arrastre(5.0, OBJETIVO_DEG, B_EJE)     # 25.0
 
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
+ZETA_P, WN_P = zeta_wn(KP_BAJO, 0.0, J_EJE, B_EJE)   # 0.0559, 2.236
+MP_P = sobreimpulso(ZETA_P)                          # 0.839 -> 83.9 %
+TS_P = t_establecimiento(ZETA_P, WN_P)               # 31.3 s
+KD_OBJ = kd_para_zeta(0.7, KP_BAJO, J_EJE, B_EJE)    # 5.761
+ZETA_D, WN_D = zeta_wn(KP_BAJO, KD_OBJ, J_EJE, B_EJE)
+MP_D = sobreimpulso(ZETA_D)                          # 0.046 -> 4.6 %
+TS_D = t_establecimiento(ZETA_D, WN_D)               # 2.50 s
+MEJORA_TS = TS_P / TS_D                              # 12.5x
 
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
+# El WINDUP vive en la ADQUISICION, no en una rafaga: se midio que a esta
+# escala una rafaga mayor que el motor no da windup sino perdida de
+# control (de 14 a 900 grados de error). Ver el docstring de
+# simular_adquisicion en atp.py.
+SALTO_ADQ = 60.0                       # grados de preposicionamiento
+ADQ_SIN = simular_adquisicion(SALTO_ADQ, ki=2.0, antiwindup=False)
+ADQ_CON = simular_adquisicion(SALTO_ADQ, ki=2.0, antiwindup=True)
+SOBRE_SIN = ADQ_SIN["sobreimpulso"]                  # 27.75 grados
+SOBRE_CON = ADQ_CON["sobreimpulso"]                  # 15.35 grados
+TAS_CON = ADQ_CON["t_asentamiento"]                  # 9.95 s
+SAT_SIN = ADQ_SIN["frac_saturado"]                   # 0.222
 
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+PERFIL_L = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
+                       n=360)
+SIM_P = simular_pase(PERFIL_L, kp=KP_BAJO, ki=0.0, kd=0.0)
+SIM_PID = simular_pase(PERFIL_L, kp=25.0, ki=2.0, kd=8.0)
 
 
 # --- Rotulos ----------------------------------------------------------

@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Sistemas ATP · 1.1 El cielo que se mueve". Bloque de
+# CO.DE Academy - "Sistemas ATP · 2.1 La frecuencia que se mueve". Bloque de
 # estilo del proyecto: se antepone al script de CADA clip; los clips NO
 # repiten imports, solo definen su ClipN(Scene).
 #
@@ -163,32 +163,23 @@ def _vigilar(texto, maximo, quien):
     return texto
 
 
-# --- Numeros de la leccion --------------------------------------------
+# --- Numeros de la leccion ---------------------------------------------
 # Todo valor que se rotule sale de aqui o de atp.py, nunca escrito a
 # mano en el clip: lo dibujado y lo escrito no pueden discrepar.
 H_LEO = 550.0                          # km, la estacion del curso
-H_BAJA = 400.0                         # km, la orbita mas rapida
-H_GEO = 35786.0                        # km (dato publico)
 MASCARA = 5.0                          # grados
-
-V_LEO = velocidad_circular(H_LEO)                  # 7.589 km/s
-W_LEO = velocidad_angular_cenit(H_LEO)             # 0.7906 grados/s
-V_BAJA = velocidad_circular(H_BAJA)                # 7.669 km/s
-W_BAJA = velocidad_angular_cenit(H_BAJA)           # 1.099 grados/s
-T_LEO_MIN = periodo_orbital(H_LEO) / 60.0          # 95.50 min
-T_GEO_H = periodo_orbital(H_GEO) / 3600.0          # 23.93 h (dia sidereo)
-
-DUR_PASE_MIN = duracion_pase(H_LEO, 90.0, MASCARA) / 60.0    # 9.82 min
-ARCO_PASE = arco_central_pase(H_LEO, 90.0, MASCARA)          # 37.0 grados
-PERFIL = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
-                     n=360)
-
-LUNA_DEG = 0.52                        # diametro aparente (dato publico)
-LUNAS_POR_SEG = W_LEO / LUNA_DEG       # 1.52 lunas por segundo
-
-TH3_S = ancho_haz(3.0, 2.2e9)          # 3.18 grados
-TH3_KA = ancho_haz(3.0, 30.0e9)        # 0.233 grados
-ESC_HAZ = TH3_S / 34.0                 # MISMA escala angular en los dos
+VR_MAX = velocidad_radial_max(H_LEO)                 # 6.986 km/s
+V_ORBITAL = velocidad_circular(H_LEO)                # 7.589 km/s
+TABLA_D = tabla_doppler(H_LEO)                       # 4 bandas medidas
+F_UHF = 437.0e6
+FD_UHF = TABLA_D[1]["fd_hz"]                         # 10 184 Hz
+EXC_UHF = TABLA_D[1]["excursion_hz"]                 # 20 367 Hz
+TASA_UHF = tasa_doppler(H_LEO, F_UHF)                # 152.6 Hz/s
+BAUDIOS = 9600                         # ancho del modem (dato publico)
+PERFIL_D = perfil_pase(H_LEO, 72.0, MASCARA, az_culminacion_deg=140.0,
+                       n=360)
+CURVA_D = curva_doppler(PERFIL_D, F_UHF)
+LAM_HORIZ = float(angulo_central(H_LEO, 0.0))        # 22.996 grados
 
 
 # --- Rotulos ----------------------------------------------------------
