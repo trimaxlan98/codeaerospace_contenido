@@ -29,6 +29,20 @@ const POR_TIPO = {
   presentacion: ['horizontal', 'clasico', 'cuadrado'],
 }
 
+// Fondos con nombre de una presentación. Los ids y los hex son los de
+// `app/projects.py::FONDOS` (y los de manim_extensions/presentacion.py, quien
+// los pinta). La paleta de textos VOLTEA con el fondo: sobre blanco, el ámbar
+// de la marca da 2.15:1 de contraste y sería ilegible.
+export const FONDOS = [
+  { id: 'marca', label: 'Marca · casi negro', hex: '#05070a', claro: false },
+  { id: 'blanco', label: 'Blanco · plantilla de tesis', hex: '#ffffff', claro: true },
+  { id: 'pizarra', label: 'Pizarra · azul muy oscuro', hex: '#0f172a', claro: false },
+]
+
+export function fondoPorId(id) {
+  return FONDOS.find((f) => f.id === id) || FONDOS[0]
+}
+
 /** Los formatos que ofrece un tipo de proyecto, en el orden en que se usan. */
 export function formatosDe(tipo) {
   const ids = POR_TIPO[tipo] || POR_TIPO.curso

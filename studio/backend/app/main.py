@@ -372,12 +372,16 @@ async def retry_job(job_id: str, _=Depends(require_auth)):
     # El formato y el fondo viajan con el job (no se vuelven a leer del
     # proyecto): un reintento tiene que producir el MISMO archivo que el
     # intento original.
+    # El tipo se relee del proyecto y no viaja con el job: es inmutable
+    # (update_project no lo acepta), asi que da siempre la misma respuesta.
+    proyecto = db.get_project(job["project_id"]) if job.get("project_id") else None
     return manager.create_job(job["script"], job["scene"], job["quality"],
                               job["timeout"], project_id=job.get("project_id"),
                               clip_id=job.get("clip_id"),
                               content_hash=job.get("content_hash"),
                               formato=job.get("formato") or FORMATO_DEFECTO,
-                              fondo=job.get("fondo") or "marca")
+                              fondo=job.get("fondo") or "marca",
+                              tipo=(proyecto or {}).get("tipo") or "curso")
 
 
 @app.delete("/api/jobs/older-than/{days}")

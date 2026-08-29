@@ -80,7 +80,7 @@ class JobManager:
                    project_id: str | None = None, clip_id: str | None = None,
                    content_hash: str | None = None,
                    formato: str = FORMATO_DEFECTO,
-                   fondo: str = "marca") -> dict:
+                   fondo: str = "marca", tipo: str = "curso") -> dict:
         job_id = uuid.uuid4().hex[:16]
         now = time.time()
         job = {
@@ -93,9 +93,14 @@ class JobManager:
         # la identidad del canal garantizada (branding.aplicar). Lo que se
         # guarda en la DB es el script del autor, sin tocar: la marca es del
         # render, no del codigo que el usuario edita.
+        #
+        # `tipo` decide QUE se garantiza: en un curso o un promo, la marca; en
+        # una presentacion, el lienzo (formato y fondo) que pidio el proyecto,
+        # que si no se ignoraria en silencio en cualquier script que no llame a
+        # `presentacion.lienzo()`.
         job_dir = self.cfg.render_jobs_dir / job_id
         job_dir.mkdir(parents=True, exist_ok=True)
-        (job_dir / "scene.py").write_text(branding.aplicar(script),
+        (job_dir / "scene.py").write_text(branding.aplicar(script, tipo),
                                           encoding="utf-8")
 
         self.db.insert_job(job)

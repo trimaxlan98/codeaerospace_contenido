@@ -202,7 +202,7 @@ falla).
 | P1 | El lienzo | `presentacion.py`: formatos, fondo, paleta volteada, `paso()` | **hecho** |
 | P2 | El paquete | `empaquetar_presentacion.py`: corte, pósters, GIF, .pptx, LEEME | **hecho** |
 | P3 | La app | tipo `presentacion` en el estudio, con su pantalla | **hecho** |
-| P4 | La biblioteca | "abrir como presentación" en las animaciones que ya existen | pendiente |
+| P4 | La biblioteca | "abrir como presentación" en las animaciones que ya existen | **hecho** |
 
 ### Lo que entró en P3
 
@@ -212,6 +212,40 @@ en `projects` y en `jobs`) · `manim_runner.py` (`PRESENTACION_FONDO`, formato
 `presentaciones_api.py` · `PresentacionPanel.jsx` · plantilla y selector de fondo en el
 frontend. `python-pptx` está en `backend/requirements.txt`: **hay que
 instalarlo en el VPS al desplegar**.
+
+### P4 — reutilizar las ~60 animaciones que ya existen
+
+En la Biblioteca, cualquier animación tiene un botón **«Como presentación»**:
+crea el proyecto, mete el script y te lleva allí. No hay que rehacer nada.
+
+Lo que había que resolver de verdad no era el trámite. Ninguna de esas
+animaciones llama a `presentacion.lienzo()` —se escribieron para un curso—,
+así que **el formato y el fondo elegidos se ignoraban en silencio**: se pedía
+4:3 sobre blanco y salía 16:9 sobre negro, sin un aviso. Un flag que no hace
+nada es peor que no ofrecerlo.
+
+La solución es simétrica a la identidad de marca: el backend **garantiza el
+lienzo** igual que garantiza la marca. `branding.aplicar(script, tipo)` anexa
+`presentacion.adaptar_escenas(globals())` a cualquier script de un proyecto de
+tipo presentación que no pida su propio lienzo. Los dos bloques son
+excluyentes — el de presentación ya aplica identidad, con la paleta volteada.
+
+Así el diálogo no tiene que recortarle la cabecera al script ni anteponerle un
+bloque de estilo (`import sys` + `from manim import *` volverían a importar el
+`Scene` real y se cargarían la sombra): el estilo compartido va **vacío** y el
+script entra tal cual.
+
+`adaptar_escenas` además **inyecta los nombres** `presentacion`, `paso` y
+`PRES` en el script (con `setdefault`, sin pisar nunca los del autor). Sin
+eso, el consejo que da el diálogo —«añade `presentacion.paso(self, "...")`
+donde quieras cada parada»— fallaría con `NameError`, porque esa animación
+nunca importó el módulo. Verificado: las dos formas producen dos slides.
+
+**Lo que NO hace, y por eso el diálogo lo dice**: no repinta los colores. Pone
+el lienzo, el fondo y la marca; los colores que la animación eligió a mano no
+se pueden adivinar. Por eso el fondo por defecto al adaptar es el de **marca**
+—aquel para el que se dibujó— y elegir uno claro sale con aviso: sobre blanco,
+un diagrama de curso queda lavado (comprobado a ojo, no supuesto).
 
 ### Las tres trampas que solo aparecieron con la app entera montada
 

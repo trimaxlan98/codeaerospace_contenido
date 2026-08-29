@@ -297,7 +297,8 @@ export default function App() {
           <Learn active={view === 'learn'}
             routeId={view === 'learn' ? route.param : null}
             onRoute={(id) => navigate('learn', id)}
-            onOpenInStudio={(script) => { setPendingScript(script); navigate('studio') }} />
+            onOpenInStudio={(script) => { setPendingScript(script); navigate('studio') }}
+            onOpenProject={(id) => navigate('projects', id)} />
         </div>
       )}
       {visited.current.has('admin') && (

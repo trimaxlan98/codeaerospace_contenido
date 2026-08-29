@@ -61,6 +61,15 @@ FORMATOS = ("horizontal", "clasico", "cuadrado")
 CALIDADES = ("ql", "qm", "qh")
 
 
+def visible(ruta: Path) -> str:
+    """La ruta como conviene leerla: relativa al repo si cuelga de el, y
+    absoluta si `--salida` apunta fuera."""
+    try:
+        return str(ruta.relative_to(REPO))
+    except ValueError:
+        return str(ruta)
+
+
 def slugify(texto: str) -> str:
     ascii_txt = (unicodedata.normalize("NFKD", texto)
                  .encode("ascii", "ignore").decode("ascii"))
@@ -101,8 +110,13 @@ def renderizar(script: Path, escena: str, trabajo: Path, args) -> Path:
     va por la cola normal de jobs.
     """
     scene_py = trabajo / "scene.py"
-    scene_py.write_text(branding.aplicar(script.read_text(encoding="utf-8")),
-                        encoding="utf-8")
+    # tipo="presentacion": garantiza el lienzo tambien en un script que no
+    # llame a `presentacion.lienzo()` — que es el caso de las ~60 animaciones
+    # de studio/content/animations/. Sin esto, --formato y --fondo se
+    # ignorarian en silencio.
+    scene_py.write_text(
+        branding.aplicar(script.read_text(encoding="utf-8"), tipo="presentacion"),
+        encoding="utf-8")
 
     entorno = {"PRESENTACION_FORMATO": args.formato, "PRESENTACION_FONDO": args.fondo,
                "PRESENTACION_CALIDAD": args.calidad}
@@ -238,17 +252,13 @@ def main() -> int:
     plan = {
         "proyecto": titulo,
         "raiz": str(REPO),
-        "destino": str(trabajo.relative_to(REPO)) if trabajo.is_relative_to(REPO)
-                   else str(trabajo),
+        "destino": visible(trabajo),
         "gif": True,
         "bucle": args.bucle,
         "escenas": [{
             "titulo": titulo,
-            "video": str(completa.relative_to(REPO)) if completa.is_relative_to(REPO)
-                     else str(completa),
-            "pasos_json": str((trabajo / "pasos.json").relative_to(REPO))
-                          if trabajo.is_relative_to(REPO)
-                          else str(trabajo / "pasos.json"),
+            "video": visible(completa),
+            "pasos_json": visible(trabajo / "pasos.json"),
         }],
     }
     informe = cortar_presentacion.cortar(plan)
@@ -277,10 +287,10 @@ def main() -> int:
                               ancho / alto, fondo_real,
                               "video" if args.video else "gif")
         print(f"    deck ({'mp4' if args.video else 'GIF'}):"
-              f" {pptx.relative_to(REPO)}  {pptx.stat().st_size/1024:.0f} KB")
+              f" {visible(pptx)}  {pptx.stat().st_size/1024:.0f} KB")
 
     escribir_leeme(trabajo, informe, args, titulo, pptx, fondo_real)
-    print(f"    todo en {trabajo.relative_to(REPO)}\n")
+    print(f"    todo en {visible(trabajo)}\n")
     return 0
 
 

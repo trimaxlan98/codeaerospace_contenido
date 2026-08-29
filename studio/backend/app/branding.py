@@ -37,6 +37,8 @@ RE_IMPORTA_PRESENTACION = re.compile(
 RUTA_EXTENSIONS = "/workspace/studio/content/manim_extensions"
 
 MARCADOR = "# --- identidad CO.DE Academy (anexada por ManimStudio) ---"
+MARCADOR_PRESENTACION = (
+    "# --- lienzo de presentacion (anexado por ManimStudio) ---")
 
 BLOQUE_MARCA = f"""{MARCADOR}
 try:
@@ -50,14 +52,44 @@ except Exception as _code_brand_error:  # la marca nunca tumba un render
 """
 
 
+MODULO_PRESENTACION = "presentacion"
+
+BLOQUE_PRESENTACION = f"""{MARCADOR_PRESENTACION}
+try:
+    import sys
+    if {RUTA_EXTENSIONS!r} not in sys.path:
+        sys.path.insert(0, {RUTA_EXTENSIONS!r})
+    from {MODULO_PRESENTACION} import adaptar_escenas as _adaptar_escenas
+    _adaptar_escenas(globals())
+except Exception as _presentacion_error:  # nunca tumba un render
+    print("[CO.DE Academy] lienzo de presentacion no aplicado:",
+          _presentacion_error)
+"""
+
+
 def ya_marcado(script: str) -> bool:
     """¿El script ya aplica la identidad por su cuenta?"""
     return (any(m in script for m in MODULOS_CON_MARCA)
             or bool(RE_IMPORTA_PRESENTACION.search(script)))
 
 
-def aplicar(script: str) -> str:
-    """Script listo para renderizar, con la identidad garantizada."""
+def aplicar(script: str, tipo: str = "curso") -> str:
+    """Script listo para renderizar, con la identidad garantizada.
+
+    En un proyecto de tipo 'presentacion' lo que se garantiza es OTRA cosa: el
+    lienzo (formato y fondo) que pidio el proyecto. Sin esto, cualquiera de las
+    ~60 animaciones que ya viven en `studio/content/animations/` —escritas para
+    un curso, sin llamar a `presentacion.lienzo()`— saldria en 16:9 sobre el
+    negro de la marca aunque se hubiera pedido 4:3 sobre blanco, y sin decir
+    nada. Un formato que se ignora en silencio es peor que no ofrecerlo.
+
+    El bloque de presentacion ya aplica la identidad (con la paleta volteada al
+    fondo), asi que los dos son excluyentes: nunca se anexan ambos.
+    """
+    if tipo == "presentacion":
+        if RE_IMPORTA_PRESENTACION.search(script):
+            return script      # el script pide su propio lienzo
+        return f"{script.rstrip()}\n\n{BLOQUE_PRESENTACION}"
     if ya_marcado(script):
         return script
     return f"{script.rstrip()}\n\n{BLOQUE_MARCA}"

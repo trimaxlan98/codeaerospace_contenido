@@ -375,3 +375,87 @@ def test_una_corrida_que_salio_BIEN_no_se_queda_pegada(authed):
     presentacion_service._run = {"project_id": pid, "estado": "listo"}
     presentacion_service._task = None
     assert presentacion_service.estado(db.get_project(pid))["run"] is None
+
+
+# ── abrir una animacion de la Biblioteca como presentacion ──────────────────
+
+ANIMACION = ("import sys\n"
+             "sys.path.insert(0, '/workspace/studio/content/manim_extensions')\n"
+             "from manim import *\n"
+             "class Diagrama(Scene):\n"
+             "    def construct(self):\n"
+             "        self.play(Create(Circle()))\n")
+
+
+def _espiar_branding(monkeypatch):
+    """Anota con que `tipo` se compone cada script.
+
+    Se espia la llamada en vez de leer el scene.py del disco: el worker de la
+    cola coge el job, el render falla (en pruebas no hay runner) y el
+    directorio del job se borra. Leerlo seria una carrera.
+    """
+    from app import jobs as app_jobs
+    visto = []
+    original = app_jobs.branding.aplicar
+
+    def espia(script, tipo="curso"):
+        visto.append(tipo)
+        return original(script, tipo)
+
+    monkeypatch.setattr(app_jobs.branding, "aplicar", espia)
+    return visto
+
+
+def _render_de(authed, pid, script=ANIMACION, scene="Diagrama"):
+    clip = authed.post(f"/api/projects/{pid}/clips",
+                       json={"title": "Diagrama", "script": script,
+                             "scene": scene}).json()
+    r = authed.post(f"/api/projects/{pid}/clips/{clip['id']}/render")
+    assert r.status_code == 201, r.text
+    return r.json()
+
+
+def test_el_render_de_una_presentacion_se_compone_con_su_lienzo(authed, monkeypatch):
+    """Es TODO el flujo de «abrir como presentación»: un proyecto de tipo
+    presentacion con estilo VACIO y el script de la animacion tal cual. Si el
+    tipo no llegara a branding, el 4:3 y el fondo elegidos no llegarian a manim
+    y el render saldria 16:9 sobre negro sin avisar de nada.
+    """
+    from app.main import db
+    visto = _espiar_branding(monkeypatch)
+    pid = _create_presentacion(authed, style_block="", formato="clasico",
+                               fondo="blanco")["id"]
+    job = _render_de(authed, pid)
+
+    assert visto == ["presentacion"]
+    # Y el lienzo pedido viaja con el job, para que el runner lo pase por entorno.
+    guardado = db.get_job(job["id"])
+    assert (guardado["formato"], guardado["fondo"]) == ("clasico", "blanco")
+
+
+def test_un_curso_con_el_mismo_script_se_compone_con_la_marca(authed, monkeypatch):
+    """El tipo del proyecto es lo unico que los separa."""
+    visto = _espiar_branding(monkeypatch)
+    pid = _create_presentacion(authed, tipo="curso", fondo="marca",
+                               style_block="")["id"]
+    _render_de(authed, pid)
+    assert visto == ["curso"]
+
+
+def test_el_reintento_conserva_el_tipo(authed, monkeypatch):
+    """Un reintento tiene que producir el MISMO archivo. El tipo se relee del
+    proyecto (es inmutable), no del job."""
+    pid = _create_presentacion(authed, style_block="")["id"]
+    job = _render_de(authed, pid)
+    visto = _espiar_branding(monkeypatch)      # solo el reintento
+    reintento = authed.post(f"/api/jobs/{job['id']}/retry")
+    assert reintento.status_code == 201, reintento.text
+    assert visto == ["presentacion"]
+
+
+def test_el_lienzo_que_de_verdad_se_compone_es_el_del_proyecto(authed):
+    """Comprobacion sin espia, sobre el texto: una animacion de curso sale con
+    `adaptar_escenas` y sin el bloque de marca."""
+    from app import branding
+    salida = branding.aplicar(ANIMACION, tipo="presentacion")
+    assert "adaptar_escenas" in salida and branding.MARCADOR not in salida

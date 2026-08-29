@@ -62,3 +62,37 @@ def test_un_paso_sin_etiqueta_recibe_una():
     ponente lee en el modo presentador: nunca puede quedar vacio."""
     tramos = cp.cortes([{"t": 1.0}, {"t": 2.0}], dur=2.0)
     assert [t["etiqueta"] for t in tramos] == ["Paso 1", "Paso 2"]
+
+
+# ── el contrato con la interfaz ──────────────────────────────────────────────
+#
+# `presentacion.py` importa manim y no se puede ejecutar aqui (el venv del
+# backend no lo tiene: manim vive en el contenedor). Lo que si se puede fijar
+# es el CONTRATO que la interfaz promete, leyendo el fuente. Es poco, pero
+# evita que se caiga en silencio lo unico que hace utilizable la adaptacion.
+
+EXTENSIONS = Path(__file__).resolve().parents[3] / "studio" / "content" / "manim_extensions"
+
+
+def test_adaptar_escenas_deja_usable_el_nombre_que_anuncia_la_interfaz():
+    """El diálogo «Abrir como presentación» le dice al usuario que escriba
+    `presentacion.paso(self, "...")`. Una animación de la Biblioteca nunca
+    importó ese módulo, así que sin inyectarlo esa línea daría NameError y el
+    consejo de la interfaz sería una trampa.
+    """
+    fuente = (EXTENSIONS / "presentacion.py").read_text(encoding="utf-8")
+    cuerpo = fuente.split("def adaptar_escenas", 1)[1]
+    for nombre in ('ns.setdefault("presentacion"', 'ns.setdefault("paso"',
+                   'ns.setdefault("PRES"'):
+        assert nombre in cuerpo, f"adaptar_escenas ya no inyecta {nombre}"
+    # setdefault y no asignacion: jamas se pisa un nombre del autor.
+    assert "ns[" not in cuerpo
+
+
+def test_el_bloque_que_anexa_el_backend_llama_a_adaptar_escenas():
+    """Las dos mitades tienen que seguir encajando: el backend anexa la
+    llamada y el modulo la expone."""
+    from app import branding
+    assert "adaptar_escenas" in branding.BLOQUE_PRESENTACION
+    fuente = (EXTENSIONS / "presentacion.py").read_text(encoding="utf-8")
+    assert "def adaptar_escenas(" in fuente

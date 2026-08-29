@@ -358,7 +358,8 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
                                   timeout=cfg.default_timeout, project_id=pid,
                                   clip_id=cid, content_hash=chash,
                                   formato=project.get("formato") or FORMATO_DEFECTO,
-                                  fondo=project.get("fondo") or FONDO_DEFECTO)
+                                  fondo=project.get("fondo") or FONDO_DEFECTO,
+                                  tipo=project.get("tipo") or "curso")
 
     @router.post("/{pid}/render-stale")
     async def render_stale(pid: str, _=Depends(require_auth)):
@@ -405,7 +406,8 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
                                      timeout=cfg.default_timeout, project_id=pid,
                                      clip_id=cid, content_hash=chash,
                                      formato=project.get("formato") or FORMATO_DEFECTO,
-                                  fondo=project.get("fondo") or FONDO_DEFECTO)
+                                     fondo=project.get("fondo") or FONDO_DEFECTO,
+                                     tipo=project.get("tipo") or "curso")
             queued.append(job["id"])
 
         return {"queued": queued, "skipped": skipped}

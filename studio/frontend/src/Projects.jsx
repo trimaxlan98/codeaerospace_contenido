@@ -19,7 +19,7 @@ import {
 import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
-import { formatoPorId, formatosDe, ratioDeJob } from './formatos.js'
+import { FONDOS, formatoPorId, formatosDe, ratioDeJob } from './formatos.js'
 import { usePref } from './prefs.js'
 import ClipAssistant from './components/ClipAssistant.jsx'
 import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
@@ -33,16 +33,6 @@ import DeleteButton from './components/DeleteButton.jsx'
 import { cn } from '@/lib/utils'
 
 const QUALITY_LABEL = { ql: '480p', qm: '720p', qh: '1080p' }
-
-// Fondos de una presentación. Los ids y los hex son los de
-// `app/projects.py::FONDOS` (y los de manim_extensions/presentacion.py, quien
-// los pinta). La paleta de textos VOLTEA con el fondo: sobre blanco, el ambar
-// de la marca da 2.15:1 de contraste y seria ilegible.
-const FONDOS = [
-  { id: 'marca', label: 'Marca · casi negro', hex: '#05070a' },
-  { id: 'blanco', label: 'Blanco · plantilla de tesis', hex: '#ffffff' },
-  { id: 'pizarra', label: 'Pizarra · azul muy oscuro', hex: '#0f172a' },
-]
 
 // Rango de duracion por tipo de proyecto. En un curso es el que valida
 // `studio/tools/render_local.py`: un clip mas corto no alcanza a contar nada

@@ -89,6 +89,10 @@ MIN_DISPLAY = 22
 
 _REGISTRO: list[dict] = []
 _LIENZO: dict = {}
+# El objeto Lienzo de la ultima llamada a lienzo(). Lo necesita
+# adaptar_escenas() para poder aplicar a una escena ajena EL MISMO lienzo que
+# ya se configuro, en vez de crear otro.
+_ULTIMO: "Lienzo | None" = None
 
 
 # ── luminancia: quien decide si un fondo es claro ────────────────────────────
@@ -230,6 +234,8 @@ def lienzo(nombre=None, fondo=None, calidad=None, alto_px=None, ancho_px=None,
     if abs(config.frame_width - lz.ancho) > 1e-6:
         raise RuntimeError("el mundo no quedo en el formato pedido: "
                            f"{config.frame_width} != {lz.ancho}")
+    global _ULTIMO
+    _ULTIMO = lz
     _REGISTRO.clear()
     # El lienzo REALMENTE usado queda anotado junto a los pasos. Asi el
     # paquete se describe a si mismo y quien lo arma no tiene que volver a
@@ -278,7 +284,68 @@ def aplicar(escena, lz: Lienzo, marca_agua=True, esquinas=None) -> None:
         escena.add(code_brand.esquinas_hud(color=lz.acento))
     if marca_agua:
         escena.add(marca(lz))
-    type(escena)._code_brand = True    # la presentacion ya trae identidad propia
+    # Marcada por partida doble: `_code_brand` para que la identidad del canal
+    # no se anexe encima, y `_presentacion` para que adaptar_escenas() no la
+    # aplique otra vez si el script ademas la llama.
+    type(escena)._code_brand = True
+    type(escena)._presentacion = True
+
+
+def _adaptar_clase(cls, lz: "Lienzo") -> None:
+    setup_original = cls.setup
+
+    def setup(self):
+        setup_original(self)
+        aplicar(self, lz)
+
+    cls.setup = setup
+    cls._presentacion = True
+
+
+def adaptar_escenas(ns: dict) -> None:
+    """Convierte en presentacion las escenas ya definidas en `ns` (el
+    `globals()` del script).
+
+    Existe por las ~60 animaciones que ya viven en
+    `studio/content/animations/`: fueron escritas para un curso y no llaman a
+    `lienzo()`, asi que sin esto el formato y el fondo que pide el proyecto se
+    IGNORAN en silencio — el render sale 16:9 sobre el negro de la marca
+    aunque se haya pedido 4:3 sobre blanco. Un flag que no hace nada es peor
+    que no tenerlo.
+
+    ManimStudio anexa la llamada al FINAL del script, igual que hace con la
+    identidad del canal: manim importa el modulo entero antes de instanciar la
+    escena, asi que anexar (en vez de anteponer) deja intactos los numeros de
+    linea que reporta un error, y `lienzo()` todavia llega a tiempo de cambiar
+    el lienzo.
+
+    Lo que SI y lo que NO hace: pone el lienzo, el fondo, la marca de agua
+    adaptada y las esquinas. NO repinta los colores que la animacion eligio a
+    mano — eso no se puede adivinar. Una animacion de curso sobre fondo claro
+    seguira dibujando en sus colores claros: es el usuario quien decide si ese
+    fondo le sirve.
+
+    Idempotente: una escena que ya trae `aplicar()` se salta.
+    """
+    from manim import Scene as _Scene
+
+    import sys as _sys
+
+    lz = _ULTIMO if _ULTIMO is not None else lienzo()
+    modulo = ns.get("__name__")
+    for obj in list(ns.values()):
+        if (isinstance(obj, type) and issubclass(obj, _Scene)
+                and obj.__module__ == modulo
+                and not getattr(obj, "_presentacion", False)):
+            _adaptar_clase(obj, lz)
+
+    # El script adaptado no importo este modulo (por eso hizo falta adaptarlo):
+    # sin esto, anadirle un `presentacion.paso(self, "...")` —que es justo lo
+    # que hay que hacer para que avance con el clic— fallaria con NameError.
+    # `setdefault` para no pisar jamas un nombre del autor.
+    ns.setdefault("presentacion", _sys.modules[__name__])
+    ns.setdefault("paso", paso)
+    ns.setdefault("PRES", lz)
 
 
 # ── mobiliario con la paleta del lienzo ──────────────────────────────────────
