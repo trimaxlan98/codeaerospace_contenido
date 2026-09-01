@@ -32,7 +32,8 @@ runtime funcione (los utilitarios referencian `var()`, no el valor).
 | `--canvas` | fondo del documento | |
 | `--surface` / `--surface-2` | vidrio de panel / elemento elevado | **velo claro sobre lienzo oscuro**; un velo oscuro sobre fondo oscuro no se ve |
 | `--line` / `--line-strong` | bordes, separadores, **barra de scroll** | **nunca `transparent`**: toda la estructura de la app se dibuja con `border-line` y el scrollbar usa `--line-strong` |
-| `--ink` / `--muted` / `--faint` | texto principal / secundario / terciario | |
+| `--ink` / `--muted` / `--faint` | texto principal / secundario / terciario | los tres cumplen **AA como texto normal** (4,5:1) sobre el fondo más claro donde aparecen. `faint` NO es un token de adorno: sus 59 usos son contadores, unidades y pistas de teclado |
+| `--code-ink` | salida monoespaciada: registro de render, script generado | rol propio, ni `ink` ni `muted`. Existe porque era un literal `#a8bcd4` que en `daylight` daba 1,77:1 |
 | `--accent` / `--accent-ink` | firma del tema y su texto encima | |
 | `--brand` / `--brand-2` | ámbar CO.DE Academy (punto del wordmark, escuadras HUD, viñetas) | **no es el acento del tema**: es la marca del canal. Ámbar `#f59e0b` en los tres temas oscuros; `#b45309` en `daylight` (el ámbar del canal sobre lienzo claro da 1,6:1) |
 | `--cyan` | anillo de foco y estado "en cola" | |
@@ -200,9 +201,20 @@ inyectado por instancia.
 - **Saltar al contenido** es el primer tabulador del documento (`App.jsx`).
   No puede ser un `<a href="#...">` — ver la regla del hash — así que es un
   botón que mueve el foco al `<main>` de la vista visible (`#contenido main`).
-- Un contador que **se lee** usa `text-muted` como mínimo; `text-faint` es
-  token de adorno (3,67:1 en el tema oscuro) y no llega a AA como texto
-  normal.
+- **Ningún color literal en el JSX.** Un `text-[#a8bcd4]` es invisible para
+  una auditoría de tokens y sobrevivió a dos: en el tema claro daba 1,77:1 en
+  el registro de render. Si un rol no tiene token, se crea el token.
+- **`text-faint` también es AA** (4,5:1 sobre el fondo más claro en que
+  aparece). Lo que NO llega es `faint` sobre **dos velos apilados** (un chip
+  `bg-surface-2` dentro de un panel `bg-surface`): ~4,05:1. Ahí, o el texto es
+  dato y sube a `muted`, o es un separador puro y lleva `aria-hidden="true"`.
+- **Medir lo que se pinta, no lo que se declara.** Comparar pares de tokens da
+  falsos aprobados; hay que recorrer los nodos de texto reales y componer el
+  fondo subiendo por los ancestros. Y **esperar a que acabe la transición de
+  tema** (`transition: all .3s`) o se miden colores interpolados inexistentes.
+- **CodeMirror sigue al tema de la app** (`useEditorTheme()` en `themes.js`).
+  `.cm-editor` tiene el fondo transparente para heredar el panel, así que un
+  `theme="dark"` fijo pinta One Dark sobre el lienzo claro: 1,60:1.
 
 ## Convenciones de contenido
 

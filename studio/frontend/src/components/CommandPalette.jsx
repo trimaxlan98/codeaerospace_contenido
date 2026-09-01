@@ -165,11 +165,16 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }) {
                     sin la familia las dos filas son la misma. */}
                 <span className="truncate">
                   {it.familia && (
-                    <span className="text-faint">{it.familia} · </span>
+                    <span className={i === sel ? 'text-muted' : 'text-faint'}>{it.familia} · </span>
                   )}
                   {it.label}
                 </span>
-                <span className="ml-auto shrink-0 truncate pl-3 font-mono text-[11px] text-faint">
+                {/* La fila seleccionada sube TODA de tono, no solo su rotulo y
+                    su icono: sobre `bg-surface-2` dentro del dialogo (dos
+                    velos apilados) `faint` se queda en 4,07:1, y esta columna
+                    dice de que tipo es el resultado — es dato, no adorno. */}
+                <span className={cn('ml-auto shrink-0 truncate pl-3 font-mono text-[11px]',
+                  i === sel ? 'text-muted' : 'text-faint')}>
                   {it.detalle || it.tipo}
                 </span>
               </button>

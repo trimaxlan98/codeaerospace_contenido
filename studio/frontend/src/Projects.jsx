@@ -317,7 +317,7 @@ function ProjectsList({ onOpen }) {
               {visible.length}/{projects.length} proyecto{projects.length === 1 ? '' : 's'}
               {families.length > 0 && ` · ${families.length} familia${families.length === 1 ? '' : 's'}`}
             </span>
-            <span className="text-faint">·</span>
+            <span className="text-faint" aria-hidden="true">·</span>
             <span><CountsLine t={all} /></span>
             {showNarr && <NarrBadge narrated={all.narrated} clips={all.clips} />}
             <ProgressBar rendered={all.rendered} stale={all.stale} total={all.clips}

@@ -36,6 +36,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 7 | Marca CO.DE Academy garantizada en todo camino de render + visible en la UI (encargo 11) | ✅ hecho 2026-08-15 | ver abajo |
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | ✅ hecho 2026-08-15 | ver `UX-AUDITORIA.md` |
 | 9 | Densidad y flujo: un render se identifica por su curso, narración visible en el índice, saltar al contenido (encargos 5 y 6) | ✅ hecho 2026-08-20 | ver abajo |
+| 10 | Regresión de las superficies nuevas: Estudio v2, presentaciones y sonido contra los 12 criterios (encargos 3 y 4) | ✅ hecho 2026-09-01 | ver abajo |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -743,3 +744,66 @@ real de su tarjeta: mínimo **4,94:1** (`daylight`), máximo 11,19:1
 (`nebula`) — AA como texto normal en los tres estados. El caso «sin narrar»
 usa `text-muted` y no `text-faint`: `faint` es token de adorno (3,67:1 en el
 tema oscuro) y esto es un contador que se lee.
+
+---
+
+## Sprint 10 — la regresión de las superficies nuevas (hecho 2026-09-01)
+
+El tablero cerró el 2026-08-20 con los 12 criterios verificados. Después
+entraron **~1 900 líneas de interfaz que nunca pasaron por él**: Estudio v2
+(`PeliculaPanel`, `CommandPalette`, `Atajos`, sonido en cursos) y
+presentaciones (`PresentacionPanel`, `AbrirComoPresentacion`). Un tablero
+completo no es una garantía permanente: la app siguió creciendo por otra vía.
+
+Este sprint no añade interfaz. Vuelve a medir la que hay —vieja y nueva— con
+un instrumento mejor, y arregla lo que aparece. Método, tablas y números:
+`UX-AUDITORIA.md`, cuarta auditoría.
+
+### El punto ciego del método anterior
+
+Las auditorías previas comparaban **pares de tokens**. Eso no ve un color
+escrito a mano en el JSX, ni un token correcto puesto sobre un fondo que no
+estaba en la lista. El instrumento nuevo recorre **cada nodo de texto visible
+del DOM** y compone su fondo real subiendo por los ancestros — los velos de
+vidrio se apilan, y un chip `bg-surface-2` dentro de un panel `bg-surface` no
+está sobre el lienzo sino sobre los dos.
+
+Con eso: **130 fallos** donde el método anterior había dado 48/48.
+
+### Los tres defectos
+
+1. **El editor de código, ilegible en el tema claro (1,60:1).** Los cuatro
+   CodeMirror de la app pasaban `theme="dark"` fijo mientras `.cm-editor`
+   hereda el fondo del panel: en `daylight`, One Dark sobre panel casi blanco.
+   El núcleo del Estudio y el cuerpo de Aprender. Arreglado con un store del
+   tema activo en `themes.js` (`useThemeId` / `useEditorTheme`).
+2. **`text-[#a8bcd4]` a mano** en el registro de render y el asistente:
+   1,77:1 en `daylight`. Ahora es el token `--code-ink`, que conserva el
+   mismo color en los tres temas oscuros (cero cambio visual) y oscurece en el
+   claro.
+3. **`--faint` no cumplía AA en ningún tema** (3,15–4,34:1) y sus 59 usos son
+   contadores, unidades, cargas y la pista `Ctrl K` — no adorno. Sube en los
+   cuatro temas hasta 4,5:1 sobre el fondo más claro donde aparece, quedando
+   aún por debajo de `muted`. Los dos casos sobre doble velo se resuelven por
+   semántica, no subiendo más el token: los `·` sueltos son separadores
+   (`aria-hidden`) y la fila seleccionada de la paleta sube de tono entera.
+
+### Lo que ya estaba bien
+
+Cero solapes, cero fugas del viewport, todo cierra con Escape, cero desbordes
+horizontales, cero errores de consola y foco visible en todo control real
+(las únicas paradas sin anillo son los `div` internos de CodeMirror). El
+criterio 4 sigue cumplido por construcción: todo lo que flota es Radix con
+portal.
+
+### Verificación
+
+`npm run build` verde · `venv/bin/pytest -q` **275/275** · auditoría
+automática **0 fallos** en 4 temas × 8 vistas × 2 viewports y en 5 overlays ×
+4 temas × 2 viewports · recorrido de foco limpio.
+
+**Trampa del instrumento:** `theme.css` anima el cambio de tema
+(`transition: all .3s`). Midiendo a 300 ms se leen colores interpolados que no
+existen en reposo — el primer informe acusó al botón del login de 1,26:1, y
+era mentira. Cualquier medición automática de color aquí tiene que esperar a
+que la transición acabe.

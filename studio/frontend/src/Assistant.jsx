@@ -42,7 +42,7 @@ function Diff({ original, fixed }) {
       {rows.map((r, k) => (
         <div key={k}
           className={cn('whitespace-pre-wrap break-words px-2.5',
-            r.t === '+' ? 'bg-ok/15 text-ok' : r.t === '-' ? 'bg-err/12 text-err' : 'text-[#a8bcd4]')}>
+            r.t === '+' ? 'bg-ok/15 text-ok' : r.t === '-' ? 'bg-err/12 text-err' : 'text-code-ink')}>
           {r.t} {r.line}
         </div>
       ))}
@@ -202,7 +202,7 @@ export default function Assistant({ open, mode, onMode, onClose, job, jobLogs,
                 </Button>
                 {generated && (
                   <>
-                    <pre className="max-h-[46vh] w-full overflow-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-3 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">{generated}</pre>
+                    <pre className="max-h-[46vh] w-full overflow-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-3 font-mono text-[11.5px] leading-relaxed text-code-ink">{generated}</pre>
                     <Button variant="primary" className="w-fit"
                       onClick={() => { onApply(generated); onClose() }}>
                       Aplicar al editor
