@@ -28,6 +28,7 @@ import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
 import { cn } from '@/lib/utils'
 import 'katex/dist/katex.min.css'
+import { useEditorTheme } from './themes.js'
 
 const READ_KEY = 'ms_lessons_read'
 // Posicion de lectura por leccion (0-100). Hasta el sprint 6 el scroll solo
@@ -334,6 +335,7 @@ export default function Learn({ routeId, onRoute, onOpenInStudio, onOpenProject,
 
 function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onOpenItem,
   onOpenInStudio, onOpenProject, onKind }) {
+  const temaEditor = useEditorTheme()   // CodeMirror sigue al tema de la app
   const [comoPresentacion, setComoPresentacion] = useState(false)
   const { lesson, animation, kind } = item
   const both = Boolean(lesson && animation)
@@ -367,7 +369,7 @@ function Reader({ item, index, curso, progress, onScroll, readerRef, endRef, onO
         <CodeMirror
           value={animation.script}
           extensions={[python()]}
-          theme="dark"
+          theme={temaEditor}
           editable={false}
           height="100%"
           className="editor min-h-0 flex-1 overflow-auto text-[13px]"
@@ -577,6 +579,7 @@ function NewSectionDialog({ open, onOpenChange, onCreated }) {
 }
 
 function AddAnimationDialog({ category, onOpenChange, onCreated }) {
+  const temaEditor = useEditorTheme()   // CodeMirror sigue al tema de la app
   const open = Boolean(category)
   const [title, setTitle] = useState('')
   const [script, setScript] = useState(SCRIPT_TEMPLATE)
@@ -625,7 +628,7 @@ function AddAnimationDialog({ category, onOpenChange, onCreated }) {
                   value={script}
                   onChange={setScript}
                   extensions={[python()]}
-                  theme="dark"
+                  theme={temaEditor}
                   height="260px"
                   className="editor overflow-hidden rounded-md border border-line text-[13px]"
                   basicSetup={{ foldGutter: false, highlightActiveLine: false }}

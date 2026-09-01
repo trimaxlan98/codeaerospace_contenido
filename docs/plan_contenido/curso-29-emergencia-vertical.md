@@ -283,6 +283,27 @@ fundido corto al unir (re-encodeando: `unir_vertical.py` concatena con
   1080x1920 @60, **502.8 s = 8 min 23 s**, pico −1.5 dB.
 - Ninguno se versiona (`exports/` esta en .gitignore).
 
+**Rehecha entera el 2026-08-29 (11:44-12:25).** La migracion al segundo disco
+del 28 por la noche se llevo los mp4: de `exports/verticales/emergencia/`
+sobrevivio solo `voz/`, y en el `render_jobs` que quedo faltaban los renders
+de tres piezas. Se rehizo asi:
+
+- **13 dos galaxias**: el render estaba COMPLETO en
+  `videos/scene/1920p60/Clip.mp4` (2094 frames, 34.90 s) y solo faltaba la
+  copia a `video.mp4`; la herramienta murio entre una cosa y la otra. Se
+  rescato en vez de repetir 13 min de render, tras comprobar que el `scene.py`
+  del disco y el que compone hoy `render_vertical.py` tienen el MISMO md5.
+  **Ojo**: `render_vertical.py` hace `rmtree(videos/)` antes de componer,
+  tambien con `--solo-componer` — hay que poner el mp4 a salvo ANTES.
+- **14 el mundo en una regla** (13 simulaciones a la vez) y **15 cierre**:
+  renderizados de nuevo en qh. 36.30 s y 8.93 s, clavados al manifiesto.
+- `unir_vertical.py` entero: 16 piezas sonorizadas + montaje.
+
+**Y salio identico**: 502.81 s, pico −1.5 dB y las mismas duraciones y picos
+por pieza que la tabla de abajo, medida el dia anterior. Es la prueba de que
+el curso es reproducible desde el fuente: lo unico irrecuperable seria la
+`voz/` (la sintetiza el VPS), y esa es justo la que sobrevivio.
+
 | Pieza | Entra en | Dura | Pico |
 |---|---|---|---|
 | 00 intro | 0:00.00 | 17.08 | −4.5 dB |

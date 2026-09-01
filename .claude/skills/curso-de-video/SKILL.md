@@ -186,3 +186,7 @@ adoptados, narradas y muxeadas; `PLAN.md` y `studio/docs/CATALOGO-CURSOS.md`
 actualizados; la cosecha de trampas escrita en el plan; y la memoria
 `familia-<tema>.md` (+ línea en `MEMORY.md`) con estado, decisiones y
 trampas.
+
+Y **la entrega se comprueba EN EL DISCO**, no en el tablero. `exports/` no
+está versionado y vive en el segundo disco: que el plan diga "entregado" no
+prueba que los mp4 sigan ahí. Lista el directorio del curso antes de cerrar.

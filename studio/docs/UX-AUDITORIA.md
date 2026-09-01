@@ -306,3 +306,134 @@ regla está en `DESIGN-SYSTEM.md`.
   conserva porque el endpoint existe y es la vía de consulta puntual.
 - `components/ui/tooltip.jsx` no se usa todavía. Es parte de la base del
   sistema de diseño que `DESIGN-SYSTEM.md` manda ampliar, no código muerto.
+
+---
+
+# Cuarta auditoría — 2026-09-01 (regresión de las superficies nuevas)
+
+El tablero del rediseño cerró el 2026-08-20 con los 12 criterios verificados.
+Entre el 21 y el 29 de agosto entraron ~1 900 líneas de interfaz nueva que
+**nunca pasaron por él**: Estudio v2 (`PeliculaPanel`, paleta de comandos,
+`Atajos`, sonido en cursos) y presentaciones (`PresentacionPanel`,
+`AbrirComoPresentacion`). Esta auditoría las mide contra los mismos criterios
+y, de paso, vuelve a medir lo viejo.
+
+## El cambio de método: medir lo que se PINTA, no lo que se declara
+
+La tercera auditoría comparó **12 pares de tokens por tema**. Ese método tiene
+un punto ciego enorme: no ve un color escrito a mano en el JSX, ni ve un token
+correcto puesto sobre un fondo que no estaba en la lista de pares.
+
+El instrumento nuevo recorre **cada nodo de texto visible del DOM**, lee su
+`color` computado y **compone el fondo real** subiendo por los ancestros hasta
+encontrar uno opaco (los velos de vidrio se apilan: un chip `bg-surface-2`
+dentro de un panel `bg-surface` no está sobre el lienzo, está sobre los dos).
+Clasifica por tamaño y peso — 3:1 para texto grande, 4,5:1 para el resto — y
+salta los subárboles `aria-hidden`.
+
+Cobertura: **4 temas × 8 vistas × 2 viewports** (1440×900 y 390×844), más
+**5 overlays** abiertos uno a uno en los 4 temas y los 2 viewports, más un
+recorrido de tabulación de 26 paradas por vista.
+
+## Lo que encontró: 130 fallos de contraste, en tres familias
+
+### 1. El editor de código era ilegible en el tema claro (1,60:1)
+
+`Studio.jsx`, `Learn.jsx` (×2) y `ClipAssistant.jsx` pasaban `theme="dark"`
+**fijo** a CodeMirror, mientras `styles.css` fuerza
+`.cm-editor { background: transparent }` para que herede el panel. En
+`daylight` eso pintaba la paleta One Dark sobre un panel casi blanco:
+
+| token | color | sobre `#f9fbfc` |
+|-------|-------|-----------------|
+| literal | `#e5c07b` | **1,60:1** |
+| operador | `#abb2bf` | 2,05:1 |
+| función | `#61afef` | 2,27:1 |
+| palabra clave | `#c678dd` | 2,83:1 |
+| clase | `#e06c75` | 3,07:1 |
+
+El editor es el núcleo del Estudio y el cuerpo de las lecciones de Aprender.
+En el único tema claro, ilegible entero. **Arreglo:** `themes.js` gana una
+marca `light` por tema y un store del tema activo (`useThemeId`,
+`useSyncExternalStore` sobre `data-theme`, el mismo patrón que
+`StarfieldBackground`); `useEditorTheme()` devuelve `'light'` o `'dark'` y los
+cuatro CodeMirror lo consumen.
+
+### 2. Un color escrito a mano en el registro de render (1,77:1)
+
+`text-[#a8bcd4]` en el `<pre>` del registro del Estudio y en dos sitios del
+asistente. Sobre lienzo oscuro daba 10,4:1; sobre `#f1f5f9`, **1,77:1**.
+Venía del rediseño original (`20c4cdd`) y sobrevivió a la tercera auditoría
+justamente porque no es un token. **Arreglo:** token nuevo `--code-ink`
+(salida monoespaciada: ni `ink` ni `muted`), con el mismo `#a8bcd4` en los
+tres temas oscuros —cero cambio visual— y `#334155` en `daylight` (9,45:1).
+
+### 3. `--faint` no cumplía AA en ningún tema
+
+| tema | faint | canvas | surface | surface-2 |
+|------|-------|--------|---------|-----------|
+| orbital | `#5c6a80` | 3,67 | 3,41 | **3,18** |
+| ion | `#438e62` | 5,00 | 4,58 | **4,22** |
+| nebula | `#7c3aed` | 3,62 | 3,37 | **3,15** |
+| daylight | `#64748b` | **4,34** | 4,57 | 4,67 |
+
+La tercera auditoría ya había subido el `faint` de `daylight` a `#64748b`
+declarando que 4,34:1 «cumple AA incluso como texto normal». **No: AA como
+texto normal son 4,5:1.** Y de los tres temas oscuros no se midió el `faint`
+contra nada.
+
+Importa porque los **59** usos de `text-faint` del código no son adorno:
+contadores (`6/6 proyectos · 2 familias`, `16 de 17 renders`,
+`0/18 lecciones leídas`), unidades (`UTC`, `s`), la carga del servidor, la
+pista de teclado `Ctrl K` de la paleta y la columna de tipo de sus resultados.
+La ficción de «token decorativo» ya la había roto la propia nota del sprint 9
+(«esto es un contador que se lee»).
+
+**Arreglo:** `--faint` sube en los cuatro temas hasta cumplir 4,5:1 sobre el
+fondo más claro en que aparece, quedando aún por debajo de `--muted` para que
+la escala tipográfica sobreviva:
+
+| tema | antes | ahora | peor caso | `muted` ahí |
+|------|-------|-------|-----------|-------------|
+| orbital | `#5c6a80` | `#778396` | 4,55 | 5,91 |
+| ion | `#438e62` | `#4b9369` | 4,53 | 7,48 |
+| nebula | `#7c3aed` | `#9762f1` | 4,55 | 6,59 |
+| daylight | `#64748b` | `#617188` | 4,54 | 6,92 |
+
+Dos casos no se arreglan subiendo el token, porque el fondo son **dos velos
+apilados** (~4,05:1 ahí) y llegar a 4,5 colapsaría `faint` contra `muted`:
+
+- Los `·` sueltos de la tira de la cola y de la cabecera de Proyectos son
+  separadores puros → `aria-hidden="true"`. WCAG 1.4.3 exime el texto
+  decorativo, y de paso un lector de pantalla deja de decir «punto medio»
+  entre cada par de datos.
+- La columna de tipo de la paleta de comandos (`Ir a`, …) sí es dato: la fila
+  **seleccionada** sube ahora de tono entera (`muted`), como ya hacían su
+  rótulo y su icono. Es el único sitio con fondo `surface-2`.
+
+## Lo que estaba bien
+
+- **Solapes: 0.** Los 5 overlays × 4 temas × 2 viewports salen dentro del
+  viewport, reciben el clic (nada encima) y cierran con Escape. El criterio 4
+  sigue cumplido por construcción: todo lo que flota es Radix con portal, y la
+  escala de capas (barra 40 · avisos 50 · diálogo 60/61 · select 70 · tooltip
+  80) no tiene huecos.
+- **Foco: limpio.** Las únicas paradas de tabulación sin anillo son los `div`
+  internos de CodeMirror, que gestiona su propio cursor.
+- **Desborde horizontal: 0** · **errores de consola: 0**, en las 64
+  combinaciones de la primera pasada y las 40 de overlays.
+
+## Un aviso sobre el propio instrumento
+
+El primer informe acusó al botón primario del login de **1,26:1** en
+`daylight`. Era falso: `theme.css` anima el cambio de tema
+(`transition: all .3s`) y la medición cayó **dentro** de la transición, sobre
+un color interpolado que no existe en reposo. Con 700 ms de espera el fallo
+desaparece y el botón mide lo que debe (blanco sobre `#0369a1`). Cualquier
+auditoría automática de color en esta app tiene que esperar a que la
+transición termine, o se inventará defectos.
+
+## Resultado final
+
+**0 fallos** en las 64 combinaciones de vistas y las 40 de overlays, tras los
+arreglos. Contraste, desborde, consola, capas, Escape y foco.

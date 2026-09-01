@@ -17,6 +17,11 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
+  /* Texto monoespaciado de salida (registro de render, script generado por el
+     asistente). Es su propio rol: ni `ink` (titulos) ni `muted` (secundario),
+     y NO puede ser un literal — lo era, `#a8bcd4`, y en el tema claro daba
+     1,77:1. */
+  --color-code-ink: var(--code-ink);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-cyan: var(--cyan);
@@ -57,7 +62,13 @@
     --line-strong: rgba(255, 255, 255, 0.2);
     --ink: #e6eaf2;
     --muted: #8a97ad;
-    --faint: #5c6a80;
+    /* `faint` NO es un token de adorno por mucho que se dijera: los 59 sitios
+       que lo usan llevan contadores, unidades, cargas del servidor y la
+       pista de teclado «Ctrl K». Asi que cumple AA (4,5:1) sobre el fondo
+       mas claro donde aparece, que es `surface-2`, no el lienzo. Antes
+       #5c6a80: 3,18:1 ahi. */
+    --faint: #778396;  /* 4,55:1 sobre surface-2 (el fondo mas claro en que aparece) */
+    --code-ink: #a8bcd4;
     --accent: #00d8f6;      /* signature: Liquid Cyan */
     --accent-ink: #020617;
     --cyan: #3b82f6;
@@ -95,7 +106,8 @@
     --line-strong: rgba(167, 243, 208, 0.22);
     --ink: #dcfce7;
     --muted: #6ebd93;
-    --faint: #438e62;
+    --faint: #4b9369;  /* 4,53:1 sobre surface-2 */
+    --code-ink: #a8bcd4;
     --accent: #10b981;      /* signature: Emerald Mint */
     --accent-ink: #022c22;
     --cyan: #34d399;
@@ -131,7 +143,8 @@
     --line-strong: rgba(233, 213, 255, 0.22);
     --ink: #f3e8ff;
     --muted: #a78bfa;
-    --faint: #7c3aed;
+    --faint: #9762f1;  /* 4,55:1 sobre surface-2 */
+    --code-ink: #a8bcd4;
     --accent: #d946ef;      /* signature: Electric Magenta */
     --accent-ink: #0d0716;
     --cyan: #a855f7;
@@ -167,11 +180,12 @@
     --line-strong: rgba(15, 23, 42, 0.28);
     --ink: #0f172a;
     --muted: #475569;
-    /* slate-500, no slate-400: sobre #f1f5f9 el 400 daba 2,34:1 y `faint`
-       lleva texto real (fechas, unidades, contadores), no adorno. 4,34:1
-       cumple AA incluso como texto normal. Lo encontro la auditoria de los
-       4 temas x 12 pares de tokens. */
-    --faint: #64748b;
+    /* slate-500, no slate-400: sobre #f1f5f9 el 400 daba 2,34:1. La auditoria
+       de julio lo subio a #64748b dando por bueno 4,34:1 «AA como texto
+       normal» — pero AA como texto normal son 4,5:1, no 4,34. Dos puntos mas
+       oscuro cierra el hueco. */
+    --faint: #617188;  /* 4,54:1 sobre el lienzo (aqui el fondo hostil es el mas oscuro) */
+    --code-ink: #334155;
     /* Contraste AA en el unico tema claro: los tonos 500 de la paleta (que
        funcionan sobre lienzo oscuro) fallan sobre #f1f5f9 — blanco sobre
        #0ea5e9 daba 2,8:1 en el boton primario y `text-ok` 2,3:1. Aqui la

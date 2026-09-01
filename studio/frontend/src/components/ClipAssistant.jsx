@@ -18,6 +18,7 @@ import { Input } from './ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.jsx'
 import { cn } from '@/lib/utils'
+import { useEditorTheme } from '../themes.js'
 
 const textareaCls = 'w-full resize-y rounded-md border border-line bg-canvas px-2.5 py-1.5 text-[13px] text-ink placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan'
 
@@ -55,6 +56,7 @@ const ORIGENES = [
 ]
 
 export default function ClipAssistant({ open, onOpenChange, project, aiEnabled, onCreated }) {
+  const temaEditor = useEditorTheme()   // CodeMirror sigue al tema de la app
   const [titulo, setTitulo] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [origen, setOrigen] = useState(aiEnabled ? 'ia' : 'ejemplo')
@@ -200,7 +202,7 @@ export default function ClipAssistant({ open, onOpenChange, project, aiEnabled, 
               <CodeMirror
                 value={preview.script}
                 extensions={[python()]}
-                theme="dark"
+                theme={temaEditor}
                 editable={false}
                 height="340px"
                 className="editor min-h-0 flex-1 overflow-auto text-[13px]"

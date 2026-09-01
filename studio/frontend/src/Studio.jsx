@@ -9,6 +9,7 @@ import { Button } from './components/ui/button.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
 import { cn } from '@/lib/utils'
+import { useEditorTheme } from './themes.js'
 
 const SAMPLE = `from manim import *
 
@@ -172,9 +173,9 @@ function JobChip({ job, curso, selected, onSelect, onCancel, onRetry, onDelete, 
       )}
       <div className="flex items-center gap-1.5 pl-4 font-mono text-[11px] text-muted">
         <span>{job.quality}</span>
-        <span className="text-faint">·</span>
+        <span className="text-faint" aria-hidden="true">·</span>
         <span>{fmtTime(job.created_at)}</span>
-        {duration(job) && (<><span className="text-faint">·</span><span>{duration(job)}</span></>)}
+        {duration(job) && (<><span className="text-faint" aria-hidden="true">·</span><span>{duration(job)}</span></>)}
       </div>
       {active ? (
         <ChipAction danger onClick={() => onCancel(job.id)}>
@@ -228,6 +229,7 @@ function ClearHistoryButton({ count, onFire }) {
 export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiEnabled,
   pendingScript, pendingScene, onConsumePendingScript, clipContext, onExitClip,
   onOpenProject }) {
+  const temaEditor = useEditorTheme()   // CodeMirror sigue al tema de la app
   const [script, setScript] = useState(() => lsGet(LS.script) ?? SAMPLE)
   const [scenes, setScenes] = useState(() => [lsGet(LS.scene) || 'Orbita'])
   const [scene, setScene] = useState(() => lsGet(LS.scene) || 'Orbita')
@@ -569,7 +571,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
             value={script}
             onChange={setScript}
             extensions={[python()]}
-            theme="dark"
+            theme={temaEditor}
             height="100%"
             className="editor min-h-0 flex-1 overflow-auto text-[13px]"
             basicSetup={{ foldGutter: false, highlightActiveLine: true }}
@@ -620,7 +622,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
               )}
             </div>
             <pre ref={logRef} onScroll={onLogScroll}
-              className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-b-[13px] bg-canvas px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-[#a8bcd4]">
+              className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-b-[13px] bg-canvas px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-code-ink">
               {logs.length ? logs.join('\n')
                 : selected?.status === 'queued' ? 'En cola — esperando su turno (1 render a la vez)…'
                 : selected?.error ? `✕ ${selected.error}`
