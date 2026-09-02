@@ -85,19 +85,23 @@ class Clip(Pieza):
         self.wait(4.4)
 
         # --- 4. el remate: eso es lo que cabe en la esquina ---------------
-        # La placa y el meandro guardan la misma escala entre si: el
-        # meandro y el trazo de comparacion miden lo MISMO (el ancho del
-        # meandro), asi que el trazo dice "esto, en linea recta, mediria
-        # igual" y el meandro dice "y aun asi se dobla en esta esquina".
-        BOARD_ANCHO, BOARD_ALTO = 2.6, 3.7
-        ANTENA_ANCHO, ANTENA_ALTO = 0.85, 0.5
-        INSET = 0.22
+        # La placa llena la franja de verdad (alto ~4.8, un 86 % de BANDA)
+        # y el meandro crece con ella, a la MISMA proporcion que antes: el
+        # trazo de comparacion sigue midiendo justo el ancho del meandro,
+        # asi que "esto, en linea recta, mediria igual" y "y aun asi se
+        # dobla en esta esquina" se leen los dos a un tamaño real. La
+        # placa va en APAGADO (mobiliario) para que el ambar del meandro y
+        # del trazo sean lo unico que llama la atencion en el remate.
+        BOARD_ANCHO, BOARD_ALTO = 3.4, 4.8
+        ANTENA_ANCHO, ANTENA_ALTO = 1.1, 0.65
+        INSET = 0.28
 
-        placa = chip.placa(ancho=BOARD_ANCHO, alto=BOARD_ALTO)
+        placa = chip.placa(ancho=BOARD_ANCHO, alto=BOARD_ALTO,
+                           color=APAGADO)
         antena = chip.meandro(vueltas=3, ancho=ANTENA_ANCHO,
                               alto=ANTENA_ALTO, color=AMBAR)
         comp = _marca(ANTENA_ANCHO, 0.0, -ANTENA_ANCHO / 2)
-        rincon = VGroup(antena, comp).arrange(DOWN, buff=0.16,
+        rincon = VGroup(antena, comp).arrange(DOWN, buff=0.20,
                                               aligned_edge=LEFT)
         objetivo = placa.get_corner(UL) + RIGHT * INSET + DOWN * INSET
         rincon.move_to(objetivo, aligned_edge=UL)
@@ -108,6 +112,6 @@ class Clip(Pieza):
             FadeIn(rincon, run_time=0.9), lag_ratio=0.30))
         self.wait(0.6)
 
-        L.dato(medido(cuarto_fr4_cm, 2), "centimetros dentro del sustrato",
+        L.dato(medido(cuarto_fr4_cm, 2), "centimetros de meandro",
               medido=True, t=0.6)
         self.wait(5.6)

@@ -22,15 +22,17 @@ class Clip(Pieza):
     def barra(self, payload):
         """El tiempo de aire de una trama, tramo a tramo y a escala.
 
-        Ancha y baja por naturaleza, asi que va anclada abajo. 2.4 de alto
-        es la mitad de la franja: la misma proporcion que el tren de
-        pulsos del molde."""
+        Ancha y baja por naturaleza, asi que va anclada abajo. 2.8 de
+        alto es lo mismo que mide el tren de pulsos del molde: con el
+        rotulo debajo, el grupo ocupa 3.15 de los 5.59 de la franja (56 %)
+        y la barra pesa lo que tiene que pesar. El ANCHO no se toca: es la
+        escala de tiempo, y cambiarlo cambiaria lo que se enseña."""
         tramos, _ = chip.tiempo_trama(payload)
         partes = [("DATOS" if k == "datos" else None,
                    tramos[k],
                    AMBAR if k == "datos" else APAGADO)
                   for k in self.TRAMOS]
-        return chip.barra_apilada(partes, ancho=5.2, alto=2.4)
+        return chip.barra_apilada(partes, ancho=5.2, alto=2.8)
 
     def pieza(self):
         L = self.L

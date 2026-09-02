@@ -3,19 +3,90 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La rampa continua que se convierte en escalera de 4096 peldaños. El escalon son 0.8 mV, el error RMS medido es q/raiz(12) y la SNR ideal, 74 dB.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 36.53,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  se dibujan el eje y la rampa continua, en tinta",
+    "3.3  3.3 voltios de fondo de escala (hoja de datos, etiqueta gris)",
+    "8.1  relevo: la escalera ambar sobre la rampa apagada, con el rotulo gris '4 BITS PARA VERLO'",
+    "10.2 4096 escalones en doce bits",
+    "15.1 0.81 milivoltios por escalon",
+    "20.3 relevo: el error, diente de sierra ambar sobre el cero discontinuo",
+    "22.8 0.23 milivoltios de error eficaz",
+    "28.3 vuelve la escalera para el remate",
+    "29.8 74 decibelios sobre el ruido",
+    "35.4 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.6,
+        "texto": "El mundo es continuo."
+      },
+      {
+        "t_inicio": 6.2,
+        "texto": "El chip solo sabe contar."
+      },
+      {
+        "t_inicio": 11.6,
+        "texto": "Cuatro mil noventa y seis peldaños, y nada entre ellos."
+      },
+      {
+        "t_inicio": 21.0,
+        "texto": "Lo que cae en medio se pierde para siempre."
+      },
+      {
+        "t_inicio": 30.4,
+        "texto": "Aun así: setenta y cuatro decibelios."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      35.78,
+      36.48
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.5,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.9,
+        -15
+      ],
+      [
+        "blip_hud",
+        3.4,
+        -17
+      ],
+      [
+        "tick",
+        8.1,
+        -14
+      ],
+      [
+        "blip_medio",
+        15.1,
+        -16
+      ],
+      [
+        "barrido",
+        20.4,
+        -16
+      ],
+      [
+        "sting",
+        30.0,
+        -12
+      ]
+    ]
   },
   "modulo": "M2 · Tocar el mundo"
 }

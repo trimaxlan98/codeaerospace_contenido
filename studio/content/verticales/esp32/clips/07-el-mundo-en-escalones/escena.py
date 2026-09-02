@@ -47,7 +47,7 @@ class Clip(Pieza):
         return ln
 
     def _escalera(self, t, x, vref):
-        """La curva apagada con su escalera ambar encima. Es el unico sitio
+        """La rampa apagada con su escalera ambar encima. Es el unico sitio
         del clip donde conviven dos trazas, y por eso una va en APAGADO."""
         y, _ = chip.cuantizar(x, bits=self.BITS_DIBUJO, vref=vref)
         esc, _ = chip.traza(t, y, ancho=self.ANCHO_C, alto=self.ALTO_C,
@@ -63,10 +63,10 @@ class Clip(Pieza):
         que el diente de sierra la llena por derecho. El suelo aqui no es
         cero (el cero esta en medio), asi que el eje en L se cambia por una
         horizontal discontinua a la altura del cero."""
-        y, q5 = chip.cuantizar(x, bits=self.BITS_DIBUJO, vref=vref)
+        y, q_dib = chip.cuantizar(x, bits=self.BITS_DIBUJO, vref=vref)
         ln, punto = chip.traza(t, x - y, ancho=self.ANCHO_C,
                                alto=self.ALTO_E, color=AMBAR,
-                               rango_y=(-q5 / 2, q5 / 2))
+                               rango_y=(-q_dib / 2, q_dib / 2))
         # El cero va en APAGADO, no en LINEA: LINEA (#1B3253) esta a un
         # paso del fondo y bajo el diente de sierra no se ve ni en el qh.
         # Aqui la horizontal no es mobiliario, dice que el error tiene

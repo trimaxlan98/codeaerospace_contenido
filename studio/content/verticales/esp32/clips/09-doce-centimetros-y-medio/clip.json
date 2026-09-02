@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La onda de 2.437 GHz medida en centimetros y la antena impresa que la caza. En FR4 la onda va mas despacio, y por eso el meandro cabe en una placa de dos centimetros.",
-  "duracion_objetivo": 32.30,
+  "duracion_objetivo": 32.3,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  la onda de 2.437 GHz se dibuja sola, llenando la franja",
@@ -12,8 +12,8 @@
     "10.3 12.3, centimetros de onda (calculado)",
     "15.1 el mismo trazo se encoge al cuarto de onda",
     "17.2 3.08, centimetros de antena (calculado)",
-    "22.7 aparece la placa con el meandro en su esquina",
-    "24.9 1.91, centimetros dentro del sustrato (calculado)",
+    "22.7 la placa llena la franja, con el meandro grande en la esquina",
+    "24.9 1.91, centimetros de meandro (calculado)",
     "31.1 fundido a azul limpio"
   ],
   "voz": {
@@ -41,14 +41,41 @@
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [31.55, 32.25],
+    "fade_out": [
+      31.55,
+      32.25
+    ],
     "eventos": [
-      ["aire_largo", 0.7, -16],
-      ["blip_hud", 3.1, -15],
-      ["blip_grave", 8.15, -14],
-      ["tick", 15.1, -14],
-      ["blip_medio", 22.7, -14],
-      ["sting", 24.9, -12]
+      [
+        "aire_largo",
+        0.7,
+        -16
+      ],
+      [
+        "blip_hud",
+        3.1,
+        -15
+      ],
+      [
+        "blip_grave",
+        8.15,
+        -14
+      ],
+      [
+        "tick",
+        15.1,
+        -14
+      ],
+      [
+        "blip_medio",
+        22.7,
+        -14
+      ],
+      [
+        "sting",
+        24.9,
+        -12
+      ]
     ]
   },
   "modulo": "M3 · La radio"
