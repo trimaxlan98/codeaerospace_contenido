@@ -1,0 +1,89 @@
+{
+  "name": "01 · El reloj que no para",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El gancho y el molde del formato: mientras miras el reel, el chip ejecuta ciclos. El contador corre a 240 MHz escalado y remata con los millones de ciclos que han pasado durante el propio clip.",
+  "duracion_objetivo": 30.3,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.7  el encapsulado se dibuja solo",
+    "3.5  240 megahercios (hoja de datos, etiqueta gris)",
+    "6.9  arranca el contador: ya lleva miles de millones de ciclos",
+    "9.4  el chip se abre en sus ocho bloques",
+    "15.3 el tren de pulsos: el latido que lo mueve todo",
+    "22.1 vuelve el encapsulado, con el contador todavia subiendo",
+    "29.2 fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.3,
+        "texto": "Esto es un ESP32."
+      },
+      {
+        "t_inicio": 4.9,
+        "texto": "Doscientos cuarenta megahercios."
+      },
+      {
+        "t_inicio": 9.4,
+        "texto": "Mientras lo miras, ya lleva miles de millones de ciclos."
+      },
+      {
+        "t_inicio": 18.4,
+        "texto": "Dos nucleos, medio mega de memoria, radio propia."
+      },
+      {
+        "t_inicio": 25.4,
+        "texto": "Todo eso, aqui dentro."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      29.55,
+      30.25
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.5,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.85,
+        -15
+      ],
+      [
+        "blip_hud",
+        3.6,
+        -17
+      ],
+      [
+        "tick",
+        7.0,
+        -14
+      ],
+      [
+        "pulso",
+        9.5,
+        -16
+      ],
+      [
+        "blip_medio",
+        15.4,
+        -16
+      ],
+      [
+        "aire",
+        22.2,
+        -17
+      ]
+    ]
+  },
+  "modulo": "M1 · El silicio"
+}

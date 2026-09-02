@@ -230,3 +230,51 @@ Esta es la categoría que **no detecta el render**: solo se caza midiendo.
 - Los mejores hallazgos vienen de agentes que **miden en vez de fiarse** de lo
   que el orquestador les dio: en una sola familia encontraron doce defectos
   reales de la librería.
+
+## Estilo LIENZO (curso 31; todas medidas, ninguna supuesta)
+
+- **La cifra grande no cabe.** Space Mono BOLD a cuerpo 128 gasta **1.061
+  unidades por carácter** y la zona segura vertical son 5.76: **5 caracteres**.
+  "7 200 000 000" mide 14.10 y el guardián aborta. La escala cerrada baja de
+  peldaño sola (128/112/96/80/72/64/56 = 5/6/7/8/9/10/12 caracteres), pero la
+  lección editorial es otra: **el número de un reel se escribe corto** — 7 200
+  con la etiqueta "millones", no 7 200 000 000.
+- **El espacio de una monoespaciada es un abismo**: "7 200" se leía como dos
+  números. Los grupos de miles van en `Text` sueltos separados a mano.
+- **Las unidades no sobreviven a las versalitas.** La etiqueta va en
+  mayúsculas y "MHz" sale "MHZ", "ms" sale "MS", "mV" sale "MV" (que es otra
+  unidad). Se escriben con todas sus letras: "megahercios", "milisegundos".
+- **Centrar el dibujo en su franja está mal.** Cualquier dibujo más bajo que
+  la franja queda a dos unidades de su cifra y la composición se parte en dos
+  mitades sin relación. Se apoya en el SUELO de la franja; el vacío se
+  acumula arriba, que es donde sí es aire.
+- **El acento traslúcido sobre el fondo no existe.** Medido: ámbar `#F5A31B`
+  sobre `#0B1B33` al 26–45 % da (72,62,45), verde oliva sucio; al 14 % da
+  (44,46,48), un gris que ya no es ámbar. No hay ventana buena: las piezas de
+  área van con **trazo** y el fondo del lienzo dentro, opaco.
+- **Barras que se tocan son una losa.** Doce tareas pegadas no se pueden
+  contar. El hueco se le quita al ANCHO de cada barra, no a su sitio, para que
+  la escala de tiempo no mienta.
+- **La 'y' de una palabra con descendente descuelga el wordmark**: alinear dos
+  tokens por el borde inferior sube media equis el que lleva descendente. Se
+  alinean por el superior si los dos tienen ascendente.
+- **`rstrip("0")` sobre un entero se come la cifra**: el formateador devolvía
+  "4" para 40.0 y "37" para 369.75. Sin punto decimal nada detiene el strip, y
+  ningún render lo marca como error.
+- **`Create` va con `rate_func=smooth` y un contador va lineal.** Si una
+  animación y una cifra cuentan el MISMO dato, van con el mismo ritmo: medido,
+  la barra iba por el 16 % del recorrido cuando el número decía 33 %.
+- **La cifra que no corresponde a lo que se enseña** es el fallo más repetido:
+  relevar el dibujo y después la cifra deja uno o dos segundos con el número
+  viejo debajo del dibujo nuevo. Se cambian los dos en el mismo movimiento
+  (`L.relevo`); un hueco sin cifra es un estado válido, una cifra falsa no.
+- **Un guardián que nunca ha abortado no está demostrado que funcione.** El de
+  legibilidad estuvo muerto medio curso (filtraba con `Text.has_points()`, y
+  un `Text` de manim no tiene puntos propios: 14 rótulos en la familia, 0
+  pasaban). Al arreglarlo empezó a medir GLIFO a glifo y abortaba el molde,
+  porque el guion de "WI-FI" mide 0.018 a cuerpo completo. **Pruébalo con un
+  caso que TIENE que fallar** antes de creerte que protege algo.
+- **Gris significa "dado", no "del fabricante".** La hoja de datos, la
+  literatura y los PARÁMETROS elegidos de una simulación (el periodo de un
+  bucle, la constante dieléctrica del sustrato) van los tres en gris. El
+  acento es sólo lo que sale de medir o calcular en ese render.

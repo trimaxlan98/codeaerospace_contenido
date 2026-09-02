@@ -1,0 +1,60 @@
+{
+  "name": "Cierre",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cierre de marca: el chip vuelve a cerrarse.",
+  "duracion_objetivo": 9.8,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.5  el encapsulado vuelve a dibujarse",
+    "3.0  se recoge hasta ser otra vez el punto ambar",
+    "4.6  el punto baja y se convierte en la marca",
+    "5.7  academy",
+    "8.3  fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.5,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.35,
+    "fade_out": [
+      9.05,
+      9.75
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.45,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.65,
+        -15
+      ],
+      [
+        "tick",
+        2.3,
+        -15
+      ],
+      [
+        "sting",
+        3.05,
+        -13
+      ],
+      [
+        "blip_medio",
+        4.7,
+        -14
+      ],
+      [
+        "subrayado",
+        5.75,
+        -14
+      ]
+    ]
+  }
+}

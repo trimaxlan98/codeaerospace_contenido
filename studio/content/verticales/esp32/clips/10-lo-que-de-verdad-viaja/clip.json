@@ -1,0 +1,98 @@
+{
+  "name": "10 · Lo que de verdad viaja",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Anatomia de una trama Wi-Fi a escala de microsegundos: espera, preambulo, datos, ACK. De los 65 Mbps nominales, la mitad del aire son cabeceras y silencio.",
+  "duracion_objetivo": 36.5,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.7  la senoide: el aire de 2.4 gigahercios",
+    "2.4  65 megabits por segundo (hoja de datos, etiqueta gris)",
+    "7.1  la barra del tiempo de aire: seis tramos a escala real, solo DATOS en ámbar",
+    "9.0  370 microsegundos de aire por trama",
+    "14.4 49.9 por ciento son datos",
+    "20.3 la cifra se apaga antes de cambiar la barra (hueco honesto)",
+    "20.8 la misma trama con 100 bytes: el tramo ámbar se queda en una rendija",
+    "21.9 6.2 por ciento son datos",
+    "28.3 vuelve la trama de 1500 bytes",
+    "29.4 32.5 megabits útiles: lo que queda de los 65",
+    "35.4 fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 2.6,
+        "texto": "La hoja promete sesenta y cinco megabits."
+      },
+      {
+        "t_inicio": 9.9,
+        "texto": "Antes de hablar hay que esperar."
+      },
+      {
+        "t_inicio": 15.6,
+        "texto": "Y solo la mitad lleva datos."
+      },
+      {
+        "t_inicio": 22.6,
+        "texto": "Con paquetes pequeños es mucho peor."
+      },
+      {
+        "t_inicio": 29.9,
+        "texto": "Eso es lo que de verdad viaja."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      35.75,
+      36.45
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.5,
+        -17
+      ],
+      [
+        "blip_hud",
+        2.5,
+        -17
+      ],
+      [
+        "barrido",
+        7.0,
+        -16
+      ],
+      [
+        "blip_medio",
+        9.0,
+        -16
+      ],
+      [
+        "tick",
+        14.4,
+        -15
+      ],
+      [
+        "blip_grave",
+        20.8,
+        -15
+      ],
+      [
+        "aire",
+        27.9,
+        -17
+      ],
+      [
+        "sting",
+        29.4,
+        -13
+      ]
+    ]
+  },
+  "modulo": "M3 · La radio"
+}

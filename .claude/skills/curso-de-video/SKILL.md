@@ -1,14 +1,19 @@
 ---
 name: curso-de-video
-description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Courses are MUTE by default (no narrative subtitles on screen: only titles, short labels and measured figures); subtitles are opt-in and only if the owner asks for them. Covers both formats (familia = one project per lesson, and the old 8-clip single course).
+description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Courses are MUTE by default (no narrative subtitles on screen: only titles, short labels and measured figures); subtitles are opt-in and only if the owner asks for them. Covers both FORMATS (horizontal familia of 4-clip lessons, and vertical 9:16 pieces for Instagram) and both visual STYLES (CONSOLA, the flight-console look of courses 1-30; and LIENZO, the flat navy 'one thing, one figure' look of course 31 — ask for it by name). Default style is CONSOLA.
 ---
 
 # Curso de video CO.DE Academy
 
 Cómo se produce un curso completo de punta a punta. Es el proceso destilado
-de 27 cursos publicados; el más extenso es el 27, Procesamiento de señales:
+de 31 cursos publicados; el más extenso es el 27, Procesamiento de señales:
 30 lecciones, 120 clips y 74 minutos de vídeo. Complementa la skill
 `manimstudio` (esa explica la app; ésta, el contenido).
+
+El proceso es **el mismo para los dos formatos y los dos estilos**: cambia el
+lienzo y el lenguaje visual, no los 10 pasos ni las herramientas. Por eso no
+hay una skill por estilo — habría que mantener dos copias de todo y se
+desincronizarían. Ver "Los dos ejes" más abajo.
 
 **Lo primero que hay que saber**: desde el curso 27 los cursos se hacen **sin
 subtítulos** salvo que el dueño los pida (ver "Formato mudo" más abajo).
@@ -38,6 +43,41 @@ idea     (4N)  →   clip, HUD "MODULO 0K"              clips
 - Fuente del temario: un hilo conceptual propio, un documento maestro, o el
   desmenuzado de `code-academy-platform`. Un curso nuevo **no re-explica** lo
   que ya cubrió otro: declara explícitamente qué capa ocupa y qué asume.
+
+## Los dos ejes: FORMATO y ESTILO
+
+No son lo mismo y se piden por separado.
+
+**Formato** es la forma del lienzo y el tamaño de la pieza:
+
+| Formato | Qué es | Cursos |
+|---|---|---|
+| **horizontal** | 16:9, familias de lecciones de 4 clips | 1–25, 27, 30 |
+| **vertical** | 9:16 real (`promo.formato()`), piezas de 30–45 s sueltas, para Instagram | 26, 28, 29, 31 |
+
+**Estilo** es el lenguaje visual dentro del formato. Hay **dos**, y se elige
+por curso, no por clip:
+
+| Estilo | Qué se ve | Módulo | Cursos |
+|---|---|---|---|
+| **CONSOLA** | Estética de consola de vuelo de la marca: fondo casi negro `#05070a`, escuadras HUD en las esquinas, telemetría en Space Mono repartida por el frame, cifra con pie de tres renglones. **Denso a propósito.** | `code_brand.py` + `promo.py` | todos hasta el 30 |
+| **LIENZO** | Superficie lisa azul marino `#0B1B33` con **una cosa y un dato**, cuatro carriles de un solo ocupante, paleta de cuatro colores con un acento, y nada más que la marca de agua y el número de pieza. **Vacío a propósito.** | `lienzo.py` | 31 |
+
+Para pedir uno u otro basta con nombrarlo: *«un curso vertical en estilo
+LIENZO sobre X»*. Si no se dice nada, **el estilo por defecto es CONSOLA**
+(es el de 30 de los 31 cursos y el que arrastra la identidad del canal).
+
+El estilo se declara en `curso.json` con `"estilo": "lienzo"`, y la guía
+completa de LIENZO —medidas del lienzo, guardianes, convención de color,
+tabla de anchos tipográficos medidos— está en **`studio/docs/LIENZO.md`**.
+Léela ENTERA antes de escribir el primer clip de un curso LIENZO; no
+intentes deducir el estilo mirando un clip.
+
+**Cuándo elegir cuál.** CONSOLA sostiene bien la densidad: muchas cifras a la
+vez, mobiliario de figura, varias señales conviviendo. LIENZO se rompe con la
+densidad y brilla cuando cada clip tiene UNA idea con UN número — que es
+justo lo que hace que cada pieza funcione sola como reel. Si el temario pide
+tres cifras simultáneas en pantalla, el estilo equivocado es LIENZO.
 
 ## Formato mudo: SIN SUBTÍTULOS por defecto
 

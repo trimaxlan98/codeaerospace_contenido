@@ -1,0 +1,81 @@
+{
+  "name": "03 · Lo que cabe en 520 KB",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La SRAM interna como un contenedor vertical de contorno donde caen, una a una y contables, las piezas de trazo ambar de lo unico que de verdad la llena: imagenes. Un fotograma de 240x240 en RGB565 son 112.5 KB, y en 520 KB caben cuatro y no un quinto.",
+  "duracion_objetivo": 30.95,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.7  el contenedor vacio se dibuja (contorno, sin relleno)",
+    "1.9  520, kilobytes de memoria interna (hoja de datos)",
+    "8.5  cae el primer fotograma, trazo ambar puro sobre azul",
+    "9.1  112.5, kilobytes de un fotograma (calculado)",
+    "15.6 caen el segundo, el tercero y el cuarto, con aire entre cada uno",
+    "22.8 4, fotogramas y no mas (calculado)",
+    "22.8 el hueco de arriba: mas bajo que una pieza, no cabe un quinto",
+    "29.8 fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.3,
+        "texto": "Quinientos veinte kilobytes de memoria suenan a mucho."
+      },
+      {
+        "t_inicio": 9.35,
+        "texto": "Una imagen ya pesa más de cien kilobytes."
+      },
+      {
+        "t_inicio": 17.4,
+        "texto": "Caben cuatro. El quinto no entra."
+      },
+      {
+        "t_inicio": 23.9,
+        "texto": "Por eso aquí se piensa en bytes."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      30.2,
+      30.9
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        8.6,
+        -14
+      ],
+      [
+        "tick",
+        15.7,
+        -16
+      ],
+      [
+        "tick",
+        18.1,
+        -16
+      ],
+      [
+        "tick",
+        20.5,
+        -16
+      ],
+      [
+        "sting",
+        22.9,
+        -10
+      ]
+    ]
+  },
+  "modulo": "M1 · El silicio"
+}

@@ -1,0 +1,57 @@
+{
+  "name": "08 · Dos cables o cuatro",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "I2C cuesta nueve bits por byte porque cada uno lleva su ACK; SPI cuesta ocho y va a 40 MHz. Mover 1 KB: 23 ms contra 0.2 ms.",
+  "duracion_objetivo": 31.0,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.7  se dibuja el byte I2C: ocho tramos de datos y el noveno, el ACK, en ambar",
+    "2.2  dato: 9, bits por cada byte",
+    "9.25 se dibuja la fila I2C (rotulo ambar), a la escala real de tiempo",
+    "10.85 dato: 23, milisegundos",
+    "16.25 relevo simultaneo: aparece la fila SPI (rotulo cian, un hilo al 0.89 % del ancho de I2C) y el dato salta a 0.2 milisegundos",
+    "23.25 dato: x113, veces mas rapido",
+    "29.85 fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 0.9,
+        "texto": "Hablar con un sensor: dos cables, o cuatro."
+      },
+      {
+        "t_inicio": 9.5,
+        "texto": "Cada byte por I2C paga un bit extra."
+      },
+      {
+        "t_inicio": 16.5,
+        "texto": "SPI usa cuatro cables y no espera nada."
+      },
+      {
+        "t_inicio": 23.5,
+        "texto": "Ciento trece veces mas rapido: cuestion de cables."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      30.25,
+      30.95
+    ],
+    "eventos": [
+      ["aire", 0.6, -16],
+      ["blip_grave", 0.9, -15],
+      ["blip_hud", 2.2, -16],
+      ["barrido", 9.25, -14],
+      ["blip_medio", 10.85, -16],
+      ["blip_agudo", 16.25, -14],
+      ["sting", 23.25, -12]
+    ]
+  },
+  "modulo": "M2 · Tocar el mundo"
+}

@@ -1,0 +1,90 @@
+{
+  "name": "04 · Un ciclo son metro y cuarto",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El cristal de 40 MHz, el PLL que multiplica por seis y el periodo de 4.17 ns. En ese tiempo la luz recorre 1.25 m: el tamaño fisico de un ciclo de reloj.",
+  "duracion_objetivo": 34.27,
+  "cola_silencio": 0.8,
+  "guion_visual": [
+    "0.0  azul limpio; entran el 04 del modulo y la marca",
+    "0.7  se dibuja el tren del cristal: tres pulsos anchos en tinta, rotulo CRISTAL",
+    "3.1  entra la cifra 40 / MEGAHERCIOS DEL CRISTAL (hoja de datos, etiqueta gris)",
+    "7.8  relevo: arriba el mismo tren en gris, abajo el de la CPU en ambar con 18 pulsos",
+    "10.5  la cifra pasa a 6x / MULTIPLICADOR DEL PLL (calculada, etiqueta ambar)",
+    "15.3  relevo: el tren solo, en gris; bajo su primer periodo entra la marca ambar UN CICLO",
+    "18.4  la cifra pasa a 4.17 / NANOSEGUNDOS POR CICLO",
+    "23.5  se va el tren y el contador de metros entra en cero",
+    "24.5  entran los dos extremos de la medida",
+    "24.9  la luz cruza de un extremo al otro (2.2 s, a velocidad constante) mientras la cifra sube",
+    "27.1  la barra toca el extremo y se queda quieta: 1.25 / METROS QUE VIAJA LA LUZ",
+    "33.1  fundido a azul limpio"
+  ],
+  "voz": {
+    "voz": "Charon",
+    "secciones": [
+      {
+        "t_inicio": 1.5,
+        "texto": "Ese latido no nace dentro del chip."
+      },
+      {
+        "t_inicio": 9.6,
+        "texto": "Ahí dentro, un lazo lo acelera."
+      },
+      {
+        "t_inicio": 16.4,
+        "texto": "Cada uno de esos ciclos dura casi nada."
+      },
+      {
+        "t_inicio": 25.6,
+        "texto": "En ese rato, la luz no cruza tu habitación."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": [
+      33.52,
+      34.22
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.0,
+        -16
+      ],
+      [
+        "barrido",
+        0.7,
+        -14
+      ],
+      [
+        "blip_medio",
+        7.75,
+        -13
+      ],
+      [
+        "blip_medio",
+        15.3,
+        -13
+      ],
+      [
+        "tick",
+        16.7,
+        -16
+      ],
+      [
+        "cuerda_la2",
+        24.85,
+        -12
+      ],
+      [
+        "subrayado",
+        27.05,
+        -11
+      ]
+    ]
+  },
+  "modulo": "M1 · El silicio"
+}
