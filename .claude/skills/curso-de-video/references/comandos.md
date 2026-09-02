@@ -95,6 +95,31 @@ eso el render local cuenta como vigente en prod. Verificación final por
 consulta a la DB (sqlite3 CLI no está instalado: `python3 -c` tras cargar el
 env).
 
+## 4bis. Verificación previa (cursos VERTICALES)
+
+Se corre **después de los `qh` y antes de mandar nada al VPS**. Cada cosa que
+mira costó una vuelta entera en algún curso:
+
+```bash
+studio/backend/venv/bin/python studio/tools/verifica_vertical.py \
+    studio/content/verticales/<slug>
+```
+
+- resolución y fps de cada pieza;
+- que **`duracion_objetivo` coincida con el render real**. La voz se alinea
+  contra el manifiesto, así que un manifiesto desfasado pone la voz sobre el
+  plano equivocado — y el redondeo a frame de 60 fps no es el de 30, hay que
+  re-comprobarlo después del `qh`, no sólo en `ql`;
+- que las piezas de curso caigan en el rango de duración;
+- que ninguna frase de voz pise a la anterior y que quede cola de silencio;
+- que el `fade_out` quepa y que los eventos de SFX existan en la paleta;
+- **las costuras**: último frame de cada pieza contra el primero de la
+  siguiente. Si la cifra se repite EXACTA en todas las uniones, el culpable
+  es siempre el mismo objeto de la capa fija — es la pista más útil.
+
+Necesita PIL y numpy: el venv del backend no los trae, así que para las
+costuras se corre con el `python3` del sistema o se mide aparte.
+
 ## 5. Narración (TTS)
 
 En el VPS, **SERIAL** — dos `guiones.py` a la vez dan 429 del TTS:
@@ -113,6 +138,22 @@ que **se narra después de adoptar los `qh`**.
 
 Salida: `guiones/<slugify(NOMBRE)[:40]>/NN-<slug>.wav` — **no** es el slug del
 curso; para bajarlos usa el glob `guiones/<familia>-N-M-*/`.
+
+### Si el TTS falla
+
+- **429** → es cuota: la de Vertex es **por minuto y por modelo**, y se agota
+  narrando en serie si las frases son cortas. Reintenta con `sleep 45` entre
+  piezas.
+- **403 `PERMISSION_DENIED` con "Lightning dunning decision is deny"** → NO es
+  cuota ni credenciales: *dunning* es cobro de morosidad, o sea que el
+  proyecto de GCP tiene la facturación en mora y la API deniega todo. No hay
+  reintento que valga; lo arregla el dueño en la consola de facturación. Se
+  distingue en un minuto probando **una sola frase** contra el TTS en el VPS
+  en vez de dejar el bucle entero fallando pieza a pieza. Pasó en el curso 31.
+
+En los dos casos el curso se puede entregar **sin voz** (`unir_vertical.py
+--sin-voz`) y añadirla después: narrar y re-muxear no obliga a re-renderizar
+nada.
 
 ## 6. Mux local con la marca
 
