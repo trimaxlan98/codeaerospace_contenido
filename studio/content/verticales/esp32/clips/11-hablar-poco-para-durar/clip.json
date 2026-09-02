@@ -3,19 +3,59 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "BLE anuncia en tres canales y se calla. Un evento dura milisegundos cada cien: el ciclo de trabajo y la corriente media salen de integrar, no de promediar.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 35.17,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7   arrancan los tres paquetes del anuncio BLE, uno por canal",
+    "2.5   dato: 1578, microsegundos de anuncio",
+    "7.3   relevo: diez anuncios sobre un segundo entero, casi todo silencio",
+    "10.05 dato: 1.6, por ciento hablando (ciclo de trabajo)",
+    "15.05 dato: 130, miliamperios al hablar (hoja de datos, etiqueta gris)",
+    "20.45 relevo: barra habla/calla, la corriente media es una integral",
+    "23.2  dato: 2061, microamperios de media",
+    "28.4  dato: 215, microamperios si el anuncio fuese cada segundo",
+    "34.0  fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 0.9,
+        "texto": "Transmitir es lo que mas gasta."
+      },
+      {
+        "t_inicio": 7.6,
+        "texto": "Y casi siempre esta callado."
+      },
+      {
+        "t_inicio": 15.3,
+        "texto": "Ciento treinta miliamperios mientras habla."
+      },
+      {
+        "t_inicio": 20.9,
+        "texto": "La media no es un promedio."
+      },
+      {
+        "t_inicio": 28.5,
+        "texto": "Hablar menos baja la corriente."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [34.42, 35.12],
+    "eventos": [
+      ["aire", 0.6, -16],
+      ["blip_hud", 1.9, -16],
+      ["barrido", 7.3, -14],
+      ["blip_medio", 10.05, -16],
+      ["tick", 15.05, -15],
+      ["blip_grave", 20.45, -15],
+      ["sting", 23.2, -12],
+      ["pulso", 29.4, -13]
+    ]
   },
   "modulo": "M3 · La radio"
 }

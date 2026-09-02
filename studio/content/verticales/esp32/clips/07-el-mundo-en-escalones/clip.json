@@ -2,7 +2,7 @@
   "name": "07 · El mundo entra en escalones",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La rampa continua que se convierte en escalera de 4096 peldaños. El escalon son 0.8 mV, el error RMS medido es q/raiz(12) y la SNR ideal, 74 dB.",
+  "description": "La rampa continua que se convierte en escalera de 4096 peldaños. El escalon son 0.81 mV, el error RMS medido sobre la propia rampa dibujada es 0.23 mV (q/raiz(12) da 0.2326) y la SNR sale de cuantizar una senoide a fondo de escala y medirla: 73.8 dB. La escalera se dibuja con 4 bits porque a 12 el peldaño mide 0.12 px en el 1080x1920 —es literalmente la rampa—, y la exageracion se declara en pantalla con un rotulo gris.",
   "duracion_objetivo": 36.53,
   "cola_silencio": 0.8,
   "guion_visual": [

@@ -132,9 +132,18 @@ def _minimo_legible(mob):
 
     Un `scale()` sobre el grupo entero encoge tambien las etiquetas, y una
     etiqueta de 22 px reducida a la mitad es ilegible en un telefono. Se
-    mide sobre los Text de verdad, no sobre el grupo."""
+    mide sobre los Text de verdad, no sobre el grupo.
+
+    OJO con el filtro: la primera version usaba `t.has_points()` y ese
+    guardian estuvo MUERTO todo el curso. Un `Text` de manim no tiene
+    puntos propios — los glifos son sus hijos —, asi que `has_points()` es
+    False para TODOS y la lista salia vacia. Medido sobre un rotulo del
+    estilo: 14 Text en la familia, 0 pasaban el filtro. Lo cazo el
+    productor del clip 07. Lo que hay que preguntar es si el Text tiene
+    algo DIBUJADO debajo, no si tiene puntos el mismo."""
     altos = [t.height for t in mob.get_family()
-             if isinstance(t, Text) and t.has_points() and t.height > 1e-6]
+             if isinstance(t, Text) and t.height > 1e-6
+             and t.family_members_with_points()]
     return min(altos) if altos else None
 
 

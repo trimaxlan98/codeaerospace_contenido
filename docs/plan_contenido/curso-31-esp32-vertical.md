@@ -229,6 +229,15 @@ de ESTE estilo y esta libreria, medidas, no supuestas:
   el MISMO dato y se contradecian medio segundo. Cuando una animacion y una
   cifra cuentan lo mismo, las dos van con el mismo ritmo (y aqui ademas el
   lineal es el fisico: la luz no acelera).
+- **El guardian de legibilidad estuvo MUERTO medio curso.** Filtraba los
+  rotulos con `Text.has_points()`, y un `Text` de manim no tiene puntos
+  propios: los glifos son sus hijos. Medido sobre un rotulo del estilo: 14
+  `Text` en la familia y **0** pasaban el filtro, asi que la lista salia
+  vacia, `_minimo_legible` devolvia `None` y `ALTO_MINIMO` no se comprobaba
+  nunca. Un `scale()` que dejara la letra a la mitad habria pasado sin
+  avisar. Lo cazo el productor del clip 07 midiendo, no mirando. La leccion
+  general: **un guardian que nunca ha abortado no esta demostrado que
+  funcione** — hay que probarlo con un caso que TIENE que fallar.
 - **El fundido final se lleva TAMBIEN la capa fija** (numero y marca). No es
   descuido: es lo que hace que toda pieza empiece y termine en el mismo azul
   exacto y la costura del montaje valga cero.
