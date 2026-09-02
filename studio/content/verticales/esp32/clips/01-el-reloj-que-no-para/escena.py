@@ -43,9 +43,13 @@ class Clip(Pieza):
         self.wait(4.6)
 
         # --- el latido que lo mueve todo ------------------------------
-        reloj = chip.pulsos(n=9, duty=0.5, ancho=5.3, alto=2.4,
+        reloj = chip.pulsos(n=9, duty=0.5, ancho=5.3, alto=2.8,
                             color=AMBAR)
-        L.escena(reloj, animacion=Create(reloj, run_time=1.6))
+        # Anclado ABAJO: un dibujo ancho y bajo centrado en la franja se
+        # queda a dos unidades de su cifra y la composicion se parte en
+        # dos. Pegado al suelo de la franja, dibujo y dato se leen juntos.
+        L.escena(reloj, animacion=Create(reloj, run_time=1.6),
+                 anclaje="abajo")
         self.wait(5.2)
 
         # --- y todo eso cabe aqui -------------------------------------

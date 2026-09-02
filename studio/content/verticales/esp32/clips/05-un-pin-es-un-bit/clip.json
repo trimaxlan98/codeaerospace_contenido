@@ -3,19 +3,86 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El registro de salida de 32 bits y los pines que obedecen. Cuatro mil millones de estados posibles, y un flanco que tarda nanosegundos en subir contra la capacidad del cable.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 36.17,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  el registro de 32 bits aparece, unos pocos en ambar",
+    "2.6  dato: 34, pines que tocan el mundo (hoja de datos)",
+    "6.0  el registro cambia de valor",
+    "10.4 el registro cambia otra vez",
+    "15.8 dato: 4 294 967 296, estados posibles (calculado)",
+    "20.4 zoom a un pin: la curva de carga, con el 10% y el 90% marcados",
+    "23.35 dato: 5.49 nanosegundos de subida (calculado)",
+    "28.6 con mas capacidad (cian) el mismo flanco se estira",
+    "30.6 dato: 25.82 nanosegundos con mas carga (calculado)",
+    "35.9 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 0.9,
+        "texto": "Escribir aqui es mover patas del chip."
+      },
+      {
+        "t_inicio": 8.0,
+        "texto": "Miles de millones de combinaciones posibles."
+      },
+      {
+        "t_inicio": 21.0,
+        "texto": "Pero nada sube instantaneamente."
+      },
+      {
+        "t_inicio": 29.0,
+        "texto": "El mundo real tiene inercia."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      35.42,
+      36.12
+    ],
+    "eventos": [
+      [
+        "blip_medio",
+        0.7,
+        -12
+      ],
+      [
+        "blip_grave",
+        6.0,
+        -14
+      ],
+      [
+        "blip_grave",
+        10.4,
+        -14
+      ],
+      [
+        "blip_agudo",
+        15.8,
+        -10
+      ],
+      [
+        "barrido",
+        20.4,
+        -12
+      ],
+      [
+        "blip_hud",
+        28.6,
+        -12
+      ],
+      [
+        "subrayado",
+        34.5,
+        -11
+      ]
+    ]
   },
   "modulo": "M2 · Tocar el mundo"
 }

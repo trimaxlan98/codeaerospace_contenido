@@ -193,6 +193,23 @@ de ESTE estilo y esta libreria, medidas, no supuestas:
   render "DIFS" y "BACKOFF" salieron pegados leyendose "DIFBACKOFF", y en el
   frame de revision parecia una palabra rara, no un fallo. En este estilo se
   rotula uno o dos tramos, no todos.
+- **Centrar el dibujo en su franja era lo natural y estaba mal.** Un dibujo
+  mas bajo que la franja (una rejilla de bits, un tren de pulsos, dos filas
+  de un gantt) se queda a dos unidades de su cifra: la composicion se parte
+  en dos mitades sin relacion y el hueco se lee como un error de
+  maquetacion, no como aire. El anclaje por defecto de `L.escena()` es
+  **abajo**: dibujo y dato bajan juntos y el vacio se acumula arriba, que es
+  donde vive el numero de pieza y donde el vacio SI es aire.
+- **El ambar traslucido sobre el azul marino no existe.** Medido sobre
+  #0B1B33: #F5A31B al 26-45 % da (72,62,45) o (116,88,40) — verde oliva
+  sucio, que no es ninguno de los dos colores; al 14 % da (44,46,48), un
+  gris que ya no es ambar. No hay ventana buena. Las piezas de area van con
+  TRAZO y el fondo del lienzo dentro, opaco.
+- **Doce barras que se tocan son una losa.** El primer gantt salio como un
+  bloque macizo en el que era imposible contar las tareas. `gantt` separa
+  ahora las barras un hueco que le quita al ANCHO, no al sitio: los centros
+  y el total siguen en su instante exacto, asi que la escala de tiempo no
+  miente.
 - **El fundido final se lleva TAMBIEN la capa fija** (numero y marca). No es
   descuido: es lo que hace que toda pieza empiece y termine en el mismo azul
   exacto y la costura del montaje valga cero.

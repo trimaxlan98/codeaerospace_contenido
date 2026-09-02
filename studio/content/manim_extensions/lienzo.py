@@ -140,7 +140,7 @@ def _minimo_legible(mob):
 ALTO_MINIMO = 0.155
 
 
-def encajar(mob, margen=0.0, que="escena", anclaje="centro"):
+def encajar(mob, margen=0.0, que="escena", anclaje="abajo"):
     """Coloca el dibujo en su franja, escalandolo solo si hace falta.
 
     No escala hacia arriba: una pieza pequeña se queda pequeña (el vacio es
@@ -551,12 +551,19 @@ class Lienzo:
         self._contadores = []
 
     def escena(self, mob, t=0.8, salida=0.45, animacion=None, margen=0.0,
-               anclaje="centro"):
+               anclaje="abajo"):
         """Atajo: encaja el dibujo en su franja y lo mete en su carril.
 
-        `anclaje="abajo"` lo apoya en el suelo de la franja, junto a la
-        cifra: un dibujo bajito centrado en la franja se queda flotando en
-        mitad del vacio y pierde la relacion con su dato."""
+        Por defecto lo apoya en el SUELO de la franja, junto a la cifra.
+        Centrarlo parecia lo natural y esta medido que no lo es: un dibujo
+        mas bajo que la franja se queda a dos unidades de su numero, la
+        composicion se parte en dos mitades sin relacion y el hueco se lee
+        como un error de maquetacion, no como aire. Apoyado abajo, dibujo y
+        dato bajan juntos y el vacio se acumula arriba, que es donde vive
+        el numero de pieza y donde el vacio SI es aire.
+
+        `anclaje="centro"` sigue disponible para una pieza que de verdad
+        quiera flotar."""
         encajar(mob, margen=margen, anclaje=anclaje)
         return self.poner("escena", mob, t=t, salida=salida,
                           animacion=animacion)

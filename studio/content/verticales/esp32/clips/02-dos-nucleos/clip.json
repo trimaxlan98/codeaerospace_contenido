@@ -3,19 +3,57 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Doce tareas y dos Xtensa. El reparto greedy LPT se dibuja a escala de tiempo real: el makespan se ve, no se rotula aparte, y la aceleracion sale de dividir la suma entre el makespan.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 31.23,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  las doce tareas se dibujan en una fila, con hueco entre barras (un nucleo)",
+    "2.1  dato: 148.6 milisegundos, el makespan de un nucleo",
+    "8.7  relevo simultaneo: la fila se parte en dos (NUCLEO 0 ambar, NUCLEO 1 cian) y el dato salta a 74.9 a la vez",
+    "15.9 dato: x1.98, veces mas rapido",
+    "23.3 dato: 2, limite teorico (etiqueta gris, es teoria)",
+    "30.1 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.0,
+        "texto": "Doce tareas independientes."
+      },
+      {
+        "t_inicio": 4.2,
+        "texto": "Un nucleo, una detras de otra."
+      },
+      {
+        "t_inicio": 11.0,
+        "texto": "Dos nucleos se las reparten."
+      },
+      {
+        "t_inicio": 17.5,
+        "texto": "Casi el doble de rapido."
+      },
+      {
+        "t_inicio": 24.5,
+        "texto": "Porque las tareas no se parten."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      30.48,
+      31.18
+    ],
+    "eventos": [
+      ["aire", 0.6, -16],
+      ["blip_grave", 0.9, -14],
+      ["blip_hud", 2.1, -16],
+      ["barrido", 8.7, -14],
+      ["sting", 16.3, -12],
+      ["tick", 23.7, -17]
+    ]
   },
   "modulo": "M1 · El silicio"
 }

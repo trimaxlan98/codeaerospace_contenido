@@ -471,6 +471,14 @@ def _exige_manim():
 TRAZO = 3.0
 TRAZO_FINO = 1.6
 
+# Relleno de las piezas de area. Medido sobre el fondo del lienzo
+# (#0B1B33): el ambar #F5A31B mezclado al 26-45 % da (72,62,45) o
+# (116,88,40) — un verde oliva sucio que no es ninguno de los dos colores
+# del estilo. Y bajarlo al 14 % da (44,46,48), un gris que ya no es ambar.
+# No hay ventana buena: las piezas de area van con TRAZO y el fondo del
+# lienzo dentro (opaco, para que se tapen bien entre ellas).
+RELLENO = 0.0
+
 
 # --- El encapsulado ---------------------------------------------------
 def encapsulado(lado=3.2, pines_por_lado=9, color=None, relleno=True):
@@ -601,11 +609,19 @@ def nivel(y_valor, punto, ancho=4.8, color=None, grosor=TRAZO_FINO,
 
 # --- Barras -----------------------------------------------------------
 def gantt(duraciones, asignacion, inicio, ancho=5.0, alto_barra=0.42,
-          buff=0.30, colores=None, escala=None):
+          buff=0.30, colores=None, escala=None, hueco=0.055):
     """El reparto de tareas entre nucleos, a escala de tiempo real.
 
     Cada barra mide lo que dura su tarea: el makespan se VE, no se rotula
-    aparte."""
+    aparte.
+
+    Dos decisiones que costaron un render entero: las barras se separan un
+    `hueco` (si se tocan, doce tareas se ven como una losa maciza y no hay
+    forma de contarlas) y van con TRAZO y relleno bajo, no con relleno
+    solido — este estilo dibuja con linea, no con masas de color. El hueco
+    se le quita al ANCHO de cada barra, no a su sitio: los centros y el
+    total siguen exactamente en su instante, asi que la escala de tiempo no
+    miente."""
     _exige_manim()
     dur = np.asarray(duraciones, dtype=float)
     asig = np.asarray(asignacion, dtype=int)
@@ -618,11 +634,13 @@ def gantt(duraciones, asignacion, inicio, ancho=5.0, alto_barra=0.42,
     for k in range(n_nucleos):
         fila = VGroup()
         for i in np.where(asig == k)[0]:
+            w = max(dur[i] * escala - hueco, 0.04)
+            color = colores[k % len(colores)]
             barra = RoundedRectangle(
-                width=max(dur[i] * escala, 0.05), height=alto_barra,
-                corner_radius=min(0.06, dur[i] * escala / 3),
-                stroke_width=0, fill_color=colores[k % len(colores)],
-                fill_opacity=0.85)
+                width=w, height=alto_barra,
+                corner_radius=min(0.07, w / 3),
+                stroke_color=color, stroke_width=2.4,
+                fill_color=_lz.AZUL, fill_opacity=1.0)
             barra.move_to([ini[i] * escala + dur[i] * escala / 2,
                            -k * (alto_barra + buff), 0])
             fila.add(barra)
@@ -646,8 +664,8 @@ def barra_apilada(partes, ancho=5.0, alto=0.62, buff=0.03):
             continue
         seg = RoundedRectangle(width=w, height=alto,
                                corner_radius=min(0.07, w / 3),
-                               stroke_width=0, fill_color=color,
-                               fill_opacity=0.85)
+                               stroke_color=color, stroke_width=2.4,
+                               fill_color=_lz.AZUL, fill_opacity=1.0)
         seg.move_to([x + w / 2 + buff / 2, 0, 0])
         grupo.add(seg)
         if texto:
@@ -683,7 +701,7 @@ def bits(valor, n=32, por_fila=8, lado=0.30, buff=0.09, color=None):
             width=lado, height=lado, corner_radius=0.05,
             stroke_color=_lz.AMBAR if encendido else color,
             stroke_width=TRAZO_FINO,
-            fill_color=_lz.AMBAR, fill_opacity=0.85 if encendido else 0.0)
+            fill_color=_lz.AMBAR, fill_opacity=1.0 if encendido else 0.0)
         fila.add(c)
         if len(fila) == por_fila:
             filas.add(fila.arrange(RIGHT, buff=buff))
@@ -792,8 +810,8 @@ def escalones_log(valores, etiquetas=None, ancho=5.0, alto=3.0,
         h = 0.10 + (np.log10(val) - lo) / rango * (alto - 0.10)
         c = (colores[i] if colores else (color or _lz.APAGADO))
         barra = RoundedRectangle(width=w, height=h, corner_radius=0.06,
-                                 stroke_width=0, fill_color=c,
-                                 fill_opacity=0.85)
+                                 stroke_color=c, stroke_width=2.4,
+                                 fill_color=_lz.AZUL, fill_opacity=1.0)
         barra.move_to([-ancho / 2 + paso * (i + 0.5), -alto / 2 + h / 2, 0])
         grupo.add(barra)
         if etiquetas:
