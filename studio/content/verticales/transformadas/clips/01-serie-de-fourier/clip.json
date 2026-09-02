@@ -1,0 +1,7 @@
+{
+  "name": "Serie de Fourier",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Senos que se suman sobre una onda cuadrada: el error baja, el sobreimpulso de Gibbs no.",
+  "duracion_objetivo": null
+}

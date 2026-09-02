@@ -1,0 +1,7 @@
+{
+  "name": "Transformada Z",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un polo cruza el circulo unidad y la respuesta deja de apagarse.",
+  "duracion_objetivo": null
+}

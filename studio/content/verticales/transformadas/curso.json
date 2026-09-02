@@ -1,0 +1,76 @@
+{
+  "name": "Transformadas · cambiar de dominio",
+  "slug": "transformadas",
+  "formato": "vertical",
+  "curso": 32,
+  "estilo": "lienzo",
+  "sonido": "mudo",
+  "description": "Curso vertical (9:16) sobre dieciocho transformadas, en el estilo LIENZO: una superficie lisa azul marino donde vive UNA cosa y UN dato, sin ruido visual, sin numeracion y sin subtitulos. Cada pieza abre con el nombre de la transformada y lo que vuelve facil, y despues lo demuestra: algo cruza de un dominio al otro y se convierte en otra cosa. Se publica MUDO — la musica la pone quien lo sube—, asi que la animacion tiene que explicar sola. Toda cifra en pantalla la calcula transformadas.py durante el render y esta demostrada por 83 invariantes en sonda_transformadas.py; lo que es un parametro elegido y no una medida va rotulado en gris. Cada pieza esta hecha para subirse sola a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-serie-de-fourier"
+    },
+    {
+      "dir": "clips/02-transformada-de-fourier"
+    },
+    {
+      "dir": "clips/03-dft"
+    },
+    {
+      "dir": "clips/04-fft"
+    },
+    {
+      "dir": "clips/05-dct"
+    },
+    {
+      "dir": "clips/06-hartley"
+    },
+    {
+      "dir": "clips/07-walsh-hadamard"
+    },
+    {
+      "dir": "clips/08-laplace"
+    },
+    {
+      "dir": "clips/09-transformada-z"
+    },
+    {
+      "dir": "clips/10-chirp-z"
+    },
+    {
+      "dir": "clips/11-stft"
+    },
+    {
+      "dir": "clips/12-wavelet"
+    },
+    {
+      "dir": "clips/13-wigner"
+    },
+    {
+      "dir": "clips/14-hilbert"
+    },
+    {
+      "dir": "clips/15-mellin"
+    },
+    {
+      "dir": "clips/16-radon"
+    },
+    {
+      "dir": "clips/17-hough"
+    },
+    {
+      "dir": "clips/18-karhunen-loeve"
+    },
+    {
+      "dir": "clips/19-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

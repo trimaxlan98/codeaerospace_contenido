@@ -36,9 +36,9 @@
 import os
 
 import numpy as np
-from manim import (DOWN, LEFT, RIGHT, UP, Dot, FadeIn, FadeOut, Line,
-                   Rectangle, Text, UpdateFromAlphaFunc, VGroup, config,
-                   linear)
+from manim import (DOWN, LEFT, RIGHT, UP, Create, Dot, FadeIn, FadeOut,
+                   Line, Rectangle, Text, UpdateFromAlphaFunc, VGroup,
+                   config, linear)
 
 import code_brand
 import promo
@@ -455,6 +455,75 @@ def guias():
                                    color=CIAN))
 
 
+# --- La portada -------------------------------------------------------
+# El curso 32 se publica SIN VOZ, con musica encima. Eso deja la
+# explicacion sin sitio: no hay narrador y el estilo prohibe la frase en
+# pantalla. La solucion es concentrarla en una portada de tres segundos —
+# el nombre de la pieza y QUE VUELVE FACIL— y que el resto del clip sea
+# solo el dibujo y su cifra. Un sitio donde se explica, y ninguno mas.
+PORTADA = 64            # el nombre, en Rajdhani (por encima del minimo 40)
+MAX_PALABRAS_TESIS = 5
+
+
+def portada(nombre, tesis=None):
+    """El nombre de la pieza sobre un filete ambar, y su tesis debajo.
+
+    Guardias: el nombre baja de cuerpo hasta caber (hay transformadas con
+    nombres largos, KARHUNEN-LOEVE mide 12 caracteres) y la tesis no
+    puede pasar de cinco palabras. Ese tope es el que impide que la
+    portada se convierta en el subtitulo que este estilo no quiere: si no
+    cabe en cinco palabras, el verbo visual de la pieza esta mal elegido
+    y lo que hay que cambiar es el dibujo."""
+    code_brand.registrar_fuentes()
+    piezas = []
+    titulo, _ = _mayor_que_entra(
+        str(nombre).upper(), (PORTADA, 56, 50, 44, 40),
+        lambda c, fs: _texto(c, FUENTE_DISPLAY, fs, TINTA, weight="SEMIBOLD"),
+        ancho=ANCHO_SEGURO - 0.2, que="nombre de la portada")
+    piezas.append(titulo)
+    raya = filete(ancho=min(titulo.width * 0.55, ANCHO_SEGURO - 1.0))
+    raya.next_to(titulo, DOWN, buff=0.34)
+    piezas.append(raya)
+    if tesis:
+        if len(str(tesis).split()) > MAX_PALABRAS_TESIS:
+            raise FueraDelLienzo(
+                f"la tesis '{tesis}' tiene {len(str(tesis).split())} "
+                f"palabras y el tope son {MAX_PALABRAS_TESIS}: no es un "
+                f"subtitulo, es lo que la pieza vuelve facil")
+        sub = etiqueta(str(tesis), medido=False)
+        sub.next_to(raya, DOWN, buff=0.34)
+        piezas.append(sub)
+    grupo = VGroup(*piezas)
+    grupo.move_to([0, (Y_TECHO + Y_SUELO) / 2, 0])
+    return cabe(grupo, "portada")
+
+
+# --- El panel partido -------------------------------------------------
+def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
+                 hueco=0.55, ancho=None):
+    """Dos dibujos, uno sobre otro, con su nombre.
+
+    Es la gramatica de media docena de piezas: aqui esta el problema y
+    ahi esta resuelto. Los dos paneles se escalan al MISMO ancho para que
+    la comparacion sea honrada (uno mas ancho que el otro sugiere que
+    tiene mas de algo), y cada uno lleva su rotulo pegado.
+
+    El separador no es una linea: es el hueco. Una raya entre los dos
+    paneles añade tinta sin añadir informacion."""
+    ancho = ancho or (ANCHO_SEGURO - 0.3)
+    paneles = []
+    for dibujo, texto in ((arriba, rotulo_arriba), (abajo, rotulo_abajo)):
+        if dibujo.width > ancho:
+            dibujo.scale(ancho / dibujo.width)
+        if texto:
+            rot = rotulo(texto)
+            rot.next_to(dibujo, DOWN, buff=0.20)
+            paneles.append(VGroup(dibujo, rot))
+        else:
+            paneles.append(VGroup(dibujo))
+    return VGroup(*paneles).arrange(DOWN, buff=hueco)
+
+
 # --- Los carriles -----------------------------------------------------
 class _Igual:
     """Centinela: "este carril se queda como esta".
@@ -498,6 +567,28 @@ class Lienzo:
         if os.environ.get("PROMO_GUIAS") == "1":
             self.e.add(guias())
         self.e.play(*[FadeIn(p, run_time=t) for p in piezas])
+
+    # --- portada ------------------------------------------------------
+    def portada(self, nombre, tesis=None, entra=0.7, quieto=1.5,
+                sale=0.55):
+        """Enseña el nombre de la pieza y lo apaga. No ocupa carril.
+
+        Es un COMPAS, no un estado: aparece, se sostiene el tiempo que se
+        tarda en leerlo sin prisa y se va, dejando el lienzo limpio para
+        que empiece el dibujo. Sin voz, `quieto` es lo unico que garantiza
+        que da tiempo a leerlo, asi que no baja de 1.2 s."""
+        if quieto < 1.2:
+            raise FueraDelLienzo(
+                f"la portada se sostiene {quieto} s y el minimo es 1.2: sin "
+                f"voz, nadie avisa de cuando hay que mirar")
+        tarjeta = portada(nombre, tesis)
+        self.e.play(FadeIn(tarjeta[0], run_time=entra))
+        self.e.play(Create(tarjeta[1], run_time=0.45))
+        if len(tarjeta) > 2:
+            self.e.play(FadeIn(tarjeta[2], shift=UP * 0.12, run_time=0.5))
+        self.e.wait(quieto)
+        self.e.play(FadeOut(tarjeta, run_time=sale))
+        return tarjeta
 
     # --- carriles -----------------------------------------------------
     def poner(self, carril, mob, t=0.6, salida=0.4, animacion=None):

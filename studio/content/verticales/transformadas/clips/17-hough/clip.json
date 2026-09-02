@@ -1,0 +1,7 @@
+{
+  "name": "Hough",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cada punto vota una senoide entera; donde se cruzan todas esta la recta.",
+  "duracion_objetivo": null
+}
