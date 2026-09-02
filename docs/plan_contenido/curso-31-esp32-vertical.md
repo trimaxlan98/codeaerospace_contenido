@@ -129,32 +129,69 @@ cuanto gasta.
 | Lote | Piezas | Estado |
 |---|---|---|
 | L0 | `lienzo.py` + `esp32.py` + sonda | **hecho** (sonda 59 ok / 0 fallos) |
-| L1 | intro, molde (clip 01) y cierre | **hecho**, validados en `ql` |
-| L2 | clips 02-06 (5 agentes) | en produccion |
-| L3 | clips 07-10 | pendiente |
-| L4 | clips 11-14 | pendiente |
-| L5 | qh local, narracion en el VPS, mux y entrega | pendiente |
+| L1 | intro, molde (clip 01) y cierre | **hecho** |
+| L2 | clips 02-06 | **hecho** |
+| L3 | clips 07-10 | **hecho** |
+| L4 | clips 11-14 | **hecho** |
+| L5 | qh local, mux y entrega | **hecho** |
+| L6 | narracion | **BLOQUEADO** por facturacion de GCP (ver abajo) |
+
+## Entrega (2026-09-02)
+
+- `exports/verticales/esp32/esp32_vertical.mp4` — 1080x1920 @60,
+  **507.44 s = 8 min 27 s**, 16 piezas, 18.2 MB, pico **-4.0 dB**.
+- `exports/verticales/esp32/piezas/*.mp4` — **las 16 piezas sueltas
+  sonorizadas**. ESAS son el producto para Instagram; el montaje es el extra.
+- Costuras entre las quince uniones: **0.0000/255, exacto**. Es lo mejor de
+  la coleccion (el 26 dio 0.003 y el 28 0.0048) y es consecuencia directa
+  de que toda pieza empiece y termine en azul limpio con la capa fija
+  apagada tambien.
+- Picos por pieza: -4.0 dB los clips, -4.5 dB intro y cierre. Suelo de
+  seguridad -0.5 dB.
+
+### LO QUE FALTA: la voz
+
+**La narracion esta bloqueada por algo ajeno al curso.** Vertex responde a
+TODO con `403 PERMISSION_DENIED: Lightning dunning decision is deny for
+project: projects/34992542254`. "Dunning" es cobro de morosidad: el proyecto
+de GCP tiene la facturacion en mora y la API deniega cualquier peticion, TTS
+incluido. No es cuota (eso seria 429) ni credenciales (la clave se lee bien).
+Comprobado dos veces, la segunda con una sola frase directa contra el TTS.
+
+Las 14 piezas con voz llevan su guion escrito y alineado en `clip.json`
+(`voz.secciones` con `t_inicio`), y el verificador confirma que ninguna
+frase pisa a la siguiente y que todas dejan cola. **En cuanto se arregle la
+facturacion, solo faltan dos comandos** (no hay que re-renderizar nada):
+
+```bash
+bash studio/tools/narrar_esp32.sh    # serial, con sleep 45 entre piezas; se salta las ya bajadas
+studio/backend/venv/bin/python studio/tools/unir_vertical.py     studio/content/verticales/esp32          # sin --sin-voz esta vez
+```
+
+El montaje entregado hoy lleva solo la cama de SFX. Es publicable tal cual
+(el curso es mudo por diseño: la pantalla enseña y la voz solo remataria),
+pero la version con voz es la buena.
 
 ### Estado pieza a pieza
 
-| Pieza | Render ql | Manifiesto | Voz | SFX |
+| Pieza | Duracion qh | Frases de voz | SFX | Estado |
 |---|---|---|---|---|
-| Intro | 10.70 s | 10.7 | — | 8 |
-| 01 · El reloj que no para | 30.33 s | 30.33 | 5 | 7 |
-| 02 · Dos nucleos | 31.23 s | 31.23 | 5 | 6 |
-| 03 · Lo que cabe en 520 KB | 30.93 s | 30.93 | 4 | 6 |
-| 04 · Un ciclo son metro y cuarto | 34.30 s | 34.3 | 4 | 7 |
-| 05 · Un pin es un bit | 36.17 s | 36.17 | 4 | 7 |
-| 06 · Voltajes que no existen | 37.80 s | 37.8 | 5 | 7 |
-| 07 · El mundo entra en escalones | 36.53 s | — | — | — |
-| 08 · Dos cables o cuatro | 31.00 s | 31.0 | 4 | 7 |
-| 09 · Doce centimetros y medio | 32.30 s | 32.3 | 4 | 6 |
-| 10 · Lo que de verdad viaja | 36.56 s | 36.56 | 5 | 8 |
-| 11 · Hablar poco para durar mucho | 35.17 s | — | — | — |
-| 12 · La linea que se interrumpe | — | — | — | — |
-| 13 · El planificador | — | — | — | — |
-| 14 · La vida de una pila | — | — | — | — |
-| Cierre | 9.80 s | 9.8 | — | 6 |
+| Intro | 10.70 s | — | 8 | entregada |
+| 01 · El reloj que no para | 30.30 s | 5 | 7 | entregada |
+| 02 · Dos nucleos | 31.25 s | 5 | 6 | entregada |
+| 03 · Lo que cabe en 520 KB | 30.95 s | 4 | 6 | entregada |
+| 04 · Un ciclo son metro y cuarto | 34.27 s | 4 | 7 | entregada |
+| 05 · Un pin es un bit | 36.15 s | 4 | 7 | entregada |
+| 06 · Voltajes que no existen | 37.75 s | 5 | 7 | entregada |
+| 07 · El mundo entra en escalones | 36.50 s | 5 | 7 | entregada |
+| 08 · Dos cables o cuatro | 31.00 s | 4 | 7 | entregada |
+| 09 · Doce centimetros y medio | 32.28 s | 4 | 6 | entregada |
+| 10 · Lo que de verdad viaja | 36.50 s | 5 | 8 | entregada |
+| 11 · Hablar poco para durar mucho | 35.15 s | 5 | 8 | entregada |
+| 12 · La linea que se interrumpe | 38.30 s | 5 | 6 | entregada |
+| 13 · El planificador | 35.55 s | 5 | 7 | entregada |
+| 14 · La vida de una pila | 40.95 s | 5 | 10 | entregada |
+| Cierre | 9.80 s | — | 6 | entregada |
 
 ## 5. Cosecha de trampas
 
