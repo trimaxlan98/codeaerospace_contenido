@@ -88,7 +88,10 @@ def formato(nombre=None, calidad=None, **kw):
     Y_MARCA = Y_SUELO + 0.30                #  el wordmark, sobre el suelo
     Y_CIFRA = -2.30                         #  centro de la cifra grande
     # La franja del dibujo: por debajo del numero y por encima de la cifra.
-    BANDA = (Y_CIFRA + 1.35, Y_TECHO - 1.05)
+    # El 1.55 de holgura sobre la cifra no es de adorno: con 1.35 un dibujo
+    # de borde recto apoyado en el suelo de la franja quedaba a 0.70 de la
+    # cifra y las dos cosas se leian pegadas.
+    BANDA = (Y_CIFRA + 1.55, Y_TECHO - 1.05)
 
     # Un objeto centrado no puede ser mas ancho que el doble del margen mas
     # estrecho: la columna de botones de la app se come 14 % por la derecha.

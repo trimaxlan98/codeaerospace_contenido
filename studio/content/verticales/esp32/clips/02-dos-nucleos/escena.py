@@ -19,7 +19,7 @@ class Clip(Pieza):
 
         # --- un nucleo: las doce, una detras de otra --------------------
         asig1, ini1, carga1, mk1 = chip.reparto(d, 1)
-        gt1, escala = chip.gantt(d, asig1, ini1, ancho=5.5, alto_barra=0.65)
+        gt1, escala = chip.gantt(d, asig1, ini1, ancho=5.5, alto_barra=2.60)
         L.escena(gt1, animacion=Create(gt1, lag_ratio=0.05, run_time=1.4),
                 anclaje="abajo")
         L.dato(medido(mk1, 1), "milisegundos", medido=True, t=0.6)
@@ -31,8 +31,8 @@ class Clip(Pieza):
         # secuenciales, la fila partida se ve unos segundos con el
         # makespan de un nucleo debajo, que es mentir con la cifra.
         asig2, ini2, carga2, mk2 = chip.reparto(d, 2)
-        gt2, _ = chip.gantt(d, asig2, ini2, ancho=5.5, alto_barra=0.65,
-                           buff=0.35, escala=escala)
+        gt2, _ = chip.gantt(d, asig2, ini2, ancho=5.5, alto_barra=1.15,
+                           buff=0.30, escala=escala)
         et0 = rot("NUCLEO 0", color=AMBAR)
         et0.next_to(gt2[0], UP, buff=0.22)
         et1 = rot("NUCLEO 1", color=CIAN)

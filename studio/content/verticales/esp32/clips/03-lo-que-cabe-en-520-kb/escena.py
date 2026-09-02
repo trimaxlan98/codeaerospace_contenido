@@ -43,28 +43,33 @@ class Clip(Pieza):
                                       fill_opacity=0.0)
         L.escena(contenedor, animacion=Create(contenedor, run_time=1.2))
         L.dato(total_kib, "kilobytes de memoria interna", medido=False)
-        self.wait(5.5)
+        self.wait(6.0)
 
         # --- cae el primer fotograma ---------------------------------------
         def pieza_i(i):
+            # Trazo puro, con el fondo del lienzo dentro: un fill ambar
+            # translucido sobre AZUL da un verde oliva sucio (medido: 30 %
+            # de opacidad produce (81,68,44), y a menos opacidad ya no lee
+            # como ambar). El relleno opaco es a proposito, tapa bien entre
+            # piezas y contra el contenedor.
             p = RoundedRectangle(width=pieza_w, height=pieza_h,
                                  corner_radius=0.10, stroke_color=AMBAR,
-                                 stroke_width=chip.TRAZO, fill_color=AMBAR,
-                                 fill_opacity=0.30)
+                                 stroke_width=2.4, fill_color=AZUL,
+                                 fill_opacity=1.0)
             p.move_to([centro[0], y_pieza(i), 0])
             return p
 
         p1 = pieza_i(1)
         self.play(Create(p1, run_time=0.6))
         L.dato(medido(kib, 1), "kilobytes de un fotograma", medido=True)
-        self.wait(5.0)
+        self.wait(5.5)
 
-        # --- el segundo, el tercero y el cuarto: contables, uno a uno ------
+        # --- el segundo, el tercero y el cuarto: contables, con aire -------
         for i in range(2, n + 1):
             pi = pieza_i(i)
-            self.play(Create(pi, run_time=0.6))
-            self.wait(0.9)
+            self.play(Create(pi, run_time=0.7))
+            self.wait(1.7)
 
         # --- el quinto no cabe: el hueco de arriba es el remate -------------
         L.dato(n, "fotogramas y no mas", medido=True)
-        self.wait(12.0)
+        self.wait(6.0)

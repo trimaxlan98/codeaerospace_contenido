@@ -47,12 +47,19 @@ class Clip(Pieza):
         self.wait(4.6)
 
         # --- zoom a un pin: lo que tarda en subir -------------------------
+        # Ventana compartida por las dos capacidades: 4 tau de la mas
+        # lenta. A 8 tau (el valor por defecto de flanco_rc) la curva
+        # lenta ya se aplana antes de la mitad del panel y deja la mitad
+        # derecha vacia; a 4 tau sigue subiendo casi hasta el borde, que
+        # es lo que hace visible "el flanco se estira" sin mentir sobre
+        # el 10-90 % medido (sigue cayendo dentro de la ventana).
         R = chip.HOJA["z_salida_ohm"]
         C1, C2 = 100e-12, 470e-12
-        t_comun = np.linspace(0.0, 8.0 * R * C2, 2001)
+        tau2 = R * C2
+        t_comun = np.linspace(0.0, 4.0 * tau2, 2001)
         t1, v1, tsub1 = chip.flanco_rc(C=C1, t=t_comun)
 
-        caja_ancho, caja_alto = 5.2, 3.8
+        caja_ancho, caja_alto = 5.2, 3.0
         eje1 = chip.eje_ele(ancho=caja_ancho, alto=caja_alto)
         curva1, punto1 = chip.traza(t1, v1, ancho=caja_ancho, alto=caja_alto,
                                     rango_y=(0.0, chip.HOJA["vdd"]))
@@ -69,16 +76,32 @@ class Clip(Pieza):
 
         # --- con mas capacidad, el mismo flanco se estira ------------------
         t2, v2, tsub2 = chip.flanco_rc(C=C2, t=t_comun)
-        curva1b, _ = chip.traza(t1, v1, ancho=caja_ancho, alto=caja_alto,
-                                rango_y=(0.0, chip.HOJA["vdd"]), color=TINTA)
-        curva2, _ = chip.traza(t2, v2, ancho=caja_ancho, alto=caja_alto,
-                               rango_y=(0.0, chip.HOJA["vdd"]), color=CIAN)
+        curva1b, punto1b = chip.traza(t1, v1, ancho=caja_ancho,
+                                      alto=caja_alto,
+                                      rango_y=(0.0, chip.HOJA["vdd"]),
+                                      color=TINTA)
+        curva2, punto2 = chip.traza(t2, v2, ancho=caja_ancho, alto=caja_alto,
+                                    rango_y=(0.0, chip.HOJA["vdd"]),
+                                    color=CIAN)
         eje2 = chip.eje_ele(ancho=caja_ancho, alto=caja_alto)
         caja2 = VGroup(eje2, curva1b, curva2)
+
+        # Cada rotulo pegado a SU curva, a alturas distintas, para que no
+        # se lean como una sola frase: "poca carga" arriba a la izquierda
+        # (justo donde esa curva ya se aplano) y "mucha carga" mas abajo
+        # y a la derecha (donde la otra todavia esta subiendo).
+        t_ref1 = 6.0 * (R * C1)
+        i1 = int(np.searchsorted(t1, t_ref1))
+        p1 = punto1b(t_ref1, v1[min(i1, len(v1) - 1)])
         rot1 = rot("POCA CARGA", color=TINTA)
+        rot1.move_to(p1 + UP * 0.35)
+
+        t_ref2 = 2.8 * tau2
+        i2 = int(np.searchsorted(t2, t_ref2))
+        p2 = punto2(t_ref2, v2[min(i2, len(v2) - 1)])
         rot2 = rot("MUCHA CARGA", color=CIAN)
-        rot1.move_to(caja2.get_top() + UP * 0.35 + LEFT * 1.7)
-        rot2.move_to(caja2.get_top() + UP * 0.35 + RIGHT * 1.3)
+        rot2.move_to(p2 + DOWN * 0.35)
+
         vista2 = VGroup(caja2, rot1, rot2)
 
         L.escena(vista2, animacion=FadeIn(vista2, run_time=1.0))

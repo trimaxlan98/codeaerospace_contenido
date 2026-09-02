@@ -113,11 +113,18 @@ class Clip(Pieza):
             return f"{metros * min(max(a, 0.0), 1.0):.2f}"
 
         L.contador_vivo("metros que viaja la luz", _avance,
-                        t_final=t_ini + subida + 0.4, paso=0.20, medido=True)
+                        t_final=t_ini + subida + 0.4, paso=0.15, medido=True)
 
         # Dos extremos y el trazo que los une: la luz sale de uno y para
         # en el otro. Es la MISMA marca de medida del estado anterior, que
         # alli media un tiempo y aqui mide un espacio.
+        #
+        # `rate_func=linear` NO es cosmetico: `Create` va con `smooth` por
+        # defecto, y medido sobre el video la barra iba por el 16 % del
+        # recorrido cuando la cifra ya decia 0.41 de 1.25 (el 33 %). La
+        # cifra y el largo de la barra son el MISMO dato, asi que las dos
+        # tienen que avanzar igual — y ademas la luz va a velocidad
+        # constante, que es justo lo que dibuja una rampa lineal.
         largo, alto_postes = 5.2, 3.4
         postes = VGroup(_tic(alto_postes, color=APAGADO, grosor=2.0),
                         _tic(alto_postes, color=APAGADO, grosor=2.0))
@@ -130,7 +137,7 @@ class Clip(Pieza):
         L.escena(b4, animacion=AnimationGroup(
             FadeIn(postes, run_time=0.6),
             Succession(Wait(0.35),
-                       Create(barra, run_time=subida),
+                       Create(barra, run_time=subida, rate_func=linear),
                        FadeIn(etq_4, run_time=0.45)),
             lag_ratio=0.0))
         self.wait(5.6)
