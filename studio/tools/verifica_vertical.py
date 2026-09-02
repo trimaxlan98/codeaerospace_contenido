@@ -19,7 +19,15 @@ Qué mira:
   - que ninguna frase de voz empiece antes de que acabe la anterior, y que
     quede cola de silencio al final;
   - que el `fade_out` del audio caiga dentro de la pieza;
-  - que los eventos de SFX existan en la paleta y no se salgan del final.
+  - que los eventos de SFX existan en la paleta y no se salgan del final;
+  - las COSTURAS: el ultimo frame de cada pieza contra el primero de la
+    siguiente. En este estilo toda pieza empieza y termina en azul limpio,
+    asi que la costura tiene que valer casi cero. No se da por supuesto: en
+    el curso 28 el fundido final dejaba encendidas la marca de agua y las
+    esquinas del HUD, la pieza siguiente las re-encendia de golpe, y habia
+    un parpadeo en las catorce uniones que a ojo no se veia. Cuando la
+    cifra de la costura se repite EXACTA en todas las uniones, el culpable
+    es siempre el mismo objeto: es la pista mas util del chequeo.
 """
 import argparse
 import json
@@ -30,7 +38,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(REPO / "studio" / "tools"))
 
-from render_vertical import SALIDA, cargar_curso, datos_video  # noqa: E402
+from render_vertical import (COLA_FINAL, SALIDA, cargar_curso,  # noqa: E402
+                             datos_video)
 
 # Charon lee a 1.2-1.7 palabras/s; 1.3 + 0.4 s de aire es la regla util
 # que sale de medir tres cursos. Una frase de UNA palabra cuesta ~5.5 s
@@ -38,6 +47,67 @@ from render_vertical import SALIDA, cargar_curso, datos_video  # noqa: E402
 PALABRAS_POR_S = 1.3
 AIRE_S = 0.4
 COSTE_MINIMO_S = 5.0
+
+
+# Suelo de la costura: el codec no devuelve el mismo azul bit a bit ni
+# entre dos frames identicos. Medido en cursos anteriores, el ruido de
+# compresion se queda por debajo de 1.0/255.
+COSTURA_MAX = 1.0
+
+
+def _frame(video: Path, destino: Path, primero: bool) -> Path:
+    """Primer o ultimo frame REAL de un video.
+
+    El ultimo se saca con `-sseof` y `-update 1`: un `-ss` al filo de la
+    duracion sale con exito SIN escribir nada."""
+    cmd = ["ffmpeg", "-nostdin", "-v", "error"]
+    if primero:
+        cmd += ["-i", str(video), "-frames:v", "1"]
+    else:
+        cmd += ["-sseof", f"-{COLA_FINAL}", "-i", str(video), "-update", "1"]
+    subprocess.run(cmd + ["-y", str(destino)], check=True)
+    return destino
+
+
+def costuras(curso, slug, tmp: Path):
+    """Diferencia media por canal entre el final de cada pieza y el
+    principio de la siguiente, en unidades de 0-255."""
+    try:
+        from PIL import Image
+        import numpy as np
+    except Exception:
+        print("  (sin PIL/numpy: no se miden las costuras)")
+        return 0
+    tmp.mkdir(parents=True, exist_ok=True)
+    piezas = curso["_piezas"]
+    fallos = 0
+    valores = []
+    for a, b in zip(piezas, piezas[1:]):
+        va = SALIDA / slug / a["_slug"] / "video.mp4"
+        vb = SALIDA / slug / b["_slug"] / "video.mp4"
+        if not (va.is_file() and vb.is_file()):
+            continue
+        fa = _frame(va, tmp / f"{a['_n']:02d}_fin.png", primero=False)
+        fb = _frame(vb, tmp / f"{b['_n']:02d}_ini.png", primero=True)
+        xa = np.asarray(Image.open(fa).convert("RGB"), dtype=float)
+        xb = np.asarray(Image.open(fb).convert("RGB"), dtype=float)
+        if xa.shape != xb.shape:
+            print(f"  FALLO: {a['_slug']} y {b['_slug']} no miden lo mismo")
+            fallos += 1
+            continue
+        d = float(np.abs(xa - xb).mean())
+        valores.append(d)
+        marca = "ok" if d <= COSTURA_MAX else "FALLO"
+        if d > COSTURA_MAX:
+            fallos += 1
+        print(f"  {marca}  {a['_slug']} -> {b['_slug']}: {d:.4f}/255")
+    if valores:
+        iguales = len(set(round(v, 4) for v in valores)) == 1
+        print(f"  peor costura: {max(valores):.4f}/255"
+              + ("  (todas EXACTAS iguales: el culpable es un objeto "
+                 "de la capa fija)" if iguales and max(valores) > COSTURA_MAX
+                 else ""))
+    return fallos
 
 
 def estima(texto):
@@ -130,6 +200,9 @@ def main() -> int:
                 print(f"     AVISO: el evento '{nombre_ev}' entra en {t0} y "
                       f"la pieza dura {d['dur']:.2f}")
                 avisos += 1
+
+    print("\n=== costuras ===")
+    fallos += costuras(curso, slug, SALIDA / slug / "_costuras")
 
     print(f"\n=== {len(curso['_piezas'])} piezas · {total:.1f} s "
           f"({total / 60:.2f} min) · {fallos} fallos · {avisos} avisos")

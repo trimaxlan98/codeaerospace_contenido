@@ -220,3 +220,51 @@ desde tierra.
   que se mueve · la montura es un robot · el lazo sobre una rampa.
 - Modulo 3, **del lazo nominal al sistema real**: LQR · la campaña Monte
   Carlo · por que una decima de grado.
+
+
+## Curso 31 — ESP32: el chip por dentro (vertical, estilo LIENZO)
+
+El cuarto curso en 9:16 y el primero con un **lenguaje visual propio**, que no
+es una variante del de los tres anteriores: los cursos 26, 28 y 29 usan la
+estética de consola de vuelo de la marca (fondo casi negro, escuadras HUD,
+telemetría en las cuatro esquinas, pie de cifra de tres renglones). El estilo
+LIENZO va al revés — una superficie lisa azul marino con **una cosa y un
+dato**, y nada más. Se elige por curso, no por clip; los tres cursos
+anteriores siguen exactamente igual.
+
+Catorce clips en cuatro módulos, del silicio a lo que el chip hace con el
+mundo: los ciclos que ejecuta mientras miras el reel, el reparto entre dos
+núcleos, lo que cabe en 520 KB, el tamaño físico de un ciclo de reloj, el
+registro de 32 bits y su flanco, el PWM que fabrica voltajes que no existen,
+la escalera del ADC, I2C contra SPI, la onda de 12.3 cm, la anatomía de una
+trama Wi-Fi, los anuncios BLE, sondeo contra interrupción, el jitter del
+planificador y la vida de una pila.
+
+Lo sostienen dos módulos nuevos:
+
+- **`manim_extensions/lienzo.py`** — el estilo. Cuatro carriles con **un solo
+  ocupante cada uno** (`L.escena`, `L.dato`, `L.relevo`), de modo que nada se
+  encima *por construcción* y no por disciplina del autor; paleta de cuatro
+  colores con un solo acento; escala tipográfica cerrada con escalón
+  automático; y guardianes que abortan el render si un texto se sale de la
+  zona que tapa la app o si un rótulo queda por debajo de 24 px reales. Guía
+  completa en `studio/docs/LIENZO.md`.
+- **`manim_extensions/esp32.py`** — la librería del curso, en dos mitades:
+  numérica (numpy puro, importable sin manim, verificada por
+  `studio/tools/sonda_esp32.py`) y de dibujo. Toda cifra en pantalla sale de
+  la primera mitad durante el render.
+
+Tres cosas que conviene saber antes de copiar este estilo:
+
+- **La procedencia va en el color de la ETIQUETA, no del número.** La cifra
+  siempre es tinta; la etiqueta es ámbar si el número sale de medir o calcular
+  en ese render, y apagada si está *dado* — hoja de datos, literatura o un
+  parámetro elegido de la simulación. Un parámetro elegido no es una medida
+  por mucho que esté escrito en el código.
+- **El dibujo se apoya en el suelo de su franja, no se centra.** Centrarlo
+  parecía lo natural y está medido que no lo es: cualquier dibujo más bajo que
+  la franja se queda a dos unidades de su cifra y la composición se parte en
+  dos mitades sin relación.
+- **Nada de ámbar traslúcido.** Medido sobre el fondo #0B1B33: el acento
+  mezclado al 26-45 % da un verde oliva sucio, y al 14 % un gris que ya no es
+  ámbar. Las piezas de área se dibujan con trazo y el fondo del lienzo dentro.
