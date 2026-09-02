@@ -1,0 +1,69 @@
+{
+  "name": "ESP32 · el chip por dentro",
+  "slug": "esp32",
+  "formato": "vertical",
+  "curso": 31,
+  "estilo": "lienzo",
+  "description": "Curso vertical (9:16) sobre el microcontrolador ESP32, en el estilo LIENZO: una superficie lisa azul marino donde vive UNA cosa y UN dato, sin ruido visual y sin subtítulos. Catorce clips que van del silicio a lo que el chip hace con el mundo: los dos núcleos, la memoria, el reloj, los pines, el PWM, el ADC, los buses, la antena, el Wi-Fi, el BLE, las interrupciones, el planificador y la vida de una pila. Toda cifra en pantalla se calcula con numpy durante el render; lo que viene de la hoja de datos de Espressif se rotula en gris. Cada clip está hecho para subirse solo a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "modulos": [
+    "M1 · El silicio (1-4)",
+    "M2 · Tocar el mundo (5-8)",
+    "M3 · La radio (9-11)",
+    "M4 · El tiempo y la energía (12-14)"
+  ],
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-el-reloj-que-no-para"
+    },
+    {
+      "dir": "clips/02-dos-nucleos"
+    },
+    {
+      "dir": "clips/03-lo-que-cabe-en-520-kb"
+    },
+    {
+      "dir": "clips/04-un-ciclo-son-metro-y-cuarto"
+    },
+    {
+      "dir": "clips/05-un-pin-es-un-bit"
+    },
+    {
+      "dir": "clips/06-voltajes-que-no-existen"
+    },
+    {
+      "dir": "clips/07-el-mundo-en-escalones"
+    },
+    {
+      "dir": "clips/08-dos-cables-o-cuatro"
+    },
+    {
+      "dir": "clips/09-doce-centimetros-y-medio"
+    },
+    {
+      "dir": "clips/10-lo-que-de-verdad-viaja"
+    },
+    {
+      "dir": "clips/11-hablar-poco-para-durar"
+    },
+    {
+      "dir": "clips/12-la-linea-que-se-interrumpe"
+    },
+    {
+      "dir": "clips/13-el-planificador"
+    },
+    {
+      "dir": "clips/14-la-vida-de-una-pila"
+    },
+    {
+      "dir": "clips/15-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

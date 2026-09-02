@@ -1,0 +1,21 @@
+{
+  "name": "14 · La vida de una pila",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Los cuatro estados de consumo en decadas y la integral que decide todo. Despertar dos segundos cada hora da años de vida, hasta que el limite deja de ser el chip y pasa a ser la pila.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M4 · El tiempo y la energia"
+}

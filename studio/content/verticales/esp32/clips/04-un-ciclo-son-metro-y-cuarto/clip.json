@@ -1,0 +1,21 @@
+{
+  "name": "04 · Un ciclo son metro y cuarto",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El cristal de 40 MHz, el PLL que multiplica por seis y el periodo de 4.17 ns. En ese tiempo la luz recorre 1.25 m: el tamaño fisico de un ciclo de reloj.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M1 · El silicio"
+}

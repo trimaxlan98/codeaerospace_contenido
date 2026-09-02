@@ -1,0 +1,21 @@
+{
+  "name": "08 · Dos cables o cuatro",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "I2C cuesta nueve bits por byte porque cada uno lleva su ACK; SPI cuesta ocho y va a 40 MHz. Mover 1 KB: 23 ms contra 0.2 ms.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M2 · Tocar el mundo"
+}

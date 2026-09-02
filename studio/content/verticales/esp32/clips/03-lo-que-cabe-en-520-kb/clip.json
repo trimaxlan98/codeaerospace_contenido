@@ -1,0 +1,21 @@
+{
+  "name": "03 · Lo que cabe en 520 KB",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La SRAM interna llenandose con lo unico que de verdad la llena: imagenes. Un fotograma de 240x240 en RGB565 son 112.5 KiB, y en 520 KB caben cuatro.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M1 · El silicio"
+}

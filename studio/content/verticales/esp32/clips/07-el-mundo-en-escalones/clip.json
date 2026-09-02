@@ -1,0 +1,21 @@
+{
+  "name": "07 · El mundo entra en escalones",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La rampa continua que se convierte en escalera de 4096 peldaños. El escalon son 0.8 mV, el error RMS medido es q/raiz(12) y la SNR ideal, 74 dB.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M2 · Tocar el mundo"
+}

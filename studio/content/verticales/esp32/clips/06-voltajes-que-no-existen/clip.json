@@ -1,0 +1,21 @@
+{
+  "name": "06 · Voltajes que no existen",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El chip solo sabe poner 0 o 3.3 V. Con PWM y un filtro RC fabrica cualquier voltaje intermedio: media y rizado medidos sobre la ventana dibujada, ya en regimen.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M2 · Tocar el mundo"
+}

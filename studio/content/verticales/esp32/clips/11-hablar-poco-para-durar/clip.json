@@ -1,0 +1,21 @@
+{
+  "name": "11 · Hablar poco para durar mucho",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "BLE anuncia en tres canales y se calla. Un evento dura milisegundos cada cien: el ciclo de trabajo y la corriente media salen de integrar, no de promediar.",
+  "duracion_objetivo": null,
+  "cola_silencio": 0.8,
+  "guion_visual": [],
+  "voz": {
+    "voz": "Charon",
+    "secciones": []
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.4,
+    "fade_out": null,
+    "eventos": []
+  },
+  "modulo": "M3 · La radio"
+}
