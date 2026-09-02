@@ -76,8 +76,16 @@ def rot(texto, color=APAGADO, cuerpo=lz.ROTULO):
 
 
 def medido(x, n=2):
-    """Formatea un numero calculado, sin ceros de adorno."""
-    s = f"{float(x):.{n}f}".rstrip("0").rstrip(".")
+    """Formatea un numero calculado, sin ceros de adorno.
+
+    El `rstrip("0")` SOLO se aplica si hay punto decimal. Sin esa guarda,
+    `medido(40.0, 0)` devolvia "4": el strip se comia el cero de las
+    decenas y ponia en pantalla una cifra falsa que ningun render habria
+    marcado como error. Lo cazo el clip 04 formateando los 40 MHz del
+    cristal."""
+    s = f"{float(x):.{n}f}"
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
     return s if s not in ("", "-") else "0"
 
 

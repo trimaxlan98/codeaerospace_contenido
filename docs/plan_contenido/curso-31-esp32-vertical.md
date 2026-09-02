@@ -210,6 +210,18 @@ de ESTE estilo y esta libreria, medidas, no supuestas:
   ahora las barras un hueco que le quita al ANCHO, no al sitio: los centros
   y el total siguen en su instante exacto, asi que la escala de tiempo no
   miente.
+- **`rstrip("0")` sobre un entero se come la cifra.** El formateador del
+  bloque de estilo devolvia `"4"` para `medido(40.0, 0)`: sin punto decimal
+  que detuviera el strip, el cero de las decenas desaparecia. Ningun render
+  lo habria marcado como error — habria salido "4 MEGAHERCIOS DEL CRISTAL"
+  en pantalla. Lo cazo el clip 04 formateando los 40 MHz. Ahora el strip
+  solo se aplica si hay punto.
+- **`Create` va con `rate_func=smooth` de fabrica y un contador va lineal.**
+  Medido en el clip 04: la barra que representa la distancia iba por el 16 %
+  del recorrido cuando la cifra ya decia el 33 %. La imagen y el numero son
+  el MISMO dato y se contradecian medio segundo. Cuando una animacion y una
+  cifra cuentan lo mismo, las dos van con el mismo ritmo (y aqui ademas el
+  lineal es el fisico: la luz no acelera).
 - **El fundido final se lleva TAMBIEN la capa fija** (numero y marca). No es
   descuido: es lo que hace que toda pieza empiece y termine en el mismo azul
   exacto y la costura del montaje valga cero.

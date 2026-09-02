@@ -13,10 +13,10 @@
 # mismo ancho que los 3 del cristal, asi que el x6 que dice la cifra es el
 # que se ve en el dibujo.
 #
-# El remate es una MEDIDA, no una grafica: un suelo, una barra ambar que
-# crece desde el suelo y un tope. Crece mientras el contador sube, y las
-# dos cosas paran a la vez porque el contador lee el reloj de la escena
-# (`renderer.time`), no un `dt` acumulado.
+# El remate es una MEDIDA, no una grafica: dos extremos quietos y la luz
+# cruzando de uno al otro. Crece mientras el contador sube y las dos cosas
+# paran a la vez, porque el contador lee el reloj de la escena
+# (`renderer.time`) en vez de un `dt` acumulado y la barra crece lineal.
 
 
 def _tic(largo, color=AMBAR, grosor=4.0):
@@ -131,7 +131,7 @@ class Clip(Pieza):
         postes[0].move_to([-largo / 2, 0, 0])
         postes[1].move_to([largo / 2, 0, 0])
         barra = lz.filete(ancho=largo, color=AMBAR, grosor=7.0)
-        etq_4 = rot("UN CICLO")
+        etq_4 = rot("LA LUZ EN UN CICLO")
         etq_4.next_to(barra, DOWN, buff=0.30)
         b4 = VGroup(postes, barra, etq_4)
         L.escena(b4, animacion=AnimationGroup(
