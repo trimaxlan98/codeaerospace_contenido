@@ -3,19 +3,105 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Los cuatro estados de consumo en decadas y la integral que decide todo. Despertar dos segundos cada hora da años de vida, hasta que el limite deja de ser el chip y pasa a ser la pila.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 41.0,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  la escalera de consumo en decadas: dormir, ligero, pensar, hablar",
+    "2.8  160 miliamperios hablando (hoja de datos, etiqueta gris)",
+    "7.3  se enciende la barra de dormir: 10 microamperios (gris)",
+    "12.1 los dos extremos en blanco y la razon entre ellos: 16 000 veces",
+    "16.9 la linea de tiempo: una rayita por despertar, y 99 microamperios de media",
+    "22.1 el mismo dibujo, y lo que eso dura: 2.3 años de autonomia",
+    "27.0 la grafica: autonomia contra cada cuanto despierta, 21.7 años con pila ideal",
+    "32.4 sin cifra abajo, se traza la curva de la pila real y se aplana",
+    "34.6 13.1 años con una pila real: el techo, y la ultima cifra del curso",
+    "39.8 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.5,
+        "texto": "El chip no gasta siempre lo mismo."
+      },
+      {
+        "t_inicio": 8.4,
+        "texto": "Entre hablar y dormir hay dieciseis mil veces."
+      },
+      {
+        "t_inicio": 17.3,
+        "texto": "La autonomia no la decide el pico: la decide el tiempo."
+      },
+      {
+        "t_inicio": 29.0,
+        "texto": "Despertar menos alarga la vida."
+      },
+      {
+        "t_inicio": 34.2,
+        "texto": "Pero la pila se gasta sola."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      40.25,
+      40.95
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.5,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.8,
+        -15
+      ],
+      [
+        "blip_hud",
+        2.85,
+        -17
+      ],
+      [
+        "blip_medio",
+        7.3,
+        -16
+      ],
+      [
+        "tick",
+        12.15,
+        -15
+      ],
+      [
+        "pulso",
+        16.9,
+        -16
+      ],
+      [
+        "blip_agudo",
+        22.1,
+        -17
+      ],
+      [
+        "aire",
+        27.05,
+        -16
+      ],
+      [
+        "cuerda_la2",
+        32.45,
+        -13
+      ],
+      [
+        "subrayado",
+        34.65,
+        -12
+      ]
+    ]
   },
   "modulo": "M4 · El tiempo y la energia"
 }

@@ -6,12 +6,12 @@
   "duracion_objetivo": 35.57,
   "cola_silencio": 0.8,
   "guion_visual": [
-    "0.7  se dibuja el cronograma: doce despertares regulares en el nucleo 0",
+    "0.7  se dibuja el cronograma: NUCLEO 0 con doce despertares regulares y, debajo, el renglon RETRASO vacio",
     "3.3  10 milisegundos de periodo (parametro de la simulacion, etiqueta gris)",
     "8.5  6.9 microsegundos de jitter, medidos sobre esos doce despertares",
-    "14.6 entra el acaparador: las marcas se desordenan y el renglon de abajo se llena de rayitas ambar de distinta longitud",
+    "14.6 entra el acaparador: las marcas se desordenan y el renglon RETRASO se llena de rayitas ambar de distinta longitud",
     "15.5 0.95 milisegundos de jitter (mismo movimiento que el dibujo)",
-    "21.9 la tarea salta al nucleo 1: vuelven los huecos iguales y el renglon del retraso se vacia",
+    "21.9 la tarea salta al NUCLEO 1: vuelven los huecos iguales y el renglon RETRASO se queda otra vez vacio",
     "22.8 2 nucleos en el chip (hoja de datos, etiqueta gris)",
     "28.2 137 veces menos jitter",
     "34.4 fundido a azul limpio"
