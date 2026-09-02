@@ -128,22 +128,37 @@ def cabe(mob, que="pieza"):
 
 
 def _minimo_legible(mob):
-    """El alto en unidades del glifo mas pequeño que quedaria en pantalla.
+    """El alto del ROTULO mas pequeño que quedaria en pantalla.
 
     Un `scale()` sobre el grupo entero encoge tambien las etiquetas, y una
-    etiqueta de 22 px reducida a la mitad es ilegible en un telefono. Se
-    mide sobre los Text de verdad, no sobre el grupo.
+    etiqueta de 22 px reducida a la mitad es ilegible en un telefono.
 
-    OJO con el filtro: la primera version usaba `t.has_points()` y ese
-    guardian estuvo MUERTO todo el curso. Un `Text` de manim no tiene
-    puntos propios — los glifos son sus hijos —, asi que `has_points()` es
-    False para TODOS y la lista salia vacia. Medido sobre un rotulo del
-    estilo: 14 Text en la familia, 0 pasaban el filtro. Lo cazo el
-    productor del clip 07. Lo que hay que preguntar es si el Text tiene
-    algo DIBUJADO debajo, no si tiene puntos el mismo."""
-    altos = [t.height for t in mob.get_family()
-             if isinstance(t, Text) and t.height > 1e-6
-             and t.family_members_with_points()]
+    Dos errores en este guardian, los dos medidos, y merece la pena
+    dejarlos escritos porque son la misma clase de error:
+
+    1. La primera version filtraba con `t.has_points()` y el guardian
+       estuvo MUERTO medio curso: un `Text` de manim no tiene puntos
+       propios (los glifos son sus hijos), asi que ninguno pasaba el
+       filtro y `ALTO_MINIMO` no se comprobaba jamas.
+    2. La segunda version media Text por Text, y como `espaciado()`
+       construye UN Text por caracter, lo que media era la altura de cada
+       GLIFO. El guion de "WI-FI" mide 0.018 a cuerpo completo y el
+       guardian abortaba el molde del curso. Una `i` o un punto habrian
+       hecho lo mismo.
+
+    Lo que hay que medir es la altura de la LINEA de texto, no la del
+    glifo mas bajo. Por eso `espaciado()` devuelve un `Rotulo` (cuya
+    altura es la del glifo mas alto, o sea la de la caja tipografica) y
+    aqui se miden los `Rotulo`, saltandose los Text que viven dentro de
+    uno."""
+    altos = []
+    for m in mob.get_family():
+        if isinstance(m, Rotulo):
+            if m.height > 1e-6:
+                altos.append(m.height)
+        elif (isinstance(m, Text) and not getattr(m, "_en_rotulo", False)
+                and m.height > 1e-6 and m.family_members_with_points()):
+            altos.append(m.height)
     return min(altos) if altos else None
 
 
@@ -189,6 +204,14 @@ def _texto(cadena, font, font_size, color, weight="MEDIUM"):
     return t
 
 
+class Rotulo(VGroup):
+    """Una linea de texto en versalitas espaciadas.
+
+    Existe como CLASE y no como VGroup pelado para que el guardian de
+    legibilidad pueda medir la linea entera en vez de sus glifos sueltos
+    (ver `_minimo_legible`)."""
+
+
 def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
               font=None, mayusculas=True):
     """Etiqueta en versalitas espaciadas, construida CARACTER A CARACTER.
@@ -203,7 +226,7 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
     if mayusculas:
         cadena = cadena.upper()
     paso = None
-    grupo = VGroup()
+    grupo = Rotulo()
     x = 0.0
     for ch in cadena:
         if ch == " ":
@@ -215,6 +238,7 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
         if paso is None:
             paso = g.width
         g.move_to(RIGHT * x)
+        g._en_rotulo = True
         grupo.add(g)
         x += paso * (1.0 + tracking)
     if len(grupo) == 0:
