@@ -134,17 +134,24 @@ cuanto gasta.
 
 ### Estado pieza a pieza
 
-| Pieza | Duracion ql | Estado |
-|---|---|---|
-| 00 intro | 10.70 s | validada |
-| 01 el reloj que no para | 30.33 s | validada (MOLDE) |
-| 02 dos nucleos | — | en produccion |
-| 03 lo que cabe en 520 KB | — | en produccion |
-| 04 un ciclo son metro y cuarto | — | en produccion |
-| 05 un pin es un bit | — | en produccion |
-| 06 voltajes que no existen | — | en produccion |
-| 07-14 | — | esqueleto |
-| 15 cierre | 9.80 s | validada |
+| Pieza | Render ql | Manifiesto | Voz | SFX |
+|---|---|---|---|---|
+| Intro | 10.70 s | 10.7 | — | 8 |
+| 01 · El reloj que no para | 30.33 s | 30.33 | 5 | 7 |
+| 02 · Dos nucleos | 31.23 s | 31.23 | 5 | 6 |
+| 03 · Lo que cabe en 520 KB | 30.93 s | 30.93 | 4 | 6 |
+| 04 · Un ciclo son metro y cuarto | 34.30 s | 34.3 | 4 | 7 |
+| 05 · Un pin es un bit | 36.17 s | 36.17 | 4 | 7 |
+| 06 · Voltajes que no existen | 37.80 s | 37.8 | 5 | 7 |
+| 07 · El mundo entra en escalones | 36.53 s | — | — | — |
+| 08 · Dos cables o cuatro | 31.00 s | 31.0 | 4 | 7 |
+| 09 · Doce centimetros y medio | 32.30 s | 32.3 | 4 | 6 |
+| 10 · Lo que de verdad viaja | 36.56 s | 36.56 | 5 | 8 |
+| 11 · Hablar poco para durar mucho | 35.17 s | — | — | — |
+| 12 · La linea que se interrumpe | — | — | — | — |
+| 13 · El planificador | — | — | — | — |
+| 14 · La vida de una pila | — | — | — | — |
+| Cierre | 9.80 s | 9.8 | — | 6 |
 
 ## 5. Cosecha de trampas
 
