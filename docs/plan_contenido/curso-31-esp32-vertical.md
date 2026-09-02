@@ -125,13 +125,74 @@ cuanto gasta.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| L0 | `lienzo.py` + `esp32.py` + sonda | pendiente |
-| L1 | intro + clips 01-04 (molde: el 01) | pendiente |
-| L2 | clips 05-08 | pendiente |
-| L3 | clips 09-11 | pendiente |
-| L4 | clips 12-14 + cierre | pendiente |
+| L0 | `lienzo.py` + `esp32.py` + sonda | **hecho** (sonda 59 ok / 0 fallos) |
+| L1 | intro, molde (clip 01) y cierre | **hecho**, validados en `ql` |
+| L2 | clips 02-06 (5 agentes) | en produccion |
+| L3 | clips 07-10 | pendiente |
+| L4 | clips 11-14 | pendiente |
 | L5 | qh local, narracion en el VPS, mux y entrega | pendiente |
+
+### Estado pieza a pieza
+
+| Pieza | Duracion ql | Estado |
+|---|---|---|
+| 00 intro | 10.70 s | validada |
+| 01 el reloj que no para | 30.33 s | validada (MOLDE) |
+| 02 dos nucleos | — | en produccion |
+| 03 lo que cabe en 520 KB | — | en produccion |
+| 04 un ciclo son metro y cuarto | — | en produccion |
+| 05 un pin es un bit | — | en produccion |
+| 06 voltajes que no existen | — | en produccion |
+| 07-14 | — | esqueleto |
+| 15 cierre | 9.80 s | validada |
 
 ## 5. Cosecha de trampas
 
-(se llena durante la produccion)
+Las de la casa siguen valiendo todas (`references/trampas.md`). Estas son las
+de ESTE estilo y esta libreria, medidas, no supuestas:
+
+- **El carril es la garantia, no la disciplina.** En los cursos anteriores
+  "que nada se encime" era una regla que el autor tenia que recordar en cada
+  `play`. Aqui hay CUATRO sitios y cada uno admite un ocupante: meter algo en
+  un carril ocupado apaga primero lo que habia. Un subagente no puede
+  encimar dos dibujos aunque quiera.
+- **La cifra grande no cabe.** Medido en el contenedor a 1080x1920 con Space
+  Mono BOLD: a cuerpo 128 cada caracter gasta **1.061 unidades** y la zona
+  segura son 5.76 -> **5 caracteres**. "7 200 000 000" mide 14.10 y el
+  guardian aborto el render. Por eso `cifra()` baja por una escala cerrada
+  (128/112/96/80/72/64/56 = 5/6/7/8/9/10/12 caracteres) en vez de escalar el
+  mobject: escalar rompe el paso monoespaciado entre estados de un contador.
+  Editorialmente la leccion es otra: **el numero de un reel se escribe corto**
+  (7 200 y la etiqueta "millones", no 7 200 000 000).
+- **El espacio de una monoespaciada es un abismo**: "7 200" se leia como dos
+  numeros distintos. Los grupos de miles van en Text sueltos separados a
+  mano (`HUECO_MILES = 0.34` anchos de caracter).
+- **La 'y' de "academy" descolgaba el wordmark entero.** Alinear los dos
+  tokens por el borde INFERIOR sube la palabra con descendente media equis.
+  Se alinean por el SUPERIOR, que es donde las dos tienen la 'd' ascendente.
+- **Las unidades no sobreviven a las versalitas.** La etiqueta va en
+  mayusculas, y "MHz" sale "MHZ", "ms" sale "MS" y "mV" sale "MV" (que es
+  otra unidad). Se escriben con todas sus letras: "megahercios",
+  "milisegundos", "milivoltios". Ademas queda mejor debajo de un numero
+  grande.
+- **Medir el transitorio no es medir.** La primera version del PWM daba
+  0.74 V de media en vez de 1.65 y 372 mV de rizado en vez de 16.5: con
+  tau = 10 ms y una ventana de 8 ms, el condensador todavia se estaba
+  cargando. `pwm_filtrado` simula 8 constantes de tiempo que NO se dibujan y
+  devuelve el indice donde empieza la ventana visible; se dibuja y se mide de
+  ahi en adelante.
+- **La SNR de un cuantizador sale 2 dB de mas con un numero entero de
+  periodos**: las muestras caen siempre en los mismos puntos de la onda y el
+  error de cuantizacion queda correlacionado. `snr_medido` usa 101.0
+  periodos a proposito.
+- **Un dibujo que no llena su franja se ve como un error**, no como
+  minimalismo: la cifra queda lejisimos y la composicion se parte en dos.
+  Regla para los clips: el dibujo ocupa al menos el 60 % del alto de la
+  banda (`lz.alto_banda()`, 5.59 unidades).
+- **`barra_apilada` aborta si dos rotulos se encimarian.** En el primer
+  render "DIFS" y "BACKOFF" salieron pegados leyendose "DIFBACKOFF", y en el
+  frame de revision parecia una palabra rara, no un fallo. En este estilo se
+  rotula uno o dos tramos, no todos.
+- **El fundido final se lleva TAMBIEN la capa fija** (numero y marca). No es
+  descuido: es lo que hace que toda pieza empiece y termine en el mismo azul
+  exacto y la costura del montaje valga cero.

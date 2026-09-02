@@ -3,18 +3,70 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Marca de apertura del curso: el titulo nace del propio chip.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 10.7,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.6  nace el punto ambar: lo primero que existe",
+    "1.3  el punto se coloca y a su lado aparecen co y de",
+    "2.8  academy entra letra a letra",
+    "4.5  la marca se encoge y sube",
+    "5.4  ESP32",
+    "6.2  la bajada y el filete",
+    "9.1  fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
     "secciones": []
   },
   "audio": {
-    "pico_db": -4.0,
+    "pico_db": -4.5,
     "pico_db_con_voz": -17.0,
-    "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_in": 0.35,
+    "fade_out": [
+      9.95,
+      10.65
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.45,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.6,
+        -14
+      ],
+      [
+        "nebulosa_intro",
+        1.55,
+        -15
+      ],
+      [
+        "blip_medio",
+        1.7,
+        -13
+      ],
+      [
+        "blip_agudo",
+        2.85,
+        -15
+      ],
+      [
+        "aire",
+        4.55,
+        -16
+      ],
+      [
+        "subrayado",
+        5.45,
+        -11
+      ],
+      [
+        "blip_hud",
+        6.25,
+        -16
+      ]
+    ]
   }
 }
