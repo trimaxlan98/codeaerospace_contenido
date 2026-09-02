@@ -225,6 +225,15 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
     font = font or FUENTE_NUM
     if mayusculas:
         cadena = cadena.upper()
+    # Cada glifo se construye JUNTO A UNA "H" y se alinea por la linea de
+    # base de esa H. Sin esto, `move_to` centra cada caracter por su propia
+    # caja y la puntuacion se va a media altura: "0.5" salia "0·5" (leido
+    # como dos numeros), la coma de una enumeracion flotaba, y un guion
+    # quedaba mas alto de lo que le toca. Con mayusculas solas no se nota
+    # porque todas miden igual — por eso el defecto sobrevivio un curso
+    # entero.
+    referencia = _texto("H", font, font_size, color)
+    base = referencia.get_bottom()[1]
     paso = None
     grupo = Rotulo()
     x = 0.0
@@ -234,10 +243,14 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
                 paso = _texto("M", font, font_size, color).width
             x += paso * (1.0 + tracking)
             continue
-        g = _texto(ch, font, font_size, color)
+        par = _texto("H" + ch, font, font_size, color)
+        if len(par) < 2:            # el caracter no pinta nada
+            continue
+        h, g = par[0], par[1]
+        alto_sobre_base = g.get_center()[1] - h.get_bottom()[1]
         if paso is None:
             paso = g.width
-        g.move_to(RIGHT * x)
+        g.move_to([x, base + alto_sobre_base, 0])
         g._en_rotulo = True
         grupo.add(g)
         x += paso * (1.0 + tracking)
