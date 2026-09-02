@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El bucle que pregunta contra la interrupcion que avisa. Cuatrocientos sucesos simulados: el sondeo llega tarde hasta un periodo entero, la ISR en microsegundos.",
-  "duracion_objetivo": 38.33,
+  "duracion_objetivo": 38.3,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  se dibuja el tren del bucle: una vuelta cada 10 ms",
@@ -51,8 +51,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      37.58,
-      38.28
+      37.55,
+      38.25
     ],
     "eventos": [
       [

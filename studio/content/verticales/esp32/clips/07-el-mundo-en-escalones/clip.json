@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La rampa continua que se convierte en escalera de 4096 peldaños. El escalon son 0.81 mV, el error RMS medido sobre la propia rampa dibujada es 0.23 mV (q/raiz(12) da 0.2326) y la SNR sale de cuantizar una senoide a fondo de escala y medirla: 73.8 dB. La escalera se dibuja con 4 bits porque a 12 el peldaño mide 0.12 px en el 1080x1920 —es literalmente la rampa—, y la exageracion se declara en pantalla con un rotulo gris.",
-  "duracion_objetivo": 36.53,
+  "duracion_objetivo": 36.5,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  se dibujan el eje y la rampa continua, en tinta",
@@ -47,8 +47,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      35.78,
-      36.48
+      35.75,
+      36.45
     ],
     "eventos": [
       [

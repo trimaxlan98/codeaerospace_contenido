@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El registro de salida de 32 bits y los pines que obedecen. Cuatro mil millones de estados posibles, y un flanco que tarda nanosegundos en subir contra la capacidad del cable.",
-  "duracion_objetivo": 36.17,
+  "duracion_objetivo": 36.15,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  el registro de 32 bits aparece, unos pocos en ambar",
@@ -43,8 +43,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      35.42,
-      36.12
+      35.4,
+      36.1
     ],
     "eventos": [
       [

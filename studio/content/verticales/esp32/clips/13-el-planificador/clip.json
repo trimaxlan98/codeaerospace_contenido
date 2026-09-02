@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una tarea periodica sobre un nucleo con un acaparador al lado. El jitter medido sobre los mismos 12 despertares que se dibujan se dispara de 6.9 microsegundos a 0.95 milisegundos; anclarla al otro nucleo (el caso sin acaparador, que es lo que la libreria modela) lo devuelve abajo.",
-  "duracion_objetivo": 35.57,
+  "duracion_objetivo": 35.55,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  se dibuja el cronograma: NUCLEO 0 con doce despertares regulares y, debajo, el renglon RETRASO vacio",
@@ -46,8 +46,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      34.82,
-      35.52
+      34.8,
+      35.5
     ],
     "eventos": [
       [

@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "BLE anuncia en tres canales y se calla. Un evento dura milisegundos cada cien: el ciclo de trabajo y la corriente media salen de integrar, no de promediar.",
-  "duracion_objetivo": 35.17,
+  "duracion_objetivo": 35.15,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7   arrancan los tres paquetes del anuncio BLE, uno por canal",
@@ -45,16 +45,51 @@
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [34.42, 35.12],
+    "fade_out": [
+      34.4,
+      35.1
+    ],
     "eventos": [
-      ["aire", 0.6, -16],
-      ["blip_hud", 1.9, -16],
-      ["barrido", 7.3, -14],
-      ["blip_medio", 10.05, -16],
-      ["tick", 15.05, -15],
-      ["blip_grave", 20.45, -15],
-      ["sting", 23.2, -12],
-      ["pulso", 29.4, -13]
+      [
+        "aire",
+        0.6,
+        -16
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -16
+      ],
+      [
+        "barrido",
+        7.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        10.05,
+        -16
+      ],
+      [
+        "tick",
+        15.05,
+        -15
+      ],
+      [
+        "blip_grave",
+        20.45,
+        -15
+      ],
+      [
+        "sting",
+        23.2,
+        -12
+      ],
+      [
+        "pulso",
+        29.4,
+        -13
+      ]
     ]
   },
   "modulo": "M3 · La radio"

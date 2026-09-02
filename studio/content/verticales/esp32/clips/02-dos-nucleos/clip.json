@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Doce tareas y dos Xtensa. El reparto greedy LPT se dibuja a escala de tiempo real: el makespan se ve, no se rotula aparte, y la aceleracion sale de dividir la suma entre el makespan.",
-  "duracion_objetivo": 31.23,
+  "duracion_objetivo": 31.25,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  las doce tareas se dibujan en una fila, con hueco entre barras (un nucleo)",
@@ -43,16 +43,40 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      30.48,
-      31.18
+      30.5,
+      31.2
     ],
     "eventos": [
-      ["aire", 0.6, -16],
-      ["blip_grave", 0.9, -14],
-      ["blip_hud", 2.1, -16],
-      ["barrido", 8.7, -14],
-      ["sting", 16.3, -12],
-      ["tick", 23.7, -17]
+      [
+        "aire",
+        0.6,
+        -16
+      ],
+      [
+        "blip_grave",
+        0.9,
+        -14
+      ],
+      [
+        "blip_hud",
+        2.1,
+        -16
+      ],
+      [
+        "barrido",
+        8.7,
+        -14
+      ],
+      [
+        "sting",
+        16.3,
+        -12
+      ],
+      [
+        "tick",
+        23.7,
+        -17
+      ]
     ]
   },
   "modulo": "M1 · El silicio"

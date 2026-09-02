@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El chip solo sabe poner 0 o 3.3 V. Con PWM y un filtro RC fabrica cualquier voltaje intermedio: media y rizado medidos sobre la ventana dibujada, ya en régimen.",
-  "duracion_objetivo": 37.8,
+  "duracion_objetivo": 37.75,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  azul limpio; entran el 06 y la marca",
@@ -49,15 +49,46 @@
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": [37.05, 37.75],
+    "fade_out": [
+      37.0,
+      37.7
+    ],
     "eventos": [
-      ["aire", 0.5, -16],
-      ["barrido", 0.75, -15],
-      ["pulso", 8.95, -13],
-      ["blip_medio", 15.9, -14],
-      ["blip_grave", 22.85, -14],
-      ["sting", 29.8, -11],
-      ["subrayado", 31.75, -14]
+      [
+        "aire",
+        0.5,
+        -16
+      ],
+      [
+        "barrido",
+        0.75,
+        -15
+      ],
+      [
+        "pulso",
+        8.95,
+        -13
+      ],
+      [
+        "blip_medio",
+        15.9,
+        -14
+      ],
+      [
+        "blip_grave",
+        22.85,
+        -14
+      ],
+      [
+        "sting",
+        29.8,
+        -11
+      ],
+      [
+        "subrayado",
+        31.75,
+        -14
+      ]
     ]
   },
   "modulo": "M2 · Tocar el mundo"

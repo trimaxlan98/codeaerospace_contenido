@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El cristal de 40 MHz, el PLL que multiplica por seis y el periodo de 4.17 ns. En ese tiempo la luz recorre 1.25 m: el tamaño fisico de un ciclo de reloj.",
-  "duracion_objetivo": 34.3,
+  "duracion_objetivo": 34.27,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.0  azul limpio; entran el 04 del modulo y la marca",
@@ -45,8 +45,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      33.55,
-      34.25
+      33.52,
+      34.22
     ],
     "eventos": [
       [

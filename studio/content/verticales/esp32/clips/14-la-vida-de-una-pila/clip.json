@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Los cuatro estados de consumo en decadas y la integral que decide todo. Despertar dos segundos cada hora da años de vida, hasta que el limite deja de ser el chip y pasa a ser la pila.",
-  "duracion_objetivo": 41.0,
+  "duracion_objetivo": 40.95,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  la escalera de consumo en decadas: dormir, ligero, pensar, hablar",
@@ -47,8 +47,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      40.25,
-      40.95
+      40.2,
+      40.9
     ],
     "eventos": [
       [

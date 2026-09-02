@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La onda de 2.437 GHz medida en centimetros y la antena impresa que la caza. En FR4 la onda va mas despacio, y por eso el meandro cabe en una placa de dos centimetros.",
-  "duracion_objetivo": 32.3,
+  "duracion_objetivo": 32.28,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  la onda de 2.437 GHz se dibuja sola, llenando la franja",
@@ -42,8 +42,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      31.55,
-      32.25
+      31.53,
+      32.23
     ],
     "eventos": [
       [

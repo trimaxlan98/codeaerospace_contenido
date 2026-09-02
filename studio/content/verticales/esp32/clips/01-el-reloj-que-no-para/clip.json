@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El gancho y el molde del formato: mientras miras el reel, el chip ejecuta ciclos. El contador corre a 240 MHz escalado y remata con los millones de ciclos que han pasado durante el propio clip.",
-  "duracion_objetivo": 30.33,
+  "duracion_objetivo": 30.3,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  el encapsulado se dibuja solo",
@@ -44,8 +44,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      29.58,
-      30.28
+      29.55,
+      30.25
     ],
     "eventos": [
       [

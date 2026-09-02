@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La SRAM interna como un contenedor vertical de contorno donde caen, una a una y contables, las piezas de trazo ambar de lo unico que de verdad la llena: imagenes. Un fotograma de 240x240 en RGB565 son 112.5 KB, y en 520 KB caben cuatro y no un quinto.",
-  "duracion_objetivo": 30.93,
+  "duracion_objetivo": 30.95,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  el contenedor vacio se dibuja (contorno, sin relleno)",
@@ -41,8 +41,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      30.18,
-      30.88
+      30.2,
+      30.9
     ],
     "eventos": [
       [

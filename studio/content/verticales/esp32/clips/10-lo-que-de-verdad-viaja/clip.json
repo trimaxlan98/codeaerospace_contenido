@@ -3,7 +3,7 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Anatomia de una trama Wi-Fi a escala de microsegundos: espera, preambulo, datos, ACK. De los 65 Mbps nominales, la mitad del aire son cabeceras y silencio.",
-  "duracion_objetivo": 36.56,
+  "duracion_objetivo": 36.5,
   "cola_silencio": 0.8,
   "guion_visual": [
     "0.7  la senoide: el aire de 2.4 gigahercios",
@@ -48,8 +48,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
     "fade_out": [
-      35.81,
-      36.51
+      35.75,
+      36.45
     ],
     "eventos": [
       [
