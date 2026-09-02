@@ -416,6 +416,20 @@ def guias():
 
 
 # --- Los carriles -----------------------------------------------------
+class _Igual:
+    """Centinela: "este carril se queda como esta".
+
+    Hace falta porque `None` ya significa algo distinto en `relevo()`:
+    vaciar el carril. Sin el centinela no habria forma de decir "cambia el
+    dibujo y deja la cifra donde estaba"."""
+
+    def __repr__(self):
+        return "IGUAL"
+
+
+IGUAL = _Igual()
+
+
 class Lienzo:
     """El estado de la pantalla. Un carril, un ocupante.
 
@@ -570,6 +584,46 @@ class Lienzo:
         encajar(mob, margen=margen, anclaje=anclaje)
         return self.poner("escena", mob, t=t, salida=salida,
                           animacion=animacion)
+
+    def relevo(self, escena=IGUAL, dato=IGUAL, t=0.8, salida=0.45,
+               animacion=None, anclaje="abajo"):
+        """Cambia dibujo y cifra A LA VEZ, en un solo movimiento.
+
+        Los tres primeros clips del curso tropezaron con lo mismo: relevar
+        primero el dibujo y despues la cifra deja uno o dos segundos con el
+        dibujo nuevo y el numero viejo debajo. Nadie lo nota en el frame de
+        validacion y sin embargo es una mentira — la cifra esta hablando de
+        algo que ya no esta en pantalla.
+
+        Un argumento que no se pasa deja su carril COMO ESTA; pasar `None`
+        lo VACIA (un hueco sin cifra es un estado valido del lienzo; una
+        cifra que no corresponde, no). `dato` admite el mobject ya hecho o
+        la tupla de argumentos de `dato()`."""
+        if dato is not IGUAL and isinstance(dato, (tuple, list)):
+            dato = globals()["dato"](*dato)
+        cambios = [("escena", escena), ("dato", dato)]
+        salidas, entradas = [], []
+        for carril, pieza in cambios:
+            if pieza is IGUAL:
+                continue
+            viejo = self.ocupantes.get(carril)
+            if viejo is not None:
+                salidas.append(FadeOut(viejo, run_time=salida))
+            self.ocupantes[carril] = None
+            if pieza is None:
+                continue
+            if carril == "escena":
+                encajar(pieza, anclaje=anclaje)
+                entradas.append(animacion if animacion is not None
+                                else FadeIn(pieza, run_time=t))
+            else:
+                entradas.append(FadeIn(pieza, run_time=t))
+            self.ocupantes[carril] = pieza
+        if salidas:
+            self.e.play(*salidas)
+        if entradas:
+            self.e.play(*entradas)
+        return escena, dato
 
     # --- cierre -------------------------------------------------------
     def fundido(self, t=0.9):

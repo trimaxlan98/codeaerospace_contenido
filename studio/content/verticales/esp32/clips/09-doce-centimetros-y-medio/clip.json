@@ -3,19 +3,53 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La onda de 2.437 GHz medida en centimetros y la antena impresa que la caza. En FR4 la onda va mas despacio, y por eso el meandro cabe en una placa de dos centimetros.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 32.30,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  la onda de 2.437 GHz se dibuja sola, llenando la franja",
+    "3.1  2.437, gigahercios del canal (hoja publica, etiqueta gris)",
+    "8.2  se marca una longitud de onda, de cresta a cresta",
+    "10.3 12.3, centimetros de onda (calculado)",
+    "15.1 el mismo trazo se encoge al cuarto de onda",
+    "17.2 3.08, centimetros de antena (calculado)",
+    "22.7 aparece la placa con el meandro en su esquina",
+    "24.9 1.91, centimetros dentro del sustrato (calculado)",
+    "31.1 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.0,
+        "texto": "La radio del chip habla en centímetros."
+      },
+      {
+        "t_inicio": 8.5,
+        "texto": "De cresta a cresta."
+      },
+      {
+        "t_inicio": 15.4,
+        "texto": "La antena quiere un cuarto de eso."
+      },
+      {
+        "t_inicio": 23.0,
+        "texto": "Pero dentro del sustrato, la onda se acorta."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [31.55, 32.25],
+    "eventos": [
+      ["aire_largo", 0.7, -16],
+      ["blip_hud", 3.1, -15],
+      ["blip_grave", 8.15, -14],
+      ["tick", 15.1, -14],
+      ["blip_medio", 22.7, -14],
+      ["sting", 24.9, -12]
+    ]
   },
   "modulo": "M3 · La radio"
 }

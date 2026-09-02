@@ -4,24 +4,31 @@
 # los 3.3 V en 4096 peldaños: todo lo que cae entre dos peldaños se pierde,
 # y esa perdida tiene un tamaño exacto.
 #
-# LA EXAGERACION, declarada en pantalla: la escalera se dibuja a 5 bits, no
+# LA EXAGERACION, declarada en pantalla: la escalera se dibuja a 4 bits, no
 # a 12. Esta medido — a 12 bits el peldaño vale 3.3/4096 = 0.81 mV, que
 # sobre la caja de 3.6 unidades son 0.00088 unidades, o sea 0.12 px en el
-# 1080x1920 final: la escalera de 12 bits ES la curva, pixel a pixel, y
-# dibujarla seria enseñar una recta y llamarla escalera. A 5 bits el
-# peldaño mide 0.1125 unidades (15 px) y se ve. Por eso el dibujo lleva
-# SIEMPRE el rotulo gris "5 BITS PARA VERLO" — en los tres estados en los
+# 1080x1920 final: la escalera de 12 bits ES la rampa, pixel a pixel, y
+# dibujarla seria enseñar una recta y llamarla escalera. A 4 bits el
+# peldaño mide 0.225 unidades (30 px) y se ve. Por eso el dibujo lleva
+# SIEMPRE el rotulo gris "4 BITS PARA VERLO" — en los tres estados en los
 # que aparece.
+#
+# Y la señal es una RAMPA, no una senoide. Tambien medido: con una senoide
+# de dos periodos a 5 bits, el error cruza 112 veces el escalon en 5
+# unidades de ancho (un diente cada 3 px en el ql) y el diente de sierra
+# sale como una MASA ambar solida — justo lo que este estilo prohibe. La
+# rampa da 15 dientes iguales, uno cada 0.33 unidades, y ademas convierte
+# el dibujo en la escalera literal del titulo.
 #
 # Las CIFRAS son todas de 12 bits y todas medidas sobre la MISMA ventana
 # que se dibuja: `error_cuantizacion(x)` devuelve el RMS y el escalon de
-# esta senoide, y `snr_medido` cuantiza su propia senoide a fondo de
+# esta rampa, y `snr_medido` cuantiza su propia senoide a fondo de
 # escala. Lo unico que viene de la hoja de datos son los 3.3 V (etiqueta
 # gris); todo lo demas es ambar.
 class Clip(Pieza):
     NUMERO = 7
 
-    BITS_DIBUJO = 5          # solo para el dibujo, y se dice en pantalla
+    BITS_DIBUJO = 4          # solo para el dibujo, y se dice en pantalla
     ANCHO_C = 5.0
     ALTO_C = 3.6
     ALTO_E = 3.1             # la caja del error, un punto mas baja
@@ -29,9 +36,9 @@ class Clip(Pieza):
     # --- piezas del dibujo --------------------------------------------
     def _aviso(self, alto):
         """El rotulo gris que declara la exageracion. Sin el, el clip
-        miente: lo que se ve son 32 peldaños y lo que se rotula, 4096."""
+        miente: lo que se ve son 16 peldaños y lo que se rotula, 4096."""
         r = rot(f"{self.BITS_DIBUJO} bits para verlo")
-        r.move_to([0, alto / 2 + 0.34, 0])
+        r.move_to([0, alto / 2 + 0.44, 0])
         return r
 
     def _curva(self, t, x, vref, color):
@@ -60,7 +67,11 @@ class Clip(Pieza):
         ln, punto = chip.traza(t, x - y, ancho=self.ANCHO_C,
                                alto=self.ALTO_E, color=AMBAR,
                                rango_y=(-q5 / 2, q5 / 2))
-        cero = chip.nivel(0.0, punto, ancho=self.ANCHO_C, color=LINEA)
+        # El cero va en APAGADO, no en LINEA: LINEA (#1B3253) esta a un
+        # paso del fondo y bajo el diente de sierra no se ve ni en el qh.
+        # Aqui la horizontal no es mobiliario, dice que el error tiene
+        # signo y que vive centrado en cero.
+        cero = chip.nivel(0.0, punto, ancho=self.ANCHO_C, color=APAGADO)
         return VGroup(cero, ln, self._aviso(self.ALTO_E))
 
     # --- la pieza ------------------------------------------------------
@@ -69,12 +80,18 @@ class Clip(Pieza):
         vref = chip.HOJA["vdd"]
         bits = chip.HOJA["adc_bits"]
 
-        # La señal del mundo: una senoide que casi recorre el fondo de
-        # escala (0.198 a 3.102 V) pero no lo toca. A proposito: pegada a
-        # los topes, el cuantizador recorta y el error dejaria de ser solo
-        # de redondeo — la cifra de abajo hablaria de otra cosa.
-        t = np.linspace(0.0, 2.0, 1200)
-        x = 0.5 * vref + 0.44 * vref * np.sin(2 * np.pi * t)
+        # La señal del mundo: una rampa que sube por casi todo el fondo de
+        # escala. Empieza y acaba EN una frontera del cuantizador del
+        # dibujo (la libreria da el escalon; los extremos salen de el), asi
+        # que los 15 dientes del error son enteros e iguales y ninguno sale
+        # cortado por el borde de la caja. Sin llegar a los topes: pegada a
+        # ellos el cuantizador recorta y el error dejaria de ser solo de
+        # redondeo — la cifra de abajo hablaria de otra cosa.
+        _, q_dib = chip.cuantizar(np.zeros(1), bits=self.BITS_DIBUJO,
+                                  vref=vref)
+        dientes = int((vref - q_dib) // q_dib)          # 15
+        t = np.linspace(0.0, 1.0, 2000)
+        x = np.linspace(q_dib / 2, q_dib / 2 + dientes * q_dib, 2000)
 
         # Las tres cifras calculadas, TODAS a 12 bits y sobre esta ventana.
         rms, q = chip.error_cuantizacion(x)      # bits=12 por defecto
