@@ -1,65 +1,86 @@
-# 00 · Intro — la marca, en el idioma del lienzo.
+# 00 · Intro — la marca de la casa, sobre el lienzo.
 #
-# Las intros de los tres verticales anteriores son de consola: reticula que
-# se enciende con un escaneo, escuadras HUD, wordmark que se ensambla. Esa
-# intro delante de este curso mentiria sobre lo que viene despues.
+# La primera version construia el wordmark en MINUSCULAS y con un `Dot`
+# redondo entre las dos silabas. Salia "co·de": un punto flotando a media
+# altura, que se lee como un separador y no como la marca. El wordmark de
+# la casa es "CO.DE" en MAYUSCULAS con un PUNTO TIPOGRAFICO, y un punto se
+# apoya en la linea de base — de ahi que el anterior se viera chueco.
 #
-# Aqui la apertura es una sola idea: el punto ambar de la marca es lo
-# primero que existe, y de el nace todo lo demas. Nada de rejillas, nada de
-# barridos. Empieza y termina en azul limpio.
+# Aqui se usa la misma construccion que
+# `studio/content/cursos/marca-intro-y-cierre/style_block.py::wordmark()`:
+# CO y DE en tinta, el punto en ambar, los tres alineados por el borde
+# INFERIOR (las mayusculas y el punto comparten linea de base, asi que
+# igualar los bordes de abajo ES alinearlos tipograficamente).
+#
+# La coreografia tambien es la de la marca: CO y DE se ensamblan, el punto
+# llega al final como un cursor y parpadea dos veces, ACADEMY entra con
+# tracking amplio y un subrayado remata. Lo que NO viene es la reticula HUD
+# ni las escuadras de esquina: son la identidad de CONSOLA y aqui
+# contradirian el estilo. El fondo liso hace ese trabajo.
 class Clip(Scene):
 
     def construct(self):
-        punto = Dot([0, 0.8, 0], radius=0.075, color=AMBAR)
+        Y_MARCA = 1.05
 
-        co = lz.titulo_display("co", font_size=92)
-        de = lz.titulo_display("de", font_size=92)
-        aca = lz.espaciado("academy", font_size=34, color=APAGADO,
-                           tracking=0.42)
-        # El wordmark se aprieta contra el punto MIDIENDO, no a ojo: en
-        # el primer render "co . de" salio con medio centimetro de aire a
-        # cada lado y se leia como tres palabras sueltas.
-        sep = punto.width / 2 + 0.15
-        marca = VGroup(co, de)
-        co.move_to([0, 0.8, 0]).shift(LEFT * (sep + co.width / 2))
-        de.move_to([0, 0.8, 0]).shift(RIGHT * (sep + de.width / 2))
-        aca.next_to(marca, DOWN, buff=0.42)
+        # --- el wordmark, construido como manda la marca ---------------
+        co = Text("CO", font=lz.FUENTE_DISPLAY, weight="SEMIBOLD",
+                  font_size=104, color=TINTA)
+        punto = Text(".", font=lz.FUENTE_DISPLAY, weight="BOLD",
+                     font_size=104, color=AMBAR)
+        de = Text("DE", font=lz.FUENTE_DISPLAY, weight="SEMIBOLD",
+                  font_size=104, color=TINTA)
+        marca = VGroup(co, punto, de).arrange(buff=0.10, aligned_edge=DOWN)
+        marca.move_to([0, Y_MARCA, 0])
         lz.cabe(marca, "wordmark")
-        lz.cabe(aca, "academy")
 
+        academy = Text("A C A D E M Y", font=lz.FUENTE_DISPLAY,
+                       weight="MEDIUM", font_size=34, color=APAGADO)
+        academy.next_to(marca, DOWN, buff=0.42)
+        lz.cabe(academy, "academy")
+
+        raya = Line(marca.get_corner(DL), marca.get_corner(DR),
+                    stroke_width=4.0, color=AMBAR)
+        raya.shift(DOWN * 0.26)
+
+        # --- el curso --------------------------------------------------
         titulo = lz.titulo_display("ESP32", font_size=112)
         bajada = lz.espaciado("el chip por dentro", font_size=30,
                               color=AMBAR, tracking=0.34)
-        titulo.move_to([0, -0.55, 0])
+        titulo.move_to([0, -1.35, 0])
         bajada.next_to(titulo, DOWN, buff=0.42)
         lz.cabe(titulo, "titulo del curso")
 
-        filete = lz.filete(ancho=1.1, color=AMBAR, grosor=3.0)
-        filete.next_to(bajada, DOWN, buff=0.52)
-
-        # --- 1. primero existe el punto -------------------------------
+        # --- 1. CO y DE se ensamblan -----------------------------------
         self.wait(0.6)
-        self.play(GrowFromCenter(punto), run_time=0.7)
-        self.wait(0.5)
-
-        # --- 2. y de el nace el nombre --------------------------------
-        self.play(punto.animate.move_to([0, 0.8, 0]),
-                  FadeIn(co, shift=RIGHT * 0.55),
-                  FadeIn(de, shift=LEFT * 0.55),
+        self.play(FadeIn(co, shift=RIGHT * 0.60),
+                  FadeIn(de, shift=LEFT * 0.60),
                   run_time=1.1, rate_func=smooth)
-        self.play(FadeIn(aca, lag_ratio=0.10, shift=UP * 0.12), run_time=0.9)
+
+        # --- 2. el punto llega el ultimo, y parpadea como un cursor ----
+        self.play(FadeIn(punto, shift=DOWN * 0.40), run_time=0.5,
+                  rate_func=rate_functions.ease_out_cubic)
+        for _ in range(2):
+            punto.set_opacity(0.0)
+            self.wait(0.17)
+            punto.set_opacity(1.0)
+            self.wait(0.16)
+        self.wait(0.2)
+
+        # --- 3. ACADEMY y el subrayado ---------------------------------
+        self.play(FadeIn(academy, lag_ratio=0.08, shift=UP * 0.12),
+                  run_time=0.9)
+        self.play(Create(raya), run_time=0.6)
         self.wait(0.7)
 
-        # --- 3. la marca se aparta y entra el curso -------------------
-        bloque = VGroup(punto, co, de, aca)
-        self.play(bloque.animate.scale(0.42).move_to([0, 2.55, 0]),
+        # --- 4. la marca se aparta y entra el curso --------------------
+        bloque = VGroup(marca, academy, raya)
+        self.play(bloque.animate.scale(0.46).move_to([0, 2.75, 0]),
                   run_time=1.0, rate_func=smooth)
         self.play(FadeIn(titulo, shift=UP * 0.22), run_time=0.9)
-        self.play(FadeIn(bajada, lag_ratio=0.06), Create(filete),
-                  run_time=0.8)
-        self.wait(2.0)
+        self.play(FadeIn(bajada, lag_ratio=0.06), run_time=0.7)
+        self.wait(1.9)
 
-        # --- 4. de vuelta al azul limpio ------------------------------
+        # --- 5. de vuelta al azul limpio -------------------------------
         self.play(*[FadeOut(m) for m in self.mobjects], run_time=1.0)
         self.remove(*self.mobjects)
         self.wait(0.5)

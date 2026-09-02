@@ -2,17 +2,19 @@
   "name": "Intro",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Marca de apertura del curso: el titulo nace del propio chip.",
-  "duracion_objetivo": 10.7,
+  "description": "Apertura de marca sobre el lienzo. El wordmark es el canonico de la casa: CO.DE en mayusculas con el punto tipografico en ambar alineado por la linea de base. CO y DE se ensamblan, el punto llega el ultimo como un cursor y parpadea dos veces, ACADEMY entra con tracking amplio y un subrayado ambar remata; entonces la marca se aparta y entra el titulo del curso. Sin reticula ni escuadras HUD: esas son la identidad de CONSOLA y aqui contradirian el estilo.",
+  "duracion_objetivo": 11.23,
   "cola_silencio": 0.8,
   "guion_visual": [
-    "0.6  nace el punto ambar: lo primero que existe",
-    "1.3  el punto se coloca y a su lado aparecen co y de",
-    "2.8  academy entra letra a letra",
-    "4.5  la marca se encoge y sube",
-    "5.4  ESP32",
-    "6.2  la bajada y el filete",
-    "9.1  fundido a azul limpio"
+    "0.6  CO y DE se ensamblan desde los lados",
+    "1.7  llega el punto ambar",
+    "2.2  el punto parpadea dos veces, como un cursor",
+    "3.1  ACADEMY con tracking amplio",
+    "4.0  el subrayado ambar",
+    "5.3  la marca se encoge y sube",
+    "6.3  ESP32",
+    "7.2  la bajada: el chip por dentro",
+    "9.8  fundido a azul limpio"
   ],
   "voz": {
     "voz": "Charon",
@@ -23,48 +25,58 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.35,
     "fade_out": [
-      9.95,
-      10.65
+      10.48,
+      11.18
     ],
     "eventos": [
       [
         "aire_largo",
-        0.45,
+        0.55,
         -17
       ],
       [
-        "blip_grave",
-        0.6,
+        "blip_medio",
+        0.68,
         -14
       ],
       [
-        "nebulosa_intro",
-        1.55,
-        -15
-      ],
-      [
-        "blip_medio",
-        1.7,
+        "blip_grave",
+        1.75,
         -13
       ],
       [
+        "tick",
+        2.3,
+        -12
+      ],
+      [
+        "tick",
+        2.63,
+        -12
+      ],
+      [
         "blip_agudo",
-        2.85,
+        3.1,
         -15
       ],
       [
+        "subrayado",
+        4.0,
+        -13
+      ],
+      [
         "aire",
-        4.55,
+        5.3,
         -16
       ],
       [
-        "subrayado",
-        5.45,
+        "sting",
+        6.3,
         -11
       ],
       [
         "blip_hud",
-        6.25,
+        7.2,
         -16
       ]
     ]

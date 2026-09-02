@@ -2,15 +2,16 @@
   "name": "Cierre",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Cierre de marca: el chip vuelve a cerrarse.",
-  "duracion_objetivo": 9.8,
+  "description": "Cierre de marca sobre el lienzo. El encapsulado se recoge hasta ser un punto, y ese punto ES el punto tipografico de CO.DE: a su lado se ensamblan las dos silabas, entra ACADEMY con su subrayado y el punto parpadea dos veces como cursor, que es la firma del canal.",
+  "duracion_objetivo": 10.62,
   "cola_silencio": 0.8,
   "guion_visual": [
-    "0.5  el encapsulado vuelve a dibujarse",
-    "3.0  se recoge hasta ser otra vez el punto ambar",
-    "4.6  el punto baja y se convierte en la marca",
-    "5.7  academy",
-    "8.3  fundido a azul limpio"
+    "0.5  el encapsulado se dibuja solo",
+    "3.0  se recoge hasta ser un punto ambar",
+    "4.7  CO y DE se ensamblan alrededor del punto",
+    "5.7  ACADEMY y el subrayado",
+    "7.4  el punto parpadea dos veces",
+    "9.2  fundido a azul limpio"
   ],
   "voz": {
     "voz": "Charon",
@@ -21,8 +22,8 @@
     "pico_db_con_voz": -17.0,
     "fade_in": 0.35,
     "fade_out": [
-      9.05,
-      9.75
+      9.87,
+      10.57
     ],
     "eventos": [
       [
@@ -32,12 +33,7 @@
       ],
       [
         "blip_grave",
-        0.65,
-        -15
-      ],
-      [
-        "tick",
-        2.3,
+        0.62,
         -15
       ],
       [
@@ -47,13 +43,23 @@
       ],
       [
         "blip_medio",
-        4.7,
+        4.72,
         -14
       ],
       [
         "subrayado",
-        5.75,
-        -14
+        5.72,
+        -13
+      ],
+      [
+        "tick",
+        7.4,
+        -12
+      ],
+      [
+        "tick",
+        7.75,
+        -12
       ]
     ]
   }

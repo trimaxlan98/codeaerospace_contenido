@@ -139,7 +139,7 @@ cuanto gasta.
 ## Entrega (2026-09-02)
 
 - `exports/verticales/esp32/esp32_vertical.mp4` — 1080x1920 @60,
-  **507.44 s = 8 min 27 s**, 16 piezas, 18.2 MB, pico **-4.0 dB**.
+  **508.79 s = 8 min 29 s**, 16 piezas, pico **-4.0 dB**.
 - `exports/verticales/esp32/piezas/*.mp4` — **las 16 piezas sueltas
   sonorizadas**. ESAS son el producto para Instagram; el montaje es el extra.
 - Costuras entre las quince uniones: **0.0000/255, exacto**. Es lo mejor de
@@ -278,6 +278,16 @@ de ESTE estilo y esta libreria, medidas, no supuestas:
   avisar. Lo cazo el productor del clip 07 midiendo, no mirando. La leccion
   general: **un guardian que nunca ha abortado no esta demostrado que
   funcione** — hay que probarlo con un caso que TIENE que fallar.
+- **El wordmark de la marca no se improvisa.** La primera intro construia
+  "co.de" en MINUSCULAS y con un `Dot` redondo entre las dos silabas: salia
+  "co·de", un punto flotando a media altura que se lee como un separador.
+  El wordmark de la casa es "CO.DE" en mayusculas con un PUNTO TIPOGRAFICO,
+  y un punto se apoya en la LINEA DE BASE — por eso el circulo centrado se
+  veia chueco. Lo canto el dueño a la primera pasada. La construccion buena
+  esta en `cursos/marca-intro-y-cierre/style_block.py::wordmark()`: CO, `.`
+  y DE alineados por el borde INFERIOR (mayusculas y punto comparten linea
+  de base, asi que igualar los bordes de abajo ES alinearlos). **Un estilo
+  nuevo puede reinventar el lienzo; la marca no se reinventa.**
 - **El fundido final se lleva TAMBIEN la capa fija** (numero y marca). No es
   descuido: es lo que hace que toda pieza empiece y termine en el mismo azul
   exacto y la costura del montaje valga cero.
