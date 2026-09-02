@@ -368,6 +368,13 @@ def etiqueta(texto, medido=True, font_size=None):
     """La linea de debajo de la cifra. AMBAR si el numero lo calcula la
     libreria en el render; APAGADA si viene de la hoja de datos.
 
+    La linea que separa los dos colores es "¿lo calculo la libreria en
+    este render?", no "¿es de Espressif?". Asi que va en APAGADO todo lo
+    DADO: la hoja de datos, la literatura y tambien los PARAMETROS de una
+    simulacion (el periodo de 10 ms de un bucle, la constante dielectrica
+    del FR4). Y en AMBAR solo lo que sale de medir o de calcular aqui. Un
+    parametro elegido no es una medida por mucho que este en el codigo.
+
     Va en VERSALITAS, asi que las unidades se escriben con todas sus
     letras: "megahercios", no "MHz". Un simbolo de unidad en mayusculas
     deja de ser el simbolo — "MHZ", "MS" y "UA" no significan nada, y en

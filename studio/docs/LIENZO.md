@@ -36,8 +36,13 @@ La cifra es **siempre** tinta: es la protagonista. Lo que cambia es la
 
 | Etiqueta | Significa |
 |---|---|
-| **ámbar** | el número lo calcula la librería durante el render |
-| **apagada** | viene de una hoja de datos / literatura |
+| **ámbar** | el número sale de medir o calcular **en este render** |
+| **apagada** | el número está **dado**: hoja de datos, literatura, o un parámetro elegido de la simulación |
+
+La línea que separa los dos colores es *"¿lo calculó la librería aquí?"*, no
+*"¿es del fabricante?"*. Un parámetro elegido — el periodo de 10 ms de un
+bucle, la constante dieléctrica del FR4 — va en gris por mucho que esté
+escrito en el código: no es una medida.
 
 `lz.etiqueta(texto, medido=True/False)` y `L.dato(valor, texto, medido=...)`.
 

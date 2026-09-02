@@ -92,7 +92,7 @@ class Clip(Pieza):
         L.relevo(escena=sucio,
                  dato=lz.dato(medido(j_con, 2), "milisegundos de jitter"),
                  t=0.9)
-        self.wait(5.6)
+        self.wait(6.0)
 
         # --- el remate: el segundo nucleo estaba libre -----------------
         # Anclada al otro nucleo no compite con nadie, que es exactamente

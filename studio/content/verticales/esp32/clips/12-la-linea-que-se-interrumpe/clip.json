@@ -3,19 +3,89 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El bucle que pregunta contra la interrupcion que avisa. Cuatrocientos sucesos simulados: el sondeo llega tarde hasta un periodo entero, la ISR en microsegundos.",
-  "duracion_objetivo": null,
+  "duracion_objetivo": 38.33,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  se dibuja el tren del bucle: una vuelta cada 10 ms",
+    "1.6  caen los cuatro sucesos, en ambar, entre pregunta y pregunta",
+    "3.8  10 milisegundos por vuelta (parametro del bucle, etiqueta gris)",
+    "7.4  relevo: el tren pasa a gris y el ambar se lo quedan las esperas",
+    "9.7  una de las cuatro esperas ocupa la vuelta ENTERA",
+    "11.4 9.998 milisegundos: el peor de los cuatrocientos, que es ese trazo",
+    "15.3 relevo: las 400 esperas ordenadas, una recta (la uniforme)",
+    "17.0 el nivel ambar cae en la mitad exacta de la rampa",
+    "19.2 4.98 milisegundos de media: medio periodo",
+    "23.1 relevo: la linea del tiempo, sin bucle. Suceso arriba",
+    "24.6 la atencion entra abajo, en el MISMO sitio",
+    "27.0 2.7 microsegundos, el peor: la misma etiqueta, otra unidad",
+    "31.8 remate: 3707 veces mas rapida",
+    "37.2 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.9,
+        "texto": "Un bucle pregunta una vez por vuelta."
+      },
+      {
+        "t_inicio": 9.2,
+        "texto": "El suceso tiene que esperar su turno."
+      },
+      {
+        "t_inicio": 16.4,
+        "texto": "A veces, una vuelta entera."
+      },
+      {
+        "t_inicio": 23.4,
+        "texto": "De media, medio periodo perdido."
+      },
+      {
+        "t_inicio": 29.4,
+        "texto": "La interrupcion no pregunta. Cuatro ordenes de magnitud."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      37.58,
+      38.28
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.5,
+        -17
+      ],
+      [
+        "pulso",
+        0.9,
+        -15
+      ],
+      [
+        "tick",
+        7.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.3,
+        -16
+      ],
+      [
+        "blip_agudo",
+        23.2,
+        -15
+      ],
+      [
+        "sting",
+        31.8,
+        -11
+      ]
+    ]
   },
   "modulo": "M4 · El tiempo y la energia"
 }

@@ -53,9 +53,12 @@ Vive en `studio/content/manim_extensions/lienzo.py` — modulo nuevo, no toca
    los dos acentos en el mismo objeto.
 4. **Provenencia por el color de la ETIQUETA, no del numero.** La cifra
    siempre es tinta (es la heroina). La etiqueta de debajo es **ambar** si el
-   numero lo calcula la libreria en el render y **apagada** si viene de la
-   hoja de datos de Espressif. Asi el cian no tiene que significar "medido" y
-   el fotograma se queda con menos colores.
+   numero sale de medir o calcular EN ESTE RENDER, y **apagada** si esta
+   DADO: hoja de datos, literatura o un parametro elegido de la simulacion
+   (el periodo de un bucle, la constante dielectrica del FR4). Un parametro
+   elegido no es una medida por mucho que este escrito en el codigo. Asi el
+   cian no tiene que significar "medido" y el fotograma se queda con menos
+   colores.
 5. **Escala tipografica cerrada**: 128 / 46 / 30 / 22 / 18. No hay tamaños
    intermedios; si algo no cabe se acorta el texto, no se baja el cuerpo.
 6. **Aire.** Margen lateral de 0.9 unidades, y la escena nunca pasa de 6.2

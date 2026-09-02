@@ -12,13 +12,19 @@
 # el programa, asi que va con etiqueta APAGADA como la hoja de datos.
 #
 # La regla de la casa dice que la estadistica se mide sobre la ventana
-# DIBUJADA. Por eso los cinco sucesos del dibujo no son cinco cualesquiera:
-# son cuatro tomados uno de cada ochenta MAS el peor de los cuatrocientos,
-# de modo que el 9.998 que se rotula es el trazo ambar que ocupa la vuelta
-# entera y no una cifra traida de fuera del cuadro. El peor va en la
-# PRIMERA vuelta a proposito: su espera dura una vuelta completa y, detras
-# de cualquier otro suceso, los dos trazos ambar se tocarian y los dos se
-# leerian como uno solo.
+# DIBUJADA. Por eso los cuatro sucesos del dibujo no son cuatro
+# cualesquiera: son tres tomados uno de cada ciento sesenta MAS el peor de
+# los cuatrocientos, de modo que el 9.998 que se rotula es el trazo ambar
+# que ocupa la vuelta entera y no una cifra traida de fuera del cuadro. El
+# peor va en la PRIMERA vuelta a proposito: su espera dura una vuelta
+# completa y, detras de cualquier otro suceso, los dos trazos ambar se
+# tocarian y se leerian como uno solo.
+#
+# Y son CUATRO sobre CINCO vueltas, no cinco sobre seis: con seis vueltas
+# en los 5.3 de ancho, la vuelta entera del peor caso median 60 px sobre
+# 359 y no se distinguia de la espera de 0.76 vueltas de al lado. Menos
+# sucesos y menos vueltas es mas ancho por vuelta, que es lo unico que
+# hace visible el peor caso.
 #
 # La media va con el otro dibujo, el de las 400 esperas ORDENADAS: alli si
 # esta dibujada la simulacion entera. La rampa recta es la distribucion
@@ -34,7 +40,7 @@ class Clip(Pieza):
     NUMERO = 12
 
     T_MS = 10.0              # el periodo del bucle, en milisegundos
-    N_VUELTAS = 6            # vueltas dibujadas (la ultima, vacia)
+    N_VUELTAS = 5            # vueltas dibujadas (la ultima, vacia)
     ANCHO_T = 5.3
     ALTO_TREN = 2.0
     Y_MARCAS = 1.45
@@ -73,10 +79,10 @@ class Clip(Pieza):
         ls = chip.latencias_sondeo(periodo_ms=T, n=400, semilla=31)
         li = chip.latencias_isr(base_us=1.8, jitter_us=0.9, n=400)
 
-        # Los cinco sucesos del dibujo, en vueltas: el peor de los 400 y
-        # cuatro tomados uno de cada ochenta. El suceso k cae dentro de la
-        # vuelta k y el bucle lo atiende al empezar la k+1.
-        idx = [int(ls.argmax()), 240, 160, 0, 320]
+        # Los cuatro sucesos del dibujo, en vueltas: el peor de los 400 y
+        # tres tomados uno de cada 160. El suceso k cae dentro de la vuelta
+        # k y el bucle lo atiende al empezar la k+1.
+        idx = [int(ls.argmax()), 0, 160, 320]
         esperas = ls[idx] / T
         sucesos = np.array([(k + 1) - e for k, e in enumerate(esperas)])
 
@@ -144,7 +150,7 @@ class Clip(Pieza):
         self.wait(3.9)
 
         # --- 4. la interrupcion no pregunta ---------------------------
-        # Los mismos cinco sucesos, sin bucle debajo. La atencion va a
+        # Los mismos cuatro sucesos, sin bucle debajo. La atencion va a
         # `suceso + li`, que a esta escala es el mismo sitio: el par se lee
         # como un unico trazo partido por la linea del tiempo.
         atencion = sucesos + li[idx] / T

@@ -2,20 +2,90 @@
   "name": "13 · El planificador",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Una tarea periodica sobre un nucleo con un acaparador al lado. El jitter medido sobre 120 despertares se dispara; anclarla al otro nucleo lo devuelve a cero.",
-  "duracion_objetivo": null,
+  "description": "Una tarea periodica sobre un nucleo con un acaparador al lado. El jitter medido sobre los mismos 12 despertares que se dibujan se dispara de 6.9 microsegundos a 0.95 milisegundos; anclarla al otro nucleo (el caso sin acaparador, que es lo que la libreria modela) lo devuelve abajo.",
+  "duracion_objetivo": 35.57,
   "cola_silencio": 0.8,
-  "guion_visual": [],
+  "guion_visual": [
+    "0.7  se dibuja el cronograma: doce despertares regulares en el nucleo 0",
+    "3.3  10 milisegundos de periodo (parametro de la simulacion, etiqueta gris)",
+    "8.5  6.9 microsegundos de jitter, medidos sobre esos doce despertares",
+    "14.6 entra el acaparador: las marcas se desordenan y el renglon de abajo se llena de rayitas ambar de distinta longitud",
+    "15.5 0.95 milisegundos de jitter (mismo movimiento que el dibujo)",
+    "21.9 la tarea salta al nucleo 1: vuelven los huecos iguales y el renglon del retraso se vacia",
+    "22.8 2 nucleos en el chip (hoja de datos, etiqueta gris)",
+    "28.2 137 veces menos jitter",
+    "34.4 fundido a azul limpio"
+  ],
   "voz": {
     "voz": "Charon",
-    "secciones": []
+    "secciones": [
+      {
+        "t_inicio": 1.5,
+        "texto": "Una tarea que despierta cada diez milisegundos."
+      },
+      {
+        "t_inicio": 9.2,
+        "texto": "Sola en su núcleo, llega puntual."
+      },
+      {
+        "t_inicio": 15.2,
+        "texto": "Otra tarea entra, y ya no llega igual."
+      },
+      {
+        "t_inicio": 22.9,
+        "texto": "El chip tiene otro núcleo libre."
+      },
+      {
+        "t_inicio": 29.0,
+        "texto": "Anclada ahí, el jitter desaparece."
+      }
+    ]
   },
   "audio": {
     "pico_db": -4.0,
     "pico_db_con_voz": -17.0,
     "fade_in": 0.4,
-    "fade_out": null,
-    "eventos": []
+    "fade_out": [
+      34.82,
+      35.52
+    ],
+    "eventos": [
+      [
+        "aire_largo",
+        0.4,
+        -17
+      ],
+      [
+        "blip_grave",
+        0.9,
+        -15
+      ],
+      [
+        "blip_hud",
+        3.4,
+        -17
+      ],
+      [
+        "tick",
+        8.6,
+        -15
+      ],
+      [
+        "pulso",
+        14.2,
+        -13
+      ],
+      [
+        "blip_medio",
+        22.0,
+        -16
+      ],
+      [
+        "subrayado",
+        28.3,
+        -13
+      ]
+    ]
   },
   "modulo": "M4 · El tiempo y la energia"
 }
