@@ -38,7 +38,7 @@ import os
 import numpy as np
 from manim import (DOWN, LEFT, RIGHT, UP, Create, Dot, FadeIn, FadeOut,
                    Group, Line, Rectangle, Text, UpdateFromAlphaFunc,
-                   VGroup, VMobject, config, linear)
+                   Transform, VGroup, VMobject, config, linear)
 
 import code_brand
 import promo
@@ -893,6 +893,46 @@ class Lienzo:
         if entradas:
             self.e.play(*entradas)
         return escena, dato
+
+    def morfeo(self, objetivo, dato=IGUAL, t=1.0, anclaje="abajo",
+               bajo=False, animaciones=(), rate_func=None):
+        """Morfea el dibujo del carril y releva la cifra EN EL MISMO gesto.
+
+        `relevo` cambia el dibujo APAGANDO el viejo y encendiendo el nuevo.
+        Cuando el dibujo no se releva sino que se MORFEA —los mismos tallos
+        cambiando de altura— eso no vale, y hacerlo a mano en dos pasos
+        (`play(Transform...)` y despues `dato(...)`) deja unos segundos con
+        el dibujo nuevo y el numero viejo debajo: exactamente la mentira
+        que `relevo` existe para evitar, la cifra hablando de algo que ya
+        no esta. Lo levanto la pieza 18 del curso 33, que tuvo que
+        manipular `ocupantes` a mano para esquivarlo.
+
+        `animaciones` permite pasar el morfeo ya construido (varios
+        `Transform` a la vez, por ejemplo); si no se pasa, se morfea el
+        ocupante entero hacia `objetivo`."""
+        actual = self.ocupantes.get("escena")
+        if not animaciones:
+            if actual is None:
+                raise FueraDelLienzo(
+                    "morfeo() necesita un dibujo ya puesto en el carril")
+            encajar(objetivo, anclaje=anclaje, bajo=bajo)
+            animaciones = [Transform(actual, objetivo)]
+        paso = list(animaciones)
+        nuevo = None
+        if dato is not IGUAL:
+            viejo = self.ocupantes.get("dato")
+            if viejo is not None:
+                paso.append(FadeOut(viejo))
+            self.ocupantes["dato"] = None
+            if dato is not None:
+                nuevo = (globals()["dato"](*dato)
+                         if isinstance(dato, (tuple, list)) else dato)
+        extra = {} if rate_func is None else {"rate_func": rate_func}
+        self.e.play(*paso, run_time=t, **extra)
+        if nuevo is not None:
+            self.e.play(FadeIn(nuevo, run_time=0.45))
+            self.ocupantes["dato"] = nuevo
+        return actual
 
     # --- cierre -------------------------------------------------------
     def fundido(self, t=0.9):
