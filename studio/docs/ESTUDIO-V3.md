@@ -342,8 +342,8 @@ banco, plan de película, hash que caduca al cambiar de tema, y la curva de
 | duplicar proyecto/clip | `POST /{pid}/duplicar`, `POST /{pid}/clips/{cid}/duplicar` (venía de R5) | **R3a** |
 | hoja de contactos | comando `frames` del runner → `GET /api/jobs/{id}/frames` (N PNG + último) | **R3b** |
 | fotograma / figura | `POST /api/jobs/{id}/fotograma {t, formato: png／svg}` a resolución del job | **R3b** |
-| costuras y picos | `pelicula/verificar` mide además la unión pieza a pieza (PIL) y el pico por pieza | R3b |
-| sondas / Laboratorio | comando `ejecutar` del runner: script Python + argumentos en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` | **R3b** |
+| costuras y picos | `pelicula/verificar` mide además la unión pieza a pieza (PIL), el pico por pieza y la cola de silencio de la voz | **R3c** |
+| sondas / Laboratorio | comando `ejecutar` del runner: script Python + argumentos en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` | R3b |
 
 ### R3a — un proyecto es un directorio (diseño)
 
@@ -393,6 +393,164 @@ lleva corriendo el job en curso.
 **Duplicar** copia lo que define cómo se ve y cómo suena; **nunca el render**:
 un vídeo es de UN clip, y dos clips apuntando al mismo `job_id` harían que
 borrarlo dejase sin vídeo a un proyecto que nadie estaba tocando.
+
+### R3c — medir la película como se mide en la terminal (2026-09-03)
+
+**Lo que cierra.** `verifica_vertical.py` y `unir_vertical.py` miden de un curso
+tres cosas que la app no medía: la **costura** entre piezas, el **pico** por
+pieza y la **cola de silencio** de cada narración. Eran justamente las tres que
+han cazado defectos reales —el parpadeo de las catorce uniones del curso 28 no
+lo vio nadie a ojo— y hasta hoy solo existían en la terminal. Ahora las mide
+`ensamblar.py verificar`, se persisten en `pelicula.json` y se pintan en el
+panel.
+
+#### La costura, y por qué los umbrales no son números redondos
+
+Costura = diferencia media absoluta por subpíxel (0–255) entre el **último
+fotograma real** de una pieza y el **primero** de la siguiente, con PIL
+(`ImageChops.difference` + `ImageStat.mean`, en C: la misma cuenta en Python
+puro sobre 1920×1080 son 6,2 millones de restas por unión).
+
+Se mide sobre los **vídeos de origen**, no sobre la película: en el montaje esos
+dos fotogramas son consecutivos y la diferencia que ve el espectador es la
+misma, pero sacarlos de los originales no depende de acertar el instante del
+empalme dentro de un archivo de media hora.
+
+Los umbrales salen de los cursos ya entregados:
+
+| medida | valor | qué era |
+|---|---|---|
+| cursos **31** (esp32) y **33** (señales) | **0,0000** exacto, 15 y 19 uniones | lo mejor de la colección |
+| curso **26** (fractales) | 0,003 | |
+| curso **28** (satélites), uniones de lección | **0,0048** (13 de máximo) | el peor caso *limpio* medido |
+| curso **28**, intro y cierre de marca | 0,055 | **legítimo**: la marca no lleva esquinas HUD ni marca de agua |
+| curso **28** antes del arreglo | **0,0552 idéntico en las catorce** | el defecto: un `FadeOut` apagaba la capa fija al final de cada pieza |
+
+De ahí: **≤ 0,01 limpia** (el doble de margen sobre el peor limpio),
+**≤ 0,06 a mirar**, **> 0,06 se ve**. Entre 0,01 y 0,06 **no se falla, se
+avisa**, porque el mismo 0,055 es un defecto en una unión de lección y lo
+correcto en una unión con la marca. Quien las distingue no es el valor: es el
+**diagnóstico**.
+
+`firma_capa_fija(valores)` emite el diagnóstico cuando **todas** las costuras
+valen lo mismo (±1e-4), no valen cero y hay al menos **tres** (dos iguales son
+una coincidencia). Si además el valor compartido pasa de 0,01, sube de aviso a
+**problema**: eso es exactamente el 0,0552 del curso 28, y es lo único que lo
+separa del 0,055 legítimo de una unión suelta con la marca.
+
+Con transición distinta de `corte` la costura **no aplica** (`n/a`): xfade funde
+las dos piezas a propósito.
+
+#### Pico y cola de la voz
+
+- **Pico por pieza**: ya se medía con `volumedetect` sobre el tramo; ahora el
+  informe lo expone con su `pico_alto` contra el techo de la casa, **−0,5 dBFS**
+  (el mismo número de `unir_vertical.py`).
+- **Pico global**: se mide sobre la película **entera**, no como máximo de los
+  tramos — los tramos se recortan 0,05 s por lado y un recorte que caiga justo
+  en un empalme se escaparía. Es el número que imprime `unir_vertical.py` al
+  cerrar un montaje vertical.
+- **Cola de silencio de la voz**: los últimos **0,8 s** del wav de narración
+  bajo **−50 dBFS**. Se mide sobre el **archivo de voz**, no sobre la película:
+  en el montaje esos 0,8 s ya llevan encima la cama de sonido de la pieza y el
+  silencio de la voz sería invisible. Una voz que llega hablando hasta el final
+  se corta a media palabra en el empalme.
+
+#### El semáforo pasa a tres colores
+
+`estado_verificacion` devuelve ahora `pasa` · **`avisos`** · `no_pasa` (más
+`sin_verificar` y `vieja`). Sin el ámbar, una costura de 0,055 o un pico en
+−0,4 dBFS tendrían que elegir entre mentir (verde) o enseñar a ignorar el rojo.
+Una película medida **antes** de R3c no trae `avisos` y sigue en verde: no se le
+inventan avisos que nadie midió.
+
+#### Verificación REAL (contenedor `codeaerospace_contenido-manim`, ffmpeg 4.3.9, PIL 12.3.0)
+
+Nueve escenas de laboratorio a `ql` (854×480 @ 15 fps, `render_jobs/escenas_r3c.py`,
+fuera de git) montadas en cinco películas con `ensamblar.py montar` y medidas con
+`ensamblar.py verificar`. Cada verificación, **1,6–2,8 s** de reloj incluida la
+puesta en marcha del contenedor.
+
+| caso | costuras medidas | veredicto | diagnóstico |
+|---|---|---|---|
+| 4 piezas limpias, corte | 0,0189 · 0,0189 · 0,0189 | 3 avisos | **sí** (todas iguales) |
+| 4 piezas con `FadeOut` de la capa fija | **0,1183 · 0,1183 · 0,1183** | 3 fallos → rojo | **sí** |
+| la 1.ª acaba **en negro** | **19,4252** · 0,0189 · 0,0189 | 1 fallo → rojo | **no** (no son iguales) |
+| el mismo material sucio con empalme `fundido` | n/a · n/a · n/a | verde | — |
+| 3 piezas con voz | 0,0189 ×3 | avisos | sí |
+
+Del último caso, lo que interesa es el audio: picos por pieza **−10,5 / −10,5 /
+−0,4 / −91,0 dBFS**, pico global **−0,4** → aviso contra el techo de −0,5; colas
+de voz **−91,0 (ok) · −10,5 (sin cola) · −91,0 (ok)**, y la pieza sin voz sin
+medida ninguna. El aviso sale en singular: «1 pieza cierra la voz sin cola de
+silencio».
+
+Los dos casos que importan salen bien discriminados: el `FadeOut` de la capa
+fija reproduce la firma del curso 28 (**el mismo valor en las tres uniones**) y
+el clip que acaba en negro da 19,4 sin diagnóstico, que es la verdad — ahí no
+hay ninguna capa fija culpable, hay un plano distinto.
+
+#### Trampas medidas
+
+1. **`-sseof -0.05` no escribe nada por debajo de 20 fps, y sale con código 0.**
+   Medido en el contenedor sobre el mismo material a 15 y a 60 fps:
+
+   | fps | `-sseof -0.05` | `-sseof -0.35` |
+   |---|---|---|
+   | 15 | código 0, **archivo vacío** | 4 993 bytes |
+   | 60 | 5 078 bytes | 5 078 bytes (**el mismo fotograma**) |
+
+   A 15 fps los fotogramas están a 66,7 ms y el salto cae detrás del último. Es
+   el mismo fallo silencioso que ya documentan `verifica_vertical.py` y
+   `promo_verifica.py`, y por eso ellos usan 0,35. Aquí se pide 0,05 (tres
+   fotogramas a 60 fps, que es el ritmo de los cursos) y **se reintenta con
+   0,35** si no salió nada. La segunda fila prueba que da igual: con `-update 1`
+   cada fotograma pisa al anterior, así que lo que queda al terminar **es** el
+   último, mida la cola lo que mida.
+2. **Un montaje a `ql` se queda en ámbar por el códec, no por el contenido.**
+   Las tres costuras «limpias» dan 0,0189 idéntico, y no hay ningún objeto
+   culpable: el último fotograma de una pieza es un P-frame al final de un GOP y
+   el primero de la siguiente es un I-frame. Se comprobó midiendo el primer
+   fotograma de cada pieza contra el primero de las demás (**0,0000**), el
+   último contra el último (**0,0000**) y el primero contra el último **de la
+   misma pieza** (**0,0189**): la deriva vive dentro del archivo, no entre
+   archivos. Los umbrales están calibrados sobre entregas `qh`; el mensaje del
+   diagnóstico nombra las dos causas posibles para que nadie salga a buscar un
+   `FadeOut` que no existe.
+3. **La cola de silencio hay que medirla en el wav, no en la película.** En el
+   montaje esos 0,8 s finales llevan encima la cama de sonido de la pieza (y la
+   música, si la hay): la voz podría acabar a media palabra y el tramo seguiría
+   sonando muy por encima de −50 dBFS.
+4. **El pico global no es el máximo de los picos por pieza.** Los tramos se
+   miden con 0,05 s de margen a cada lado para no arrastrar el empalme; un
+   recorte que caiga justo ahí no aparecería en ninguno de los dos tramos
+   vecinos.
+5. **Medir la película dejó de costar segundos.** Son dos fotogramas por unión
+   más un `volumedetect` por pieza más otro global. Los 300 s de
+   `VERIFICA_TIMEOUT` —que es el tope del *promo*, una pieza— se quedaban
+   cortos para un curso de treinta piezas a 1080p60 en un VPS de 1,5 vCPU:
+   `handle_ensamblar` estrena `ENSAMBLAR_VERIFICA_TIMEOUT = 1800` y el cliente
+   espera 1 860. Un test comprueba que los dos números no se separen.
+6. **`diagnostico()` devuelve ahora dos listas.** Problemas (rojo, `ok=False`) y
+   avisos (ámbar, entregable). Meter los avisos en `problemas` habría puesto en
+   rojo cualquier montaje de previsualización; dejarlos fuera del informe habría
+   sido no medirlos.
+
+#### Superficie nueva
+
+`ensamblar.py`: `diferencia_media` (pura, sobre dos imágenes PIL),
+`veredicto_costura`, `firma_capa_fija`, `medir_costuras`, `cola_voz_db`,
+`_saca_frame`, las constantes `COSTURA_OK/COSTURA_AVISO/PICO_MAX_DB/COLA_VOZ_*`
+y un `verificar` que devuelve `costuras`, `costura_peor`,
+`costura_diagnostico`, `costura_umbrales`, `pico_max_db`, `pico_veredicto`,
+`sin_cola_voz` y `avisos`. `pelicula.py`: el semáforo de tres colores.
+`PeliculaPanel.jsx`: el subcomponente `Costuras` (una celda por unión, valor a
+cuatro decimales, color por veredicto **y recuento en palabras**, tooltip
+«de → a»), la línea del pico y las dos listas de problemas y avisos.
+`manim_runner.py` y `runner_client.py`: el tope nuevo. **17 tests** en
+`tests/test_pelicula.py` (46 en el archivo, 330 en la suite).
+
+## R4 — Rigor de investigación (agente Opus, librerías)
 
 ## R4 — Rigor de investigación · **hecho** (librerías) 2026-09-03
 

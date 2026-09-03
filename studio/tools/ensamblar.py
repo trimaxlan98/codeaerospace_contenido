@@ -44,8 +44,16 @@ prueba, contra el 37 % real.
 
 La ultima linea de stdout es un JSON con el informe. `montar` devuelve lo que se
 hizo (duracion medida, resolucion, tamano y que llevaba cada pieza); `verificar`
-mide la pelicula ya montada contra su plan — duracion, sonido pieza a pieza y
-resolucion — porque la union puede salir mal SIN fallar.
+mide la pelicula ya montada contra su plan porque la union puede salir mal SIN
+fallar: duracion, sonido pieza a pieza, resolucion y —desde R3c— las tres cosas
+que hasta ahora solo se median en la terminal:
+
+  costuras     el ultimo frame de cada pieza contra el primero de la siguiente
+               (`verifica_vertical.py`), con PIL. Cuando todas valen lo mismo,
+               el culpable es un objeto de la capa fija.
+  picos        el de cada pieza y el de la pelicula, contra el techo de -0.5
+               dBFS de `unir_vertical.py`.
+  cola de voz  los ultimos 0.8 s de cada narracion bajo -50 dBFS.
 """
 
 from __future__ import annotations
@@ -505,6 +513,61 @@ SILENCIO_DB = -60.0
 # que medio segundo de margen es normal; dos son otra cosa.
 TOLERANCIA_S = 0.5
 
+# ── las tres cifras que se miden en la terminal ──────────────────────────────
+#
+# COSTURA. Diferencia media absoluta por subpixel (0-255) entre el ULTIMO
+# frame real de una pieza y el PRIMERO de la siguiente. Los dos umbrales no
+# son numeros redondos: salen de los cursos ya entregados.
+#
+#   curso 31 (esp32) y 33 (senales y sistemas)  0.0000 EXACTO, 15 y 19 uniones
+#   curso 26 (fractales)                        0.003
+#   curso 28 (satelites), uniones de leccion    0.0048 (13 de maximo)
+#   curso 28, intro y cierre de marca           0.055, A PROPOSITO: la marca
+#                                               no lleva esquinas HUD ni marca
+#                                               de agua, asi que la union con
+#                                               ella cambia de dibujo de verdad
+#   curso 28 ANTES del arreglo                  0.0552 IDENTICO en las catorce
+#
+# Ese ultimo es el caso que da sentido a todo esto: cada clip terminaba con un
+# `FadeOut` sobre TODOS sus mobjects —incluidas la marca de agua y las cuatro
+# esquinas del HUD—, la pieza siguiente las encendia de golpe, y habia un
+# parpadeo en las catorce uniones que a ojo no se veia. Se caza mirando dos
+# cosas a la vez: el valor (bajo, 0.055) y que sea el MISMO en todas.
+#
+# De ahi las fronteras: 0.01 deja pasar lo sano con el doble de margen sobre el
+# peor caso limpio (0.0048), y 0.06 separa "un objeto de la capa fija cambia de
+# estado" de "estas dos piezas no encajan". Entre las dos NO se falla, se
+# avisa: el mismo 0.055 es un defecto en una union de leccion y lo correcto en
+# una union de marca. Quien las distingue no es el valor, es el diagnostico.
+COSTURA_OK = 0.01
+COSTURA_AVISO = 0.06
+# Dos costuras iguales son una coincidencia; tres ya son una firma.
+COSTURA_MIN_FIRMA = 3
+# Por debajo de esto una costura es cero a efectos practicos (se informa con
+# cuatro decimales) y no hay ninguna capa fija de la que sospechar.
+COSTURA_NULA = 1e-4
+
+# PICO. Por encima de esto la pelicula recorta. Es el mismo numero de
+# `unir_vertical.py`: si uno cambia, el otro tambien.
+PICO_MAX_DB = -0.5
+
+# COLA DE SILENCIO DE LA VOZ. Los ultimos 0.8 s del wav de narracion tienen
+# que estar por debajo de -50 dBFS. Una voz que llega hablando hasta el ultimo
+# frame se corta a media palabra en el empalme con la pieza siguiente, y en un
+# curso montado eso se oye como un chasquido. -50 dBFS es holgado: el suelo de
+# un WAV de TTS recortado queda en el silencio digital.
+COLA_VOZ_S = 0.8
+COLA_VOZ_DB = -50.0
+
+# El ultimo frame NO se saca con `-ss dur-epsilon`: si el salto cae despues del
+# ultimo paquete, ffmpeg sale con EXITO y no escribe nada. Se decodifica la
+# cola con `-update 1` (cada frame pisa al anterior) y lo que queda al terminar
+# ES el ultimo frame. 0.05 s son 3 frames a 60 fps; si el contenedor devolviera
+# el PNG vacio (un GOP largo, un contenedor raro), se reintenta con los 0.35 s
+# que ya usan `verifica_vertical.py` y `promo_verifica.py`.
+SSEOF_COSTURA = 0.05
+SSEOF_RESPALDO = 0.35
+
 
 def pico_db(video, inicio: float, dur: float) -> float | None:
     """Pico en dBFS de un tramo del archivo, o None si no hay audio.
@@ -529,15 +592,158 @@ def pico_db(video, inicio: float, dur: float) -> float | None:
     return None
 
 
+def cola_voz_db(voz) -> float | None:
+    """Pico de los ultimos `COLA_VOZ_S` segundos del wav de narracion.
+
+    Se mide sobre el ARCHIVO DE VOZ, no sobre la pelicula: en el montaje esos
+    0.8 s finales ya llevan encima la cama de sonido de la pieza y el silencio
+    de la voz seria invisible. Lo que interesa es si el TTS dejo aire al final
+    o si la frase muere pegada al corte.
+    """
+    voz = Path(voz)
+    if not voz.is_file():
+        return None
+    try:
+        d = duracion(voz)
+    except ErrorPlan:
+        return None
+    return pico_db(voz, max(d - COLA_VOZ_S, 0.0), min(COLA_VOZ_S, d))
+
+
+# ── costuras ─────────────────────────────────────────────────────────────────
+
+def _saca_frame(video, destino, primero: bool) -> bool:
+    """Primer o ultimo frame REAL de un video, a PNG. False si no salio.
+
+    Ver la nota de SSEOF_COSTURA: el ultimo frame se decodifica por la cola,
+    y si con 0.05 s no sale nada se reintenta con 0.35.
+    """
+    destino = Path(destino)
+    for cola in (SSEOF_COSTURA, SSEOF_RESPALDO):
+        cmd = ["ffmpeg", "-nostdin", "-v", "error"]
+        if primero:
+            cmd += ["-i", str(video), "-frames:v", "1"]
+        else:
+            cmd += ["-sseof", f"-{cola}", "-i", str(video), "-update", "1"]
+        destino.unlink(missing_ok=True)
+        r = _corre(*cmd, "-y", str(destino), timeout=300)
+        if r.returncode == 0 and destino.is_file() and destino.stat().st_size:
+            return True
+        if primero:
+            break
+    return False
+
+
+def diferencia_media(xa, xb) -> float:
+    """Diferencia media absoluta por subpixel (0-255) entre dos imagenes PIL.
+
+    Funcion PURA: se prueba con dos imagenes sinteticas, sin ffmpeg y sin
+    montar nada. Es la unica aritmetica de la costura, y por eso vive aparte —
+    cambiar el criterio no puede exigir renderizar un curso.
+
+    Solo PIL, y a proposito: `ImageChops.difference` + `ImageStat.mean` dan la
+    media por canal en C. La misma cuenta en Python puro sobre un fotograma de
+    1920x1080 son 6.2 millones de restas por costura.
+    """
+    from PIL import ImageChops, ImageStat
+    if xa.size != xb.size:
+        raise ErrorPlan(f"los dos frames no miden lo mismo: "
+                        f"{xa.size} contra {xb.size}")
+    canales = ImageStat.Stat(
+        ImageChops.difference(xa.convert("RGB"), xb.convert("RGB"))).mean
+    return sum(canales) / len(canales)
+
+
+def veredicto_costura(valor: float | None) -> str:
+    """'n/a' | 'bien' | 'aviso' | 'fallo'. Funcion pura, ver los umbrales."""
+    if valor is None:
+        return "n/a"
+    if valor <= COSTURA_OK:
+        return "bien"
+    if valor <= COSTURA_AVISO:
+        return "aviso"
+    return "fallo"
+
+
+def firma_capa_fija(valores: list[float]) -> str | None:
+    """El diagnostico que ninguna costura suelta puede dar.
+
+    Cuando TODAS las uniones valen lo mismo (±1e-4) y no valen cero, el
+    culpable no esta en el contenido de las piezas —que es distinto en cada
+    una— sino en un objeto que hay en todas: la marca de agua, las esquinas
+    del HUD, el fondo. Es literalmente el fallo del curso 28: 0.0552 identico
+    en las catorce uniones, un `FadeOut` que apagaba la capa fija al final de
+    cada pieza y la siguiente la encendia de golpe.
+
+    Funcion pura. Con menos de tres uniones no se afirma nada: dos costuras
+    iguales son una coincidencia razonable.
+    """
+    if len(valores) < COSTURA_MIN_FIRMA:
+        return None
+    v = max(valores)
+    if v <= COSTURA_NULA or (v - min(valores)) > 1e-4:
+        return None
+    return (f"las {len(valores)} costuras valen exactamente lo mismo "
+            f"({v:.4f}/255): o hay un objeto de la capa fija —marca de agua, "
+            f"esquinas del HUD, fondo— que se apaga al final de cada pieza y "
+            f"la siguiente lo enciende de golpe, o el montaje es de calidad "
+            f"baja (a ql el propio codec ya deja 0.019). En un curso qh "
+            f"entregable esto vale 0.0000–0.0048")
+
+
+def medir_costuras(piezas: list[dict], raiz: Path, tmp: Path) -> list[dict]:
+    """Una costura por union pieza→pieza, con su veredicto.
+
+    Los dos PNG de cada union se borran en cuanto se comparan: el contenedor
+    tiene `/tmp` en un tmpfs de 512 MB y un curso de treinta piezas verticales
+    a 1080x1920 dejaria ahi cien megas de fotogramas que ya nadie mira.
+    """
+    from PIL import Image
+    tmp.mkdir(parents=True, exist_ok=True)
+    out = []
+    for i, (a, b) in enumerate(zip(piezas, piezas[1:])):
+        de = a.get("titulo", f"pieza {i + 1}")
+        hasta = b.get("titulo", f"pieza {i + 2}")
+        va, vb = raiz / a["video"], raiz / b["video"]
+        fa, fb = tmp / f"{i:03d}_fin.png", tmp / f"{i:03d}_ini.png"
+        fila = {"de": de, "a": hasta, "valor": None, "veredicto": "n/a"}
+        try:
+            if (va.is_file() and vb.is_file()
+                    and _saca_frame(va, fa, primero=False)
+                    and _saca_frame(vb, fb, primero=True)):
+                with Image.open(fa) as xa, Image.open(fb) as xb:
+                    valor = diferencia_media(xa, xb)
+                fila["valor"] = round(valor, 4)
+                fila["veredicto"] = veredicto_costura(valor)
+            else:
+                fila["motivo"] = "no se pudo sacar el frame"
+        except (ErrorPlan, OSError) as exc:
+            fila["motivo"] = str(exc)[:200]
+        finally:
+            fa.unlink(missing_ok=True)
+            fb.unlink(missing_ok=True)
+        out.append(fila)
+    return out
+
+
 def diagnostico(medida: float, prevista: float, mudos: list[str],
-                res_medida: str, res_plan: str) -> list[str]:
-    """De las medidas a los problemas. Funcion pura: se prueba sin ffmpeg.
+                res_medida: str, res_plan: str,
+                costuras: list[dict] | None = None,
+                pico_max: float | None = None,
+                colas: list[str] | None = None) -> tuple[list[str], list[str]]:
+    """De las medidas a los problemas y los avisos. Funcion pura: sin ffmpeg.
 
     Vive aparte de `verificar` a proposito — lo que decide si una pelicula
     esta bien es esta lista de reglas, y tiene que poder cambiarse y probarse
     sin montar nada.
+
+    Devuelve DOS listas, y la diferencia importa: un **problema** dice que la
+    pelicula esta rota (falta material, se perdio el sonido, una costura se ve)
+    y pinta el panel en rojo; un **aviso** dice que hay algo que mirar (una
+    costura en la banda de la capa fija, el pico a un pelo del techo, una voz
+    sin cola) y lo pinta en ambar sin llamar rota a una pelicula entregable.
     """
-    problemas = []
+    problemas, avisos = [], []
     desfase = medida - prevista
     if abs(desfase) > TOLERANCIA_S:
         problemas.append(
@@ -549,7 +755,39 @@ def diagnostico(medida: float, prevista: float, mudos: list[str],
                          + ("…" if len(mudos) > 4 else ""))
     if res_plan and res_medida and res_plan != res_medida:
         problemas.append(f"la pelicula es {res_medida} y el curso es {res_plan}")
-    return problemas
+
+    for c in costuras or []:
+        if c.get("veredicto") == "fallo":
+            problemas.append(
+                f"la costura {c['de']} → {c['a']} vale {c['valor']:.4f}/255: "
+                f"el corte entre las dos piezas se ve")
+        elif c.get("veredicto") == "aviso":
+            avisos.append(
+                f"la costura {c['de']} → {c['a']} vale {c['valor']:.4f}/255 "
+                f"(el limpio de la casa es 0.0000–0.0048)")
+
+    # La firma de la capa fija: sola no acusa a nadie —un curso limpio da
+    # 0.0000 en todas las uniones y eso tambien es "todas iguales"—, pero con
+    # el valor ya en la banda de aviso es EL sintoma, y entonces sube a
+    # problema: es lo unico que separa el 0.0552 de un FadeOut mal puesto del
+    # 0.055 legitimo de una union con la marca.
+    valores = [c["valor"] for c in (costuras or []) if c.get("valor") is not None]
+    firma = firma_capa_fija(valores)
+    if firma and max(valores) > COSTURA_OK:
+        problemas.append(firma)
+    elif firma:
+        avisos.append(firma)
+
+    if pico_max is not None and pico_max > PICO_MAX_DB:
+        avisos.append(f"la pelicula pica en {pico_max:.1f} dBFS y el techo de "
+                      f"la casa es {PICO_MAX_DB}: va a recortar")
+    if colas:
+        n = len(colas)
+        avisos.append(f"{n} pieza{'' if n == 1 else 's'} "
+                      f"cierra{'' if n == 1 else 'n'} la voz sin cola de "
+                      f"silencio ({COLA_VOZ_S} s bajo {COLA_VOZ_DB:.0f} dBFS): "
+                      + ", ".join(colas[:4]) + ("…" if n > 4 else ""))
+    return problemas, avisos
 
 
 def espera_sonido(pieza: dict, video) -> bool:
@@ -562,11 +800,12 @@ def espera_sonido(pieza: dict, video) -> bool:
     return bool(pieza.get("voz")) or (video.is_file() and tiene_audio(video))
 
 
-def verificar(plan_path, pelicula) -> dict:
+def verificar(plan_path, pelicula, trabajo=None) -> dict:
     """Mide la pelicula montada contra el plan del que salio.
 
-    Tres comprobaciones, todas objetivas, y cada una caza un fallo que la
-    union puede producir SIN fallar:
+    Lo que la terminal mide de un curso —y hasta el sprint R3c la app no—, todo
+    objetivo y cada cosa cazando un fallo que la union puede producir SIN
+    fallar:
 
       duracion     si falta una pieza, o si el offset de un xfade la dejo
                    fuera, el total no cuadra con la suma menos los empalmes.
@@ -577,6 +816,27 @@ def verificar(plan_path, pelicula) -> dict:
                    es mudo a proposito.
       resolucion   la que dice el plan es la del proyecto; si no coincide, se
                    colo material de otro tamano.
+      costuras     el ultimo frame de cada pieza contra el primero de la
+                   siguiente (`verifica_vertical.py`). En un curso de la casa
+                   toda pieza empieza y acaba en el fondo limpio, asi que la
+                   costura vale casi cero; cuando no, o las dos piezas no
+                   encajan, o —el caso util— hay un objeto de la capa fija que
+                   se apaga y se enciende en TODAS las uniones.
+      pico         el techo de la casa son -0.5 dBFS (`unir_vertical.py`). Se
+                   da el pico de cada pieza y el de la pelicula entera.
+      cola de voz  los ultimos 0.8 s de cada wav de narracion bajo -50 dBFS:
+                   una voz que llega hablando hasta el final se corta a media
+                   palabra en el empalme.
+
+    Las costuras se miden sobre los VIDEOS DE ORIGEN, no sobre la pelicula: en
+    el montaje esos dos fotogramas son consecutivos y la diferencia que
+    interesa —la que el espectador ve como parpadeo— es exactamente la misma,
+    pero sacarlos de los originales no depende de acertar el instante del
+    empalme en un archivo de media hora.
+
+    Con transicion distinta de `corte` la costura NO APLICA (`n/a`): xfade
+    funde las dos piezas a proposito, asi que el ultimo frame de una y el
+    primero de la siguiente son dibujos distintos por diseno.
     """
     plan = lee_plan(plan_path)
     pelicula = Path(pelicula)
@@ -603,26 +863,56 @@ def verificar(plan_path, pelicula) -> dict:
     for p, dur, con_sonido in zip(plan["piezas"], duraciones, esperaba):
         pico = pico_db(pelicula, t + 0.05, max(dur - 0.1, 0.1))
         callado = pico is None or pico <= SILENCIO_DB
-        tramos.append({
+        fila = {
             "titulo": p.get("titulo", ""),
             "inicio": round(t, 3),
             "duracion": round(dur, 3),
             "pico_db": pico,
+            "pico_alto": pico is not None and pico > PICO_MAX_DB,
             "esperaba_sonido": con_sonido,
             "mudo": callado,
             "perdio_sonido": con_sonido and callado,
-        })
+        }
+        if p.get("voz"):
+            cola = cola_voz_db(raiz / p["voz"])
+            fila["cola_voz_db"] = cola
+            fila["cola_voz_ok"] = cola is None or cola <= COLA_VOZ_DB
+        tramos.append(fila)
         t += dur - d_tr
+
+    # Pico de la pelicula ENTERA, no el maximo de los tramos: los tramos se
+    # miden con 0.05 s de margen a cada lado y un recorte que caiga justo en un
+    # empalme se escaparia. Es el mismo numero que imprime `unir_vertical.py`
+    # al terminar un montaje vertical.
+    pico_max = pico_db(pelicula, 0.0, medida)
+
+    tmp = Path(trabajo) if trabajo else Path(
+        tempfile.mkdtemp(prefix="costuras-"))
+    try:
+        if tipo == "corte":
+            costuras = medir_costuras(plan["piezas"], raiz, tmp)
+        else:
+            costuras = [{"de": a.get("titulo", ""), "a": b.get("titulo", ""),
+                         "valor": None, "veredicto": "n/a",
+                         "motivo": f"empalme «{tipo}»: las dos piezas se funden"}
+                        for a, b in zip(plan["piezas"], plan["piezas"][1:])]
+    finally:
+        if trabajo is None:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     res_medida = resolucion(pelicula)
     res_plan = plan.get("resolucion", "")
     mudos = [x["titulo"] for x in tramos if x["perdio_sonido"]]
+    sin_cola = [x["titulo"] for x in tramos if x.get("cola_voz_ok") is False]
     desfase = medida - prevista
-    problemas = diagnostico(medida, prevista, mudos, res_medida, res_plan)
+    problemas, avisos = diagnostico(medida, prevista, mudos, res_medida,
+                                    res_plan, costuras, pico_max, sin_cola)
+    valores = [c["valor"] for c in costuras if c.get("valor") is not None]
 
     return {
         "ok": not problemas,
         "problemas": problemas,
+        "avisos": avisos,
         "duracion_medida": round(medida, 3),
         "duracion_prevista": round(prevista, 3),
         "desfase": round(desfase, 3),
@@ -632,6 +922,15 @@ def verificar(plan_path, pelicula) -> dict:
         "piezas": len(tramos),
         "mudas": len(mudos),
         "tramos": tramos,
+        "costuras": costuras,
+        "costura_peor": round(max(valores), 4) if valores else None,
+        "costura_diagnostico": firma_capa_fija(valores),
+        "costura_umbrales": [COSTURA_OK, COSTURA_AVISO],
+        "pico_max_db": pico_max,
+        "pico_techo_db": PICO_MAX_DB,
+        "pico_veredicto": ("n/a" if pico_max is None else
+                           "aviso" if pico_max > PICO_MAX_DB else "bien"),
+        "sin_cola_voz": sin_cola,
     }
 
 
