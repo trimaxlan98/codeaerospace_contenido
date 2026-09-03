@@ -447,35 +447,47 @@ la tarjeta: dentro hay campos de texto).
 
 ### Narración de cursos (botón «Generar narración» en Proyectos)
 
-- Guion cronometrado con `gemini-2.5-pro` (secciones con `t_inicio`/`t_fin` leyendo los
-  `run_time`/`wait` del script compuesto) y voz con `gemini-2.5-flash-preview-tts`
-  (Vertex, misma service account del asistente; sin `gcp-key.json` la función se oculta).
-- El audio se **alinea a las secciones**: cada una se sintetiza aparte, se recorta su
-  silencio inicial/final y se coloca en su `t_inicio` (hueco máximo 2.5 s, cascada si la
-  anterior se pasa).
-- **Que quepa en el video** (tolerancia +5 %) se ataca en tres niveles, de menos a más
-  invasivo: 1) los silencios entre secciones se comprimen por búsqueda binaria hasta el
-  máximo que aún cabe (`_ajustar_al_limite`, no toca la voz); 2) hasta
-  `MAX_INTENTOS_GUION` guiones, cada uno con menos palabras en proporción a lo que se
-  pasó, **conservando el intento que mejor encaja** —no el último, que el TTS varía—;
-  3) si aun así se pasa, `mux.sh` lo acelera con `atempo` al montar. Ninguna de las tres
-  recorta la narración.
-- Salida en `guiones/<slug-proyecto>/NN-slug.{md,txt,wav,secciones.json}` + `estado.json`
-  (hash de script compuesto+escena+duración+voz → detecta narraciones desactualizadas).
-- API: `GET/POST /api/projects/{pid}/narracion` (estado por clip / corrida en segundo
-  plano, una a la vez), `POST .../narracion/cancel`, `GET .../narracion/{cid}/{audio,texto}`.
-- El zip de `GET /api/projects/{pid}/archive` incluye los `.wav`/`.txt` emparejados con
-  cada mp4, `mux.sh` y el estado de narración en `manifest.json`. `mux.sh` mide con
-  `ffprobe`: si la voz cabe, `apad -shortest` (cada clip conserva su duración exacta y el
-  concat no se desincroniza); si no cabe, `atempo` con el ratio justo (tope 1.15, preserva
-  el tono) para no perder la cola de la narración. La lista de concat se **copia dentro de
-  `con_audio/`**: ffmpeg resuelve las rutas relativas de un `concat.txt` contra el
-  directorio del archivo, no contra el cwd — leerla desde `../` concatenaba los mp4
-  originales y el curso salía mudo sin que nada fallara.
-- CLI equivalente: `studio/tools/guiones.py` (`--solo-guion`, `--solo-audio`, `--voz`,
-  `--force`); comparte la lógica de `app/narracion.py`.
-- Operación: la unidad systemd necesita `ReadWritePaths` sobre `guiones/` y el directorio
-  debe ser del usuario `manimstudio` (mismo patrón que Animaciones).
+**Desde 2026-09-03 la voz no depende de GCP.** Hay cuatro proveedores
+(`app/tts.py`), y la interfaz enseña cuáles están disponibles y por qué no:
+
+| Proveedor | Qué es | Red | Guion |
+|---|---|---|---|
+| `edge` (defecto) | edge-tts, 45 voces neuronales en español (es-MX Jorge/Dalia…) | desde el backend | no |
+| `piper` | Piper offline; un `.onnx` por voz en `MS_PIPER_VOICES_DIR` (`/etc/manimstudio/voces`) | no | no |
+| `vertex` | Gemini TTS; el único que **escribe** el guion (Gemini 2.5 Pro) | sí, de pago | sí |
+| `archivo` | la grabación del dueño, subida por clip | — | — |
+
+Flujo:
+
+- **Guion**: si Vertex está disponible lo escribe Gemini a partir del script
+  (como siempre). Si no, se escribe a mano en «Guion y voz» (tabla de
+  secciones `t_inicio / t_fin / momento / texto`; `PUT
+  /api/projects/{pid}/narracion/{cid}/guion`) o lo escribe Claude desde la
+  terminal. Un guion a mano se alinea **exacto** a sus tiempos (sin el tope
+  de 2.5 s de hueco que aplica a los tiempos estimados por Gemini).
+- **Voz**: `POST /api/projects/{pid}/narracion` acepta `{proveedor, voz,
+  solo_audio, clips, force}`. Sin guion y sin Vertex responde 409 diciendo
+  qué clips lo necesitan. `GET /api/narracion/proveedores` es el catálogo.
+- **Grabación propia**: `PUT /api/projects/{pid}/narracion/{cid}/audio?nombre=toma.m4a`
+  con el archivo como cuerpo (wav/mp3/flac/ogg se decodifican en el backend
+  con miniaudio; m4a/aac/webm/opus pasan por ffmpeg en el contenedor,
+  comando `normalizar_voz` del runner). Se convierte a mono 24 kHz, se le
+  recorta el silencio y queda en la **misma ruta canónica** que el TTS
+  (`guiones/<slug>/NN-<slug>.wav`), así la película la recoge sin cambios.
+  nginx admite 25 MB en `/api/`.
+- Cambiar el proveedor por defecto **no** deja desactualizado el catálogo: el
+  hash de frescura usa la voz con que se narró cada clip.
+- Piper corre como subproceso (`python -m piper`); la unidad del backend sube
+  a `MemoryMax=1024M` por eso. Sale a 0 dBFS y se atenúa a −3 dB.
+- Los tests simulan «solo Vertex» con `MS_TTS_PROVEEDORES=vertex,archivo`.
+
+Lo anterior sigue vigente: guion por secciones cronometradas, síntesis por
+sección con recorte de silencio, compresión de silencios para caber en el
+vídeo y hasta tres guiones más cortos (solo con Gemini), estado en
+`guiones/<slug>/estado.json` (hash de script compuesto+escena+duración+voz →
+detecta narraciones desactualizadas). API: `GET/POST
+/api/projects/{pid}/narracion`, `POST .../narracion/cancel`, `GET
+.../narracion/{cid}/{audio,texto,guion}`.
 
 ### Identidad CO.DE Academy en los videos
 

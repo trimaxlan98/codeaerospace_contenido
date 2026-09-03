@@ -78,7 +78,7 @@ app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=No
               lifespan=lifespan)
 app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
-app.include_router(make_narracion_router(cfg, db, narracion_service))
+app.include_router(make_narracion_router(cfg, db, narracion_service, runner))
 app.include_router(make_pelicula_router(cfg, db, pelicula_service))
 app.include_router(make_presentaciones_router(cfg, db,
                                              presentacion_service))

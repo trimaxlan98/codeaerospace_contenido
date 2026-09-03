@@ -106,6 +106,17 @@ class RunnerClient:
             raise RunnerError(resp.get("error", "el montaje fallo"))
         return resp.get("informe") or {}
 
+    async def normalizar_voz(self, slug: str, entrada: str, salida: str) -> dict:
+        """Convierte una grabacion subida (m4a/aac/webm...) a WAV mono 24 kHz
+        con ffmpeg en el contenedor. `slug` es el directorio del proyecto
+        bajo guiones/; `entrada`/`salida` son nombres de archivo dentro."""
+        resp = await self._request_one(
+            {"cmd": "normalizar_voz", "slug": slug, "entrada": entrada,
+             "salida": salida}, timeout=300)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la conversion de audio fallo"))
+        return resp
+
     async def paleta(self) -> list[str]:
         """Sintetiza el banco de sonidos (wavs sueltos) para poder oirlo."""
         resp = await self._request_one({"cmd": "paleta"}, timeout=660)

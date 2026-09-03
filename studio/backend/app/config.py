@@ -66,7 +66,27 @@ class Settings:
             "MS_GUIONES_DIR", str(self.workspace / "guiones")))
         self.gemini_model_tts = os.environ.get(
             "MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts")
-        self.tts_voice = os.environ.get("MS_TTS_VOICE", "Charon")
+        # Proveedores de voz (ver app/tts.py). `MS_TTS_PROVIDER` es el
+        # preferido; si no esta disponible se cae al primero que sintetice
+        # (edge -> piper -> vertex). `MS_TTS_PROVEEDORES` acota cuales se
+        # ofrecen (los tests lo usan para simular "sin voz").
+        self.tts_provider = os.environ.get("MS_TTS_PROVIDER", "edge")
+        self.tts_proveedores = tuple(
+            p.strip() for p in os.environ.get(
+                "MS_TTS_PROVEEDORES", "vertex,edge,piper,archivo").split(",")
+            if p.strip())
+        self.tts_voice_vertex = os.environ.get("MS_TTS_VOICE", "Charon")
+        self.tts_voice = self.tts_voice_vertex  # compatibilidad
+        self.tts_voice_edge = os.environ.get("MS_TTS_VOICE_EDGE",
+                                             "es-MX-JorgeNeural")
+        self.tts_voice_piper = os.environ.get("MS_TTS_VOICE_PIPER",
+                                              "es_MX-claude-high")
+        # Modelos .onnx de Piper. Fuera del repo por defecto (63 MB por voz).
+        self.piper_voices_dir = Path(os.environ.get(
+            "MS_PIPER_VOICES_DIR", "/etc/manimstudio/voces"))
+        # Subidas de narracion propia: tope del cuerpo (un WAV estereo a
+        # 48 kHz de 45 s son ~8.6 MB; 25 MB deja aire para 2 min).
+        self.max_upload_audio_mb = int(os.environ.get("MS_MAX_UPLOAD_AUDIO_MB", "25"))
 
         # Peliculas montadas (los clips de un curso unidos en un archivo). Van
         # bajo exports/, que ya era el sitio de los cursos muxeados a mano y

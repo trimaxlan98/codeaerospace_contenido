@@ -214,7 +214,7 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
             if not narracion.enabled:
                 raise HTTPException(
                     status_code=503,
-                    detail="La voz requiere la service account de Vertex;"
+                    detail="No hay ningun proveedor de voz disponible;"
                            " quita las frases para mezclar solo la cama.")
             await _voz(m, job_dir, dur)
 
@@ -254,9 +254,10 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         # bucle se oye: se sintetiza contra ese limite, no contra el final.
         limite = (dur - audio_promo.COLA_SILENCIO_S) if dur else None
         try:
-            await asyncio.to_thread(sintetizar, narracion._vertex(),
-                                    m["voz"]["secciones"], m["voz"]["voz"],
-                                    wav, limite)
+            proveedor, voz = narracion.resolver_voz(
+                m["voz"].get("proveedor"), m["voz"]["voz"] or None)
+            await asyncio.to_thread(sintetizar, narracion._narrador(proveedor),
+                                    m["voz"]["secciones"], voz, wav, limite)
         except Exception as e:
             raise HTTPException(status_code=502,
                                 detail=f"La síntesis de voz falló: {e}")

@@ -79,6 +79,15 @@ PRESENTACIONES_DIR = "exports/presentaciones"
 # Cortar es recodificar fragmentos cortos y generar GIF: minutos, no horas.
 CORTAR_TIMEOUT = 3600
 
+# Grabaciones propias de narracion (PUT .../narracion/{cid}/audio): el backend
+# deja el archivo subido en guiones/<slug>/ y pide convertirlo a WAV mono
+# 24 kHz con el ffmpeg del contenedor. Solo entran un slug y dos nombres de
+# archivo con forma cerrada; el directorio se monta rw solo para esa llamada.
+GUIONES_DIR = "guiones"
+NORMALIZAR_TIMEOUT = 240
+RE_SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,40}$")
+RE_SUBIDA = re.compile(r"^[0-9]{2}-[a-z0-9-]{1,60}\.subida(?:\.[a-z0-9]{2,5})?$")
+
 RE_JOB_ID = re.compile(r"^[a-f0-9]{8,32}$")
 RE_SCENE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,127}$")
 QUALITIES = {"ql", "qm", "qh"}
@@ -634,6 +643,45 @@ async def handle_paleta(req: dict, writer: asyncio.StreamWriter) -> None:
     await send(writer, {"type": "ok", "sonidos": wavs})
 
 
+async def handle_normalizar_voz(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Convierte una grabacion subida a WAV mono 24 kHz s16 (ffmpeg en el
+    contenedor). Ver GUIONES_DIR: rutas cerradas, montaje rw del directorio
+    del proyecto y nada mas."""
+    slug = str(req.get("slug", ""))
+    entrada = str(req.get("entrada", ""))
+    salida = str(req.get("salida", ""))
+    if not RE_SLUG.match(slug) or not RE_SUBIDA.match(entrada) \
+            or not RE_SUBIDA.match(salida) or not salida.endswith(".wav"):
+        await send(writer, {"type": "error", "error": "parametros invalidos"})
+        return
+    dir_rel = f"{GUIONES_DIR}/{slug}"
+    dir_abs = os.path.join(PROJECT_DIR, dir_rel)
+    if not os.path.isfile(os.path.join(dir_abs, entrada)):
+        await send(writer, {"type": "error", "error": "archivo subido no encontrado"})
+        return
+    container = f"{CONTAINER_PREFIX}voz-{slug[:24]}"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", f"{os.path.realpath(dir_abs)}:/workspace/{dir_rel}:rw",
+        "--name", container,
+        "--entrypoint", "ffmpeg", "manim-render",
+        "-y", "-v", "error", "-i", f"/workspace/{dir_rel}/{entrada}",
+        "-vn", "-ac", "1", "-ar", "24000", "-sample_fmt", "s16",
+        "-f", "wav", f"/workspace/{dir_rel}/{salida}",
+        timeout=NORMALIZAR_TIMEOUT,
+    )
+    if code != 0 or not os.path.isfile(os.path.join(dir_abs, salida)):
+        await force_remove(container)
+        log(f"[voz] slug={slug} conversion fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"ffmpeg salio con codigo {code}:"
+                                     f" {(err or out)[-300:]}"})
+        return
+    log(f"[voz] slug={slug} ok {entrada} -> {salida}")
+    await send(writer, {"type": "ok", "salida": f"{dir_rel}/{salida}"})
+
+
 async def handle_cancel(req: dict, writer: asyncio.StreamWriter) -> None:
     job_id = str(req.get("job_id", ""))
     if not RE_JOB_ID.match(job_id):
@@ -724,6 +772,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_ensamblar(req, writer)
         elif cmd == "presentacion":
             await handle_presentacion(req, writer)
+        elif cmd == "normalizar_voz":
+            await handle_normalizar_voz(req, writer)
         elif cmd == "paleta":
             await handle_paleta(req, writer)
         elif cmd == "thumbnail":

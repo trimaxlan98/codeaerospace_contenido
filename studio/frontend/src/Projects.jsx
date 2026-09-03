@@ -25,6 +25,8 @@ import ClipAssistant from './components/ClipAssistant.jsx'
 import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioPromoDialog.jsx'
 import PeliculaPanel from './components/PeliculaPanel.jsx'
 import PresentacionPanel from './components/PresentacionPanel.jsx'
+import GuionDialog from './components/GuionDialog.jsx'
+import VozSelector, { PROVEEDOR_LABEL, vozInicial } from './components/VozSelector.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -63,6 +65,7 @@ const STATUS_META = {
 const NARR_META = {
   al_dia: { label: 'al día', text: 'text-ok' },
   desactualizada: { label: 'desactualizada', text: 'text-warn' },
+  guion: { label: 'guion sin voz', text: 'text-warn' },
   sin_narracion: { label: 'sin narración', text: 'text-muted' },
 }
 
@@ -648,7 +651,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   // Modo guiado apagado (el valor por defecto) = esta vista es exactamente la
   // de siempre: ni el boton del asistente se monta.
   const guided = usePref('guided')
-  const [guionClip, setGuionClip] = useState(null) // clip cuyo guion se lee
+  const [guionClip, setGuionClip] = useState(null) // clip cuyo guion se edita/narra
+  // Proveedor y voz con que se narra (R1): parte del defecto que anuncia el
+  // backend y se recuerda mientras dure la vista.
+  const [voz, setVoz] = useState({ proveedor: null, voz: null })
   const [audioClip, setAudioClip] = useState(null) // clip cuyo audio se edita
   const savedRef = useRef({ name: '', description: '' })
   const savedClipsRef = useRef({})
@@ -668,7 +674,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   useEffect(() => { load() }, [load])
 
   const loadNarracion = useCallback(() => {
-    api.getNarracion(projectId).then(setNarracion).catch(() => setNarracion(null))
+    api.getNarracion(projectId).then((n) => {
+      setNarracion(n)
+      setVoz((v) => (v.proveedor ? v : vozInicial(n)))
+    }).catch(() => setNarracion(null))
   }, [projectId])
 
   useEffect(() => { loadNarracion() }, [loadNarracion])
@@ -878,7 +887,9 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
   const generarNarracion = async (body = {}) => {
     setError('')
     try {
-      await api.startNarracion(project.id, body)
+      await api.startNarracion(project.id, {
+        proveedor: voz.proveedor || undefined, voz: voz.voz || undefined, ...body,
+      })
       loadNarracion()
     } catch (err) {
       setError(err.message)
@@ -1055,7 +1066,8 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
             ) : (
               <Stat label="Narración" value={narracion ? `${narrAlDia}/${clips.length}` : '—'}
                 tone={narracion && narrAlDia === clips.length && clips.length > 0 ? 'ok' : 'muted'}
-                detail={narracion?.voz || (narracion?.enabled === false ? 'sin Vertex' : '…')} />
+                detail={narracion?.enabled === false ? 'sin proveedor de voz'
+                  : voz.proveedor ? `${PROVEEDOR_LABEL[voz.proveedor] || voz.proveedor} · ${voz.voz || ''}` : '…'} />
             )}
           </div>
 
@@ -1092,6 +1104,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               title={staleCount === 0 ? 'no hay clips desactualizados sin un render en curso' : undefined}>
               <RefreshCw className="h-3.5 w-3.5" /> Re-renderizar desactualizados{staleCount > 0 ? ` (${staleCount})` : ''}
             </Button>
+            {esPromo || !narracion?.proveedores ? null : (
+              <VozSelector proveedores={narracion.proveedores} value={voz} onChange={setVoz}
+                disabled={Boolean(narrRun)} compact />
+            )}
             {esPromo ? null : narrRun ? (
               <>
                 <Button size="sm" variant="default" disabled>
@@ -1105,7 +1121,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
               <Button size="sm" variant="default" onClick={() => generarNarracion()}
                 disabled={!narracion?.enabled || narrPending === 0 || Boolean(runAjena)}
                 title={!narracion?.enabled
-                  ? 'requiere el asistente IA (Vertex) configurado'
+                  ? 'ningún proveedor de voz disponible (edge-tts, Piper o Vertex)'
                   : runAjena
                     ? 'hay una narración en curso en otro proyecto (solo una a la vez)'
                     : (narrPending === 0 ? 'la narración de todos los clips está al día' : undefined)}>
@@ -1192,8 +1208,9 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
           onOpenChange={(o) => !o && setAudioClip(null)} onSaved={load} />
       )}
 
-      <GuionDialog projectId={project.id} clip={guionClip}
-        onOpenChange={(o) => !o && setGuionClip(null)} />
+      <GuionDialog projectId={project.id} clip={guionClip} narr={guionClip ? narrByClip[guionClip.id] : null}
+        narracion={narracion} voz={voz} onVoz={setVoz}
+        onOpenChange={(o) => !o && setGuionClip(null)} onChanged={loadNarracion} />
       {guided && (
         <ClipAssistant open={assistantOpen} onOpenChange={setAssistantOpen}
           project={project} aiEnabled={aiEnabled}
@@ -1404,7 +1421,7 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
                 )}
                 {narr.audio_s != null && (
                   <span className="font-mono text-[11px] text-muted">
-                    {narr.audio_s} s{narr.voz ? ` · ${narr.voz}` : ''}
+                    {narr.audio_s} s · {narr.origen === 'subido' ? 'grabación propia' : (narr.voz || '')}
                   </span>
                 )}
                 {narr.aviso_largo && (
@@ -1413,14 +1430,13 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
                     ⚠ más larga que el video
                   </span>
                 )}
-                {narr.has_texto && (
-                  <Button size="xs" variant="ghost" onClick={onVerGuion} title="ver el texto del guion">
-                    <FileText className="h-3.5 w-3.5" /> Guion
-                  </Button>
-                )}
+                <Button size="xs" variant="ghost" onClick={onVerGuion}
+                  title="escribir o leer el guion, narrarlo con la voz elegida o subir tu grabación">
+                  <FileText className="h-3.5 w-3.5" /> Guion y voz
+                </Button>
                 <Button size="xs" variant="ghost" onClick={onNarrar} disabled={narrBusy || !narrEnabled}
                   aria-label="regenerar narración"
-                  title={narrEnabled ? 'regenerar la narración de este clip' : 'requiere el asistente IA (Vertex)'}>
+                  title={narrEnabled ? 'regenerar la narración de este clip' : 'ningún proveedor de voz disponible'}>
                   <RefreshCw className="h-3.5 w-3.5" />
                 </Button>
               </>
@@ -1429,48 +1445,6 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
         )}
       </div>
     </article>
-  )
-}
-
-// Lector del guion generado por Vertex: el endpoint existia desde el primer
-// dia y no habia ninguna forma de leer el texto sin bajarse el zip del curso.
-function GuionDialog({ projectId, clip, onOpenChange }) {
-  const [texto, setTexto] = useState(null)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (!clip) return
-    setTexto(null); setError('')
-    let alive = true
-    api.getNarracionTexto(projectId, clip.id)
-      .then((d) => { if (alive) setTexto(d) })
-      .catch((err) => { if (alive) setError(err.message) })
-    return () => { alive = false }
-  }, [projectId, clip])
-
-  return (
-    <Dialog open={Boolean(clip)} onOpenChange={onOpenChange}>
-      {clip && (
-        <DialogContent className="p-0">
-          <div className="border-b border-line px-4 py-3 pr-12">
-            <DialogTitle className="truncate font-display text-[15px] text-ink">
-              Guion · {clip.title}
-            </DialogTitle>
-          </div>
-          <div className="max-h-[70vh] overflow-y-auto p-4">
-            {error ? (
-              <p role="alert" className="text-[13px] text-warn">{error}</p>
-            ) : texto == null ? (
-              <p className="text-[13px] text-muted">Cargando guion…</p>
-            ) : (
-              <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-ink">
-                {texto.txt || texto.md || 'Guion vacío.'}
-              </p>
-            )}
-          </div>
-        </DialogContent>
-      )}
-    </Dialog>
   )
 }
 

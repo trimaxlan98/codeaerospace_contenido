@@ -269,7 +269,7 @@ def test_con_render_pide_voz_pero_no_hay_vertex(authed):
     # a medias ni se descarta la voz en silencio.
     r = authed.post(f"/api/projects/{p['id']}/clips/{clip['id']}/audio/mezclar")
     assert r.status_code == 503
-    assert "Vertex" in r.json()["detail"]
+    assert "proveedor de voz" in r.json()["detail"]
 
 
 def test_estado_al_dia_y_desactualizado(authed):

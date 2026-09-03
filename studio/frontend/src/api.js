@@ -25,6 +25,21 @@ async function request(method, path, body) {
   return data
 }
 
+// Subida de un archivo como cuerpo crudo (sin multipart: el backend no lo
+// necesita y asi no hay dependencia extra). Mismo manejo de 401 y errores.
+async function subirArchivo(path, file) {
+  const res = await fetch(path, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    body: file,
+  })
+  let data = null
+  try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (res.status === 401) onUnauthorized?.()
+  if (!res.ok) throw new ApiError(res.status, data?.detail)
+  return data
+}
+
 export const api = {
   me: () => request('GET', '/api/me'),
   login: (username, password) => request('POST', '/api/login', { username, password }),
@@ -73,6 +88,12 @@ export const api = {
   startNarracion: (pid, body = {}) => request('POST', `/api/projects/${pid}/narracion`, body),
   cancelNarracion: (pid) => request('POST', `/api/projects/${pid}/narracion/cancel`),
   getNarracionTexto: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/texto`),
+  // Voz sin GCP: catalogo de proveedores, guion editable y grabacion propia.
+  getVoces: () => request('GET', '/api/narracion/proveedores'),
+  getGuion: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/guion`),
+  putGuion: (pid, cid, secciones) => request('PUT', `/api/projects/${pid}/narracion/${cid}/guion`, { secciones }),
+  subirNarracion: (pid, cid, file) => subirArchivo(
+    `/api/projects/${pid}/narracion/${cid}/audio?nombre=${encodeURIComponent(file.name || 'voz.wav')}`, file),
   // La pelicula del curso (clips + narracion + marca en un solo archivo).
   getPelicula: (pid) => request('GET', `/api/projects/${pid}/pelicula`),
   montarPelicula: (pid, body = {}) => request('POST', `/api/projects/${pid}/pelicula`, body),

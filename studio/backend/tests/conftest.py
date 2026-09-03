@@ -25,6 +25,11 @@ def _set_env(tmp_path: Path) -> None:
     # El asistente IA queda deshabilitado en tests (la clave no existe en tmp);
     # los tests de IA que lo necesitan crean este archivo y mockean el cliente.
     os.environ["MS_GCP_KEY_PATH"] = str(tmp_path / "gcp-key.json")
+    # Voz: en tests solo existe Vertex (mockeado); edge-tts/piper del venv
+    # quedan fuera para que "sin credenciales" siga significando "sin voz".
+    os.environ["MS_TTS_PROVIDER"] = "vertex"
+    os.environ["MS_TTS_PROVEEDORES"] = "vertex,archivo"
+    os.environ["MS_PIPER_VOICES_DIR"] = str(tmp_path / "voces")
 
 
 @pytest.fixture()
