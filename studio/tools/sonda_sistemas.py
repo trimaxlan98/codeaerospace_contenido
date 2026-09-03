@@ -290,6 +290,27 @@ ok("lo que cambia es lo de FUERA de la resonancia",
    > 8 * sis.amplificacion(sis.resonador(0.08, 4.0, N=1200), 0.08, 0.02),
    "la amplificacion sube casi 10 veces mientras el pico baja")
 
+# Y la MISMA trampa en el eje de frecuencia: la campana de un Q alto es tan
+# estrecha que una rejilla gruesa no cae en su pico y lo mide por debajo. La
+# amplificacion de Q=40 sube de 37.38 a 38.25 solo con afinar la fft, sin
+# que nada cambie en el sistema. Con Q=4 no se mueve. La precision a la que
+# las tres SI son del sistema es el entero.
+_h40 = sis.resonador(0.08, 40.0, N=1200)
+_h4 = sis.resonador(0.08, 4.0, N=1200)
+ok("la amplificacion de Q=40 depende de la rejilla (contraejemplo)",
+   abs(sis.amplificacion(_h40, 0.08, 0.02, N=1024)
+       - sis.amplificacion(_h40, 0.08, 0.02, N=16384)) > 0.5,
+   f"{sis.amplificacion(_h40, 0.08, 0.02, N=1024):.2f} contra "
+   f"{sis.amplificacion(_h40, 0.08, 0.02, N=16384):.2f}")
+ok("la de Q=4 no", abs(sis.amplificacion(_h4, 0.08, 0.02, N=1024)
+                       - sis.amplificacion(_h4, 0.08, 0.02, N=16384)) < 0.01,
+   "estable en 3.89")
+ok("y redondeadas a entero las dos son estables",
+   all(round(sis.amplificacion(_h, 0.08, 0.02, N=N)) == v
+       for _h, v in ((_h4, 4), (_h40, 38))
+       for N in (4096, 8192, 16384, 32768)),
+   "4 y 38 en las cuatro rejillas")
+
 print("\n== 16 · Transitorio y permanente ==")
 y_esc = np.convolve(sis.escalon(200), hr)[:200]
 ta = sis.tiempo_asentamiento(y_esc, 0.02)
