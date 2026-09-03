@@ -552,54 +552,6 @@ cuatro decimales, color por veredicto **y recuento en palabras**, tooltip
 
 ## R4 — Rigor de investigación (agente Opus, librerías)
 
-## R4 — Rigor de investigación · **hecho** (librerías) 2026-09-03
-
-Dos primitivas nuevas en `studio/content/manim_extensions/`, con sondas,
-demos, tres CSV/JSONL de ejemplo en `studio/content/datos/ejemplo/` y una
-lección. Sondas en producción desde el Laboratorio: **ntn 94/0, figura 79/0**.
-
-**`figura.py` — el lienzo es físico.** Columna IEEE (3.5 in / 7.16 in) por
-dpi: 1050×652 y 2148×1332 px a 300 dpi, 18 pt por unidad de escena en las
-dos. La tipografía se mide en **puntos impresos** (verificado contando píxeles
-del PNG de `-s` con PIL: 8 pt = 34 px a 300 dpi). Ejes con el marco al borde,
-banda de IC95, CDF, Gantt de disponibilidad con marcadores, leyenda, **sello
-de proveniencia** (commit/semilla/fecha; lee `MS_COMMIT`, `MS_SEMILLA`,
-`MS_FECHA`) y datos que entran de `MS_DATOS_DIR` (`leer_csv`, `leer_jsonl`)
-en vez de transcribirse. Tres guardianes probados con contraejemplo:
-legibilidad, ancho y caja colocada.
-
-**`ntn.py` — la tesis.** Pase LEO con AOS/TCA/LOS, Doppler, retardo,
-cascada de handover, quórum PBFT, margen adaptativo y gates con IC95 % por
-bootstrap sobre semillas. Reutiliza `satelites.py` y `enlace.py`;
-determinista.
-
-Dos hallazgos que trascienden el sprint (los cazó la sonda, no la lectura):
-
-- **El quórum de PBFT es `ceil((n+f+1)/2)`, no `2f+1`**: con n=6 y f=1, `2f+1`
-  da 3, que no es mayoría de 6, y dos quórums podrían no compartir ninguna
-  réplica correcta.
-- **Los retardos del CSV LEO-600 del banco de pruebas son de ida y vuelta**:
-  12.9 ms de ida serían 3 867 km, y el horizonte a 600 km está en 2 829.
-  Leídos como RTT dan 9.97°, la máscara de 10° del propio escenario.
-
-Trampas nuevas, todas medidas: un `Text` con espacio infla su caja hasta el
-siguiente glifo; un número impar de píxeles mata a libx264 sin nombrarlo;
-`frame_width` y `frame_height` son independientes en manim 0.20.1; `Axes`
-pega el eje al borde de arriba cuando el rango no contiene el cero; **manim
-0.20.1 no exporta SVG** (la figura estática es PNG a 300 dpi; el SVG queda
-fuera del alcance).
-
-**De camino, el asistente.** `conocimiento.py` recortaba el paquete del
-asistente de un tajo a 60 000 caracteres sobre 280 000: el modelo veía las
-primitivas por orden alfabético hasta la letra *c* y ninguna de las demás
-existía para él. Ahora lleva índice de una línea por módulo, fuentes
-prioritarias primero y la API completa detrás de la fuente recortada.
-
-Pendiente de R4: **datos adjuntos por proyecto** (`POST /{pid}/datos`
-montados como `datos/` en el job). Hoy `MS_DATOS_DIR` apunta al repo
-(`studio/content/datos/`), que es suficiente para las figuras de la tesis
-versionadas en git.
-
 ## R5 — UX
 
 Panel de **Audio** por clip que unifica voz (proveedor, voz, guion editable,
@@ -801,4 +753,167 @@ Trampas:
 - **Un lote terminado y limpio no se pinta.** La barra solo aparece mientras
   corre o si dejó fallos: un `30/30` en verde no dice nada que no diga ya el
   contador «Render N/N» de la cabecera.
+
+---
+
+## R4 — Librerías de investigación (`figura.py` y `ntn.py`)
+
+Cerrado el **2026-09-03**. Dos primitivas nuevas, dos sondas, cinco demos y una
+lección. Nada de backend salvo `conocimiento.py`, que tenía un defecto que dejaba
+a la mitad de las primitivas invisibles para el asistente (abajo).
+
+### Qué entra
+
+| Archivo | Qué es |
+|---|---|
+| `studio/content/manim_extensions/figura.py` | figura de paper: lienzo IEEE en pulgadas y dpi, tipografía medida en **puntos impresos**, ejes, banda de IC, CDF, Gantt, leyenda, sello de proveniencia, `leer_csv` / `leer_jsonl` |
+| `studio/content/manim_extensions/ntn.py` | pase LEO (AOS/TCA/LOS, elevación, distancia oblicua), Doppler, retardo, handover, quórum PBFT, margen adaptativo y gates con IC95 % |
+| `studio/tools/sonda_figura.py` | 79 invariantes, incluido el PNG de `-s` medido con PIL |
+| `studio/tools/sonda_ntn.py` | 94 invariantes, con contraejemplo en cada propiedad que lo admite |
+| `studio/content/animations/investigacion/01..05` | figura MA con IC y sello, Gantt desde JSONL, CDF desde CSV, pase LEO-600 animado, quórum PBFT |
+| `studio/content/datos/ejemplo/` | `disponibilidad.jsonl`, `recuperacion.csv`, `rtt_leo600.csv` |
+| `studio/content/lessons/manim-primitivas/06-figuras-de-investigacion.md` | la lección |
+
+**173 invariantes, 0 fallos.** Backend: 275 tests verdes.
+
+### El lienzo, medido
+
+| | 1 columna | 2 columnas |
+|---|---|---|
+| plantilla IEEE | 3.5 in | 7.16 in |
+| a 300 dpi | **1050 × 652 px** | **2148 × 1332 px** |
+| frame de escena | 14.00 × 8.69 u | 28.64 × 17.76 u |
+| 1 unidad de escena | **18 pt** | **18 pt** |
+
+Que una unidad valga 18 puntos en las dos hace que un `font_size` signifique el
+mismo tamaño físico en una columna y en dos, y que la misma figura entre en un
+clip de vídeo con `Figura.pantalla(tema="marca")` sin tocar el dibujo. La
+verificación que cierra el círculo está en la sonda: un texto declarado de 8 pt
+sale con **34 px de tinta** en el PNG a 300 dpi (lo exacto son 33.33), contados
+con PIL.
+
+### Las cifras de la tesis que ya se pueden dibujar
+
+| | |
+|---|---|
+| FSPL a 600 km y 2 GHz | 154.03 dB (el 92.45 de la casa sobra **0.0022 dB**) |
+| horizonte geométrico a 600 km | 2829.35 km |
+| pase sobre Ciudad de México (h=600, i=53°, máscara 10°) | **89.63°** máx., **530.1 s** |
+| distancia / retardo de ida | 1930 km (6.44 ms) en AOS, 600 km (2.00 ms) en TCA |
+| Doppler de pico a 2 GHz | **43.60 kHz** = 21.82 ppm |
+| tick 0 del banco (12.9 ms) leído como RTT | **9.97°** — la máscara de 10° del propio escenario |
+| tick 4 (4.5 ms) leído como RTT | 61.46° |
+| tren de 4 satélites, solape 0.25 | 100 % de cobertura, 3 relevos, elevación máx. 89.8° → 51.9° |
+| quórum PBFT n=7 | f=2, quórum 5, 84 mensajes (total exacto `2n(n−1)`) |
+| quórum PBFT n=6 | f=1, quórum **4** — `2f+1` daría 3 |
+| gate con 3 semillas al borde del umbral | media 0.253, IC95 [0.200, 0.300] → **indeciso** |
+
+### Los dos hallazgos que trascienden el sprint
+
+**1. El quórum de PBFT no es `2f+1`.** Es `ceil((n+f+1)/2)`, y coincide con
+`2f+1` justo cuando `n = 3f+1` — el caso de todos los diagramas, y por eso
+«2f+1» se repite como si fuera la definición. Con n=6 y f=1, `2f+1` = 3 no es ni
+mayoría de 6: dos quórums de tres pueden no compartir **ninguna** réplica
+correcta, y el protocolo pierde la intersección en la que se apoya. La primera
+versión de `quorum_pbft` devolvía 3; lo cazó la sonda pidiendo «el quórum es
+mayoría estricta», que es una propiedad, no una fórmula.
+
+**2. Los delays del CSV LEO-600 del banco son de ida y vuelta.** Leídos como de
+ida, los 12.9 ms del primer tick serían 3867 km y el horizonte a 600 km está en
+2829: geométricamente imposible. Leídos como RTT dan 9.97° de elevación, o sea
+la máscara de 10° del propio escenario, y el resto de los ticks encajan (61.46°
+en el mínimo). `ntn.escenario_leo600()` calcula las dos lecturas y dice cuál es
+posible, en vez de suponerlo.
+
+### Trampas nuevas para `references/trampas.md`
+
+- **El espacio infla la caja.** Un `Text` con un espacio crea un submobject
+  **vacío**, y `Mobject.reduce_across_dimension` devuelve `0` para un submobject
+  sin puntos: la caja del texto se come el origen en cuanto se mueve.
+  `Text("RTT (ms)")` mide 0.2539 de alto recién nacido y **2.1270** después de
+  un `shift`; sin espacios no pasa. `.width`, `.height`, `.get_center()`,
+  `next_to()` y `move_to()` quedan inservibles con texto de más de una palabra.
+  `figura` posiciona con `caja` / `poner` / `pegar`, que leen los puntos reales.
+  Esto afecta a **toda** la casa, no solo a las figuras.
+- **Un lado impar de píxeles rompe el vídeo.** 1050 × 651 mataba el render con
+  `avcodec_open2("libx264") -> Generic error in an external library`, sin nombrar
+  el 651; el PNG de `-s` salía perfecto, así que el fallo aparecía solo al pedir
+  el clip. `Figura` sube el lado al par siguiente.
+- **`frame_width` y `frame_height` son independientes en manim 0.20.1**: fijar
+  uno no recalcula el otro, y la figura sale deformada sin aviso.
+- **`Axes` con un rango que no contiene el cero pega el eje X al borde de
+  ARRIBA** (`_origin_shift`), con sus números encima de la curva. `ejes_paper`
+  dibuja el marco a mano abajo y a la izquierda.
+- **Un guardián de ancho no basta: hay que medir la caja COLOCADA.** Un bloque
+  de 11 unidades cabe de sobra en un frame de 14.23 y se sale por la izquierda
+  si se ancla a la derecha de unos ejes.
+- **`Create` sobre unos ejes dibuja los rótulos letra a letra** (el eje X decía
+  «tie» a mitad de la animación): se traza el marco y lo escrito entra fundido.
+- **Un pase LEO es casi simétrico alrededor del TCA, también uno oblicuo**: los
+  2.2° que gira la Tierra en 530 s apenas tuercen la elevación (el azimut sí).
+  Está escrito para que nadie «arregle» una asimetría que la física no pide.
+- **El TCA es un instante, no una muestra**: cerca del cenit la elevación cae ~1°
+  cada 1.5 s y un pase cenital rotulaba 89.13° donde la geometría dice 90.
+- **Con tres semillas el bootstrap solo tiene 10 remuestras distintas.** El IC95 %
+  está cuantizado y dos semillas de bootstrap dan el mismo intervalo: es el techo
+  de resolución de tres corridas, y por eso un gate al borde sale indeciso por
+  construcción. Y remuestrear MUESTRAS en vez de SEMILLAS estrecha el intervalo
+  hasta hacer pasar un gate indeciso (medido: límite inferior falso 0.254 contra
+  el honesto 0.221, con umbral 0.25).
+
+### `conocimiento.py`: la mitad de las primitivas eran invisibles
+
+El paquete que ve el asistente recortaba el TOTAL de un tajo a 60 000
+caracteres. Con 47 primitivas y ~280 000 caracteres ya recortados a 7 000 por
+archivo, el modelo veía las fuentes **por orden alfabético hasta la letra «c»**
+(`calculo_vectorial.py`) y ninguna de las demás —`enlace`, `satelites`,
+`lienzo`, `transformadas`, `figura`, `ntn`…— existía para él. No hay lista fija
+que arreglar: el defecto era el recorte. Ahora:
+
+1. un **índice de una línea por módulo** (47 líneas, ~5 kB), para que ninguna
+   primitiva sea invisible;
+2. la fuente completa de los **prioritarios** primero (`code_brand`,
+   `transiciones`, `lienzo`, `figura`, `ntn`) y el resto hasta donde quepa, con
+   el corte en la frontera de un módulo y un aviso que dice cuáles quedaron
+   fuera;
+3. cuando una fuente se recorta, se le pega detrás **su lista completa de
+   firmas**: en `figura.py` y `ntn.py` (40 y 30 kB) el corte a 7 000 se comía
+   `sello`, `leer_csv` y `quorum_pbft`, justo lo que hay que llamar.
+
+Medido: el paquete pasa de 60 000 truncados a 56 567 con las 47 primitivas
+nombradas y la API de `figura` y `ntn` entera. Los 275 tests siguen verdes.
+
+### Comprobado en la app, no solo en la terminal
+
+- `GET /api/animations` indexa la categoría «Investigación» con sus **5**
+  demos y la escena correcta de cada una (`FiguraMA`, `FiguraGantt`,
+  `FiguraCDF`, `PaseLeo600`, `QuorumPbft`); `test_animations.py` en verde
+  (7 pasan). La lección nueva sale en `manim-primitivas` con orden 6.
+- Las cinco demos se renderizaron **con el bloque de identidad que anexa
+  `branding.aplicar()`**, que es lo que de verdad corre en la app: las tres
+  figuras de paper salen idénticas (fondo blanco, sin marca de agua ni
+  esquinas HUD, gracias a `sellar_escenas`) y las dos de vídeo reciben la
+  marca sin que el wordmark toque ningún pie.
+- Efecto secundario conocido y no corregido: sin una lección con el mismo id,
+  el título de una animación se deriva del slug con `.capitalize()` y las
+  siglas quedan en minúscula («Cdf de recuperacion»). Es el comportamiento que
+  ya tienen «De 5g a 6g» e «Isac sensado y comunicacion» en producción;
+  arreglarlo es tocar `animations.py`, que R4 no toca.
+
+### Lo que R4 deja pendiente para R3/R5
+
+`figura.leer_csv` ya lee de `MS_DATOS_DIR`, pero **la app todavía no monta un
+`datos/` en el job**: eso es la brecha «datos adjuntos» de R3
+(`POST /{pid}/datos`). Hasta entonces, un clip declara su directorio a la vista,
+como hacen las demos 02 y 03.
+
+Y una corrección al plan: **manim 0.20.1 no exporta SVG**. `--format` solo
+acepta `png`, `gif`, `mp4`, `webm` y `mov` (comprobado: `Error: Invalid value
+for '--format': 'svg' is not one of ...`). La figura citable es el **PNG a 300
+dpi**, que es lo que `Figura` está construida para dar exacto; si algún día hace
+falta vectorial, hay que pasar por el `Camera` de manim o por un exportador
+propio, no por la CLI. Queda también llevar `Figura` a la UI como tipo de
+proyecto «figura».
+
+Pendiente de R4: **datos adjuntos por proyecto** (`POST /{pid}/datos` montados como `datos/` en el job). Hoy `MS_DATOS_DIR` apunta al repo (`studio/content/datos/`), suficiente para las figuras de la tesis versionadas en git.
 
