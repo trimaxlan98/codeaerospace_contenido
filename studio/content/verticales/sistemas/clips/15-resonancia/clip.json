@@ -2,5 +2,6 @@
   "name": "Resonancia",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La misma energia a la frecuencia justa levanta la respuesta."
+  "description": "La misma energia a la frecuencia justa levanta la respuesta.",
+  "duracion_objetivo": 34.6
 }

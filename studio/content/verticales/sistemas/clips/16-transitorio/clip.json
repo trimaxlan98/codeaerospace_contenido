@@ -2,5 +2,6 @@
   "name": "Transitorio",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La respuesta se parte en dos y una de las dos se apaga."
+  "description": "La respuesta se parte en dos y una de las dos se apaga.",
+  "duracion_objetivo": 30.05
 }

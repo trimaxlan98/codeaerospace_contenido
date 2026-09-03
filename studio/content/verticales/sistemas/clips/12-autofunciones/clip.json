@@ -2,5 +2,6 @@
   "name": "Autofunciones",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Una exponencial entra y sale identica salvo un factor."
+  "description": "Una exponencial entra y sale identica salvo un factor.",
+  "duracion_objetivo": 41.85
 }

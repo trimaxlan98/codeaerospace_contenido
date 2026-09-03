@@ -2,5 +2,6 @@
   "name": "La Ecuacion",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Cada muestra de salida se construye con las anteriores."
+  "description": "Cada muestra de salida se construye con las anteriores.",
+  "duracion_objetivo": 33.9
 }

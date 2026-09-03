@@ -2,5 +2,6 @@
   "name": "Respuesta En Frecuencia",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Entra un tono y sale el mismo tono con otra amplitud."
+  "description": "Entra un tono y sale el mismo tono con otra amplitud.",
+  "duracion_objetivo": 33.5
 }

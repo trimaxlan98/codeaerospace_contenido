@@ -2,5 +2,6 @@
   "name": "19 · Cierre",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La convolucion se recoge en el punto ambar de CO.DE."
+  "description": "La convolucion se recoge en el punto ambar de CO.DE.",
+  "duracion_objetivo": 13.68
 }

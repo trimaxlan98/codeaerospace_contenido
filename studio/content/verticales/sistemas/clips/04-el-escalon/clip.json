@@ -2,5 +2,6 @@
   "name": "El Escalon",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "El escalon se descompone en impulsos y su respuesta es la suma acumulada."
+  "description": "El escalon se descompone en impulsos y su respuesta es la suma acumulada.",
+  "duracion_objetivo": 31.45
 }

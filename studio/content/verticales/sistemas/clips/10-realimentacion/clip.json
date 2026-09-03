@@ -2,5 +2,6 @@
   "name": "Realimentacion",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Se cierra el lazo y la respuesta cambia de forma."
+  "description": "Se cierra el lazo y la respuesta cambia de forma.",
+  "duracion_objetivo": 31.6
 }
