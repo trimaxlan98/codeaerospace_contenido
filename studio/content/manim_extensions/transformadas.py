@@ -555,9 +555,22 @@ def coeficientes_haar(x, niveles=None):
     return np.concatenate([a] + det[::-1])
 
 
-def señal_con_salto(N=512, n_salto=384, semilla=SEMILLA):
+def señal_con_salto(N=512, n_salto=385, semilla=SEMILLA):
     """Una rampa suave con UN escalon. Fourier necesita cientos de senos
-    para dibujar ese escalon; Haar lo resuelve con un puñado."""
+    para dibujar ese escalon; Haar lo resuelve con un puñado.
+
+    El 385 no es un capricho y el 384 que habia antes estaba MAL: 384 es
+    512*0.75, divisible por todas las potencias de dos hasta 128, asi que
+    el salto cae exactamente sobre una frontera de la particion diadica
+    en TODAS las escalas y nunca queda dentro del soporte de una
+    ondicula. Consecuencia: los coeficientes de detalle finos salian
+    EXACTAMENTE cero y la pieza que quisiera enseñar "la ondicula sabe
+    donde esta el salto" dibujaba una fila de ceros. Lo aislo el agente
+    de la pieza 12 probando con un escalon puro.
+
+    Con 385 (impar, nunca frontera diadica) el salto domina su escala:
+    66.9, 16.0 y 3.3 veces el siguiente valor en los tres niveles mas
+    finos."""
     n = np.arange(int(N))
     x = 0.6 * np.sin(2 * np.pi * 2 * n / N)
     x[n >= int(n_salto)] += 1.0

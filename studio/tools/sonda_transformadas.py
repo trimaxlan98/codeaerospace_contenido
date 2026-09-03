@@ -182,6 +182,36 @@ cfo = tr.coefs_fourier_ortonormales(xs)
 casi("Parseval de la base de Fourier real", float(np.sum(cfo ** 2)),
      float(np.sum(xs ** 2)), 1e-8)
 ok("y tambien N", cfo.size == 512, f"{cfo.size}")
+# El salto tiene que caer DENTRO del soporte de una ondicula en las
+# escalas finas, o los detalles finos salen exactamente cero y la pieza
+# 12 dibuja una fila de ceros creyendo que enseña algo. Paso con el
+# n_salto=384 de la primera version (512*0.75 es divisible por todas las
+# potencias de dos hasta 128, o sea frontera diadica en toda escala).
+_, det = tr.dwt_haar(xs)
+finos = det[0]
+ok("el salto se ve en la escala mas fina",
+   float(np.max(np.abs(finos))) > 0.2,
+   f"maximo {np.max(np.abs(finos)):.3f}")
+casi("y cae donde esta el salto",
+     float(np.argmax(np.abs(finos))), 385 / 2.0, 1.0, "muestras")
+# El contraejemplo se mide sobre un escalon PURO: la señal de la pieza
+# lleva ademas un seno, cuyos detalles finos no son cero y taparian la
+# degeneracion (1.04e-2, que es del seno y no del salto).
+def _escalon_puro(n0, N=512):
+    x = np.zeros(N)
+    x[n0:] = 1.0
+    return x
+
+
+malo = tr.dwt_haar(_escalon_puro(384))[1][0]
+bueno = tr.dwt_haar(_escalon_puro(385))[1][0]
+ok("un salto en 384 es INVISIBLE en la escala fina",
+   float(np.max(np.abs(malo))) < 1e-12,
+   f"maximo {np.max(np.abs(malo)):.1e} — 384 es frontera diadica en toda "
+   f"escala")
+ok("y en 385 se ve entero", float(np.max(np.abs(bueno))) > 0.5,
+   f"maximo {np.max(np.abs(bueno)):.3f}: por eso el defecto es 385")
+
 nh = tr.cuantos_para_energia(cf, 0.99)
 nf = tr.cuantos_para_energia(cfo, 0.99)
 ok("Haar necesita muchos menos que Fourier", nh < nf, f"Haar {nh}, "
