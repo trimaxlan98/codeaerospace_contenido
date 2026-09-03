@@ -1145,7 +1145,7 @@ def _rampa(m, color_alto=None):
 
 
 def mapa(matriz, ancho=None, alto=None, color_alto=None, gamma=1.0,
-         voltear=True):
+         voltear=True, rango=None):
     """Un mapa de intensidad (espectrograma, sinograma, acumulador...).
 
     Va como `ImageMobject` y no como miles de rectangulos: un
@@ -1157,8 +1157,8 @@ def mapa(matriz, ancho=None, alto=None, color_alto=None, gamma=1.0,
     una matriz de frecuencias es la de la frecuencia mas baja."""
     _exige_manim()
     m = np.asarray(matriz, dtype=float)
-    lo, hi = float(np.min(m)), float(np.max(m))
-    m = (m - lo) / ((hi - lo) or 1.0)
+    lo, hi = rango if rango else (float(np.min(m)), float(np.max(m)))
+    m = (m - float(lo)) / ((float(hi) - float(lo)) or 1.0)
     if gamma != 1.0:
         m = m ** float(gamma)
     if voltear:
@@ -1172,17 +1172,30 @@ def mapa(matriz, ancho=None, alto=None, color_alto=None, gamma=1.0,
     return img
 
 
-def malla(valores, lado=2.4, color_alto=None, rejilla=True):
+def malla(valores, lado=2.4, color_alto=None, rejilla=True, rango=None):
     """Una imagen pequeña celda a celda, con su rejilla.
 
     Para el bloque 8x8 de la DCT SI se dibujan celdas: son 64, se ven
     individualmente y la pieza va justamente de que cada una es un numero.
-    Por encima de ~20x20 hay que usar `mapa`."""
+    Por encima de ~20x20 hay que usar `mapa`.
+
+    `rango=(lo, hi)` fija la escala de color en vez de sacarla de la
+    propia matriz, y hace falta SIEMPRE que se comparen dos imagenes. Sin
+    el, cada una se normaliza por su minimo y su maximo: en la pieza 05
+    el bloque rehecho tiene menos rango que el original (0.579 contra
+    0.644) y salia mas contrastado de lo que es, o sea MAS distinto del
+    original de lo que realmente era — justo al reves de lo que la pieza
+    afirma. Lo levanto el agente que la escribio.
+
+    Y ademas resuelve un caso degenerado: una matriz constante (la
+    reconstruccion con un solo coeficiente) tiene rango cero y sin
+    `rango` se pinta entera del color del fondo, o sea invisible."""
     _exige_manim()
     m = np.asarray(valores, dtype=float)
     n = m.shape[0]
-    lo, hi = float(np.min(m)), float(np.max(m))
-    norm = (m - lo) / ((hi - lo) or 1.0)
+    lo, hi = rango if rango else (float(np.min(m)), float(np.max(m)))
+    norm = (m - float(lo)) / ((float(hi) - float(lo)) or 1.0)
+    norm = np.clip(norm, 0.0, 1.0)
     from manim.utils.color import ManimColor
     c0 = np.array(ManimColor(_lz.AZUL).to_rgb())
     c1 = np.array(ManimColor(color_alto or _lz.TINTA).to_rgb())

@@ -90,12 +90,21 @@ compromiso tiempo-frecuencia, 14-18 las que ya no son de frecuencia.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| A | 00 intro, 01, 02, 03, 04 | pendiente |
-| B | 05, 06, 07, 08, 09 | pendiente |
-| C | 10, 11, 12, 13, 14 | pendiente |
-| D | 15, 16, 17, 18, 19 cierre | pendiente |
+| A | 00 intro, 01, 02, 03, 04 | **escritas y validadas en frames** |
+| B | 05, 06, 07, 08, 09 | **escritas y validadas en frames** |
+| C | 10, 11, 12, **13**, 14 | 13 hecha; 10, 11, 12 y 14 en produccion |
+| D | 15, 16, 17, 18, **19 cierre** | cierre hecho; 15-18 en produccion |
 
 Cada lote recorre los 10 pasos entero antes de empezar el siguiente.
+
+**Duraciones medidas (ql)**: intro 15.03, 01 30.47, 02 35.00, 03 34.17,
+04 37.06, 05 36.23, 06 31.47, 07 31.70, 08 37.37, 09 35.77, 13 30.53,
+cierre 13.63.
+
+**Lo que falta cuando esten las 20**: render `qh` local (3 en paralelo),
+`verifica_vertical.py` (resolucion, duraciones contra el manifiesto y
+COSTURAS), y `unir_vertical.py --mudo`. No hay narracion: el curso se
+entrega sin pista de audio.
 
 ## 4. Contrato de la libreria
 

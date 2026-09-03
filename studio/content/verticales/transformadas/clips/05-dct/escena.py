@@ -49,8 +49,8 @@ class Clip(Pieza):
     GAMMA = 0.35            # compresion SOLO de la escala de color, y se
                             # dice en pantalla. Ver la nota 2 de arriba.
 
-    def _malla(self, valores, lado=None):
-        return tf.malla(valores, lado=lado or self.LADO)
+    def _malla(self, valores, lado=None, rango=None):
+        return tf.malla(valores, lado=lado or self.LADO, rango=rango)
 
     def _gemela(self, valores, referencia):
         """Una malla colocada EXACTAMENTE encima de otra que ya esta en
@@ -95,7 +95,7 @@ class Clip(Pieza):
         tirados = bloque.size - self.GUARDADOS
 
         # --- 1. el bloque: 64 casillas de una imagen ------------------
-        m_bloque = self._malla(bloque)
+        m_bloque = self._malla(bloque)   # solo, sin comparar
         r_bloque = rot("el bloque")
         r_bloque.next_to(m_bloque, UP, buff=0.28)
         L.relevo(escena=VGroup(m_bloque, r_bloque),
@@ -148,17 +148,27 @@ class Clip(Pieza):
         # --- 5. la vuelta: la imagen que dan esos seis ----------------
         # Sigue habiendo seis numeros, asi que la cifra sigue siendo
         # cierta y se queda: lo que cambia es lo que se ve con ellos.
-        m_rehecho = self._malla(rehecho)
+        #
+        # Las dos imagenes que se van a comparar comparten ESCALA DE
+        # COLOR. Sin `rango`, `tf.malla` normaliza cada una por su propio
+        # minimo y maximo: el bloque rehecho tiene menos recorrido (0.579
+        # contra 0.644) y salia mas contrastado, o sea MAS distinto del
+        # original de lo que de verdad es. El defecto iba en contra de la
+        # tesis de la pieza. Lo levanto el agente que la escribio y ahora
+        # la libreria acepta el rango comun.
+        escala = (min(float(bloque.min()), float(rehecho.min())),
+                  max(float(bloque.max()), float(rehecho.max())))
+        m_rehecho = self._malla(rehecho, rango=escala)
         r_rehecho = rot("rehecho con 6", color=AMBAR)
         r_rehecho.next_to(m_rehecho, UP, buff=0.28)
         L.escena(VGroup(m_rehecho, r_rehecho), t=0.8)
         self.leer(3.2)
 
         # --- 6. el original al lado, y lo que costo ------------------
-        par_orig = self._malla(bloque, lado=self.LADO_PAR)
+        par_orig = self._malla(bloque, lado=self.LADO_PAR, rango=escala)
         rp_orig = rot("el bloque")
         rp_orig.next_to(par_orig, DOWN, buff=0.22)
-        par_rec = self._malla(rehecho, lado=self.LADO_PAR)
+        par_rec = self._malla(rehecho, lado=self.LADO_PAR, rango=escala)
         rp_rec = rot("con 6 numeros", color=AMBAR)
         rp_rec.next_to(par_rec, DOWN, buff=0.22)
         fila = VGroup(VGroup(par_orig, rp_orig), VGroup(par_rec, rp_rec))
