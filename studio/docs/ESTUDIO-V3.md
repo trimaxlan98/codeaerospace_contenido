@@ -114,7 +114,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | **hecho** |
 | R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3a hecho** (import/export, lote, duplicar); R3b pendiente |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | **hecho** (librerías; datos adjuntos pendiente) |
-| R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | pendiente |
+| R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | **R5a hecho** (Proyectos: descomposición, CodeMirror, fila de audio, historial de script); R5b pendiente (Estudio: fotogramas, Laboratorio) |
 | R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | pendiente |
 
 Cada sprint termina con `pytest -q` verde, `vite build`, commit atómico y
@@ -917,3 +917,138 @@ proyecto «figura».
 
 Pendiente de R4: **datos adjuntos por proyecto** (`POST /{pid}/datos` montados como `datos/` en el job). Hoy `MS_DATOS_DIR` apunta al repo (`studio/content/datos/`), suficiente para las figuras de la tesis versionadas en git.
 
+
+
+### R5a — UX de Proyectos: descomposición, CodeMirror, audio y historial (2026-09-03)
+
+La vista más usada del estudio era **un archivo de 1 667 líneas con trece
+subcomponentes dentro**. Este sprint la parte, y de paso arregla las tres
+cosas que ese tamaño escondía: el estilo compartido se editaba en un
+`<textarea>`, el sonido de un clip vivía en dos sitios que no se miraban, y
+la app tenía delante el script del último render que funcionó sin enseñarlo
+nunca.
+
+#### Lo que se partió
+
+`Projects.jsx` pasa de **1 667 líneas a 31**: hoy solo enruta lista/detalle.
+Lo demás son **14 archivos** en `components/proyectos/` (2 195 líneas, ~530
+de ellas nuevas: comentarios de por qué, la fila de audio y el historial):
+
+| Archivo | Líneas | Qué es |
+|---|---:|---|
+| `ProjectDetail.jsx` | 686 | el detalle: cabecera, panel de estado, acciones, clips |
+| `meta.js` | 229 | el vocabulario compartido: estados, rangos, agrupación, espejos del backend |
+| `NewProjectDialog.jsx` | 199 | alta de proyecto con plantillas |
+| `ClipCard.jsx` | 189 | un clip |
+| `ProjectsList.jsx` | 170 | el índice: buscador, filtro, orden, familias |
+| `HistorialScriptDialog.jsx` | 154 | **nuevo** — el diff contra el último render |
+| `StyleDialog.jsx` | 129 | el estilo compartido, ahora en CodeMirror |
+| `FilaAudio.jsx` | 128 | **nuevo** — voz · música · SFX en una fila |
+| `insignias.jsx` | 88 | `ProgressBar`, `CountsLine`, `NarrBadge`, `Stat`, `DurationBadge` |
+| `DuplicarProyectoDialog.jsx` | 67 | duplicar el proyecto |
+| `AddClipDialog.jsx` | 64 | añadir clip |
+| `ProjectCard.jsx` | 44 | la tarjeta del índice |
+| `FamilyGroup.jsx` | 33 | una familia plegable |
+| `ProjectGrid.jsx` | 15 | la rejilla de tarjetas |
+
+Además, el diff por LCS sale de `Assistant.jsx` (219 → 195 líneas) a
+`src/lib/diff.js`: lo usan el asistente y el historial de script, y dos copias
+del mismo algoritmo se separan en silencio.
+
+La descomposición es **a comportamiento constante**: cada prop, cada efecto y
+cada comentario viajan tal cual. Lo que cambia de verdad son las tres piezas
+de abajo.
+
+#### `style_block` en CodeMirror
+
+El mismo editor del Estudio (`python()`, `useEditorTheme()`), y dos datos que
+antes solo se sabían leyendo el backend:
+
+- **el desfase de líneas.** manim numera los fallos sobre el script
+  *compuesto* (estilo + marcador + clip) y el Estudio le resta `style_offset`
+  para señalar la línea del clip. Al editar el estilo ese número cambia, así
+  que se enseña: «23 líneas · desfase +25 líneas».
+- **qué va a pasar con la identidad.** `branding.aplicar` anexa el bloque de
+  marca CO.DE Academy salvo que el script compuesto ya la traiga. El diálogo
+  dice cuál de los dos casos es, y en una presentación habla del lienzo
+  (`presentacion`) en vez de la marca, que es lo que ese tipo garantiza.
+
+#### El audio de un clip, en una fila
+
+Estaban repartidos en dos sitios a dos alturas: un botón «Audio» (cama de SFX
+y música) en la fila de acciones y, más abajo y **solo si el backend ya sabía
+algo del clip**, una fila de narración con «Guion y voz». Ahora es una fila
+con tres chips —**voz · música · SFX**— que dicen *lo que hay*, no solo que la
+opción existe: `música ORBITA`, `sfx 3 EFECTOS`, `voz SIN NARRACIÓN`. Cada uno
+abre el diálogo que lo edita. En un promo el chip de voz abre el manifiesto y
+no el guion, porque allí la voz son frases del propio manifiesto.
+
+#### Historial ligero del script
+
+El estudio no guarda versiones, pero guarda una: la del último render que
+salió bien. Con el clip **desactualizado** aparece «Último render», que
+compara las dos versiones (LCS, «11 líneas distintas · −6 / +5») y permite
+volver a la que funcionó, en dos toques porque se pierde lo escrito.
+
+#### Verificación
+
+`vite build` verde. QA Playwright contra una instancia local real (uvicorn en
+3002 con `MS_WORKSPACE` aislado + `dist/` servido con proxy a `/api`),
+sembrada por la API con 6 proyectos en 2 familias, 12 clips, un promo y un
+clip con cama musical: **14/14 pasos** en 1440×900, en 390×844 y en el tema
+claro, **cero errores de consola** y cero desborde horizontal; más **5/5**
+del ciclo del historial (el botón solo en el clip desactualizado, el diff, los
+dos toques y la restauración).
+
+Y **11/11 casos** comparando los espejos en JS contra el Python real
+(`style_offset`, el corte por el marcador y `branding.ya_marcado`), incluidos
+los dos que importan: un estilo con cola de líneas en blanco y un script que
+contiene el propio marcador.
+
+#### Trampas
+
+1. **`GET /api/projects/{pid}` no trae el manifiesto de audio.** El encargo
+   daba por hecho que el tema de música se leía de `audio_json` del clip, pero
+   `clip_public` quita `audio_json` **a propósito** (hasta 30 clips por curso)
+   y solo deja `audio = {estado, has_audio}`. Sin tocar el backend, el detalle
+   pide `GET .../clips/{cid}/audio` **solo para los clips que ya tienen
+   manifiesto**: en un curso normal son cero peticiones. Mientras viaja, el
+   chip dice «…» y no «ninguna», que sería mentir antes de saberlo.
+2. **Lo que guarda un job NO es el script del clip: es el compuesto.**
+   Restaurar sin cortar por `STYLE_MARKER` habría metido el `style_block`
+   entero *dentro* del script del clip, y el siguiente render se lo habría
+   antepuesto otra vez: el estilo duplicado, dos veces cada import. Medido en
+   el fixture: 34 líneas de compuesto, 9 de clip, 25 de estilo. La prueba de
+   que el corte es exacto no es leer el diff: es que **tras restaurar el clip
+   vuelve a «renderizado»**, porque el hash de contenido se calcula sobre
+   `style_block + script + scene` y solo cuadra si se devolvió exactamente lo
+   que se renderizó.
+3. **`style_offset` no son «las líneas del estilo».** Es
+   `lines(style.rstrip()) + 3` — la línea en blanco, el marcador y otra línea
+   en blanco. Un espejo escrito a ojo se habría equivocado en 3 y el número
+   habría sido plausible y falso; por eso se compara contra el Python.
+4. **Buscar la palabra `lienzo` o `presentacion` sueltas repetiría un fallo ya
+   corregido.** `branding.py` busca el **import** justamente porque
+   «presentación» es una palabra común y un comentario cualquiera dejaría el
+   render sin marca. El espejo del frontend hace lo mismo, y hay dos casos de
+   prueba (`# presentacion de la idea`, `# el lienzo va en negro`) que deben
+   dar *false*.
+5. **El detalle tampoco ve el `script` de los clips** (`clip_public` lo quita
+   igual). Eso deja `usaSimulacion` mirando en la práctica solo el
+   `style_block`: el aviso de «esta pieza se renderiza en local» no se dispara
+   por el código de un clip escrito a mano. **Es un fallo preexistente y no se
+   ha tocado** —esto era una refactorización— pero queda anotado: se arregla
+   con un campo calculado en el backend, no en el navegador.
+6. **El estado de la mezcla se calla cuando no dice nada nuevo.** Con la fila
+   llamándose «Audio», un `AUDIO SIN RENDER` al lado sonaba a tartamudeo, y
+   además ya lo dice el distintivo de estado del clip dos líneas más arriba.
+   Solo se pinta en `sin_mezclar`, `desactualizado` y `al_dia`.
+7. **En el QA, desplegar la segunda familia con un clic real falla.** La lista
+   se re-pinta al abrir la primera y Playwright acaba pulsando sobre `<html>`.
+   Se despliega desde dentro de la página, que es lo que ya se hacía con el
+   arrastre de clips.
+8. **El fixture del render terminado deja un 404 en la consola.** Es un job
+   `done` escrito a mano (el arnés corre sin runner), así que no hay mp4 en
+   disco y **Renders** —que sigue montada, las vistas son *keep-alive*— pide
+   su vídeo. Artefacto del arnés, no del código: un `done` real siempre tiene
+   archivo.
