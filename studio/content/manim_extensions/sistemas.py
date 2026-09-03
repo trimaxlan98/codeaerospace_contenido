@@ -389,11 +389,23 @@ def deformar_fases(x, giro):
 
     Es la pieza 14: el espectro de amplitud no cambia ni un poco y la
     señal deja de parecerse a si misma. Lo que se ve no lo dice el modulo
-    del espectro."""
-    X = np.fft.rfft(np.asarray(x, dtype=float))
+    del espectro.
+
+    Los extremos NO se giran, y ahi estaba el fallo. Para que la salida
+    sea real, el bin 0 y el de Nyquist tienen que ser reales; `irfft` los
+    fuerza tirando su parte imaginaria, asi que girarlos CAMBIA su modulo
+    y la pieza afirmaria en pantalla algo falso. Medido con dos tonos y
+    giro 6: el bin de Nyquist pasaba de 0.4857 a 0.1014 mientras el rotulo
+    decia "las mismas amplitudes". Dejandolos quietos, el espectro de
+    amplitud se conserva hasta el ultimo bit."""
+    x = np.asarray(x, dtype=float)
+    X = np.fft.rfft(x)
     k = np.arange(X.size)
-    return np.fft.irfft(X * np.exp(1j * float(giro) * k * k / X.size),
-                        n=np.asarray(x).size)
+    giros = np.exp(1j * float(giro) * k * k / X.size)
+    giros[0] = 1.0
+    if x.size % 2 == 0:
+        giros[-1] = 1.0        # el bin de Nyquist solo existe si N es par
+    return np.fft.irfft(X * giros, n=x.size)
 
 
 # --- 15 · Resonancia ---------------------------------------------------

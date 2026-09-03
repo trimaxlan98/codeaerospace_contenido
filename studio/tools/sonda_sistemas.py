@@ -198,6 +198,32 @@ ok("y aun asi la señal deja de parecerse",
    float(np.max(np.abs(xd - mov)) / np.max(np.abs(xd))) > 0.5,
    f"difieren un {100 * np.max(np.abs(xd - mov)) / np.max(np.abs(xd)):.0f} %")
 
+# El invariante de arriba PASABA con la libreria rota, por pura suerte de
+# la senal elegida: con dos tonos en 400 muestras el bin de Nyquist sale
+# practicamente vacio, asi que girarlo no movia nada medible. Con 256
+# muestras y otras dos frecuencias ese bin vale 0.4857 y se quedaba en
+# 0.1014 — el rotulo de la pieza 14 habria dicho "las mismas amplitudes"
+# sobre un espectro cambiado. Un invariante que solo prueba el caso que
+# elegiste no prueba la propiedad: hay que anadir el caso que la rompe.
+xn = sis.dos_tonos(0.04, 0.11, 256)          # este SI carga el Nyquist
+Xn = np.abs(np.fft.rfft(xn))
+ok("el caso que destapo el fallo carga el bin de Nyquist", Xn[-1] > 0.3,
+   f"|X| en Nyquist = {Xn[-1]:.4f}")
+for giro in (6.0, 18.0):
+    casi(f"girar las fases (giro {giro}) no toca las amplitudes",
+         float(np.max(np.abs(Xn - np.abs(np.fft.rfft(
+             sis.deformar_fases(xn, giro)))))), 0.0, 1e-10)
+
+# Y el contraejemplo explicito: girando TAMBIEN los extremos —lo que hacia
+# la version rota— `irfft` tira la parte imaginaria del bin de Nyquist y el
+# modulo se mueve. Si esto no fallara, lo de arriba no probaria nada.
+kk = np.arange(Xn.size)
+mal = np.fft.irfft(np.fft.rfft(xn) * np.exp(1j * 6.0 * kk * kk / Xn.size),
+                   n=xn.size)
+ok("y girar los extremos SI las estropea (contraejemplo)",
+   float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))) > 0.3,
+   f"cambio maximo {float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))):.4f}")
+
 print("\n== 15 · Resonancia ==")
 hr = sis.resonador(0.08, 12.0, 400)
 amp = sis.amplificacion(hr, 0.08)
