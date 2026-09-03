@@ -101,17 +101,17 @@ class Clip(Pieza):
 
         # --- 1. la base de Fourier -------------------------------------
         L.escena(self._senos(), t=0.8)
-        self.leer(3.0)
+        self.leer(4.4)
 
         # --- 2. el relevo: EL momento de la pieza -----------------------
         L.relevo(escena=self._walsh(), t=0.9, salida=0.5)
-        self.leer(3.6)
+        self.leer(7.4)
 
         # --- 3. lo que cuesta hacerlo con Fourier -----------------------
         L.relevo(escena=self._barra_fft(),
                 dato=(lz.miles(tf.coste_fft(self.N)), "multiplicaciones"),
                 t=0.8, salida=0.45)
-        self.leer(2.6)
+        self.leer(4.4)
 
         # --- 4. y lo que cuesta hacerlo con Walsh: nada -----------------
         L.relevo(escena=self._barras_comparadas(),

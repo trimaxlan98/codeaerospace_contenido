@@ -31,9 +31,13 @@ class Clip(Pieza):
     NOMBRE = "TRANSFORMADA Z"
     TESIS = "el mundo a saltos"
 
-    RADIO_PLANO = 1.5      # el radio DIBUJADO del circulo unidad
+    # Medido: con radio 1.5 y respuesta de 1.65 el grupo mide 6.84 y la
+    # franja son 5.389, asi que `encajar` lo encogia al 79 % y los
+    # rotulos bajaban a 0.142 — por debajo del minimo legible. El
+    # guardian abortaba el render, que es lo que tiene que hacer.
+    RADIO_PLANO = 1.05     # el radio DIBUJADO del circulo unidad
     ANCHO_RESP = 5.0
-    ALTO_RESP = 1.65
+    ALTO_RESP = 1.45
     N = 60
     POLOS = (0.90, 0.98, 1.05)
 
@@ -53,14 +57,17 @@ class Clip(Pieza):
                          rango_y=rango)
 
         estado = rot("se apaga" if estable else "explota", color=AMBAR)
-        estado.next_to(resp, DOWN, buff=0.24)
-        abajo = VGroup(resp, estado)
+        pie = VGroup(estado)
         if not estable:
-            nota = rot("escala propia", color=APAGADO, cuerpo=lz.MICRO)
-            nota.next_to(resp, UP, buff=0.18)
-            abajo.add(nota)
+            # La nota va JUNTO al estado, en el mismo renglon, y no encima
+            # de la respuesta: un renglon mas de rotulo hacia que el grupo
+            # no cupiera en la franja y el guardian tumbaba el render.
+            pie.add(rot("escala propia", color=APAGADO, cuerpo=lz.MICRO))
+            pie.arrange(RIGHT, buff=0.42)
+        pie.next_to(resp, DOWN, buff=0.24)
+        abajo = VGroup(resp, pie)
 
-        panel = lz.dos_dominios(plano, abajo, "el polo", None, hueco=0.42)
+        panel = lz.dos_dominios(plano, abajo, "el polo", None, hueco=0.34)
         return panel, radio
 
     def pieza(self):
