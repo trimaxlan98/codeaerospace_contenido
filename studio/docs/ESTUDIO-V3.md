@@ -112,7 +112,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R0 | Plan | este documento, rama `estudio/v3-investigacion` | **hecho** |
 | R1 | Voz sin GCP | proveedores edge/piper/vertex/archivo, guion editable, **subida de narración propia**, normalización en el contenedor | **hecho** |
 | R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | en curso (agente) |
-| R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | pendiente |
+| R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3a hecho** (import/export, lote, duplicar); R3b pendiente |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | en curso (agente, librerías) |
 | R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | pendiente |
 | R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | pendiente |
@@ -180,14 +180,64 @@ acepta `musica` global con *sidechain* simple (−9 dB bajo la voz).
 
 ## R3 — Paridad con la terminal
 
-| Brecha | Entra como |
-|---|---|
-| curso como archivos | `POST /api/projects/importar` (zip o `{slug}` del repo) y `GET /{pid}/fuentes.zip` |
-| lote con calidad | `POST /{pid}/render-lote {clips, calidad, force}` + progreso agregado en `GET /{pid}` |
-| hoja de contactos | comando `frames` del runner → `GET /api/jobs/{id}/frames` (N PNG + último) |
-| fotograma / figura | `POST /api/jobs/{id}/fotograma {t, formato: png|svg}` a resolución del job |
-| costuras y picos | `pelicula/verificar` mide además la unión pieza a pieza (PIL) y el pico por pieza |
-| sondas / Laboratorio | comando `ejecutar` del runner: script Python + argumentos en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` |
+| Brecha | Entra como | Estado |
+|---|---|---|
+| curso como archivos | `POST /api/projects/importar` (zip o `{slug}` del repo) y `GET /{pid}/fuentes.zip` | **R3a** |
+| lote con calidad | `POST /{pid}/render-lote {clips, calidad, force}` + progreso en `GET /{pid}/lote` | **R3a** |
+| duplicar proyecto/clip | `POST /{pid}/duplicar`, `POST /{pid}/clips/{cid}/duplicar` (venía de R5) | **R3a** |
+| hoja de contactos | comando `frames` del runner → `GET /api/jobs/{id}/frames` (N PNG + último) | R3b |
+| fotograma / figura | `POST /api/jobs/{id}/fotograma {t, formato: png／svg}` a resolución del job | R3b |
+| costuras y picos | `pelicula/verificar` mide además la unión pieza a pieza (PIL) y el pico por pieza | R3b |
+| sondas / Laboratorio | comando `ejecutar` del runner: script Python + argumentos en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` | R3b |
+
+### R3a — un proyecto es un directorio (diseño)
+
+**El módulo compartido.** `subir_curso.py` tenía dentro toda la lectura de un
+curso-como-archivos. Se mueve entera a **`app/importar.py`** (puro: sin
+FastAPI, sin `sys.exit`) y los dos CLI pasan a ser envoltorios que traducen
+`ErrorImportacion` a `sys.exit`. La terminal y la app ejecutan literalmente el
+mismo código, que es la única forma de que no diverjan. `subir_promo.py`
+también: su `cargar_promo` aplana el manifiesto genérico a la forma
+`clip` + `audio` que espera su `sincronizar` (que sigue siendo suyo, porque
+sus mensajes de reporte son de promo).
+
+Tres cargadores, un solo manifiesto en memoria:
+
+| Función | Lee | Particularidad |
+|---|---|---|
+| `cargar_curso` | `curso.json` con `clips` | el de siempre, más `formato`, `tipo` y `estilo` |
+| `cargar_vertical` | `curso.json` con `piezas` + una `clip.json`/`escena.py` por pieza | cada pieza es un clip; `audio`/`voz` → `audio_json`; `modulo` y `duracion_objetivo` → `notes` |
+| `cargar_promo` | `promo.json` | un proyecto de un clip, `tipo='promo'`, prefijo `Promo · ` |
+
+`aplicar(service, db, curso, dry_run)` escribe: idempotente por **nombre
+exacto**, clips por **posición**, y nunca borra. Devuelve un `Resultado`
+(`project_id`, `creado`, `clips`, `creados`, `actualizados`, `stale`,
+`reporte`), del que el CLI toma solo `reporte` para no cambiar su salida.
+
+**El zip de fuentes es determinista.** `GET /{pid}/fuentes.zip` produce
+`curso.json` + `style_block.py` + `clips/NN-<slug>.py` + `guiones/NN-<slug>.*`,
+sin compresión, con la fecha de cada miembro fijada a 1980-01-01 y en orden
+fijo. Sin eso, dos exportaciones del mismo proyecto salen con bytes distintos
+(la hora va en cada cabecera local) y el round-trip deja de ser verificable.
+El test hace exportar → borrar el proyecto → importar → exportar y compara
+**los bytes**.
+
+**Los guiones no se reescriben al exportar** (se copian tal cual) y **sí** al
+importar: entran por `narracion.guardar_guion`, el mismo camino que el editor,
+para que `estado.json` quede coherente y la narración se marque
+`desactualizada` — que es la verdad: hay guion, no hay audio.
+
+**El lote** (`app/lotes.py`) no es una cola nueva: es *una lista de job_ids con
+nombre* sobre la cola de siempre (un render a la vez). Doble vía: en memoria
+mientras el backend viva, y **derivado de la tabla de jobs** si se reinició
+(los que siguen activos, más todo lo encolado desde el primero de ellos).
+`GET /{pid}/lote` da `total/hechos/fallidos/en_curso/pendientes`, la media de
+duración de los `done` **de ese proyecto** y la ETA, que descuenta lo que
+lleva corriendo el job en curso.
+
+**Duplicar** copia lo que define cómo se ve y cómo suena; **nunca el render**:
+un vídeo es de UN clip, y dos clips apuntando al mismo `job_id` harían que
+borrarlo dejase sin vídeo a un proyecto que nadie estaba tocando.
 
 ## R4 — Rigor de investigación (agente Opus, librerías)
 
@@ -243,4 +293,48 @@ Trampas:
   1024M. Corre como subproceso para que no quede residente.
 - **FastAPI `UploadFile` exige `python-multipart`**, que no está en el venv. La
   subida es el cuerpo crudo con `?nombre=`; no hay dependencia nueva.
+
+### R3a — Paridad con la terminal: import/export, lote y duplicar (2026-09-03)
+
+Lo que quedó: `app/importar.py` (tres cargadores + `aplicar` + el zip de
+fuentes + la apertura validada del zip), `app/lotes.py`, seis rutas nuevas en
+`projects_api.py`, `components/ImportarDialog.jsx` y `components/RenderLote.jsx`,
+y los dos CLI convertidos en envoltorios. Medido sobre el contenido real del
+repo: **169 cursos, 6 verticales y 10 promos** cargan sin un solo fallo, y el
+primer curso vuelve **idéntico** tras exportar → zip → importar.
+
+Trampas:
+
+- **Un zip no es determinista por defecto.** `zipfile` escribe la hora actual
+  en la cabecera local de cada miembro: dos exportaciones seguidas del mismo
+  proyecto daban bytes distintos y el round-trip byte a byte era imposible de
+  afirmar. Se construye cada entrada con un `ZipInfo` de fecha fija
+  (1980-01-01), `ZIP_STORED` y orden fijo.
+- **La calidad no entra en el hash de contenido.** Cambiarla no vuelve `stale`
+  a ningún clip (el hash es `style_block + script + scene`), así que un lote a
+  otra calidad se habría saltado los treinta clips por estar «al día» con un
+  vídeo del tamaño viejo. El lote implica `force` cuando cambia la calidad.
+- **Y el guardián de `update_project` habría bloqueado ese cambio**: existe
+  para que un curso a medio renderizar no acabe con vídeos de dos tamaños. El
+  lote lo salta a propósito —es el acto deliberado de rehacer el curso
+  entero— y por eso **rechaza con 409 el cambio de calidad con `clips`
+  elegidos a dedo**: eso sí dejaría el proyecto mezclado.
+- **El nombre del clip decide el nombre del archivo del guion.**
+  `narracion.slugify` quita acentos; `projects._slugify` no. Si el importador
+  hubiera usado el segundo, el zip habría exportado los guiones con un nombre
+  y la app los habría buscado con otro, en silencio. `importar.slug` replica
+  el primero y un test compara las dos funciones sobre siete títulos.
+- **`módulo` y `duración objetivo` de un vertical no tienen columna.** Van a
+  `notes` en un formato fijo (mismas líneas, mismo orden) para que reimportar
+  dos veces no genere un cambio. Una migración por dos campos que solo usan
+  seis proyectos habría sido peor negocio; `estilo` sí la tuvo, porque
+  `lienzo` no se puede deducir del `style_block` sin adivinar.
+- **La `voz` de un vertical se guarda aunque el diálogo de audio de un curso
+  la rechace.** `audio_promo.validar(..., tipo="curso")` prohíbe frases (la
+  narración de un curso va por «Generar narración»), pero los clip.json de
+  fractales, satélites y emergencia traen voz alineada a mano: perderla al
+  importar habría sido peor que no poder editarla desde ahí.
+- **Un lote terminado y limpio no se pinta.** La barra solo aparece mientras
+  corre o si dejó fallos: un `30/30` en verde no dice nada que no diga ya el
+  contador «Render N/N» de la cabecera.
 

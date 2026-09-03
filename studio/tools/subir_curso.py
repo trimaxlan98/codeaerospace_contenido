@@ -21,7 +21,6 @@ avisa y los deja (borrar es decision humana, via UI).
 """
 
 import argparse
-import json
 import os
 import sys
 from pathlib import Path
@@ -29,121 +28,30 @@ from pathlib import Path
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(BACKEND))
 
+from app import importar  # noqa: E402
 from app.db import Database  # noqa: E402
-from app.projects import (QUALITIES, ProjectService,  # noqa: E402
-                          compose_script, content_hash)
-from app.scenes import detect_scenes  # noqa: E402
+from app.projects import ProjectService  # noqa: E402
 
 DEFAULT_DB = "/var/www/codeaerospace_contenido/studio/backend/manimstudio.db"
 
 
 def cargar_curso(curso_dir: Path) -> dict:
-    """Lee y valida curso.json + style_block + clips. Sale con mensaje claro
-    ante cualquier inconsistencia (archivo faltante, escena ausente...)."""
-    manifest_path = curso_dir / "curso.json"
-    if not manifest_path.is_file():
-        sys.exit(f"no existe {manifest_path}")
-    curso = json.loads(manifest_path.read_text())
+    """Lee y valida curso.json + style_block + clips.
 
-    for campo in ("name", "quality", "clips"):
-        if not curso.get(campo):
-            sys.exit(f"curso.json sin campo obligatorio: {campo}")
-    if curso["quality"] not in QUALITIES:
-        sys.exit(f"calidad invalida: {curso['quality']}")
-
-    style_path = curso_dir / curso.get("style_block", "style_block.py")
-    style = style_path.read_text() if style_path.is_file() else ""
-
-    clips = []
-    for i, spec in enumerate(curso["clips"]):
-        ruta = curso_dir / spec["file"]
-        if not ruta.is_file():
-            sys.exit(f"clip {i + 1}: no existe {ruta}")
-        script = ruta.read_text()
-        escena = spec.get("scene") or ""
-        compuesto = compose_script(style, script)
-        if escena not in detect_scenes(compuesto):
-            sys.exit(f"clip {i + 1} ({ruta.name}): la escena '{escena}' no "
-                     "esta definida en el script compuesto")
-        clips.append({
-            "title": spec.get("title") or ruta.stem,
-            "script": script,
-            "scene": escena,
-            "final_state": spec.get("final_state") or "",
-        })
-
-    return {"name": curso["name"],
-            "description": curso.get("description") or "",
-            "quality": curso["quality"], "style_block": style,
-            "clips": clips}
+    La logica vive en `app/importar.py`, que es el MISMO modulo que usa
+    `POST /api/projects/importar`: la terminal y la app no pueden divergir.
+    Aqui solo se traduce el error a un `sys.exit` con mensaje claro.
+    """
+    try:
+        return importar.cargar_curso(curso_dir)
+    except importar.ErrorImportacion as e:
+        sys.exit(str(e))
 
 
 def sincronizar(service: ProjectService, db: Database, curso: dict,
                 dry_run: bool) -> list[str]:
     """Aplica el curso sobre la base; devuelve las lineas del reporte."""
-    reporte = []
-    proyecto = next((p for p in db.list_projects()
-                     if p["name"] == curso["name"]), None)
-
-    if proyecto is None:
-        reporte.append(f"+ proyecto nuevo: {curso['name']!r} "
-                       f"({curso['quality']})")
-        if not dry_run:
-            proyecto = service.create_project(
-                curso["name"], curso["description"], curso["quality"],
-                curso["style_block"])
-    else:
-        cambios = {k: curso[k] for k in ("description", "style_block")
-                   if proyecto.get(k) != curso[k]}
-        if proyecto["quality"] != curso["quality"]:
-            # update_project ya protege el caso con renders; aqui solo se
-            # intenta si de verdad cambio.
-            cambios["quality"] = curso["quality"]
-        if cambios:
-            reporte.append(f"~ proyecto {proyecto['id']}: actualiza "
-                           + ", ".join(sorted(cambios)))
-            if not dry_run:
-                proyecto = service.update_project(proyecto["id"], **cambios)
-        else:
-            reporte.append(f"= proyecto {proyecto['id']}: sin cambios de "
-                           "metadatos")
-
-    existentes = db.list_clips(proyecto["id"]) if proyecto else []
-    for pos, clip in enumerate(curso["clips"]):
-        actual = existentes[pos] if pos < len(existentes) else None
-        if actual is None:
-            reporte.append(f"+ clip {pos + 1}: {clip['title']!r}")
-            if not dry_run:
-                creado = service.add_clip(proyecto["id"], clip["title"],
-                                          clip["script"], clip["scene"],
-                                          position=pos)
-                service.update_clip(creado["id"],
-                                    final_state=clip["final_state"])
-            continue
-
-        campos = {k: clip[k] for k in ("title", "script", "scene",
-                                       "final_state")
-                  if (actual.get(k) or "") != clip[k]}
-        if not campos:
-            reporte.append(f"= clip {pos + 1}: {clip['title']!r} al dia")
-            continue
-        nuevo_hash = content_hash(curso["style_block"], clip["script"],
-                                  clip["scene"])
-        stale = (bool(actual.get("job_id"))
-                 and actual.get("rendered_hash") != nuevo_hash)
-        reporte.append(f"~ clip {pos + 1}: {clip['title']!r} actualiza "
-                       + ", ".join(sorted(campos))
-                       + ("  -> STALE (re-render)" if stale else ""))
-        if not dry_run:
-            service.update_clip(actual["id"], **campos)
-
-    if proyecto and len(existentes) > len(curso["clips"]):
-        sobran = existentes[len(curso["clips"]):]
-        reporte.append("! en la base sobran "
-                       f"{len(sobran)} clips no listados en curso.json "
-                       "(no se borran): "
-                       + ", ".join(c["title"] for c in sobran))
-    return reporte
+    return importar.aplicar(service, db, curso, dry_run).reporte
 
 
 def main() -> None:

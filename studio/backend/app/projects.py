@@ -177,7 +177,8 @@ class ProjectService:
     def create_project(self, name: str, description: str, quality: str,
                         style_block: str, tipo: str = TIPO_DEFECTO,
                         formato: str = FORMATO_DEFECTO,
-                        fondo: str = FONDO_DEFECTO) -> dict:
+                        fondo: str = FONDO_DEFECTO,
+                        estilo: str = "") -> dict:
         if quality not in QUALITIES:
             raise ValueError(f"calidad invalida: {quality}")
         if tipo not in TIPOS:
@@ -195,11 +196,65 @@ class ProjectService:
             "tipo": tipo,
             "formato": formato,
             "fondo": fondo,
+            # Estilo con nombre ("lienzo"): dato del manifiesto, no del
+            # render. Se acota para que un curso.json cualquiera no meta
+            # una novela en la columna.
+            "estilo": (estilo or "")[:40],
             "created_at": now,
             "updated_at": now,
         }
         self.db.insert_project(project)
         return project
+
+    def duplicar_project(self, pid: str, name: str) -> dict:
+        """Copia el proyecto y sus clips SIN sus renders.
+
+        Se copia lo que define como se ve y como suena (estilo compartido,
+        formato, calidad, fondo, y por clip script/escena/notas/manifiesto de
+        audio); no se copian `job_id` ni `rendered_hash`, porque un video es
+        de UN clip: dos clips apuntando al mismo mp4 harian que borrarlo
+        dejara sin render a un proyecto que nadie estaba tocando.
+        """
+        origen = self.db.get_project(pid)
+        if not origen:
+            raise ValueError("proyecto no encontrado")
+        if any(p["name"] == name for p in self.db.list_projects()):
+            raise ValueError(f"ya existe un proyecto llamado {name!r}")
+        copia = self.create_project(
+            name, origen.get("description") or "", origen["quality"],
+            origen.get("style_block") or "",
+            tipo=origen.get("tipo") or TIPO_DEFECTO,
+            formato=origen.get("formato") or FORMATO_DEFECTO,
+            fondo=origen.get("fondo") or FONDO_DEFECTO,
+            estilo=origen.get("estilo") or "")
+        for clip in self.db.list_clips(pid):
+            nuevo = self.add_clip(copia["id"], clip["title"],
+                                  script=clip.get("script") or "",
+                                  scene=clip.get("scene") or "")
+            self.update_clip(nuevo["id"],
+                             final_state=clip.get("final_state") or "",
+                             notes=clip.get("notes") or "",
+                             audio_json=clip.get("audio_json"))
+        return copia
+
+    def duplicar_clip(self, pid: str, cid: str) -> dict:
+        """Inserta una copia del clip JUSTO DESPUES del original.
+
+        Detras de un clip es donde se lo quiere: duplicar un clip es casi
+        siempre "hazme una variante de este", y variante y original se
+        comparan mirandolos uno al lado del otro.
+        """
+        clip = self.db.get_clip(cid)
+        if not clip or clip.get("project_id") != pid:
+            raise ValueError("clip no encontrado")
+        copia = self.add_clip(pid, f"{clip['title']} (copia)",
+                              script=clip.get("script") or "",
+                              scene=clip.get("scene") or "",
+                              position=clip["position"] + 1)
+        return self.update_clip(copia["id"],
+                                final_state=clip.get("final_state") or "",
+                                notes=clip.get("notes") or "",
+                                audio_json=clip.get("audio_json"))
 
     def get_project_detail(self, pid: str) -> dict | None:
         project = self.db.get_project(pid)

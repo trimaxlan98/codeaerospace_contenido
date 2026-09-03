@@ -13,10 +13,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ChevronDown, ChevronRight, ChevronUp, Cpu, Download, FileJson, FileText,
-  FolderKanban, Film, GripVertical, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Wand2,
+  ChevronDown, ChevronRight, ChevronUp, Copy, Cpu, Download, FileArchive, FileJson, FileText,
+  FolderKanban, Film, GripVertical, Layers, Mic, Music, Pencil, Plus, RefreshCw, Search, Square, Upload, Wand2,
 } from 'lucide-react'
-import { api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, thumbUrl, videoUrl } from './api.js'
+import {
+  api, narracionAudioUrl, projectArchiveUrl, projectExportUrl, projectSourcesUrl, thumbUrl, videoUrl,
+} from './api.js'
 import { refreshCatalogo, splitName, useCatalogo } from './catalogo.js'
 import { PLANTILLAS, plantillaPorId } from './plantillas.js'
 import { FONDOS, formatoPorId, formatosDe, ratioDeJob } from './formatos.js'
@@ -26,6 +28,8 @@ import AudioPromoDialog, { AUDIO_META, VERIF_META } from './components/AudioProm
 import PeliculaPanel from './components/PeliculaPanel.jsx'
 import PresentacionPanel from './components/PresentacionPanel.jsx'
 import GuionDialog from './components/GuionDialog.jsx'
+import ImportarDialog from './components/ImportarDialog.jsx'
+import { LoteProgreso, RenderLoteDialog, useLote } from './components/RenderLote.jsx'
 import VozSelector, { PROVEEDOR_LABEL, vozInicial } from './components/VozSelector.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
@@ -108,7 +112,7 @@ export default function Projects({ jobs, onEditClip, routeId, onRoute, aiEnabled
   if (routeId) {
     return (
       <ProjectDetail key={routeId} projectId={routeId} jobs={jobs} aiEnabled={aiEnabled}
-        onEditClip={onEditClip} onBack={() => onRoute(null)} />
+        onEditClip={onEditClip} onBack={() => onRoute(null)} onOpen={(id) => onRoute(id)} />
     )
   }
   return <ProjectsList onOpen={(id) => onRoute(id)} />
@@ -238,6 +242,7 @@ function ProjectsList({ onOpen }) {
   const [deleteError, setDeleteError] = useState('')
   const error = deleteError || catalogo.error
   const [newOpen, setNewOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('todos')
   const [order, setOrder] = useState('actividad')
@@ -308,6 +313,10 @@ function ProjectsList({ onOpen }) {
                 <SelectItem value="nombre">Nombre</SelectItem>
               </SelectContent>
             </Select>
+            <Button size="sm" variant="default" onClick={() => setImportOpen(true)}
+              title="mete un curso-como-archivos: un .zip de fuentes o un directorio de studio/content/">
+              <Upload className="h-3.5 w-3.5" /> Importar…
+            </Button>
             <Button size="sm" variant="primary" onClick={() => setNewOpen(true)}>
               <Plus className="h-3.5 w-3.5" /> Nuevo proyecto
             </Button>
@@ -366,6 +375,11 @@ function ProjectsList({ onOpen }) {
 
       <NewProjectDialog open={newOpen} onOpenChange={setNewOpen}
         onCreated={(p) => { setNewOpen(false); load(); onOpen(p.id) }} />
+      {/* El importador NO cierra solo ni salta al proyecto: el reporte (que
+          clips cambiaron, cuales quedaron por re-renderizar) es la mitad del
+          valor de importar, y cerrarse encima lo escondia. */}
+      <ImportarDialog open={importOpen} onOpenChange={setImportOpen}
+        onImported={() => load()} />
     </main>
   )
 }
@@ -641,12 +655,14 @@ function NewProjectDialog({ open, onOpenChange, onCreated }) {
 
 // ── detalle ──────────────────────────────────────────────────────────────
 
-function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
+function ProjectDetail({ projectId, jobs, onEditClip, onBack, onOpen, aiEnabled }) {
   const [project, setProject] = useState(null)
   const [narracion, setNarracion] = useState(null)
   const [error, setError] = useState('')
   const [styleOpen, setStyleOpen] = useState(false)
   const [addClipOpen, setAddClipOpen] = useState(false)
+  const [loteOpen, setLoteOpen] = useState(false)
+  const [duplicarOpen, setDuplicarOpen] = useState(false)
   const [assistantOpen, setAssistantOpen] = useState(false)
   // Modo guiado apagado (el valor por defecto) = esta vista es exactamente la
   // de siempre: ni el boton del asistente se monta.
@@ -716,6 +732,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
     if (becameTerminal) { load(); loadNarracion() }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- solo reacciona a cambios de `jobs`
   }, [jobs])
+
+  // Progreso agregado del lote de renders. `jobs` (la cola global, por SSE)
+  // hace de disparador: cuando un render termina, el lote cambia.
+  const { lote, refrescar: refrescarLote } = useLote(projectId, jobs)
 
   const updateClipLocal = (cid, patch) => {
     setProject((p) => (p ? { ...p, clips: p.clips.map((c) => (c.id === cid ? { ...c, ...patch } : c)) } : p))
@@ -849,36 +869,35 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
     }
   }
 
+  // «Re-renderizar desactualizados» es ahora un lote sin preguntar nada: el
+  // endpoint salta solo los clips al dia y los que ya tienen un render en
+  // vuelo, asi que el bucle de renders individuales que habia aqui (para no
+  // encolar dos veces el mismo clip) sobra.
   const renderAllStale = async () => {
     setError('')
-    const allStale = project.clips.filter((c) => c.status === 'stale' || c.status === 'no_render')
-    const pending = staleWithoutActiveJob(project.clips, jobs)
-    if (pending.length === 0) return
+    if (staleWithoutActiveJob(project.clips, jobs).length === 0) return
     try {
-      if (pending.length === allStale.length) {
-        // Ningun clip stale tiene job en vuelo: el endpoint masivo es seguro.
-        const res = await api.renderStale(project.id)
-        if (res.skipped?.length) {
-          setError(`Algunos clips no se pudieron encolar: ${res.skipped.map((s) => s.error).join('; ')}`)
-        }
-      } else {
-        // Hay clips stale con job en vuelo: el endpoint masivo re-evalua el
-        // status en el momento y volveria a encolar ese clip (su
-        // rendered_hash aun no cambio mientras el render sigue en curso).
-        // Disparamos renders individuales solo para los que no tienen job
-        // activo, en secuencia, igual que hace el flujo de `skipped`.
-        const skipped = []
-        for (const c of pending) {
-          try {
-            await api.renderClip(project.id, c.id)
-          } catch (err) {
-            skipped.push({ error: err.message })
-          }
-        }
-        if (skipped.length) {
-          setError(`Algunos clips no se pudieron encolar: ${skipped.map((s) => s.error).join('; ')}`)
-        }
-      }
+      recibirLote(await api.renderLote(project.id, { clips: null, force: false }))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const recibirLote = (res) => {
+    const reales = (res.saltados || []).filter((s) => s.error !== 'al dia'
+      && s.error !== 'ya hay un render en curso')
+    if (reales.length) {
+      setError(`Algunos clips no se pudieron encolar: ${reales.map((s) => s.error).join('; ')}`)
+    }
+    if (res.calidad_cambiada) load()
+    refrescarLote()
+  }
+
+  const duplicarClip = async (cid) => {
+    setError('')
+    try {
+      await api.duplicarClip(project.id, cid)
+      load()
     } catch (err) {
       setError(err.message)
     }
@@ -1100,9 +1119,21 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 <Download className="h-3.5 w-3.5" /> Descargar curso (.zip)
               </Button>
             )}
+            <Button size="sm" variant="default" asChild>
+              <a href={projectSourcesUrl(project.id)}
+                download={`${project.name || 'curso'}-fuentes.zip`}
+                title="curso.json + style_block.py + un .py por clip (+ guiones): lo que vuelve a leer subir_curso.py">
+                <FileArchive className="h-3.5 w-3.5" /> Fuentes (.zip)
+              </a>
+            </Button>
             <Button size="sm" variant="default" onClick={renderAllStale} disabled={staleCount === 0}
               title={staleCount === 0 ? 'no hay clips desactualizados sin un render en curso' : undefined}>
               <RefreshCw className="h-3.5 w-3.5" /> Re-renderizar desactualizados{staleCount > 0 ? ` (${staleCount})` : ''}
+            </Button>
+            <Button size="sm" variant="default" onClick={() => setLoteOpen(true)}
+              disabled={clips.length === 0}
+              title="encola varios clips en orden, a la calidad que elijas">
+              <Layers className="h-3.5 w-3.5" /> Render en lote…
             </Button>
             {esPromo || !narracion?.proveedores ? null : (
               <VozSelector proveedores={narracion.proveedores} value={voz} onChange={setVoz}
@@ -1131,7 +1162,15 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
             <Button size="sm" variant="default" onClick={() => setStyleOpen(true)}>
               <Pencil className="h-3.5 w-3.5" /> Editar estilo
             </Button>
+            <Button size="sm" variant="default" onClick={() => setDuplicarOpen(true)}>
+              <Copy className="h-3.5 w-3.5" /> Duplicar proyecto
+            </Button>
           </div>
+
+          {/* La barra del lote se pinta mientras corre y, si termino con
+              fallos, hasta que se lance otro: un lote limpio y terminado no
+              dice nada que no diga ya el contador «Render N/N». */}
+          {lote && (lote.activo || lote.fallidos > 0) && <LoteProgreso lote={lote} />}
         </div>
 
         {runAjena && (
@@ -1186,6 +1225,7 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
                 prevClip={i > 0 ? clips[i - 1] : null} jobs={jobs}
                 onFieldChange={onFieldChange} onFieldBlur={onFieldBlur}
                 onMove={move} onDelete={removeClip} onRender={renderClip} arrastre={arrastre}
+                onDuplicate={duplicarClip}
                 onOpenInStudio={openInStudio}
                 projectId={project.id} formato={project.formato} tipo={project.tipo}
                 narr={narrByClip[clip.id]}
@@ -1199,6 +1239,10 @@ function ProjectDetail({ projectId, jobs, onEditClip, onBack, aiEnabled }) {
         </div>
       </section>
 
+      <RenderLoteDialog open={loteOpen} onOpenChange={setLoteOpen} project={project}
+        staleCount={staleCount} onLanzado={recibirLote} />
+      <DuplicarProyectoDialog open={duplicarOpen} onOpenChange={setDuplicarOpen}
+        project={project} onDuplicado={(p) => { setDuplicarOpen(false); refreshCatalogo(); onOpen(p.id) }} />
       <StyleDialog open={styleOpen} onOpenChange={setStyleOpen} project={project}
         onSaved={(styleBlock, updatedAt) => setProject((p) => ({ ...p, style_block: styleBlock, updated_at: updatedAt }))} />
       <AddClipDialog open={addClipOpen} onOpenChange={setAddClipOpen} projectId={project.id}
@@ -1249,7 +1293,7 @@ function DurationBadge({ s, rango = DURACION.curso }) {
   )
 }
 
-function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion, onAudio, arrastre }) {
+function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBlur, onMove, onDelete, onRender, onDuplicate, onOpenInStudio, projectId, formato, tipo, narr, narrando, narrBusy, narrEnabled, onNarrar, onVerGuion, onAudio, arrastre }) {
   // Reordenar arrastrando. Quien es `draggable` es EL ASA, no la tarjeta:
   // dentro de la tarjeta hay inputs y un textarea, y un contenedor arrastrable
   // se pelea con la seleccion de texto. La tarjeta solo hace de destino. Para
@@ -1399,6 +1443,10 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
                 </span>
               )}
           </Button>
+          <Button size="xs" variant="ghost" onClick={() => onDuplicate(clip.id)}
+            title="copia este clip justo detrás (script, escena, notas y audio; sin el render)">
+            <Copy className="h-3.5 w-3.5" /> Duplicar
+          </Button>
           <span className="ml-auto"><DeleteButton onDelete={() => onDelete(clip.id)} /></span>
         </div>
 
@@ -1445,6 +1493,66 @@ function ClipCard({ clip, index, total, prevClip, jobs, onFieldChange, onFieldBl
         )}
       </div>
     </article>
+  )
+}
+
+/** Duplicar el proyecto entero. El nombre es obligatorio y tiene que ser
+ *  nuevo: es la clave con la que el importador empareja proyectos, y dos
+ *  cursos con el mismo nombre romperían `subir_curso.py`. */
+function DuplicarProyectoDialog({ open, onOpenChange, project, onDuplicado }) {
+  const [name, setName] = useState('')
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (open) { setName(`${project.name} (copia)`); setError(''); setBusy(false) }
+  }, [open, project.name])
+
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      onDuplicado(await api.duplicarProyecto(project.id, name.trim()))
+    } catch (err) {
+      setError(err.message)
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open && (
+        <DialogContent className="p-0">
+          <form onSubmit={submit} className="flex flex-col">
+            <div className="border-b border-line px-4 py-3 pr-12">
+              <DialogTitle className="font-display text-[15px] text-ink">Duplicar proyecto</DialogTitle>
+            </div>
+            <div className="flex flex-col gap-3 p-4">
+              <label className="flex flex-col gap-1">
+                <span className="eyebrow">Nombre de la copia</span>
+                <Input value={name} onChange={(e) => setName(e.target.value)}
+                  autoFocus required maxLength={120} />
+                <span className="text-[11.5px] text-faint">
+                  Se copian el estilo compartido, el formato, la calidad, el
+                  fondo y los {project.clips?.length || 0} clips (script, escena,
+                  notas y cama de sonido). <strong>Los renders no</strong>: un
+                  vídeo es de un solo clip.
+                </span>
+              </label>
+              {error && <p role="alert" className="text-[13px] text-warn">{error}</p>}
+            </div>
+            <div className="flex justify-end gap-2 border-t border-line px-4 py-3">
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button type="submit" variant="primary" disabled={busy || !name.trim()}>
+                <Copy className="h-3.5 w-3.5" /> {busy ? 'Duplicando…' : 'Duplicar'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      )}
+    </Dialog>
   )
 }
 

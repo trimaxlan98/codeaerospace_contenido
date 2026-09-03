@@ -40,6 +40,22 @@ async function subirArchivo(path, file) {
   return data
 }
 
+// Envio de un archivo como cuerpo crudo por POST (el zip de fuentes). Igual
+// que `subirArchivo` pero con el metodo y el tipo explicitos: el backend no
+// usa multipart en ningun sitio (no hay `python-multipart` en el venv).
+async function subirCrudo(path, file, contentType) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': contentType },
+    body: file,
+  })
+  let data = null
+  try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (res.status === 401) onUnauthorized?.()
+  if (!res.ok) throw new ApiError(res.status, data?.detail)
+  return data
+}
+
 export const api = {
   me: () => request('GET', '/api/me'),
   login: (username, password) => request('POST', '/api/login', { username, password }),
@@ -79,6 +95,18 @@ export const api = {
   moveClip: (pid, cid, position) => request('POST', `/api/projects/${pid}/clips/${cid}/move`, { position }),
   renderClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/render`),
   renderStale: (pid) => request('POST', `/api/projects/${pid}/render-stale`),
+  // R3a — paridad con la terminal: un proyecto es un directorio.
+  // El lote encola varios clips a la calidad elegida (la del proyecto si no
+  // se dice otra) y `getLote` da el progreso agregado mientras dure.
+  renderLote: (pid, body = {}) => request('POST', `/api/projects/${pid}/render-lote`, body),
+  getLote: (pid) => request('GET', `/api/projects/${pid}/lote`),
+  duplicarProyecto: (pid, name) => request('POST', `/api/projects/${pid}/duplicar`, { name }),
+  duplicarClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/duplicar`),
+  importables: () => request('GET', '/api/projects/importables'),
+  importarDelRepo: (slug, origen, dryRun = false) => request(
+    'POST', `/api/projects/importar${dryRun ? '?dry_run=1' : ''}`, { slug, origen }),
+  importarZip: (file, dryRun = false) => subirCrudo(
+    `/api/projects/importar${dryRun ? '?dry_run=1' : ''}`, file, 'application/zip'),
   getClipScript: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/script`),
   getAudioPromo: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/audio`),
   putAudioPromo: (pid, cid, body) => request('PUT', `/api/projects/${pid}/clips/${cid}/audio`, body),
@@ -126,6 +154,12 @@ export function projectExportUrl(id) {
 
 export function projectArchiveUrl(id) {
   return `/api/projects/${id}/archive`
+}
+
+// Las FUENTES del proyecto (curso.json + style_block.py + clips/ + guiones/):
+// lo que `subir_curso.py` vuelve a leer, no los videos.
+export function projectSourcesUrl(id) {
+  return `/api/projects/${id}/fuentes.zip`
 }
 
 export function frameVerificacionUrl(jobId, archivo) {
