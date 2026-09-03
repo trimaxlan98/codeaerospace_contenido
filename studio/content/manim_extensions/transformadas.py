@@ -464,7 +464,15 @@ def factor_zoom(N, f_ini, f_fin, M=256):
 def pico_interpolado(mag, f_ini, f_fin):
     """La frecuencia del maximo de |CZT| sobre el arco, en ciclos.
 
-    Es lo que la DFT no puede dar: su maximo cae siempre en un entero."""
+    Es lo que la DFT no puede dar: su maximo cae siempre en un entero.
+
+    MINA: si el arco es la circunferencia ENTERA de una señal real, el
+    espectro es simetrico y el maximo puede caer en el bin ESPEJO. Medido
+    en la pieza 10: con el arco (0, 256) el argmax salia en el bin 236
+    (= 256 - 20) en vez del 20, porque los dos valen 123.18030... y el
+    espejo ganaba por el ultimo bit del flotante. La cifra en pantalla
+    habria sido 236. Para una señal real se pide MEDIA circunferencia
+    (f_fin = N/2), que ademas es lo unico que significa algo."""
     M = np.asarray(mag).size
     i = int(np.argmax(mag))
     return float(f_ini) + i * (float(f_fin) - float(f_ini)) / M
@@ -1049,12 +1057,21 @@ def nivel(y_dato, punto, ancho=4.8, color=None, discontinua=True):
 
 
 def tallos(valores, ancho=4.8, alto=2.2, color=None, grosor=TRAZO_FINO,
-           punta=0.045, rango_y=None):
+           punta=0.045, rango_y=None, con_punto=False):
     """Un espectro discreto: una raya por bin, con su punto arriba.
 
     Es el dibujo honrado de una DFT. Unir los bins con una curva sugiere
     que hay algo entre ellos, y no lo hay: la DFT solo existe en esos
-    puntos."""
+    puntos.
+
+    `con_punto=True` devuelve `(grupo, punto)` como hace `traza`, donde
+    `punto(indice, valor)` da la posicion de cualquier bin dentro del
+    dibujo. Sin eso, una pieza que quiera colgar un rotulo o un corchete
+    de un bin concreto tiene que replicar esta formula de disposicion a
+    mano — lo tuvo que hacer la pieza 10, y si algun dia cambia el
+    reparto aqui, esa copia se queda apuntando a otro sitio sin avisar.
+    No devuelve la tupla siempre por no romper las llamadas que ya
+    existen."""
     _exige_manim()
     v = np.asarray(valores, dtype=float)
     n = v.size
