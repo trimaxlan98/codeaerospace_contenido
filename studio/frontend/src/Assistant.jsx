@@ -7,32 +7,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Sparkles, X } from 'lucide-react'
 import { api } from './api.js'
 import { Button } from './components/ui/button.jsx'
+import { diffLines } from './lib/diff.js'
 import { cn } from '@/lib/utils'
-
-// Diff de lineas por LCS (scripts pequeños: O(n·m) es suficiente).
-function diffLines(aText, bText) {
-  const a = aText.split('\n')
-  const b = bText.split('\n')
-  const n = a.length
-  const m = b.length
-  const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1))
-  for (let i = n - 1; i >= 0; i--) {
-    for (let j = m - 1; j >= 0; j--) {
-      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
-    }
-  }
-  const out = []
-  let i = 0
-  let j = 0
-  while (i < n && j < m) {
-    if (a[i] === b[j]) { out.push({ t: ' ', line: a[i] }); i++; j++ }
-    else if (dp[i + 1][j] >= dp[i][j + 1]) { out.push({ t: '-', line: a[i] }); i++ }
-    else { out.push({ t: '+', line: b[j] }); j++ }
-  }
-  while (i < n) out.push({ t: '-', line: a[i++] })
-  while (j < m) out.push({ t: '+', line: b[j++] })
-  return out
-}
 
 function Diff({ original, fixed }) {
   const rows = diffLines(original, fixed)
