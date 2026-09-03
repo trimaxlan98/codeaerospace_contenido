@@ -1,0 +1,7 @@
+{
+  "name": "El Impulso",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un pulso que se estrecha y crece a area constante hasta ser una raya.",
+  "duracion_objetivo": 31.65
+}

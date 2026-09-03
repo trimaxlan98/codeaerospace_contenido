@@ -1,0 +1,7 @@
+{
+  "name": "Un Filtro",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Una senal con dos tonos entra y sale con uno.",
+  "duracion_objetivo": 34.75
+}

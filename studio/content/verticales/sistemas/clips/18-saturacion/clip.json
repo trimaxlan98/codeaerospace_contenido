@@ -1,0 +1,7 @@
+{
+  "name": "Saturacion",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un tono entra en una caja que satura y salen armonicos.",
+  "duracion_objetivo": 34.95
+}

@@ -1,0 +1,7 @@
+{
+  "name": "La Convolucion",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La senal invertida desliza sobre la otra y el area barrida dibuja la salida.",
+  "duracion_objetivo": 35.7
+}

@@ -1140,17 +1140,25 @@ def aspa(z, radio=1.35, escala=1.0, color=None, lado=0.13):
 
 # --- Barras ------------------------------------------------------------
 def barras(valores, ancho=4.6, alto=2.0, color=None, hueco=0.28,
-           colores=None, minimo_visible=0.02):
+           colores=None, minimo_visible=0.02, rango_y=None):
     """Barras verticales proporcionales al valor, sin mentir de escala.
 
     `minimo_visible` NO estira la barra: le pone un grosor de trazo
     suficiente para verse cuando su valor es minusculo. En el curso 31 un
     agente inflo una barra un 52 % 'para que se viera' y hubo que
     rechazarlo: lo que no se ve se dibuja con su tamaño real y se le sube
-    el trazo, o se cambia de dibujo."""
+    el trazo, o se cambia de dibujo.
+
+    `rango_y` fija la escala DESDE FUERA, y sin el esta funcion es una
+    escopeta cargada: normaliza por su propio maximo, asi que dos llamadas
+    para comparar dos espectros los dibujan cada uno a su escala y los dos
+    salen igual de altos — exactamente la mentira que la comparacion queria
+    desmentir. Lo levanto la pieza 18 del curso 33, que tuvo que irse a
+    `sis.tallos` por esto."""
     _exige_manim()
     v = np.asarray(valores, dtype=float)
-    tope = float(np.max(np.abs(v))) or 1.0
+    tope = (float(max(abs(rango_y[0]), abs(rango_y[1]))) if rango_y
+            else float(np.max(np.abs(v)))) or 1.0
     n = v.size
     w = ancho / (n + (n - 1) * hueco)
     g = VGroup()

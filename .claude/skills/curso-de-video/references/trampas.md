@@ -62,6 +62,35 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **La linea del cero solo esta en el suelo del cuadro si el rango EMPIEZA
+  en cero.** El molde de una familia suele dibujar magnitudes positivas, asi
+  que su `cero(y=-alto/2)` es correcto — y se copia intacto a piezas cuyos
+  datos bajan de cero, donde la raya cae por debajo del cero verdadero y se
+  lee como el eje sin serlo: el dibujo afirma que unas muestras son positivas
+  cuando son negativas. Cazado en el curso 33, propagado por mi propio molde.
+  El eje se coloca CALCULANDO (`sis.cero(alto=, rango_y=)`), y si el cero no
+  cae dentro del rango, se aborta: un eje de cero en un cuadro que no
+  contiene el cero es una referencia que no existe.
+- **`Create` VUELVE A ANADIR su mobject a la escena al terminar**
+  (`introducer=True` por defecto). Si lo que animas es una PARTE del dibujo
+  que vive dentro del grupo de un carril, eso lo saca del grupo y lo deja
+  como ocupante suelto en `scene.mobjects`: el carril deja de poder
+  apagarlo y aparece encimado en el plano siguiente. Se anima con
+  `Create(x, introducer=False)`, o con `.animate.set_opacity()` en vez de
+  `FadeIn`. Cazado en el curso 33.
+- **El objetivo de un `Transform` tiene que estar VIVO aunque no se vea.**
+  `Transform(a, b)` copia en `a` el estilo de `b`, opacidad incluida. El
+  patron de esta casa —construir los estados dentro del grupo y apagarlos
+  con opacidad 0 para que hereden la escala de `encajar`— choca de frente
+  con eso: transformar hacia un estado apagado deja el dibujo INVISIBLE, y
+  el fotograma se queda con el eje y ni un tallo. Se transforma hacia
+  `estado.copy().set_opacity(1.0)`. Cazado en el curso 33.
+- **`Indicate` escala alrededor del centro del bounding box**, asi que sobre
+  un tallo —una `Line` que nace en el eje y su `Dot` en la punta— la raya se
+  estira TAMBIEN hacia abajo, atraviesa el eje y se encima con lo que haya
+  debajo. Cazado en el curso 33. Resaltar un tallo se hace en dos piezas: el
+  `Dot` (cuyo centro ES la punta) recibe el `Indicate` con escala, y la
+  `Line` solo cambia de color con `there_and_back`, sin tocar su geometria.
 - **`Group` y `VGroup` no son intercambiables en NINGUNA direccion**, y la
   cura de un lado provoca el fallo del otro. `VGroup` rechaza un
   `ImageMobject` con TypeError; `Group` es igual de invalido como HIJO de un
@@ -262,6 +291,19 @@ Esta es la categoría que **no detecta el render**: solo se caza midiendo.
   sobre `#0B1B33` al 26–45 % da (72,62,45), verde oliva sucio; al 14 % da
   (44,46,48), un gris que ya no es ámbar. No hay ventana buena: las piezas de
   área van con **trazo** y el fondo del lienzo dentro, opaco.
+  Y no es solo cosa de MASAS, que era como estaba escrito hasta el curso 33:
+  un **trazo grueso** (7.0) al 32 % da exactamente el mismo gusano oliva
+  ilegible. Una curva de referencia —"lo que la teoría predice", debajo de lo
+  que de verdad sale— se dibuja en `APAGADO` **opaco**, nunca en ámbar
+  transparente.
+  Y la regla de verdad ni siquiera es la transparencia, es el **ancho
+  efectivo**: dos trazos OPACOS de colores distintos, uno fino encima de una
+  banda gruesa, se funden en el mismo oliva si el de encima mide un par de
+  píxeles y casi todo él es borde antialiasado. Medido en el curso 33 con
+  ámbar 2.2 sobre cian 6.5 a 540 px de ancho. Cuando dos curvas tienen que
+  verse COINCIDIR, la de encima va **a trozos** (`DashedVMobject`): en cada
+  hueco se ve el color puro de abajo y en cada trazo el de arriba, y
+  "coinciden" se lee porque se ven DOS curvas, no una mezcla.
 - **Barras que se tocan son una losa.** Doce tareas pegadas no se pueden
   contar. El hueco se le quita al ANCHO de cada barra, no a su sitio, para que
   la escala de tiempo no mienta.

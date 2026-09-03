@@ -79,6 +79,20 @@ casi("el deslizamiento que se dibuja da la muestra que sale",
      s, float(sis.convolucion(x1, h)[12]), 1e-12)
 ok("la cola de h se mide", 20 < sis.cola(h) <= 48, f"{sis.cola(h)} muestras")
 
+# `cola` y `duracion` NO son la misma cifra, y el contraejemplo es el caso
+# que de verdad se usa en pantalla: un impulso retrasado.
+_d = sis.impulso(N=41, n0=20)
+ok("un impulso retrasado dura UNA muestra", sis.duracion(_d) == 1,
+   f"duracion {sis.duracion(_d)}")
+ok("...y su cola son 21, que es otra cosa", sis.cola(_d) == 21,
+   f"cola {sis.cola(_d)}")
+ok("duracion no cuenta los ceros de delante",
+   sis.duracion(_d) == sis.duracion(sis.impulso(N=41, n0=0)),
+   "misma duracion este donde este")
+ok("una respuesta que dura no se confunde con una que no",
+   sis.duracion(h) > sis.duracion(_d),
+   f"{sis.duracion(h)} contra {sis.duracion(_d)}")
+
 print("\n== 04 · El escalon ==")
 esc = sis.escalon(60)
 y_esc_conv = sis.convolucion(esc, h)
@@ -89,6 +103,20 @@ casi("y se asienta en la suma de h", float(y_esc_conv[59]),
      sis.valor_final(h), 1e-9)
 ok("la respuesta al escalon no hace falta medirla aparte",
    y_esc_conv.size == 60 + h.size - 1)
+
+# `valor_final` es la SUMA de la h que le pases, y solo coincide con el
+# valor al que la respuesta se asienta si esa h ya ha decaido. Rotular
+# "valor final" sobre una respuesta que en pantalla sigue oscilando es
+# poner una palabra donde no hay una medida: paso en el primer intento de
+# la pieza 04, con N=32 y las ocho ultimas muestras moviendose 0.1381.
+_hc = lambda N: sis.h_amortiguada(N=N, tau=9.0, f=0.11)
+_osc = lambda N: float(np.ptp(sis.respuesta_escalon(_hc(N))[-8:]))
+ok("con N=32 la respuesta al escalon NO se ha asentado (contraejemplo)",
+   _osc(32) > 0.10, f"oscilacion final {_osc(32):.4f}")
+ok("con N=80 si", _osc(80) < 0.01, f"oscilacion final {_osc(80):.4f}")
+ok("y por eso el valor final de N=32 se aleja del de verdad",
+   abs(sis.valor_final(_hc(32)) - sis.valor_final(_hc(120))) > 0.01,
+   f"{sis.valor_final(_hc(32)):.4f} contra {sis.valor_final(_hc(120)):.4f}")
 
 print("\n== 05 · Linealidad (con su contraejemplo) ==")
 lin = sis.error_superposicion(h, x1, x2, 1.7, -0.4)
@@ -184,6 +212,46 @@ ok("y aun asi la señal deja de parecerse",
    float(np.max(np.abs(xd - mov)) / np.max(np.abs(xd))) > 0.5,
    f"difieren un {100 * np.max(np.abs(xd - mov)) / np.max(np.abs(xd)):.0f} %")
 
+# El invariante de arriba PASABA con la libreria rota, por pura suerte de
+# la senal elegida: con dos tonos en 400 muestras el bin de Nyquist sale
+# practicamente vacio, asi que girarlo no movia nada medible. Con 256
+# muestras y otras dos frecuencias ese bin vale 0.4857 y se quedaba en
+# 0.1014 — el rotulo de la pieza 14 habria dicho "las mismas amplitudes"
+# sobre un espectro cambiado. Un invariante que solo prueba el caso que
+# elegiste no prueba la propiedad: hay que anadir el caso que la rompe.
+xn = sis.dos_tonos(0.04, 0.11, 256)          # este SI carga el Nyquist
+Xn = np.abs(np.fft.rfft(xn))
+ok("el caso que destapo el fallo carga el bin de Nyquist", Xn[-1] > 0.3,
+   f"|X| en Nyquist = {Xn[-1]:.4f}")
+for giro in (6.0, 18.0):
+    casi(f"girar las fases (giro {giro}) no toca las amplitudes",
+         float(np.max(np.abs(Xn - np.abs(np.fft.rfft(
+             sis.deformar_fases(xn, giro)))))), 0.0, 1e-10)
+
+# Y el contraejemplo explicito: girando TAMBIEN los extremos —lo que hacia
+# la version rota— `irfft` tira la parte imaginaria del bin de Nyquist y el
+# modulo se mueve. Si esto no fallara, lo de arriba no probaria nada.
+kk = np.arange(Xn.size)
+mal = np.fft.irfft(np.fft.rfft(xn) * np.exp(1j * 6.0 * kk * kk / Xn.size),
+                   n=xn.size)
+ok("y girar los extremos SI las estropea (contraejemplo)",
+   float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))) > 0.3,
+   f"cambio maximo {float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))):.4f}")
+
+# Comparar dos espectros de amplitud exige la MISMA rejilla. `espectro_amplitud`
+# no rellena de ceros; el contraejemplo es hacerlo con el N=1024 por defecto de
+# `respuesta_frecuencia`, que interpola cada senal de otra manera.
+xn2 = sis.dos_tonos(0.04, 0.11, 256)
+yn2 = sis.deformar_fases(xn2, 6.0)
+casi("dos espectros comparados en su propia rejilla no cambian",
+     float(np.max(np.abs(sis.espectro_amplitud(xn2)
+                         - sis.espectro_amplitud(yn2)))), 0.0, 1e-10)
+_a = sis.respuesta_frecuencia(xn2)[1]
+_b = sis.respuesta_frecuencia(yn2)[1]
+ok("y compararlos rellenando de ceros da un cambio FALSO (contraejemplo)",
+   float(np.max(np.abs(_a - _b))) > 1.0,
+   f"cambio aparente {float(np.max(np.abs(_a - _b))):.2f}")
+
 print("\n== 15 · Resonancia ==")
 hr = sis.resonador(0.08, 12.0, 400)
 amp = sis.amplificacion(hr, 0.08)
@@ -196,6 +264,52 @@ ok("mas Q, mas estrecho",
    sis.amplificacion(sis.resonador(0.08, 40.0, 800), 0.08) > amp,
    f"Q=12 -> x{amp:.1f}, Q=40 -> "
    f"x{sis.amplificacion(sis.resonador(0.08, 40.0, 800), 0.08):.1f}")
+
+# Una cifra "medida" puede seguir siendo del CUADRO y no del sistema, y la
+# forma de saberlo es medirla con varias ventanas y ver si se mueve. El eco
+# de un resonador de Q alto tarda en morir: con N=600 `duracion` dice 552 y
+# con N>=800 dice 620 y ya no se mueve. Yo mismo pase el 552 como cifra de
+# referencia en el encargo de la pieza 15, y era el tamano de la ventana
+# disfrazado de medida — el mismo error que la pieza 10 con su "60".
+_eco = lambda N: sis.duracion(sis.resonador(0.08, 40.0, N=N))
+ok("el eco de Q=40 no ha terminado en 600 muestras (contraejemplo)",
+   _eco(600) < _eco(1200), f"{_eco(600)} contra {_eco(1200)}")
+ok("y a partir de 800 la cifra ya no se mueve",
+   _eco(800) == _eco(1200) == _eco(1600) == 620,
+   f"{_eco(800)}, {_eco(1200)}, {_eco(1600)}")
+
+# El pico de la campana CASI NO CAMBIA con Q: la amplificacion viene de que
+# baja lo de fuera, no de que suba lo de dentro. Dibujar campanas que
+# "crecen" con Q seria falso; lo que crece es el cociente.
+for _Q, _pico in ((4.0, 1.070), (12.0, 1.048), (40.0, 1.037)):
+    _w, _m, _ = sis.respuesta_frecuencia(sis.resonador(0.08, _Q, N=1200), 4096)
+    casi(f"el pico de |H| con Q={_Q:g} apenas se mueve", float(_m.max()),
+         _pico, 0.005)
+ok("lo que cambia es lo de FUERA de la resonancia",
+   sis.amplificacion(sis.resonador(0.08, 40.0, N=1200), 0.08, 0.02)
+   > 8 * sis.amplificacion(sis.resonador(0.08, 4.0, N=1200), 0.08, 0.02),
+   "la amplificacion sube casi 10 veces mientras el pico baja")
+
+# Y la MISMA trampa en el eje de frecuencia: la campana de un Q alto es tan
+# estrecha que una rejilla gruesa no cae en su pico y lo mide por debajo. La
+# amplificacion de Q=40 sube de 37.38 a 38.25 solo con afinar la fft, sin
+# que nada cambie en el sistema. Con Q=4 no se mueve. La precision a la que
+# las tres SI son del sistema es el entero.
+_h40 = sis.resonador(0.08, 40.0, N=1200)
+_h4 = sis.resonador(0.08, 4.0, N=1200)
+ok("la amplificacion de Q=40 depende de la rejilla (contraejemplo)",
+   abs(sis.amplificacion(_h40, 0.08, 0.02, N=1024)
+       - sis.amplificacion(_h40, 0.08, 0.02, N=16384)) > 0.5,
+   f"{sis.amplificacion(_h40, 0.08, 0.02, N=1024):.2f} contra "
+   f"{sis.amplificacion(_h40, 0.08, 0.02, N=16384):.2f}")
+ok("la de Q=4 no", abs(sis.amplificacion(_h4, 0.08, 0.02, N=1024)
+                       - sis.amplificacion(_h4, 0.08, 0.02, N=16384)) < 0.01,
+   "estable en 3.89")
+ok("y redondeadas a entero las dos son estables",
+   all(round(sis.amplificacion(_h, 0.08, 0.02, N=N)) == v
+       for _h, v in ((_h4, 4), (_h40, 38))
+       for N in (4096, 8192, 16384, 32768)),
+   "4 y 38 en las cuatro rejillas")
 
 print("\n== 16 · Transitorio y permanente ==")
 y_esc = np.convolve(sis.escalon(200), hr)[:200]

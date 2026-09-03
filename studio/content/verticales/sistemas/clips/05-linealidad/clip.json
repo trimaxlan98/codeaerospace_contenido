@@ -1,0 +1,7 @@
+{
+  "name": "Linealidad",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos senales por separado y luego juntas: la salida es la suma exacta.",
+  "duracion_objetivo": 36.55
+}

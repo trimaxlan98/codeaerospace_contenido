@@ -104,6 +104,21 @@ def cola(h, umbral=0.01):
     return int(grande[-1] + 1) if grande.size else 0
 
 
+def duracion(x, umbral=0.01):
+    """CUANTAS muestras valen algo. No es lo mismo que `cola`.
+
+    `cola` mide DONDE se acaba la senal contando desde el origen, asi que
+    incluye los ceros de delante: un impulso colocado en la muestra 20
+    tiene cola 21 y dura 1. Las dos cifras son utiles y son distintas, y
+    confundirlas pone en pantalla un numero falso — paso en la pieza 01,
+    que rotulaba "muestra que dura" sobre un 21."""
+    x = np.abs(np.asarray(x, dtype=float))
+    pico = np.max(x)
+    if pico <= 0:
+        return 0
+    return int(np.sum(x > float(umbral) * pico))
+
+
 # --- 03 · La convolucion -----------------------------------------------
 def convolucion(x, h):
     """Convolucion completa, escrita a mano.
@@ -347,6 +362,19 @@ def respuesta_frecuencia(h, N=1024):
     return w, np.abs(H), np.unwrap(np.angle(H))
 
 
+def espectro_amplitud(x):
+    """|X| de una señal, SIN rellenar de ceros.
+
+    Existe para comparar los espectros de amplitud de dos señales, que es
+    lo que afirma la pieza 14. Hacerlo con `respuesta_frecuencia(x)` y su
+    N=1024 por defecto rellena cada señal de ceros y le interpola el
+    espectro de otra manera: el "cambio" entre una señal y la misma con
+    las fases movidas salia **49.30** en vez de 0, sin que nada fallara.
+    Lo levanto la pieza 14."""
+    x = np.asarray(x, dtype=float)
+    return np.abs(np.fft.rfft(x, n=x.size))
+
+
 def ganancia_medida(h, w, N=400):
     """La ganancia MEDIDA metiendo un tono y midiendo lo que sale.
 
@@ -374,11 +402,23 @@ def deformar_fases(x, giro):
 
     Es la pieza 14: el espectro de amplitud no cambia ni un poco y la
     señal deja de parecerse a si misma. Lo que se ve no lo dice el modulo
-    del espectro."""
-    X = np.fft.rfft(np.asarray(x, dtype=float))
+    del espectro.
+
+    Los extremos NO se giran, y ahi estaba el fallo. Para que la salida
+    sea real, el bin 0 y el de Nyquist tienen que ser reales; `irfft` los
+    fuerza tirando su parte imaginaria, asi que girarlos CAMBIA su modulo
+    y la pieza afirmaria en pantalla algo falso. Medido con dos tonos y
+    giro 6: el bin de Nyquist pasaba de 0.4857 a 0.1014 mientras el rotulo
+    decia "las mismas amplitudes". Dejandolos quietos, el espectro de
+    amplitud se conserva hasta el ultimo bit."""
+    x = np.asarray(x, dtype=float)
+    X = np.fft.rfft(x)
     k = np.arange(X.size)
-    return np.fft.irfft(X * np.exp(1j * float(giro) * k * k / X.size),
-                        n=np.asarray(x).size)
+    giros = np.exp(1j * float(giro) * k * k / X.size)
+    giros[0] = 1.0
+    if x.size % 2 == 0:
+        giros[-1] = 1.0        # el bin de Nyquist solo existe si N es par
+    return np.fft.irfft(X * giros, n=x.size)
 
 
 # --- 15 · Resonancia ---------------------------------------------------
@@ -540,13 +580,24 @@ def cadena(cajas, largo=0.85, color=None):
     return piezas, p_ini, p_fin
 
 
-def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None):
+def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None,
+         color_entrada=None, color_salida=None):
     """El diagrama del lazo cerrado: la salida vuelve a la entrada.
 
     Es el unico dibujo del curso con una linea que se muerde la cola, y
-    esa forma ES la pieza 10."""
+    esa forma ES la pieza 10.
+
+    `color_entrada` y `color_salida` pintan los tramos por lo que son —el
+    reparto del curso es CIAN la entrada y AMBAR la salida— en vez de
+    dejarlo todo del mismo gris. Existen porque sin ellos la unica salida
+    era entrar por indice en el VGroup devuelto (`g[2]`, `g[4]`, `g[5]`),
+    y eso ata la pieza al orden en que esta funcion añade sus hijos: el
+    dia que se le meta un elemento mas por medio, el color se va al tramo
+    equivocado sin que falle nada. Lo levanto la pieza 10."""
     _exige_manim()
     color = color or _lz.APAGADO
+    c_ent = color_entrada or color
+    c_sal = color_salida or color
     g = VGroup(caja_directa)
     izq = caja_directa.get_left() + LEFT * ancho / 3
     der = caja_directa.get_right() + RIGHT * ancho / 3
@@ -555,25 +606,37 @@ def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None):
                   fill_color=_lz.AZUL, fill_opacity=1.0)
     nodo.move_to(izq)
     g.add(nodo)
-    g.add(flecha(izq + LEFT * 0.75, izq + LEFT * 0.11, color))
-    g.add(flecha(izq + RIGHT * 0.11, caja_directa.get_left(), color))
-    g.add(flecha(caja_directa.get_right(), der, color))
-    vuelta = VMobject(stroke_color=color, stroke_width=TRAZO_FINO)
+    g.add(flecha(izq + LEFT * 0.75, izq + LEFT * 0.11, c_ent))
+    g.add(flecha(izq + RIGHT * 0.11, caja_directa.get_left(), c_ent))
+    g.add(flecha(caja_directa.get_right(), der, c_sal))
+    vuelta = VMobject(stroke_color=c_sal, stroke_width=TRAZO_FINO)
     vuelta.set_points_as_corners([
         der, [der[0], abajo, 0], [izq[0], abajo, 0], izq + DOWN * 0.11])
     g.add(vuelta)
     if caja_vuelta is not None:
         caja_vuelta.move_to([(der[0] + izq[0]) / 2, abajo, 0])
         g.add(caja_vuelta)
+    # El tramo de vuelta, por NOMBRE. Una pieza que quiera animarlo sola
+    # tenia que pescarlo del grupo —por indice o por tipo—, y eso ata la
+    # pieza al orden en que esta funcion añade sus hijos.
+    g.vuelta = vuelta
     return g
 
 
 def tallos(valores, ancho=4.8, alto=2.4, color=None, grosor=TRAZO_FINO,
-           punta=0.045, rango_y=None):
+           punta=0.045, rango_y=None, colores=None):
     """Una secuencia discreta: una raya por muestra y su punto.
 
     Unir las muestras con una curva sugiere que hay algo entre ellas, y en
-    una senal discreta no lo hay."""
+    una senal discreta no lo hay.
+
+    `colores` da un color POR MUESTRA, que es como se resalta un tramo
+    —las muestras anteriores al golpe, la parte que satura, el trozo que
+    se va—. Existe porque sin el la unica salida era indexar los hijos del
+    VGroup contando "dos por muestra, Line y Dot", y eso ata la pieza a la
+    estructura interna de esta funcion: el dia que alguien dibuje con
+    `punta=0` no hay Dots, la cuenta se desplaza y el color acaba en la
+    muestra equivocada sin que falle nada. Lo levanto la pieza 07."""
     _exige_manim()
     v = np.asarray(valores, dtype=float)
     n = v.size
@@ -586,10 +649,12 @@ def tallos(valores, ancho=4.8, alto=2.4, color=None, grosor=TRAZO_FINO,
     for i, vi in enumerate(v):
         x = -ancho / 2 + i * paso
         y = -alto / 2 + (vi - y0) / dy * alto
+        c = (colores[i] if colores is not None and i < len(colores)
+             else (color or _lz.TINTA))
         g.add(Line([x, base, 0], [x, y, 0],
-                   stroke_color=color or _lz.TINTA, stroke_width=grosor))
+                   stroke_color=c, stroke_width=grosor))
         if punta:
-            g.add(Dot([x, y, 0], radius=punta, color=color or _lz.TINTA))
+            g.add(Dot([x, y, 0], radius=punta, color=c))
     return g
 
 
@@ -621,19 +686,48 @@ def traza(x, y, ancho=4.8, alto=2.4, color=None, grosor=TRAZO,
     return linea, punto
 
 
-def cero(ancho=4.8, y=0.0, color=None, grosor=TRAZO_PELO):
+def cero(ancho=4.8, y=0.0, color=None, grosor=TRAZO_PELO, alto=None,
+         rango_y=None):
+    """La linea del cero de un cuadro.
+
+    Pasale `alto` y `rango_y` y la coloca donde de verdad esta el cero.
+    Es la unica forma segura: el molde del curso dibuja sobre rangos que
+    EMPIEZAN en 0, asi que alli `y=-alto/2` es correcto y se copio a
+    piezas cuyos datos SI bajan de cero. Ahi la raya cae en el suelo del
+    cuadro, un dedo por debajo del cero verdadero, y se lee como el eje
+    aunque no lo sea: el dibujo dice que unas muestras son positivas
+    cuando son negativas. Lo destapo la pieza 11.
+
+    Y si el cero no cae dentro del rango, aborta: pintar un eje de cero
+    en un cuadro que no contiene el cero es dibujar una referencia que no
+    existe."""
     _exige_manim()
+    if rango_y is not None:
+        if alto is None:
+            raise ValueError("cero(rango_y=...) necesita tambien `alto`")
+        y0, y1 = float(rango_y[0]), float(rango_y[1])
+        if not (y0 <= 0.0 <= y1):
+            raise ValueError(
+                f"el cero no cae dentro de rango_y=({y0}, {y1}): no dibujes "
+                f"un eje de cero en un cuadro que no lo contiene")
+        y = -alto / 2 + (0.0 - y0) / ((y1 - y0) or 1.0) * alto
     return Line([-ancho / 2, y, 0], [ancho / 2, y, 0],
                 stroke_color=color or _lz.LINEA, stroke_width=grosor)
 
 
 def banda(y_centro, semiancho, punto, ancho=4.8, color=None):
-    """La banda de tolerancia de la pieza 16: dos discontinuas."""
+    """La banda de tolerancia de la pieza 16: dos discontinuas.
+
+    El defecto es APAGADO y no LINEA: LINEA (#1B3253) es un azul a un paso
+    del fondo, hecho a proposito para rejillas y ejes que no deben verse.
+    Una banda de tolerancia no es mobiliario — es el umbral que la pieza
+    esta afirmando— y con LINEA resultaba practicamente invisible. Lo
+    levanto la pieza 05."""
     _exige_manim()
     g = VGroup()
     for v in (y_centro - semiancho, y_centro + semiancho):
         y = punto(0, v)[1]
         ln = Line([-ancho / 2, y, 0], [ancho / 2, y, 0],
-                  stroke_color=color or _lz.LINEA, stroke_width=TRAZO_PELO)
+                  stroke_color=color or _lz.APAGADO, stroke_width=TRAZO_PELO)
         g.add(DashedVMobject(ln, num_dashes=30, dashed_ratio=0.45))
     return g
