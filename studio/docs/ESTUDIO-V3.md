@@ -114,8 +114,8 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | **hecho** |
 | R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3a hecho** (import/export, lote, duplicar); R3b pendiente |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | **hecho** (librerías; datos adjuntos pendiente) |
-| R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | **R5a hecho** (Proyectos: descomposición, CodeMirror, fila de audio, historial de script); R5b pendiente (Estudio: fotogramas, Laboratorio) |
-| R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | pendiente |
+| R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | **R5a hecho** (Proyectos partido, estilo en CodeMirror, audio en una fila, historial de script); Estudio con fotogramas y Laboratorio entraron por R3b |
+| R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | **hecho** 2026-09-03 (desplegado desde la rama; PR #75 pendiente de merge por el dueño) |
 
 Cada sprint termina con `pytest -q` verde, `vite build`, commit atómico y
 despliegue verificado desde fuera.
@@ -1052,3 +1052,34 @@ contiene el propio marcador.
    disco y **Renders** —que sigue montada, las vistas son *keep-alive*— pide
    su vídeo. Artefacto del arnés, no del código: un `done` real siempre tiene
    archivo.
+
+### R6 — cierre (2026-09-03, 15:30)
+
+Todo lo anterior está desplegado en https://coderesearch.space **desde la
+rama** `estudio/v3-investigacion` (el clasificador de permisos de la sesión
+bloqueó `gh pr merge` y el push a `main`; el PR #75 queda para el dueño:
+después, en el VPS, `git checkout main && git pull`).
+
+Verificado en producción con cookie firmada, no leyendo el código:
+
+| Qué | Medido |
+|---|---|
+| voz edge / piper (guion a mano, 2 secciones) | 14.2 s de audio en 2.0 s / 14.5 s en 4.1 s |
+| grabación propia subida (wav estéreo 44.1 kHz) | 200, mono 24 kHz, silencio recortado, `al_dia` |
+| banco de música | 8 temas en 6.4 s |
+| importar curso 33 desde el repo (`dry_run`) | 20 clips, 200 |
+| `fuentes.zip` de un curso real | 49 908 bytes |
+| hoja de contactos / fotograma 1920 | 5.6 s / 1920×1080 |
+| sondas en el Laboratorio | ntn 94/0 · figura 79/0 · sistemas 73/0 |
+| película real con música (ATP 3.3, 4 clips, corte) | montada en 27.1 s, 151.3 s, 8.4 MB, verificada en 5.4 s: ok con avisos |
+
+Lo que la película destapó: **en horizontal la costura visible es por
+diseño** (2.23, 5.55 y 5.96/255 en un curso entregado): la regla estricta se
+queda para 9:16 y en 16:9 baja a aviso. Y las cuatro piezas cierran la voz
+sin cola de 0.8 s: eso sí es un aviso legítimo que antes nadie medía.
+
+Pendiente que trasciende este encargo: datos adjuntos por proyecto (R4),
+SVG (manim 0.20.1 no lo exporta; la figura estática es PNG a 300 dpi), la
+migración del asistente al catálogo completo de primitivas (hecho el índice,
+falta medirlo con Gemini cuando vuelva la facturación), y el `.gitignore`
+de `node_modules/` con barra final que no ignora un symlink.
