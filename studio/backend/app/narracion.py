@@ -603,7 +603,7 @@ class NarracionService:
         return {"enabled": self.enabled, "proveedor": proveedor,
                 "voz": self.voz_defecto(proveedor) if proveedor else None,
                 "proveedores": self.proveedores(),
-                "escribe_guion": any(p["id"] == "vertex" and p["disponible"]
+                "escribe_guion": any(p["escribe_guion"]
                                      for p in self.proveedores()),
                 "clips": clips_out, "run": self.run_public()}
 
@@ -742,7 +742,7 @@ class NarracionService:
         if not plan:
             return {"queued": []}
         cat = {p["id"]: p for p in self.proveedores()}
-        con_guionista = cat["vertex"]["disponible"] and not solo_audio
+        con_guionista = cat["vertex"]["escribe_guion"] and not solo_audio
         # Con guion guardado y `solo_audio`, o con un proveedor que no
         # escribe, se usa el guion existente. Si no lo hay, hace falta
         # Vertex; si tampoco, se dice QUE clips necesitan guion.

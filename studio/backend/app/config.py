@@ -75,6 +75,10 @@ class Settings:
             p.strip() for p in os.environ.get(
                 "MS_TTS_PROVEEDORES", "vertex,edge,piper,archivo").split(",")
             if p.strip())
+        # Quien escribe el guion: "vertex" (Gemini) o "ninguno" (se escribe a
+        # mano). Con GCP en mora, Vertex parece disponible (la key existe) y
+        # falla con 403 al primer clip: mejor declararlo.
+        self.tts_guionista = os.environ.get("MS_TTS_GUIONISTA", "vertex")
         self.tts_voice_vertex = os.environ.get("MS_TTS_VOICE", "Charon")
         self.tts_voice = self.tts_voice_vertex  # compatibilidad
         self.tts_voice_edge = os.environ.get("MS_TTS_VOICE_EDGE",

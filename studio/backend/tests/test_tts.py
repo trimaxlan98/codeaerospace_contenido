@@ -235,3 +235,29 @@ def test_recortar_silencio_de_la_grabacion(authed, tmp_path):
     assert r.status_code == 200, r.text
     # 1 s de voz + 0.12 s de margen a cada lado
     assert 1.1 <= r.json()["audio_s"] <= 1.35
+
+
+def test_guionista_apagado_usa_el_guion_a_mano(authed, tmp_path, monkeypatch):
+    """GCP en mora: la key existe pero MS_TTS_GUIONISTA=ninguno. Vertex sigue
+    pudiendo hablar, pero no se le pide el guion."""
+    (tmp_path / "gcp-key.json").write_text('{"project_id": "test"}')
+    import app.main as main_mod
+    svc = main_mod.narracion_service
+    svc.cfg.tts_guionista = "ninguno"
+    fake = FakeVertex()
+    monkeypatch.setattr(svc, "_vertex", lambda: fake)
+    project = _create_project(authed)
+    pid = project["id"]
+    clip = _add_clip(authed, pid)
+    d = authed.get(f"/api/projects/{pid}/narracion").json()
+    assert d["escribe_guion"] is False
+    r = authed.post(f"/api/projects/{pid}/narracion", json={})
+    assert r.status_code == 409 and "sin guion" in r.json()["detail"]
+    authed.put(f"/api/projects/{pid}/narracion/{clip['id']}/guion",
+               json={"secciones": [{"t_inicio": 0, "texto": "Hola."}]})
+    r = authed.post(f"/api/projects/{pid}/narracion", json={})
+    assert r.status_code == 202
+    d = _wait_run(authed, pid)
+    assert d["run"]["errores"] == []
+    assert fake.llamadas_guion == 0
+    assert d["clips"][0]["estado"] == "al_dia"

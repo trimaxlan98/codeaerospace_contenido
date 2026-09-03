@@ -364,7 +364,9 @@ def catalogo(cfg) -> list[dict]:
         "id": "vertex", "nombre": "Gemini TTS (Vertex AI)",
         "disponible": disponible and "vertex" in permitidos,
         "motivo": None if disponible else "falta la service account de Vertex",
-        "escribe_guion": True, "offline": False,
+        "escribe_guion": bool(disponible and "vertex" in permitidos
+                              and cfg.tts_guionista == "vertex"),
+        "offline": False,
         "voz_defecto": cfg.tts_voice_vertex,
         "voces": [{"id": v, "nombre": n} for v, n in VERTEX_VOCES],
     })
