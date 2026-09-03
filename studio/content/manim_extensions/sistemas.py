@@ -673,8 +673,31 @@ def traza(x, y, ancho=4.8, alto=2.4, color=None, grosor=TRAZO,
     return linea, punto
 
 
-def cero(ancho=4.8, y=0.0, color=None, grosor=TRAZO_PELO):
+def cero(ancho=4.8, y=0.0, color=None, grosor=TRAZO_PELO, alto=None,
+         rango_y=None):
+    """La linea del cero de un cuadro.
+
+    Pasale `alto` y `rango_y` y la coloca donde de verdad esta el cero.
+    Es la unica forma segura: el molde del curso dibuja sobre rangos que
+    EMPIEZAN en 0, asi que alli `y=-alto/2` es correcto y se copio a
+    piezas cuyos datos SI bajan de cero. Ahi la raya cae en el suelo del
+    cuadro, un dedo por debajo del cero verdadero, y se lee como el eje
+    aunque no lo sea: el dibujo dice que unas muestras son positivas
+    cuando son negativas. Lo destapo la pieza 11.
+
+    Y si el cero no cae dentro del rango, aborta: pintar un eje de cero
+    en un cuadro que no contiene el cero es dibujar una referencia que no
+    existe."""
     _exige_manim()
+    if rango_y is not None:
+        if alto is None:
+            raise ValueError("cero(rango_y=...) necesita tambien `alto`")
+        y0, y1 = float(rango_y[0]), float(rango_y[1])
+        if not (y0 <= 0.0 <= y1):
+            raise ValueError(
+                f"el cero no cae dentro de rango_y=({y0}, {y1}): no dibujes "
+                f"un eje de cero en un cuadro que no lo contiene")
+        y = -alto / 2 + (0.0 - y0) / ((y1 - y0) or 1.0) * alto
     return Line([-ancho / 2, y, 0], [ancho / 2, y, 0],
                 stroke_color=color or _lz.LINEA, stroke_width=grosor)
 

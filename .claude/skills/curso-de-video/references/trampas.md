@@ -62,6 +62,15 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **La linea del cero solo esta en el suelo del cuadro si el rango EMPIEZA
+  en cero.** El molde de una familia suele dibujar magnitudes positivas, asi
+  que su `cero(y=-alto/2)` es correcto — y se copia intacto a piezas cuyos
+  datos bajan de cero, donde la raya cae por debajo del cero verdadero y se
+  lee como el eje sin serlo: el dibujo afirma que unas muestras son positivas
+  cuando son negativas. Cazado en el curso 33, propagado por mi propio molde.
+  El eje se coloca CALCULANDO (`sis.cero(alto=, rango_y=)`), y si el cero no
+  cae dentro del rango, se aborta: un eje de cero en un cuadro que no
+  contiene el cero es una referencia que no existe.
 - **`Create` VUELVE A ANADIR su mobject a la escena al terminar**
   (`introducer=True` por defecto). Si lo que animas es una PARTE del dibujo
   que vive dentro del grupo de un carril, eso lo saca del grupo y lo deja
