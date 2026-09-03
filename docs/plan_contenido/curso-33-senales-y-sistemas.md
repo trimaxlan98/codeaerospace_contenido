@@ -97,10 +97,14 @@ salga igual medida con tonos que calculada con la FFT de h.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| A | **00 intro**, **01**, 02, 03, 04 | intro, cierre y **el molde (01)** escritos y validados; 02-04 en produccion |
-| B | 05, 06, 07, 08, 09 | 05 y 06 en produccion |
-| C | 10, 11, 12, 13, 14 | pendiente |
-| D | 15, 16, 17, 18, **19 cierre** | cierre escrito y validado |
+| A | 00 intro, 01, 02, 03, 04 | **cerrado** (revisadas y commiteadas) |
+| B | 05, 06, 07, 08, 09 | **cerrado** |
+| C | **10**, 11, 12, 13, 14 | 10 cerrada; 11-14 en produccion |
+| D | 15, 16, 17, 18, 19 cierre | cierre validado; 15 en produccion; 16-18 pendientes |
+
+**Duraciones medidas (ql)**: intro 15.07, 01 31.70, 02 32.40, 03 36.03,
+04 31.50, 05 36.60, 06 32.83, 07 31.93, 08 34.57, 09 36.73, 10 31.67,
+cierre 13.63.
 
 **Nombres de portada, MEDIDOS** (no elegidos a ojo): los 18 caben. Tres van
 en **dos lineas** al cuerpo 64 — RESPUESTA AL IMPULSO, ECUACION EN
@@ -146,3 +150,46 @@ FRECUENCIA. El resto en una linea a 64 o 56.
   1. El ultimo plano del molde rotulaba "muestra que dura" sobre un **21**.
   Separado en `sis.duracion`, con el contraejemplo en la sonda (55
   invariantes).
+
+### De la produccion (lo que cazo revisar los frames)
+
+- **Una cifra que cambia con la ventana no es del sistema.** La pieza 10
+  rotulaba "60 muestras que duran" sobre una respuesta divergente: ese 60 era
+  `N=60`, y con N=200 habria dicho 200 sin que nada cambiara en el sistema. Se
+  cambio por cuanto multiplica cada muestra a la anterior (`h[-1]/h[-2]`), que
+  no depende del cuadro. Es la misma regla de la malla, aplicada al eje del
+  tiempo.
+- **Y una cifra que no se ha asentado tampoco.** La 04 rotulaba "valor final"
+  sobre una respuesta que en pantalla seguia oscilando: 0.1381 de vaiven en
+  las 8 ultimas muestras, y un 2.2 % de distancia al valor de asentamiento de
+  verdad. `sis.valor_final` es la suma de la `h` que le pases.
+- **Normalizar cada panel a su propio maximo es mentir por omision.** La 08
+  dibujaba dos sistemas a la misma altura con escalas que difieren 17.8 veces:
+  el que se dispara parecia manso y el dibujo contradecia a su cifra. Se
+  declara la escala (1X / 18X), como en el molde.
+- **Lo que hay que RECORDAR para creerse una cifra, en un reel mudo no se
+  recuerda.** La 09 ensenaba una salida, el intercambio y otra salida; el cero
+  solo es comprobable desde que las dos se dibujan SUPERPUESTAS. Mismo remedio
+  que la 06.
+- **La igualdad bit a bit solo se puede exigir cuando es alcanzable.** En la
+  06 las dos curvas son tramos del mismo array y `np.array_equal` vale; en la
+  09 son dos convoluciones por caminos distintos y sumar en otro orden mueve
+  el ultimo bit (1.33e-15 sobre un pico de 1.9). La guarda va en 1e-9, que
+  sigue cazando un desfase real de un indice.
+- **Tres huecos de API del mismo tipo**: una pieza obligada a pescar cosas de
+  un grupo por indice o por tipo. `sis.tallos` acepta `colores=` por muestra,
+  `sis.lazo` acepta `color_entrada`/`color_salida` y devuelve `g.vuelta` por
+  nombre. Todos se rompen en silencio, no con un error.
+- **`sis.banda` pintaba en LINEA**, que es el azul de las rejillas, a un paso
+  del fondo. Una banda de tolerancia no es mobiliario: es el umbral que la
+  pieza afirma. Ahora va en APAGADO.
+- **Trampas de manim nuevas**, las tres en `references/trampas.md`: `Indicate`
+  escala alrededor del centro del bounding box (sobre un tallo estira la raya
+  hacia abajo y cruza el eje); el objetivo de un `Transform` tiene que estar
+  VIVO aunque no se vea (copia tambien la opacidad, y transformar hacia un
+  estado apagado deja el dibujo invisible); y `Create` RE-ANADE su mobject a
+  la escena al terminar (`introducer=True`), lo que saca del grupo del carril
+  la parte que animas.
+- **El acento traslucido no es solo cosa de masas**: un trazo grueso (7.0) al
+  32 % da el mismo verde oliva ilegible. Una curva de referencia va en
+  APAGADO opaco.
