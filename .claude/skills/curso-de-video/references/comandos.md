@@ -122,7 +122,28 @@ costuras se corre con el `python3` del sistema o se mide aparte.
 
 ## 5. Narración (TTS)
 
-En el VPS, **SERIAL** — dos `guiones.py` a la vez dan 429 del TTS:
+**Desde 2026-09-03 la voz no necesita GCP** (`studio/docs/ESTUDIO-V3.md`,
+R1). Proveedores: `edge` (edge-tts, gratis, red; defecto), `piper`
+(offline, modelo en `MS_PIPER_VOICES_DIR`), `vertex` (Gemini, de pago) y la
+grabación propia del dueño. Todas las herramientas aceptan `--proveedor`:
+
+```bash
+# horizontal, LOCAL (edge no necesita el VPS ni la key): usa el
+# .secciones.json del clip; el guion lo escribes tú o Claude
+studio/backend/venv/bin/python studio/tools/guiones.py "Familia · 1.1 Titulo" --proveedor edge
+# vertical: frase a frase en sus t_inicio exactos (clip.json > voz.secciones)
+studio/backend/venv/bin/python studio/tools/alinear_voz.py \
+  studio/content/verticales/<slug>/clips/01-<pieza> salida.wav --proveedor edge
+```
+
+Desde la app: «Guion y voz» en cada clip (escribir el guion por secciones,
+narrarlo con la voz elegida o **subir tu grabación** wav/mp3/m4a). API:
+`PUT /api/projects/{pid}/narracion/{cid}/guion`, `POST …/narracion
+{proveedor, voz, solo_audio}`, `PUT …/narracion/{cid}/audio?nombre=`.
+
+Solo Vertex escribe el guion a partir del script; con `MS_TTS_GUIONISTA=ninguno`
+(GCP en mora) la app pide el guion escrito. Con Vertex, en el VPS,
+**SERIAL** — dos `guiones.py` a la vez dan 429 del TTS:
 
 ```bash
 ssh triage-vps "cd /var/www/codeaerospace_contenido && sudo -u manimstudio bash -c '

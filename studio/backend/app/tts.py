@@ -457,3 +457,43 @@ def entorno_tts() -> dict:
         "ffmpeg_host": hay_ffmpeg(),
         "piper_voices_dir": os.environ.get("MS_PIPER_VOICES_DIR"),
     }
+
+
+class _CfgEntorno:
+    """Lo minimo de Settings que `catalogo`/`fabricar` necesitan, leido del
+    entorno: para los CLIs de studio/tools, que no cargan la app."""
+
+    def __init__(self) -> None:
+        self.gcp_key_path = Path(os.environ.get(
+            "MS_GCP_KEY_PATH", "/etc/manimstudio/gcp-key.json"))
+        self.gcp_location = os.environ.get("MS_GCP_LOCATION", "us-central1")
+        self.gemini_model_deep = os.environ.get("MS_GEMINI_MODEL_DEEP",
+                                                "gemini-2.5-pro")
+        self.gemini_model_tts = os.environ.get(
+            "MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts")
+        self.tts_provider = os.environ.get("MS_TTS_PROVIDER", "edge")
+        self.tts_proveedores = tuple(
+            p.strip() for p in os.environ.get(
+                "MS_TTS_PROVEEDORES", "vertex,edge,piper,archivo").split(",")
+            if p.strip())
+        self.tts_guionista = os.environ.get("MS_TTS_GUIONISTA", "vertex")
+        self.tts_voice_vertex = os.environ.get("MS_TTS_VOICE", "Charon")
+        self.tts_voice_edge = os.environ.get("MS_TTS_VOICE_EDGE",
+                                             "es-MX-JorgeNeural")
+        self.tts_voice_piper = os.environ.get("MS_TTS_VOICE_PIPER",
+                                              "es_MX-claude-high")
+        self.piper_voices_dir = Path(os.environ.get(
+            "MS_PIPER_VOICES_DIR", "/etc/manimstudio/voces"))
+
+
+def narrador_desde_entorno(proveedor: str | None = None,
+                           voz: str | None = None):
+    """(narrador, voz) para un CLI: `proveedor` o MS_TTS_PROVIDER o el primero
+    disponible. Lanza RuntimeError legible si no hay ninguno."""
+    cfg = _CfgEntorno()
+    proveedor = proveedor or proveedor_defecto(cfg)
+    if not proveedor:
+        raise RuntimeError("ningun proveedor de voz disponible: instala "
+                           "edge-tts/piper-tts+miniaudio o configura Vertex")
+    voz = voz or voz_defecto(cfg, proveedor)
+    return fabricar(cfg, proveedor), voz
