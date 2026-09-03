@@ -90,21 +90,23 @@ compromiso tiempo-frecuencia, 14-18 las que ya no son de frecuencia.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| A | 00 intro, 01, 02, 03, 04 | **escritas y validadas en frames** |
-| B | 05, 06, 07, 08, 09 | **escritas y validadas en frames** |
-| C | 10, 11, 12, **13**, 14 | 13 hecha; 10, 11, 12 y 14 en produccion |
-| D | 15, 16, 17, 18, **19 cierre** | cierre hecho; 15-18 en produccion |
+| A | 00 intro, 01, 02, 03, 04 | **entregado** |
+| B | 05, 06, 07, 08, 09 | **entregado** |
+| C | 10, 11, 12, 13, 14 | **entregado** |
+| D | 15, 16, 17, 18, 19 cierre | **entregado** |
 
-Cada lote recorre los 10 pasos entero antes de empezar el siguiente.
+**Duraciones REALES del `qh`** (1080x1920 @ 60 fps, selladas en cada
+`clip.json` por `sellar_duraciones.py --fps 60`): intro 15.08, 01 30.45,
+02 34.95, 03 34.10, 04 37.05, 05 36.17, 06 31.45, 07 31.65, 08 37.25,
+09 35.75, 10 36.25, 11 37.10, 12 35.85, 13 30.45, 14 36.53, 15 37.70,
+16 39.65, 17 34.35, 18 37.35, cierre 13.68.
 
-**Duraciones medidas (ql)**: intro 15.03, 01 30.47, 02 35.00, 03 34.17,
-04 37.06, 05 36.23, 06 31.47, 07 31.70, 08 37.37, 09 35.77, 13 30.53,
-cierre 13.63.
-
-**Lo que falta cuando esten las 20**: render `qh` local (3 en paralelo),
-`verifica_vertical.py` (resolucion, duraciones contra el manifiesto y
-COSTURAS), y `unir_vertical.py --mudo`. No hay narracion: el curso se
-entrega sin pista de audio.
+**Entrega** (2026-09-02): `verifica_vertical.py` da 20 piezas, 0 fallos,
+0 avisos, y las **19 costuras a 0.0000/255**. Montaje mudo en
+`exports/verticales/transformadas/transformadas_vertical.mp4`:
+**11.05 min (662.8 s), 1080x1920 @ 60 fps, SIN pista de audio**, mas las
+20 piezas sueltas en `piezas/`. No hay narracion por decision del dueño:
+la musica se pone encima en posproduccion.
 
 ## 4. Contrato de la libreria
 
@@ -135,7 +137,7 @@ contenedor antes de escribir un solo clip.
 
 ## 6. Cosecha de trampas
 
-### De la libreria (las cazo la sonda, 83 invariantes)
+### De la libreria (las cazo la sonda, 91 invariantes)
 
 La sonda se escribio ANTES que ningun clip y saco **10 fallos a la
 primera**. Dos eran errores conceptuales que habrian salido publicados:
@@ -192,3 +194,26 @@ primera**. Dos eran errores conceptuales que habrian salido publicados:
 - **"TRANSFORMADA DE FOURIER" no cabe en la portada** ni al cuerpo minimo.
   Medidos los 20 nombres: entran todos menos ese. La pieza se llama
   FOURIER.
+
+### De la entrega (las dos que solo salen al final)
+
+- **Una clase de agrupacion elegida a ciegas es una bomba de efecto
+  retardado.** `dos_dominios` devolvia `VGroup`; una pieza con un mapa
+  (`tf.mapa` -> `ImageMobject`) exigio `Group`; y ese cambio tumbo en el
+  **render final de alta** a tres piezas que solo dibujan curvas y
+  envolvian el panel en un `VGroup`. Las tres habian pasado su `ql` ANTES
+  del cambio, asi que no habia forma de que saliera antes. Las dos clases
+  se rechazan mutuamente: la unica salida es DECIDIR MIRANDO el contenido,
+  que es lo que hace ahora `lz.agrupar(*piezas)`.
+- **El chequeo de costuras llevaba desactivandose solo.** `verifica_vertical`
+  las medic con PIL **y numpy**, el venv del backend no tiene numpy, y el
+  bloque se saltaba imprimiendo `(sin PIL/numpy: no se miden las costuras)`
+  mientras el resumen final seguia diciendo "0 fallos". Un guardian que se
+  apaga solo y ademas da el visto bueno es peor que no tenerlo: la falta de
+  la dependencia ahora **cuenta como FALLO**, y la medida va con PIL sola.
+  Verificada contra un contraejemplo (frame final contra el medio de la
+  misma pieza: 4.4159/255) antes de creerse los 0.0000 de las 19 uniones.
+- **El azul del render no es el azul del codigo**: `#0B1B33` = (11,27,51)
+  sale del mp4 como (9,25,50) por el rango limitado de video. Es uniforme
+  en todas las piezas, asi que las costuras dan cero igual; pero no midas
+  un color contra su constante del codigo.
