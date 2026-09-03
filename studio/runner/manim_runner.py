@@ -78,6 +78,13 @@ MUSICA_TIMEOUT = 900
 # 4 h + margen: con transiciones se recodifica la pelicula entera y el
 # contenedor esta capado a 1.5 vCPU. Sin transiciones son segundos.
 ENSAMBLAR_TIMEOUT = 14400
+# Medir la pelicula ya no es solo leer su duracion: desde R3c saca dos
+# fotogramas por union y compara los picos pieza a pieza. Medido en el
+# contenedor sobre cuatro piezas de 480p15, 1.3 s de trabajo; a 1080p60 y
+# treinta piezas la extrapolacion se va a varios minutos, y el VPS corre a
+# 1.5 vCPU. Los 300 s de VERIFICA_TIMEOUT (que es el del promo, una pieza)
+# se quedaban cortos.
+ENSAMBLAR_VERIFICA_TIMEOUT = 1800
 # Presentaciones: `cortar_presentacion.py` parte el render de cada clip en
 # sus fragmentos (uno por clic del ponente) y saca posters y GIF. Trabaja
 # dentro del contenedor porque el backend no tiene ffmpeg; el .pptx lo arma
@@ -551,7 +558,8 @@ async def handle_ensamblar(req: dict, writer: asyncio.StreamWriter) -> None:
         f"/workspace/{ENSAMBLAR_SCRIPT}", modo,
         f"/workspace/{peli_rel}/plan.json",
         f"/workspace/{peli_rel}/pelicula.mp4",
-        timeout=ENSAMBLAR_TIMEOUT if modo == "montar" else VERIFICA_TIMEOUT,
+        timeout=(ENSAMBLAR_TIMEOUT if modo == "montar"
+                 else ENSAMBLAR_VERIFICA_TIMEOUT),
     )
     if code != 0:
         await force_remove(container)

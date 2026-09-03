@@ -97,11 +97,14 @@ class RunnerClient:
         copia. El plan ya esta escrito en exports/peliculas/<pid>/plan.json.
 
         `modo="verificar"` mide la pelicula ya montada contra ese mismo plan
-        en vez de volver a montarla.
+        en vez de volver a montarla. Desde R3c eso incluye sacar dos
+        fotogramas por union para medir la costura y un `volumedetect` por
+        pieza, asi que su tope acompana al del runner
+        (`ENSAMBLAR_VERIFICA_TIMEOUT`): si uno cambia, el otro tambien.
         """
         resp = await self._request_one(
             {"cmd": "ensamblar", "project_id": project_id, "modo": modo},
-            timeout=14700 if modo == "montar" else 360)
+            timeout=14700 if modo == "montar" else 1860)
         if resp.get("type") != "ok":
             raise RunnerError(resp.get("error", "el montaje fallo"))
         return resp.get("informe") or {}

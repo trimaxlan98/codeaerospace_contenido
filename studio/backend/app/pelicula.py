@@ -350,13 +350,26 @@ class PeliculaService:
         return informe["verificacion"]
 
     def estado_verificacion(self, informe: dict | None) -> str:
-        """'sin_verificar' | 'vieja' | 'pasa' | 'no_pasa'."""
+        """'sin_verificar' | 'vieja' | 'pasa' | 'avisos' | 'no_pasa'.
+
+        Semaforo de tres colores desde R3c, y hacia falta: las medidas nuevas
+        —costuras, pico, cola de la voz— no son todas de vida o muerte. Una
+        costura de 0.055 puede ser un `FadeOut` mal puesto o la union legitima
+        con la intro de marca, y un pico en -0.4 dBFS es una pelicula
+        entregable con un margen que conviene mirar. Llamarlas «no pasa»
+        ensenaria a ignorar el rojo; callarlas seria no medirlas.
+
+        Las peliculas medidas ANTES de R3c no traen `avisos` y siguen en
+        verde: no se les inventan avisos que nadie midio.
+        """
         v = (informe or {}).get("verificacion")
         if not v:
             return "sin_verificar"
         if v.get("hash") != (informe or {}).get("hash"):
             return "vieja"
-        return "pasa" if v.get("ok") else "no_pasa"
+        if not v.get("ok"):
+            return "no_pasa"
+        return "avisos" if v.get("avisos") else "pasa"
 
     def cancel(self) -> bool:
         if not self.running:

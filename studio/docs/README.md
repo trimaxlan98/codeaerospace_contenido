@@ -285,13 +285,31 @@ Detalle completo y decisiones en `ESTUDIO-V2.md`.
 | GET | `/api/projects/{pid}/pelicula/video` | el mp4, con soporte de Range |
 | DELETE | `/api/projects/{pid}/pelicula` | borra la película, no el material |
 
-**Medición**: la unión puede salir mal **sin fallar** (un offset de `xfade` que deja una pieza
-fuera da un mp4 bien formado y más corto; un `concat` con audios distintos enmudece a mitad).
-`POST /api/projects/{pid}/pelicula/verificar` mide la película contra su plan —duración con
-±0,5 s de tolerancia, sonido **pieza a pieza** y resolución— y se dispara sola al terminar de
-montar. Solo se acusa a las piezas que **traían** sonido: un curso sin narrar es mudo a
-propósito. El informe vive en `pelicula.json` con el mismo hash que el montaje, así que
-volver a montar lo deja en «medición vieja» en vez de enseñar números de otra película.
+**Medir la película**: la unión puede salir mal **sin fallar** (un offset de `xfade` que deja
+una pieza fuera da un mp4 bien formado y más corto; un `concat` con audios distintos enmudece a
+mitad). `POST /api/projects/{pid}/pelicula/verificar` mide la película contra su plan y se
+dispara sola al terminar de montar. Desde el sprint R3c mide **lo mismo que la terminal**
+(`verifica_vertical.py` y `unir_vertical.py`), que es donde se cazaron los defectos reales:
+
+- **duración** con ±0,5 s de tolerancia y **resolución** contra la del proyecto;
+- **sonido pieza a pieza** — solo se acusa a las que **traían** sonido: un curso sin narrar es
+  mudo a propósito;
+- **costuras**: el último fotograma de cada pieza contra el primero de la siguiente, con PIL.
+  **≤ 0,01 limpia · ≤ 0,06 a mirar · por encima se ve**, umbrales medidos sobre los cursos
+  entregados (0,0000 en el 31 y el 33; 0,0048 en el 28). Cuando **todas** las uniones valen
+  exactamente lo mismo y no valen cero, salta el diagnóstico de la **capa fija**: es la firma
+  del parpadeo del curso 28 (0,0552 idéntico en las catorce uniones, un `FadeOut` que apagaba
+  la marca de agua y las esquinas del HUD al final de cada pieza). Con empalme distinto de
+  `corte` la costura no aplica: xfade funde las dos piezas a propósito;
+- **picos**: el de cada pieza y el de la película entera contra el techo de la casa,
+  **−0,5 dBFS**;
+- **cola de silencio de la voz**: los últimos 0,8 s de cada narración bajo −50 dBFS, medidos
+  sobre el wav y no sobre el montaje (ahí los taparía la cama de sonido de la pieza).
+
+El veredicto tiene **tres colores**: verde, **ámbar** (avisos: una costura en la banda de la
+capa fija, un pico a un pelo del techo, una voz sin cola — la película es entregable, pero hay
+algo que mirar) y rojo. El informe vive en `pelicula.json` con el mismo hash que el montaje,
+así que volver a montar lo deja en «medición vieja» en vez de enseñar números de otra película.
 
 Operación: `exports/` necesita `ReadWritePaths` en la unidad del backend y `exports/peliculas/`
 debe ser del usuario `manimstudio` — el contenedor corre con ese uid y `cap_drop: ALL` le quita
