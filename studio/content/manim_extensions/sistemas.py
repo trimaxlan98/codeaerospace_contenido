@@ -603,6 +603,10 @@ def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None,
     if caja_vuelta is not None:
         caja_vuelta.move_to([(der[0] + izq[0]) / 2, abajo, 0])
         g.add(caja_vuelta)
+    # El tramo de vuelta, por NOMBRE. Una pieza que quiera animarlo sola
+    # tenia que pescarlo del grupo —por indice o por tipo—, y eso ata la
+    # pieza al orden en que esta funcion añade sus hijos.
+    g.vuelta = vuelta
     return g
 
 
@@ -676,12 +680,18 @@ def cero(ancho=4.8, y=0.0, color=None, grosor=TRAZO_PELO):
 
 
 def banda(y_centro, semiancho, punto, ancho=4.8, color=None):
-    """La banda de tolerancia de la pieza 16: dos discontinuas."""
+    """La banda de tolerancia de la pieza 16: dos discontinuas.
+
+    El defecto es APAGADO y no LINEA: LINEA (#1B3253) es un azul a un paso
+    del fondo, hecho a proposito para rejillas y ejes que no deben verse.
+    Una banda de tolerancia no es mobiliario — es el umbral que la pieza
+    esta afirmando— y con LINEA resultaba practicamente invisible. Lo
+    levanto la pieza 05."""
     _exige_manim()
     g = VGroup()
     for v in (y_centro - semiancho, y_centro + semiancho):
         y = punto(0, v)[1]
         ln = Line([-ancho / 2, y, 0], [ancho / 2, y, 0],
-                  stroke_color=color or _lz.LINEA, stroke_width=TRAZO_PELO)
+                  stroke_color=color or _lz.APAGADO, stroke_width=TRAZO_PELO)
         g.add(DashedVMobject(ln, num_dashes=30, dashed_ratio=0.45))
     return g

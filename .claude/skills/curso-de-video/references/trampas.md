@@ -282,6 +282,11 @@ Esta es la categoría que **no detecta el render**: solo se caza midiendo.
   sobre `#0B1B33` al 26–45 % da (72,62,45), verde oliva sucio; al 14 % da
   (44,46,48), un gris que ya no es ámbar. No hay ventana buena: las piezas de
   área van con **trazo** y el fondo del lienzo dentro, opaco.
+  Y no es solo cosa de MASAS, que era como estaba escrito hasta el curso 33:
+  un **trazo grueso** (7.0) al 32 % da exactamente el mismo gusano oliva
+  ilegible. Una curva de referencia —"lo que la teoría predice", debajo de lo
+  que de verdad sale— se dibuja en `APAGADO` **opaco**, nunca en ámbar
+  transparente.
 - **Barras que se tocan son una losa.** Doce tareas pegadas no se pueden
   contar. El hueco se le quita al ANCHO de cada barra, no a su sitio, para que
   la escala de tiempo no mienta.
