@@ -1,6 +1,6 @@
 // Router por hash minimo: la vista activa (y un parametro opcional) viven en
-// la URL — #/estudio, #/aprender/<id>, #/renders, #/admin/<tab> — para que F5
-// conserve la vista, atras/adelante navegue y haya deep-links.
+// la URL — #/estudio, #/aprender/<id>, #/renders, #/laboratorio, #/admin/<tab>
+// — para que F5 conserve la vista, atras/adelante navegue y haya deep-links.
 
 import { useCallback, useEffect, useState } from 'react'
 import { getPrefs } from './prefs.js'
@@ -11,6 +11,7 @@ const VIEW_TO_HASH = {
   projects: 'proyectos',
   renders: 'renders',
   learn: 'aprender',
+  lab: 'laboratorio',
   admin: 'admin',
   settings: 'configuracion',
 }

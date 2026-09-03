@@ -26,9 +26,10 @@ export const ATAJOS = [
   { teclas: ['g', 'e'], que: 'Ir al Estudio', view: 'studio' },
   { teclas: ['g', 'r'], que: 'Ir a Renders', view: 'renders' },
   { teclas: ['g', 'a'], que: 'Ir a Aprender', view: 'learn' },
+  { teclas: ['g', 'l'], que: 'Ir al Laboratorio', view: 'lab' },
   { teclas: ['g', 'd'], que: 'Ir a Admin', view: 'admin' },
   { teclas: ['g', 'c'], que: 'Ir a Configuración', view: 'settings' },
-  { teclas: ['Ctrl', '↵'], que: 'Renderizar, desde el editor del Estudio' },
+  { teclas: ['Ctrl', '↵'], que: 'Renderizar (Estudio) o ejecutar (Laboratorio), desde el editor' },
   { teclas: ['?'], que: 'Esta hoja' },
 ]
 

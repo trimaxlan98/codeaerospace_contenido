@@ -102,6 +102,7 @@ Configuración:
 | Estudio | `#/estudio` | escribir y renderizar una escena o el clip de un curso |
 | Renders | `#/renders` | el archivo de todo lo que salió de la cola, con o sin video |
 | Aprender | `#/aprender[/<id>]` | teoría del curso de Manim **y** animaciones de ejemplo, un solo índice |
+| Laboratorio | `#/laboratorio` | ejecutar Python de validación en el sandbox: las sondas de las librerías, y numpy/PIL a mano (sprint R3b) |
 | Admin | `#/admin[/<tab>]` | salud del host, jobs y disco |
 | Configuración | `#/configuracion` | todo lo que el usuario ajusta (encargo 8) |
 

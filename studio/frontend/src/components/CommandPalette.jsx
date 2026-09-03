@@ -19,7 +19,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Activity, FileCode, Film, FolderKanban, GraduationCap, Search, Settings,
+  Activity, FileCode, Film, FlaskConical, FolderKanban, GraduationCap, Search,
+  Settings,
 } from 'lucide-react'
 import { splitName, useCatalogo } from '../catalogo.js'
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog.jsx'
@@ -30,6 +31,7 @@ const VISTAS = [
   { view: 'studio', label: 'Estudio', icon: FileCode },
   { view: 'renders', label: 'Renders', icon: Film },
   { view: 'learn', label: 'Aprender', icon: GraduationCap },
+  { view: 'lab', label: 'Laboratorio', icon: FlaskConical },
   { view: 'admin', label: 'Admin', icon: Activity },
   { view: 'settings', label: 'Configuración', icon: Settings },
 ]

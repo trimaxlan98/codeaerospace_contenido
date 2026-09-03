@@ -57,7 +57,14 @@
 - Escape de contenedor Docker: mitigado (sin red, sin privilegios nuevos, límites pids/cpu/mem,
   timeout, sin montajes fuera del workspace), no eliminable al 100% sin gVisor/kata.
 - El runner corre como root: es el punto de diseño (en vez de exponer docker.sock al proceso
-  web); su superficie son 4 comandos validados por regex sobre un compose file fijo.
+  web); su superficie son **comandos contados y validados por regex** sobre un compose file
+  fijo, y ninguno acepta una ruta del exterior: `render`, `cancel`, `thumbnail`, `stats`,
+  `ping` (auditoría original), más `postproceso`, `verificar`, `ensamblar`, `presentacion`,
+  `paleta`, `normalizar_voz` y —sprint R3b— `frames`, `fotograma` y `ejecutar`. Los tres
+  últimos corren en el MISMO contenedor `manim-render` (sin red, repo read-only, `cap_drop:
+  ALL`, 1.5 vCPU / 2 GB / 256 pids) y montan con escritura sólo el directorio del job o del
+  laboratorio. `ejecutar` no amplía la superficie de ejecución: un render ya ejecuta Python
+  arbitrario desde el primer día; lo que cambia es que ese Python mide en vez de dibujar.
 - Rate-limit global puede permitir que un tercero (sin credenciales) bloquee el login 15 min
   (DoS de login). Umbral global x3 mitiga; aceptable para un sitio no indexado de un usuario.
 

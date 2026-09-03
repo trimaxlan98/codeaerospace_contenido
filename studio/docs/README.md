@@ -22,7 +22,8 @@ navegador ──HTTPS──▶ nginx (coderesearch.space)
                                             │  HTTPS a us-central1-aiplatform.googleapis.com)
                                             ▼ socket unix /run/manimstudio/runner.sock (0660 root:manimstudio)
                                         manim-runner (root, superficie minima:
-                                        render/cancel/thumbnail/stats/ping)
+                                        render/cancel/thumbnail/frames/fotograma/
+                                        ejecutar/stats/ping + los de audio y montaje)
                                             ▼ docker compose run … manim-render
                                         contenedor de render: network_mode:none, cpus:1.5, mem:2g,
                                         pids:256, no-new-privileges, timeout duro, --rm,
@@ -44,8 +45,10 @@ Decisiones clave (y por qué):
 - **Frontend estático servido por nginx** (en lugar de proxy a un proceso node en 5174):
   un proceso menos en un VPS con 2 vCPU; el puerto interno de ManimStudio es solo 3002.
 - **Runner separado**: el proceso web NUNCA toca `docker.sock` (equivale a root). El runner
-  (root) expone 4 comandos con validación regex estricta y solo sobre este compose file;
-  `cancel` solo puede matar contenedores `manimstudio-render-*`.
+  (root) expone un puñado de comandos con validación regex estricta y solo sobre este compose
+  file; `cancel` solo puede matar contenedores `manimstudio-render-*`. **Ninguno acepta una
+  ruta del exterior**: todas se derivan de un id validado (el nombre del PNG de una figura lo
+  compone el propio runner a partir de `t` y `ancho`).
 - **Escenas por AST**: la lista de escenas del script se extrae con `ast.parse`, jamás
   ejecutándolo fuera del contenedor.
 
@@ -495,13 +498,90 @@ otro archivo.
 Mezclar el audio dispara la verificación al terminar: recién mezclado es cuando el informe
 anterior deja de valer.
 
+### Fotogramas de un render: hoja de contactos y figura (sprint R3b)
+
+Hasta R3b el único resultado de un render en la app era el mp4. En la terminal el bucle es
+otro: `render_local.py --frames 8` deja los PNG y **se miran uno a uno** antes de dar un clip
+por bueno —la regla dura del proyecto es que nada quede encimado, y eso no lo dice ningún
+número—; y cuando una figura tiene que entrar en la tesis se saca un `ffmpeg -ss` a mano.
+
+- **Hoja de contactos** (botón bajo el vídeo, en el Estudio y en el modal de Renders): N
+  fotogramas equiespaciados en `t = dur·(i+½)/N` —el mismo reparto que `render_local.py`, que
+  evita los fundidos de los extremos— **más el último fotograma real**, que va aparte y
+  destacado porque es el que cierra la pieza (y el que empalma con la siguiente en un
+  vertical). 480 px de ancho; cada miniatura lleva su instante encima y se amplía al pulsar.
+- **Fotograma → PNG**: el instante que se está viendo (`currentTime` del `<video>`) a 1920,
+  2560 o 3840 px, descargado al momento. Es la salida estática para una figura de paper o de
+  tesis: el vídeo está a la calidad con que se renderizó, pero el PNG se pide al ancho que
+  necesita la página.
+
+La extracción vive en `studio/tools/hoja_contactos.py` — **una sola implementación**, un
+contenedor por hoja (no uno por fotograma: arrancar `docker compose run` cuesta ~1,5 s) y un
+informe JSON, igual que `promo_verifica.py`.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/jobs/{id}/frames` | `{n: 1..24}`. **Idempotente**: si el índice de esa `n` ya está en disco con todos sus PNG, devuelve `recalculada: false` sin arrancar contenedor (el mp4 de un job es inmutable). 409 si el job no tiene vídeo |
+| GET | `/api/jobs/{id}/frames/{archivo}` | `NN.png` o `final.png`, conjunto cerrado y misma defensa de path que `/thumb` |
+| POST | `/api/jobs/{id}/fotograma` | `{t, ancho: 320..3840, formato: "png"}` → `{archivo, url, ancho, alto, bytes}` |
+| GET | `/api/jobs/{id}/figuras/{archivo}` | `t<ms>_<ancho>.png`; el nombre lo **deriva el runner**, y el regex se vuelve a exigir aquí |
+
+**Dos trampas medidas**: un `-ss` al filo de la duración *sale con éxito sin escribir nada*, y
+el navegador manda justo ese instante al terminar el vídeo (`currentTime == duration`), así
+que la cola final se atiende con `-sseof -0.4 -update 1`; y `scale=3840:-2` sobre un 854×480
+da **2158** de alto, no 2160 — la resolución que se enseña es la medida sobre el PNG escrito,
+no la que se pidió.
+
+### Laboratorio: Python de validación en el sandbox (`#/laboratorio`, sprint R3b)
+
+Las **sondas** (`studio/tools/sonda_*.py`) son el guardián de cada librería del repo: cada
+invariante con su contraejemplo y una tabla de cifras medidas. Se corrían sólo desde una
+terminal; en la app no había forma de «verificar la librería» antes de escribir un clip, ni de
+calcular una cifra con numpy, ni de dibujar un PNG con PIL.
+
+- Editor CodeMirror (Python, con el tema de la app) y **`Ctrl+Enter` para ejecutar**. La
+  plantilla de partida usa numpy, una librería del repo y PIL, que es exactamente lo que hay a
+  mano. El script se guarda en `localStorage`, como el del Estudio.
+- Panel de salida con `stdout`/`stderr`, y **galería de lo que produjo**: los PNG se ven ahí
+  mismo, los WAV se oyen, el resto se descarga.
+- **Sondas del repo** con un botón «Correr» cada una. Se ejecuta el archivo del repo montado
+  read-only, no una copia: si mañana cambia, el botón corre la versión nueva.
+- Historial de las últimas 30 ejecuciones, con el **veredicto** (la última línea útil de la
+  salida: «73 invariantes ok, 0 fallos») sin abrir la ejecución.
+
+**Las garantías son las de un render**, porque es el mismo contenedor: sin red, repo
+read-only, `cap_drop: ALL`, `no-new-privileges`, 1.5 vCPU / 2 GB / 256 pids, `--rm`, y como
+único directorio escribible el de la propia ejecución. Ejecutar Python no confiable no es una
+capacidad nueva —una escena de manim ya lo es desde el primer día—; lo que cambia es que este
+Python **mide** en vez de dibujar. `PYTHONPATH` apunta a `manim_extensions`, así que
+`import sistemas` funciona igual que en una sonda.
+
+Cada ejecución es un directorio (`render_jobs/lab/<id>/`) con `script.py`, `meta.json` y sus
+resultados: sin migración de esquema, y borrar una ejecución es borrar su directorio. **Una a
+la vez** (409 si hay otra en curso): el VPS tiene 2 vCPU y no compite con un render. No pasa
+por la cola de renders porque una sonda son 1–3 s, igual que `mezclar_audio` y
+`verificar_promo`, que tampoco pasan.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/laboratorio` | últimas 30 ejecuciones (sin la salida: 30 × 200 KB por refresco), `ocupado`, plantilla del editor y rango de timeout |
+| POST | `/api/laboratorio` | `{script, timeout: 30..900, titulo}` → **202** con el id; la ejecución va en segundo plano y la vista consulta cada 1,2 s (nginx corta mucho antes de 900 s) |
+| GET | `/api/laboratorio/{id}` | estado, `code`, `stdout`, `stderr` y archivos |
+| GET | `/api/laboratorio/{id}/archivos/{nombre}` | PNG/JPG/SVG/WAV/TXT/JSON/CSV/MD/LOG; `script.py` y `meta.json` **no** se sirven |
+| DELETE | `/api/laboratorio/{id}` | borra el directorio |
+| GET | `/api/laboratorio/sondas` | las `sonda_*.py` del disco, con la primera línea de su docstring |
+| POST | `/api/laboratorio/sondas/{nombre}` | corre esa sonda tal cual, sin argumentos (ruta cerrada) |
+
+**`exit 1` no es una avería**: una sonda con invariantes rotos sale con 1 a propósito, y eso es
+ámbar («con hallazgos»), no rojo. Rojo son `timeout` y `error` (runner caído).
+
 ### Atajos y paleta de comandos
 
 | Tecla | Qué hace |
 |---|---|
 | `Ctrl+K` / `⌘K` | paleta de comandos: ir a un curso o a una sección escribiendo |
-| `g` + `p`/`e`/`r`/`a`/`d`/`c` | Proyectos · Estudio · Renders · Aprender · Admin · Configuración |
-| `Ctrl+Enter` | renderizar, desde el editor del Estudio |
+| `g` + `p`/`e`/`r`/`a`/`l`/`d`/`c` | Proyectos · Estudio · Renders · Aprender · Laboratorio · Admin · Configuración |
+| `Ctrl+Enter` | renderizar (Estudio) o ejecutar (Laboratorio), desde el editor |
 | `?` | la hoja con todo esto |
 
 La tabla `ATAJOS` de `components/Atajos.jsx` es a la vez la implementación y la hoja de ayuda.

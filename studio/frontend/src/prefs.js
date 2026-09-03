@@ -32,6 +32,7 @@ export const LANDING_VIEWS = [
   { id: 'studio', label: 'Estudio' },
   { id: 'renders', label: 'Renders' },
   { id: 'learn', label: 'Aprender' },
+  { id: 'lab', label: 'Laboratorio' },
   { id: 'admin', label: 'Admin' },
 ]
 

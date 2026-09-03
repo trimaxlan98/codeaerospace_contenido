@@ -5,6 +5,7 @@ import { Play, Sparkles, Wrench, Download, FileCode, RotateCcw, Trash2, X, Save,
 import { api, videoUrl } from './api.js'
 import { cursoDeJob, useCatalogo } from './catalogo.js'
 import Assistant from './Assistant.jsx'
+import HojaContactos, { BotonFotograma } from './components/Fotogramas.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.jsx'
@@ -253,6 +254,7 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
   const [aiAutoRun, setAiAutoRun] = useState(0)
   const [confirmScript, setConfirmScript] = useState(null) // {script, scene} entrante a confirmar
   const logRef = useRef(null)
+  const videoRef = useRef(null)   // el instante que se ve, para el fotograma
   const debounceRef = useRef(null)
   // Nombres de curso para la tira de renders (una sola copia para toda la app).
   const catalogo = useCatalogo()
@@ -581,7 +583,12 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
         {/* ── Rail de resultado ── */}
         <aside className="flex w-full flex-col gap-3 lg:min-h-0 lg:w-[440px] lg:shrink-0" aria-label="resultado">
           {selected?.status === 'done' && (
-            <div className="panel shrink-0 overflow-hidden">
+            /* El mp4 dejo de ser el unico resultado del render: debajo van
+               los fotogramas (revision visual, la regla dura del proyecto) y
+               el fotograma suelto a resolucion (figura de tesis). El panel
+               puede crecer, asi que scrollea por dentro en vez de empujar
+               el registro fuera de la pantalla. */
+            <div className="panel flex max-h-[62dvh] shrink-0 flex-col overflow-hidden lg:max-h-[58dvh]">
               <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
                 <span className="eyebrow truncate" title={cursoSel?.name}>
                   Resultado · {cursoSel ? `${cursoSel.label} · ` : ''}{selected.scene}
@@ -591,8 +598,16 @@ export default function Studio({ jobs, liveLog, resetLiveLog, onJobsChanged, aiE
                   <Download className="h-3.5 w-3.5" /> MP4
                 </a>
               </div>
-              <video key={selected.id} className="block w-full bg-black" controls preload="metadata"
-                src={videoUrl(selected.id)} />
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <video ref={videoRef} key={selected.id} className="block w-full bg-black"
+                  controls preload="metadata" src={videoUrl(selected.id)} />
+                <div className="flex flex-col gap-2.5 border-t border-line px-3 py-2.5">
+                  <BotonFotograma jobId={selected.id} escena={selected.scene}
+                    videoRef={videoRef} />
+                  <HojaContactos key={selected.id} jobId={selected.id}
+                    escena={selected.scene} />
+                </div>
+              </div>
             </div>
           )}
 
