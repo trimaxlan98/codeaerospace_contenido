@@ -1209,9 +1209,19 @@ def mapa(matriz, ancho=None, alto=None, color_alto=None, gamma=1.0,
         m = m[::-1]
     img = ImageMobject(_rampa(m, color_alto))
     img.set_resampling_algorithm(RESAMPLING_ALGORITHMS["nearest"])
-    if alto:
+    # Los setters `.width` y `.height` de manim escalan UNIFORME, asi que
+    # poner los dos seguidos hace que el segundo deshaga al primero y la
+    # imagen salga con el aspecto de la matriz — en silencio, aunque la
+    # firma invita a creer que encaja en una caja. Con una matriz de 6
+    # filas eso daba una raya de 0.28 unidades de alto. Lo levanto el
+    # agente de la pieza 11. Si se piden los DOS, se estira; si se pide
+    # uno solo, se escala uniforme, que es lo que se espera.
+    if ancho and alto:
+        img.stretch_to_fit_width(float(ancho))
+        img.stretch_to_fit_height(float(alto))
+    elif alto:
         img.height = float(alto)
-    if ancho:
+    elif ancho:
         img.width = float(ancho)
     return img
 
@@ -1353,18 +1363,38 @@ def ventana_sobre(x, inicio, largo, ancho=4.8, alto=2.2, color=None):
     return r
 
 
-def haz_rayos(angulo_grados, radio=1.25, cuantos=9, largo=3.0, color=None):
-    """El haz que atraviesa el objeto en la pieza 16, a un angulo dado."""
+def direccion_rayos(grados):
+    """La direccion en la que `radon` integra de verdad a ese angulo.
+
+    NO es (cos, sin) sino (sin, cos), y la diferencia son 90 grados. Es
+    consecuencia de como esta escrito `radon`: gira la imagen y suma por
+    COLUMNAS, asi que a cero grados integra en vertical, no en
+    horizontal.
+
+    La primera version de `haz_rayos` dibujaba (cos, sin) y por tanto
+    enseñaba el haz perpendicular al que se estaba midiendo: el dibujo
+    mentia sobre la cuenta. Medido con una raya fina alineada a cada
+    direccion, el pico de la proyeccion vale 95 con esta y entre 2 y 6.4
+    con la otra. Lo levanto el agente de la pieza 16."""
+    th = np.deg2rad(float(grados))
+    return np.array([np.sin(th), np.cos(th), 0.0])
+
+
+def haz_rayos(angulo_grados, radio=1.25, cuantos=9, largo=3.0, color=None,
+              grosor=TRAZO_PELO, opacidad=0.7):
+    """El haz que atraviesa el objeto, en la direccion que SE MIDE.
+
+    `grosor` es ajustable porque a lado corto 540 un trazo de pelo sobre
+    el gris del objeto son 0.7 pixeles y practicamente no se ve."""
     _exige_manim()
-    th = np.deg2rad(float(angulo_grados))
-    d = np.array([np.cos(th), np.sin(th), 0.0])
-    perp = np.array([-np.sin(th), np.cos(th), 0.0])
+    d = direccion_rayos(angulo_grados)
+    perp = np.array([d[1], -d[0], 0.0])
     g = VGroup()
     for s in np.linspace(-radio, radio, int(cuantos)):
         c = perp * s
         g.add(Line(c - d * largo / 2, c + d * largo / 2,
                    stroke_color=color or _lz.APAGADO,
-                   stroke_width=TRAZO_PELO, stroke_opacity=0.7))
+                   stroke_width=grosor, stroke_opacity=opacidad))
     return g
 
 

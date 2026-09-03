@@ -37,8 +37,8 @@ import os
 
 import numpy as np
 from manim import (DOWN, LEFT, RIGHT, UP, Create, Dot, FadeIn, FadeOut,
-                   Line, Rectangle, Text, UpdateFromAlphaFunc, VGroup,
-                   config, linear)
+                   Group, Line, Rectangle, Text, UpdateFromAlphaFunc,
+                   VGroup, config, linear)
 
 import code_brand
 import promo
@@ -545,16 +545,20 @@ def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
     paneles añade tinta sin añadir informacion."""
     ancho = ancho or (ANCHO_SEGURO - 0.3)
     paneles = []
+    # `Group` y no `VGroup`: la mitad de las piezas que comparan dos cosas
+    # comparan dos MAPAS, y `tf.mapa` devuelve un `ImageMobject`, que un
+    # VGroup rechaza con un TypeError. Lo levanto el agente de la pieza 16
+    # despues de tener que apilar los paneles a mano.
     for dibujo, texto in ((arriba, rotulo_arriba), (abajo, rotulo_abajo)):
         if dibujo.width > ancho:
             dibujo.scale(ancho / dibujo.width)
+        piezas = [dibujo]
         if texto:
             rot = rotulo(texto)
             rot.next_to(dibujo, DOWN, buff=0.20)
-            paneles.append(VGroup(dibujo, rot))
-        else:
-            paneles.append(VGroup(dibujo))
-    return VGroup(*paneles).arrange(DOWN, buff=hueco)
+            piezas.append(rot)
+        paneles.append(Group(*piezas))
+    return Group(*paneles).arrange(DOWN, buff=hueco)
 
 
 # --- Los carriles -----------------------------------------------------
@@ -696,7 +700,13 @@ class Lienzo:
         (`renderer.time`) y llama a `valor_en(t)`. Asi el numero que se ve
         es exactamente el que corresponde al segundo de video en el que se
         ve — si un `play` cambia de duracion al ajustar el ritmo, la cifra
-        se corrige sola en vez de mentir."""
+        se corrige sola en vez de mentir.
+
+        OJO, y de la firma se lee lo contrario: `valor_en` y `t_final` van
+        en tiempo ABSOLUTO de la escena, no en tiempo desde que arranca el
+        contador. Si el contador empieza en el segundo 12 de la pieza y
+        tiene que contar 8 segundos, `t_final` es 20 y `valor_en` recibe
+        valores de 12 a 20. Lo levanto el agente de la pieza 16."""
         tiempos = np.arange(0.0, float(t_final) + float(paso), float(paso))
         valores = [str(valor_en(float(ti))) for ti in tiempos]
         fs = cuerpo_cifra(valores)

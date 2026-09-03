@@ -299,6 +299,25 @@ ok("el sinograma tiene una columna por angulo", sino.shape == (96, 180),
 casi("cada sombra conserva la masa del objeto",
      float(np.std(np.sum(sino, axis=0)) / np.mean(np.sum(sino, axis=0))),
      0.0, 0.02)
+# El haz que se DIBUJA tiene que ir en la direccion que se MIDE. Con la
+# direccion equivocada (90 grados de desfase) el dibujo enseñaba el haz
+# perpendicular a la cuenta y nadie lo habria notado mirando un frame.
+def _raya(grados, n=96, grosor=1.5):
+    th = np.deg2rad(grados)
+    yy, xx = np.mgrid[0:n, 0:n].astype(float)
+    xx -= (n - 1) / 2.0
+    yy -= (n - 1) / 2.0
+    d = np.abs(-np.sin(th) * xx + np.cos(th) * yy)
+    return (d < grosor).astype(float)
+
+
+for ang in (0, 30, 60, 90):
+    dx, dy, _ = tr.direccion_rayos(ang)
+    raya = _raya(np.degrees(np.arctan2(dy, dx)))
+    pico = float(np.max(tr.radon(raya, [ang])[:, 0]))
+    ok(f"el haz dibujado a {ang} grados va como radon integra",
+       pico > 80, f"pico {pico:.1f} (con la direccion vieja daba 2-6)")
+
 e8 = tr.error_reconstruccion(8, n=96)
 e180 = tr.error_reconstruccion(180, n=96)
 ok("mas angulos, menos error", e180 < e8 / 2,
