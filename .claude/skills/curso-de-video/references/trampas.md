@@ -62,6 +62,13 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **El objetivo de un `Transform` tiene que estar VIVO aunque no se vea.**
+  `Transform(a, b)` copia en `a` el estilo de `b`, opacidad incluida. El
+  patron de esta casa —construir los estados dentro del grupo y apagarlos
+  con opacidad 0 para que hereden la escala de `encajar`— choca de frente
+  con eso: transformar hacia un estado apagado deja el dibujo INVISIBLE, y
+  el fotograma se queda con el eje y ni un tallo. Se transforma hacia
+  `estado.copy().set_opacity(1.0)`. Cazado en el curso 33.
 - **`Indicate` escala alrededor del centro del bounding box**, asi que sobre
   un tallo —una `Line` que nace en el eje y su `Dot` en la punta— la raya se
   estira TAMBIEN hacia abajo, atraviesa el eje y se encima con lo que haya

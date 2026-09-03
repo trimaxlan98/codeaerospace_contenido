@@ -596,11 +596,19 @@ def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None):
 
 
 def tallos(valores, ancho=4.8, alto=2.4, color=None, grosor=TRAZO_FINO,
-           punta=0.045, rango_y=None):
+           punta=0.045, rango_y=None, colores=None):
     """Una secuencia discreta: una raya por muestra y su punto.
 
     Unir las muestras con una curva sugiere que hay algo entre ellas, y en
-    una senal discreta no lo hay."""
+    una senal discreta no lo hay.
+
+    `colores` da un color POR MUESTRA, que es como se resalta un tramo
+    —las muestras anteriores al golpe, la parte que satura, el trozo que
+    se va—. Existe porque sin el la unica salida era indexar los hijos del
+    VGroup contando "dos por muestra, Line y Dot", y eso ata la pieza a la
+    estructura interna de esta funcion: el dia que alguien dibuje con
+    `punta=0` no hay Dots, la cuenta se desplaza y el color acaba en la
+    muestra equivocada sin que falle nada. Lo levanto la pieza 07."""
     _exige_manim()
     v = np.asarray(valores, dtype=float)
     n = v.size
@@ -613,10 +621,12 @@ def tallos(valores, ancho=4.8, alto=2.4, color=None, grosor=TRAZO_FINO,
     for i, vi in enumerate(v):
         x = -ancho / 2 + i * paso
         y = -alto / 2 + (vi - y0) / dy * alto
+        c = (colores[i] if colores is not None and i < len(colores)
+             else (color or _lz.TINTA))
         g.add(Line([x, base, 0], [x, y, 0],
-                   stroke_color=color or _lz.TINTA, stroke_width=grosor))
+                   stroke_color=c, stroke_width=grosor))
         if punta:
-            g.add(Dot([x, y, 0], radius=punta, color=color or _lz.TINTA))
+            g.add(Dot([x, y, 0], radius=punta, color=c))
     return g
 
 
