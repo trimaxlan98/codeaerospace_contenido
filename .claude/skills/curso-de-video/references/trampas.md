@@ -296,6 +296,14 @@ Esta es la categoría que **no detecta el render**: solo se caza midiendo.
   ilegible. Una curva de referencia —"lo que la teoría predice", debajo de lo
   que de verdad sale— se dibuja en `APAGADO` **opaco**, nunca en ámbar
   transparente.
+  Y la regla de verdad ni siquiera es la transparencia, es el **ancho
+  efectivo**: dos trazos OPACOS de colores distintos, uno fino encima de una
+  banda gruesa, se funden en el mismo oliva si el de encima mide un par de
+  píxeles y casi todo él es borde antialiasado. Medido en el curso 33 con
+  ámbar 2.2 sobre cian 6.5 a 540 px de ancho. Cuando dos curvas tienen que
+  verse COINCIDIR, la de encima va **a trozos** (`DashedVMobject`): en cada
+  hueco se ve el color puro de abajo y en cada trazo el de arriba, y
+  "coinciden" se lee porque se ven DOS curvas, no una mezcla.
 - **Barras que se tocan son una losa.** Doce tareas pegadas no se pueden
   contar. El hueco se le quita al ANCHO de cada barra, no a su sitio, para que
   la escala de tiempo no mienta.
