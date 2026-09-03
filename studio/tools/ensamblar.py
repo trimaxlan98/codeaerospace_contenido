@@ -726,12 +726,30 @@ def medir_costuras(piezas: list[dict], raiz: Path, tmp: Path) -> list[dict]:
     return out
 
 
+def _es_vertical(res: str) -> bool:
+    """"1080x1920" -> True; sin resolucion se asume vertical (la regla
+    estricta)."""
+    try:
+        w, h = (int(v) for v in res.lower().split("x"))
+    except (AttributeError, ValueError):
+        return True
+    return h > w
+
+
 def diagnostico(medida: float, prevista: float, mudos: list[str],
                 res_medida: str, res_plan: str,
                 costuras: list[dict] | None = None,
                 pico_max: float | None = None,
-                colas: list[str] | None = None) -> tuple[list[str], list[str]]:
+                colas: list[str] | None = None,
+                vertical: bool = True) -> tuple[list[str], list[str]]:
     """De las medidas a los problemas y los avisos. Funcion pura: sin ffmpeg.
+
+    `vertical`: en un curso 9:16 cada pieza empieza y termina en el lienzo
+    limpio y una costura que se ve es un defecto. En un curso horizontal cada
+    clip cierra con su propia composicion (cifra, cierre de leccion) y el
+    corte se ve POR DISENO: la misma costura baja a aviso. Medido en prod el
+    2026-09-03 sobre Sistemas ATP 3.3: 2.23, 5.55 y 5.96/255 en un curso
+    entregado y correcto.
 
     Vive aparte de `verificar` a proposito — lo que decide si una pelicula
     esta bien es esta lista de reglas, y tiene que poder cambiarse y probarse
@@ -757,7 +775,12 @@ def diagnostico(medida: float, prevista: float, mudos: list[str],
         problemas.append(f"la pelicula es {res_medida} y el curso es {res_plan}")
 
     for c in costuras or []:
-        if c.get("veredicto") == "fallo":
+        if c.get("veredicto") == "fallo" and not vertical:
+            avisos.append(
+                f"la costura {c['de']} → {c['a']} vale {c['valor']:.4f}/255: "
+                f"el corte se ve (en horizontal es por diseno; con una "
+                f"transicion desaparece)")
+        elif c.get("veredicto") == "fallo":
             problemas.append(
                 f"la costura {c['de']} → {c['a']} vale {c['valor']:.4f}/255: "
                 f"el corte entre las dos piezas se ve")
@@ -905,8 +928,10 @@ def verificar(plan_path, pelicula, trabajo=None) -> dict:
     mudos = [x["titulo"] for x in tramos if x["perdio_sonido"]]
     sin_cola = [x["titulo"] for x in tramos if x.get("cola_voz_ok") is False]
     desfase = medida - prevista
+    vertical = _es_vertical(res_medida or res_plan)
     problemas, avisos = diagnostico(medida, prevista, mudos, res_medida,
-                                    res_plan, costuras, pico_max, sin_cola)
+                                    res_plan, costuras, pico_max, sin_cola,
+                                    vertical=vertical)
     valores = [c["valor"] for c in costuras if c.get("valor") is not None]
 
     return {

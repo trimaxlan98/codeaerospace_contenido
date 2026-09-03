@@ -786,3 +786,22 @@ def test_una_medicion_con_costuras_rotas_deja_la_pelicula_en_rojo(
     body = authed.post(f"/api/projects/{pid}/pelicula/verificar").json()
     assert body["verificacion"] == "no_pasa"
     assert "19.4252" in body["informe"]["verificacion"]["problemas"][0]
+
+
+def test_costura_visible_es_aviso_en_horizontal():
+    """Un curso 16:9 cierra cada clip con su propia composicion: la costura
+    que en vertical es un problema aqui es un aviso (medido en prod: 2.23,
+    5.55 y 5.96/255 en Sistemas ATP 3.3, un curso entregado y correcto)."""
+    import importlib.util, sys
+    from pathlib import Path
+    ruta = Path(__file__).resolve().parents[2] / "tools" / "ensamblar.py"
+    spec = importlib.util.spec_from_file_location("ensamblar_mod", ruta)
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    costuras = [{"de": "a", "a": "b", "valor": 5.55, "veredicto": "fallo"}]
+    prob, avi = mod.diagnostico(10, 10, [], "1920x1080", "1920x1080", costuras,
+                                vertical=mod._es_vertical("1920x1080"))
+    assert prob == [] and len(avi) == 1 and "por diseno" in avi[0]
+    prob, avi = mod.diagnostico(10, 10, [], "1080x1920", "1080x1920", costuras,
+                                vertical=mod._es_vertical("1080x1920"))
+    assert len(prob) == 1 and avi == []
+    assert mod._es_vertical("") is True
