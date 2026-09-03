@@ -113,7 +113,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R1 | Voz sin GCP | proveedores edge/piper/vertex/archivo, guion editable, **subida de narración propia**, normalización en el contenedor | **hecho** |
 | R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | **hecho** |
 | R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3a hecho** (import/export, lote, duplicar); R3b pendiente |
-| R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | en curso (agente, librerías) |
+| R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | **hecho** (librerías; datos adjuntos pendiente) |
 | R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | pendiente |
 | R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | pendiente |
 
@@ -405,6 +405,7 @@ borrarlo dejase sin vídeo a un proyecto que nadie estaba tocando.
   (`n ≥ 3f+1`), margen adaptativo y gates con IC95 %. Determinista, con sonda.
 - Datos adjuntos: `POST /{pid}/datos` (CSV/JSON/JSONL ≤ 10 MB) montados en
   el directorio del job como `datos/`; `figura.leer_csv()` los lee.
+
 
 ## R5 — UX
 
