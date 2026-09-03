@@ -111,7 +111,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 |---|---|---|---|
 | R0 | Plan | este documento, rama `estudio/v3-investigacion` | **hecho** |
 | R1 | Voz sin GCP | proveedores edge/piper/vertex/archivo, guion editable, **subida de narración propia**, normalización en el contenedor | **hecho** |
-| R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | en curso (agente) |
+| R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | **hecho** |
 | R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | pendiente |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | en curso (agente, librerías) |
 | R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | pendiente |
@@ -167,16 +167,171 @@ Comando `normalizar_voz {job_dir, entrada}` calcado de `postproceso`:
 `ffmpeg -i entrada -ac 1 -ar 24000 -af silenceremove=... -f wav` +
 `volumedetect`, devuelve `{duracion_s, pico_db}`.
 
-## R2 — Música (agente Opus, `studio/tools/musica.py`)
+## R2 — Música (`studio/tools/musica.py`) · **hecho** 2026-09-03
 
-Síntesis con numpy, semillas fijas, sin assets, en el contenedor. `TEMAS`
-espejo de `PALETA`: raíz, progresión de grados, bpm, carácter. Tres capas:
-drone (pad aditivo por nota del acorde), arpegio (Karplus-Strong en
-subdivisiones del bpm), sub-bajo senoidal; todo bajo ~950 Hz («espacial pero
-tranquilo», criterio verificado en la marca). Manifiesto: `audio.musica =
-{tema, db, bpm}` validado contra una tupla cerrada. Se suma dentro de
-`sfx.promo()` antes del `_norm` a `pico_db`; en la película, `ensamblar.py`
-acepta `musica` global con *sidechain* simple (−9 dB bajo la voz).
+Hasta hoy la app no tenía música: `unir_vertical.py --mudo` existe
+*precisamente* porque el dueño se la ponía fuera. La paleta de SFX da 18
+efectos y dos ambientes (`pad`, `nebulosa`), pero un ambiente no es una cama:
+no tiene tonalidad, ni pulso, ni progresión.
+
+### Diseño
+
+`TEMAS` es un dict cerrado de **ocho temas**, espejo de `PALETA` y con el mismo
+test de AST que impide que la app y la síntesis se separen en silencio. Cada
+tema declara raíz (Hz), progresión de acordes por grados (semitonos sobre la
+raíz), bpm, compás, subdivisión, el nivel de cada capa y su semilla.
+
+| tema | raíz | bpm | capas (de más fuerte a más floja) |
+|---|---|---|---|
+| `orbita` | 55,00 | 52 | drone + sub + arpegio — la cama por defecto |
+| `deriva` | 49,00 | 44 | drone + sub + arpegio — dos armonías muy lentas |
+| `pulso_lento` | 61,74 | 60 | sub + drone + arpegio — un latido por segundo |
+| `aurora` | 65,41 | 66 | drone + sub + arpegio — mayor con séptimas, tresillos |
+| `telemetria` | 58,27 | 84 | arpegio + sub + drone — datos, órbitas, señales |
+| `cuerdas_frias` | 51,91 | 48 | sub + arpegio + drone — cuerdas por delante |
+| `amanecer` | 73,42 | 72 | drone + sub + arpegio — mayor ascendente |
+| `marcha` | 43,65 | 96 | sub + drone + arpegio — el pulso más rápido |
+
+Tres capas, todas sobre el **reloj absoluto** (eso es lo que hace posible
+sintetizar por bloques sin costuras):
+
+- **drone** — pad aditivo, una voz por nota del acorde, con dos capas
+  desafinadas un 0,25 % (batido ~0,3 Hz: el colchón respira) y vibrato sumado
+  a la **fase** con desviación fija 0,18 rad. Multiplicarlo por `t` —el error
+  que ya se corrigió en `sfx.pad`— hace crecer la desviación con los segundos
+  y llena el colchón de laterales ásperos.
+- **arpegio** — Karplus-Strong en las subdivisiones del bpm, patrón cíclico
+  determinista, acento en la cabeza de cada tiempo. Vectorizado por pasadas de
+  la tabla de onda (`np.roll`): el bucle muestra a muestra de `sfx.cuerda`
+  serían millones de iteraciones de Python por bloque.
+- **sub** — senoidal en la fundamental del acorde (`grado % 12`, siempre en
+  40–100 Hz), articulado a cada tiempo con envolvente `cos²` **con suelo**: no
+  llega a cero (chasquearía) pero baja lo bastante como para que el pulso sea
+  *medible* por autocorrelación.
+
+Pasabanda 30–900 Hz para drone y sub; el arpegio va por **90–950 Hz** propios
+—recortarle las fundamentales, que viven donde vive el sub, limpió el grave
+sin quitarle presencia—. Reverberación única y corta (1,6 s, mezcla 0,22): las
+tres capas comparten espacio, como en `sfx.mezclar`.
+
+`tema(nombre, dur, semilla=None, bpm=None)` dura exactamente
+`round(dur·24000)` muestras: la progresión se repite y se recorta donde caiga,
+y la caída final la pone la envolvente global (entrada ≤ 1,2 s, salida ≤ 1,8 s)
+—que es también lo que mantiene mudos los extremos de un promo en bucle—.
+
+### Cifras medidas (contenedor `codeaerospace_contenido-manim`, numpy 2.5.1)
+
+Los ocho temas a 12 s y a 37,3 s, 16 corridas. **Todas pasan**:
+
+| invariante | exigido | medido |
+|---|---|---|
+| duración | ±1 muestra | **0** de desvío en las 16 |
+| determinismo | dos corridas iguales al byte | sha256 idéntico en las 16 |
+| pico | ≤ −1 dBFS | −3,00 … −4,31 dBFS |
+| recorte | ninguna muestra a fondo de escala | ninguna |
+| energía < 300 Hz | ≥ 50 % | **95,4 – 99,8 %** |
+| energía < 950 Hz | ≥ 95 % | **99,8 – 100 %** |
+| periodicidad del bpm | ±3 % | **0,00 – 2,20 %** (autocorrelación 0,39–0,80) |
+| picos espectrales en las notas | ±1 % | 0 notas desplazadas |
+
+Balance por bandas (RMS, ponderación A, tema a 12 s): 40–150 Hz de −33,7 a
+−39,7 dB; 150–300 Hz de −31,5 a −41,3; 300–900 Hz de −32,9 a −46,6. Es decir,
+grave y medio a la par y la cuerda 8–13 dB por debajo en los temas de colchón,
+a la par en `telemetria` y `cuerdas_frias`. «Espacial pero tranquilo», el
+criterio verificado del dueño para la marca, aquí es eso.
+
+### El manifiesto y el promo
+
+`audio.musica = {tema, db, bpm?}`, normalizado y validado contra la tupla
+`TEMAS` de `audio_promo.py`. `sfx.promo()` suma la cama **antes** del `_norm` a
+`pico_db`, así que el pico final sigue siendo el que pide el manifiesto y la
+música queda en su sitio relativo a los efectos, no encima. Medido sobre el
+promo real de filotaxis (10,73 s, vertical ql) con `volumedetect`:
+
+| mezcla | pico | medio |
+|---|---|---|
+| sin música (referencia) | **−3,0 dB** | −17,3 dB |
+| música `orbita` −24 dB | **−3,0 dB** | −17,3 dB |
+| música −24 + voz | −1,7 dB | −20,7 dB |
+| música −12 + voz | −1,7 dB | −20,5 dB |
+
+El pico no se mueve: la música entra dentro del presupuesto, no encima de él.
+
+**El umbral del aviso no es un número redondo: sale de medir.** Con una voz a
+−1,5 dBFS, la separación voz/música (RMS contra RMS) en el tramo hablado es
+**14,98 dB** con la cama en −24, **8,98** en −18 y **2,98** en −12 — o sea
+`separación = −9,02 − db`. El mínimo de la casa son 12 dB, y eso se rompe justo
+en **−21**: ahí salta el aviso y el defecto son −24, con 3 dB de margen.
+
+> Salvedad honesta: hoy no hay TTS (GCP en mora), así que la voz de la medición
+> es de laboratorio — ruido en la banda de la palabra (200–3400 Hz) con
+> envolvente silábica a 2,45 sílabas/s, la cadencia medida de Charon, y pico en
+> −1,5 dBFS. Mide el **camino de mezcla**, no el timbre.
+
+### La película
+
+`plan.json` acepta `musica: {tema, db}` global. `ensamblar.py` añade un paso 3:
+mide la película recién unida, saca su envolvente, construye la curva de
+*ducking* y sintetiza la cama de esa duración exacta con la ganancia ya
+aplicada. Escalón −9 dB, ataque 0,12 s, liberación 0,60 s, umbral −40 dBFS,
+envolvente a 100 Hz sobre un decimado a 4 kHz. Medido sobre una película de
+prueba de 21,59 s (una pieza con voz, otra muda):
+
+- cama de **518 160 muestras**, 0 de desvío contra la duración medida;
+- pico de la cama **−24,00 dBFS** exacto;
+- misma ventana, con y sin *ducking*: **−7,92 dB** en el tramo hablado y
+  **0,00 dB** en el mudo. (El escalón pedido son 9; el promedio bajo una voz
+  con pausas es 7,9 porque la liberación devuelve la música entre sílabas.)
+- película entera: pico **−1,7 dB** con música contra **−1,6 dB** sin ella, y
+  el tramo hablado −18,9 contra −18,8. Añadir música no mueve el montaje.
+
+### Trampas
+
+1. **`amix=…:normalize=0` no existe en el ffmpeg de la imagen.** Debian 11 trae
+   **4.3.9** y esa opción llegó en 4.4: el filtro aborta con «Option
+   'normalize' not found». Y sin la opción, `amix` divide cada entrada por el
+   número de entradas, así que la película entera bajaría 6 dB por el hecho de
+   añadir una segunda pista. **Era un fallo ya existente**, no de este sprint:
+   la rama voz+cama de `args_pieza` (sprint E3) lo usaba, de modo que montar un
+   curso cuyos clips llevaran cama de sonido *y* narración fallaba en seco.
+   Ahora las dos sumas van por `amerge=inputs=2,pan=mono|c0=c0+c1` con un
+   `aformat` explícito delante, que suma a ganancia unidad desde ffmpeg 2.x.
+2. **`alimiter` trae el auto-nivel ENCENDIDO.** `level` es `true` por defecto:
+   sin `level=disabled`, el limitador —que está ahí como red, no como efecto—
+   sube la película entera hasta el techo, exactamente lo contrario de lo que
+   se le pide.
+3. **La envolvente del *ducking* se mide sobre el montaje SIN música.** Medida
+   sobre la película ya mezclada, la propia cama supera el umbral y se agacha a
+   sí misma: 96 % del metraje agachado contra el 37 % real.
+4. **`_filtra` es una convolución CIRCULAR.** Al sintetizar por bloques, el
+   final de cada bloque se contamina con su propio principio. Con sólo la
+   entradilla de 3 s (que sí recupera las cuerdas vivas y la cola de reverb),
+   el salto entre muestras vecinas en la costura era 0,0089 sobre un pico de
+   0,063 — el mayor salto de todo el archivo, es decir, un clic. Con una guarda
+   de cola de 1 s baja a 0,0010 y 0,0005, por debajo del salto máximo natural
+   de la señal (0,0023).
+5. **Una escala por bloque hace saltar el nivel en cada costura**, que es justo
+   lo que se oiría. `escribe_cama` hace **dos pasadas**: la primera sólo mide el
+   pico de toda la cama, la segunda escribe. Sintetizar 200 s cuesta 17 s en el
+   contenedor (las dos pasadas incluidas); un curso de media hora, ~2,5 min.
+6. **La música se aparta bajo cualquier sonido del montaje**, no sólo bajo la
+   voz: en un curso narrado eso es la voz, y en un clip con cama de SFX también
+   la cama. Es lo que se quiere —la música es el fondo de todo lo demás— pero
+   hay que saberlo antes de extrañarse.
+7. **La sonda de picos espectrales tiene que mirar sólo los acordes que
+   SUENAN.** A 12 s de `orbita` (4,6 s por acorde) el cuarto no llega a entrar;
+   buscarlo encontraba el vecino y acusaba un desplazamiento del 3 % inexistente.
+
+### Superficie nueva
+
+`studio/tools/musica.py` (`banco` / `tema` / `aplicar`), comando `musica` del
+runner (calcado de `paleta`, destino fijo `exports/musica`), `cfg.musica_dir`,
+`app/musica_api.py` (`GET/POST /api/musica`, `GET /api/musica/{tema}` con la
+misma defensa de ruta que `sfx_api`), `MusicaSelector.jsx` compartido por
+`AudioPromoDialog` y `PeliculaPanel`, y 20 tests nuevos en
+`tests/test_musica.py` (espejo AST de nombres **y** de bpm, manifiesto, avisos,
+banco, plan de película, hash que caduca al cambiar de tema, y la curva de
+*ducking* como función pura).
 
 ## R3 — Paridad con la terminal
 

@@ -30,6 +30,8 @@ Uso:
                           extremos quedan en silencio: en un promo eso hace
                           invisible el corte del bucle, y en un curso hace
                           que el `concat -c copy` no chasquee en la union.
+                          Si el manifiesto trae "musica", la cama musical de
+                          `musica.py` se suma antes de normalizar al pico.
 
 Corre en el host o dentro del contenedor manim; en ambos casos el canario
 de main() verifica el numpy antes de sintetizar. Historia: el numpy del
@@ -351,6 +353,15 @@ def promo(promo_dir, video, salida=None, voz_wav=None):
         fin = [fin[0] * k, min(total, fin[1] * k)]
     m = mezclar(total, eventos, fade_in=float(spec.get("fade_in", 0.3)),
                 fade_out=(float(fin[0]), float(fin[1])))
+    # La cama MUSICAL se suma antes de normalizar: asi el pico final sigue
+    # siendo el que pide el manifiesto y la musica queda en su sitio relativo
+    # a los efectos, no encima. Trae sus propios fundidos (musica.tema los
+    # pone), que es lo que mantiene mudos los extremos del bucle.
+    mus = spec.get("musica") or {}
+    if mus.get("tema"):
+        from musica import cama  # tarde: musica.py importa de este modulo
+        m = m + cama(mus["tema"], total, float(mus.get("db", -24.0)),
+                     mus.get("bpm"))
     pico = float(spec.get("pico_db_con_voz", -16.0) if voz_wav
                  else spec.get("pico_db", -3.0))
     m = _norm(m, 10 ** (pico / 20))
@@ -370,6 +381,7 @@ def promo(promo_dir, video, salida=None, voz_wav=None):
         video.stem + "_sfx.mp4")
     aplicar(video, wav, salida)
     print(f"{salida}  ({total:.2f} s, cama a {pico} dBFS"
+          f"{', musica ' + mus['tema'] if mus.get('tema') else ''}"
           f"{', con voz' if voz_wav else ''})")
 
 

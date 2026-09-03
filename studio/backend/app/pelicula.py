@@ -27,6 +27,7 @@ import json
 import time
 from pathlib import Path
 
+from . import audio_promo
 from .narracion import etiqueta_clip, slugify
 from .projects import specs
 from .rutas import relativa_al_workspace
@@ -38,6 +39,11 @@ TRANSICIONES = ("corte", "fundido", "negro", "blanco", "deslizar", "barrido",
 TRANSICION_DEFECTO = "corte"
 DUR_MIN, DUR_MAX = 0.1, 3.0
 DUR_DEFECTO = 0.6
+
+# La cama musical de la pelicula ENTERA. Vive en las opciones (no en el
+# manifiesto de un clip): es una decision del curso, no de una pieza. El
+# montaje la sintetiza con la duracion medida y la agacha bajo la voz.
+MUSICA_DB_DEFECTO = audio_promo.MUSICA_DB
 
 NOMBRE_VIDEO = "pelicula.mp4"
 NOMBRE_INFORME = "pelicula.json"
@@ -57,12 +63,17 @@ def normaliza_opciones(op: dict | None) -> dict:
     if not (DUR_MIN <= dur <= DUR_MAX):
         raise PeliculaError(
             f"la transicion debe durar entre {DUR_MIN} y {DUR_MAX} s")
+    musica = audio_promo.normalizar_musica(op.get("musica"))
+    errores = audio_promo.validar_musica(musica)
+    if errores:
+        raise PeliculaError("; ".join(errores))
     return {
         "transicion": tipo,
         "duracion_transicion": round(dur, 3),
         "narracion": bool(op.get("narracion", True)),
         "intro_job_id": op.get("intro_job_id") or None,
         "cierre_job_id": op.get("cierre_job_id") or None,
+        "musica": musica,
     }
 
 
@@ -162,7 +173,7 @@ class PeliculaService:
             job = self._job_marca(op["cierre_job_id"], "cierre", esperada)
             piezas.append(self._pieza_de_job(job, "Cierre de marca"))
 
-        return {
+        plan = {
             "proyecto": project["name"],
             "raiz": "/workspace",
             "fps": sp["fps"],
@@ -172,6 +183,9 @@ class PeliculaService:
             "piezas": piezas,
             "faltan": sin_render,
         }
+        if op["musica"]:
+            plan["musica"] = op["musica"]
+        return plan
 
     # ── estado ───────────────────────────────────────────────────────────────
 
@@ -181,8 +195,10 @@ class PeliculaService:
         Se hashea el plan sin `faltan` (que es informativo) y con el mtime de
         cada archivo: un re-render deja la misma ruta y otro contenido.
         """
+        mus = plan.get("musica") or {}
         partes = [plan["proyecto"], plan["resolucion"], str(plan["fps"]),
-                  plan["transicion"]["tipo"], str(plan["transicion"]["duracion"])]
+                  plan["transicion"]["tipo"], str(plan["transicion"]["duracion"]),
+                  f"{mus.get('tema', '')}:{mus.get('db', '')}"]
         for p in plan["piezas"]:
             for clave in ("video", "voz"):
                 ruta = p.get(clave)
@@ -253,6 +269,8 @@ class PeliculaService:
             "verificacion": self.estado_verificacion(informe),
             "run": corriendo,
             "transiciones": list(TRANSICIONES),
+            "temas": list(audio_promo.TEMAS),
+            "musica_db": MUSICA_DB_DEFECTO,
         }
 
     # ── montar ───────────────────────────────────────────────────────────────

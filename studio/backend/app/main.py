@@ -24,6 +24,7 @@ from .db import Database
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .lessons import LessonStore
+from .musica_api import make_router as make_musica_router
 from .narracion import NarracionService
 from .narracion_api import make_router as make_narracion_router
 from .pelicula import PeliculaService
@@ -83,6 +84,7 @@ app.include_router(make_pelicula_router(cfg, db, pelicula_service))
 app.include_router(make_presentaciones_router(cfg, db,
                                              presentacion_service))
 app.include_router(make_sfx_router(cfg, runner))
+app.include_router(make_musica_router(cfg, runner))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))
 

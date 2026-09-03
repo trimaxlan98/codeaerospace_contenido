@@ -8,10 +8,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
+from . import audio_promo
 from .auth import require_auth
 from .db import Database
-from .pelicula import (DUR_DEFECTO, DUR_MAX, DUR_MIN, PeliculaError,
-                       PeliculaService, TRANSICION_DEFECTO)
+from .pelicula import (DUR_DEFECTO, DUR_MAX, DUR_MIN, MUSICA_DB_DEFECTO,
+                       PeliculaError, PeliculaService, TRANSICION_DEFECTO)
+
+
+class MusicaBody(BaseModel):
+    """Cama musical de la pelicula entera. `tema` vacio = sin musica, que es
+    como la apaga el desplegable del panel."""
+    tema: str | None = Field(default=None, max_length=32)
+    db: float = Field(default=MUSICA_DB_DEFECTO,
+                      ge=audio_promo.MUSICA_DB_MIN,
+                      le=audio_promo.MUSICA_DB_MAX)
 
 
 class PeliculaBody(BaseModel):
@@ -21,6 +31,7 @@ class PeliculaBody(BaseModel):
     narracion: bool = True
     intro_job_id: str | None = Field(default=None, max_length=32)
     cierre_job_id: str | None = Field(default=None, max_length=32)
+    musica: MusicaBody | None = None
 
 
 def make_router(cfg, db: Database, pelicula: PeliculaService) -> APIRouter:
