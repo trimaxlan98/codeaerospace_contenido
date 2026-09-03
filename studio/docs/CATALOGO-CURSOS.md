@@ -273,7 +273,7 @@ Tres cosas que conviene saber antes de copiar este estilo:
 
 Dieciocho transformadas, una por pieza, más intro y cierre: serie de Fourier,
 Fourier, DFT, FFT, DCT, Hartley, Walsh-Hadamard, Laplace, Z, Chirp-Z, STFT,
-wavelet de Haar, Wigner, Hilbert, Mellin, Radon, Hough y Karhunen-Loève. Cada
+wavelet de Haar, Fourier fraccional, Hilbert, Mellin, Radon, Hough y Karhunen-Loève. Cada
 una se cuenta por **lo que vuelve fácil**, nunca por su fórmula: la DCT
 existe porque concentra la energía de un bloque en unos pocos coeficientes,
 Radon porque convierte un objeto en las sombras que proyecta.
@@ -308,9 +308,12 @@ que se dibujara nada:
   resolución: la CZT pone las muestras donde te interesan.
 - **La transformada fraccional de Fourier discretizando el núcleo continuo no
   es unitaria** (155.3 contra 128 de energía), y ordenar autovectores tampoco
-  es estable (funcionaba a N=32 y 64, fallaba a 128). Se abandonaron las dos y
-  la pieza pasó a **Radon-Wigner**, que sí es riguroso y además ES el verbo
-  visual.
+  es estable (funcionaba a N=32 y 64, fallaba a 128). Lo que se abandonó fueron
+  los dos **caminos**, no el tema: la pieza sigue siendo la fraccional y llega
+  por **Radon-Wigner**, que es riguroso y además ES el verbo visual. El módulo
+  al cuadrado de la FrFT de orden *a* **es** la sombra de la distribución de
+  Wigner proyectada sobre un eje girado *a*·π/2, así que girar el plano y mirar
+  su sombra no es una metáfora de la fraccional: es la fraccional.
 
 Se apoya en `manim_extensions/transformadas.py`, con
 `studio/tools/sonda_transformadas.py` — **91 invariantes, cada uno con su
