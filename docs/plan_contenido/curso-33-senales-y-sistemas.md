@@ -97,20 +97,52 @@ salga igual medida con tonos que calculada con la FFT de h.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| A | 00 intro, 01, 02, 03, 04 | pendiente |
-| B | 05, 06, 07, 08, 09 | pendiente |
+| A | **00 intro**, **01**, 02, 03, 04 | intro, cierre y **el molde (01)** escritos y validados; 02-04 en produccion |
+| B | 05, 06, 07, 08, 09 | 05 y 06 en produccion |
 | C | 10, 11, 12, 13, 14 | pendiente |
-| D | 15, 16, 17, 18, 19 cierre | pendiente |
+| D | 15, 16, 17, 18, **19 cierre** | cierre escrito y validado |
+
+**Nombres de portada, MEDIDOS** (no elegidos a ojo): los 18 caben. Tres van
+en **dos lineas** al cuerpo 64 — RESPUESTA AL IMPULSO, ECUACION EN
+DIFERENCIAS (que en pantalla se llama **LA ECUACION**) y RESPUESTA EN
+FRECUENCIA. El resto en una linea a 64 o 56.
 
 ## 5. Estado
 
-- **Bloqueado por el curso 32**, que va por 12 de 20 piezas. Este no empieza
-  a producirse hasta que el 32 esté entregado.
-- Lo que ya se hereda del 32 y no hay que volver a hacer: el estilo LIENZO
-  con portada y modo mudo, los guardianes (`FRACCION_MINIMA`, legibilidad,
-  ancho, tesis de 5 palabras), `unir_vertical.py --mudo`, y el contrato de
-  subagente.
+- Rama `curso/senales-y-sistemas`. Desbloqueado: el curso 32 se entrego el
+  2026-09-02.
+- **Molde**: `clips/01-el-impulso/escena.py`, 31.70 s. Todas las piezas
+  copian de ahi la forma (construir los estados antes, un solo grupo,
+  morfeo entre ellos).
+- Contrato de subagente en el scratchpad de la sesion.
+- Lo que se hereda del 32 y no hay que volver a hacer: el estilo LIENZO con
+  portada y modo mudo, los guardianes, `sellar_duraciones.py`,
+  `unir_vertical.py --mudo` y el contrato.
 
 ## 6. Cosecha de trampas
 
 (se rellena al cerrar cada lote)
+
+### Del arranque (las tres del molde)
+
+- **Un nombre que no cabe no se renombra: se parte en dos lineas.** Medidos
+  los 18 nombres, RESPUESTA AL IMPULSO solo entraba al cuerpo 40 —la mitad
+  que EL IMPULSO, en la misma serie— y otros dos no entraban ni a 40. La
+  salida facil era renombrar las piezas (LA ECUACION, EN FRECUENCIA), que es
+  dejar que la tipografia decida el temario. `lz.portada` parte en dos lineas
+  por debajo del cuerpo 50 y conserva el termino tecnico, que es lo unico que
+  el espectador se lleva escrito.
+- **El guardian de la fraccion medía el bounding box, no lo que se pinta.**
+  El patron que esta casa recomienda —construir todos los estados antes y
+  encenderlos con opacidad— mete en el grupo estados invisibles que inflan la
+  caja: el molde paso el guardian con un dibujo visible que ocupaba el 22 % de
+  la franja. Un guardian al que se le cuela el caso que el propio manual
+  recomienda no es un guardian. Ahora mide sobre los miembros con opacidad.
+  **Corolario para las piezas**: dentro de un cuadro con el rango fijo, el
+  estado mas bajo no puede bajar de la mitad del mas alto; se encadenan pares
+  de razon 2 y se DECLARA el salto de escala entre pares.
+- **`cola` no es "cuanto dura".** Mide donde se acaba la senal contando desde
+  el origen, asi que un impulso puesto en la muestra 20 tiene cola 21 y dura
+  1. El ultimo plano del molde rotulaba "muestra que dura" sobre un **21**.
+  Separado en `sis.duracion`, con el contraejemplo en la sonda (55
+  invariantes).
