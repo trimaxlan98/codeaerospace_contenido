@@ -28,14 +28,14 @@ class Clip(Pieza):
 
     ARMONICOS = (1, 3, 7, 21)
     ANCHO_T = 5.2
-    ALTO_T = 2.6
+    ALTO_T = 3.2
     RANGO_ZOOM = (0.885, 1.225)
     VENTANAS = {21: (0.3900, 0.4830), 201: (0.48855, 0.49855)}
 
     def _cuadro(self, n_armonicos, con_suma=True):
         """La cuadrada gris y, encima, la suma parcial en ambar."""
         t, suma, cuad = tf.serie_cuadrada(n_armonicos, N=1600)
-        rango = (-1.45, 1.45)
+        rango = (-1.30, 1.30)
         meta, _ = tf.traza(t, cuad, ancho=self.ANCHO_T, alto=self.ALTO_T,
                            color=APAGADO, grosor=2.2, rango_y=rango,
                            escalones=True)

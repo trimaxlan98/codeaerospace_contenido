@@ -166,8 +166,20 @@ def _minimo_legible(mob):
 # a 135 px/unidad son 24 px de alto real en el 1080x1920 final.
 ALTO_MINIMO = 0.155
 
+# Fraccion minima de la franja que tiene que ocupar un dibujo.
+#
+# El aviso llevaba escrito en LIENZO.md desde el curso 31 ("un dibujo que
+# ocupa menos del 60 % del alto de la franja se lee como un error, no como
+# minimalismo") y en el 32 hubo que corregirlo en TODAS las piezas que
+# escribieron los subagentes: dibujos de 1.5 unidades en una franja de
+# 5.59, con el fotograma medio vacio. Un consejo que hay que recordar no
+# sobrevive a dieciocho piezas y a trece autores distintos, asi que pasa a
+# ser guardian. El umbral es 0.45 y no 0.60 para dejar sitio a los dibujos
+# que de verdad son bajos (una sola fila de tallos, un panel unico).
+FRACCION_MINIMA = 0.45
 
-def encajar(mob, margen=0.0, que="escena", anclaje="abajo"):
+
+def encajar(mob, margen=0.0, que="escena", anclaje="abajo", bajo=False):
     """Coloca el dibujo en su franja, escalandolo solo si hace falta.
 
     No escala hacia arriba: una pieza pequeña se queda pequeña (el vacio es
@@ -193,6 +205,14 @@ def encajar(mob, margen=0.0, que="escena", anclaje="abajo"):
             f"{que}: tras encajarla, el rotulo mas pequeño mide "
             f"{minimo:.3f} de alto y el minimo legible es {ALTO_MINIMO}: "
             f"quita elementos del dibujo en vez de encogerlo")
+    ocupa = mob.height / max(alto_banda(), 1e-9)
+    if not bajo and ocupa < FRACCION_MINIMA:
+        raise FueraDelLienzo(
+            f"{que} mide {mob.height:.2f} de alto y ocupa el "
+            f"{ocupa * 100:.0f} % de la franja ({alto_banda():.2f}): por "
+            f"debajo del {FRACCION_MINIMA * 100:.0f} % el fotograma se lee "
+            f"como un error de maquetacion. Sube el `alto` del dibujo a "
+            f"2.4-3.0, o pasa bajo=True si de verdad tiene que ser bajo")
     return cabe(mob, que)
 
 
@@ -712,7 +732,7 @@ class Lienzo:
         self._contadores = []
 
     def escena(self, mob, t=0.8, salida=0.45, animacion=None, margen=0.0,
-               anclaje="abajo"):
+               anclaje="abajo", bajo=False):
         """Atajo: encaja el dibujo en su franja y lo mete en su carril.
 
         Por defecto lo apoya en el SUELO de la franja, junto a la cifra.
@@ -725,12 +745,12 @@ class Lienzo:
 
         `anclaje="centro"` sigue disponible para una pieza que de verdad
         quiera flotar."""
-        encajar(mob, margen=margen, anclaje=anclaje)
+        encajar(mob, margen=margen, anclaje=anclaje, bajo=bajo)
         return self.poner("escena", mob, t=t, salida=salida,
                           animacion=animacion)
 
     def relevo(self, escena=IGUAL, dato=IGUAL, t=0.8, salida=0.45,
-               animacion=None, anclaje="abajo"):
+               animacion=None, anclaje="abajo", bajo=False):
         """Cambia dibujo y cifra A LA VEZ, en un solo movimiento.
 
         Los tres primeros clips del curso tropezaron con lo mismo: relevar
@@ -757,7 +777,7 @@ class Lienzo:
             if pieza is None:
                 continue
             if carril == "escena":
-                encajar(pieza, anclaje=anclaje)
+                encajar(pieza, anclaje=anclaje, bajo=bajo)
                 entradas.append(animacion if animacion is not None
                                 else FadeIn(pieza, run_time=t))
             else:

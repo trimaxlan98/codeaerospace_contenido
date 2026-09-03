@@ -60,8 +60,8 @@ class Clip(Pieza):
 
         # --- 1. en el tiempo esta repartido ---------------------------
         curva, _ = tf.traza(np.arange(self.N), np.real(x), ancho=self.ANCHO_T,
-                            alto=2.1, color=TINTA, grosor=2.2,
-                            rango_y=(-1.25, 1.25))
+                            alto=3.0, color=TINTA, grosor=2.2,
+                            rango_y=(-1.12, 1.12))
         r1 = rot("en el tiempo", color=APAGADO)
         r1.next_to(curva, UP, buff=0.28)
         L.escena(VGroup(tf.cero(ancho=self.ANCHO_T), curva, r1), t=0.9)
@@ -70,8 +70,8 @@ class Clip(Pieza):
         # --- 2. en la frecuencia, tampoco -----------------------------
         esp = np.abs(np.fft.fftshift(np.fft.fft(x)))
         espectro, _ = tf.traza(np.arange(esp.size), esp, ancho=self.ANCHO_T,
-                               alto=2.1, color=TINTA, grosor=2.4,
-                               rango_y=(0.0, float(esp.max()) * 1.08))
+                               alto=3.0, color=TINTA, grosor=2.4,
+                               rango_y=(0.0, float(esp.max()) * 1.02))
         r2 = rot("en la frecuencia", color=APAGADO)
         r2.next_to(espectro, UP, buff=0.28)
         L.relevo(escena=VGroup(espectro, r2), t=0.8, salida=0.45)

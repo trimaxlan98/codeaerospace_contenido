@@ -132,16 +132,19 @@ dibujo**, nunca subir el límite ni escalar el grupo a mano.
 | | |
 |---|---|
 | techo / suelo útiles | `+5.689` / `-4.267` |
-| franja del dibujo | `-0.95` … `+4.639` (alto 5.589) |
+| franja del dibujo | `-0.75` … `+4.639` (alto **5.389**) |
 | centro de la cifra | `-2.30` |
 | marca de agua | `-3.967` |
 | ancho seguro centrado | `5.760` |
 | cifra a cuerpo 128 | 1.061 unidades por carácter → **5 caracteres** |
 | etiqueta a cuerpo 30 | 0.277 por carácter → **20 caracteres** |
 
-Un dibujo que ocupa menos del 60 % del alto de la franja se lee como un
+Un dibujo que ocupa menos del **45 %** del alto de la franja se lee como un
 error, no como minimalismo: la cifra queda lejísimos y la composición se
-parte en dos.
+parte en dos. **Desde el curso 32 eso es un guardián**, no un consejo
+(`FRACCION_MINIMA`): el aviso llevaba escrito aquí desde el 31 y aun así
+hubo que corregirlo en todas las piezas que escribieron los subagentes. Si
+un dibujo tiene que ser bajo de verdad, `L.escena(..., bajo=True)`.
 
 ## Dos avisos que ahorran una vuelta entera
 
