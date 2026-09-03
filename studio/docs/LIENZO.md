@@ -146,7 +146,7 @@ parte en dos. **Desde el curso 32 eso es un guardián**, no un consejo
 hubo que corregirlo en todas las piezas que escribieron los subagentes. Si
 un dibujo tiene que ser bajo de verdad, `L.escena(..., bajo=True)`.
 
-## Dos avisos que ahorran una vuelta entera
+## Tres avisos que ahorran una vuelta entera
 
 - **Si el temario pide tres cifras simultáneas, LIENZO es el estilo
   equivocado.** Se rompe con la densidad; usa CONSOLA.
@@ -154,3 +154,10 @@ un dibujo tiene que ser bajo de verdad, `L.escena(..., bajo=True)`.
   convierte en una mancha maciza. Para encender o apagar una curva se toca
   el trazo: `mob.set_stroke(opacity=...)`. Cazado en el curso 32 y ya
   conocido del curso de naturaleza: es el mismo defecto.
+- **Nunca elijas `Group` o `VGroup` a ciegas: usa `lz.agrupar(*piezas)`.**
+  Las dos clases se rechazan mutuamente — `VGroup` no admite un
+  `ImageMobject` (y `tf.mapa` devuelve uno), y un `Group` no vale como hijo
+  de un `VGroup`, que es donde acaba casi todo. Curar un lado rompe el otro
+  en una pieza distinta, y puede no salir hasta el render final: paso en el
+  curso 32, con tres piezas de curvas caidas en el `qh` despues de haber
+  pasado todas el `ql`. `agrupar` mira lo que hay dentro y decide.

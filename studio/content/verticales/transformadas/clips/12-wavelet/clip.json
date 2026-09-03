@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Ondas anchas para lo lento y estrechas para lo rapido: el salto se localiza.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 35.85
 }

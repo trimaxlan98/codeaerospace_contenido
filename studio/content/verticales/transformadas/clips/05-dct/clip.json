@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un bloque de imagen, sus 64 coeficientes, y lo que sobrevive al tirar 58.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 36.17
 }

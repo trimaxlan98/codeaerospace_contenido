@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La envolvente de una nota, recuperada sin conocer la portadora.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 36.53
 }

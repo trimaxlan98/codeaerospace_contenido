@@ -72,12 +72,18 @@ def _frame(video: Path, destino: Path, primero: bool) -> Path:
 def costuras(curso, slug, tmp: Path):
     """Diferencia media por canal entre el final de cada pieza y el
     principio de la siguiente, en unidades de 0-255."""
+    # Solo PIL, y a proposito. Con `numpy` en la lista este bloque se
+    # convirtio en un agujero silencioso: el venv del backend no lleva
+    # numpy (no lo necesita, los renders van en el contenedor), asi que el
+    # chequeo MAS util de la herramienta se saltaba solo imprimiendo una
+    # linea entre parentesis y el resumen seguia diciendo "0 fallos". Un
+    # guardian que se desactiva solo y da el visto bueno es peor que no
+    # tenerlo. `ImageChops` + `ImageStat` dan la misma media por canal.
     try:
-        from PIL import Image
-        import numpy as np
-    except Exception:
-        print("  (sin PIL/numpy: no se miden las costuras)")
-        return 0
+        from PIL import Image, ImageChops, ImageStat
+    except Exception as e:
+        print(f"  FALLO: sin PIL no se pueden medir las costuras ({e})")
+        return 1
     tmp.mkdir(parents=True, exist_ok=True)
     piezas = curso["_piezas"]
     fallos = 0
@@ -89,13 +95,14 @@ def costuras(curso, slug, tmp: Path):
             continue
         fa = _frame(va, tmp / f"{a['_n']:02d}_fin.png", primero=False)
         fb = _frame(vb, tmp / f"{b['_n']:02d}_ini.png", primero=True)
-        xa = np.asarray(Image.open(fa).convert("RGB"), dtype=float)
-        xb = np.asarray(Image.open(fb).convert("RGB"), dtype=float)
-        if xa.shape != xb.shape:
+        xa = Image.open(fa).convert("RGB")
+        xb = Image.open(fb).convert("RGB")
+        if xa.size != xb.size:
             print(f"  FALLO: {a['_slug']} y {b['_slug']} no miden lo mismo")
             fallos += 1
             continue
-        d = float(np.abs(xa - xb).mean())
+        canales = ImageStat.Stat(ImageChops.difference(xa, xb)).mean
+        d = sum(canales) / len(canales)
         valores.append(d)
         marca = "ok" if d <= COSTURA_MAX else "FALLO"
         if d > COSTURA_MAX:

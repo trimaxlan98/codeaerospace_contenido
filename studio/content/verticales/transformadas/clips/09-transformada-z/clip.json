@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un polo cruza el circulo unidad y la respuesta deja de apagarse.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 35.75
 }

@@ -62,6 +62,16 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **`Group` y `VGroup` no son intercambiables en NINGUNA direccion**, y la
+  cura de un lado provoca el fallo del otro. `VGroup` rechaza un
+  `ImageMobject` con TypeError; `Group` es igual de invalido como HIJO de un
+  `VGroup`, que es donde acaban casi todos los dibujos. En el curso 32 cambie
+  `dos_dominios` a `Group` para que la pieza del mapa funcionara — y tres
+  piezas que solo dibujan curvas reventaron **en el render final de alta**,
+  no en el `ql` de validacion, porque las tres envolvian el panel en un
+  `VGroup`. La forma correcta es DECIDIR MIRANDO lo que hay dentro:
+  `lz.agrupar(*piezas)` devuelve `VGroup` si todo es `VMobject` y `Group` si
+  no. Nunca elijas la clase a ciegas.
 - `interpolate_color` exige `ManimColor`; las constantes `C_*` de las familias
   son `str`.
 - Las etiquetas de `Grafica` son hijos internos: no aparecen si se animan

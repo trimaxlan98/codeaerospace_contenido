@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La DFT solo sabe decir entre que dos enteros; la chirp-Z pone los puntos donde importan.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 36.25
 }

@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un tono que cabe entero enciende un bin; uno que no cabe se derrama por todos.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 34.1
 }

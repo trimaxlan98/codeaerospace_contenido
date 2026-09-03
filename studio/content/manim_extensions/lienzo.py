@@ -38,7 +38,7 @@ import os
 import numpy as np
 from manim import (DOWN, LEFT, RIGHT, UP, Create, Dot, FadeIn, FadeOut,
                    Group, Line, Rectangle, Text, UpdateFromAlphaFunc,
-                   VGroup, config, linear)
+                   VGroup, VMobject, config, linear)
 
 import code_brand
 import promo
@@ -532,6 +532,24 @@ def portada(nombre, tesis=None):
 
 
 # --- El panel partido -------------------------------------------------
+def agrupar(*piezas):
+    """`VGroup` si se puede, `Group` si hay una imagen dentro.
+
+    Existe porque las dos clases NO son intercambiables en ninguna de las
+    dos direcciones: un `VGroup` rechaza con TypeError cualquier
+    `ImageMobject` (y `tf.mapa` devuelve uno), pero un `Group` es
+    igualmente inservible como hijo de un `VGroup`, que es donde acaban
+    casi todos los dibujos de este lienzo. Devolver siempre `Group` para
+    curar el primer problema causa el segundo en otra pieza distinta —
+    paso exactamente asi en el curso 32: la pieza 16 pidio `Group` y tres
+    piezas que solo dibujan curvas reventaron en el render final.
+
+    Asi que se decide MIRANDO lo que hay dentro, no adivinando."""
+    if all(isinstance(x, VMobject) for x in piezas):
+        return VGroup(*piezas)
+    return Group(*piezas)
+
+
 def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
                  hueco=0.55, ancho=None):
     """Dos dibujos, uno sobre otro, con su nombre.
@@ -545,10 +563,6 @@ def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
     paneles añade tinta sin añadir informacion."""
     ancho = ancho or (ANCHO_SEGURO - 0.3)
     paneles = []
-    # `Group` y no `VGroup`: la mitad de las piezas que comparan dos cosas
-    # comparan dos MAPAS, y `tf.mapa` devuelve un `ImageMobject`, que un
-    # VGroup rechaza con un TypeError. Lo levanto el agente de la pieza 16
-    # despues de tener que apilar los paneles a mano.
     for dibujo, texto in ((arriba, rotulo_arriba), (abajo, rotulo_abajo)):
         if dibujo.width > ancho:
             dibujo.scale(ancho / dibujo.width)
@@ -557,8 +571,8 @@ def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
             rot = rotulo(texto)
             rot.next_to(dibujo, DOWN, buff=0.20)
             piezas.append(rot)
-        paneles.append(Group(*piezas))
-    return Group(*paneles).arrange(DOWN, buff=hueco)
+        paneles.append(agrupar(*piezas))
+    return agrupar(*paneles).arrange(DOWN, buff=hueco)
 
 
 # --- Los carriles -----------------------------------------------------

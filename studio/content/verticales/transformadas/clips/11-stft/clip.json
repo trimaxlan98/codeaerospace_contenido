@@ -3,5 +3,5 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una ventana desliza y pinta el espectrograma; estrecharla gana tiempo y pierde frecuencia.",
-  "duracion_objetivo": null
+  "duracion_objetivo": 37.1
 }
