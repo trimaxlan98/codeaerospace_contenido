@@ -115,7 +115,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3a hecho** (import/export, lote, duplicar); R3b pendiente |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | **hecho** (librerías; datos adjuntos pendiente) |
 | R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | **R5a hecho** (Proyectos partido, estilo en CodeMirror, audio en una fila, historial de script); Estudio con fotogramas y Laboratorio entraron por R3b |
-| R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | **hecho** 2026-09-03 (desplegado desde la rama; PR #75 pendiente de merge por el dueño) |
+| R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | **hecho** 2026-09-03 (PR #75 mergeado, prod en `main`) |
 
 Cada sprint termina con `pytest -q` verde, `vite build`, commit atómico y
 despliegue verificado desde fuera.
@@ -1055,10 +1055,8 @@ contiene el propio marcador.
 
 ### R6 — cierre (2026-09-03, 15:30)
 
-Todo lo anterior está desplegado en https://coderesearch.space **desde la
-rama** `estudio/v3-investigacion` (el clasificador de permisos de la sesión
-bloqueó `gh pr merge` y el push a `main`; el PR #75 queda para el dueño:
-después, en el VPS, `git checkout main && git pull`).
+Todo lo anterior está en `main` (PR #75, merge `65fbac3`) y desplegado en
+https://coderesearch.space, que corre `main` desde el 2026-09-03 20:55 UTC.
 
 Verificado en producción con cookie firmada, no leyendo el código:
 
