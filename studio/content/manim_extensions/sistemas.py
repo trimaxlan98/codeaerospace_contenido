@@ -362,6 +362,19 @@ def respuesta_frecuencia(h, N=1024):
     return w, np.abs(H), np.unwrap(np.angle(H))
 
 
+def espectro_amplitud(x):
+    """|X| de una señal, SIN rellenar de ceros.
+
+    Existe para comparar los espectros de amplitud de dos señales, que es
+    lo que afirma la pieza 14. Hacerlo con `respuesta_frecuencia(x)` y su
+    N=1024 por defecto rellena cada señal de ceros y le interpola el
+    espectro de otra manera: el "cambio" entre una señal y la misma con
+    las fases movidas salia **49.30** en vez de 0, sin que nada fallara.
+    Lo levanto la pieza 14."""
+    x = np.asarray(x, dtype=float)
+    return np.abs(np.fft.rfft(x, n=x.size))
+
+
 def ganancia_medida(h, w, N=400):
     """La ganancia MEDIDA metiendo un tono y midiendo lo que sale.
 

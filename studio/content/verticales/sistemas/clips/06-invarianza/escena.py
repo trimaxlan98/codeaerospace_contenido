@@ -156,12 +156,23 @@ class Clip(Pieza):
         # de la respuesta, `rango_x=(0, M-1)`, no el eje de 54 muestras
         # que hacia falta para que el retardo se viera. Con el eje
         # correcto la curva ocupa el ancho entero del cuadro.
+        # La referencia va en APAGADO OPACO y la de encima A TROZOS. La
+        # primera version ponia el fondo en ambar al 32 % con trazo 7.0, y
+        # medido sobre el fotograma renderizado el trazo salia (70,73,63) y
+        # (164,121,34): oliva y ambar apagado, no ambar. La regla no es la
+        # transparencia sino el ANCHO EFECTIVO — dos trazos de un par de
+        # pixeles, uno dentro del otro, se mezclan en vez de leerse como
+        # dos curvas, sean opacos o no. A trozos, en cada hueco se ve el
+        # color de abajo y en cada trazo el de arriba, y "misma forma" se
+        # lee porque se ven DOS curvas.
         fondo = self._curva_salida(y1, 0, RANGO_SAL, alto=self.ALTO_REMATE,
                                    rango_x=(0, self.M - 1))[0]
-        fondo.set_stroke(opacity=0.32, width=7.0)
-        encima = self._curva_salida(y2, 0, RANGO_SAL, alto=self.ALTO_REMATE,
-                                    rango_x=(0, self.M - 1))[0]
-        encima.set_stroke(width=sis.TRAZO_FINO)
+        fondo.set_stroke(color=APAGADO, opacity=1.0, width=8.0)
+        crudo = self._curva_salida(y2, 0, RANGO_SAL, alto=self.ALTO_REMATE,
+                                   rango_x=(0, self.M - 1))[0]
+        crudo.set_stroke(color=AMBAR, width=sis.TRAZO_FINO)
+        encima = DashedVMobject(crudo, num_dashes=48, dashed_ratio=0.55)
+        encima.set_stroke(color=AMBAR, width=2.6)
         encima.set_stroke(opacity=0.0)
 
         grupo3 = VGroup(axis_r, label_r, fondo, encima)

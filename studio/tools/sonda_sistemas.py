@@ -238,6 +238,20 @@ ok("y girar los extremos SI las estropea (contraejemplo)",
    float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))) > 0.3,
    f"cambio maximo {float(np.max(np.abs(Xn - np.abs(np.fft.rfft(mal))))):.4f}")
 
+# Comparar dos espectros de amplitud exige la MISMA rejilla. `espectro_amplitud`
+# no rellena de ceros; el contraejemplo es hacerlo con el N=1024 por defecto de
+# `respuesta_frecuencia`, que interpola cada senal de otra manera.
+xn2 = sis.dos_tonos(0.04, 0.11, 256)
+yn2 = sis.deformar_fases(xn2, 6.0)
+casi("dos espectros comparados en su propia rejilla no cambian",
+     float(np.max(np.abs(sis.espectro_amplitud(xn2)
+                         - sis.espectro_amplitud(yn2)))), 0.0, 1e-10)
+_a = sis.respuesta_frecuencia(xn2)[1]
+_b = sis.respuesta_frecuencia(yn2)[1]
+ok("y compararlos rellenando de ceros da un cambio FALSO (contraejemplo)",
+   float(np.max(np.abs(_a - _b))) > 1.0,
+   f"cambio aparente {float(np.max(np.abs(_a - _b))):.2f}")
+
 print("\n== 15 · Resonancia ==")
 hr = sis.resonador(0.08, 12.0, 400)
 amp = sis.amplificacion(hr, 0.08)
@@ -250,6 +264,31 @@ ok("mas Q, mas estrecho",
    sis.amplificacion(sis.resonador(0.08, 40.0, 800), 0.08) > amp,
    f"Q=12 -> x{amp:.1f}, Q=40 -> "
    f"x{sis.amplificacion(sis.resonador(0.08, 40.0, 800), 0.08):.1f}")
+
+# Una cifra "medida" puede seguir siendo del CUADRO y no del sistema, y la
+# forma de saberlo es medirla con varias ventanas y ver si se mueve. El eco
+# de un resonador de Q alto tarda en morir: con N=600 `duracion` dice 552 y
+# con N>=800 dice 620 y ya no se mueve. Yo mismo pase el 552 como cifra de
+# referencia en el encargo de la pieza 15, y era el tamano de la ventana
+# disfrazado de medida — el mismo error que la pieza 10 con su "60".
+_eco = lambda N: sis.duracion(sis.resonador(0.08, 40.0, N=N))
+ok("el eco de Q=40 no ha terminado en 600 muestras (contraejemplo)",
+   _eco(600) < _eco(1200), f"{_eco(600)} contra {_eco(1200)}")
+ok("y a partir de 800 la cifra ya no se mueve",
+   _eco(800) == _eco(1200) == _eco(1600) == 620,
+   f"{_eco(800)}, {_eco(1200)}, {_eco(1600)}")
+
+# El pico de la campana CASI NO CAMBIA con Q: la amplificacion viene de que
+# baja lo de fuera, no de que suba lo de dentro. Dibujar campanas que
+# "crecen" con Q seria falso; lo que crece es el cociente.
+for _Q, _pico in ((4.0, 1.070), (12.0, 1.048), (40.0, 1.037)):
+    _w, _m, _ = sis.respuesta_frecuencia(sis.resonador(0.08, _Q, N=1200), 4096)
+    casi(f"el pico de |H| con Q={_Q:g} apenas se mueve", float(_m.max()),
+         _pico, 0.005)
+ok("lo que cambia es lo de FUERA de la resonancia",
+   sis.amplificacion(sis.resonador(0.08, 40.0, N=1200), 0.08, 0.02)
+   > 8 * sis.amplificacion(sis.resonador(0.08, 4.0, N=1200), 0.08, 0.02),
+   "la amplificacion sube casi 10 veces mientras el pico baja")
 
 print("\n== 16 · Transitorio y permanente ==")
 y_esc = np.convolve(sis.escalon(200), hr)[:200]
