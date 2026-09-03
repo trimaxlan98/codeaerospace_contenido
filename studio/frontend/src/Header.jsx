@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Activity, FileCode, Film, FolderKanban, GraduationCap,
+  Activity, FileCode, Film, FlaskConical, FolderKanban, GraduationCap,
   Settings as SettingsIcon, WifiOff, Search,
 } from 'lucide-react'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
@@ -18,6 +18,10 @@ const NAV = [
   { id: 'studio', label: 'Estudio', icon: FileCode },
   { id: 'renders', label: 'Renders', icon: Film },
   { id: 'learn', label: 'Aprender', icon: GraduationCap },
+  // El Laboratorio va DESPUES del Estudio en la lectura pero antes de Admin:
+  // es trabajo de contenido (verificar la libreria antes de escribir un
+  // clip), no salud del host.
+  { id: 'lab', label: 'Laboratorio', icon: FlaskConical },
   { id: 'admin', label: 'Admin', icon: Activity },
 ]
 
@@ -33,7 +37,14 @@ function useUtcClock() {
 function MeterChip({ label, pct }) {
   const tone = pct >= 90 ? 'bg-err' : pct >= 70 ? 'bg-warn' : 'bg-cyan'
   return (
-    <div className="hidden items-center gap-2 rounded-md border border-line bg-surface-2/50 px-2.5 py-1.5 lg:flex">
+    // 2xl y no lg: la nav crecio a seis vistas (Laboratorio, sprint R3b) y a
+    // 1440 px los dos medidores le comian el ultimo boton — "Admin" salia
+    // cortado sin que nada lo dijera. La telemetria es informativa y hasta se
+    // puede apagar (Configuracion); la navegacion no es opcional, asi que la
+    // que cede es la telemetria. Medido con Playwright a 1024/1180/1280/1366/
+    // 1440/1600/1920: recorte 0 en todas salvo 1024, donde la nav ya
+    // scrolleaba antes de este sprint.
+    <div className="hidden items-center gap-2 rounded-md border border-line bg-surface-2/50 px-2.5 py-1.5 2xl:flex">
       <span className="eyebrow">{label}</span>
       <span className="font-mono text-xs tabular-nums text-ink">{pct.toFixed(0)}%</span>
       <span className="block h-1 w-8 overflow-hidden rounded-full bg-canvas">
@@ -103,7 +114,7 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
           </>
         )}
         {telemetry && (
-          <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted md:inline">
+          <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted xl:inline">
             {clock} <span className="text-faint">UTC</span>
           </span>
         )}
@@ -115,8 +126,11 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
             title="Buscar e ir (Ctrl+K)"
             className="hidden h-9 items-center gap-2 rounded-md border border-line px-2.5 text-sm text-muted transition-colors hover:border-line-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan sm:flex">
             <Search className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden lg:inline">Buscar</span>
-            <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint lg:inline">Ctrl K</kbd>
+            {/* Los rotulos de las dos acciones de la derecha ceden antes que
+                la nav (ver MeterChip): por debajo de xl quedan como iconos con
+                `title`, que es lo que la cabecera ya hacia por debajo de sm. */}
+            <span className="hidden xl:inline">Buscar</span>
+            <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline">Ctrl K</kbd>
           </button>
         )}
         {/* La barra ya no lleva ajustes (encargo 8): ni selector de tema ni
@@ -133,7 +147,7 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
           )}
         >
           <SettingsIcon className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden sm:inline">Configuración</span>
+          <span className="hidden xl:inline">Configuración</span>
         </button>
       </div>
     </header>

@@ -13,6 +13,7 @@ import { Play, Download, FolderPlus, Search, ArrowUpRight } from 'lucide-react'
 import { api, thumbUrl, videoUrl } from './api.js'
 import { refreshCatalogo, useCatalogo } from './catalogo.js'
 import { ratioDeJob, resolucionLegible } from './formatos.js'
+import HojaContactos from './components/Fotogramas.jsx'
 import { Button } from './components/ui/button.jsx'
 import { Input } from './components/ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './components/ui/dialog.jsx'
@@ -300,16 +301,25 @@ export default function Renders({ jobs, storage, onJobsChanged, onOpenProject })
 
       <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
         {playing && (
-          <DialogContent className="p-0">
-            <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2 pr-12">
+          <DialogContent className="flex max-h-[92vh] flex-col p-0">
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-2 pr-12">
               <DialogTitle className="truncate font-mono text-[13px] text-ink">
                 {playing.scene} <span className="text-faint">· {playing.id.slice(0, 8)}</span>
               </DialogTitle>
             </div>
-            {/* w-auto: un promo vertical se acota por ALTO. Con w-full el
-                video se metia en una caja ancha y se veia con bandas. */}
-            <video className="mx-auto block max-h-[78vh] w-auto max-w-full bg-black"
-              controls autoPlay src={videoUrl(playing.id)} />
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {/* w-auto: un promo vertical se acota por ALTO. Con w-full el
+                  video se metia en una caja ancha y se veia con bandas. */}
+              <video className="mx-auto block max-h-[62vh] w-auto max-w-full bg-black"
+                controls autoPlay src={videoUrl(playing.id)} />
+              {/* Ver el video una vez no caza lo que si caza mirar los
+                  fotogramas uno a uno (un elemento fuera del lienzo, dos
+                  cifras que se leen pegadas). */}
+              <div className="border-t border-line px-3 py-2.5">
+                <HojaContactos key={playing.id} jobId={playing.id}
+                  escena={playing.scene} />
+              </div>
+            </div>
           </DialogContent>
         )}
       </Dialog>

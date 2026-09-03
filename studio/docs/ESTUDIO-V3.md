@@ -112,7 +112,7 @@ de secciones con `t_inicio`; el proveedor de voz solo lo habla.
 | R0 | Plan | este documento, rama `estudio/v3-investigacion` | **hecho** |
 | R1 | Voz sin GCP | proveedores edge/piper/vertex/archivo, guion editable, **subida de narración propia**, normalización en el contenedor | **hecho** |
 | R2 | Música | `musica.py` procedural (temas, bpm, tonalidad), banco audible, `audio.musica` en el manifiesto, cama bajo la película con *ducking* | en curso (agente) |
-| R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | pendiente |
+| R3 | Paridad con la terminal | import/export de curso como archivos, render en lote con calidad, hoja de contactos + fotograma PNG, costuras y picos en la película, **Laboratorio** (ejecutar Python en el sandbox: sondas) | **R3b hecho** (fotogramas + Laboratorio); import/export, lote y costuras pendientes |
 | R4 | Rigor de investigación | `figura.py` (estilo paper, proveniencia, PNG/SVG), datos adjuntos por proyecto, `ntn.py` para la tesis (pase LEO, Doppler, handover, PBFT, MA) | en curso (agente, librerías) |
 | R5 | UX | Estudio con fotogramas, `style_block` en CodeMirror, duplicar proyecto/clip, panel de audio unificado (voz + música + SFX), pestaña Laboratorio, `Projects.jsx` descompuesto | pendiente |
 | R6 | Producción y cierre | VPS, nginx (`client_max_body_size`), unit (`MemoryMax`), README, skills, catálogo, memoria | pendiente |
@@ -184,10 +184,10 @@ acepta `musica` global con *sidechain* simple (−9 dB bajo la voz).
 |---|---|
 | curso como archivos | `POST /api/projects/importar` (zip o `{slug}` del repo) y `GET /{pid}/fuentes.zip` |
 | lote con calidad | `POST /{pid}/render-lote {clips, calidad, force}` + progreso agregado en `GET /{pid}` |
-| hoja de contactos | comando `frames` del runner → `GET /api/jobs/{id}/frames` (N PNG + último) |
-| fotograma / figura | `POST /api/jobs/{id}/fotograma {t, formato: png|svg}` a resolución del job |
+| hoja de contactos ✅ | comando `frames` del runner → `POST /api/jobs/{id}/frames` + `GET …/frames/NN.png` (N PNG + último real) |
+| fotograma / figura ✅ | comando `fotograma` → `POST /api/jobs/{id}/fotograma {t, ancho}` a la resolución pedida |
 | costuras y picos | `pelicula/verificar` mide además la unión pieza a pieza (PIL) y el pico por pieza |
-| sondas / Laboratorio | comando `ejecutar` del runner: script Python + argumentos en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` |
+| sondas / Laboratorio ✅ | comando `ejecutar` del runner: script Python en el sandbox, stdout + archivos producidos → `POST /api/laboratorio` y vista `#/laboratorio` |
 
 ## R4 — Rigor de investigación (agente Opus, librerías)
 
@@ -211,6 +211,121 @@ fuentes, progreso del lote. Pestaña **Laboratorio**. `Projects.jsx` partido
 en `components/proyectos/*`.
 
 ---
+
+## R3b — Fotogramas y Laboratorio (2026-09-03)
+
+Lo que cierra: **ver lo que se pinta y ejecutar lo que se mide**. Hasta hoy el
+único resultado de un render en la app era el mp4, y el único Python que la
+consola sabía ejecutar era una escena de manim.
+
+### Diseño
+
+**Un solo contenedor por hoja, no uno por fotograma.** Arrancar
+`docker compose run` cuesta ~1,5 s; doce arranques serían veinte segundos para
+doce PNG de un cuarto de segundo. Por eso hay una herramienta nueva,
+`studio/tools/hoja_contactos.py`, con el mismo patrón que `promo_verifica.py`:
+ruta fija del script, todo el trabajo en un contenedor, informe JSON en la
+última línea de stdout. Dos modos:
+
+- `tira VIDEO DESTINO --n N --ancho 480` — N fotogramas en `t = dur·(i+½)/N`
+  (el mismo reparto que `render_local.py`, que evita los fundidos de los
+  extremos) más `final.png`, el último fotograma **real**. Deja `indice.json`
+  al lado con el instante y el tamaño medido de cada uno.
+- `figura VIDEO SALIDA --t T --ancho W` — un PNG a la resolución pedida.
+
+**Idempotencia por el índice, no por una tabla.** El mp4 de un job es
+inmutable: pedir la misma hoja dos veces no puede costar dos contenedores. El
+backend lee `frames/indice.json`, comprueba que el `n` coincide y que **todos**
+sus PNG siguen en disco, y devuelve `recalculada: false` sin tocar el runner.
+Medido: 2,2 s la primera vez, 0,00 s la segunda.
+
+**El Laboratorio no entra en la cola de renders.** `JobManager._run_job` está
+construido alrededor de `runner.render()` —transmite el log de manim línea a
+línea por SSE, busca un mp4 al terminar, saca miniatura y resolución, y guarda
+en columnas (`scene`, `quality`, `video_path`…) que un script no tiene—; meterlo
+ahí obligaría a partir el worker en dos caminos y a inventar valores para media
+docena de columnas. Se hace lo que ya hacen `mezclar_audio` y `verificar_promo`,
+que tampoco pasan por la cola: **son segundos, no minutos**. Pero **sólo una
+ejecución a la vez**, con el turno apartado de forma síncrona (`crear()` fija
+`_corriendo` sin ningún `await` entre la comprobación y la reserva; hacerlo
+dentro de la corrutina deja una ventana por la que se cuelan dos). Así lo peor
+que puede coincidir en 2 vCPU es un render largo y una sonda corta, y el tope
+de 1.5 vCPU de compose sigue mandando.
+
+**El registro del Laboratorio es el disco.** Cada ejecución es
+`render_jobs/lab/<id>/` con `script.py`, `meta.json` y lo que el script deje.
+Sin migración de esquema y sin dos fuentes de verdad que sincronizar; borrar una
+ejecución es borrar su directorio.
+
+**La ejecución va en segundo plano y la vista pregunta.** El tope es de 900 s y
+nginx corta una petición mucho antes: `POST` devuelve 202 con el id y
+`Laboratorio.jsx` consulta cada 1,2 s mientras dura. No se añade un evento SSE
+por una tarea que dura segundos.
+
+### Superficie nueva
+
+| Runner | Backend | Frontend |
+|---|---|---|
+| `frames {job_id, n}` | `POST /api/jobs/{id}/frames` · `GET …/frames/{NN.png\|final.png}` | «Hoja de contactos» bajo el vídeo (Estudio y modal de Renders) |
+| `fotograma {job_id, t, ancho, formato}` | `POST /api/jobs/{id}/fotograma` · `GET …/figuras/{archivo}` | «Fotograma → PNG» con el `currentTime` del `<video>` y 1920/2560/3840 |
+| `ejecutar {lab_id, sonda?, timeout}` | `POST /api/laboratorio` · `GET /api/laboratorio[/{id}]` · `GET …/{id}/archivos/{n}` · `DELETE` · `GET /api/laboratorio/sondas` · `POST /api/laboratorio/sondas/{nombre}` | vista `#/laboratorio` (`g l`): editor CodeMirror, salida, galería de archivos, sondas del repo e historial |
+
+### Medido (runner y backend reales, Docker de verdad, 2026-09-03)
+
+| Qué | Resultado |
+|---|---|
+| hoja de 6 fotogramas de un clip de 4,0 s (`ql`) | 2,2 s · 7 PNG de 480×270 · segunda petición 0,00 s |
+| figura a 1920 px | 1080 de alto, 72 KB, 0,8 s |
+| figura a 3840 px | **2158** de alto (no 2160), 229 KB, 1,7 s |
+| `sonda_sistemas.py` en el sandbox | **73 invariantes ok, 0 fallos** en 2,6 s (3,1 s por HTTP) |
+| script con numpy + PIL + `import code_brand` | 2,4 s, `figura.png` de 480×240 devuelta y pintada en la vista |
+| timeout (script que duerme 600 s, `timeout: 30`) | `code 124`, `timed_out: true` a los 60,1 s, **sin contenedor huérfano** |
+| garantías del sandbox, medidas DESDE DENTRO | red bloqueada · repo read-only · otro job no escribible · sólo el directorio propio escribible · uid:gid 1000:1000 |
+
+### Trampas
+
+- **Un `-ss` al filo de la duración sale con éxito SIN escribir nada.** Y el
+  instante de la figura lo manda el `<video>` del navegador, que al terminar
+  marca `currentTime == duration`: el caso más probable era justo el roto.
+  Cualquier `t` dentro de los últimos 0,4 s se atiende con `-sseof -0.4
+  -update 1`, que es como sacan el último fotograma `promo_verifica.py` y
+  `verifica_vertical.py`. Verificado pidiendo `t = 4.0` de un vídeo de 4,0 s.
+- **`scale=3840:-2` sobre un 854×480 da 2158, no 2160.** La resolución que
+  enseña la interfaz es la **medida sobre el PNG escrito** (`ffprobe`), no la
+  que se pidió: una figura de tesis que dice 2160 y mide 2158 es una cifra
+  falsa, del mismo tipo que las que caza la regla de la casa.
+- **`docker compose run` escribe su progreso en stderr.** En los demás comandos
+  da igual (se lee el JSON de stdout); en el Laboratorio **no**, porque ese
+  stderr se le enseña al usuario tal cual y las dos líneas de «Container …
+  Creating/Created» dejaban un traceback de Python enterrado bajo ruido del
+  orquestador. El runner las filtra con un regex anclado.
+- **`meta.json` no cae por la lista de extensiones.** La ruta de archivos
+  producidos filtra por extensión (`.png`, `.wav`, `.json`…), y `.json` está
+  permitido: sin una lista de nombres reservados, `GET …/archivos/meta.json`
+  servía el registro interno de la ejecución —con su stdout entero— como si
+  fuera un resultado del script. Lo cazó el test antes que nadie.
+- **`exit 1` no es una avería.** Una sonda con invariantes rotos sale con 1 **a
+  propósito**: pintarlo de rojo como fallo del sistema sería perder justo la
+  señal que se buscaba. Estado propio (`salida`, ámbar) distinto de `timeout` y
+  de `error` (runner caído).
+- **Las sondas se buscan en `<workspace>/studio/tools`, no junto al código.**
+  Es la ruta que el runner ejecuta dentro del contenedor
+  (`/workspace/studio/tools/sonda_<x>.py`): si el backend mirara a otro sitio,
+  la app ofrecería una sonda que el runner no encuentra. En los tests el
+  workspace es un `tmp_path`, así que el fixture enlaza las herramientas reales
+  —sondas y no-sondas, para que el filtro tenga algo que descartar.
+- **El laboratorio cuenta contra la cuota de disco de renders**, porque vive
+  bajo `render_jobs/`. Es deliberado: son bytes en el mismo volumen, y
+  `storage_usage()` ya los ve sin cambiar nada.
+- **Con `render_jobs` enlazado a otro disco, el cwd del laboratorio es la ruta
+  REAL, no `/workspace/…`.** En esta máquina `render_jobs` es un enlace al
+  segundo disco (`ARTEFACTOS-LOCALES.md`) y dentro del contenedor ese enlace
+  cuelga; Docker resuelve el destino del montaje a través de él y lo crea en
+  la ruta del host. Los tres comandos **funcionan igual** (verificado con el
+  enlace puesto: hoja de 4 fotogramas, figura a 1920 px y un script que
+  escribe un `.txt`), pero un `os.getcwd()` o un traceback imprimen
+  `/home/…/data/…/render_jobs/lab/<id>` en un clon local y
+  `/workspace/render_jobs/lab/<id>` en el VPS, donde el directorio es real.
 
 ## Cosecha (se rellena al cerrar cada sprint)
 

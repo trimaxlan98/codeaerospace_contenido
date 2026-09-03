@@ -17,6 +17,15 @@ Superficie deliberadamente minima — no es un proxy generico de Docker:
   - verificar : `studio/tools/promo_verifica.py` en el MISMO contenedor:
              mide costura del bucle, duracion, audio y frames del archivo
              que la app sirve, y devuelve el informe JSON.
+  - frames : `studio/tools/hoja_contactos.py tira` en el MISMO contenedor:
+             la hoja de contactos del render (N fotogramas equiespaciados y
+             el ultimo real). Solo llegan el job_id y cuantos.
+  - fotograma : el mismo script en modo `figura`: un PNG a la resolucion
+             pedida desde el mp4 del job. El nombre del archivo lo DERIVA el
+             runner de (t, ancho); del exterior no llega ninguna ruta.
+  - ejecutar : Python de validacion (las `sonda_*.py`, o un script escrito en
+             el Laboratorio) en el MISMO contenedor: sin red, repo read-only
+             y como unico directorio escribible render_jobs/lab/<lab_id>.
   - cancel : `docker rm -f` de un contenedor cuyo nombre coincide con el
              prefijo fijo de render de ManimStudio (no puede tocar otros).
   - stats  : lectura agregada (`docker ps` + `docker stats --no-stream`),
@@ -693,6 +702,283 @@ async def handle_cancel(req: dict, writer: asyncio.StreamWriter) -> None:
     await send(writer, {"type": "ok"})
 
 
+# ── fotogramas y laboratorio (R3b) ────────────────────────────────────────────
+#
+# Tres comandos que cierran la brecha «lo que se ve y lo que se mide en la
+# terminal, en la app»:
+#
+#   - frames    : la hoja de contactos de un render (N fotogramas + el ultimo
+#                 real). `hoja_contactos.py tira` en el contenedor, ruta fija
+#                 del script y del destino; del exterior solo llegan el job_id
+#                 y cuantos fotogramas.
+#   - fotograma : un PNG a la resolucion pedida desde el mp4 del job (la
+#                 figura de una tesis). El nombre del archivo lo DERIVA el
+#                 runner de (t, ancho): nunca llega del exterior.
+#   - ejecutar  : Python de validacion en el sandbox (las `sonda_*.py`). El
+#                 mismo contenedor que un render —que ya ejecuta Python
+#                 arbitrario— con el repo read-only, sin red, y como unico
+#                 directorio escribible el del laboratorio.
+
+CONTACTOS_SCRIPT = "studio/tools/hoja_contactos.py"
+CONTACTOS_TIMEOUT = 300
+# Tope de la hoja: mas de 24 miniaturas no se revisan de una mirada, y cada
+# una es un `ffmpeg -ss` con su decodificacion.
+HOJA_MAX = 24
+ANCHO_TIRA = 480
+# 4K: mas alla no hay pantalla ni pagina. Es el mismo techo que ANCHO_MAX de
+# hoja_contactos.py (si uno cambia, el otro tambien).
+ANCHO_FIGURA_MIN, ANCHO_FIGURA_MAX = 320, 3840
+T_MAX = 21600.0  # 6 h: cualquier instante posible de una pelicula montada
+
+# Laboratorio: un directorio por ejecucion bajo render_jobs/lab/, escrito por
+# el backend (script.py) y montado rw solo para su contenedor.
+LAB_DIR = f"{RENDER_JOBS_DIR}/lab"
+LAB_TIMEOUT_MIN, LAB_TIMEOUT_MAX = 30, 900
+# Tope por flujo. Una sonda imprime ~100 lineas; un bucle desbocado imprime
+# hasta llenar el disco del backend si nadie corta.
+LAB_SALIDA_MAX = 200 * 1024
+# `import sistemas` tiene que funcionar en el laboratorio igual que en una
+# sonda: es la MISMA ruta que cfg.manim_extensions_dir del backend.
+LAB_PYTHONPATH = "/workspace/studio/content/manim_extensions"
+# Sondas: ruta CERRADA (studio/tools/sonda_<nombre>.py) y sin argumentos.
+RE_SONDA = re.compile(r"^[a-z0-9_]{1,32}$")
+SONDAS_DIR = "studio/tools"
+# Lo que un script del laboratorio puede dejar como resultado. Fuera de esta
+# lista no se enumera (ni se sirve): un .py o un .sh producidos por el script
+# no son un resultado que la app tenga que ofrecer de vuelta.
+LAB_EXT = {".png", ".jpg", ".jpeg", ".svg", ".wav", ".txt", ".json",
+           ".csv", ".md", ".log"}
+RE_LAB_ARCHIVO = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$")
+
+
+def _recorta(texto: str) -> str:
+    """Salida acotada, diciendo que se acoto (un limite silencioso miente)."""
+    if len(texto) <= LAB_SALIDA_MAX:
+        return texto
+    return texto[:LAB_SALIDA_MAX] + f"\n… [recortado en {LAB_SALIDA_MAX} bytes]"
+
+
+# `docker compose run` escribe su propio progreso en stderr ("Container …
+# Creating/Created/Removing"). En los demas comandos da igual porque lo que se
+# lee es el JSON de stdout; aqui NO: el stderr del laboratorio se le ensena al
+# usuario tal cual, y con esas dos lineas siempre delante un traceback de
+# Python queda enterrado bajo ruido del orquestador.
+RE_COMPOSE = re.compile(
+    r"^\s*(?:Container|Network|Volume|Image)\s+\S+\s+"
+    r"(?:Creating|Created|Starting|Started|Stopping|Stopped|Removing|Removed|"
+    r"Recreate|Recreated|Running|Waiting|Pulling|Pulled|Built|Building)\s*$")
+
+
+def _limpia_stderr(texto: str) -> str:
+    return "\n".join(l for l in texto.splitlines() if not RE_COMPOSE.match(l))
+
+
+async def handle_frames(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Hoja de contactos del render: n fotogramas + el ultimo real."""
+    job_id = str(req.get("job_id", ""))
+    n = req.get("n", 8)
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+    if not isinstance(n, int) or isinstance(n, bool) or not (1 <= n <= HOJA_MAX):
+        await send(writer, {"type": "error", "error": "n fuera de rango"})
+        return
+
+    video_rel = video_del_job(job_id)
+    if video_rel is None:
+        await send(writer, {"type": "error", "error": "video del job no encontrado"})
+        return
+
+    job_rel = f"{RENDER_JOBS_DIR}/{job_id}"
+    job_abs = os.path.join(PROJECT_DIR, job_rel)
+    container = f"{CONTAINER_PREFIX}{job_id}-frames"
+    job_mount = f"{os.path.realpath(job_abs)}:/workspace/{job_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{CONTACTOS_SCRIPT}", "tira",
+        f"/workspace/{video_rel}", f"/workspace/{job_rel}/frames",
+        "--n", str(n), "--ancho", str(ANCHO_TIRA),
+        timeout=CONTACTOS_TIMEOUT,
+    )
+    informe = _ultimo_json(out)
+    if code != 0 or informe is None or not informe.get("ok"):
+        await force_remove(container)
+        detalle = (informe or {}).get("error") or (err or out)[-300:]
+        log(f"[frames] job={job_id} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"la hoja de contactos fallo: {detalle}"})
+        return
+    log(f"[frames] job={job_id} ok n={n} dur={informe.get('duracion')}")
+    await send(writer, {"type": "ok", "informe": informe})
+
+
+async def handle_fotograma(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Un fotograma a la resolucion pedida: la figura estatica de un paper."""
+    job_id = str(req.get("job_id", ""))
+    t = req.get("t", 0.0)
+    ancho = req.get("ancho", 1920)
+    formato = str(req.get("formato") or "png")
+    if not RE_JOB_ID.match(job_id):
+        await send(writer, {"type": "error", "error": "job_id invalido"})
+        return
+    if isinstance(t, bool) or not isinstance(t, (int, float)) \
+            or not (0 <= float(t) <= T_MAX):
+        await send(writer, {"type": "error", "error": "instante fuera de rango"})
+        return
+    if not isinstance(ancho, int) or isinstance(ancho, bool) \
+            or not (ANCHO_FIGURA_MIN <= ancho <= ANCHO_FIGURA_MAX):
+        await send(writer, {"type": "error", "error": "ancho fuera de rango"})
+        return
+    if formato != "png":
+        await send(writer, {"type": "error", "error": "formato invalido"})
+        return
+
+    video_rel = video_del_job(job_id)
+    if video_rel is None:
+        await send(writer, {"type": "error", "error": "video del job no encontrado"})
+        return
+
+    # El nombre lo DERIVA el runner de los dos numeros ya validados: del
+    # exterior no llega ni una ruta ni un nombre de archivo.
+    nombre = f"t{int(round(float(t) * 1000)):08d}_{ancho}.png"
+    job_rel = f"{RENDER_JOBS_DIR}/{job_id}"
+    job_abs = os.path.join(PROJECT_DIR, job_rel)
+    container = f"{CONTAINER_PREFIX}{job_id}-figura"
+    job_mount = f"{os.path.realpath(job_abs)}:/workspace/{job_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", job_mount,
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{CONTACTOS_SCRIPT}", "figura",
+        f"/workspace/{video_rel}", f"/workspace/{job_rel}/figuras/{nombre}",
+        "--t", f"{float(t):.4f}", "--ancho", str(ancho),
+        timeout=CONTACTOS_TIMEOUT,
+    )
+    informe = _ultimo_json(out)
+    if code != 0 or informe is None or not informe.get("ok"):
+        await force_remove(container)
+        detalle = (informe or {}).get("error") or (err or out)[-300:]
+        log(f"[figura] job={job_id} fallo (code={code})")
+        await send(writer, {"type": "error",
+                            "error": f"el fotograma fallo: {detalle}"})
+        return
+    log(f"[figura] job={job_id} ok {nombre} {informe.get('ancho')}x{informe.get('alto')}")
+    await send(writer, {"type": "ok", "informe": informe})
+
+
+def _ultimo_json(salida: str) -> dict | None:
+    """El informe es la ULTIMA linea de stdout (el resto puede ser ruido de
+    docker compose o de ffmpeg)."""
+    try:
+        return json.loads(salida.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        return None
+
+
+def _archivos_lab(lab_abs: str) -> list[dict]:
+    """Lo que el script dejo en su directorio: nombre y tamano.
+
+    Solo el primer nivel y solo extensiones de resultado: ni se recorre el
+    arbol ni se enumera lo que el propio laboratorio escribio (script.py,
+    meta.json)."""
+    salida = []
+    try:
+        nombres = sorted(os.listdir(lab_abs))
+    except OSError:
+        return salida
+    for nombre in nombres:
+        if nombre in ("script.py", "meta.json"):
+            continue
+        if not RE_LAB_ARCHIVO.match(nombre):
+            continue
+        if os.path.splitext(nombre)[1].lower() not in LAB_EXT:
+            continue
+        ruta = os.path.join(lab_abs, nombre)
+        if not os.path.isfile(ruta):
+            continue
+        salida.append({"nombre": nombre, "bytes": os.path.getsize(ruta)})
+    return salida
+
+
+async def handle_ejecutar(req: dict, writer: asyncio.StreamWriter) -> None:
+    """Corre Python de validacion en el sandbox y devuelve lo que produjo.
+
+    Ejecutar Python no confiable NO es una capacidad nueva: cada render lo
+    hace desde el primer dia (una escena de manim es Python arbitrario). Lo
+    que cambia es que aqui el script no dibuja, mide. Las garantias son las
+    mismas y estan en docker-compose.yml: sin red, repo read-only, cap_drop
+    ALL, no-new-privileges, 1.5 vCPU / 2 GB / 256 pids y --rm. Lo unico
+    escribible es el directorio de ESTA ejecucion.
+    """
+    lab_id = str(req.get("lab_id", ""))
+    sonda = str(req.get("sonda") or "")
+    timeout = req.get("timeout", 120)
+    if not RE_JOB_ID.match(lab_id):
+        await send(writer, {"type": "error", "error": "lab_id invalido"})
+        return
+    if not isinstance(timeout, int) or isinstance(timeout, bool) \
+            or not (LAB_TIMEOUT_MIN <= timeout <= LAB_TIMEOUT_MAX):
+        await send(writer, {"type": "error", "error": "timeout fuera de rango"})
+        return
+
+    lab_rel = f"{LAB_DIR}/{lab_id}"
+    lab_abs = os.path.join(PROJECT_DIR, lab_rel)
+    if not os.path.isdir(lab_abs):
+        await send(writer, {"type": "error",
+                            "error": "el directorio del laboratorio no existe"})
+        return
+
+    if sonda:
+        if not RE_SONDA.match(sonda):
+            await send(writer, {"type": "error", "error": "sonda invalida"})
+            return
+        script_rel = f"{SONDAS_DIR}/sonda_{sonda}.py"
+        if not os.path.isfile(os.path.join(PROJECT_DIR, script_rel)):
+            await send(writer, {"type": "error", "error": "esa sonda no existe"})
+            return
+    else:
+        script_rel = f"{lab_rel}/script.py"
+        if not os.path.isfile(os.path.join(PROJECT_DIR, script_rel)):
+            await send(writer, {"type": "error",
+                                "error": "el laboratorio no tiene script.py"})
+            return
+
+    container = f"{CONTAINER_PREFIX}{lab_id}-lab"
+    lab_mount = f"{os.path.realpath(lab_abs)}:/workspace/{lab_rel}:rw"
+    code, out, err = await run_cmd(
+        "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
+        "run", "--rm", "--no-deps", "-T", *RUN_AS_ARGS,
+        "-v", lab_mount,
+        "-w", f"/workspace/{lab_rel}",
+        "-e", f"PYTHONPATH={LAB_PYTHONPATH}",
+        "--name", container,
+        "--entrypoint", "python3", "manim-render",
+        f"/workspace/{script_rel}",
+        # Margen sobre el timeout pedido: arrancar el contenedor y bajarlo no
+        # es tiempo del script, y sin margen un script que tarda justo lo
+        # pedido se reporta como matado por el runner.
+        timeout=timeout + 30,
+    )
+    timed_out = code == 124
+    if timed_out:
+        await force_remove(container)
+    # Un `exit 1` NO es un fallo del comando: es el resultado (una sonda con
+    # invariantes rotos sale con 1 a proposito). Solo el timeout y el runner
+    # caido son errores de verdad.
+    log(f"[lab] id={lab_id} sonda={sonda or '-'} exit={code} "
+        f"timed_out={timed_out} archivos={len(_archivos_lab(lab_abs))}")
+    await send(writer, {"type": "ok", "code": code, "timed_out": timed_out,
+                        "stdout": _recorta(out),
+                        "stderr": _recorta(_limpia_stderr(err)),
+                        "archivos": _archivos_lab(lab_abs)})
+
+
 # ── stats ─────────────────────────────────────────────────────────────────────
 
 async def collect_stats() -> dict:
@@ -778,6 +1064,12 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             await handle_paleta(req, writer)
         elif cmd == "thumbnail":
             await handle_thumbnail(req, writer)
+        elif cmd == "frames":
+            await handle_frames(req, writer)
+        elif cmd == "fotograma":
+            await handle_fotograma(req, writer)
+        elif cmd == "ejecutar":
+            await handle_ejecutar(req, writer)
         elif cmd == "stats":
             await handle_stats(writer)
         elif cmd == "ping":

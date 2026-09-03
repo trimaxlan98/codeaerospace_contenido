@@ -110,6 +110,21 @@ export const api = {
   // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
   getSfx: () => request('GET', '/api/sfx'),
   generarSfx: () => request('POST', '/api/sfx'),
+
+  // Fotogramas de un render: la hoja de contactos (revision visual, la regla
+  // dura del proyecto es que nada quede encimado) y el fotograma suelto a
+  // resolucion, que es la figura estatica de una tesis.
+  hojaContactos: (jobId, n) => request('POST', `/api/jobs/${jobId}/frames`, { n }),
+  fotograma: (jobId, t, ancho) => request('POST', `/api/jobs/${jobId}/fotograma`,
+    { t, ancho, formato: 'png' }),
+
+  // Laboratorio: Python de validacion en el sandbox (las sondas del repo).
+  listarLab: () => request('GET', '/api/laboratorio'),
+  getLab: (id) => request('GET', `/api/laboratorio/${id}`),
+  ejecutarLab: (body) => request('POST', '/api/laboratorio', body),
+  borrarLab: (id) => request('DELETE', `/api/laboratorio/${id}`),
+  getSondas: () => request('GET', '/api/laboratorio/sondas'),
+  correrSonda: (nombre) => request('POST', `/api/laboratorio/sondas/${encodeURIComponent(nombre)}`),
 }
 
 export function videoUrl(id) {
@@ -152,4 +167,10 @@ export function sfxUrl(nombre) {
 
 export function narracionAudioUrl(pid, cid) {
   return `/api/projects/${pid}/narracion/${cid}/audio`
+}
+
+// Un archivo producido por una ejecucion del Laboratorio (PNG, WAV, JSON...).
+// El nombre va contra un regex anclado en el backend; aqui basta escaparlo.
+export function labArchivoUrl(labId, nombre) {
+  return `/api/laboratorio/${labId}/archivos/${encodeURIComponent(nombre)}`
 }
