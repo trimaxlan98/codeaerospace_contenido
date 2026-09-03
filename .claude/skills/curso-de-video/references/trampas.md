@@ -62,6 +62,12 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **`Indicate` escala alrededor del centro del bounding box**, asi que sobre
+  un tallo —una `Line` que nace en el eje y su `Dot` en la punta— la raya se
+  estira TAMBIEN hacia abajo, atraviesa el eje y se encima con lo que haya
+  debajo. Cazado en el curso 33. Resaltar un tallo se hace en dos piezas: el
+  `Dot` (cuyo centro ES la punta) recibe el `Indicate` con escala, y la
+  `Line` solo cambia de color con `there_and_back`, sin tocar su geometria.
 - **`Group` y `VGroup` no son intercambiables en NINGUNA direccion**, y la
   cura de un lado provoca el fallo del otro. `VGroup` rechaza un
   `ImageMobject` con TypeError; `Group` es igual de invalido como HIJO de un

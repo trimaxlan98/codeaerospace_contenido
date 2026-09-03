@@ -104,6 +104,20 @@ casi("y se asienta en la suma de h", float(y_esc_conv[59]),
 ok("la respuesta al escalon no hace falta medirla aparte",
    y_esc_conv.size == 60 + h.size - 1)
 
+# `valor_final` es la SUMA de la h que le pases, y solo coincide con el
+# valor al que la respuesta se asienta si esa h ya ha decaido. Rotular
+# "valor final" sobre una respuesta que en pantalla sigue oscilando es
+# poner una palabra donde no hay una medida: paso en el primer intento de
+# la pieza 04, con N=32 y las ocho ultimas muestras moviendose 0.1381.
+_hc = lambda N: sis.h_amortiguada(N=N, tau=9.0, f=0.11)
+_osc = lambda N: float(np.ptp(sis.respuesta_escalon(_hc(N))[-8:]))
+ok("con N=32 la respuesta al escalon NO se ha asentado (contraejemplo)",
+   _osc(32) > 0.10, f"oscilacion final {_osc(32):.4f}")
+ok("con N=80 si", _osc(80) < 0.01, f"oscilacion final {_osc(80):.4f}")
+ok("y por eso el valor final de N=32 se aleja del de verdad",
+   abs(sis.valor_final(_hc(32)) - sis.valor_final(_hc(120))) > 0.01,
+   f"{sis.valor_final(_hc(32)):.4f} contra {sis.valor_final(_hc(120)):.4f}")
+
 print("\n== 05 · Linealidad (con su contraejemplo) ==")
 lin = sis.error_superposicion(h, x1, x2, 1.7, -0.4)
 sat = sis.error_superposicion_saturado(0.7, x1, x2, 1.7, -0.4)
