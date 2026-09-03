@@ -133,6 +133,20 @@ except KeyError:
 RUN_AS_ARGS = ("--user", f"{_run_uid}:{_run_gid}", "-e", "HOME=/tmp")
 
 
+def _asegurar_dir_del_runner(path: str) -> None:
+    """Crea `path` (si falta) con el uid:gid con que corren los contenedores.
+    El runner es root: un `makedirs` a secas deja el directorio root:root y
+    el contenedor (manimstudio) no puede escribir en el — paso en produccion
+    con exports/musica el 2026-09-03."""
+    creado = not os.path.isdir(path)
+    os.makedirs(path, exist_ok=True)
+    if creado:
+        try:
+            os.chown(path, _run_uid, _run_gid)
+        except OSError:
+            pass
+
+
 def montaje_render_jobs() -> str:
     """El `-v` que le da al contenedor los videos ya renderizados, read-only.
 
@@ -629,7 +643,7 @@ async def handle_paleta(req: dict, writer: asyncio.StreamWriter) -> None:
     siquiera un id: el destino es una ruta fija.
     """
     destino_abs = os.path.join(PROJECT_DIR, SFX_DIR)
-    os.makedirs(destino_abs, exist_ok=True)
+    _asegurar_dir_del_runner(destino_abs)
     container = f"{CONTAINER_PREFIX}paleta"
     code, out, err = await run_cmd(
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
@@ -699,7 +713,7 @@ async def handle_musica(req: dict, writer: asyncio.StreamWriter) -> None:
     recibe NADA del exterior — ni siquiera un id: el destino es una ruta fija.
     """
     destino_abs = os.path.join(PROJECT_DIR, MUSICA_DIR)
-    os.makedirs(destino_abs, exist_ok=True)
+    _asegurar_dir_del_runner(destino_abs)
     container = f"{CONTAINER_PREFIX}musica"
     code, out, err = await run_cmd(
         "docker", "compose", "-f", COMPOSE_FILE, "--profile", "render",
