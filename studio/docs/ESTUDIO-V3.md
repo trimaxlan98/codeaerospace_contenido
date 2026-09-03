@@ -622,6 +622,23 @@ que arreglar: el defecto era el recorte. Ahora:
 Medido: el paquete pasa de 60 000 truncados a 56 567 con las 47 primitivas
 nombradas y la API de `figura` y `ntn` entera. Los 275 tests siguen verdes.
 
+### Comprobado en la app, no solo en la terminal
+
+- `GET /api/animations` indexa la categoría «Investigación» con sus **5**
+  demos y la escena correcta de cada una (`FiguraMA`, `FiguraGantt`,
+  `FiguraCDF`, `PaseLeo600`, `QuorumPbft`); `test_animations.py` en verde
+  (7 pasan). La lección nueva sale en `manim-primitivas` con orden 6.
+- Las cinco demos se renderizaron **con el bloque de identidad que anexa
+  `branding.aplicar()`**, que es lo que de verdad corre en la app: las tres
+  figuras de paper salen idénticas (fondo blanco, sin marca de agua ni
+  esquinas HUD, gracias a `sellar_escenas`) y las dos de vídeo reciben la
+  marca sin que el wordmark toque ningún pie.
+- Efecto secundario conocido y no corregido: sin una lección con el mismo id,
+  el título de una animación se deriva del slug con `.capitalize()` y las
+  siglas quedan en minúscula («Cdf de recuperacion»). Es el comportamiento que
+  ya tienen «De 5g a 6g» e «Isac sensado y comunicacion» en producción;
+  arreglarlo es tocar `animations.py`, que R4 no toca.
+
 ### Lo que R4 deja pendiente para R3/R5
 
 `figura.leer_csv` ya lee de `MS_DATOS_DIR`, pero **la app todavía no monta un

@@ -137,14 +137,42 @@ dop = ntn.resumen_doppler(p, 2.0e9)
 
 ## Demos
 
-`studio/content/animations/investigacion/`: figura de paper con banda IC y
-sello (01), Gantt de disponibilidad desde un JSONL (02), CDF de recuperación
-desde un CSV (03), pase LEO-600 animado (04) y quórum PBFT (05). Las tres
-primeras se exportan además a PNG:
+Viven en `studio/content/animations/investigacion/` y salen en la pestaña
+**Animaciones** bajo «Investigación»:
+
+| id | escena | qué enseña | tema |
+|---|---|---|---|
+| `investigacion/01-margen-adaptativo-con-ic` | `FiguraMA` | curva MA con banda IC95 %, umbral y sello | paper, 1 col |
+| `investigacion/02-gantt-de-disponibilidad` | `FiguraGantt` | Gantt de 4 nodos desde `disponibilidad.jsonl` | paper, 2 col |
+| `investigacion/03-cdf-de-recuperacion` | `FiguraCDF` | CDF empírica desde `recuperacion.csv` | paper, 1 col |
+| `investigacion/04-pase-leo-600` | `PaseLeo600` | traza, elevación con AOS/TCA/LOS y Doppler | marca, vídeo |
+| `investigacion/05-quorum-pbft` | `QuorumPbft` | las tres fases, el quórum y el contraejemplo n=6 | marca, vídeo |
+
+Las tres de paper se exportan además a PNG con `-s`, que es lo que se cita:
 
 ```bash
 manim render -s --media_dir <dir> 01-margen-adaptativo-con-ic.py FiguraMA
 ```
+
+Ojo con el título que verás en la pestaña: sin una lección con el mismo id,
+`animations.py` lo deriva del slug con `.capitalize()`, así que las siglas
+salen en minúscula («Cdf de recuperacion»). Es el mismo comportamiento que ya
+tienen «De 5g a 6g» o «Isac sensado y comunicacion»; no es cosa de estas demos.
+
+### Comprobado contra la tubería real, no contra el archivo del repo
+
+Lo que corre en la app no es el archivo tal cual: `branding.aplicar()` le anexa
+`code_brand.marcar_escenas(globals())` a todo script que no mencione
+`code_brand`, y las cinco demos entran en ese caso. Se renderizaron **con el
+bloque anexado** para ver lo que de verdad se pinta:
+
+- las tres figuras de paper salen **idénticas**: fondo blanco, sin marca de
+  agua y sin esquinas HUD. `sellar_escenas(globals())` funciona porque marca
+  las escenas con el mismo `_code_brand` que la marca usa para ser idempotente;
+- las dos de vídeo sí reciben la marca de agua y las esquinas, y el wordmark de
+  la esquina inferior derecha **no toca** los pies centrados de ninguna de las
+  dos (medido en los fotogramas: el pie más largo del Doppler acaba unos 45 px
+  antes de donde empieza el wordmark a 480p).
 
 ## Trampas (todas medidas, ninguna supuesta)
 
