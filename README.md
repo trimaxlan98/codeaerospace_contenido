@@ -78,12 +78,22 @@ más un flujo de propuesta y aprobación de primitivas nuevas.
 **Monitoreo.** CPU, RAM y disco en vivo por SSE, con histórico de ~30 min en
 gráficas SVG que marcan los intervalos con renders activos.
 
-**Asistentes IA.** Ambos son feature-flags: sin credenciales la app funciona
-igual y su UI se oculta. Vertex AI (Gemini 2.5) explica errores, corrige
-scripts y genera escenas desde lenguaje natural; Fable 5 (Anthropic) propone
-primitivas nuevas para la biblioteca. El código que generan **nunca** se
-renderiza solo: pasa por la misma validación AST y el mismo sandbox sin red
-que el escrito a mano.
+**Asistente IA.** Feature-flag: sin credenciales la app funciona igual y su
+UI se oculta. Vertex AI (Gemini 2.5) explica errores, corrige scripts y genera
+escenas desde lenguaje natural. El código que genera **nunca** se renderiza
+solo: pasa por la misma validación AST y el mismo sandbox sin red que el
+escrito a mano.
+
+**Estudio de investigación (v3, 2026-09).** Voz sin depender de GCP (edge-tts
+y Piper, o la grabación del dueño subida por clip, con guion editable por
+secciones), música procedural con *ducking* bajo la voz, un proyecto que se
+importa y exporta como directorio (`curso.json` + `style_block.py` +
+`clips/`), render en lote, hoja de contactos y fotograma a PNG para figuras
+de tesis, un **Laboratorio** que ejecuta Python de validación en el sandbox
+(las sondas de invariantes de cada librería), y las primitivas `figura`
+(figuras de paper con sello de proveniencia) y `ntn` (pase LEO, Doppler,
+PBFT, margen adaptativo). Tablero y decisiones:
+[`studio/docs/ESTUDIO-V3.md`](studio/docs/ESTUDIO-V3.md).
 
 ### Arquitectura, en corto
 
@@ -114,7 +124,7 @@ Docker. La guía completa —incluidos dos errores de configuración que dan un
 401 silencioso— está en
 [`docs/entorno_desarrollo/README.md`](docs/entorno_desarrollo/README.md).
 
-Tests del backend (86, sin tocar Docker ni las APIs de IA):
+Tests del backend (365, sin tocar Docker ni las APIs de IA):
 
 ```bash
 cd studio/backend && venv/bin/python -m pytest tests/ -q
