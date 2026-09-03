@@ -16,7 +16,7 @@ navegador ─HTTPS→ nginx ├─ /      → estático  studio/frontend/dist  (
                                        cola en memoria: 1 render a la vez · SQLite WAL studio/backend/manimstudio.db
                                        Vertex AI (único módulo con salida a red)
                                        ↓ socket unix /run/manimstudio/runner.sock (0660 root:manimstudio)
-                                   manim-runner (root, 4 comandos: render/cancel/thumbnail/stats/ping)
+                                   manim-runner (root; comandos: render/cancel/thumbnail/postproceso/verificar/ensamblar/presentacion/paleta/musica/normalizar_voz/frames/fotograma/ejecutar/stats/ping)
                                        ↓ docker compose run  (network_mode:none, --user manimstudio, --rm, timeout duro)
 ```
 
@@ -63,6 +63,16 @@ cookie = TimestampSigner(SECRET, salt="manimstudio-session").sign(f"{user}:{hex}
 - **OpenGL headless renders work** (Mesa/EGL in the image) but require `--write_to_movie` — without it the OpenGL renderer exits 0 writing no video. The UI pipeline still uses Cairo by default.
 - **`JobManager.storage_usage()` is cached** (TTL 15 s), invalidated in `_finish` and `delete_job`; it does not walk the FS on every `GET /api/jobs`.
 - Config is env vars with prefix `MS_` (`studio/backend/app/config.py`); required: `MS_ADMIN_USER`, `MS_ADMIN_PASSWORD_HASH`, `MS_SECRET_KEY`.
+
+## v3 (2026-09-03) — lo que cambió (`studio/docs/ESTUDIO-V3.md`)
+
+- **Voz sin GCP** (`app/tts.py`): proveedores `edge` (defecto, edge-tts), `piper` (offline, `MS_PIPER_VOICES_DIR=/etc/manimstudio/voces`), `vertex`, `archivo`. Guion editable (`PUT /api/projects/{pid}/narracion/{cid}/guion`), grabación propia (`PUT …/audio?nombre=`, cuerpo crudo, ≤25 MB; m4a/aac por `normalizar_voz` en el contenedor). `MS_TTS_GUIONISTA=ninguno` mientras GCP esté en mora. Tests: `MS_TTS_PROVEEDORES=vertex,archivo`.
+- **Música** (`studio/tools/musica.py`, 8 temas): `audio.musica={tema,db}` en el manifiesto, `/api/musica`, banco en `exports/musica`, ducking en `ensamblar.py`. El ffmpeg de la imagen es 4.3: **no existe `amix normalize=0`** (se usa `amerge+pan`).
+- **Un proyecto es un directorio**: `POST /api/projects/importar` (zip o `{slug, origen}`), `GET /{pid}/fuentes.zip` (determinista), `render-lote`, `GET /{pid}/lote`, duplicar. `app/importar.py` es el código de `subir_curso.py`.
+- **Fotogramas y Laboratorio**: `POST /api/jobs/{id}/frames`, `POST /api/jobs/{id}/fotograma {t, ancho}` (figura PNG), `#/laboratorio` con `POST /api/laboratorio` (Python en el sandbox) y `POST /api/laboratorio/sondas/{nombre}` (`ntn`, `figura`, `sistemas`…; el nombre es sin `sonda_` ni `.py`). Registro en `render_jobs/lab/<id>/`.
+- **Librerías de investigación**: `figura.py` (paper, IEEE, sello de proveniencia, `MS_DATOS_DIR`) y `ntn.py` (pase LEO, Doppler, PBFT, MA, gates).
+- Los directorios que crea el runner nacen con el uid del contenedor (`_asegurar_dir_del_runner`); si un `POST /api/musica` o `/api/sfx` da 502, mira que `exports/<x>` no sea root:root.
+- Unit del backend: `MemoryMax=1024M`. nginx: `client_max_body_size 25M` en `/api/`.
 
 ## Hard rules
 

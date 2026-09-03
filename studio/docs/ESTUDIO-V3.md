@@ -394,18 +394,53 @@ lleva corriendo el job en curso.
 un vídeo es de UN clip, y dos clips apuntando al mismo `job_id` harían que
 borrarlo dejase sin vídeo a un proyecto que nadie estaba tocando.
 
-## R4 — Rigor de investigación (agente Opus, librerías)
+## R4 — Rigor de investigación · **hecho** (librerías) 2026-09-03
 
-- `manim_extensions/figura.py`: figura de paper (fondo blanco o marca),
-  anchos de columna IEEE (3.5 in / 7.16 in), tipografía serif para eje,
-  **sello de proveniencia** (`figura.sello(commit, semilla)`), exportación a
-  PNG/SVG con `-s`.
-- `manim_extensions/ntn.py`: geometría de pase LEO (AOS/TCA/LOS, elevación,
-  distancia oblicua), Doppler y retardo, cascada de handover, quórum PBFT
-  (`n ≥ 3f+1`), margen adaptativo y gates con IC95 %. Determinista, con sonda.
-- Datos adjuntos: `POST /{pid}/datos` (CSV/JSON/JSONL ≤ 10 MB) montados en
-  el directorio del job como `datos/`; `figura.leer_csv()` los lee.
+Dos primitivas nuevas en `studio/content/manim_extensions/`, con sondas,
+demos, tres CSV/JSONL de ejemplo en `studio/content/datos/ejemplo/` y una
+lección. Sondas en producción desde el Laboratorio: **ntn 94/0, figura 79/0**.
 
+**`figura.py` — el lienzo es físico.** Columna IEEE (3.5 in / 7.16 in) por
+dpi: 1050×652 y 2148×1332 px a 300 dpi, 18 pt por unidad de escena en las
+dos. La tipografía se mide en **puntos impresos** (verificado contando píxeles
+del PNG de `-s` con PIL: 8 pt = 34 px a 300 dpi). Ejes con el marco al borde,
+banda de IC95, CDF, Gantt de disponibilidad con marcadores, leyenda, **sello
+de proveniencia** (commit/semilla/fecha; lee `MS_COMMIT`, `MS_SEMILLA`,
+`MS_FECHA`) y datos que entran de `MS_DATOS_DIR` (`leer_csv`, `leer_jsonl`)
+en vez de transcribirse. Tres guardianes probados con contraejemplo:
+legibilidad, ancho y caja colocada.
+
+**`ntn.py` — la tesis.** Pase LEO con AOS/TCA/LOS, Doppler, retardo,
+cascada de handover, quórum PBFT, margen adaptativo y gates con IC95 % por
+bootstrap sobre semillas. Reutiliza `satelites.py` y `enlace.py`;
+determinista.
+
+Dos hallazgos que trascienden el sprint (los cazó la sonda, no la lectura):
+
+- **El quórum de PBFT es `ceil((n+f+1)/2)`, no `2f+1`**: con n=6 y f=1, `2f+1`
+  da 3, que no es mayoría de 6, y dos quórums podrían no compartir ninguna
+  réplica correcta.
+- **Los retardos del CSV LEO-600 del banco de pruebas son de ida y vuelta**:
+  12.9 ms de ida serían 3 867 km, y el horizonte a 600 km está en 2 829.
+  Leídos como RTT dan 9.97°, la máscara de 10° del propio escenario.
+
+Trampas nuevas, todas medidas: un `Text` con espacio infla su caja hasta el
+siguiente glifo; un número impar de píxeles mata a libx264 sin nombrarlo;
+`frame_width` y `frame_height` son independientes en manim 0.20.1; `Axes`
+pega el eje al borde de arriba cuando el rango no contiene el cero; **manim
+0.20.1 no exporta SVG** (la figura estática es PNG a 300 dpi; el SVG queda
+fuera del alcance).
+
+**De camino, el asistente.** `conocimiento.py` recortaba el paquete del
+asistente de un tajo a 60 000 caracteres sobre 280 000: el modelo veía las
+primitivas por orden alfabético hasta la letra *c* y ninguna de las demás
+existía para él. Ahora lleva índice de una línea por módulo, fuentes
+prioritarias primero y la API completa detrás de la fuente recortada.
+
+Pendiente de R4: **datos adjuntos por proyecto** (`POST /{pid}/datos`
+montados como `datos/` en el job). Hoy `MS_DATOS_DIR` apunta al repo
+(`studio/content/datos/`), que es suficiente para las figuras de la tesis
+versionadas en git.
 
 ## R5 — UX
 
