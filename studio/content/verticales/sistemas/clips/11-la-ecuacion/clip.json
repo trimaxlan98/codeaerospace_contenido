@@ -1,5 +1,5 @@
 {
-  "name": "La Ecuacion",
+  "name": "Ecuacion en diferencias",
   "scene": "Clip",
   "file": "escena.py",
   "description": "Cada muestra de salida se construye con las anteriores.",

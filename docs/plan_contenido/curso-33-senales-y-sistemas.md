@@ -123,10 +123,19 @@ error estaba en MI encargo, no en el trabajo del agente):
 | 16 | el cuarto decimal del valor final lo ponia la ventana |
 | 17 | "COINCIDEN" sobre dos curvas en antifase: faltaba compensar el retardo |
 
-**Nombres de portada, MEDIDOS** (no elegidos a ojo): los 18 caben. Tres van
-en **dos lineas** al cuerpo 64 — RESPUESTA AL IMPULSO, ECUACION EN
-DIFERENCIAS (que en pantalla se llama **LA ECUACION**) y RESPUESTA EN
-FRECUENCIA. El resto en una linea a 64 o 56.
+**Nombres de portada, MEDIDOS** (no elegidos a ojo): los 18 caben con su
+termino tecnico entero. Tres van en **dos lineas** al cuerpo 64 —RESPUESTA AL
+IMPULSO, ECUACION EN DIFERENCIAS y RESPUESTA EN FRECUENCIA—; el resto en una
+linea a 64 o 56.
+
+La pieza 11 estuvo a punto de escaparse con el nombre corto. Cuando escribi
+los esqueletos, "ECUACION EN DIFERENCIAS" no cabia y la llame **LA
+ECUACION**; luego arregle `portada` para partir en dos lineas —precisamente
+para no dejar que la tipografia decidiera el temario— y **no volvi a
+cambiarle el nombre**. Lo destapo la hoja de contactos de las 20 portadas al
+cerrar el curso: el plan predicaba una cosa y la pieza enseñaba otra. Ya
+lleva su nombre entero. La leccion es que un principio nuevo hay que
+aplicarlo hacia atras, a lo que se escribio antes de tenerlo.
 
 ## 5. Estado
 

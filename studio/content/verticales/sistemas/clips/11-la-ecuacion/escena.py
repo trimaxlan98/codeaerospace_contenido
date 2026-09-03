@@ -26,7 +26,7 @@
 # posicion que decidio `encajar`, y no hace falta declarar ningun salto de
 # escala porque no hay ninguno — es el mismo dibujo, resaltado distinto.
 class Clip(Pieza):
-    NOMBRE = "LA ECUACION"
+    NOMBRE = "ECUACION EN DIFERENCIAS"
     TESIS = "el sistema como receta"
 
     # La ecuacion en diferencias: PARAMETROS elegidos (huella gris).
