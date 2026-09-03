@@ -1,0 +1,6 @@
+{
+  "name": "Fase Y Retardo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Mismas amplitudes y fases movidas: la senal deja de parecerse."
+}

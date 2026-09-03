@@ -1,0 +1,6 @@
+{
+  "name": "En Cascada",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos cajas encadenadas; se intercambian y la salida es identica."
+}

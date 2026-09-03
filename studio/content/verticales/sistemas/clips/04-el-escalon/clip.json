@@ -1,0 +1,6 @@
+{
+  "name": "El Escalon",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El escalon se descompone en impulsos y su respuesta es la suma acumulada."
+}

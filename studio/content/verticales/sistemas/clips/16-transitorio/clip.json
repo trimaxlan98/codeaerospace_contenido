@@ -1,0 +1,6 @@
+{
+  "name": "Transitorio",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La respuesta se parte en dos y una de las dos se apaga."
+}

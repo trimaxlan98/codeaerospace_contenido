@@ -1,0 +1,6 @@
+{
+  "name": "Respuesta Al Impulso",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Un golpe entra en la caja y sale una forma que se apaga."
+}

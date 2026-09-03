@@ -1,0 +1,76 @@
+{
+  "name": "Señales y sistemas · que le hace un sistema a una señal",
+  "slug": "sistemas",
+  "formato": "vertical",
+  "curso": 33,
+  "estilo": "lienzo",
+  "sonido": "mudo",
+  "description": "Curso vertical (9:16) en el estilo LIENZO sobre lo que un SISTEMA le hace a una señal. No re-explica las transformadas del curso 32 ni el procesamiento del 27: ocupa la capa de encima, la de la caja que convierte una entrada en una salida, y toda su gracia es que con UNA sola medida —la respuesta al impulso— la caja queda determinada para siempre. Cada pieza mete una señal por un lado y enseña que sale por el otro. Se publica MUDO —la musica la pone quien lo sube—, asi que la animacion tiene que explicar sola: portada con la tesis, UN verbo visual y UNA cifra. Toda cifra la calcula sistemas.py durante el render y esta demostrada por los invariantes de sonda_sistemas.py; lo que es un parametro elegido va rotulado en gris. Cada pieza esta hecha para subirse sola a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-el-impulso"
+    },
+    {
+      "dir": "clips/02-respuesta-al-impulso"
+    },
+    {
+      "dir": "clips/03-la-convolucion"
+    },
+    {
+      "dir": "clips/04-el-escalon"
+    },
+    {
+      "dir": "clips/05-linealidad"
+    },
+    {
+      "dir": "clips/06-invarianza"
+    },
+    {
+      "dir": "clips/07-causalidad"
+    },
+    {
+      "dir": "clips/08-estabilidad"
+    },
+    {
+      "dir": "clips/09-en-cascada"
+    },
+    {
+      "dir": "clips/10-realimentacion"
+    },
+    {
+      "dir": "clips/11-la-ecuacion"
+    },
+    {
+      "dir": "clips/12-autofunciones"
+    },
+    {
+      "dir": "clips/13-respuesta-en-frecuencia"
+    },
+    {
+      "dir": "clips/14-fase-y-retardo"
+    },
+    {
+      "dir": "clips/15-resonancia"
+    },
+    {
+      "dir": "clips/16-transitorio"
+    },
+    {
+      "dir": "clips/17-un-filtro"
+    },
+    {
+      "dir": "clips/18-saturacion"
+    },
+    {
+      "dir": "clips/19-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

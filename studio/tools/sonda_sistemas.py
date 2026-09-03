@@ -79,6 +79,20 @@ casi("el deslizamiento que se dibuja da la muestra que sale",
      s, float(sis.convolucion(x1, h)[12]), 1e-12)
 ok("la cola de h se mide", 20 < sis.cola(h) <= 48, f"{sis.cola(h)} muestras")
 
+# `cola` y `duracion` NO son la misma cifra, y el contraejemplo es el caso
+# que de verdad se usa en pantalla: un impulso retrasado.
+_d = sis.impulso(N=41, n0=20)
+ok("un impulso retrasado dura UNA muestra", sis.duracion(_d) == 1,
+   f"duracion {sis.duracion(_d)}")
+ok("...y su cola son 21, que es otra cosa", sis.cola(_d) == 21,
+   f"cola {sis.cola(_d)}")
+ok("duracion no cuenta los ceros de delante",
+   sis.duracion(_d) == sis.duracion(sis.impulso(N=41, n0=0)),
+   "misma duracion este donde este")
+ok("una respuesta que dura no se confunde con una que no",
+   sis.duracion(h) > sis.duracion(_d),
+   f"{sis.duracion(h)} contra {sis.duracion(_d)}")
+
 print("\n== 04 · El escalon ==")
 esc = sis.escalon(60)
 y_esc_conv = sis.convolucion(esc, h)

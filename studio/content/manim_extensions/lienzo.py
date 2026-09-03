@@ -179,6 +179,29 @@ ALTO_MINIMO = 0.155
 FRACCION_MINIMA = 0.45
 
 
+def _se_ve(m):
+    """¿Este mobject pinta algo? Trazo o relleno con opacidad."""
+    op = 0.0
+    for leer in ("get_stroke_opacity", "get_fill_opacity"):
+        f = getattr(m, leer, None)
+        if f is None:
+            return True            # no es un VMobject (una imagen): cuenta
+        try:
+            op = max(op, float(np.max(f())))
+        except Exception:
+            return True
+    return op > 0.01
+
+
+def _alto_pintado(mob):
+    """El alto de lo que de verdad se ve, ignorando lo apagado."""
+    trozos = [m for m in mob.family_members_with_points() if _se_ve(m)]
+    if not trozos:
+        return 0.0
+    return (max(m.get_top()[1] for m in trozos)
+            - min(m.get_bottom()[1] for m in trozos))
+
+
 def encajar(mob, margen=0.0, que="escena", anclaje="abajo", bajo=False):
     """Coloca el dibujo en su franja, escalandolo solo si hace falta.
 
@@ -205,14 +228,25 @@ def encajar(mob, margen=0.0, que="escena", anclaje="abajo", bajo=False):
             f"{que}: tras encajarla, el rotulo mas pequeño mide "
             f"{minimo:.3f} de alto y el minimo legible es {ALTO_MINIMO}: "
             f"quita elementos del dibujo en vez de encogerlo")
-    ocupa = mob.height / max(alto_banda(), 1e-9)
+    # La fraccion se mide sobre lo que se PINTA, no sobre la caja del
+    # grupo. La diferencia no es teorica: el patron que esta casa
+    # recomienda —construir todos los estados antes y encenderlos con
+    # opacidad— mete en el grupo estados invisibles que inflan el
+    # bounding box, y con `mob.height` el guardian daba por bueno un
+    # fotograma cuyo unico dibujo visible ocupaba el 22 % de la franja.
+    # Un guardian al que se le puede colar el caso que el propio manual
+    # recomienda no es un guardian.
+    alto = _alto_pintado(mob)
+    ocupa = alto / max(alto_banda(), 1e-9)
     if not bajo and ocupa < FRACCION_MINIMA:
         raise FueraDelLienzo(
-            f"{que} mide {mob.height:.2f} de alto y ocupa el "
-            f"{ocupa * 100:.0f} % de la franja ({alto_banda():.2f}): por "
+            f"{que}: lo que se VE mide {alto:.2f} de alto y ocupa el "
+            f"{ocupa * 100:.0f} % de la franja ({alto_banda():.2f}); por "
             f"debajo del {FRACCION_MINIMA * 100:.0f} % el fotograma se lee "
-            f"como un error de maquetacion. Sube el `alto` del dibujo a "
-            f"2.4-3.0, o pasa bajo=True si de verdad tiene que ser bajo")
+            f"como un error de maquetacion. Ojo: los estados que dejas a "
+            f"opacidad 0 para encenderlos luego NO cuentan aqui. Sube el "
+            f"`alto` del dibujo a 2.4-3.0, o pasa bajo=True si de verdad "
+            f"tiene que ser bajo")
     return cabe(mob, que)
 
 
@@ -498,6 +532,56 @@ PORTADA = 64            # el nombre, en Rajdhani (por encima del minimo 40)
 MAX_PALABRAS_TESIS = 5
 
 
+# Debajo de este cuerpo, un titulo de portada deja de leerse como titulo:
+# en un movil compite con la tesis que tiene debajo y la jerarquia se cae.
+# Antes que encoger mas, se parte en dos lineas.
+CUERPO_MINIMO_UNA_LINEA = 50
+
+
+def _parte_en_dos(texto):
+    """Corta una cadena en las dos mitades mas parejas, por palabras."""
+    palabras = texto.split()
+    if len(palabras) < 2:
+        return None
+    mejor, corte = None, None
+    for i in range(1, len(palabras)):
+        a, b = " ".join(palabras[:i]), " ".join(palabras[i:])
+        d = abs(len(a) - len(b))
+        if mejor is None or d < mejor:
+            mejor, corte = d, (a, b)
+    return corte
+
+
+def _titulo_de_portada(nombre):
+    """El nombre de la pieza, en una linea si cabe grande y en dos si no.
+
+    Existe porque encoger es la respuesta equivocada a un nombre largo.
+    Medidos los nombres del curso 33: RESPUESTA AL IMPULSO solo entraba al
+    cuerpo 40 —la mitad que EL IMPULSO, en la misma serie y con el mismo
+    rango— y ECUACION EN DIFERENCIAS y RESPUESTA EN FRECUENCIA no entraban
+    ni a 40. La salida por la que estuve a punto de tirar era renombrar las
+    piezas (LA ECUACION, EN FRECUENCIA), y eso es dejar que la tipografia
+    decida el temario. Partir en dos lineas conserva el termino tecnico, que
+    es lo unico que el espectador se lleva escrito."""
+    hueco = ANCHO_SEGURO - 0.2
+    hacer = lambda c, fs: _texto(c, FUENTE_DISPLAY, fs, TINTA,
+                                 weight="SEMIBOLD")
+    for fs in (PORTADA, 56, CUERPO_MINIMO_UNA_LINEA):
+        pieza = hacer(nombre, fs)
+        if pieza.width <= hueco + 1e-6:
+            return pieza
+    corte = _parte_en_dos(nombre)
+    if corte is not None:
+        for fs in (PORTADA, 56, 50, 44, 40):
+            lineas = [hacer(c, fs) for c in corte]
+            if max(l.width for l in lineas) <= hueco + 1e-6:
+                return VGroup(*lineas).arrange(DOWN, buff=fs * 0.0042)
+    # Ni partido cabe: que lo diga con el nombre delante.
+    return _mayor_que_entra(
+        nombre, (44, 40), hacer, ancho=hueco,
+        que="nombre de la portada")[0]
+
+
 def portada(nombre, tesis=None):
     """El nombre de la pieza sobre un filete ambar, y su tesis debajo.
 
@@ -509,10 +593,7 @@ def portada(nombre, tesis=None):
     y lo que hay que cambiar es el dibujo."""
     code_brand.registrar_fuentes()
     piezas = []
-    titulo, _ = _mayor_que_entra(
-        str(nombre).upper(), (PORTADA, 56, 50, 44, 40),
-        lambda c, fs: _texto(c, FUENTE_DISPLAY, fs, TINTA, weight="SEMIBOLD"),
-        ancho=ANCHO_SEGURO - 0.2, que="nombre de la portada")
+    titulo = _titulo_de_portada(str(nombre).upper())
     piezas.append(titulo)
     raya = filete(ancho=min(titulo.width * 0.55, ANCHO_SEGURO - 1.0))
     raya.next_to(titulo, DOWN, buff=0.34)

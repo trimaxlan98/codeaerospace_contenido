@@ -1,0 +1,6 @@
+{
+  "name": "Invarianza",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La entrada se retrasa y la salida se retrasa igual, sin deformarse."
+}

@@ -104,6 +104,21 @@ def cola(h, umbral=0.01):
     return int(grande[-1] + 1) if grande.size else 0
 
 
+def duracion(x, umbral=0.01):
+    """CUANTAS muestras valen algo. No es lo mismo que `cola`.
+
+    `cola` mide DONDE se acaba la senal contando desde el origen, asi que
+    incluye los ceros de delante: un impulso colocado en la muestra 20
+    tiene cola 21 y dura 1. Las dos cifras son utiles y son distintas, y
+    confundirlas pone en pantalla un numero falso — paso en la pieza 01,
+    que rotulaba "muestra que dura" sobre un 21."""
+    x = np.abs(np.asarray(x, dtype=float))
+    pico = np.max(x)
+    if pico <= 0:
+        return 0
+    return int(np.sum(x > float(umbral) * pico))
+
+
 # --- 03 · La convolucion -----------------------------------------------
 def convolucion(x, h):
     """Convolucion completa, escrita a mano.

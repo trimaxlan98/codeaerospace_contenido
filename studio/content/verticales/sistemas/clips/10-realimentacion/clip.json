@@ -1,0 +1,6 @@
+{
+  "name": "Realimentacion",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Se cierra el lazo y la respuesta cambia de forma."
+}

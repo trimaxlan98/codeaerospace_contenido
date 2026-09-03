@@ -1,0 +1,6 @@
+{
+  "name": "Causalidad",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Una respuesta que empieza antes de cero, y por que es imposible."
+}

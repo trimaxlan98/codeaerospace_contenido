@@ -1,0 +1,6 @@
+{
+  "name": "Estabilidad",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos sistemas: uno se apaga y el otro crece sin parar."
+}
