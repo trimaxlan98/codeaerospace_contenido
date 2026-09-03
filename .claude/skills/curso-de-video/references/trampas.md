@@ -62,6 +62,16 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **`Group` y `VGroup` no son intercambiables en NINGUNA direccion**, y la
+  cura de un lado provoca el fallo del otro. `VGroup` rechaza un
+  `ImageMobject` con TypeError; `Group` es igual de invalido como HIJO de un
+  `VGroup`, que es donde acaban casi todos los dibujos. En el curso 32 cambie
+  `dos_dominios` a `Group` para que la pieza del mapa funcionara — y tres
+  piezas que solo dibujan curvas reventaron **en el render final de alta**,
+  no en el `ql` de validacion, porque las tres envolvian el panel en un
+  `VGroup`. La forma correcta es DECIDIR MIRANDO lo que hay dentro:
+  `lz.agrupar(*piezas)` devuelve `VGroup` si todo es `VMobject` y `Group` si
+  no. Nunca elijas la clase a ciegas.
 - `interpolate_color` exige `ManimColor`; las constantes `C_*` de las familias
   son `str`.
 - Las etiquetas de `Grafica` son hijos internos: no aparecen si se animan
@@ -278,3 +288,69 @@ Esta es la categoría que **no detecta el render**: solo se caza midiendo.
   literatura y los PARÁMETROS elegidos de una simulación (el periodo de un
   bucle, la constante dieléctrica del sustrato) van los tres en gris. El
   acento es sólo lo que sale de medir o calcular en ese render.
+
+
+## Curso MUDO (curso 32)
+
+- **`set_opacity` sobre una polilínea enciende el RELLENO.** La curva se
+  convierte en una mancha maciza blanca. Para encender o apagar una curva se
+  toca el trazo: `mob.set_stroke(opacity=...)`. Es el mismo defecto que ya
+  salió en el curso de naturaleza.
+- **`traza()` no recorta.** Un solo valor fuera de `rango_y` manda la
+  polilínea kilómetros fuera del cuadro; el grupo pasa a medir el triple de
+  la franja, `encajar` lo encoge y el guardián de legibilidad aborta con "el
+  rótulo más pequeño mide 0.09". El síntoma no señala la causa. **Se elige la
+  ventana de datos**, no se recorta después.
+- **Lo que se construye DESPUÉS de `L.escena` no lleva la escala ni la
+  posición** que `encajar` le dio al grupo. Construye todos los estados antes
+  y enciéndelos con opacidad.
+- **Enseñar UNA curva no demuestra que algo no baja.** Para probar que el
+  sobreimpulso de Gibbs no se encoge hicieron falta dos zooms a distinta
+  escala (ventanas de 0.081 y 0.0082) con la misma raya de referencia arriba:
+  el pico no baja, se ESTRECHA. Con una sola curva el espectador no tiene con
+  qué comparar; con las dos en la misma ventana el sobreimpulso queda en el
+  7 % de la altura del dibujo, invisible.
+- **Un nombre largo no cabe en la portada.** Medidos los 20 nombres del curso
+  32 contra la zona segura (5.56): entran todos menos "TRANSFORMADA DE
+  FOURIER", ni al cuerpo mínimo. Mídelos antes de repartir el trabajo, no
+  después de escribir cinco piezas.
+
+## Matemáticas que se implementan mal sin que se note (curso 32)
+
+Una transformada mal implementada **no se ve mal**: dibuja una curva
+razonable y saca una cifra plausible. La única defensa es una sonda de
+invariantes escrita ANTES que los clips, que le pida a cada una una
+propiedad que sólo cumple si está bien (Parseval, la inversa, los
+marginales, el caso conocido). La del curso 32 sacó **10 fallos a la
+primera**, dos de ellos conceptuales:
+
+- **La chirp-Z no rompe el límite de Rayleigh.** Iba a publicarse que separa
+  dos tonos que la DFT no separa. Ningún método lineal puede: esa información
+  no está en la señal. Lo que da son *puntos donde interesan*, no resolución.
+- **El sobreimpulso de Gibbs es el 8.95 % del SALTO**, no de la amplitud.
+  Medido sobre la amplitud sale 17.9 %: un número correcto que nadie
+  reconoce.
+- **El primer nulo de un sinc no se busca con un umbral absoluto**: en una
+  malla discreta el cero casi nunca cae sobre una muestra y la búsqueda se va
+  al ruido numérico de lejos (dio 42.9 Hz donde tocaba 1.0). Primer mínimo
+  local bajo un corte relativo.
+- **`np.searchsorted` para votar en un acumulador desplaza cada voto medio
+  escalón** y reparte el pico entre dos filas. Al vecino más cercano
+  (`np.rint`).
+- **El ángulo de un eje propio vive módulo 180**: el signo de un autovector
+  es arbitrario.
+- **Los ejes de una distribución de Wigner no son los de una FFT**: el eje de
+  frecuencia va al doble (la correlación se toma a desfase 2m). La fórmula
+  del ángulo óptimo puede estar bien y la respuesta salir mal por los ejes.
+
+## Manim: componer animaciones en un mismo `play`
+
+- **`Rotate(grupo, ...)` y `.animate.set_color(...)` sobre los hijos de ese
+  grupo, en el MISMO `self.play()`, se pisan.** Las dos interpolan los
+  puntos de los hijos en cada fotograma y gana la que corra la última en el
+  bucle interno de manim. En la práctica el cambio de color ganaba siempre y
+  **deshacía el giro en silencio**: los ejes se quedaban a 0°/90° mientras la
+  cifra ya decía "27.75 grados medidos". No hay error, no hay aviso, y en un
+  frame suelto parece que simplemente no se giró.
+  Se arregla partiéndolo en dos `self.play()` seguidos: primero girar,
+  después recolorear. Cazado en el curso 32 (pieza 18).

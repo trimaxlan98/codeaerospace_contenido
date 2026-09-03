@@ -1,0 +1,7 @@
+{
+  "name": "Wigner y la fraccional",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El plano tiempo-frecuencia gira, y la raya diagonal del chirp se vuelve un pico.",
+  "duracion_objetivo": 30.45
+}

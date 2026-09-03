@@ -1,0 +1,7 @@
+{
+  "name": "Mellin",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La forma se estira al triple: el espectro de Fourier se mueve, el de Mellin no.",
+  "duracion_objetivo": 37.7
+}

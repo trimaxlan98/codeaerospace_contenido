@@ -1,0 +1,7 @@
+{
+  "name": "Laplace",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Una ecuacion diferencial se vuelve dos polos, y los polos predicen la respuesta.",
+  "duracion_objetivo": 37.25
+}

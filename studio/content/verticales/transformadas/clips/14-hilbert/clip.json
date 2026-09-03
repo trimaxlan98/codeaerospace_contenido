@@ -1,0 +1,7 @@
+{
+  "name": "Hilbert",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La envolvente de una nota, recuperada sin conocer la portadora.",
+  "duracion_objetivo": 36.53
+}

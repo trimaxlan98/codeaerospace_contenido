@@ -36,9 +36,9 @@
 import os
 
 import numpy as np
-from manim import (DOWN, LEFT, RIGHT, UP, Dot, FadeIn, FadeOut, Line,
-                   Rectangle, Text, UpdateFromAlphaFunc, VGroup, config,
-                   linear)
+from manim import (DOWN, LEFT, RIGHT, UP, Create, Dot, FadeIn, FadeOut,
+                   Group, Line, Rectangle, Text, UpdateFromAlphaFunc,
+                   VGroup, VMobject, config, linear)
 
 import code_brand
 import promo
@@ -166,8 +166,20 @@ def _minimo_legible(mob):
 # a 135 px/unidad son 24 px de alto real en el 1080x1920 final.
 ALTO_MINIMO = 0.155
 
+# Fraccion minima de la franja que tiene que ocupar un dibujo.
+#
+# El aviso llevaba escrito en LIENZO.md desde el curso 31 ("un dibujo que
+# ocupa menos del 60 % del alto de la franja se lee como un error, no como
+# minimalismo") y en el 32 hubo que corregirlo en TODAS las piezas que
+# escribieron los subagentes: dibujos de 1.5 unidades en una franja de
+# 5.59, con el fotograma medio vacio. Un consejo que hay que recordar no
+# sobrevive a dieciocho piezas y a trece autores distintos, asi que pasa a
+# ser guardian. El umbral es 0.45 y no 0.60 para dejar sitio a los dibujos
+# que de verdad son bajos (una sola fila de tallos, un panel unico).
+FRACCION_MINIMA = 0.45
 
-def encajar(mob, margen=0.0, que="escena", anclaje="abajo"):
+
+def encajar(mob, margen=0.0, que="escena", anclaje="abajo", bajo=False):
     """Coloca el dibujo en su franja, escalandolo solo si hace falta.
 
     No escala hacia arriba: una pieza pequeña se queda pequeña (el vacio es
@@ -193,6 +205,14 @@ def encajar(mob, margen=0.0, que="escena", anclaje="abajo"):
             f"{que}: tras encajarla, el rotulo mas pequeño mide "
             f"{minimo:.3f} de alto y el minimo legible es {ALTO_MINIMO}: "
             f"quita elementos del dibujo en vez de encogerlo")
+    ocupa = mob.height / max(alto_banda(), 1e-9)
+    if not bajo and ocupa < FRACCION_MINIMA:
+        raise FueraDelLienzo(
+            f"{que} mide {mob.height:.2f} de alto y ocupa el "
+            f"{ocupa * 100:.0f} % de la franja ({alto_banda():.2f}): por "
+            f"debajo del {FRACCION_MINIMA * 100:.0f} % el fotograma se lee "
+            f"como un error de maquetacion. Sube el `alto` del dibujo a "
+            f"2.4-3.0, o pasa bajo=True si de verdad tiene que ser bajo")
     return cabe(mob, que)
 
 
@@ -225,6 +245,15 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
     font = font or FUENTE_NUM
     if mayusculas:
         cadena = cadena.upper()
+    # Cada glifo se construye JUNTO A UNA "H" y se alinea por la linea de
+    # base de esa H. Sin esto, `move_to` centra cada caracter por su propia
+    # caja y la puntuacion se va a media altura: "0.5" salia "0·5" (leido
+    # como dos numeros), la coma de una enumeracion flotaba, y un guion
+    # quedaba mas alto de lo que le toca. Con mayusculas solas no se nota
+    # porque todas miden igual — por eso el defecto sobrevivio un curso
+    # entero.
+    referencia = _texto("H", font, font_size, color)
+    base = referencia.get_bottom()[1]
     paso = None
     grupo = Rotulo()
     x = 0.0
@@ -234,10 +263,14 @@ def espaciado(cadena, font_size=ROTULO, color=APAGADO, tracking=0.34,
                 paso = _texto("M", font, font_size, color).width
             x += paso * (1.0 + tracking)
             continue
-        g = _texto(ch, font, font_size, color)
+        par = _texto("H" + ch, font, font_size, color)
+        if len(par) < 2:            # el caracter no pinta nada
+            continue
+        h, g = par[0], par[1]
+        alto_sobre_base = g.get_center()[1] - h.get_bottom()[1]
         if paso is None:
             paso = g.width
-        g.move_to(RIGHT * x)
+        g.move_to([x, base + alto_sobre_base, 0])
         g._en_rotulo = True
         grupo.add(g)
         x += paso * (1.0 + tracking)
@@ -455,6 +488,93 @@ def guias():
                                    color=CIAN))
 
 
+# --- La portada -------------------------------------------------------
+# El curso 32 se publica SIN VOZ, con musica encima. Eso deja la
+# explicacion sin sitio: no hay narrador y el estilo prohibe la frase en
+# pantalla. La solucion es concentrarla en una portada de tres segundos —
+# el nombre de la pieza y QUE VUELVE FACIL— y que el resto del clip sea
+# solo el dibujo y su cifra. Un sitio donde se explica, y ninguno mas.
+PORTADA = 64            # el nombre, en Rajdhani (por encima del minimo 40)
+MAX_PALABRAS_TESIS = 5
+
+
+def portada(nombre, tesis=None):
+    """El nombre de la pieza sobre un filete ambar, y su tesis debajo.
+
+    Guardias: el nombre baja de cuerpo hasta caber (hay transformadas con
+    nombres largos, KARHUNEN-LOEVE mide 12 caracteres) y la tesis no
+    puede pasar de cinco palabras. Ese tope es el que impide que la
+    portada se convierta en el subtitulo que este estilo no quiere: si no
+    cabe en cinco palabras, el verbo visual de la pieza esta mal elegido
+    y lo que hay que cambiar es el dibujo."""
+    code_brand.registrar_fuentes()
+    piezas = []
+    titulo, _ = _mayor_que_entra(
+        str(nombre).upper(), (PORTADA, 56, 50, 44, 40),
+        lambda c, fs: _texto(c, FUENTE_DISPLAY, fs, TINTA, weight="SEMIBOLD"),
+        ancho=ANCHO_SEGURO - 0.2, que="nombre de la portada")
+    piezas.append(titulo)
+    raya = filete(ancho=min(titulo.width * 0.55, ANCHO_SEGURO - 1.0))
+    raya.next_to(titulo, DOWN, buff=0.34)
+    piezas.append(raya)
+    if tesis:
+        if len(str(tesis).split()) > MAX_PALABRAS_TESIS:
+            raise FueraDelLienzo(
+                f"la tesis '{tesis}' tiene {len(str(tesis).split())} "
+                f"palabras y el tope son {MAX_PALABRAS_TESIS}: no es un "
+                f"subtitulo, es lo que la pieza vuelve facil")
+        sub = etiqueta(str(tesis), medido=False)
+        sub.next_to(raya, DOWN, buff=0.34)
+        piezas.append(sub)
+    grupo = VGroup(*piezas)
+    grupo.move_to([0, (Y_TECHO + Y_SUELO) / 2, 0])
+    return cabe(grupo, "portada")
+
+
+# --- El panel partido -------------------------------------------------
+def agrupar(*piezas):
+    """`VGroup` si se puede, `Group` si hay una imagen dentro.
+
+    Existe porque las dos clases NO son intercambiables en ninguna de las
+    dos direcciones: un `VGroup` rechaza con TypeError cualquier
+    `ImageMobject` (y `tf.mapa` devuelve uno), pero un `Group` es
+    igualmente inservible como hijo de un `VGroup`, que es donde acaban
+    casi todos los dibujos de este lienzo. Devolver siempre `Group` para
+    curar el primer problema causa el segundo en otra pieza distinta —
+    paso exactamente asi en el curso 32: la pieza 16 pidio `Group` y tres
+    piezas que solo dibujan curvas reventaron en el render final.
+
+    Asi que se decide MIRANDO lo que hay dentro, no adivinando."""
+    if all(isinstance(x, VMobject) for x in piezas):
+        return VGroup(*piezas)
+    return Group(*piezas)
+
+
+def dos_dominios(arriba, abajo, rotulo_arriba=None, rotulo_abajo=None,
+                 hueco=0.55, ancho=None):
+    """Dos dibujos, uno sobre otro, con su nombre.
+
+    Es la gramatica de media docena de piezas: aqui esta el problema y
+    ahi esta resuelto. Los dos paneles se escalan al MISMO ancho para que
+    la comparacion sea honrada (uno mas ancho que el otro sugiere que
+    tiene mas de algo), y cada uno lleva su rotulo pegado.
+
+    El separador no es una linea: es el hueco. Una raya entre los dos
+    paneles añade tinta sin añadir informacion."""
+    ancho = ancho or (ANCHO_SEGURO - 0.3)
+    paneles = []
+    for dibujo, texto in ((arriba, rotulo_arriba), (abajo, rotulo_abajo)):
+        if dibujo.width > ancho:
+            dibujo.scale(ancho / dibujo.width)
+        piezas = [dibujo]
+        if texto:
+            rot = rotulo(texto)
+            rot.next_to(dibujo, DOWN, buff=0.20)
+            piezas.append(rot)
+        paneles.append(agrupar(*piezas))
+    return agrupar(*paneles).arrange(DOWN, buff=hueco)
+
+
 # --- Los carriles -----------------------------------------------------
 class _Igual:
     """Centinela: "este carril se queda como esta".
@@ -498,6 +618,28 @@ class Lienzo:
         if os.environ.get("PROMO_GUIAS") == "1":
             self.e.add(guias())
         self.e.play(*[FadeIn(p, run_time=t) for p in piezas])
+
+    # --- portada ------------------------------------------------------
+    def portada(self, nombre, tesis=None, entra=0.7, quieto=1.5,
+                sale=0.55):
+        """Enseña el nombre de la pieza y lo apaga. No ocupa carril.
+
+        Es un COMPAS, no un estado: aparece, se sostiene el tiempo que se
+        tarda en leerlo sin prisa y se va, dejando el lienzo limpio para
+        que empiece el dibujo. Sin voz, `quieto` es lo unico que garantiza
+        que da tiempo a leerlo, asi que no baja de 1.2 s."""
+        if quieto < 1.2:
+            raise FueraDelLienzo(
+                f"la portada se sostiene {quieto} s y el minimo es 1.2: sin "
+                f"voz, nadie avisa de cuando hay que mirar")
+        tarjeta = portada(nombre, tesis)
+        self.e.play(FadeIn(tarjeta[0], run_time=entra))
+        self.e.play(Create(tarjeta[1], run_time=0.45))
+        if len(tarjeta) > 2:
+            self.e.play(FadeIn(tarjeta[2], shift=UP * 0.12, run_time=0.5))
+        self.e.wait(quieto)
+        self.e.play(FadeOut(tarjeta, run_time=sale))
+        return tarjeta
 
     # --- carriles -----------------------------------------------------
     def poner(self, carril, mob, t=0.6, salida=0.4, animacion=None):
@@ -572,7 +714,13 @@ class Lienzo:
         (`renderer.time`) y llama a `valor_en(t)`. Asi el numero que se ve
         es exactamente el que corresponde al segundo de video en el que se
         ve — si un `play` cambia de duracion al ajustar el ritmo, la cifra
-        se corrige sola en vez de mentir."""
+        se corrige sola en vez de mentir.
+
+        OJO, y de la firma se lee lo contrario: `valor_en` y `t_final` van
+        en tiempo ABSOLUTO de la escena, no en tiempo desde que arranca el
+        contador. Si el contador empieza en el segundo 12 de la pieza y
+        tiene que contar 8 segundos, `t_final` es 20 y `valor_en` recibe
+        valores de 12 a 20. Lo levanto el agente de la pieza 16."""
         tiempos = np.arange(0.0, float(t_final) + float(paso), float(paso))
         valores = [str(valor_en(float(ti))) for ti in tiempos]
         fs = cuerpo_cifra(valores)
@@ -608,7 +756,7 @@ class Lienzo:
         self._contadores = []
 
     def escena(self, mob, t=0.8, salida=0.45, animacion=None, margen=0.0,
-               anclaje="abajo"):
+               anclaje="abajo", bajo=False):
         """Atajo: encaja el dibujo en su franja y lo mete en su carril.
 
         Por defecto lo apoya en el SUELO de la franja, junto a la cifra.
@@ -621,12 +769,12 @@ class Lienzo:
 
         `anclaje="centro"` sigue disponible para una pieza que de verdad
         quiera flotar."""
-        encajar(mob, margen=margen, anclaje=anclaje)
+        encajar(mob, margen=margen, anclaje=anclaje, bajo=bajo)
         return self.poner("escena", mob, t=t, salida=salida,
                           animacion=animacion)
 
     def relevo(self, escena=IGUAL, dato=IGUAL, t=0.8, salida=0.45,
-               animacion=None, anclaje="abajo"):
+               animacion=None, anclaje="abajo", bajo=False):
         """Cambia dibujo y cifra A LA VEZ, en un solo movimiento.
 
         Los tres primeros clips del curso tropezaron con lo mismo: relevar
@@ -653,7 +801,7 @@ class Lienzo:
             if pieza is None:
                 continue
             if carril == "escena":
-                encajar(pieza, anclaje=anclaje)
+                encajar(pieza, anclaje=anclaje, bajo=bajo)
                 entradas.append(animacion if animacion is not None
                                 else FadeIn(pieza, run_time=t))
             else:

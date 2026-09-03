@@ -1,0 +1,7 @@
+{
+  "name": "Karhunen-Loeve",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Los ejes giran hasta alinearse con la nube: la base que dicta la propia señal.",
+  "duracion_objetivo": 37.35
+}

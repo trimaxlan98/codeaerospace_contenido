@@ -53,7 +53,7 @@ No son lo mismo y se piden por separado.
 | Formato | Qué es | Cursos |
 |---|---|---|
 | **horizontal** | 16:9, familias de lecciones de 4 clips | 1–25, 27, 30 |
-| **vertical** | 9:16 real (`promo.formato()`), piezas de 30–45 s sueltas, para Instagram | 26, 28, 29, 31 |
+| **vertical** | 9:16 real (`promo.formato()`), piezas de 30–45 s sueltas, para Instagram | 26, 28, 29, 31, 32 |
 
 **Estilo** es el lenguaje visual dentro del formato. Hay **dos**, y se elige
 por curso, no por clip:
@@ -61,7 +61,7 @@ por curso, no por clip:
 | Estilo | Qué se ve | Módulo | Cursos |
 |---|---|---|---|
 | **CONSOLA** | Estética de consola de vuelo de la marca: fondo casi negro `#05070a`, escuadras HUD en las esquinas, telemetría en Space Mono repartida por el frame, cifra con pie de tres renglones. **Denso a propósito.** | `code_brand.py` + `promo.py` | todos hasta el 30 |
-| **LIENZO** | Superficie lisa azul marino `#0B1B33` con **una cosa y un dato**, cuatro carriles de un solo ocupante, paleta de cuatro colores con un acento, y nada más que la marca de agua y el número de pieza. **Vacío a propósito.** | `lienzo.py` | 31 |
+| **LIENZO** | Superficie lisa azul marino `#0B1B33` con **una cosa y un dato**, cuatro carriles de un solo ocupante, paleta de cuatro colores con un acento, y nada más que la marca de agua (el número de pieza es opcional). **Vacío a propósito.** | `lienzo.py` | 31, 32 |
 
 Para pedir uno u otro basta con nombrarlo: *«un curso vertical en estilo
 LIENZO sobre X»*. Si no se dice nada, **el estilo por defecto es CONSOLA**
@@ -72,6 +72,32 @@ completa de LIENZO —medidas del lienzo, guardianes, convención de color,
 tabla de anchos tipográficos medidos— está en **`studio/docs/LIENZO.md`**.
 Léela ENTERA antes de escribir el primer clip de un curso LIENZO; no
 intentes deducir el estilo mirando un clip.
+
+### El tercer eje: SONIDO (desde el curso 32)
+
+| Sonido | Qué lleva | Cursos |
+|---|---|---|
+| **narrado** | voz TTS alineada a mano + cama de SFX | todos hasta el 31 |
+| **mudo** | ninguna pista de audio: el dueño le pone música al publicar | 32 |
+
+Se declara en `curso.json` con `"sonido": "mudo"` y se entrega con
+`unir_vertical.py <curso> --mudo`.
+
+**Un curso mudo NO es un curso narrado al que se le quita la voz.** Sin
+narrador, la pantalla es lo único que explica, y este estilo no admite
+subtítulos: si no se compensa, el clip se llena de texto y deja de ser
+LIENZO. Se compensa con tres cosas y ninguna más:
+
+1. **Una portada de ~3.7 s** (`L.portada(nombre, tesis)`) con el nombre de
+   la pieza y **qué vuelve fácil**, en 5 palabras como mucho (tope duro).
+   Es el único sitio del clip donde se explica con palabras.
+2. **Un solo verbo visual** por pieza. Si para entenderlo hiciera falta una
+   frase en pantalla, el verbo está mal elegido: se cambia el dibujo.
+3. **Una cifra** al final.
+
+Y cambia el ritmo: el hueco entre planos ya no lo llena una frase hablada,
+así que es el único momento en que se puede entender lo que acaba de pasar.
+`Pieza.leer(t)` sostiene el estado y **no admite menos de 1.8 s**.
 
 **Cuándo elegir cuál.** CONSOLA sostiene bien la densidad: muchas cifras a la
 vez, mobiliario de figura, varias señales conviviendo. LIENZO se rompe con la

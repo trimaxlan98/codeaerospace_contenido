@@ -14,7 +14,8 @@ una no obligue a rehacer las demas; aqui se cierra el circulo:
         studio/content/verticales/<slug>
     ... --solo-sonido      sonoriza las piezas y no concatena
     ... --solo-unir        concatena lo que ya haya en piezas/
-    ... --sin-voz          ignora los wav de voz (montaje mudo de prueba)
+    ... --sin-voz          ignora los wav de voz (montaje sin narrar)
+    ... --mudo             SIN pista de audio: ni voz ni cama de SFX
     ... --pieza 3          solo esa pieza (repetible), para rehacer una
 
 Rutas:
@@ -112,6 +113,8 @@ def main() -> int:
     p.add_argument("--solo-sonido", action="store_true", dest="solo_sonido")
     p.add_argument("--solo-unir", action="store_true", dest="solo_unir")
     p.add_argument("--sin-voz", action="store_true", dest="sin_voz")
+    p.add_argument("--mudo", action="store_true",
+                   help="deja las piezas SIN pista de audio")
     args = p.parse_args()
 
     curso_dir = args.curso_dir.resolve()
@@ -139,11 +142,26 @@ def main() -> int:
             voz = destino / "voz" / f"{base}.wav"
             usar_voz = voz if (voz.is_file() and not args.sin_voz) else None
             salida = destino / "piezas" / f"{base}.mp4"
-            print(f"[{clip['_n']:02d}] {clip['name']}"
-                  f"{'  (con voz)' if usar_voz else '  (solo SFX)'}")
-            if not mezclar(clip["_dir"], video, salida, usar_voz):
-                fallos.append(base)
-                continue
+            if args.mudo:
+                # El curso 32 se publica sin audio a proposito: el dueño le
+                # pone musica. Pegarle la cama de SFX obligaria a quitarla
+                # despues, y mezclar dos camas suena peor que cualquiera de
+                # las dos. Se copia el video tal cual, sin re-encodear.
+                print(f"[{clip['_n']:02d}] {clip['name']}  (mudo)")
+                proc = subprocess.run(
+                    ["ffmpeg", "-y", "-nostdin", "-v", "error", "-i",
+                     str(video), "-an", "-c", "copy", str(salida)],
+                    capture_output=True, text=True)
+                if proc.returncode != 0:
+                    print(proc.stderr.strip()[-600:])
+                    fallos.append(base)
+                    continue
+            else:
+                print(f"[{clip['_n']:02d}] {clip['name']}"
+                      f"{'  (con voz)' if usar_voz else '  (solo SFX)'}")
+                if not mezclar(clip["_dir"], video, salida, usar_voz):
+                    fallos.append(base)
+                    continue
             pico = pico_db(salida)
             d = datos_video(salida)
             aviso = ""

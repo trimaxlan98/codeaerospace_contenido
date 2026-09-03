@@ -268,3 +268,55 @@ Tres cosas que conviene saber antes de copiar este estilo:
 - **Nada de ámbar traslúcido.** Medido sobre el fondo #0B1B33: el acento
   mezclado al 26-45 % da un verde oliva sucio, y al 14 % un gris que ya no es
   ámbar. Las piezas de área se dibujan con trazo y el fondo del lienzo dentro.
+
+## Curso 32 — Transformadas (vertical, estilo LIENZO, **mudo**)
+
+Dieciocho transformadas, una por pieza, más intro y cierre: serie de Fourier,
+Fourier, DFT, FFT, DCT, Hartley, Walsh-Hadamard, Laplace, Z, Chirp-Z, STFT,
+wavelet de Haar, Wigner, Hilbert, Mellin, Radon, Hough y Karhunen-Loève. Cada
+una se cuenta por **lo que vuelve fácil**, nunca por su fórmula: la DCT
+existe porque concentra la energía de un bloque en unos pocos coeficientes,
+Radon porque convierte un objeto en las sombras que proyecta.
+
+Lo que hace distinto a este curso es el tercer eje del estilo. Hasta aquí un
+curso se elegía en dos: **formato** (horizontal o vertical) y **estilo**
+(CONSOLA o LIENZO). El 32 estrena el **sonido**: se publica **mudo**, sin
+pista de audio, para ponerle música encima en posproducción. Eso no es un
+detalle de entrega, cambia cómo se escribe cada pieza — sin voz que explique,
+la animación tiene que explicar sola, y llenar la pantalla de texto para
+compensar es exactamente lo que arruina el estilo.
+
+La regla que lo resuelve reparte el trabajo en tres cosas y ninguna más:
+
+1. **La portada** (~3.7 s) dice el nombre y una tesis de **≤ 5 palabras** —
+   la única explicación con palabras de la pieza. El guardián aborta el
+   render en la sexta.
+2. **La animación** es **un solo verbo visual**. Si para entenderla hiciera
+   falta una frase en pantalla, el verbo está mal elegido: se cambia el
+   dibujo, no se añade la frase.
+3. **La cifra**, una, calculada por la librería durante el render.
+
+Y como sin voz el único momento para entender un estado es el silencio que lo
+sostiene, `Pieza.leer()` **rechaza cualquier pausa menor de 1.8 s**.
+
+Dos afirmaciones no llegaron a publicarse porque la sonda las midió antes de
+que se dibujara nada:
+
+- **Chirp-Z no separa dos tonos más cerca que la resolución de Rayleigh.** La
+  pieza iba a enseñar dos tonos a 0.4 bins resueltos por el zoom, y ningún
+  método lineal hace eso. La tesis pasó a ser la correcta —**puntería**, no
+  resolución: la CZT pone las muestras donde te interesan.
+- **La transformada fraccional de Fourier discretizando el núcleo continuo no
+  es unitaria** (155.3 contra 128 de energía), y ordenar autovectores tampoco
+  es estable (funcionaba a N=32 y 64, fallaba a 128). Se abandonaron las dos y
+  la pieza pasó a **Radon-Wigner**, que sí es riguroso y además ES el verbo
+  visual.
+
+Se apoya en `manim_extensions/transformadas.py`, con
+`studio/tools/sonda_transformadas.py` — **91 invariantes, cada uno con su
+contraejemplo**. Esa última parte es la que sirve: un invariante que solo
+comprueba que el caso bueno sale bien no distingue una implementación correcta
+de una que devuelve siempre lo mismo.
+
+Entrega: 20 piezas, **11.05 min** en 1080x1920 @ 60 fps, 19 costuras a
+0.0000/255, sin pista de audio.

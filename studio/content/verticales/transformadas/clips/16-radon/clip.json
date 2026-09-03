@@ -1,0 +1,7 @@
+{
+  "name": "Radon",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Sombras desde muchos angulos, un sinograma, y el interior que aparece.",
+  "duracion_objetivo": 39.65
+}

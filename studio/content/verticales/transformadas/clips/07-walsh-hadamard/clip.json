@@ -1,0 +1,7 @@
+{
+  "name": "Walsh-Hadamard",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Ondas cuadradas de mas y menos uno: la mariposa solo suma y resta.",
+  "duracion_objetivo": 31.65
+}
