@@ -89,6 +89,9 @@ export const api = {
   // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
   getSfx: () => request('GET', '/api/sfx'),
   generarSfx: () => request('POST', '/api/sfx'),
+  // Banco de musica: una vista previa de 12 s por tema, por la misma razon.
+  getMusica: () => request('GET', '/api/musica'),
+  generarMusica: () => request('POST', '/api/musica'),
 }
 
 export function videoUrl(id) {
@@ -127,6 +130,12 @@ export function presentacionDeckUrl(pid) {
 
 export function sfxUrl(nombre) {
   return `/api/sfx/${encodeURIComponent(nombre)}`
+}
+
+// La vista previa de un tema musical. El nombre va contra el catalogo cerrado
+// del backend: aqui no hace falta escaparlo mas alla de la URL.
+export function musicaUrl(tema) {
+  return `/api/musica/${encodeURIComponent(tema)}`
 }
 
 export function narracionAudioUrl(pid, cid) {

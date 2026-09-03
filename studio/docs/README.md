@@ -357,6 +357,46 @@ generan una vez y no caducan.
 El listado cruza el directorio con la paleta viva: `exports/sfx/` sobrevive a los cambios de
 `PALETA` y una corrida vieja deja efectos que ya no existen.
 
+### Música procedural (`musica.py` y `/api/musica`)
+
+Hasta el sprint R2 la app no tenía música: `unir_vertical.py --mudo` existe *precisamente*
+porque el dueño se la ponía fuera. `studio/tools/musica.py` sintetiza **ocho temas** con
+numpy —sin un solo asset, con semillas fijas, determinista al byte— dentro del contenedor de
+render. Cada tema declara raíz, progresión de acordes por grados, bpm y el nivel de sus tres
+capas: **drone** (pad aditivo por nota del acorde), **arpegio** (Karplus-Strong en las
+subdivisiones del pulso) y **sub-bajo** (senoidal articulado a cada tiempo, que es lo que da
+el pulso medible). Todo por debajo de ~950 Hz: «espacial pero tranquilo», el criterio que el
+dueño verificó para la marca. Medido en los ocho, a 12 s y a 37,3 s: duración exacta al
+sample, pico ≤ −3 dBFS, **95,4–99,8 %** de la energía bajo 300 Hz, **99,8–100 %** bajo 950, y
+el bpm reconocible por autocorrelación con ≤ 2,2 % de error.
+
+`tema(nombre, dur)` dura exactamente lo que se le pide y termina con una caída suave —lo que
+mantiene mudos los extremos de un promo en bucle—. `escribe_cama()` la escribe por bloques de
+90 s sobre el reloj absoluto, para que una película de media hora no pida más de un giga de
+FFT.
+
+Dónde entra:
+
+- **manifiesto de una pieza**: `audio.musica = {tema, db, bpm?}`. `sfx.promo()` suma la cama
+  **antes** del `_norm` a `pico_db`, así que el pico final no se mueve (medido sobre el promo
+  de filotaxis: −3,0 dBFS con y sin música). Por encima de **−21 dB** salta un aviso: ahí la
+  voz deja de quedar los 12 dB por encima que pide la casa (medido: 15,0 dB de separación con
+  la cama en −24, 9,0 en −18).
+- **película del curso**: `plan.json` acepta `musica: {tema, db}` global. `ensamblar.py` mide
+  el montaje, saca la envolvente de la voz y sintetiza la cama de esa duración con el
+  *ducking* ya aplicado: −9 dB donde hay voz, ataque 0,12 s, liberación 0,60 s.
+- **banco audible**: `musica.py banco` deja una vista previa de 12 s por tema en
+  `exports/musica/` (comando `musica` del runner, calcado de `paleta`).
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/musica` | los temas con bpm, carácter y descripción, y cuáles están listos |
+| POST | `/api/musica` | sintetiza el banco (409 si ya se está sintetizando) |
+| GET | `/api/musica/{tema}` | el wav; el nombre va contra el catálogo **cerrado**, igual que en SFX |
+
+`MusicaSelector.jsx` es el mismo control en los dos sitios: el diálogo de audio de un clip y
+el panel de la película.
+
 ### Importar los promos del repo (`subir_promo.py`)
 
 Los diez promos escritos a mano viven en `studio/content/promos/<slug>/` (`promo.json` +

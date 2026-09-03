@@ -102,13 +102,18 @@ def test_la_voz_se_MEZCLA_sobre_la_cama_de_sonido():
     Mapear solo la voz (`-map 1:a`) tiraba la cama por la borda sin que nada
     fallara: la pelicula salia con narracion y sin los efectos que se habian
     elegido clip a clip.
+
+    Sprint R2: la suma dejo de ser `amix`. `amix=...:normalize=0` llego en
+    ffmpeg 4.4 y la imagen trae 4.3.9 (Debian 11), asi que ese filtro fallaba
+    con «Option 'normalize' not found» — y sin la opcion, amix divide cada
+    entrada por el numero de entradas y la pieza entera bajaria 6 dB.
     """
     mod = _ensamblar_mod()
     argv = mod.args_pieza("a.mp4", "v.wav", "out.mp4", ratio=1.0, cama=True)
     filtro = argv[argv.index("-filter_complex") + 1]
-    assert "amix=inputs=2" in filtro
+    assert "amerge=inputs=2" in filtro and "pan=mono|c0=c0+c1" in filtro
+    assert "amix" not in filtro                      # ver el docstring
     assert "[0:a]" in filtro and "[1:a]" in filtro   # cama Y voz
-    assert "normalize=0" in filtro                   # sin ganancia escondida
     assert argv[argv.index("-c:v") + 1] == "copy"
 
 

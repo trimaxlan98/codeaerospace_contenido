@@ -6,11 +6,17 @@
 // porque la decision real es una sola: **corte o transicion**. El corte no
 // recodifica (segundos); cualquier otra cosa recodifica la pelicula entera y
 // eso hay que decirlo ANTES, no despues de media hora de espera.
+//
+// Sprint R2: y una cama MUSICAL bajo el curso entero, con el nivel en dB. La
+// musica es del curso, no de un clip — por eso vive aqui y no en el dialogo
+// de audio de cada pieza —, se sintetiza con la duracion medida del montaje y
+// el ensamblador la agacha 9 dB donde suena la voz.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, Clapperboard, Download, Film, Play, Ruler, Square, Trash2 } from 'lucide-react'
 import { api, peliculaVideoUrl } from '../api.js'
 import { cursoDeJob, useCatalogo } from '../catalogo.js'
+import MusicaSelector from './MusicaSelector.jsx'
 import { Button } from './ui/button.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.jsx'
 import { cn } from '@/lib/utils'
@@ -112,6 +118,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
   const [narrar, setNarrar] = useState(true)
   const [marcaIntro, setMarcaIntro] = useState('')
   const [marcaCierre, setMarcaCierre] = useState('')
+  const [musica, setMusica] = useState(null)
   const [midiendo, setMidiendo] = useState(false)
 
   const load = useCallback(() => {
@@ -123,6 +130,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
         setNarrar(e.opciones.narracion !== false)
         setMarcaIntro(e.opciones.intro_job_id || '')
         setMarcaCierre(e.opciones.cierre_job_id || '')
+        setMusica(e.opciones.musica || null)
       }
     }).catch(() => setEstado(null))
   }, [projectId])
@@ -157,6 +165,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
         narracion: narrar,
         intro_job_id: marcaIntro || null,
         cierre_job_id: marcaCierre || null,
+        musica,
       })
       load()
     } catch (err) { setError(err.message) }
@@ -286,6 +295,18 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
             className="h-3.5 w-3.5 accent-[var(--accent)]" />
           pegar la narración
         </label>
+      </div>
+
+      <div className="space-y-1 border-t border-line pt-2">
+        <span className="text-xs text-muted">Cama musical del curso</span>
+        <MusicaSelector valor={musica} temas={estado.temas || []}
+          dbDefecto={estado.musica_db ?? -24} onChange={setMusica} />
+        {musica && (
+          <p className="text-[11.5px] text-faint">
+            Se sintetiza con la duración medida del montaje y se agacha 9 dB
+            donde hay voz. Cambiar de tema o de nivel desactualiza la película.
+          </p>
+        )}
       </div>
 
       {recodifica && (

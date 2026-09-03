@@ -86,6 +86,11 @@ class Settings:
         # El runner tiene esta misma ruta como constante ("exports/sfx").
         self.sfx_dir = Path(os.environ.get(
             "MS_SFX_DIR", str(self.workspace / "exports" / "sfx")))
+        # Banco de musica audible: la vista previa de 12 s de cada tema de
+        # musica.py. El runner tiene esta misma ruta como constante
+        # ("exports/musica"): si una cambia, la otra tambien.
+        self.musica_dir = Path(os.environ.get(
+            "MS_MUSICA_DIR", str(self.workspace / "exports" / "musica")))
 
         # Biblioteca curada de primitivas de Manim (solo lectura: la consume
         # el asistente via conocimiento.py y los demos de Animaciones).

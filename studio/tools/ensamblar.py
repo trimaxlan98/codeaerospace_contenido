@@ -17,12 +17,22 @@ El plan lo escribe el backend; todas sus rutas son relativas al workspace:
       "proyecto": "Algebra lineal - 1.1 El vector",
       "fps": 60,
       "transicion": {"tipo": "corte", "duracion": 0.6},
+      "musica": {"tema": "orbita", "db": -24},
       "piezas": [
         {"titulo": "Clip 1", "video": "render_jobs/ab../media/.../Clip1.mp4",
          "voz": "guiones/algebra/01-el-vector.wav"},
         ...
       ]
     }
+
+`musica` (opcional) pone una cama musical bajo la pelicula ENTERA, sintetizada
+por `musica.py` con la duracion medida del montaje y agachada 9 dB donde hay
+voz (*ducking*). Sin `musica` no cambia nada: el paso ni se ejecuta.
+
+La envolvente del ducking se mide sobre el montaje SIN musica (el intermedio
+`unida.mp4`), nunca sobre la pelicula ya mezclada: medida ahi, la propia cama
+supera el umbral y se agacha a si misma — 96 % del metraje agachado en la
+prueba, contra el 37 % real.
 
 `tipo` de transicion:
   corte    empalme seco. NO recodifica el video (concat -c copy): es el unico
@@ -68,10 +78,47 @@ TRANSICIONES = {
 DUR_TRANSICION_MIN = 0.1
 DUR_TRANSICION_MAX = 3.0
 
+# ── cama musical ──────────────────────────────────────────────────────────────
+# Cuanto se agacha la musica donde suena la voz. 9 dB es el escalon que deja
+# la musica presente y la palabra por delante; con 6 todavia compite y con 12
+# el bombeo se oye como un error.
+DUCK_DB = -9.0
+# Por debajo de esto un tramo del montaje es silencio, no voz bajita (el suelo
+# de ruido del AAC a 24 kHz queda muy por debajo). Nota: la musica se aparta
+# bajo CUALQUIER sonido del montaje, no solo bajo la voz — en un curso narrado
+# eso es la voz, y en un clip con cama de SFX tambien la cama. Es lo que se
+# quiere: la musica es el fondo de todo lo demas, no un cuarto instrumento.
+DUCK_UMBRAL_DB = -40.0
+# Ataque corto y liberacion larga: la musica se aparta enseguida y vuelve sin
+# que se note. Al reves (ataque largo) se come la primera silaba.
+DUCK_ATAQUE_S, DUCK_LIBERA_S = 0.12, 0.60
+# La envolvente se mide a 100 Hz sobre un decimado a 4 kHz: una pelicula de
+# media hora a 24 kHz en float son cientos de MB y no hace falta ni uno.
+ENV_HZ, ENV_SR = 100.0, 4000
+MUSICA_DB_DEFECTO = -24.0
+MUSICA_DB_MIN, MUSICA_DB_MAX = -60.0, 0.0
+
 # Audio comun a todas las piezas: sin esto, un concat que mezcla clips con y sin
 # pista de audio sale roto (y sin avisar).
 AUDIO_ARGS = ("-c:a", "aac", "-b:a", "192k", "-ar", "24000", "-ac", "1")
 SILENCIO = "anullsrc=r=24000:cl=mono"
+
+# Suma de DOS pistas mono a ganancia unidad, sin `amix`.
+#
+# TRAMPA MEDIDA (2026-09-03): `amix=...:normalize=0` no existe en el ffmpeg de
+# la imagen — Debian 11 trae 4.3.9 y esa opcion llego en 4.4. Un `amix` sin
+# ella divide cada entrada por el numero de entradas, asi que la pelicula
+# entera bajaria 6 dB por el hecho de anadir una segunda pista. `amerge`+`pan`
+# suma con ganancia 1 y funciona desde ffmpeg 2.x. El `aformat` explicito
+# evita que amerge se plante ante dos entradas con formatos distintos (aac
+# decodificado contra wav pcm).
+FMT_MONO = "aformat=sample_fmts=fltp:sample_rates=24000:channel_layouts=mono"
+
+
+def suma_mono(a: str, b: str, salida: str) -> str:
+    """Filtergraph que suma dos etiquetas de audio mono en `salida`."""
+    return (f"{a}{FMT_MONO}[sa];{b}{FMT_MONO}[sb];"
+            f"[sa][sb]amerge=inputs=2,pan=mono|c0=c0+c1{salida}")
 
 
 class ErrorPlan(Exception):
@@ -148,6 +195,13 @@ def lee_plan(ruta) -> dict:
     dur = float(tr.get("duracion", 0.6))
     if tipo != "corte" and not (DUR_TRANSICION_MIN <= dur <= DUR_TRANSICION_MAX):
         raise ErrorPlan(f"duracion de transicion fuera de rango: {dur}")
+    mus = plan.get("musica")
+    if mus:
+        if not isinstance(mus, dict) or not mus.get("tema"):
+            raise ErrorPlan("la musica del plan no dice que tema")
+        db = float(mus.get("db", MUSICA_DB_DEFECTO))
+        if not (MUSICA_DB_MIN <= db <= MUSICA_DB_MAX):
+            raise ErrorPlan(f"nivel de musica fuera de rango: {db}")
     return plan
 
 
@@ -160,7 +214,8 @@ def args_pieza(video: str, voz: str | None, salida: str,
     El video se COPIA siempre (`-c:v copy`): este paso solo toca el audio, asi
     que cuesta segundos aunque el clip dure minutos. Cuatro casos:
 
-        voz + cama   se mezclan (amix). El nivel de la cama es cosa del
+        voz + cama   se SUMAN a ganancia unidad (`suma_mono`, ver la trampa
+                     del amix ahi arriba). El nivel de la cama es cosa del
                      manifiesto —nace en -16 dB para un clip de curso— y aqui
                      no se toca: una ganancia escondida haria que el nivel que
                      se eligio en la interfaz no fuera el que se oye.
@@ -172,8 +227,7 @@ def args_pieza(video: str, voz: str | None, salida: str,
     """
     af = "apad" if ratio == 1.0 else f"atempo={ratio:.4f},apad"
     if voz and cama:
-        filtro = (f"[1:a]{af}[v];"
-                  f"[0:a][v]amix=inputs=2:duration=first:normalize=0[a]")
+        filtro = f"[1:a]{af}[v];" + suma_mono("[0:a]", "[v]", "[a]")
         return ["ffmpeg", "-y", "-nostdin", "-i", video, "-i", voz,
                 "-filter_complex", filtro, "-map", "0:v", "-map", "[a]",
                 "-c:v", "copy", *AUDIO_ARGS, "-shortest", salida]
@@ -237,6 +291,111 @@ def args_xfade(entradas: list[str], filtro: str, fps: int,
     return argv
 
 
+# ── paso 3: la cama musical ───────────────────────────────────────────────────
+
+def envolvente(video, hz: float = ENV_HZ, sr: int = ENV_SR):
+    """Envolvente RMS del audio de `video`, muestreada a `hz`.
+
+    Decimando a `sr` primero: media hora a 24 kHz en float64 son 345 MB y la
+    envolvente no gana ni un decimal por tenerlos. None si no hay audio.
+    """
+    import numpy as np
+    r = subprocess.run(
+        ["ffmpeg", "-v", "error", "-nostdin", "-i", str(video),
+         "-map", "0:a?", "-ac", "1", "-ar", str(sr), "-f", "s16le", "-"],
+        capture_output=True, timeout=3600)
+    if r.returncode != 0 or not r.stdout:
+        return None
+    x = np.frombuffer(r.stdout, dtype="<i2").astype(np.float32) / 32768.0
+    k = max(1, int(round(sr / hz)))
+    n = len(x) // k
+    if n == 0:
+        return None
+    return np.sqrt((x[:n * k].reshape(n, k).astype(np.float64) ** 2).mean(1))
+
+
+def curva_ducking(env, hz: float = ENV_HZ, duck_db: float = DUCK_DB,
+                  umbral_db: float = DUCK_UMBRAL_DB,
+                  ataque: float = DUCK_ATAQUE_S, libera: float = DUCK_LIBERA_S):
+    """De la envolvente de la pelicula a la ganancia LINEAL de la musica.
+
+    Funcion pura: se prueba sin ffmpeg y sin montar nada, que es justo lo que
+    hace falta para poder cambiar el escalon sin volver a montar un curso.
+
+    Un polo asimetrico — rapido para bajar, lento para subir — porque el
+    error que se oye es siempre el mismo: la musica que tarda en apartarse se
+    come la primera silaba, y la que vuelve de golpe bombea.
+    """
+    import numpy as np
+    env = np.asarray(env, dtype=float)
+    objetivo = np.where(env > 10 ** (umbral_db / 20), 10 ** (duck_db / 20), 1.0)
+    a_at = float(np.exp(-1.0 / max(ataque * hz, 1e-6)))
+    a_re = float(np.exp(-1.0 / max(libera * hz, 1e-6)))
+    g = np.empty(len(objetivo))
+    y = 1.0
+    for i, o in enumerate(objetivo):
+        a = a_at if o < y else a_re
+        y = a * y + (1 - a) * o
+        g[i] = y
+    return g
+
+
+def args_musica(video: str, musica_wav: str, salida: str) -> list[str]:
+    """Mezcla la cama bajo el montaje. El video se COPIA.
+
+    La suma va a ganancia unidad (`suma_mono`): la pelicula tiene que sonar
+    igual que antes, con musica debajo, no 6 dB mas baja por haberla anadido.
+
+    El `alimiter` es una red, no un efecto: con la musica en -24 dB y la voz
+    en -1.5 la suma pica en -0.9 dBFS y no llega a tocarlo; existe por si
+    alguien sube la cama. `level=disabled` es obligatorio — el auto-level de
+    alimiter viene ENCENDIDO por defecto y sin apagarlo el filtro sube la
+    pelicula entera hasta el techo, que es exactamente lo contrario de lo que
+    se le pide.
+    """
+    return ["ffmpeg", "-y", "-nostdin", "-i", video, "-i", musica_wav,
+            "-filter_complex",
+            suma_mono("[0:a]", "[1:a]", "[m]")
+            + ";[m]alimiter=limit=0.94:attack=5:release=60:level=disabled[a]",
+            "-map", "0:v", "-map", "[a]", "-c:v", "copy", *AUDIO_ARGS,
+            "-shortest", "-movflags", "+faststart", salida]
+
+
+def pon_musica(video, salida, mus: dict, tmp: Path, verbose=True) -> dict:
+    """Cama musical bajo la pelicula ya montada. Devuelve lo medido.
+
+    El orden importa: primero se MIDE la pelicula (duracion real y envolvente
+    de la voz), luego se sintetiza la cama de esa duracion exacta con la
+    ganancia de ducking ya aplicada, y solo entonces se mezcla. Sintetizar
+    antes de medir daria una cama que sobra o falta al final.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import musica as musica_mod
+
+    total = duracion(video)
+    tema = str(mus["tema"])
+    db = float(mus.get("db", MUSICA_DB_DEFECTO))
+    env = envolvente(video)
+    ganancia = None
+    tramo_voz = 0.0
+    if env is not None and len(env):
+        g = curva_ducking(env, ENV_HZ)
+        ganancia = (g, ENV_HZ)
+        tramo_voz = float((g < 0.9).mean())
+    wav = tmp / "musica.wav"
+    musica_mod.escribe_cama(wav, tema, total, db, mus.get("bpm"),
+                            ganancia=ganancia)
+    if verbose:
+        print(f"[musica] {tema} {total:.1f} s a {db:.0f} dB, ducking sobre el "
+              f"{tramo_voz * 100:.0f} % de la pelicula", file=sys.stderr)
+    r = _corre(*args_musica(str(video), str(wav), str(salida)), timeout=7200)
+    if r.returncode != 0 or not Path(salida).is_file():
+        raise ErrorPlan(f"la cama musical salio con {r.returncode}: "
+                        f"{r.stderr.strip()[-300:]}")
+    return {"tema": tema, "db": db, "duracion": round(total, 3),
+            "ducking_db": DUCK_DB, "tramo_con_voz": round(tramo_voz, 3)}
+
+
 # ── orquestacion ──────────────────────────────────────────────────────────────
 
 def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
@@ -247,6 +406,7 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
     tipo = tr.get("tipo", "corte")
     d_tr = float(tr.get("duracion", 0.6))
     fps = int(plan.get("fps", 60))
+    mus = plan.get("musica") or None
 
     tmp = Path(trabajo) if trabajo else Path(tempfile.mkdtemp(prefix="pelicula-"))
     tmp.mkdir(parents=True, exist_ok=True)
@@ -291,22 +451,30 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
 
         salida = Path(salida)
         salida.parent.mkdir(parents=True, exist_ok=True)
+        # Con musica la union va a un intermedio: la cama necesita la duracion
+        # MEDIDA del montaje, asi que solo puede ponerse despues de unir.
+        unida = (tmp / "unida.mp4") if mus else salida
 
         # Paso 2 — unir.
         if tipo == "corte" or len(montadas) == 1:
             lista = tmp / "concat.txt"
             lista.write_text("".join(f"file '{m.name}'\n" for m in montadas))
-            argv = args_concat(str(lista), str(salida.resolve()))
+            argv = args_concat(str(lista), str(Path(unida).resolve()))
             r = _corre(*argv, timeout=3600)
         else:
             duraciones = [duracion(m) for m in montadas]
             filtro = filtro_xfade(duraciones, TRANSICIONES[tipo], d_tr)
             argv = args_xfade([str(m) for m in montadas], filtro, fps,
-                              str(salida.resolve()))
+                              str(Path(unida).resolve()))
             r = _corre(*argv, timeout=14400)
-        if r.returncode != 0 or not salida.is_file():
+        if r.returncode != 0 or not Path(unida).is_file():
             raise ErrorPlan(f"la union salio con {r.returncode}: "
                             f"{r.stderr.strip()[-300:]}")
+
+        # Paso 3 — la cama musical (opcional).
+        info_musica = None
+        if mus:
+            info_musica = pon_musica(unida, salida, mus, tmp, verbose)
 
         informe = {
             "ok": True,
@@ -318,6 +486,7 @@ def ensamblar(plan_path, salida, trabajo=None, verbose=True) -> dict:
             "duracion": round(duracion(salida), 3),
             "resolucion": resolucion(salida),
             "bytes": salida.stat().st_size,
+            "musica": info_musica,
             "detalle": detalle,
         }
         return informe

@@ -16,10 +16,16 @@
 // sale de «Generar narración» y la película la pega al montar. Y los sonidos
 // se pueden OÍR antes de elegirlos (botón ▶ en cada línea): elegir «sting» o
 // «subrayado» por el nombre era adivinar.
+//
+// Sprint R2: además de los efectos sueltos, la pieza puede llevar una CAMA
+// MUSICAL — un tema con tonalidad, pulso y progresión, sintetizado por
+// `musica.py`. Va en su propia sección porque es una decisión distinta: los
+// efectos marcan momentos, la música sostiene la pieza entera.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle2, Loader2, Mic, Music, Play, Plus, Trash2, Volume2 } from 'lucide-react'
 import { api, frameVerificacionUrl, sfxUrl } from '../api.js'
+import MusicaSelector from './MusicaSelector.jsx'
 import { Button } from './ui/button.jsx'
 import { Input } from './ui/input.jsx'
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog.jsx'
@@ -74,6 +80,7 @@ function aFormulario(m) {
     pico_db: m.audio.pico_db,
     pico_db_con_voz: m.audio.pico_db_con_voz,
     fade_in: m.audio.fade_in,
+    musica: m.audio.musica || null,
   }
 }
 
@@ -113,6 +120,9 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
         pico_db: num(form.pico_db, -3),
         pico_db_con_voz: num(form.pico_db_con_voz, -16),
         fade_in: num(form.fade_in, 0.35),
+        // null = sin música. El backend lo trata igual que la ausencia de la
+        // clave, así que quitarla es dejar el desplegable en «sin música».
+        musica: form.musica,
       })
       setDatos(d)
       setForm(aFormulario(d.manifiesto))
@@ -258,6 +268,21 @@ export default function AudioPromoDialog({ projectId, clip, onOpenChange, onSave
                   </Button>
                 )}
               </div>
+            </section>
+
+            {/* — la música — la cama que sostiene la pieza entera. Aparte de
+                los efectos: aquellos marcan momentos, esta no marca nada. */}
+            <section className="flex flex-col gap-2 border-t border-line pt-3">
+              <div className="flex items-center gap-2">
+                <Music className="h-3.5 w-3.5 text-accent" />
+                <span className="eyebrow">Música</span>
+                <span className="ml-auto font-mono text-[11px] text-faint">
+                  {form.musica ? form.musica.tema : 'sin cama musical'}
+                </span>
+              </div>
+              <MusicaSelector valor={form.musica} temas={datos.temas || []}
+                dbDefecto={datos.musica_db ?? -24}
+                onChange={(v) => setForm((f) => ({ ...f, musica: v }))} />
             </section>
 
             {/* — la voz — solo en un promo: un curso narra por otro camino y
