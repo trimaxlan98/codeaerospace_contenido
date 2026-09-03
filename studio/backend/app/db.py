@@ -112,6 +112,12 @@ MIGRATIONS = {
         # que pasarlo por entorno al renderizar, igual que el formato.
         ("fondo", "ALTER TABLE projects ADD COLUMN fondo TEXT NOT NULL"
                   " DEFAULT 'marca'"),
+        # Estilo visual con NOMBRE ("lienzo", "consola"...): lo declara el
+        # curso.json de los verticales y no se puede deducir del style_block
+        # sin adivinar. Vive aqui para que exportar las fuentes devuelva el
+        # mismo manifiesto que entro.
+        ("estilo", "ALTER TABLE projects ADD COLUMN estilo TEXT NOT NULL"
+                   " DEFAULT ''"),
     ),
 }
 
@@ -172,6 +178,23 @@ class Database:
                 " audio_hash, length(script) AS script_len"
                 " FROM jobs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def project_jobs(self, pid: str, limit: int = 500) -> list[dict]:
+        """Jobs de un proyecto, del mas reciente al mas viejo.
+
+        `list_jobs` no filtra, y el progreso de un lote necesita solo los de
+        un curso: recorrer las ~40 000 filas del historial para quedarse con
+        veinte seria absurdo en un endpoint que la interfaz sondea.
+        """
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id, scene, quality, status, error, created_at,"
+                " started_at, finished_at, size_bytes, clip_id, project_id"
+                " FROM jobs WHERE project_id = ?"
+                " ORDER BY created_at DESC LIMIT ?",
+                (pid, limit),
             ).fetchall()
         return [dict(r) for r in rows]
 
@@ -241,13 +264,14 @@ class Database:
         # Los defectos repiten los de projects.py (TIPO_DEFECTO /
         # FORMATO_DEFECTO); no se importa de alli para no cerrar el ciclo
         # projects -> db -> projects.
-        p = {"tipo": "curso", "formato": "horizontal", "fondo": "marca", **p}
+        p = {"tipo": "curso", "formato": "horizontal", "fondo": "marca",
+             "estilo": "", **p}
         with self._lock:
             self._conn.execute(
                 "INSERT INTO projects (id, name, description, quality, style_block,"
-                " tipo, formato, fondo, created_at, updated_at)"
+                " tipo, formato, fondo, estilo, created_at, updated_at)"
                 " VALUES (:id, :name, :description, :quality, :style_block,"
-                " :tipo, :formato, :fondo, :created_at, :updated_at)",
+                " :tipo, :formato, :fondo, :estilo, :created_at, :updated_at)",
                 p,
             )
             self._conn.commit()

@@ -21,6 +21,10 @@ def _set_env(tmp_path: Path) -> None:
     os.environ["MS_RUNNER_SOCKET"] = str(tmp_path / "runner.sock")
     os.environ["MS_LESSONS_DIR"] = str(tmp_path / "lessons")
     os.environ["MS_ANIMATIONS_DIR"] = str(tmp_path / "animations")
+    # Import de cursos "del repo": en tests el repo es un directorio del
+    # tmp_path, para que un test pueda plantar un curso sintetico sin tocar
+    # studio/content/.
+    os.environ["MS_CONTENT_DIR"] = str(tmp_path / "content")
     os.environ["MS_COOKIE_SECURE"] = "0"
     # El asistente IA queda deshabilitado en tests (la clave no existe en tmp);
     # los tests de IA que lo necesitan crean este archivo y mockean el cliente.

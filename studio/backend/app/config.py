@@ -25,6 +25,12 @@ class Settings:
             "MS_LESSONS_DIR", str(self.workspace / "studio" / "content" / "lessons")))
         self.animations_dir = Path(os.environ.get(
             "MS_ANIMATIONS_DIR", str(self.workspace / "studio" / "content" / "animations")))
+        # Cursos, verticales y promos versionados en git
+        # (studio/content/{cursos,verticales,promos}/<slug>/). Es de donde
+        # los importa `POST /api/projects/importar` con `{slug, origen}`:
+        # la misma fuente que leen subir_curso.py y subir_promo.py.
+        self.content_dir = Path(os.environ.get(
+            "MS_CONTENT_DIR", str(self.workspace / "studio" / "content")))
 
         self.cookie_name = "ms_session"
         self.cookie_secure = os.environ.get("MS_COOKIE_SECURE", "1") == "1"

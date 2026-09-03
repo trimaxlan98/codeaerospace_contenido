@@ -36,72 +36,38 @@ from pathlib import Path
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from app import audio_promo  # noqa: E402
+from app import importar  # noqa: E402
 from app.db import Database  # noqa: E402
-from app.projects import (FORMATOS, QUALITIES, ProjectService,  # noqa: E402
-                          compose_script, content_hash)
-from app.scenes import detect_scenes  # noqa: E402
+from app.projects import ProjectService, content_hash  # noqa: E402
 
 DEFAULT_DB = "/var/www/codeaerospace_contenido/studio/backend/manimstudio.db"
-PREFIJO = "Promo · "
-CALIDAD = "qh"
+PREFIJO = importar.PREFIJO_PROMO
+CALIDAD = importar.CALIDAD_PROMO
 
 
 def cargar_promo(promo_dir: Path) -> dict:
-    """Lee y valida promo.json + style_block + escena. Sale con mensaje
-    claro ante cualquier inconsistencia."""
-    manifest_path = promo_dir / "promo.json"
-    if not manifest_path.is_file():
-        sys.exit(f"no existe {manifest_path}")
-    promo = json.loads(manifest_path.read_text())
+    """Lee y valida promo.json + style_block + escena.
 
-    for campo in ("name", "scene", "file"):
-        if not promo.get(campo):
-            sys.exit(f"{manifest_path}: falta el campo obligatorio {campo}")
-
-    style_path = promo_dir / promo.get("style_block", "style_block.py")
-    style = style_path.read_text() if style_path.is_file() else ""
-
-    ruta = promo_dir / promo["file"]
-    if not ruta.is_file():
-        sys.exit(f"{manifest_path}: no existe {ruta}")
-    script = ruta.read_text()
-    compuesto = compose_script(style, script)
-    if promo["scene"] not in detect_scenes(compuesto):
-        sys.exit(f"{promo_dir.name}: la escena '{promo['scene']}' no esta "
-                 "definida en el script compuesto")
-
-    # El formato sale del manifiesto (el primero de la lista es el que se
-    # trabajo); si no lo dice, vertical, que es el formato de redes.
-    formatos = promo.get("formatos") or ["vertical"]
-    formato = formatos[0]
-    if formato not in FORMATOS:
-        sys.exit(f"{promo_dir.name}: formato desconocido '{formato}'")
-    if CALIDAD not in QUALITIES:  # defensa boba, por si cambian las calidades
-        sys.exit(f"calidad invalida: {CALIDAD}")
-
-    manifiesto = audio_promo.normalizar(
-        {"audio": promo.get("audio"), "voz": promo.get("voz")})
-    errores = audio_promo.validar(manifiesto)
-    if errores:
-        sys.exit(f"{promo_dir.name}: manifiesto de audio invalido: "
-                 + "; ".join(errores))
-
-    descripcion = promo.get("description") or ""
-    curso = promo.get("curso")
-    if curso and curso.lower() not in descripcion.lower():
-        descripcion = f"[{curso}] {descripcion}".strip()
-
+    La lectura la hace `app/importar.py` (el mismo modulo que usa la API);
+    aqui solo se traduce el error a `sys.exit` y se devuelve la forma que
+    espera `sincronizar`: un promo es un proyecto de UN clip, asi que el
+    manifiesto generico se aplana a `clip` + `audio`.
+    """
+    try:
+        generico = importar.cargar_promo(promo_dir)
+    except importar.ErrorImportacion as e:
+        sys.exit(str(e))
+    clip = generico["clips"][0]
     return {
-        "name": PREFIJO + promo["name"],
-        "description": descripcion,
-        "quality": CALIDAD,
-        "formato": formato,
-        "style_block": style,
-        "clip": {"title": promo["name"], "script": script,
-                 "scene": promo["scene"]},
-        "audio": manifiesto,
-        "duracion_objetivo": promo.get("duracion_objetivo"),
+        "name": generico["name"],
+        "description": generico["description"],
+        "quality": generico["quality"],
+        "formato": generico["formato"],
+        "style_block": generico["style_block"],
+        "clip": {"title": clip["title"], "script": clip["script"],
+                 "scene": clip["scene"]},
+        "audio": json.loads(clip["audio_json"]),
+        "duracion_objetivo": generico.get("duracion_objetivo"),
     }
 
 

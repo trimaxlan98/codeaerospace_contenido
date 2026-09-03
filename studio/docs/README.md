@@ -131,9 +131,10 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 
 - **Proyecto**: `name`, `description`, `quality` (fija para todos sus clips, `ql`/`qm`/`qh`),
   `formato` (`horizontal` 16:9 · `vertical` 9:16 · `cuadrado` 1:1, también fijo para todos
-  sus clips), `tipo` (`curso` o `promo` de redes) y `style_block` (código Python opcional que
-  se antepone a cada clip antes de renderizar — imports, paleta de colores, helpers de
-  continuidad…).
+  sus clips), `tipo` (`curso` o `promo` de redes), `estilo` (el nombre del estilo visual —
+  `lienzo`— cuando el manifiesto del curso lo declara; no se puede deducir del código) y
+  `style_block` (código Python opcional que se antepone a cada clip antes de renderizar —
+  imports, paleta de colores, helpers de continuidad…).
 - **Clip**: pertenece a un proyecto, tiene `position` (orden dentro del curso), `title`,
   `script` (el código del clip, **sin** el estilo del proyecto), `scene` (nombre de la clase
   `Scene` a renderizar), `final_state` (nota de en qué queda la escena al terminar, visible
@@ -191,8 +192,53 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 | GET | `/{pid}/clips/{cid}/script` | `{script, style_offset}` — script crudo del clip (sin estilo) + líneas que antepone el estilo actual |
 | POST | `/{pid}/clips/{cid}/render` | compone estilo+script, valida la escena y encola el render (201, devuelve el job); 422 si no hay escena asignada, si el script compuesto es inválido, o si la escena no existe en él |
 | POST | `/{pid}/render-stale` | encola todos los clips `stale`/`no_render` sin job en vuelo; devuelve `{queued, skipped}` |
+| POST | `/{pid}/render-lote` | lote de renders: `{clips: [ids]｜null, calidad: ql/qm/qh｜null, force}` → `{queued, lote_id, saltados, calidad, calidad_cambiada}`; 409 si se cambia la calidad con `clips` elegidos a dedo |
+| GET | `/{pid}/lote` | progreso agregado del lote vigente: `{total, hechos, fallidos, en_curso, pendientes, media_s, eta_s, derivado}` o `{lote: null}` |
+| POST | `/{pid}/duplicar` | `{name}` → copia el proyecto y sus clips **sin** los renders (201); 409 si el nombre ya existe |
+| POST | `/{pid}/clips/{cid}/duplicar` | inserta la copia justo detrás, con título «… (copia)» (201) |
+| POST | `/importar` | importa un curso-como-archivos (ver abajo); `?dry_run=1` valida sin escribir |
+| GET | `/importables` | los slugs que hay en `studio/content/{cursos,verticales,promos}/` |
 | GET | `/{pid}/export` | manifiesto JSON del curso (clips, orden, estado, sin campos internos) |
+| GET | `/{pid}/fuentes.zip` | las **fuentes** del proyecto: `curso.json` + `style_block.py` + `clips/NN-*.py` + `guiones/NN-*.{secciones.json,txt}` |
 | GET | `/{pid}/archive` | ZIP con los videos vigentes + `concat.txt` + `manifest.json` + `LEEME.txt`; 404 si ningún clip tiene video vigente |
+
+**Un proyecto es un directorio** (sprint R3a): un curso vive igual de bien en la base y en
+git, y se pasa de una a otro sin salir de la app.
+
+- **Exportar** — «Fuentes (.zip)» en el detalle del proyecto (`GET /{pid}/fuentes.zip`). No
+  lleva vídeos (para eso está «Descargar curso»): lleva `curso.json`, `style_block.py`, un
+  `.py` por clip y, si los hay, los guiones. Es **el mismo esquema que lee `subir_curso.py`**,
+  así que se puede versionar en `studio/content/cursos/<slug>/` tal cual. El zip es
+  determinista (sin compresión, fecha fija en cada miembro, orden fijo): exportar dos veces
+  el mismo proyecto da **los mismos bytes**.
+- **Importar** — «Importar…» en la lista de proyectos (`POST /importar`), por dos puertas:
+  un **.zip de fuentes** (cuerpo crudo `Content-Type: application/zip`, ≤ 5 MB) o un
+  **directorio del repo** (`{"slug": "...", "origen": "cursos"｜"verticales"｜"promos"}`, leído
+  de `MS_CONTENT_DIR`, por defecto `studio/content/`). El slug se valida contra un regex
+  cerrado (minúsculas, dígitos y guiones) y la ruta resuelta se comprueba dentro de su origen.
+  Un **vertical** convierte cada pieza (`clip.json` + `escena.py`) en un clip: su bloque
+  `audio`/`voz` va al manifiesto de audio del clip, y `modulo` + `duracion_objetivo` a sus
+  notas. **Idempotente por nombre exacto** y por posición de clip, igual que el CLI: crea lo
+  que falta, actualiza lo que cambió y **nunca borra**. «Comprobar» es el `--dry-run`.
+- **La misma lógica que la terminal**: `app/importar.py` es el único sitio donde se lee un
+  curso-como-archivos; `subir_curso.py` y `subir_promo.py` son envoltorios suyos.
+
+**Render en lote** («Render en lote…», `POST /{pid}/render-lote`): encola varios clips en
+orden en la cola de siempre (un render a la vez), saltando los que estén al día —salvo
+`force`— y los que ya tengan un render en vuelo. Como **la calidad es del proyecto**, pedir
+otra la cambia en el proyecto *antes* de encolar y lo dice en la respuesta
+(`calidad_cambiada`); eso rehace el curso entero, así que con `clips` elegidos a dedo se
+responde 409 en vez de dejar vídeos de dos tamaños. `GET /{pid}/lote` da el progreso agregado
+(hechos/total, fallidos, ETA con la duración media de los renders `done` de ese proyecto) y
+sobrevive a un reinicio del backend: si el estado en memoria se perdió, el lote se **deriva**
+de los jobs del proyecto (los activos y todo lo encolado desde el primero de ellos).
+«Re-renderizar desactualizados» usa este mismo endpoint.
+
+**Duplicar**: «Duplicar proyecto» copia estilo compartido, formato, calidad, fondo y todos los
+clips (script, escena, `final_state`, notas y manifiesto de audio); «Duplicar» en un clip
+inserta la copia justo detrás. **En ninguno de los dos se copia el render**: un vídeo es de un
+solo clip, y dos clips apuntando al mismo job harían que borrarlo dejase sin vídeo a un
+proyecto que nadie estaba tocando.
 
 **Estudio en contexto de clip**: desde un proyecto, «Editar en Estudio» abre el script del
 clip en el editor con un banner (`Proyecto · clip · calidad fija`) y botón «Salir del clip»
