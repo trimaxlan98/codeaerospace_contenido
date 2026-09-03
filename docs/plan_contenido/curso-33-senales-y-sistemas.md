@@ -97,14 +97,31 @@ salga igual medida con tonos que calculada con la FFT de h.
 
 | Lote | Piezas | Estado |
 |---|---|---|
-| A | 00 intro, 01, 02, 03, 04 | **cerrado** (revisadas y commiteadas) |
+| A | 00 intro, 01, 02, 03, 04 | **cerrado** |
 | B | 05, 06, 07, 08, 09 | **cerrado** |
-| C | **10**, 11, 12, 13, 14 | 10 cerrada; 11-14 en produccion |
-| D | 15, 16, 17, 18, 19 cierre | cierre validado; 15 en produccion; 16-18 pendientes |
+| C | 10, 11, 12, 13, 14 | **cerrado** |
+| D | 15, 16, 17, 18, 19 cierre | **cerrado** |
 
-**Duraciones medidas (ql)**: intro 15.07, 01 31.70, 02 32.40, 03 36.03,
-04 31.50, 05 36.60, 06 32.83, 07 31.93, 08 34.57, 09 36.73, 10 31.67,
-cierre 13.63.
+**LAS 20 ESCRITAS Y REVISADAS FOTOGRAMA A FOTOGRAMA.** Duraciones medidas en
+`ql`: intro 15.07, 01 31.70, 02 32.40, 03 36.03, 04 31.50, 05 36.60,
+06 32.83, 07 31.93, 08 34.57, 09 36.73, 10 31.67, 11 33.93, 12 41.90,
+13 33.57, 14 41.50, 15 34.67, 16 30.07, 17 34.86, 18 35.03, cierre 13.63.
+Suma ~11.4 min. Sonda: **73 invariantes, 0 fallos**.
+
+**Piezas devueltas y por que** (nueve de dieciocho, y en cinco casos el
+error estaba en MI encargo, no en el trabajo del agente):
+
+| Pieza | Que estaba mal |
+|---|---|
+| 04 | "valor final" sobre una respuesta que seguia oscilando (0.1381 de vaiven) |
+| 06 | el remate apinado en dos tercios del cuadro; y despues, ambar al 32 % = oliva |
+| 08 | dos paneles a la misma altura con escalas que difieren 17.8x, sin declararlo |
+| 09 | el cero solo era comprobable si el espectador RECORDABA la salida anterior |
+| 10 | "60 muestras que duran" era el tamano de la ventana |
+| 11 | el eje del cero en el suelo del cuadro con datos que bajan de cero |
+| 15 | mi encargo daba una cifra de ventana (552) y decia que la campana "crece" |
+| 16 | el cuarto decimal del valor final lo ponia la ventana |
+| 17 | "COINCIDEN" sobre dos curvas en antifase: faltaba compensar el retardo |
 
 **Nombres de portada, MEDIDOS** (no elegidos a ojo): los 18 caben. Tres van
 en **dos lineas** al cuerpo 64 — RESPUESTA AL IMPULSO, ECUACION EN
