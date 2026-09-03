@@ -63,6 +63,47 @@ class RunnerClient:
         return {"thumb": resp.get("thumb", ""),
                 "resolution": resp.get("resolution", "")}
 
+    async def frames(self, job_id: str, n: int) -> dict:
+        """Hoja de contactos del render: n fotogramas equiespaciados y el
+        ultimo REAL, a 480 px, en <job>/frames/. Devuelve el indice con el
+        instante de cada uno."""
+        resp = await self._request_one(
+            {"cmd": "frames", "job_id": job_id, "n": n}, timeout=360)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la hoja de contactos fallo"))
+        return resp.get("informe") or {}
+
+    async def fotograma(self, job_id: str, t: float, ancho: int,
+                        formato: str = "png") -> dict:
+        """Un fotograma del mp4 del job a la resolucion pedida, en
+        <job>/figuras/. Devuelve {archivo, t, ancho, alto, bytes}."""
+        resp = await self._request_one(
+            {"cmd": "fotograma", "job_id": job_id, "t": t, "ancho": ancho,
+             "formato": formato}, timeout=360)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "el fotograma fallo"))
+        return resp.get("informe") or {}
+
+    async def ejecutar(self, lab_id: str, timeout: int,
+                       sonda: str | None = None) -> dict:
+        """Corre `render_jobs/lab/<lab_id>/script.py` —o la sonda `sonda`, que
+        vive en ruta cerrada del repo— dentro del contenedor de render.
+
+        Devuelve {code, timed_out, stdout, stderr, archivos}. `code != 0` NO
+        es un error del transporte: una sonda con invariantes rotos sale con
+        1 a proposito, y eso es justo lo que se quiere ver.
+        """
+        payload = {"cmd": "ejecutar", "lab_id": lab_id, "timeout": timeout}
+        if sonda:
+            payload["sonda"] = sonda
+        # Margen sobre el timeout del runner, que a su vez ya suma 30 s al
+        # pedido: si se agota este, el que responde es el cliente y el
+        # contenedor se queda vivo.
+        resp = await self._request_one(payload, timeout=timeout + 90)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la ejecucion fallo"))
+        return resp
+
     async def postproceso(self, job_id: str, con_voz: bool) -> str:
         """Mezcla el audio del promo sobre el video del job (sfx.py en el
         contenedor). Devuelve la ruta relativa del mp4 sonorizado."""
@@ -97,14 +138,28 @@ class RunnerClient:
         copia. El plan ya esta escrito en exports/peliculas/<pid>/plan.json.
 
         `modo="verificar"` mide la pelicula ya montada contra ese mismo plan
-        en vez de volver a montarla.
+        en vez de volver a montarla. Desde R3c eso incluye sacar dos
+        fotogramas por union para medir la costura y un `volumedetect` por
+        pieza, asi que su tope acompana al del runner
+        (`ENSAMBLAR_VERIFICA_TIMEOUT`): si uno cambia, el otro tambien.
         """
         resp = await self._request_one(
             {"cmd": "ensamblar", "project_id": project_id, "modo": modo},
-            timeout=14700 if modo == "montar" else 360)
+            timeout=14700 if modo == "montar" else 1860)
         if resp.get("type") != "ok":
             raise RunnerError(resp.get("error", "el montaje fallo"))
         return resp.get("informe") or {}
+
+    async def normalizar_voz(self, slug: str, entrada: str, salida: str) -> dict:
+        """Convierte una grabacion subida (m4a/aac/webm...) a WAV mono 24 kHz
+        con ffmpeg en el contenedor. `slug` es el directorio del proyecto
+        bajo guiones/; `entrada`/`salida` son nombres de archivo dentro."""
+        resp = await self._request_one(
+            {"cmd": "normalizar_voz", "slug": slug, "entrada": entrada,
+             "salida": salida}, timeout=300)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la conversion de audio fallo"))
+        return resp
 
     async def paleta(self) -> list[str]:
         """Sintetiza el banco de sonidos (wavs sueltos) para poder oirlo."""
@@ -112,6 +167,13 @@ class RunnerClient:
         if resp.get("type") != "ok":
             raise RunnerError(resp.get("error", "la sintesis del banco fallo"))
         return resp.get("sonidos") or []
+
+    async def musica(self) -> list[str]:
+        """Sintetiza el banco de musica (una vista previa por tema)."""
+        resp = await self._request_one({"cmd": "musica"}, timeout=960)
+        if resp.get("type") != "ok":
+            raise RunnerError(resp.get("error", "la sintesis de musica fallo"))
+        return resp.get("temas") or []
 
     async def verificar(self, job_id: str, frames: int = 6,
                         dur_min: float = 8.0, dur_max: float = 15.0) -> dict:

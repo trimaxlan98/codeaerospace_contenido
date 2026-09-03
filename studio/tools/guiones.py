@@ -40,9 +40,10 @@ from pathlib import Path
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from app.narracion import (TOLERANCIA_AUDIO, VertexNarrador,  # noqa: E402
+from app.narracion import (TOLERANCIA_AUDIO,  # noqa: E402
                            duracion_mp4, etiqueta_clip, generar_clip,
                            hash_guion, sintetizar, slugify)
+from app.tts import narrador_desde_entorno  # noqa: E402
 from app.projects import compose_script  # noqa: E402
 
 ENV_FILE = Path("/etc/manimstudio/env")
@@ -107,8 +108,12 @@ def main() -> None:
     ap.add_argument("proyecto", help="id o parte del nombre del proyecto")
     ap.add_argument("--clips", help="posiciones 1-based, ej. 1,3-5")
     ap.add_argument("--voz", default=None,
-                    help="voz prebuilt de Gemini TTS (defecto: MS_TTS_VOICE "
-                    "o Charon)")
+                    help="voz del proveedor (defecto: la suya)")
+    ap.add_argument("--proveedor", default=None,
+                    choices=["vertex", "edge", "piper"],
+                    help="quien pone la voz (defecto: MS_TTS_PROVIDER o el "
+                    "primero disponible). Solo vertex escribe el guion; con "
+                    "otro se usa el .secciones.json existente")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--solo-guion", action="store_true")
     ap.add_argument("--solo-audio", action="store_true",
@@ -119,12 +124,11 @@ def main() -> None:
 
     cargar_env()
     db_path = os.environ.get("MS_DB_PATH", DEFAULT_DB)
-    key_path = Path(os.environ.get("MS_GCP_KEY_PATH", DEFAULT_KEY))
-    voz = args.voz or os.environ.get("MS_TTS_VOICE", "Charon")
-    model_guion = os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro")
-    model_tts = os.environ.get("MS_GEMINI_MODEL_TTS",
-                               "gemini-2.5-flash-preview-tts")
-    location = os.environ.get("MS_GCP_LOCATION", "us-central1")
+    try:
+        vertex, voz = narrador_desde_entorno(args.proveedor, args.voz)
+    except RuntimeError as e:
+        sys.exit(str(e))
+    print(f"voz: {vertex.id} · {voz}")
 
     import sqlite3
     db = sqlite3.connect(db_path)
@@ -160,10 +164,6 @@ def main() -> None:
     estado = (json.loads(estado_path.read_text())
               if estado_path.is_file() else {})
 
-    try:
-        vertex = VertexNarrador(key_path, location, model_guion, model_tts)
-    except RuntimeError as e:
-        sys.exit(str(e))
     curso = {"name": proyecto["name"], "description": proyecto["description"],
              "total_clips": len(clips)}
     resumen = []
@@ -209,8 +209,18 @@ def main() -> None:
             print(f"[{etiqueta}] al día (hash sin cambios), saltado")
             continue
 
+        # Un proveedor que no escribe guiones usa el .secciones.json que haya
+        secciones = None
+        if vertex.id != "vertex":
+            secciones = cargar_secciones(destino, etiqueta)
+            if not secciones:
+                print(f"[{etiqueta}] {vertex.id} no escribe guiones y no hay "
+                      ".secciones.json: escribelo (app > Guion y voz) o usa "
+                      "--proveedor vertex")
+                continue
         entry = generar_clip(vertex, curso, clip, compuesto, video_s, voz,
-                             destino, etiqueta, solo_guion=args.solo_guion)
+                             destino, etiqueta, solo_guion=args.solo_guion,
+                             secciones=secciones)
         estado[clip["id"]] = entry
         estado_path.write_text(json.dumps(estado, indent=2))
         resumen.append((etiqueta, video_s, entry["audio_s"]))

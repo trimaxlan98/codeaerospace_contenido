@@ -25,6 +25,37 @@ async function request(method, path, body) {
   return data
 }
 
+// Subida de un archivo como cuerpo crudo (sin multipart: el backend no lo
+// necesita y asi no hay dependencia extra). Mismo manejo de 401 y errores.
+async function subirArchivo(path, file) {
+  const res = await fetch(path, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    body: file,
+  })
+  let data = null
+  try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (res.status === 401) onUnauthorized?.()
+  if (!res.ok) throw new ApiError(res.status, data?.detail)
+  return data
+}
+
+// Envio de un archivo como cuerpo crudo por POST (el zip de fuentes). Igual
+// que `subirArchivo` pero con el metodo y el tipo explicitos: el backend no
+// usa multipart en ningun sitio (no hay `python-multipart` en el venv).
+async function subirCrudo(path, file, contentType) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': contentType },
+    body: file,
+  })
+  let data = null
+  try { data = await res.json() } catch { /* respuestas no-JSON */ }
+  if (res.status === 401) onUnauthorized?.()
+  if (!res.ok) throw new ApiError(res.status, data?.detail)
+  return data
+}
+
 export const api = {
   me: () => request('GET', '/api/me'),
   login: (username, password) => request('POST', '/api/login', { username, password }),
@@ -64,6 +95,18 @@ export const api = {
   moveClip: (pid, cid, position) => request('POST', `/api/projects/${pid}/clips/${cid}/move`, { position }),
   renderClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/render`),
   renderStale: (pid) => request('POST', `/api/projects/${pid}/render-stale`),
+  // R3a — paridad con la terminal: un proyecto es un directorio.
+  // El lote encola varios clips a la calidad elegida (la del proyecto si no
+  // se dice otra) y `getLote` da el progreso agregado mientras dure.
+  renderLote: (pid, body = {}) => request('POST', `/api/projects/${pid}/render-lote`, body),
+  getLote: (pid) => request('GET', `/api/projects/${pid}/lote`),
+  duplicarProyecto: (pid, name) => request('POST', `/api/projects/${pid}/duplicar`, { name }),
+  duplicarClip: (pid, cid) => request('POST', `/api/projects/${pid}/clips/${cid}/duplicar`),
+  importables: () => request('GET', '/api/projects/importables'),
+  importarDelRepo: (slug, origen, dryRun = false) => request(
+    'POST', `/api/projects/importar${dryRun ? '?dry_run=1' : ''}`, { slug, origen }),
+  importarZip: (file, dryRun = false) => subirCrudo(
+    `/api/projects/importar${dryRun ? '?dry_run=1' : ''}`, file, 'application/zip'),
   getClipScript: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/script`),
   getAudioPromo: (pid, cid) => request('GET', `/api/projects/${pid}/clips/${cid}/audio`),
   putAudioPromo: (pid, cid, body) => request('PUT', `/api/projects/${pid}/clips/${cid}/audio`, body),
@@ -73,6 +116,12 @@ export const api = {
   startNarracion: (pid, body = {}) => request('POST', `/api/projects/${pid}/narracion`, body),
   cancelNarracion: (pid) => request('POST', `/api/projects/${pid}/narracion/cancel`),
   getNarracionTexto: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/texto`),
+  // Voz sin GCP: catalogo de proveedores, guion editable y grabacion propia.
+  getVoces: () => request('GET', '/api/narracion/proveedores'),
+  getGuion: (pid, cid) => request('GET', `/api/projects/${pid}/narracion/${cid}/guion`),
+  putGuion: (pid, cid, secciones) => request('PUT', `/api/projects/${pid}/narracion/${cid}/guion`, { secciones }),
+  subirNarracion: (pid, cid, file) => subirArchivo(
+    `/api/projects/${pid}/narracion/${cid}/audio?nombre=${encodeURIComponent(file.name || 'voz.wav')}`, file),
   // La pelicula del curso (clips + narracion + marca en un solo archivo).
   getPelicula: (pid) => request('GET', `/api/projects/${pid}/pelicula`),
   montarPelicula: (pid, body = {}) => request('POST', `/api/projects/${pid}/pelicula`, body),
@@ -89,6 +138,24 @@ export const api = {
   // Banco de sonidos: los wavs sueltos de la paleta, para poder OIRLOS.
   getSfx: () => request('GET', '/api/sfx'),
   generarSfx: () => request('POST', '/api/sfx'),
+  // Banco de musica: una vista previa de 12 s por tema, por la misma razon.
+  getMusica: () => request('GET', '/api/musica'),
+  generarMusica: () => request('POST', '/api/musica'),
+
+  // Fotogramas de un render: la hoja de contactos (revision visual, la regla
+  // dura del proyecto es que nada quede encimado) y el fotograma suelto a
+  // resolucion, que es la figura estatica de una tesis.
+  hojaContactos: (jobId, n) => request('POST', `/api/jobs/${jobId}/frames`, { n }),
+  fotograma: (jobId, t, ancho) => request('POST', `/api/jobs/${jobId}/fotograma`,
+    { t, ancho, formato: 'png' }),
+
+  // Laboratorio: Python de validacion en el sandbox (las sondas del repo).
+  listarLab: () => request('GET', '/api/laboratorio'),
+  getLab: (id) => request('GET', `/api/laboratorio/${id}`),
+  ejecutarLab: (body) => request('POST', '/api/laboratorio', body),
+  borrarLab: (id) => request('DELETE', `/api/laboratorio/${id}`),
+  getSondas: () => request('GET', '/api/laboratorio/sondas'),
+  correrSonda: (nombre) => request('POST', `/api/laboratorio/sondas/${encodeURIComponent(nombre)}`),
 }
 
 export function videoUrl(id) {
@@ -105,6 +172,12 @@ export function projectExportUrl(id) {
 
 export function projectArchiveUrl(id) {
   return `/api/projects/${id}/archive`
+}
+
+// Las FUENTES del proyecto (curso.json + style_block.py + clips/ + guiones/):
+// lo que `subir_curso.py` vuelve a leer, no los videos.
+export function projectSourcesUrl(id) {
+  return `/api/projects/${id}/fuentes.zip`
 }
 
 export function frameVerificacionUrl(jobId, archivo) {
@@ -129,6 +202,18 @@ export function sfxUrl(nombre) {
   return `/api/sfx/${encodeURIComponent(nombre)}`
 }
 
+// La vista previa de un tema musical. El nombre va contra el catalogo cerrado
+// del backend: aqui no hace falta escaparlo mas alla de la URL.
+export function musicaUrl(tema) {
+  return `/api/musica/${encodeURIComponent(tema)}`
+}
+
 export function narracionAudioUrl(pid, cid) {
   return `/api/projects/${pid}/narracion/${cid}/audio`
+}
+
+// Un archivo producido por una ejecucion del Laboratorio (PNG, WAV, JSON...).
+// El nombre va contra un regex anclado en el backend; aqui basta escaparlo.
+export function labArchivoUrl(labId, nombre) {
+  return `/api/laboratorio/${labId}/archivos/${encodeURIComponent(nombre)}`
 }

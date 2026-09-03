@@ -1,13 +1,16 @@
-"""Narracion de clips: guion cronometrado con Gemini + voz con Gemini TTS.
+"""Narracion de clips: guion cronometrado + voz.
 
 Logica compartida entre el CLI (studio/tools/guiones.py) y el endpoint
 "Generar narracion" de Proyectos. La salida vive en <workspace>/guiones/
-<slug-proyecto>/ (md + txt + wav + estado.json), fuera de render_jobs/ y de
-la cola de render: narrar no encola jobs ni toca los videos.
+<slug-proyecto>/ (md + txt + wav + secciones.json + estado.json), fuera de
+render_jobs/ y de la cola de render: narrar no encola jobs ni toca los
+videos.
 
-Reusa la service account del asistente IA (mismo feature-flag: sin
-gcp-key.json no hay narracion). El SDK de google-genai se importa perezoso,
-igual que en ai.py (el servicio corre con MemoryMax=512M).
+La voz la pone un PROVEEDOR (app/tts.py): Vertex (Gemini TTS, el original),
+edge-tts (gratis, red desde el backend), Piper (offline) o una grabacion
+propia subida por el dueno. El guion lo escribe Gemini si hay credenciales;
+si no, se escribe a mano (PUT .../guion) y el proveedor solo lo habla.
+Desde 2026-09-03 la app no depende de GCP para tener voz.
 """
 
 import asyncio
@@ -20,14 +23,16 @@ import unicodedata
 import wave
 from pathlib import Path
 
+from . import tts as tts_mod
 from .projects import compose_script
+from .tts import (GUION_SCHEMA, INSTRUCCION_TTS, TTS_RATE,  # noqa: F401
+                  VertexNarrador)
 
 # Narracion en español pausada: ~2.2 palabras/s, y solo se apunta al 90 %
 # de la duracion del video para dejar aire entre secciones.
 PALABRAS_POR_SEGUNDO = 2.2
 MARGEN = 0.9
 MAX_PALABRAS_SIN_RENDER = 160
-TTS_RATE = 24_000  # PCM mono 16-bit que devuelve Gemini TTS
 TTS_MAX_CHARS = 3_000  # por llamada; las secciones se agrupan hasta este tope
 PAUSA_ENTRE_TROZOS_S = 0.35
 # El audio puede exceder el video hasta este factor antes de reintentar con
@@ -44,33 +49,6 @@ MAX_HUECO_S = 2.5
 # Recorte de silencio del TTS: umbral de amplitud (int16) y margen conservado.
 UMBRAL_SILENCIO = 300
 MARGEN_SILENCIO_S = 0.12
-
-INSTRUCCION_TTS = (
-    "Lee el siguiente guion de un video de divulgación científica en "
-    "español, con tono cálido, claro y pausado, como la voz en off de un "
-    "documental:\n\n"
-)
-
-GUION_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "secciones": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "t_inicio": {"type": "number"},
-                    "t_fin": {"type": "number"},
-                    "momento": {"type": "string"},
-                    "texto": {"type": "string"},
-                },
-                "required": ["t_inicio", "t_fin", "momento", "texto"],
-            },
-        },
-    },
-    "required": ["secciones"],
-}
-
 
 def slugify(text: str) -> str:
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
@@ -122,70 +100,6 @@ def hash_guion(script_compuesto: str, scene: str, video_s: float | None,
     h.update(f"\n# video_s: {round(video_s) if video_s else 0}".encode())
     h.update(f"\n# voz: {voz}".encode())
     return h.hexdigest()
-
-
-# ── Vertex AI ────────────────────────────────────────────────────────────────
-
-class VertexNarrador:
-    """Cliente Vertex para guion (JSON) y TTS. Llamadas bloqueantes: usarlo
-    desde un thread (asyncio.to_thread) o desde un CLI."""
-
-    def __init__(self, key_path: Path, location: str, model_guion: str,
-                 model_tts: str) -> None:
-        if not key_path.is_file():
-            raise RuntimeError(
-                f"No existe la service account {key_path}: la narracion "
-                "necesita el mismo acceso a Vertex AI que el asistente IA.")
-        from google import genai
-        from google.oauth2 import service_account
-
-        self.types = __import__("google.genai.types", fromlist=["types"])
-        self.model_guion = model_guion
-        self.model_tts = model_tts
-        project = json.loads(key_path.read_text())["project_id"]
-        creds = service_account.Credentials.from_service_account_file(
-            str(key_path),
-            scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        self.client = genai.Client(vertexai=True, project=project,
-                                   location=location, credentials=creds)
-
-    def guion(self, system: str, user: str) -> dict:
-        t = self.types
-        resp = self.client.models.generate_content(
-            model=self.model_guion,
-            contents=user,
-            config=t.GenerateContentConfig(
-                system_instruction=system,
-                temperature=0.6,
-                max_output_tokens=8192,
-                response_mime_type="application/json",
-                response_schema=GUION_SCHEMA,
-            ),
-        )
-        return json.loads(resp.text)
-
-    def tts(self, texto: str, voz: str) -> bytes:
-        t = self.types
-        for intento in (1, 2, 3):
-            try:
-                resp = self.client.models.generate_content(
-                    model=self.model_tts,
-                    contents=INSTRUCCION_TTS + texto,
-                    config=t.GenerateContentConfig(
-                        response_modalities=["AUDIO"],
-                        speech_config=t.SpeechConfig(
-                            voice_config=t.VoiceConfig(
-                                prebuilt_voice_config=t.PrebuiltVoiceConfig(
-                                    voice_name=voz))),
-                    ),
-                )
-                part = resp.candidates[0].content.parts[0]
-                return part.inline_data.data
-            except Exception:
-                if intento == 3:
-                    raise
-                time.sleep(5 * intento)
-        raise RuntimeError("unreachable")
 
 
 def prompt_guion(curso: dict, clip: dict, script_compuesto: str,
@@ -256,7 +170,7 @@ def _escribir_wav(pcm: bytes, wav_path: Path) -> float:
     return len(pcm) / 2 / TTS_RATE
 
 
-def _pcm_agrupado(vertex: VertexNarrador, secciones: list[dict],
+def _pcm_agrupado(vertex, secciones: list[dict],
                   voz: str) -> bytes:
     """Secciones agrupadas hasta TTS_MAX_CHARS con una pausa breve entre
     trozos (sin tiempos: narracion continua)."""
@@ -298,16 +212,19 @@ def _recortar_silencio(audio: bytes) -> bytes:
 
 
 def _ensamblar(secciones: list[dict], audios: list[bytes],
-               holgura: float = 1.0) -> bytes:
+               holgura: float = 1.0, hueco_max_s: float = MAX_HUECO_S) -> bytes:
     """Coloca cada seccion en su t_inicio: la voz cae sobre el momento visual
     que comenta. El hueco insertado se acota a MAX_HUECO_S (los tiempos del
     guion son estimados) y si una seccion se pasa de largo, la siguiente cede
     hacia adelante (con la pausa minima) en cascada.
 
     `holgura` escala los silencios que se insertan (1.0 = tiempos tal cual,
-    0.0 = secciones pegadas una tras otra, el minimo posible)."""
+    0.0 = secciones pegadas una tras otra, el minimo posible). `hueco_max_s`
+    es el tope del silencio insertado: 2.5 s para un guion ESTIMADO por
+    Gemini; para uno escrito a mano los tiempos son deliberados (huecos de
+    4-7 s en un vertical) y el tope se levanta (`exacto`)."""
     pausa_min = int(TTS_RATE * PAUSA_ENTRE_TROZOS_S * holgura)
-    hueco_max = int(TTS_RATE * MAX_HUECO_S * holgura)
+    hueco_max = int(TTS_RATE * hueco_max_s * holgura)
     pcm = bytearray()
     cursor = 0  # muestras escritas
     for i, (s, audio) in enumerate(zip(secciones, audios)):
@@ -323,18 +240,18 @@ def _ensamblar(secciones: list[dict], audios: list[bytes],
 
 
 def _ajustar_al_limite(secciones: list[dict], audios: list[bytes],
-                       limite_s: float) -> bytes:
+                       limite_s: float, hueco_max_s: float = MAX_HUECO_S) -> bytes:
     """Mayor holgura entre secciones que aun cabe en `limite_s` (busqueda
     binaria). Recortar silencio no toca la voz, asi que es lo primero que se
     sacrifica antes de pedir un guion mas corto."""
     limite = int(limite_s * TTS_RATE)
-    minimo = _ensamblar(secciones, audios, 0.0)
+    minimo = _ensamblar(secciones, audios, 0.0, hueco_max_s)
     if len(minimo) // 2 > limite:
         return minimo  # ni pegadas caben: lo resuelve el reintento de guion
     lo, hi, mejor = 0.0, 1.0, minimo
     for _ in range(8):
         mid = (lo + hi) / 2
-        pcm = _ensamblar(secciones, audios, mid)
+        pcm = _ensamblar(secciones, audios, mid, hueco_max_s)
         if len(pcm) // 2 <= limite:
             mejor, lo = pcm, mid
         else:
@@ -342,28 +259,31 @@ def _ajustar_al_limite(secciones: list[dict], audios: list[bytes],
     return mejor
 
 
-def _pcm_alineado(vertex: VertexNarrador, secciones: list[dict], voz: str,
-                  limite_s: float | None = None) -> bytes:
+def _pcm_alineado(vertex, secciones: list[dict], voz: str,
+                  limite_s: float | None = None, exacto: bool = False) -> bytes:
     """Cada seccion se sintetiza aparte (con su silencio recortado) y se
     ensambla sobre los tiempos del guion, comprimiendo los silencios si hace
-    falta para no pasarse de `limite_s`."""
+    falta para no pasarse de `limite_s`. Con `exacto` los t_inicio se
+    respetan sin tope de hueco (guion escrito a mano)."""
     audios = [_recortar_silencio(vertex.tts(s["texto"], voz))
               for s in secciones]
-    pcm = _ensamblar(secciones, audios)
+    hueco = 1e9 if exacto else MAX_HUECO_S
+    pcm = _ensamblar(secciones, audios, 1.0, hueco)
     if limite_s and len(pcm) // 2 > limite_s * TTS_RATE:
-        pcm = _ajustar_al_limite(secciones, audios, limite_s)
+        pcm = _ajustar_al_limite(secciones, audios, limite_s, hueco)
     return pcm
 
 
-def sintetizar(vertex: VertexNarrador, secciones: list[dict], voz: str,
-               wav_path: Path, limite_s: float | None = None) -> float:
+def sintetizar(vertex, secciones: list[dict], voz: str,
+               wav_path: Path, limite_s: float | None = None,
+               exacto: bool = False) -> float:
     """TTS a WAV. Con tiempos por seccion (t_inicio) el audio se alinea a los
     momentos visuales del guion; sin tiempos se narra de corrido. Devuelve la
     duracion del audio en segundos."""
     alineable = (len(secciones) > 1
                  and all(isinstance(s.get("t_inicio"), (int, float))
                          for s in secciones))
-    pcm = (_pcm_alineado(vertex, secciones, voz, limite_s) if alineable
+    pcm = (_pcm_alineado(vertex, secciones, voz, limite_s, exacto) if alineable
            else _pcm_agrupado(vertex, secciones, voz))
     return _escribir_wav(pcm, wav_path)
 
@@ -383,24 +303,82 @@ def _mejor_intento(candidato: float, actual: float | None,
     return candidato > actual if cabe else candidato < actual
 
 
-def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
+def validar_secciones(secciones) -> list[dict]:
+    """Guion escrito a mano (PUT .../guion): misma forma que el de Gemini.
+    Devuelve las secciones normalizadas o lanza ValueError legible."""
+    if not isinstance(secciones, list) or not secciones:
+        raise ValueError("el guion necesita al menos una seccion")
+    if len(secciones) > 200:
+        raise ValueError("demasiadas secciones (tope 200)")
+    out = []
+    t_prev = -1.0
+    for i, s in enumerate(secciones, 1):
+        if not isinstance(s, dict):
+            raise ValueError(f"seccion {i}: no es un objeto")
+        texto = str(s.get("texto") or "").strip()
+        if not texto:
+            raise ValueError(f"seccion {i}: texto vacio")
+        if len(texto) > 2000:
+            raise ValueError(f"seccion {i}: texto demasiado largo (tope 2000)")
+        try:
+            t0 = float(s.get("t_inicio", 0))
+        except (TypeError, ValueError):
+            raise ValueError(f"seccion {i}: t_inicio no es un numero")
+        if t0 < 0 or t0 > 7200:
+            raise ValueError(f"seccion {i}: t_inicio fuera de rango")
+        if t0 < t_prev:
+            raise ValueError(f"seccion {i}: t_inicio retrocede")
+        t_prev = t0
+        try:
+            t1 = float(s.get("t_fin", t0))
+        except (TypeError, ValueError):
+            raise ValueError(f"seccion {i}: t_fin no es un numero")
+        if t1 < t0:
+            t1 = t0
+        out.append({"t_inicio": round(t0, 2), "t_fin": round(t1, 2),
+                    "momento": str(s.get("momento") or "")[:120],
+                    "texto": texto})
+    return out
+
+
+def generar_clip(narrador, curso: dict, clip: dict,
                  compuesto: str, video_s: float | None, voz: str,
                  destino: Path, etiqueta: str, solo_guion: bool = False,
-                 log=print) -> dict:
+                 log=print, secciones: list[dict] | None = None,
+                 guionista=None) -> dict:
     """Genera guion (+ audio) de UN clip y escribe md/txt/wav en `destino`.
-    Devuelve la entrada para estado.json. Bloqueante (Vertex)."""
+    Devuelve la entrada para estado.json. Bloqueante (red o subproceso).
+
+    `narrador` pone la voz (cualquier proveedor de tts.py). El guion lo
+    escribe `guionista` (Vertex) si se pasa; si no, tiene que venir ya en
+    `secciones` (escrito a mano) y entonces no se reintenta con un guion mas
+    corto: solo se comprimen los silencios para que quepa.
+    """
     md_path = destino / f"{etiqueta}.md"
     txt_path = destino / f"{etiqueta}.txt"
     wav_path = destino / f"{etiqueta}.wav"
 
+    if guionista is None and secciones is None \
+            and getattr(narrador, "id", "vertex") == "vertex":
+        guionista = narrador
+
     max_palabras = (int(video_s * PALABRAS_POR_SEGUNDO * MARGEN)
                     if video_s else MAX_PALABRAS_SIN_RENDER)
-    log(f"[{etiqueta}] guion… (video "
-        + (f"{video_s:.0f} s, tope {max_palabras} palabras)"
-           if video_s else f"sin render, tope {MAX_PALABRAS_SIN_RENDER} palabras)"))
-    system, user = prompt_guion(curso, clip, compuesto, video_s, max_palabras)
-    data = vertex.guion(system, user)
-    secciones = data["secciones"]
+    if secciones is None:
+        if guionista is None:
+            raise RuntimeError(
+                "no hay guion para este clip y el proveedor de voz no lo "
+                "escribe: escribelo en la app (Guion) o configura Vertex")
+        log(f"[{etiqueta}] guion… (video "
+            + (f"{video_s:.0f} s, tope {max_palabras} palabras)"
+               if video_s else f"sin render, tope {MAX_PALABRAS_SIN_RENDER} palabras)"))
+        system, user = prompt_guion(curso, clip, compuesto, video_s, max_palabras)
+        data = guionista.guion(system, user)
+        secciones = data["secciones"]
+        puede_reescribir = True
+    else:
+        secciones = validar_secciones(secciones)
+        puede_reescribir = False
     narracion = "\n\n".join(s["texto"].strip() for s in secciones)
 
     audio_s = None
@@ -411,13 +389,14 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
         for intento in range(1, MAX_INTENTOS_GUION + 1):
             log(f"[{etiqueta}] narrando con {voz}…"
                 + (f" (intento {intento})" if intento > 1 else ""))
-            audio_s = sintetizar(vertex, secciones, voz, tmp, limite)
+            audio_s = sintetizar(narrador, secciones, voz, tmp, limite,
+                                 exacto=not puede_reescribir)
             if _mejor_intento(audio_s, mejor and mejor["audio_s"], limite):
                 mejor = {"audio_s": audio_s, "secciones": secciones,
                          "narracion": narracion}
                 tmp.replace(wav_path)
             if limite is None or audio_s <= limite \
-                    or intento == MAX_INTENTOS_GUION:
+                    or intento == MAX_INTENTOS_GUION or not puede_reescribir:
                 break
             # Aun no cabe: guion mas corto en proporcion a lo que se paso.
             log(f"[{etiqueta}] audio {audio_s:.0f} s > video "
@@ -425,7 +404,7 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
             max_palabras = max(20, int(max_palabras * video_s / audio_s * .95))
             system, user = prompt_guion(curso, clip, compuesto, video_s,
                                         max_palabras)
-            data = vertex.guion(system, user)
+            data = guionista.guion(system, user)
             secciones = data["secciones"]
             narracion = "\n\n".join(s["texto"].strip() for s in secciones)
         tmp.unlink(missing_ok=True)
@@ -437,16 +416,19 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
                 f"largo que el video ({video_s:.0f} s); mux.sh lo ajusta "
                 "con atempo al montar.")
 
+    model_tts = getattr(narrador, "model_tts", "tts")
     md_path.write_text(render_md(curso, clip, secciones, narracion,
-                                 video_s, voz, vertex.model_tts))
+                                 video_s, voz, model_tts))
     txt_path.write_text(narracion + "\n")
     # Secciones con tiempos: permiten re-sintetizar el audio alineado sin
-    # volver a generar el guion (CLI --solo-audio).
+    # volver a generar el guion (CLI --solo-audio, o cambiar de voz).
     (destino / f"{etiqueta}.secciones.json").write_text(
         json.dumps(secciones, ensure_ascii=False, indent=2))
     return {
         "hash": hash_guion(compuesto, clip["scene"] or "", video_s, voz),
         "etiqueta": etiqueta, "voz": voz,
+        "proveedor": getattr(narrador, "id", "vertex"),
+        "origen": "tts",
         "video_s": round(video_s, 1) if video_s else None,
         "audio_s": round(audio_s, 1) if audio_s else None,
         "palabras": len(narracion.split()),
@@ -459,11 +441,11 @@ def generar_clip(vertex: VertexNarrador, curso: dict, clip: dict,
 class NarracionService:
     """Estado y generacion de narraciones desde la API.
 
-    Una sola generacion en curso a la vez (app de sesion unica y una sola
-    cuota de Vertex): `start` devuelve 409 via ValueError si ya hay una.
-    El progreso vive en memoria (`run_public`); el resultado durable es
-    estado.json + los archivos, asi que un reinicio a mitad solo pierde el
-    progreso visual, no el trabajo ya escrito.
+    Una sola generacion en curso a la vez (app de sesion unica): `start`
+    devuelve 409 via ValueError si ya hay una. El progreso vive en memoria
+    (`run_public`); el resultado durable es estado.json + los archivos, asi
+    que un reinicio a mitad solo pierde el progreso visual, no el trabajo ya
+    escrito.
     """
 
     def __init__(self, cfg, db) -> None:
@@ -478,11 +460,42 @@ class NarracionService:
 
     @property
     def enabled(self) -> bool:
-        return self.cfg.gcp_key_path.is_file()
+        """Hay al menos un proveedor que SINTETIZA (la grabacion propia
+        siempre esta, pero no cuenta: no genera nada sola)."""
+        return tts_mod.proveedor_defecto(self.cfg) is not None
 
     @property
     def running(self) -> bool:
         return self._run is not None and not self._run.get("finished")
+
+    def proveedores(self) -> list[dict]:
+        return tts_mod.catalogo(self.cfg)
+
+    def proveedor_defecto(self) -> str | None:
+        return tts_mod.proveedor_defecto(self.cfg)
+
+    def voz_defecto(self, proveedor: str | None = None) -> str:
+        proveedor = proveedor or self.proveedor_defecto()
+        return tts_mod.voz_defecto(self.cfg, proveedor) if proveedor else ""
+
+    def resolver_voz(self, proveedor: str | None, voz: str | None) -> tuple[str, str]:
+        """(proveedor, voz) validados contra el catalogo. ValueError si el
+        proveedor no esta disponible o la voz no es suya."""
+        proveedor = proveedor or self.proveedor_defecto()
+        if not proveedor:
+            raise ValueError("Narracion no disponible: ningun proveedor de "
+                             "voz instalado (edge-tts, piper o Vertex)")
+        cat = {p["id"]: p for p in self.proveedores()}
+        p = cat.get(proveedor)
+        if not p:
+            raise ValueError(f"proveedor de voz desconocido: {proveedor}")
+        if not p["disponible"]:
+            raise ValueError(f"proveedor {proveedor} no disponible: "
+                             f"{p['motivo'] or 'desactivado'}")
+        voz = voz or p["voz_defecto"] or ""
+        if p["voces"] and voz not in {v["id"] for v in p["voces"]}:
+            raise ValueError(f"la voz {voz!r} no es de {proveedor}")
+        return proveedor, voz
 
     # ── consulta ─────────────────────────────────────────────────────────
 
@@ -495,6 +508,12 @@ class NarracionService:
             return json.loads(p.read_text()) if p.is_file() else {}
         except (OSError, ValueError):
             return {}
+
+    def _escribir_estado(self, destino: Path, clip_id: str, entry: dict) -> None:
+        destino.mkdir(parents=True, exist_ok=True)
+        estado = self._leer_estado(destino)
+        estado[clip_id] = entry
+        (destino / "estado.json").write_text(json.dumps(estado, indent=2))
 
     def resumen_audio(self, project: dict, clips: list[dict]) -> dict:
         """Cuantos clips ya tienen audio, sin abrir un solo mp4.
@@ -533,25 +552,37 @@ class NarracionService:
         self._dur_cache[str(path)] = (mtime, dur)
         return dur
 
+    def _hash_vigente(self, project: dict, clip: dict, previo: dict,
+                      video_s: float | None, voz: str | None = None) -> str:
+        """El hash que tendria la narracion de este clip HOY. La voz que
+        entra en el hash es la de la narracion existente (cambiar el
+        proveedor por defecto no deja desactualizado todo el catalogo);
+        `voz` la fuerza cuando se va a generar con otra."""
+        compuesto = compose_script(project["style_block"],
+                                   clip.get("script") or "")
+        v = voz or previo.get("voz") or self.voz_defecto()
+        return hash_guion(compuesto, clip.get("scene") or "", video_s, v)
+
     def estado_proyecto(self, project: dict) -> dict:
         """Estado de narracion por clip + progreso de la corrida en curso."""
         destino = self.destino(project)
         estado = self._leer_estado(destino)
-        voz = self.cfg.tts_voice
+        proveedor = self.proveedor_defecto()
         clips_out = []
         for clip in self.db.list_clips(project["id"]):
-            compuesto = compose_script(project["style_block"],
-                                       clip.get("script") or "")
             video_s = self._video_s(clip)
-            h = hash_guion(compuesto, clip.get("scene") or "", video_s, voz)
             previo = estado.get(clip["id"]) or {}
+            h = self._hash_vigente(project, clip, previo, video_s)
             etiqueta = previo.get("etiqueta") or etiqueta_clip(
                 clip["position"], clip["title"])
             has_texto = (destino / f"{etiqueta}.md").is_file()
+            has_guion = (destino / f"{etiqueta}.secciones.json").is_file()
             has_audio = (destino / f"{etiqueta}.wav").is_file()
-            if not previo or not has_texto:
+            if not previo and not has_guion:
                 st = "sin_narracion"
-            elif previo.get("hash") != h or not has_audio:
+            elif not has_audio:
+                st = "guion" if has_guion else "sin_narracion"
+            elif previo.get("hash") != h:
                 st = "desactualizada"
             else:
                 st = "al_dia"
@@ -561,29 +592,110 @@ class NarracionService:
                 "title": clip["title"], "etiqueta": etiqueta, "estado": st,
                 "video_s": video_s and round(video_s, 1),
                 "audio_s": audio_s, "palabras": previo.get("palabras"),
-                "voz": previo.get("voz"), "generado": previo.get("generado"),
+                "voz": previo.get("voz"), "proveedor": previo.get("proveedor"),
+                "origen": previo.get("origen"),
+                "generado": previo.get("generado"),
                 "has_texto": has_texto, "has_audio": has_audio,
+                "has_guion": has_guion,
                 "aviso_largo": bool(video_s and audio_s
                                     and audio_s > video_s * TOLERANCIA_AUDIO),
             })
-        return {"enabled": self.enabled, "voz": voz, "clips": clips_out,
-                "run": self.run_public()}
+        return {"enabled": self.enabled, "proveedor": proveedor,
+                "voz": self.voz_defecto(proveedor) if proveedor else None,
+                "proveedores": self.proveedores(),
+                "escribe_guion": any(p["escribe_guion"]
+                                     for p in self.proveedores()),
+                "clips": clips_out, "run": self.run_public()}
 
     def run_public(self) -> dict | None:
         if self._run is None:
             return None
         r = self._run
-        return {k: r[k] for k in ("project_id", "total", "done", "current",
-                                  "errores", "started", "finished")}
+        return {k: r.get(k) for k in ("project_id", "total", "done", "current",
+                                      "errores", "started", "finished",
+                                      "proveedor", "voz")}
+
+    # ── guion escrito a mano ─────────────────────────────────────────────
+
+    def _etiqueta(self, project: dict, clip: dict) -> str:
+        previo = self._leer_estado(self.destino(project)).get(clip["id"]) or {}
+        return previo.get("etiqueta") or etiqueta_clip(clip["position"],
+                                                      clip["title"])
+
+    def leer_guion(self, project: dict, clip: dict) -> list[dict] | None:
+        p = self.destino(project) / f"{self._etiqueta(project, clip)}.secciones.json"
+        try:
+            return json.loads(p.read_text()) if p.is_file() else None
+        except (OSError, ValueError):
+            return None
+
+    def guardar_guion(self, project: dict, clip: dict, secciones) -> dict:
+        """Escribe el guion (secciones.json + txt + md) sin sintetizar. Si
+        habia audio, queda `desactualizada`: el hash se vacia."""
+        secciones = validar_secciones(secciones)
+        destino = self.destino(project)
+        destino.mkdir(parents=True, exist_ok=True)
+        etiqueta = self._etiqueta(project, clip)
+        previo = self._leer_estado(destino).get(clip["id"]) or {}
+        narracion = "\n\n".join(s["texto"] for s in secciones)
+        video_s = self._video_s(clip)
+        curso = {"name": project["name"]}
+        (destino / f"{etiqueta}.secciones.json").write_text(
+            json.dumps(secciones, ensure_ascii=False, indent=2))
+        (destino / f"{etiqueta}.txt").write_text(narracion + "\n")
+        (destino / f"{etiqueta}.md").write_text(render_md(
+            curso, clip, secciones, narracion, video_s,
+            previo.get("voz") or "—", "guion escrito a mano"))
+        entry = dict(previo)
+        entry.update({"hash": "", "etiqueta": etiqueta,
+                      "palabras": len(narracion.split()),
+                      "guion_editado": time.time()})
+        self._escribir_estado(destino, clip["id"], entry)
+        return entry
+
+    # ── grabacion propia ─────────────────────────────────────────────────
+
+    def registrar_subida(self, project: dict, clip: dict, pcm: bytes,
+                         nombre: str = "") -> dict:
+        """Deja una grabacion del dueno como LA narracion del clip: PCM ya
+        decodificado a TTS_RATE, silencio recortado, en la ruta canonica
+        (la misma que produce el TTS), asi `pelicula.plan` la recoge sin
+        saber de donde salio."""
+        if len(pcm) < TTS_RATE:  # menos de medio segundo
+            raise ValueError("la grabacion es demasiado corta o vacia")
+        pcm = _recortar_silencio(pcm)
+        destino = self.destino(project)
+        destino.mkdir(parents=True, exist_ok=True)
+        etiqueta = self._etiqueta(project, clip)
+        audio_s = _escribir_wav(pcm, destino / f"{etiqueta}.wav")
+        video_s = self._video_s(clip)
+        previo = self._leer_estado(destino).get(clip["id"]) or {}
+        if not (destino / f"{etiqueta}.md").is_file():
+            (destino / f"{etiqueta}.md").write_text(
+                f"# {clip['title']}\n\n- **Curso:** {project['name']}\n"
+                f"- **Voz:** grabacion propia ({nombre or 'archivo'})\n"
+                f"- **Duracion del audio:** {audio_s:.1f} s\n")
+        entry = {
+            "hash": self._hash_vigente(project, clip, {}, video_s, "propia"),
+            "etiqueta": etiqueta, "voz": "propia", "proveedor": "archivo",
+            "origen": "subido", "archivo": nombre[:120],
+            "video_s": round(video_s, 1) if video_s else None,
+            "audio_s": round(audio_s, 1),
+            "palabras": previo.get("palabras"),
+            "generado": time.time(),
+        }
+        self._escribir_estado(destino, clip["id"], entry)
+        return entry
 
     # ── generacion ───────────────────────────────────────────────────────
 
     def _plan(self, project: dict, clip_ids: list[str] | None,
-              force: bool) -> list[dict]:
+              force: bool, voz: str) -> list[dict]:
         """Trabajo por clip, resuelto ANTES de lanzar el thread (la DB y los
-        mp4 se consultan aqui; el thread solo habla con Vertex y el disco)."""
-        estado = self._leer_estado(self.destino(project))
-        voz = self.cfg.tts_voice
+        mp4 se consultan aqui; el thread solo habla con el proveedor y el
+        disco)."""
+        destino = self.destino(project)
+        estado = self._leer_estado(destino)
         plan = []
         for clip in self.db.list_clips(project["id"]):
             if clip_ids is not None and clip["id"] not in clip_ids:
@@ -591,41 +703,71 @@ class NarracionService:
             compuesto = compose_script(project["style_block"],
                                        clip.get("script") or "")
             video_s = self._video_s(clip)
-            h = hash_guion(compuesto, clip.get("scene") or "", video_s, voz)
-            etiqueta = etiqueta_clip(clip["position"], clip["title"])
             previo = estado.get(clip["id"]) or {}
-            destino = self.destino(project)
+            h = self._hash_vigente(project, clip, previo, video_s, voz)
+            etiqueta = etiqueta_clip(clip["position"], clip["title"])
             al_dia = (previo.get("hash") == h
                       and (destino / f"{etiqueta}.md").is_file()
                       and (destino / f"{etiqueta}.wav").is_file())
             if al_dia and not force:
                 continue
+            sec_path = destino / f"{etiqueta}.secciones.json"
+            secciones = None
+            if sec_path.is_file():
+                try:
+                    secciones = json.loads(sec_path.read_text())
+                except (OSError, ValueError):
+                    secciones = None
             plan.append({"clip": clip, "compuesto": compuesto,
-                         "video_s": video_s, "etiqueta": etiqueta})
+                         "video_s": video_s, "etiqueta": etiqueta,
+                         "secciones": secciones})
         return plan
 
     def start(self, project: dict, clip_ids: list[str] | None = None,
-              force: bool = False) -> dict:
+              force: bool = False, proveedor: str | None = None,
+              voz: str | None = None, solo_audio: bool = False) -> dict:
         """Lanza la generacion en segundo plano. ValueError si ya hay una
-        corrida activa o si Vertex no esta configurado."""
+        corrida activa, si el proveedor no esta disponible, o si hay que
+        escribir un guion y nadie sabe escribirlo."""
         if not self.enabled:
-            raise ValueError("Narracion no disponible: falta la service "
-                             "account de Vertex AI")
+            raise ValueError("Narracion no disponible: ningun proveedor de "
+                             "voz instalado (edge-tts, piper o Vertex)")
         if self.running:
             raise ValueError("Ya hay una narracion en curso")
-        plan = self._plan(project, clip_ids, force)
+        proveedor, voz = self.resolver_voz(proveedor, voz)
+        if proveedor == "archivo":
+            raise ValueError("la grabacion propia se sube por clip, no se "
+                             "genera")
+        plan = self._plan(project, clip_ids, force, voz)
         if not plan:
             return {"queued": []}
+        cat = {p["id"]: p for p in self.proveedores()}
+        con_guionista = cat["vertex"]["escribe_guion"] and not solo_audio
+        # Con guion guardado y `solo_audio`, o con un proveedor que no
+        # escribe, se usa el guion existente. Si no lo hay, hace falta
+        # Vertex; si tampoco, se dice QUE clips necesitan guion.
+        if not con_guionista:
+            faltan = [i["clip"]["title"] for i in plan if i["secciones"] is None]
+            if faltan:
+                raise ValueError(
+                    "sin guion en: " + ", ".join(faltan[:6])
+                    + (" …" if len(faltan) > 6 else "")
+                    + ". Escribelo desde «Guion» (o configura Vertex)")
+        else:
+            for item in plan:
+                item["secciones"] = None  # Vertex lo (re)escribe
         self._cancel = False
         self._run = {"project_id": project["id"], "total": len(plan),
                      "done": 0, "current": None, "errores": [],
-                     "started": time.time(), "finished": False}
+                     "started": time.time(), "finished": False,
+                     "proveedor": proveedor, "voz": voz}
         curso = {"name": project["name"], "description": project["description"],
                  "total_clips": len(self.db.list_clips(project["id"]))}
         destino = self.destino(project)
         self._task = asyncio.get_running_loop().create_task(
-            self._correr(plan, curso, destino))
-        return {"queued": [item["clip"]["id"] for item in plan]}
+            self._correr(plan, curso, destino, proveedor, voz, con_guionista))
+        return {"queued": [item["clip"]["id"] for item in plan],
+                "proveedor": proveedor, "voz": voz}
 
     def cancel(self) -> bool:
         if not self.running:
@@ -633,10 +775,11 @@ class NarracionService:
         self._cancel = True
         return True
 
-    async def _correr(self, plan: list[dict], curso: dict,
-                      destino: Path) -> None:
+    async def _correr(self, plan: list[dict], curso: dict, destino: Path,
+                      proveedor: str, voz: str, con_guionista: bool) -> None:
         try:
-            await asyncio.to_thread(self._generar, plan, curso, destino)
+            await asyncio.to_thread(self._generar, plan, curso, destino,
+                                    proveedor, voz, con_guionista)
         except Exception as e:  # fallo de setup (p.ej. credenciales rotas)
             self._run["errores"].append({"clip_id": None,
                                          "error": f"{type(e).__name__}: {e}"})
@@ -644,12 +787,17 @@ class NarracionService:
             self._run["current"] = None
             self._run["finished"] = True
 
-    def _generar(self, plan: list[dict], curso: dict, destino: Path) -> None:
+    def _generar(self, plan: list[dict], curso: dict, destino: Path,
+                 proveedor: str = "vertex", voz: str | None = None,
+                 con_guionista: bool = True) -> None:
         """Cuerpo bloqueante (corre en thread): un clip tras otro, escribiendo
         estado.json tras cada uno para que un corte a mitad no pierda nada."""
         destino.mkdir(parents=True, exist_ok=True)
-        vertex = self._vertex()
-        voz = self.cfg.tts_voice
+        narrador = self._narrador(proveedor)
+        guionista = None
+        if con_guionista:
+            guionista = narrador if proveedor == "vertex" else self._vertex()
+        voz = voz or self.voz_defecto(proveedor)
         estado_path = destino / "estado.json"
         for item in plan:
             if self._cancel:
@@ -658,9 +806,11 @@ class NarracionService:
             self._run["current"] = {"clip_id": clip["id"],
                                     "etiqueta": item["etiqueta"]}
             try:
-                entry = generar_clip(vertex, curso, clip, item["compuesto"],
+                entry = generar_clip(narrador, curso, clip, item["compuesto"],
                                      item["video_s"], voz, destino,
-                                     item["etiqueta"], log=lambda _m: None)
+                                     item["etiqueta"], log=lambda _m: None,
+                                     secciones=item.get("secciones"),
+                                     guionista=guionista)
             except Exception as e:
                 self._run["errores"].append(
                     {"clip_id": clip["id"],
@@ -670,6 +820,18 @@ class NarracionService:
             estado[clip["id"]] = entry
             estado_path.write_text(json.dumps(estado, indent=2))
             self._run["done"] += 1
+
+    def _narrador(self, proveedor: str):
+        if proveedor == "vertex":
+            return self._vertex()
+        return tts_mod.fabricar(self.cfg, proveedor)
+
+    def narrador_defecto(self):
+        """Para la voz de los promos (audio_api): el proveedor por defecto."""
+        proveedor = self.proveedor_defecto()
+        if not proveedor:
+            raise RuntimeError("ningun proveedor de voz disponible")
+        return self._narrador(proveedor)
 
     def _vertex(self) -> VertexNarrador:
         return VertexNarrador(self.cfg.gcp_key_path, self.cfg.gcp_location,

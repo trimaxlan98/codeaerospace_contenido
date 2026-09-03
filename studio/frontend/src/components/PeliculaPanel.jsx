@@ -6,11 +6,17 @@
 // porque la decision real es una sola: **corte o transicion**. El corte no
 // recodifica (segundos); cualquier otra cosa recodifica la pelicula entera y
 // eso hay que decirlo ANTES, no despues de media hora de espera.
+//
+// Sprint R2: y una cama MUSICAL bajo el curso entero, con el nivel en dB. La
+// musica es del curso, no de un clip — por eso vive aqui y no en el dialogo
+// de audio de cada pieza —, se sintetiza con la duracion medida del montaje y
+// el ensamblador la agacha 9 dB donde suena la voz.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, Clapperboard, Download, Film, Play, Ruler, Square, Trash2 } from 'lucide-react'
 import { api, peliculaVideoUrl } from '../api.js'
 import { cursoDeJob, useCatalogo } from '../catalogo.js'
+import MusicaSelector from './MusicaSelector.jsx'
 import { Button } from './ui/button.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.jsx'
 import { cn } from '@/lib/utils'
@@ -30,7 +36,17 @@ const VERIF_META = {
   sin_verificar: { label: 'sin medir', tone: 'text-muted' },
   vieja: { label: 'medición vieja', tone: 'text-warn' },
   pasa: { label: 'medida ✓', tone: 'text-ok' },
+  avisos: { label: 'con avisos', tone: 'text-warn' },
   no_pasa: { label: 'no pasa', tone: 'text-err' },
+}
+
+// Veredicto de una costura (studio/tools/ensamblar.py::veredicto_costura).
+// El texto NUNCA se omite: el color solo acompaña (DESIGN-SYSTEM.md).
+const COSTURA_META = {
+  bien: { tone: 'text-ok', borde: 'border-ok/50', label: 'limpia' },
+  aviso: { tone: 'text-warn', borde: 'border-warn/60', label: 'mirar' },
+  fallo: { tone: 'text-err', borde: 'border-err/60', label: 'se ve' },
+  'n/a': { tone: 'text-faint', borde: 'border-line', label: 'n/a' },
 }
 
 const TRANSICION_LABEL = {
@@ -103,6 +119,70 @@ function Regleta({ piezas, transicion, duracionTransicion, onIr }) {
   )
 }
 
+// Las costuras: una celda por unión pieza→pieza, con la diferencia media
+// entre el último fotograma de una y el primero de la siguiente.
+//
+// Se pintan TODAS y no solo las malas: el dato que delató el parpadeo del
+// curso 28 no fue ninguna costura suelta —valían 0,0552, casi nada— sino que
+// las catorce valieran EXACTAMENTE lo mismo. Eso solo se ve mirando la fila
+// entera. El recuento por veredicto va en palabras porque el color no puede
+// ser el único portador del estado (DESIGN-SYSTEM.md).
+function Costuras({ costuras, peor, diagnostico, umbrales }) {
+  if (!costuras?.length) return null
+  const cuenta = costuras.reduce((a, c) => {
+    a[c.veredicto] = (a[c.veredicto] || 0) + 1
+    return a
+  }, {})
+  const [bien, aviso] = umbrales || [0.01, 0.06]
+  const naytodas = costuras.every((c) => c.veredicto === 'n/a')
+
+  return (
+    <div className="space-y-1">
+      <p className="flex flex-wrap items-baseline gap-x-2 text-[11.5px] text-muted">
+        <span>Costuras entre piezas</span>
+        {cuenta.bien > 0 && <span className="text-ok">{cuenta.bien} limpias</span>}
+        {cuenta.aviso > 0 && <span className="text-warn">{cuenta.aviso} a mirar</span>}
+        {cuenta.fallo > 0 && <span className="text-err">{cuenta.fallo} se ven</span>}
+        {cuenta['n/a'] > 0 && (
+          <span className="text-faint">{cuenta['n/a']} no aplican</span>
+        )}
+        <span className="text-faint">
+          {naytodas
+            ? '(el empalme funde las piezas a propósito)'
+            : `· limpia ≤ ${bien} · a mirar ≤ ${aviso} · por encima se ve`}
+        </span>
+      </p>
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        {costuras.map((c, i) => {
+          const m = COSTURA_META[c.veredicto] || COSTURA_META['n/a']
+          return (
+            <span key={i}
+              title={`${c.de} → ${c.a}: ${m.label}`
+                + (c.motivo ? ` (${c.motivo})` : '')}
+              className={cn('shrink-0 rounded border bg-canvas px-1.5 py-0.5',
+                'font-mono text-[10.5px] tabular-nums', m.borde, m.tone)}>
+              {c.valor === null || c.valor === undefined
+                ? 'n/a' : c.valor.toFixed(4)}
+            </span>
+          )
+        })}
+      </div>
+      {peor !== null && peor !== undefined && (
+        <p className="font-mono text-[10.5px] text-faint">
+          peor costura {peor.toFixed(4)}/255 — en un curso qh entregable esto
+          vale 0,0000 (cursos 31 y 33) y como mucho 0,0048 (curso 28)
+        </p>
+      )}
+      {diagnostico && (
+        <p role="status"
+          className="rounded border border-warn/50 bg-warn/10 p-2 text-[12px] text-warn">
+          Todas iguales: {diagnostico}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function PeliculaPanel({ projectId, projectName, jobs, clips, duraciones, narrarConVoz }) {
   const videoRef = useRef(null)
   const [estado, setEstado] = useState(null)
@@ -112,6 +192,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
   const [narrar, setNarrar] = useState(true)
   const [marcaIntro, setMarcaIntro] = useState('')
   const [marcaCierre, setMarcaCierre] = useState('')
+  const [musica, setMusica] = useState(null)
   const [midiendo, setMidiendo] = useState(false)
 
   const load = useCallback(() => {
@@ -123,6 +204,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
         setNarrar(e.opciones.narracion !== false)
         setMarcaIntro(e.opciones.intro_job_id || '')
         setMarcaCierre(e.opciones.cierre_job_id || '')
+        setMusica(e.opciones.musica || null)
       }
     }).catch(() => setEstado(null))
   }, [projectId])
@@ -157,6 +239,7 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
         narracion: narrar,
         intro_job_id: marcaIntro || null,
         cierre_job_id: marcaCierre || null,
+        musica,
       })
       load()
     } catch (err) { setError(err.message) }
@@ -288,6 +371,18 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
         </label>
       </div>
 
+      <div className="space-y-1 border-t border-line pt-2">
+        <span className="text-xs text-muted">Cama musical del curso</span>
+        <MusicaSelector valor={musica} temas={estado.temas || []}
+          dbDefecto={estado.musica_db ?? -24} onChange={setMusica} />
+        {musica && (
+          <p className="text-[11.5px] text-faint">
+            Se sintetiza con la duración medida del montaje y se agacha 9 dB
+            donde hay voz. Cambiar de tema o de nivel desactualiza la película.
+          </p>
+        )}
+      </div>
+
       {recodifica && (
         <p className="text-xs text-warn">
           Un empalme que no es corte <strong>recodifica la película entera</strong>:
@@ -381,10 +476,48 @@ export default function PeliculaPanel({ projectId, projectName, jobs, clips, dur
                 </span>
               )}
             </p>
+            {v && estado.verificacion !== 'sin_verificar' && (
+              <p className="flex flex-wrap items-baseline gap-x-2 text-[11.5px] text-muted">
+                <span>Pico de la película</span>
+                <span className={cn('font-mono tabular-nums',
+                  v.pico_veredicto === 'aviso' ? 'text-warn'
+                    : v.pico_veredicto === 'bien' ? 'text-ok' : 'text-faint')}>
+                  {v.pico_max_db === null || v.pico_max_db === undefined
+                    ? 'sin audio'
+                    : `${v.pico_max_db.toFixed(1)} dBFS`}
+                </span>
+                <span className={v.pico_veredicto === 'aviso' ? 'text-warn' : 'text-faint'}>
+                  {v.pico_veredicto === 'aviso' ? 'va a recortar'
+                    : v.pico_veredicto === 'bien' ? 'bajo el techo' : 'no aplica'}
+                </span>
+                <span className="text-faint">
+                  (techo de la casa {v.pico_techo_db ?? -0.5} dBFS)
+                </span>
+                {v.sin_cola_voz?.length > 0 && (
+                  <span className="text-warn">
+                    {v.sin_cola_voz.length} sin cola de silencio en la voz
+                  </span>
+                )}
+              </p>
+            )}
+
+            {v && estado.verificacion !== 'sin_verificar' && (
+              <Costuras costuras={v.costuras} peor={v.costura_peor}
+                diagnostico={v.costura_diagnostico}
+                umbrales={v.costura_umbrales} />
+            )}
+
             {v?.problemas?.length > 0 && estado.verificacion === 'no_pasa' && (
-              <ul className="rounded border border-err/40 bg-err/10 p-2">
+              <ul role="alert" className="rounded border border-err/40 bg-err/10 p-2">
                 {v.problemas.map((x, i) => (
                   <li key={i} className="text-[12.5px] text-err">· {x}</li>
+                ))}
+              </ul>
+            )}
+            {v?.avisos?.length > 0 && (
+              <ul role="status" className="rounded border border-warn/50 bg-warn/10 p-2">
+                {v.avisos.map((x, i) => (
+                  <li key={i} className="text-[12.5px] text-warn">· {x}</li>
                 ))}
               </ul>
             )}

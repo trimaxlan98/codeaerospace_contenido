@@ -29,7 +29,9 @@ ReadWritePaths=/var/www/codeaerospace_contenido/render_jobs /var/www/codeaerospa
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictSUIDSGID=yes
-MemoryMax=512M
+# 1 GiB desde R1 (voz sin GCP): Piper corre como subproceso del backend y
+# onnxruntime + un modelo de 63 MB rondan 250 MB de pico dentro del cgroup.
+MemoryMax=1024M
 
 [Install]
 WantedBy=multi-user.target

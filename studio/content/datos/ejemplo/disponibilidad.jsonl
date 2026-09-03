@@ -1,0 +1,11 @@
+{"fila": "satellite", "t0": 0, "t1": 52, "estado": "up"}
+{"fila": "satellite", "t0": 52, "t1": 63, "estado": "down"}
+{"fila": "satellite", "t0": 63, "t1": 120, "estado": "up"}
+{"fila": "gateway-a", "t0": 0, "t1": 120, "estado": "up"}
+{"fila": "gateway-b", "t0": 0, "t1": 38, "estado": "up"}
+{"fila": "gateway-b", "t0": 38, "t1": 46, "estado": "hueco"}
+{"fila": "gateway-b", "t0": 46, "t1": 120, "estado": "up"}
+{"fila": "ue", "t0": 0, "t1": 120, "estado": "up"}
+{"evento": "kill", "t": 52, "etiqueta": "kill satellite"}
+{"evento": "policy", "t": 58, "etiqueta": "policy pada"}
+{"evento": "clear", "t": 63, "etiqueta": "recuperado"}

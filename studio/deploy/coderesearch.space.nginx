@@ -32,6 +32,9 @@ server {
     }
 
     location /api/ {
+        # Grabaciones de narracion propia (PUT .../narracion/{cid}/audio):
+        # un WAV estereo a 48 kHz de 2 min ronda 23 MB. Solo en /api/.
+        client_max_body_size 25M;
         proxy_pass http://127.0.0.1:3002;
         proxy_http_version 1.1;
         proxy_set_header Host $host;

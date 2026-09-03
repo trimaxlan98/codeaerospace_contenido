@@ -45,6 +45,17 @@ class SeccionBody(BaseModel):
     texto: str = Field(max_length=audio_promo.MAX_TEXTO)
 
 
+class MusicaBody(BaseModel):
+    """La cama musical de la pieza. `tema` vacio = sin musica (asi la apaga
+    el desplegable de la interfaz sin tener que borrar el objeto entero)."""
+    tema: str | None = Field(default=None, max_length=32)
+    db: float = Field(default=audio_promo.MUSICA_DB,
+                      ge=audio_promo.MUSICA_DB_MIN,
+                      le=audio_promo.MUSICA_DB_MAX)
+    bpm: float | None = Field(default=None, ge=audio_promo.BPM_MIN,
+                              le=audio_promo.BPM_MAX)
+
+
 class ManifiestoBody(BaseModel):
     eventos: list[EventoBody] = Field(default_factory=list,
                                       max_length=audio_promo.MAX_EVENTOS)
@@ -55,6 +66,7 @@ class ManifiestoBody(BaseModel):
     pico_db_con_voz: float = audio_promo.PICO_DB_CON_VOZ
     fade_in: float = audio_promo.FADE_IN
     fade_out: list[float] | None = None
+    musica: MusicaBody | None = None
 
     def a_manifiesto(self) -> dict:
         audio = {"pico_db": self.pico_db,
@@ -63,6 +75,8 @@ class ManifiestoBody(BaseModel):
                  "eventos": [[e.sonido, e.t, e.db] for e in self.eventos]}
         if self.fade_out:
             audio["fade_out"] = list(self.fade_out)
+        if self.musica:
+            audio["musica"] = self.musica.model_dump()
         return {"audio": audio,
                 "voz": {"voz": self.voz,
                         "secciones": [s.model_dump() for s in self.secciones]}}
@@ -121,6 +135,8 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
             "avisos": audio_promo.avisos(m, dur, tipo),
             "duracion_video": dur,
             "sonidos": list(audio_promo.SONIDOS),
+            "temas": list(audio_promo.TEMAS),
+            "musica_db": audio_promo.MUSICA_DB,
             # En un curso la voz NO se escribe aqui: sale de «Generar
             # narracion» y la pelicula la pega al montar.
             "voz_aqui": tipo == "promo",
@@ -214,7 +230,7 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
             if not narracion.enabled:
                 raise HTTPException(
                     status_code=503,
-                    detail="La voz requiere la service account de Vertex;"
+                    detail="No hay ningun proveedor de voz disponible;"
                            " quita las frases para mezclar solo la cama.")
             await _voz(m, job_dir, dur)
 
@@ -254,9 +270,10 @@ def make_router(cfg, db: Database, manager: JobManager, service: ProjectService,
         # bucle se oye: se sintetiza contra ese limite, no contra el final.
         limite = (dur - audio_promo.COLA_SILENCIO_S) if dur else None
         try:
-            await asyncio.to_thread(sintetizar, narracion._vertex(),
-                                    m["voz"]["secciones"], m["voz"]["voz"],
-                                    wav, limite)
+            proveedor, voz = narracion.resolver_voz(
+                m["voz"].get("proveedor"), m["voz"]["voz"] or None)
+            await asyncio.to_thread(sintetizar, narracion._narrador(proveedor),
+                                    m["voz"]["secciones"], voz, wav, limite)
         except Exception as e:
             raise HTTPException(status_code=502,
                                 detail=f"La síntesis de voz falló: {e}")

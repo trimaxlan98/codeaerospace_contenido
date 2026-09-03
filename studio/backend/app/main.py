@@ -23,7 +23,10 @@ from .conocimiento import Conocimiento
 from .db import Database
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
+from .laboratorio import LaboratorioService
+from .laboratorio_api import make_router as make_laboratorio_router
 from .lessons import LessonStore
+from .musica_api import make_router as make_musica_router
 from .narracion import NarracionService
 from .narracion_api import make_router as make_narracion_router
 from .pelicula import PeliculaService
@@ -32,7 +35,7 @@ from .presentaciones import PresentacionService
 from .presentaciones_api import make_router as make_presentaciones_router
 from .projects import FORMATO_DEFECTO, ProjectService
 from .projects_api import make_router as make_projects_router
-from .runner_client import RunnerClient
+from .runner_client import RunnerClient, RunnerError
 from .sfx_api import make_router as make_sfx_router
 from .scenes import detect_scenes
 
@@ -54,6 +57,7 @@ manager.on_job_done = service.handle_job_done
 narracion_service = NarracionService(cfg, db)
 pelicula_service = PeliculaService(cfg, db, runner, narracion_service)
 presentacion_service = PresentacionService(cfg, db, runner)
+laboratorio_service = LaboratorioService(cfg, runner)
 # 30 min de historia al intervalo configurado (450 muestras a 4 s).
 history = metrics.History(maxlen=max(360, int(1800 // cfg.metrics_interval)))
 conocimiento = Conocimiento(cfg)
@@ -78,11 +82,13 @@ app = FastAPI(title="ManimStudio", docs_url=None, redoc_url=None, openapi_url=No
               lifespan=lifespan)
 app.include_router(make_projects_router(cfg, db, manager, service,
                                         narracion_service))
-app.include_router(make_narracion_router(cfg, db, narracion_service))
+app.include_router(make_narracion_router(cfg, db, narracion_service, runner))
 app.include_router(make_pelicula_router(cfg, db, pelicula_service))
 app.include_router(make_presentaciones_router(cfg, db,
                                              presentacion_service))
 app.include_router(make_sfx_router(cfg, runner))
+app.include_router(make_musica_router(cfg, runner))
+app.include_router(make_laboratorio_router(cfg, laboratorio_service))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))
 
@@ -346,6 +352,137 @@ async def get_frame_verificacion(job_id: str, archivo: str,
     if not png.is_file() or job_dir not in png.parents:
         raise HTTPException(status_code=404, detail="Frame no disponible")
     return FileResponse(png, media_type="image/png")
+
+
+# ── fotogramas del render (R3b) ───────────────────────────────────────────────
+#
+# Hasta aqui, el unico resultado de un render en la app era el mp4. En la
+# terminal se revisa `render_local.py --frames 8` uno a uno (la regla dura del
+# proyecto es que NADA quede encimado) y se saca un `ffmpeg -ss` a mano cuando
+# una figura tiene que entrar en la tesis. Las dos cosas entran aqui.
+
+HOJA_MAX = 24
+ANCHO_FIGURA = (1920, 2560, 3840)
+# Nombres que escribe `hoja_contactos.py`: conjunto cerrado, igual que los de
+# la verificacion. `NN.png` (1..24) y `final.png`.
+RE_HOJA = re.compile(r"^(?:[0-9]{2}\.png|final\.png)$")
+# `t<ms 8 digitos>_<ancho>.png`, el nombre que DERIVA el runner de los dos
+# numeros validados. Aqui se vuelve a exigir la forma: lo que llega por URL
+# no toca el sistema de archivos sin pasar por un regex anclado.
+RE_FIGURA = re.compile(r"^t[0-9]{8}_[0-9]{3,4}\.png$")
+
+
+class FramesBody(BaseModel):
+    n: int = Field(default=8, ge=1, le=HOJA_MAX)
+
+
+class FotogramaBody(BaseModel):
+    t: float = Field(ge=0, le=21600)
+    ancho: int = Field(default=1920, ge=320, le=3840)
+    formato: str = "png"
+
+
+def _job_con_video(job_id: str) -> dict:
+    job = _get_job_or_404(job_id)
+    if job["status"] != "done" or not job.get("video_path"):
+        raise HTTPException(status_code=409, detail="El job no tiene video")
+    return job
+
+
+def _hoja_en_disco(job_id: str, n: int) -> dict | None:
+    """El indice ya escrito para ESE n, si todos sus PNG siguen ahi.
+
+    Es toda la idempotencia que hace falta: la hoja de contactos de un render
+    no cambia nunca (el mp4 es inmutable), asi que volver a pedirla no puede
+    costar un contenedor.
+    """
+    frames_dir = (cfg.render_jobs_dir / job_id / "frames").resolve()
+    indice = frames_dir / "indice.json"
+    if not indice.is_file():
+        return None
+    try:
+        datos = json.loads(indice.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if datos.get("n") != n:
+        return None
+    nombres = [f["archivo"] for f in datos.get("frames", [])]
+    nombres.append((datos.get("final") or {}).get("archivo", "final.png"))
+    if not all((frames_dir / nombre).is_file() for nombre in nombres):
+        return None
+    return datos
+
+
+def _con_urls(job_id: str, informe: dict) -> dict:
+    """El informe del runner con la URL de cada PNG ya resuelta."""
+    base = f"/api/jobs/{job_id}/frames"
+    frames = [f | {"url": f"{base}/{f['archivo']}"}
+              for f in informe.get("frames", [])]
+    final = informe.get("final") or {}
+    if final:
+        final = final | {"url": f"{base}/{final['archivo']}"}
+    return informe | {"frames": frames, "final": final}
+
+
+@app.post("/api/jobs/{job_id}/frames")
+async def crear_hoja_contactos(job_id: str, body: FramesBody,
+                               _=Depends(require_auth)):
+    """La hoja de contactos del render: n fotogramas + el ultimo real."""
+    _job_con_video(job_id)
+    ya = _hoja_en_disco(job_id, body.n)
+    if ya is not None:
+        return _con_urls(job_id, ya) | {"recalculada": False}
+    _check_quota()
+    try:
+        informe = await runner.frames(job_id, body.n)
+    except (RunnerError, asyncio.TimeoutError) as e:
+        raise HTTPException(status_code=502,
+                            detail=f"La hoja de contactos falló: {e}")
+    manager.invalidate_storage()  # la hoja son n PNG mas en el directorio
+    return _con_urls(job_id, informe) | {"recalculada": True}
+
+
+@app.get("/api/jobs/{job_id}/frames/{archivo}")
+async def get_frame_hoja(job_id: str, archivo: str, _=Depends(require_auth)):
+    _get_job_or_404(job_id)
+    if not RE_HOJA.match(archivo):
+        raise HTTPException(status_code=404, detail="Fotograma no disponible")
+    job_dir = (cfg.render_jobs_dir / job_id).resolve()
+    png = (job_dir / "frames" / archivo).resolve()
+    # Misma defensa en profundidad que /thumb y /verificacion.
+    if not png.is_file() or job_dir not in png.parents:
+        raise HTTPException(status_code=404, detail="Fotograma no disponible")
+    return FileResponse(png, media_type="image/png")
+
+
+@app.post("/api/jobs/{job_id}/fotograma")
+async def crear_fotograma(job_id: str, body: FotogramaBody,
+                          _=Depends(require_auth)):
+    """Un fotograma a la resolución pedida: la figura estática de una tesis."""
+    _job_con_video(job_id)
+    if body.formato != "png":
+        raise HTTPException(status_code=422, detail="Formato inválido (png)")
+    _check_quota()
+    try:
+        informe = await runner.fotograma(job_id, body.t, body.ancho,
+                                         body.formato)
+    except (RunnerError, asyncio.TimeoutError) as e:
+        raise HTTPException(status_code=502, detail=f"El fotograma falló: {e}")
+    manager.invalidate_storage()
+    archivo = informe.get("archivo", "")
+    return informe | {"url": f"/api/jobs/{job_id}/figuras/{archivo}"}
+
+
+@app.get("/api/jobs/{job_id}/figuras/{archivo}")
+async def get_figura(job_id: str, archivo: str, _=Depends(require_auth)):
+    _get_job_or_404(job_id)
+    if not RE_FIGURA.match(archivo):
+        raise HTTPException(status_code=404, detail="Figura no disponible")
+    job_dir = (cfg.render_jobs_dir / job_id).resolve()
+    png = (job_dir / "figuras" / archivo).resolve()
+    if not png.is_file() or job_dir not in png.parents:
+        raise HTTPException(status_code=404, detail="Figura no disponible")
+    return FileResponse(png, media_type="image/png", filename=archivo)
 
 
 @app.delete("/api/jobs/failed")

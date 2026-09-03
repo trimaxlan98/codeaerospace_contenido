@@ -13,6 +13,7 @@ import Header from './Header.jsx'
 import Studio from './Studio.jsx'
 import Admin from './Admin.jsx'
 import Renders from './Renders.jsx'
+import Laboratorio from './Laboratorio.jsx'
 import Learn from './Learn.jsx'
 import Projects from './Projects.jsx'
 import Settings from './Settings.jsx'
@@ -299,6 +300,11 @@ export default function App() {
             onRoute={(id) => navigate('learn', id)}
             onOpenInStudio={(script) => { setPendingScript(script); navigate('studio') }}
             onOpenProject={(id) => navigate('projects', id)} />
+        </div>
+      )}
+      {visited.current.has('lab') && (
+        <div {...pane('lab')}>
+          <Laboratorio active={view === 'lab'} />
         </div>
       )}
       {visited.current.has('admin') && (

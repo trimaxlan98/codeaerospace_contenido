@@ -33,7 +33,8 @@ from pathlib import Path
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from app.narracion import VertexNarrador, duracion_mp4, sintetizar  # noqa: E402
+from app.narracion import duracion_mp4, sintetizar  # noqa: E402
+from app.tts import narrador_desde_entorno  # noqa: E402
 
 DEFAULT_KEY = "/etc/manimstudio/gcp-key.json"
 
@@ -49,6 +50,8 @@ def main() -> int:
     p.add_argument("--limite", type=float, default=None,
                    help="duracion del video en segundos (evita subir el mp4)")
     p.add_argument("--voz", default=None)
+    p.add_argument("--proveedor", default=None,
+                   choices=["vertex", "edge", "piper"])
     args = p.parse_args()
 
     manifiesto = ruta = None
@@ -71,16 +74,11 @@ def main() -> int:
     if limite is None:
         limite = manifiesto.get("duracion_objetivo")
 
-    key_path = Path(os.environ.get("MS_GCP_KEY_PATH", DEFAULT_KEY))
-    vertex = VertexNarrador(
-        key_path,
-        os.environ.get("MS_GCP_LOCATION", "us-central1"),
-        os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro"),
-        os.environ.get("MS_GEMINI_MODEL_TTS",
-                       "gemini-2.5-flash-preview-tts"))
-
-    voz = args.voz or spec.get("voz") or os.environ.get("MS_TTS_VOICE",
-                                                        "Charon")
+    proveedor = getattr(args, "proveedor", None)
+    voz_pedida = args.voz or (spec.get("voz") if (proveedor or
+                              os.environ.get("MS_TTS_PROVIDER", "edge")) == "vertex" else None)
+    vertex, voz = narrador_desde_entorno(proveedor, voz_pedida)
+    print(f"voz: {vertex.id} · {voz}")
     args.salida.parent.mkdir(parents=True, exist_ok=True)
     dur = sintetizar(vertex, secciones, voz, args.salida,
                      limite_s=float(limite) if limite else None)

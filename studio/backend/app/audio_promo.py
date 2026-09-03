@@ -43,6 +43,91 @@ SONIDOS = (
     "subrayado", "sting", "pulso",
 )
 
+# Espejo de `TEMAS` en studio/tools/musica.py, por la misma razon que
+# SONIDOS: un tema que la app ofrece y la sintesis no conoce falla DENTRO del
+# contenedor, tarde y con un SystemExit. `tests/test_musica.py` compara esta
+# tupla (y los bpm de abajo) con la fuente real, leida con ast.
+TEMAS = (
+    "orbita", "deriva", "pulso_lento", "aurora",
+    "telemetria", "cuerdas_frias", "amanecer", "marcha",
+)
+
+# Lo que la interfaz necesita saber de un tema SIN importar numpy: con que
+# pulso va y de que esta hecho. `caracter` se lee de las capas encendidas en
+# musica.py (drone / arpegio / sub-bajo, de mas fuerte a mas floja).
+TEMAS_INFO = {
+    "orbita": {
+        "bpm": 52,
+        "caracter": "drone + sub-bajo + arpegio",
+        "descripcion":
+            "Menor abierto y lento; la cama por defecto de un curso. Gira "
+            "sin llegar a ninguna parte.",
+    },
+    "deriva": {
+        "bpm": 44,
+        "caracter": "drone + sub-bajo + arpegio",
+        "descripcion":
+            "Casi sin acordes: dos armonias que se turnan muy despacio. "
+            "Para planos largos y contemplativos.",
+    },
+    "pulso_lento": {
+        "bpm": 60,
+        "caracter": "sub-bajo + drone + arpegio",
+        "descripcion":
+            "El sub-bajo manda: un latido por segundo bajo un colchon "
+            "tenue. Sostiene sin llamar la atencion.",
+    },
+    "aurora": {
+        "bpm": 66,
+        "caracter": "drone + sub-bajo + arpegio",
+        "descripcion":
+            "Mayor con septimas y tresillos: luminoso sin ser alegre. "
+            "Para lo que se abre o se descubre.",
+    },
+    "telemetria": {
+        "bpm": 84,
+        "caracter": "arpegio + sub-bajo + drone",
+        "descripcion":
+            "Arpegio menudo y regular, como un enlace que llega. La cama "
+            "de lo tecnico: datos, orbitas, senales.",
+    },
+    "cuerdas_frias": {
+        "bpm": 48,
+        "caracter": "sub-bajo + arpegio + drone",
+        "descripcion":
+            "Las cuerdas pulsadas por delante y el colchon detras. "
+            "Intima, casi de camara.",
+    },
+    "amanecer": {
+        "bpm": 72,
+        "caracter": "drone + sub-bajo + arpegio",
+        "descripcion":
+            "Mayor sencillo y ascendente. Para un cierre o para una "
+            "leccion que termina bien.",
+    },
+    "marcha": {
+        "bpm": 96,
+        "caracter": "sub-bajo + drone + arpegio",
+        "descripcion":
+            "El pulso mas rapido del banco, todavia por debajo de 100 "
+            "bpm. Empuja sin correr.",
+    },
+}
+
+# La cama musical dentro de una mezcla, en dBFS de pico.
+#
+# El umbral del aviso NO es un numero redondo: sale de medir. Sobre el promo
+# de filotaxis (10.73 s) con una voz a -1.5 dBFS, la separacion voz/musica en
+# el tramo hablado (rms contra rms) es 14.98 dB con la musica en -24, 8.98 en
+# -18 y 2.98 en -12 — es decir, `separacion = -9.02 - db`. El criterio de la
+# casa es que la voz quede al menos 12 dB por encima, y eso se rompe justo en
+# -21. El defecto son -24: tres decibelios de margen.
+MUSICA_DB = -24.0
+MUSICA_DB_MIN, MUSICA_DB_MAX = -60.0, 0.0
+# No es un error (una pieza sin voz puede querer musica alta): es un aviso.
+MUSICA_DB_AVISO = -21.0
+BPM_MIN, BPM_MAX = 30.0, 180.0
+
 MAX_EVENTOS = 40
 MAX_SECCIONES = 12
 MAX_TEXTO = 400
@@ -81,6 +166,43 @@ def vacio(voz: str = "Charon", tipo: str = "promo") -> dict:
     }
 
 
+def normalizar_musica(musica: dict | None) -> dict | None:
+    """La cama musical del manifiesto, o None si no hay.
+
+    Ausente y `{"tema": null}` son lo MISMO: sin musica. La interfaz apaga la
+    musica dejando el desplegable en «sin musica», y eso llega como un dict
+    con el tema vacio; tratarlo como error habria hecho imposible quitarla.
+    """
+    if not isinstance(musica, dict):
+        return None
+    tema = str(musica.get("tema") or "").strip()
+    if not tema:
+        return None
+    salida = {"tema": tema,
+              "db": float(musica.get("db") if musica.get("db") is not None
+                          else MUSICA_DB)}
+    if musica.get("bpm"):
+        salida["bpm"] = float(musica["bpm"])
+    return salida
+
+
+def validar_musica(musica: dict | None) -> list[str]:
+    """Errores de la cama musical. Lista vacia = ok (o no hay musica)."""
+    if not musica:
+        return []
+    errores = []
+    if musica["tema"] not in TEMAS:
+        errores.append(f"tema de musica desconocido: «{musica['tema']}»")
+    if not (MUSICA_DB_MIN <= musica["db"] <= MUSICA_DB_MAX):
+        errores.append(f"el nivel de la musica tiene que estar entre "
+                       f"{MUSICA_DB_MIN:.0f} y {MUSICA_DB_MAX:.0f} dBFS")
+    bpm = musica.get("bpm")
+    if bpm is not None and not (BPM_MIN <= bpm <= BPM_MAX):
+        errores.append(f"el bpm de la musica tiene que estar entre "
+                       f"{BPM_MIN:.0f} y {BPM_MAX:.0f}")
+    return errores
+
+
 def normalizar(manifiesto: dict | None, voz_defecto: str = "Charon") -> dict:
     """Manifiesto completo y ordenado a partir de lo que haya guardado.
 
@@ -117,6 +239,9 @@ def normalizar(manifiesto: dict | None, voz_defecto: str = "Charon") -> dict:
         },
         "voz": {"voz": str(voz.get("voz") or voz_defecto), "secciones": secciones},
     }
+    musica = normalizar_musica(audio.get("musica"))
+    if musica:  # ausente = sin cama musical, que es el caso normal
+        salida["audio"]["musica"] = musica
     fade_out = audio.get("fade_out")
     if fade_out:  # ausente = automatico (los ultimos FADE_OUT_S del video)
         salida["audio"]["fade_out"] = [float(fade_out[0]), float(fade_out[1])]
@@ -149,6 +274,7 @@ def validar(m: dict, tipo: str = "promo") -> list[str]:
         errores.append("el pico de la cama con voz tiene que estar entre -40 y 0 dBFS")
     if not (0.0 <= audio["fade_in"] <= 5.0):
         errores.append("el fundido de entrada tiene que estar entre 0 y 5 s")
+    errores += validar_musica(audio.get("musica"))
     fade_out = audio.get("fade_out")
     if fade_out is not None and not (0.0 <= fade_out[0] < fade_out[1]):
         errores.append("el fundido de salida tiene que ser [inicio, fin] con inicio < fin")
@@ -208,6 +334,7 @@ def avisos(m: dict, dur_video: float | None, tipo: str = "promo") -> list[str]:
                 f"la cama pica en {m['audio']['pico_db']:.0f} dB y la narracion"
                 f" pica en -1.5 dB: por encima de {PICO_DB_CURSO:.0f} dB compite"
                 " con la voz al montar la pelicula")
+        fuera += avisos_musica(m)
         if dur_video:
             for nombre, t, _db in m["audio"]["eventos"]:
                 if t >= dur_video:
@@ -233,12 +360,25 @@ def avisos(m: dict, dur_video: float | None, tipo: str = "promo") -> list[str]:
                 f"la voz termina hacia {fin:.1f} s y el video dura {dur_video:.1f} s:"
                 f" deja al menos {COLA_SILENCIO_S} s de silencio o el bucle chasquea")
 
+    fuera += avisos_musica(m)
     if dur_video:
         for nombre, t, _db in m["audio"]["eventos"]:
             if t >= dur_video:
                 fuera.append(f"«{nombre}» empieza en {t:.1f} s, despues del final"
                              f" ({dur_video:.1f} s): no se oira")
     return fuera
+
+
+def avisos_musica(m: dict) -> list[str]:
+    """La cama musical solo tiene un aviso, y es el que importa: si sube tapa
+    la voz. Medido sobre el promo de filotaxis con una voz a -1.5 dBFS, la
+    voz queda 15.0 dB por encima de la musica a -24 dB y solo 9.0 a -18: el
+    corte esta en -21, donde deja de haber los 12 dB que pide la casa."""
+    musica = m["audio"].get("musica")
+    if musica and musica["db"] > MUSICA_DB_AVISO:
+        return [f"la musica pica en {musica['db']:.0f} dB: por encima de"
+                f" {MUSICA_DB_AVISO:.0f} dB tapa la voz"]
+    return []
 
 
 def _digest(obj) -> str:

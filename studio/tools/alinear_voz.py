@@ -27,8 +27,9 @@ from pathlib import Path
 
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(BACKEND))
-from app.narracion import (TTS_RATE, VertexNarrador, _escribir_wav,
+from app.narracion import (TTS_RATE, _escribir_wav,  # noqa: E402
                            _recortar_silencio)
+from app.tts import narrador_desde_entorno  # noqa: E402
 
 PAUSA_MINIMA_S = 0.25     # si una frase pisa a la siguiente, este es el aire
 COLA_MINIMA_S = 0.8       # silencio que tiene que quedar al final
@@ -40,19 +41,20 @@ def main():
     p.add_argument("salida", type=Path)
     p.add_argument("--limite", type=float, default=None)
     p.add_argument("--voz", default=None)
+    p.add_argument("--proveedor", default=None,
+                   choices=["vertex", "edge", "piper"])
     args = p.parse_args()
 
     manifiesto = json.loads((args.pieza / "clip.json").read_text())
     spec = manifiesto["voz"]
     secciones = spec["secciones"]
-    voz = args.voz or spec.get("voz") or "Charon"
     limite = args.limite or manifiesto.get("duracion_objetivo")
-
-    vertex = VertexNarrador(
-        Path(os.environ.get("MS_GCP_KEY_PATH", "/etc/manimstudio/gcp-key.json")),
-        os.environ.get("MS_GCP_LOCATION", "us-central1"),
-        os.environ.get("MS_GEMINI_MODEL_DEEP", "gemini-2.5-pro"),
-        os.environ.get("MS_GEMINI_MODEL_TTS", "gemini-2.5-flash-preview-tts"))
+    # La voz del clip.json (p.ej. "Charon") solo vale para su proveedor; con
+    # otro se usa la voz por defecto de ese proveedor salvo --voz.
+    voz_pedida = args.voz or (spec.get("voz") if (args.proveedor or
+                              os.environ.get("MS_TTS_PROVIDER", "edge")) == "vertex" else None)
+    vertex, voz = narrador_desde_entorno(args.proveedor, voz_pedida)
+    print(f"voz: {vertex.id} · {voz}")
 
     audios = [_recortar_silencio(vertex.tts(s["texto"], voz))
               for s in secciones]

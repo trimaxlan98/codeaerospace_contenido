@@ -22,7 +22,8 @@ navegador ──HTTPS──▶ nginx (coderesearch.space)
                                             │  HTTPS a us-central1-aiplatform.googleapis.com)
                                             ▼ socket unix /run/manimstudio/runner.sock (0660 root:manimstudio)
                                         manim-runner (root, superficie minima:
-                                        render/cancel/thumbnail/stats/ping)
+                                        render/cancel/thumbnail/frames/fotograma/
+                                        ejecutar/stats/ping + los de audio y montaje)
                                             ▼ docker compose run … manim-render
                                         contenedor de render: network_mode:none, cpus:1.5, mem:2g,
                                         pids:256, no-new-privileges, timeout duro, --rm,
@@ -44,8 +45,10 @@ Decisiones clave (y por qué):
 - **Frontend estático servido por nginx** (en lugar de proxy a un proceso node en 5174):
   un proceso menos en un VPS con 2 vCPU; el puerto interno de ManimStudio es solo 3002.
 - **Runner separado**: el proceso web NUNCA toca `docker.sock` (equivale a root). El runner
-  (root) expone 4 comandos con validación regex estricta y solo sobre este compose file;
-  `cancel` solo puede matar contenedores `manimstudio-render-*`.
+  (root) expone un puñado de comandos con validación regex estricta y solo sobre este compose
+  file; `cancel` solo puede matar contenedores `manimstudio-render-*`. **Ninguno acepta una
+  ruta del exterior**: todas se derivan de un id validado (el nombre del PNG de una figura lo
+  compone el propio runner a partir de `t` y `ancho`).
 - **Escenas por AST**: la lista de escenas del script se extrae con `ast.parse`, jamás
   ejecutándolo fuera del contenedor.
 
@@ -131,9 +134,10 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 
 - **Proyecto**: `name`, `description`, `quality` (fija para todos sus clips, `ql`/`qm`/`qh`),
   `formato` (`horizontal` 16:9 · `vertical` 9:16 · `cuadrado` 1:1, también fijo para todos
-  sus clips), `tipo` (`curso` o `promo` de redes) y `style_block` (código Python opcional que
-  se antepone a cada clip antes de renderizar — imports, paleta de colores, helpers de
-  continuidad…).
+  sus clips), `tipo` (`curso` o `promo` de redes), `estilo` (el nombre del estilo visual —
+  `lienzo`— cuando el manifiesto del curso lo declara; no se puede deducir del código) y
+  `style_block` (código Python opcional que se antepone a cada clip antes de renderizar —
+  imports, paleta de colores, helpers de continuidad…).
 - **Clip**: pertenece a un proyecto, tiene `position` (orden dentro del curso), `title`,
   `script` (el código del clip, **sin** el estilo del proyecto), `scene` (nombre de la clase
   `Scene` a renderizar), `final_state` (nota de en qué queda la escena al terminar, visible
@@ -191,8 +195,53 @@ compartido, y permiten exportar el resultado como un solo video sin salir de Man
 | GET | `/{pid}/clips/{cid}/script` | `{script, style_offset}` — script crudo del clip (sin estilo) + líneas que antepone el estilo actual |
 | POST | `/{pid}/clips/{cid}/render` | compone estilo+script, valida la escena y encola el render (201, devuelve el job); 422 si no hay escena asignada, si el script compuesto es inválido, o si la escena no existe en él |
 | POST | `/{pid}/render-stale` | encola todos los clips `stale`/`no_render` sin job en vuelo; devuelve `{queued, skipped}` |
+| POST | `/{pid}/render-lote` | lote de renders: `{clips: [ids]｜null, calidad: ql/qm/qh｜null, force}` → `{queued, lote_id, saltados, calidad, calidad_cambiada}`; 409 si se cambia la calidad con `clips` elegidos a dedo |
+| GET | `/{pid}/lote` | progreso agregado del lote vigente: `{total, hechos, fallidos, en_curso, pendientes, media_s, eta_s, derivado}` o `{lote: null}` |
+| POST | `/{pid}/duplicar` | `{name}` → copia el proyecto y sus clips **sin** los renders (201); 409 si el nombre ya existe |
+| POST | `/{pid}/clips/{cid}/duplicar` | inserta la copia justo detrás, con título «… (copia)» (201) |
+| POST | `/importar` | importa un curso-como-archivos (ver abajo); `?dry_run=1` valida sin escribir |
+| GET | `/importables` | los slugs que hay en `studio/content/{cursos,verticales,promos}/` |
 | GET | `/{pid}/export` | manifiesto JSON del curso (clips, orden, estado, sin campos internos) |
+| GET | `/{pid}/fuentes.zip` | las **fuentes** del proyecto: `curso.json` + `style_block.py` + `clips/NN-*.py` + `guiones/NN-*.{secciones.json,txt}` |
 | GET | `/{pid}/archive` | ZIP con los videos vigentes + `concat.txt` + `manifest.json` + `LEEME.txt`; 404 si ningún clip tiene video vigente |
+
+**Un proyecto es un directorio** (sprint R3a): un curso vive igual de bien en la base y en
+git, y se pasa de una a otro sin salir de la app.
+
+- **Exportar** — «Fuentes (.zip)» en el detalle del proyecto (`GET /{pid}/fuentes.zip`). No
+  lleva vídeos (para eso está «Descargar curso»): lleva `curso.json`, `style_block.py`, un
+  `.py` por clip y, si los hay, los guiones. Es **el mismo esquema que lee `subir_curso.py`**,
+  así que se puede versionar en `studio/content/cursos/<slug>/` tal cual. El zip es
+  determinista (sin compresión, fecha fija en cada miembro, orden fijo): exportar dos veces
+  el mismo proyecto da **los mismos bytes**.
+- **Importar** — «Importar…» en la lista de proyectos (`POST /importar`), por dos puertas:
+  un **.zip de fuentes** (cuerpo crudo `Content-Type: application/zip`, ≤ 5 MB) o un
+  **directorio del repo** (`{"slug": "...", "origen": "cursos"｜"verticales"｜"promos"}`, leído
+  de `MS_CONTENT_DIR`, por defecto `studio/content/`). El slug se valida contra un regex
+  cerrado (minúsculas, dígitos y guiones) y la ruta resuelta se comprueba dentro de su origen.
+  Un **vertical** convierte cada pieza (`clip.json` + `escena.py`) en un clip: su bloque
+  `audio`/`voz` va al manifiesto de audio del clip, y `modulo` + `duracion_objetivo` a sus
+  notas. **Idempotente por nombre exacto** y por posición de clip, igual que el CLI: crea lo
+  que falta, actualiza lo que cambió y **nunca borra**. «Comprobar» es el `--dry-run`.
+- **La misma lógica que la terminal**: `app/importar.py` es el único sitio donde se lee un
+  curso-como-archivos; `subir_curso.py` y `subir_promo.py` son envoltorios suyos.
+
+**Render en lote** («Render en lote…», `POST /{pid}/render-lote`): encola varios clips en
+orden en la cola de siempre (un render a la vez), saltando los que estén al día —salvo
+`force`— y los que ya tengan un render en vuelo. Como **la calidad es del proyecto**, pedir
+otra la cambia en el proyecto *antes* de encolar y lo dice en la respuesta
+(`calidad_cambiada`); eso rehace el curso entero, así que con `clips` elegidos a dedo se
+responde 409 en vez de dejar vídeos de dos tamaños. `GET /{pid}/lote` da el progreso agregado
+(hechos/total, fallidos, ETA con la duración media de los renders `done` de ese proyecto) y
+sobrevive a un reinicio del backend: si el estado en memoria se perdió, el lote se **deriva**
+de los jobs del proyecto (los activos y todo lo encolado desde el primero de ellos).
+«Re-renderizar desactualizados» usa este mismo endpoint.
+
+**Duplicar**: «Duplicar proyecto» copia estilo compartido, formato, calidad, fondo y todos los
+clips (script, escena, `final_state`, notas y manifiesto de audio); «Duplicar» en un clip
+inserta la copia justo detrás. **En ninguno de los dos se copia el render**: un vídeo es de un
+solo clip, y dos clips apuntando al mismo job harían que borrarlo dejase sin vídeo a un
+proyecto que nadie estaba tocando.
 
 **Estudio en contexto de clip**: desde un proyecto, «Editar en Estudio» abre el script del
 clip en el editor con un banner (`Proyecto · clip · calidad fija`) y botón «Salir del clip»
@@ -239,13 +288,31 @@ Detalle completo y decisiones en `ESTUDIO-V2.md`.
 | GET | `/api/projects/{pid}/pelicula/video` | el mp4, con soporte de Range |
 | DELETE | `/api/projects/{pid}/pelicula` | borra la película, no el material |
 
-**Medición**: la unión puede salir mal **sin fallar** (un offset de `xfade` que deja una pieza
-fuera da un mp4 bien formado y más corto; un `concat` con audios distintos enmudece a mitad).
-`POST /api/projects/{pid}/pelicula/verificar` mide la película contra su plan —duración con
-±0,5 s de tolerancia, sonido **pieza a pieza** y resolución— y se dispara sola al terminar de
-montar. Solo se acusa a las piezas que **traían** sonido: un curso sin narrar es mudo a
-propósito. El informe vive en `pelicula.json` con el mismo hash que el montaje, así que
-volver a montar lo deja en «medición vieja» en vez de enseñar números de otra película.
+**Medir la película**: la unión puede salir mal **sin fallar** (un offset de `xfade` que deja
+una pieza fuera da un mp4 bien formado y más corto; un `concat` con audios distintos enmudece a
+mitad). `POST /api/projects/{pid}/pelicula/verificar` mide la película contra su plan y se
+dispara sola al terminar de montar. Desde el sprint R3c mide **lo mismo que la terminal**
+(`verifica_vertical.py` y `unir_vertical.py`), que es donde se cazaron los defectos reales:
+
+- **duración** con ±0,5 s de tolerancia y **resolución** contra la del proyecto;
+- **sonido pieza a pieza** — solo se acusa a las que **traían** sonido: un curso sin narrar es
+  mudo a propósito;
+- **costuras**: el último fotograma de cada pieza contra el primero de la siguiente, con PIL.
+  **≤ 0,01 limpia · ≤ 0,06 a mirar · por encima se ve**, umbrales medidos sobre los cursos
+  entregados (0,0000 en el 31 y el 33; 0,0048 en el 28). Cuando **todas** las uniones valen
+  exactamente lo mismo y no valen cero, salta el diagnóstico de la **capa fija**: es la firma
+  del parpadeo del curso 28 (0,0552 idéntico en las catorce uniones, un `FadeOut` que apagaba
+  la marca de agua y las esquinas del HUD al final de cada pieza). Con empalme distinto de
+  `corte` la costura no aplica: xfade funde las dos piezas a propósito;
+- **picos**: el de cada pieza y el de la película entera contra el techo de la casa,
+  **−0,5 dBFS**;
+- **cola de silencio de la voz**: los últimos 0,8 s de cada narración bajo −50 dBFS, medidos
+  sobre el wav y no sobre el montaje (ahí los taparía la cama de sonido de la pieza).
+
+El veredicto tiene **tres colores**: verde, **ámbar** (avisos: una costura en la banda de la
+capa fija, un pico a un pelo del techo, una voz sin cola — la película es entregable, pero hay
+algo que mirar) y rojo. El informe vive en `pelicula.json` con el mismo hash que el montaje,
+así que volver a montar lo deja en «medición vieja» en vez de enseñar números de otra película.
 
 Operación: `exports/` necesita `ReadWritePaths` en la unidad del backend y `exports/peliculas/`
 debe ser del usuario `manimstudio` — el contenedor corre con ese uid y `cap_drop: ALL` le quita
@@ -357,6 +424,46 @@ generan una vez y no caducan.
 El listado cruza el directorio con la paleta viva: `exports/sfx/` sobrevive a los cambios de
 `PALETA` y una corrida vieja deja efectos que ya no existen.
 
+### Música procedural (`musica.py` y `/api/musica`)
+
+Hasta el sprint R2 la app no tenía música: `unir_vertical.py --mudo` existe *precisamente*
+porque el dueño se la ponía fuera. `studio/tools/musica.py` sintetiza **ocho temas** con
+numpy —sin un solo asset, con semillas fijas, determinista al byte— dentro del contenedor de
+render. Cada tema declara raíz, progresión de acordes por grados, bpm y el nivel de sus tres
+capas: **drone** (pad aditivo por nota del acorde), **arpegio** (Karplus-Strong en las
+subdivisiones del pulso) y **sub-bajo** (senoidal articulado a cada tiempo, que es lo que da
+el pulso medible). Todo por debajo de ~950 Hz: «espacial pero tranquilo», el criterio que el
+dueño verificó para la marca. Medido en los ocho, a 12 s y a 37,3 s: duración exacta al
+sample, pico ≤ −3 dBFS, **95,4–99,8 %** de la energía bajo 300 Hz, **99,8–100 %** bajo 950, y
+el bpm reconocible por autocorrelación con ≤ 2,2 % de error.
+
+`tema(nombre, dur)` dura exactamente lo que se le pide y termina con una caída suave —lo que
+mantiene mudos los extremos de un promo en bucle—. `escribe_cama()` la escribe por bloques de
+90 s sobre el reloj absoluto, para que una película de media hora no pida más de un giga de
+FFT.
+
+Dónde entra:
+
+- **manifiesto de una pieza**: `audio.musica = {tema, db, bpm?}`. `sfx.promo()` suma la cama
+  **antes** del `_norm` a `pico_db`, así que el pico final no se mueve (medido sobre el promo
+  de filotaxis: −3,0 dBFS con y sin música). Por encima de **−21 dB** salta un aviso: ahí la
+  voz deja de quedar los 12 dB por encima que pide la casa (medido: 15,0 dB de separación con
+  la cama en −24, 9,0 en −18).
+- **película del curso**: `plan.json` acepta `musica: {tema, db}` global. `ensamblar.py` mide
+  el montaje, saca la envolvente de la voz y sintetiza la cama de esa duración con el
+  *ducking* ya aplicado: −9 dB donde hay voz, ataque 0,12 s, liberación 0,60 s.
+- **banco audible**: `musica.py banco` deja una vista previa de 12 s por tema en
+  `exports/musica/` (comando `musica` del runner, calcado de `paleta`).
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/musica` | los temas con bpm, carácter y descripción, y cuáles están listos |
+| POST | `/api/musica` | sintetiza el banco (409 si ya se está sintetizando) |
+| GET | `/api/musica/{tema}` | el wav; el nombre va contra el catálogo **cerrado**, igual que en SFX |
+
+`MusicaSelector.jsx` es el mismo control en los dos sitios: el diálogo de audio de un clip y
+el panel de la película.
+
 ### Importar los promos del repo (`subir_promo.py`)
 
 Los diez promos escritos a mano viven en `studio/content/promos/<slug>/` (`promo.json` +
@@ -409,13 +516,90 @@ otro archivo.
 Mezclar el audio dispara la verificación al terminar: recién mezclado es cuando el informe
 anterior deja de valer.
 
+### Fotogramas de un render: hoja de contactos y figura (sprint R3b)
+
+Hasta R3b el único resultado de un render en la app era el mp4. En la terminal el bucle es
+otro: `render_local.py --frames 8` deja los PNG y **se miran uno a uno** antes de dar un clip
+por bueno —la regla dura del proyecto es que nada quede encimado, y eso no lo dice ningún
+número—; y cuando una figura tiene que entrar en la tesis se saca un `ffmpeg -ss` a mano.
+
+- **Hoja de contactos** (botón bajo el vídeo, en el Estudio y en el modal de Renders): N
+  fotogramas equiespaciados en `t = dur·(i+½)/N` —el mismo reparto que `render_local.py`, que
+  evita los fundidos de los extremos— **más el último fotograma real**, que va aparte y
+  destacado porque es el que cierra la pieza (y el que empalma con la siguiente en un
+  vertical). 480 px de ancho; cada miniatura lleva su instante encima y se amplía al pulsar.
+- **Fotograma → PNG**: el instante que se está viendo (`currentTime` del `<video>`) a 1920,
+  2560 o 3840 px, descargado al momento. Es la salida estática para una figura de paper o de
+  tesis: el vídeo está a la calidad con que se renderizó, pero el PNG se pide al ancho que
+  necesita la página.
+
+La extracción vive en `studio/tools/hoja_contactos.py` — **una sola implementación**, un
+contenedor por hoja (no uno por fotograma: arrancar `docker compose run` cuesta ~1,5 s) y un
+informe JSON, igual que `promo_verifica.py`.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/jobs/{id}/frames` | `{n: 1..24}`. **Idempotente**: si el índice de esa `n` ya está en disco con todos sus PNG, devuelve `recalculada: false` sin arrancar contenedor (el mp4 de un job es inmutable). 409 si el job no tiene vídeo |
+| GET | `/api/jobs/{id}/frames/{archivo}` | `NN.png` o `final.png`, conjunto cerrado y misma defensa de path que `/thumb` |
+| POST | `/api/jobs/{id}/fotograma` | `{t, ancho: 320..3840, formato: "png"}` → `{archivo, url, ancho, alto, bytes}` |
+| GET | `/api/jobs/{id}/figuras/{archivo}` | `t<ms>_<ancho>.png`; el nombre lo **deriva el runner**, y el regex se vuelve a exigir aquí |
+
+**Dos trampas medidas**: un `-ss` al filo de la duración *sale con éxito sin escribir nada*, y
+el navegador manda justo ese instante al terminar el vídeo (`currentTime == duration`), así
+que la cola final se atiende con `-sseof -0.4 -update 1`; y `scale=3840:-2` sobre un 854×480
+da **2158** de alto, no 2160 — la resolución que se enseña es la medida sobre el PNG escrito,
+no la que se pidió.
+
+### Laboratorio: Python de validación en el sandbox (`#/laboratorio`, sprint R3b)
+
+Las **sondas** (`studio/tools/sonda_*.py`) son el guardián de cada librería del repo: cada
+invariante con su contraejemplo y una tabla de cifras medidas. Se corrían sólo desde una
+terminal; en la app no había forma de «verificar la librería» antes de escribir un clip, ni de
+calcular una cifra con numpy, ni de dibujar un PNG con PIL.
+
+- Editor CodeMirror (Python, con el tema de la app) y **`Ctrl+Enter` para ejecutar**. La
+  plantilla de partida usa numpy, una librería del repo y PIL, que es exactamente lo que hay a
+  mano. El script se guarda en `localStorage`, como el del Estudio.
+- Panel de salida con `stdout`/`stderr`, y **galería de lo que produjo**: los PNG se ven ahí
+  mismo, los WAV se oyen, el resto se descarga.
+- **Sondas del repo** con un botón «Correr» cada una. Se ejecuta el archivo del repo montado
+  read-only, no una copia: si mañana cambia, el botón corre la versión nueva.
+- Historial de las últimas 30 ejecuciones, con el **veredicto** (la última línea útil de la
+  salida: «73 invariantes ok, 0 fallos») sin abrir la ejecución.
+
+**Las garantías son las de un render**, porque es el mismo contenedor: sin red, repo
+read-only, `cap_drop: ALL`, `no-new-privileges`, 1.5 vCPU / 2 GB / 256 pids, `--rm`, y como
+único directorio escribible el de la propia ejecución. Ejecutar Python no confiable no es una
+capacidad nueva —una escena de manim ya lo es desde el primer día—; lo que cambia es que este
+Python **mide** en vez de dibujar. `PYTHONPATH` apunta a `manim_extensions`, así que
+`import sistemas` funciona igual que en una sonda.
+
+Cada ejecución es un directorio (`render_jobs/lab/<id>/`) con `script.py`, `meta.json` y sus
+resultados: sin migración de esquema, y borrar una ejecución es borrar su directorio. **Una a
+la vez** (409 si hay otra en curso): el VPS tiene 2 vCPU y no compite con un render. No pasa
+por la cola de renders porque una sonda son 1–3 s, igual que `mezclar_audio` y
+`verificar_promo`, que tampoco pasan.
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/laboratorio` | últimas 30 ejecuciones (sin la salida: 30 × 200 KB por refresco), `ocupado`, plantilla del editor y rango de timeout |
+| POST | `/api/laboratorio` | `{script, timeout: 30..900, titulo}` → **202** con el id; la ejecución va en segundo plano y la vista consulta cada 1,2 s (nginx corta mucho antes de 900 s) |
+| GET | `/api/laboratorio/{id}` | estado, `code`, `stdout`, `stderr` y archivos |
+| GET | `/api/laboratorio/{id}/archivos/{nombre}` | PNG/JPG/SVG/WAV/TXT/JSON/CSV/MD/LOG; `script.py` y `meta.json` **no** se sirven |
+| DELETE | `/api/laboratorio/{id}` | borra el directorio |
+| GET | `/api/laboratorio/sondas` | las `sonda_*.py` del disco, con la primera línea de su docstring |
+| POST | `/api/laboratorio/sondas/{nombre}` | corre esa sonda tal cual, sin argumentos (ruta cerrada) |
+
+**`exit 1` no es una avería**: una sonda con invariantes rotos sale con 1 a propósito, y eso es
+ámbar («con hallazgos»), no rojo. Rojo son `timeout` y `error` (runner caído).
+
 ### Atajos y paleta de comandos
 
 | Tecla | Qué hace |
 |---|---|
 | `Ctrl+K` / `⌘K` | paleta de comandos: ir a un curso o a una sección escribiendo |
-| `g` + `p`/`e`/`r`/`a`/`d`/`c` | Proyectos · Estudio · Renders · Aprender · Admin · Configuración |
-| `Ctrl+Enter` | renderizar, desde el editor del Estudio |
+| `g` + `p`/`e`/`r`/`a`/`l`/`d`/`c` | Proyectos · Estudio · Renders · Aprender · Laboratorio · Admin · Configuración |
+| `Ctrl+Enter` | renderizar (Estudio) o ejecutar (Laboratorio), desde el editor |
 | `?` | la hoja con todo esto |
 
 La tabla `ATAJOS` de `components/Atajos.jsx` es a la vez la implementación y la hoja de ayuda.
@@ -447,35 +631,47 @@ la tarjeta: dentro hay campos de texto).
 
 ### Narración de cursos (botón «Generar narración» en Proyectos)
 
-- Guion cronometrado con `gemini-2.5-pro` (secciones con `t_inicio`/`t_fin` leyendo los
-  `run_time`/`wait` del script compuesto) y voz con `gemini-2.5-flash-preview-tts`
-  (Vertex, misma service account del asistente; sin `gcp-key.json` la función se oculta).
-- El audio se **alinea a las secciones**: cada una se sintetiza aparte, se recorta su
-  silencio inicial/final y se coloca en su `t_inicio` (hueco máximo 2.5 s, cascada si la
-  anterior se pasa).
-- **Que quepa en el video** (tolerancia +5 %) se ataca en tres niveles, de menos a más
-  invasivo: 1) los silencios entre secciones se comprimen por búsqueda binaria hasta el
-  máximo que aún cabe (`_ajustar_al_limite`, no toca la voz); 2) hasta
-  `MAX_INTENTOS_GUION` guiones, cada uno con menos palabras en proporción a lo que se
-  pasó, **conservando el intento que mejor encaja** —no el último, que el TTS varía—;
-  3) si aun así se pasa, `mux.sh` lo acelera con `atempo` al montar. Ninguna de las tres
-  recorta la narración.
-- Salida en `guiones/<slug-proyecto>/NN-slug.{md,txt,wav,secciones.json}` + `estado.json`
-  (hash de script compuesto+escena+duración+voz → detecta narraciones desactualizadas).
-- API: `GET/POST /api/projects/{pid}/narracion` (estado por clip / corrida en segundo
-  plano, una a la vez), `POST .../narracion/cancel`, `GET .../narracion/{cid}/{audio,texto}`.
-- El zip de `GET /api/projects/{pid}/archive` incluye los `.wav`/`.txt` emparejados con
-  cada mp4, `mux.sh` y el estado de narración en `manifest.json`. `mux.sh` mide con
-  `ffprobe`: si la voz cabe, `apad -shortest` (cada clip conserva su duración exacta y el
-  concat no se desincroniza); si no cabe, `atempo` con el ratio justo (tope 1.15, preserva
-  el tono) para no perder la cola de la narración. La lista de concat se **copia dentro de
-  `con_audio/`**: ffmpeg resuelve las rutas relativas de un `concat.txt` contra el
-  directorio del archivo, no contra el cwd — leerla desde `../` concatenaba los mp4
-  originales y el curso salía mudo sin que nada fallara.
-- CLI equivalente: `studio/tools/guiones.py` (`--solo-guion`, `--solo-audio`, `--voz`,
-  `--force`); comparte la lógica de `app/narracion.py`.
-- Operación: la unidad systemd necesita `ReadWritePaths` sobre `guiones/` y el directorio
-  debe ser del usuario `manimstudio` (mismo patrón que Animaciones).
+**Desde 2026-09-03 la voz no depende de GCP.** Hay cuatro proveedores
+(`app/tts.py`), y la interfaz enseña cuáles están disponibles y por qué no:
+
+| Proveedor | Qué es | Red | Guion |
+|---|---|---|---|
+| `edge` (defecto) | edge-tts, 45 voces neuronales en español (es-MX Jorge/Dalia…) | desde el backend | no |
+| `piper` | Piper offline; un `.onnx` por voz en `MS_PIPER_VOICES_DIR` (`/etc/manimstudio/voces`) | no | no |
+| `vertex` | Gemini TTS; el único que **escribe** el guion (Gemini 2.5 Pro) | sí, de pago | sí |
+| `archivo` | la grabación del dueño, subida por clip | — | — |
+
+Flujo:
+
+- **Guion**: si Vertex está disponible lo escribe Gemini a partir del script
+  (como siempre). Si no, se escribe a mano en «Guion y voz» (tabla de
+  secciones `t_inicio / t_fin / momento / texto`; `PUT
+  /api/projects/{pid}/narracion/{cid}/guion`) o lo escribe Claude desde la
+  terminal. Un guion a mano se alinea **exacto** a sus tiempos (sin el tope
+  de 2.5 s de hueco que aplica a los tiempos estimados por Gemini).
+- **Voz**: `POST /api/projects/{pid}/narracion` acepta `{proveedor, voz,
+  solo_audio, clips, force}`. Sin guion y sin Vertex responde 409 diciendo
+  qué clips lo necesitan. `GET /api/narracion/proveedores` es el catálogo.
+- **Grabación propia**: `PUT /api/projects/{pid}/narracion/{cid}/audio?nombre=toma.m4a`
+  con el archivo como cuerpo (wav/mp3/flac/ogg se decodifican en el backend
+  con miniaudio; m4a/aac/webm/opus pasan por ffmpeg en el contenedor,
+  comando `normalizar_voz` del runner). Se convierte a mono 24 kHz, se le
+  recorta el silencio y queda en la **misma ruta canónica** que el TTS
+  (`guiones/<slug>/NN-<slug>.wav`), así la película la recoge sin cambios.
+  nginx admite 25 MB en `/api/`.
+- Cambiar el proveedor por defecto **no** deja desactualizado el catálogo: el
+  hash de frescura usa la voz con que se narró cada clip.
+- Piper corre como subproceso (`python -m piper`); la unidad del backend sube
+  a `MemoryMax=1024M` por eso. Sale a 0 dBFS y se atenúa a −3 dB.
+- Los tests simulan «solo Vertex» con `MS_TTS_PROVEEDORES=vertex,archivo`.
+
+Lo anterior sigue vigente: guion por secciones cronometradas, síntesis por
+sección con recorte de silencio, compresión de silencios para caber en el
+vídeo y hasta tres guiones más cortos (solo con Gemini), estado en
+`guiones/<slug>/estado.json` (hash de script compuesto+escena+duración+voz →
+detecta narraciones desactualizadas). API: `GET/POST
+/api/projects/{pid}/narracion`, `POST .../narracion/cancel`, `GET
+.../narracion/{cid}/{audio,texto,guion}`.
 
 ### Identidad CO.DE Academy en los videos
 

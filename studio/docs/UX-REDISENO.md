@@ -364,8 +364,10 @@ secciones en 1440×900 y 390×844, tema oscuro y claro. Sin errores de consola
 
 ## Pendiente conocido
 
-- `Projects.jsx` (≈1 250 líneas) y `Studio.jsx` (≈700) piden descomponerse.
-  Es deuda de mantenimiento, no un defecto visible para quien usa la app.
+- ~~`Projects.jsx` (≈1 250 líneas)~~ **partido en el sprint R5a**
+  (`ESTUDIO-V3.md`): quedan 31 líneas que solo enrutan lista/detalle y 14
+  archivos en `components/proyectos/`. `Studio.jsx` (≈700) sigue pidiendo lo
+  mismo. Es deuda de mantenimiento, no un defecto visible para quien usa la app.
 - La web usa Space Grotesk donde el video usa Rajdhani: el wordmark de la
   consola no es tipográficamente idéntico al del render. Traer la TTF del repo
   a `public/` es viable si algún día se quiere fidelidad exacta.
