@@ -332,3 +332,15 @@ primera**, dos de ellos conceptuales:
 - **Los ejes de una distribución de Wigner no son los de una FFT**: el eje de
   frecuencia va al doble (la correlación se toma a desfase 2m). La fórmula
   del ángulo óptimo puede estar bien y la respuesta salir mal por los ejes.
+
+## Manim: componer animaciones en un mismo `play`
+
+- **`Rotate(grupo, ...)` y `.animate.set_color(...)` sobre los hijos de ese
+  grupo, en el MISMO `self.play()`, se pisan.** Las dos interpolan los
+  puntos de los hijos en cada fotograma y gana la que corra la última en el
+  bucle interno de manim. En la práctica el cambio de color ganaba siempre y
+  **deshacía el giro en silencio**: los ejes se quedaban a 0°/90° mientras la
+  cifra ya decía "27.75 grados medidos". No hay error, no hay aviso, y en un
+  frame suelto parece que simplemente no se giró.
+  Se arregla partiéndolo en dos `self.play()` seguidos: primero girar,
+  después recolorear. Cazado en el curso 32 (pieza 18).
