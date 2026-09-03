@@ -755,15 +755,29 @@ def forma_ejemplo(escala=1.0, centro=1.2, ancho=0.45):
     return f
 
 
+def espectro_fourier(x_de_t, t_max=8.0, N=1024):
+    """(frecuencias, |espectro|) de una forma muestreada en [0, t_max).
+
+    Existe para que la pieza pueda DIBUJAR el mismo espectro del que
+    `pico_fourier` saca su cifra. Antes solo estaba el pico, y quien
+    quisiera dibujar la curva tenia que reproducir esta FFT a mano en el
+    clip, con los mismos `t_max` y `N`: si alguien cambiaba un defecto
+    aqui, el dibujo y la cifra se separaban en silencio. Ahora las dos
+    salen de la misma funcion y no pueden divergir. Lo levanto el agente
+    de la pieza 15."""
+    t = np.linspace(0.0, float(t_max), int(N), endpoint=False)
+    g = np.asarray([x_de_t(ti) for ti in t], dtype=float)
+    mag = np.abs(np.fft.rfft(g))
+    f = np.fft.rfftfreq(int(N), d=t[1] - t[0])
+    return f, mag
+
+
 def pico_fourier(x_de_t, t_max=8.0, N=1024):
     """Frecuencia del maximo del espectro de Fourier, en la malla dada.
 
     Es lo que SE MUEVE al escalar la forma, y es la mitad de la pieza 15:
     la otra mitad es que el de Mellin no se mueve."""
-    t = np.linspace(0.0, float(t_max), int(N), endpoint=False)
-    g = np.asarray([x_de_t(ti) for ti in t], dtype=float)
-    mag = np.abs(np.fft.rfft(g))
-    f = np.fft.rfftfreq(int(N), d=t[1] - t[0])
+    f, mag = espectro_fourier(x_de_t, t_max=t_max, N=N)
     return float(f[int(np.argmax(mag))])
 
 
