@@ -323,3 +323,93 @@ de una que devuelve siempre lo mismo.
 
 Entrega: 20 piezas, **11.05 min** en 1080x1920 @ 60 fps, 19 costuras a
 0.0000/255, sin pista de audio.
+
+## Curso 33 — Señales y sistemas (vertical, estilo LIENZO, **mudo**)
+
+Dieciocho piezas más intro y cierre sobre lo que un **sistema** le hace a una
+señal: el impulso, la respuesta al impulso, la convolución, el escalón, las
+cuatro propiedades que hacen manejable un sistema (linealidad, invarianza,
+causalidad, estabilidad), cómo se componen (cascada, realimentación, la
+ecuación en diferencias), lo mismo visto en frecuencia (autofunciones,
+respuesta en frecuencia, fase y retardo de grupo, resonancia) y los límites
+(transitorio, un filtro, saturación).
+
+La decisión que más importa es **la capa que ocupa**. Un curso clásico de
+señales y sistemas contiene Fourier, Laplace y Z — es decir, el curso 32
+entero— y roza el 27. Este ocupa la capa de encima: la caja que convierte una
+entrada en una salida, y toda su gracia es que con **una sola medida** —la
+respuesta al impulso— la caja queda determinada para siempre. Las
+transformadas se citan como herramienta y no se explican; la pieza 12
+(*autofunciones*) es la bisagra, porque explica **por qué** existe el curso 32
+—una exponencial entra en un sistema lineal y sale igual salvo un número— sin
+volver a contar ninguna transformada.
+
+### Lo que enseñó este curso, y trasciende al curso
+
+Nueve de las dieciocho piezas volvieron corregidas, y **siete de esas nueve
+fallaban de la misma manera**: una cifra o un rótulo que afirmaba algo sobre
+el **sistema** cuando en realidad hablaba del **cuadro** en que lo dibujamos.
+El catálogo tenía esa trampa escrita solo para el eje de frecuencia ("la
+profundidad de un nulo cambia con el número de puntos; su posición no"), y
+apareció en cinco disfraces distintos:
+
+| Disfraz | Medido |
+|---|---|
+| La ventana de muestras | "60 muestras que duran" sobre una respuesta que no se acaba nunca; con N=200 diría 200 |
+| Una respuesta sin asentar | "valor final" con 0.1381 de vaivén en las ocho últimas muestras dibujadas |
+| La rejilla de la FFT | la amplificación de un Q=40 sube de 37.38 a 38.25 solo al afinar la malla |
+| La escala del panel | dos sistemas dibujados a la misma altura con escalas que difieren 17.8× |
+| Los decimales | el cuarto decimal del valor final lo ponía el tamaño de la ventana |
+
+La regla que sale de ahí, y que conviene aplicar antes de rotular cualquier
+cifra: **mídela con dos ventanas y dos rejillas distintas, y si se mueve, no
+es del sistema.** A veces la salida no es cambiar el cálculo sino la
+precisión: las tres amplificaciones de la pieza 15 solo son del sistema
+redondeadas a entero (4, 11, 38), y ahí se quedaron.
+
+En **cinco de los nueve casos el error estaba en el encargo**, no en el
+trabajo del agente. Y dos veces un agente devolvió una corrección con una
+medida encima: uno demostró que exigir igualdad *bit a bit* entre dos
+convoluciones calculadas por caminos distintos era imposible (1.33e-15, el
+ULP de la máquina) y propuso la tolerancia que sí distingue un desfase real;
+otro, que el filtro especificado en su brief tenía ganancia 0.794 donde su
+plano necesitaba 1.000, así que el plano habría enseñado lo contrario de su
+propio rótulo.
+
+### Defectos de librería, corregidos en la librería
+
+- **`deformar_fases` sí cambiaba las amplitudes**: para que la salida sea real
+  el bin de Nyquist tiene que ser real, `irfft` lo fuerza tirando su parte
+  imaginaria, y girarlo movía su módulo (0.4857 → 0.1014) bajo un rótulo que
+  decía "las mismas amplitudes". Lo grave es que **la sonda ya afirmaba esa
+  propiedad y pasaba** — no por suerte del código sino de la señal elegida.
+  Un invariante que solo prueba tu caso no prueba la propiedad.
+- **`sis.cero` ponía el eje en el suelo del cuadro**, que solo es el cero si el
+  rango empieza en cero. El molde del curso dibuja áreas positivas, así que se
+  copió intacto a piezas cuyos datos bajan de cero: la raya caía bajo el cero
+  verdadero y el dibujo afirmaba que las muestras negativas eran positivas.
+  Ahora se calcula, y aborta si el cero no cae dentro del rango.
+- **`cola` no es "cuánto dura"**: mide dónde se acaba contando desde el origen,
+  así que un impulso en la muestra 20 tiene cola 21 y dura 1 → `sis.duracion`.
+- **Cuatro huecos de API que obligaban a una pieza a pescar cosas de un grupo
+  por índice o por tipo** — y todos se rompen en silencio, no con un error:
+  `sis.tallos(colores=)`, `sis.lazo(color_entrada=, color_salida=)` con
+  `g.vuelta`, `tf.barras(rango_y=)` y `L.morfeo` (que es `relevo` para un
+  dibujo que se transforma en vez de relevarse).
+- **`sis.banda` pintaba en `LINEA`**, el azul de las rejillas: una banda de
+  tolerancia no es mobiliario, es el umbral que la pieza afirma, y era
+  invisible.
+
+### Y una corrección a la trampa del acento
+
+Estaba escrita como "el ámbar traslúcido sobre este azul da verde oliva". La
+transparencia no es la causa: lo es el **ancho efectivo**. Dos trazos
+**opacos** de colores distintos, uno fino sobre una banda gruesa, se funden en
+el mismo oliva si el de encima mide un par de píxeles y casi todo él es borde
+antialiasado. Cuando dos curvas tienen que verse *coincidir*, la de encima va
+**a trozos**: en cada hueco se ve el color puro de abajo y en cada trazo el de
+arriba, y "coinciden" se lee porque se ven **dos** curvas, no una mezcla. Tres
+piezas de este curso usan ese remate y las tres se ven iguales.
+
+Entrega: 20 piezas, **10.82 min** en 1080x1920 @ 60 fps, 19 costuras a
+0.0000/255, sin pista de audio.
