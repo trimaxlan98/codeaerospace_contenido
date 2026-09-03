@@ -567,13 +567,24 @@ def cadena(cajas, largo=0.85, color=None):
     return piezas, p_ini, p_fin
 
 
-def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None):
+def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None,
+         color_entrada=None, color_salida=None):
     """El diagrama del lazo cerrado: la salida vuelve a la entrada.
 
     Es el unico dibujo del curso con una linea que se muerde la cola, y
-    esa forma ES la pieza 10."""
+    esa forma ES la pieza 10.
+
+    `color_entrada` y `color_salida` pintan los tramos por lo que son —el
+    reparto del curso es CIAN la entrada y AMBAR la salida— en vez de
+    dejarlo todo del mismo gris. Existen porque sin ellos la unica salida
+    era entrar por indice en el VGroup devuelto (`g[2]`, `g[4]`, `g[5]`),
+    y eso ata la pieza al orden en que esta funcion añade sus hijos: el
+    dia que se le meta un elemento mas por medio, el color se va al tramo
+    equivocado sin que falle nada. Lo levanto la pieza 10."""
     _exige_manim()
     color = color or _lz.APAGADO
+    c_ent = color_entrada or color
+    c_sal = color_salida or color
     g = VGroup(caja_directa)
     izq = caja_directa.get_left() + LEFT * ancho / 3
     der = caja_directa.get_right() + RIGHT * ancho / 3
@@ -582,10 +593,10 @@ def lazo(caja_directa, caja_vuelta=None, ancho=3.2, alto=1.5, color=None):
                   fill_color=_lz.AZUL, fill_opacity=1.0)
     nodo.move_to(izq)
     g.add(nodo)
-    g.add(flecha(izq + LEFT * 0.75, izq + LEFT * 0.11, color))
-    g.add(flecha(izq + RIGHT * 0.11, caja_directa.get_left(), color))
-    g.add(flecha(caja_directa.get_right(), der, color))
-    vuelta = VMobject(stroke_color=color, stroke_width=TRAZO_FINO)
+    g.add(flecha(izq + LEFT * 0.75, izq + LEFT * 0.11, c_ent))
+    g.add(flecha(izq + RIGHT * 0.11, caja_directa.get_left(), c_ent))
+    g.add(flecha(caja_directa.get_right(), der, c_sal))
+    vuelta = VMobject(stroke_color=c_sal, stroke_width=TRAZO_FINO)
     vuelta.set_points_as_corners([
         der, [der[0], abajo, 0], [izq[0], abajo, 0], izq + DOWN * 0.11])
     g.add(vuelta)

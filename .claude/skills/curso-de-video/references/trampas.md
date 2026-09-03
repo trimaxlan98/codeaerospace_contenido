@@ -62,6 +62,13 @@ parecida a la que vas a producir.
 - `set_opacity` **enciende el fill** (no solo el trazo). `Indicate` va sobre
   la versión `_con_fondo`.
 - `.animate` re-sube el VGroup al frente: cuidado con el orden z.
+- **`Create` VUELVE A ANADIR su mobject a la escena al terminar**
+  (`introducer=True` por defecto). Si lo que animas es una PARTE del dibujo
+  que vive dentro del grupo de un carril, eso lo saca del grupo y lo deja
+  como ocupante suelto en `scene.mobjects`: el carril deja de poder
+  apagarlo y aparece encimado en el plano siguiente. Se anima con
+  `Create(x, introducer=False)`, o con `.animate.set_opacity()` en vez de
+  `FadeIn`. Cazado en el curso 33.
 - **El objetivo de un `Transform` tiene que estar VIVO aunque no se vea.**
   `Transform(a, b)` copia en `a` el estilo de `b`, opacidad incluida. El
   patron de esta casa —construir los estados dentro del grupo y apagarlos
