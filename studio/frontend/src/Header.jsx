@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Activity, FileCode, Film, FlaskConical, FolderKanban, GraduationCap,
+  Activity, FileCode, Film, FlaskConical, FolderKanban, GraduationCap, Library,
   Settings as SettingsIcon, WifiOff, Search,
 } from 'lucide-react'
 import { OrbitGlyph } from './components/OrbitGlyph.jsx'
@@ -17,6 +17,9 @@ const NAV = [
   { id: 'projects', label: 'Proyectos', icon: FolderKanban },
   { id: 'studio', label: 'Estudio', icon: FileCode },
   { id: 'renders', label: 'Renders', icon: Film },
+  // Renders es la cocina (un job por clip); Biblioteca es lo que se entrega
+  // (el arbol de exports/: peliculas, verticales, presentaciones, bancos).
+  { id: 'entregas', label: 'Biblioteca', icon: Library },
   { id: 'learn', label: 'Aprender', icon: GraduationCap },
   // El Laboratorio va DESPUES del Estudio en la lectura pero antes de Admin:
   // es trabajo de contenido (verificar la libreria antes de escribir un

@@ -25,6 +25,7 @@ export const ATAJOS = [
   { teclas: ['g', 'p'], que: 'Ir a Proyectos', view: 'projects' },
   { teclas: ['g', 'e'], que: 'Ir al Estudio', view: 'studio' },
   { teclas: ['g', 'r'], que: 'Ir a Renders', view: 'renders' },
+  { teclas: ['g', 'b'], que: 'Ir a la Biblioteca de entregas', view: 'entregas' },
   { teclas: ['g', 'a'], que: 'Ir a Aprender', view: 'learn' },
   { teclas: ['g', 'l'], que: 'Ir al Laboratorio', view: 'lab' },
   { teclas: ['g', 'd'], que: 'Ir a Admin', view: 'admin' },

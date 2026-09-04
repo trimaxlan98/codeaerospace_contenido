@@ -21,6 +21,8 @@ from .audio_api import make_router as make_audio_router
 from .config import get_settings
 from .conocimiento import Conocimiento
 from .db import Database
+from .entregas import EntregasService
+from .entregas_api import make_router as make_entregas_router
 from .events import EventBus
 from .jobs import QUALITIES, JobManager, job_public
 from .laboratorio import LaboratorioService
@@ -55,6 +57,7 @@ manager = JobManager(cfg, db, runner, bus)
 service = ProjectService(db)
 manager.on_job_done = service.handle_job_done
 narracion_service = NarracionService(cfg, db)
+entregas_service = EntregasService(cfg)
 pelicula_service = PeliculaService(cfg, db, runner, narracion_service)
 presentacion_service = PresentacionService(cfg, db, runner)
 laboratorio_service = LaboratorioService(cfg, runner)
@@ -88,6 +91,7 @@ app.include_router(make_presentaciones_router(cfg, db,
                                              presentacion_service))
 app.include_router(make_sfx_router(cfg, runner))
 app.include_router(make_musica_router(cfg, runner))
+app.include_router(make_entregas_router(entregas_service))
 app.include_router(make_laboratorio_router(cfg, laboratorio_service))
 app.include_router(make_audio_router(cfg, db, manager, service,
                                      narracion_service))

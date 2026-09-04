@@ -10,6 +10,7 @@ const VIEW_TO_HASH = {
   studio: 'estudio',
   projects: 'proyectos',
   renders: 'renders',
+  entregas: 'biblioteca',
   learn: 'aprender',
   lab: 'laboratorio',
   admin: 'admin',
@@ -23,7 +24,10 @@ const VIEW_TO_HASH = {
 const HASH_TO_VIEW = {
   ...Object.fromEntries(Object.entries(VIEW_TO_HASH).map(([v, h]) => [h, v])),
   animaciones: 'learn',
-  biblioteca: 'renders',
+  // `#/biblioteca` apuntaba a los renders cuando esa pestaña se llamaba asi
+  // (antes del sprint 4). Desde la Biblioteca de entregas el nombre vuelve a
+  // significar lo que dice: las entregas. Los renders siguen en `#/renders`.
+  entregas: 'entregas',
 }
 
 export function parseHash(hash = window.location.hash) {

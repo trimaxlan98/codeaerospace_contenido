@@ -117,6 +117,29 @@ Decisiones clave (y por qué):
 - Requiere que el servicio pueda escribir en `studio/content/animations` y
   `studio/content/lessons` (`ReadWritePaths` en la unit + ownership `manimstudio`).
 
+### Biblioteca de entregas (pestaña «Biblioteca»)
+
+Explorador de solo lectura de `exports/`, que es donde vive lo que se
+entrega: `peliculas/<project_id>/`, `verticales/<slug>/`,
+`presentaciones/<project_id>/`, `marca-intro-y-cierre/`, y los bancos
+`musica/` y `sfx/`. Hasta el 2026-09-03 nada de esto se veía desde la app.
+
+- `GET /api/entregas?ruta=<subruta>` — carpetas (con el número de archivos y
+  los bytes de **todo su árbol**) y archivos (tipo, tamaño, fecha y, en los
+  vídeos, duración leída del `moov` **sin cargar el archivo**: se salta de
+  caja en caja con `seek`).
+- `GET /api/entregas/archivo/<ruta>` — el archivo con `FileResponse`, que
+  trae `Range`: el reproductor puede saltar dentro de una película de media
+  hora sin descargarla entera.
+- Defensa de ruta: se prohíbe `..`, se limita la profundidad y el destino
+  **resuelto** tiene que seguir dentro del `exports/` resuelto (en la máquina
+  de desarrollo es un enlace a otro disco, y un enlace que apunte fuera se
+  rechaza).
+
+La vista (`#/biblioteca`, atajo `g b`) tiene migas de pan, buscador por
+carpeta, reproductor en línea de vídeo/audio/imagen y descarga. Nada escribe
+ni borra: para eso están Renders y las herramientas.
+
 ### Monitoreo histórico (pestaña «Monitoreo»)
 
 - Ring buffer en memoria (`deque`, ~30 min al intervalo configurado; 450 muestras a 4 s)

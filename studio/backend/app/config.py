@@ -98,6 +98,11 @@ class Settings:
         # 48 kHz de 45 s son ~8.6 MB; 25 MB deja aire para 2 min).
         self.max_upload_audio_mb = int(os.environ.get("MS_MAX_UPLOAD_AUDIO_MB", "25"))
 
+        # Raiz de las entregas (la pestaña Biblioteca navega este arbol de
+        # solo lectura). En esta maquina es un enlace al segundo disco.
+        self.exports_dir = Path(os.environ.get(
+            "MS_EXPORTS_DIR", str(self.workspace / "exports")))
+
         # Peliculas montadas (los clips de un curso unidos en un archivo). Van
         # bajo exports/, que ya era el sitio de los cursos muxeados a mano y
         # esta en .gitignore. Requiere ReadWritePaths sobre exports/ en la

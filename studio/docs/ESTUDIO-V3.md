@@ -1081,3 +1081,35 @@ SVG (manim 0.20.1 no lo exporta; la figura estática es PNG a 300 dpi), la
 migración del asistente al catálogo completo de primitivas (hecho el índice,
 falta medirlo con Gemini cuando vuelva la facturación), y el `.gitignore`
 de `node_modules/` con barra final que no ignora un symlink.
+
+### R5b — la Biblioteca de entregas (2026-09-03)
+
+Pregunta del dueño al ver que sus verticales no aparecían: *«¿no sería más
+fácil poner una pestaña de biblioteca donde ver los vídeos en su carpeta?»*.
+Sí, y era la brecha 10 de la auditoría: **el frontend no listaba `exports/`**.
+La pestaña «Renders» enseña los *jobs* (un clip por escena, la cocina); lo
+que se entrega vivía en disco y solo se veía por ssh.
+
+`app/entregas.py` + `entregas_api.py` son un explorador de solo lectura:
+
+- `GET /api/entregas?ruta=` — carpetas con **el peso y el número de archivos
+  de todo su árbol** (para ver lo que pesa una entrega sin entrar) y archivos
+  con tipo, tamaño, fecha y, en los vídeos, **duración**.
+- `GET /api/entregas/archivo/<ruta>` — el archivo, con `FileResponse` (trae
+  `Range`, así que se puede saltar dentro de una película sin descargarla).
+
+Dos decisiones que importan:
+
+- **La duración se lee saltando de caja en caja.** `narracion.duracion_mp4`
+  hace `read_bytes()` del mp4 entero, que para `emergencia` (330 MB) es
+  inaceptable en un listado. `entregas.duracion_mp4` hace `seek` hasta `moov`
+  y solo lee esa caja; el test lo demuestra con 8 MB de relleno entre medias.
+- **La defensa de ruta compara contra el destino REAL de `exports/`**, que en
+  la máquina de desarrollo es un enlace al segundo disco. Un test recorre
+  `..`, rutas absolutas y **un enlace simbólico que apunta fuera**.
+
+En la interfaz, vista `#/biblioteca` con migas de pan, buscador por carpeta,
+reproductor en línea (vídeo, audio e imagen) y descarga. El hash
+`#/biblioteca`, que era un alias de los renders desde antes del sprint 4,
+vuelve a significar lo que dice; los renders siguen en `#/renders`. Atajo
+`g b`.
