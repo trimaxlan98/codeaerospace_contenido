@@ -4,8 +4,23 @@
   "file": "escena.py",
   "description": "La malla de N cuadrado operaciones se parte por la mitad doce veces.",
   "duracion_objetivo": 37.05,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Cada entrada tocando cada salida."},
+      {"t_inicio": 8.55, "texto": "Dieciséis millones de productos."},
+      {"t_inicio": 13.15, "texto": "Partido por la mitad: doce etapas."},
+      {"t_inicio": 16.05, "texto": "Un aspa cruza todo el grafo."},
+      {"t_inicio": 18.75, "texto": "Después dos aspas."},
+      {"t_inicio": 21.45, "texto": "Y ahora ocho."},
+      {"t_inicio": 24.55, "texto": "Esto es la fft entera."},
+      {"t_inicio": 27.45, "texto": "Veinticuatro mil quinientas setenta y seis mariposas."},
+      {"t_inicio": 32.05, "texto": "Seiscientas ochenta y tres veces menos cuentas."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       35.9,

@@ -4,8 +4,18 @@
   "file": "escena.py",
   "description": "Ondas anchas para lo lento y estrechas para lo rapido: el salto se localiza.",
   "duracion_objetivo": 35.85,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.55, "texto": "Una señal suave, con un salto brusco."},
+      {"t_inicio": 11.55, "texto": "Las ondas de Haar son cortas: viven en un trozo."},
+      {"t_inicio": 18.55, "texto": "Y se agrupan justo donde está el salto."},
+      {"t_inicio": 26.85, "texto": "Haar necesita muchos menos coeficientes que Fourier."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       34.7,

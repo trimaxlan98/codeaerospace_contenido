@@ -4,8 +4,19 @@
   "file": "escena.py",
   "description": "El par real e imaginario se funde en un solo numero real, y el espectro es el mismo.",
   "duracion_objetivo": 31.45,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.65, "texto": "La dft de una señal real da dos vectores."},
+      {"t_inicio": 11.95, "texto": "Se funden en uno solo, y es real."},
+      {"t_inicio": 18.05, "texto": "El mismo espectro, por otro camino."},
+      {"t_inicio": 21.15, "texto": "Cae exacto encima. Cero diferencia."},
+      {"t_inicio": 26.05, "texto": "La mitad de números que guardar."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       30.3,

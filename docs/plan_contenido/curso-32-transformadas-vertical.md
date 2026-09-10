@@ -123,6 +123,93 @@ con audio (AAC 24 kHz mono); el máster mudo original queda de
 respaldo en `piezas_mudo/`/`transformadas_vertical_mudo.mp4`. Rama
 `curso/transformadas-sfx-vertical`.
 
+## 5. Plan para agregar voz (investigacion 2026-09-10)
+
+El dueño pidió agregar voz ademas del SFX. Antes de tocar nada se midieron
+los huecos de silencio (`self.leer()`) de las 20 piezas contra el ritmo de
+un clip narrado desde el origen (`studio/content/verticales/esp32/clips/
+01-el-reloj-que-no-para/`, que trae `guion_visual` y `voz` ya escritos: sus
+frases van de 2 a 9 palabras, y el hueco MAS CORTO entre dos lineas de voz
+es de ~3.6 s).
+
+**Medicion real de los 18 `leer()` de contenido** (marca aparte):
+
+| Pieza | Hueco minimo | Piezas |
+|---|---|---|
+| Comodo (≥2.4 s, la mayoria ≥3.0 s) | 2.4-8.0 s | 02,03,05,06,07,08,09,10,11,12,13,14,15,16,17,18 (16 piezas) |
+| Ajustado (<2.4 s) | 1.8-2.0 s | 01-serie-de-fourier (min 2.0), 04-fft (min 1.8) |
+| Sin `leer()` (coreografia de marca continua) | — | 00-intro, 19-cierre |
+
+A 2.3-2.6 palabras/seg en español, un hueco de 3.0 s alcanza para 7-8
+palabras — mas que suficiente para las frases cortas que ya usa esp32
+(la mediana de sus 5 lineas es 4 palabras). Un hueco de 1.8-2.0 s solo
+alcanza para 4-5 palabras muy justas.
+
+**Conclusion: opcion (a), NO hace falta re-renderizar la coreografia.**
+16 de las 18 piezas de contenido ya tienen hueco suficiente para una frase
+corta de voz sin tocar el render — la voz se escribe para caber en el
+silencio que ya existe, igual que se hizo con los eventos de SFX. Las 2
+piezas ajustadas (01, 04) necesitan frases de 3-4 palabras nada mas, o
+alargar 1-2 `self.leer()` en ~0.5-1.0 s cada uno (opcion (b) minima, solo
+en esas 2 piezas: mismo dibujo, `wait` un poco mas largo, re-render de
+solo esas 2 piezas en el contenedor). Ningun clip necesita opcion (c)
+(rehacer la coreografia al estilo denso de esp32): el ritmo mudo, pausado
+por diseño, ya deja sitio de sobra para una voz que NO narra continuo sino
+que puntua, igual que esp32. Las 2 piezas de marca (00-intro, 19-cierre)
+quedan sin voz, como es la convencion en el resto del catalogo para los
+clips de identidad — solo SFX.
+
+**Tamano del trabajo si se ejecuta**, en orden:
+
+1. **Guion** (18 piezas, frases cortas ancladas al `leer()` que ya existe,
+   siguiendo el patron de esp32) — el trabajo mas largo, del orden de 1-2 h
+   escribiendolo con cuidado (o un fork dedicado que lea cada `escena.py`
+   como se hizo para el SFX).
+2. **TTS** con el pipeline de ManimStudio (`app/tts.py`, proveedor `edge`)
+   — minutos, es rapido y serial.
+3. **Re-render**: SOLO 01-serie-de-fourier y 04-fft si se decide alargar
+   sus huecos en vez de acortar la frase; ~1 min/clip en qh local. El resto
+   (16 piezas + 2 de marca) no toca el render.
+4. **Remezcla**: `unir_vertical.py` sin `--mudo` ni `--sin-voz` (ya soporta
+   voz + cama de SFX juntas via `sfx.py promo <dir> <video> <out> <voz.wav>`)
+   sobre los `clip.json` que ya tienen `"audio"` del pase de SFX — solo se
+   agrega el `"voz"` con las secciones ancladas al guion.
+5. **Reverificar** costuras y picos con `verifica_vertical.py`.
+
+Estimado total: ~2-3 horas de trabajo humano/agente (dominado por escribir
+el guion), no un dia de re-produccion — la coreografia visual sobrevive
+casi intacta.
+
+## 6. Ejecucion de voz (2026-09-10)
+
+**Los tiempos absolutos de cada `leer()` se midieron de verdad, no a mano.**
+`studio/tools/sonda_tiempos_voz.py` (nuevo) parchea `Scene.play`/`Scene.wait`
+para que NO rendericen ni un frame (solo acumulan el `run_time` declarado) y
+corre el `scene.py` compuesto por `render_vertical.py --solo-componer` dentro
+del contenedor manim. Sin eso, reconstruir a mano la linea de tiempo de 18
+piezas con `L.relevo`/`L.escena`/`L.morfeo` anidados habria sido el cuello
+de botella real: en la pieza 01 el calculo manual coincidio con la sonda al
+milisegundo (30.45 s exactos), lo que la valido antes de correrla en las
+otras 17.
+
+Con esos huecos reales se escribio el bloque `"voz"` (18 clip.json, 86
+frases en total, es-MX-JorgeNeural) y se añadio `"pico_db_con_voz": -17.0`
+junto al `"pico_db"` que ya tenia el pase de SFX (mismo patron que
+`esp32/clips/*/clip.json`). Sintetizado con
+`studio/tools/alinear_voz.py --proveedor edge`: **0 avisos de solape en las
+18 piezas**, cola de silencio entre 2.0 y 6.5 s en todas (el minimo exigido
+es 0.8 s). Confirma la conclusion del §5: el ritmo mudo ya tenia sitio de
+sobra para una voz que puntua.
+
+**Lo que falta y por que no se hizo aqui**: esta ejecucion corrio en un
+worktree aislado (`curso/transformadas-voz-vertical`) que NO tiene los
+`video.mp4` ya renderizados (viven en `render_jobs/` y `exports/`, sin
+versionar, en el checkout principal). Sonorizar de verdad
+(`unir_vertical.py studio/content/verticales/transformadas`, sin `--mudo` ni
+`--sin-voz`) y verificar costuras/picos con `verifica_vertical.py` hay que
+correrlo en el checkout principal, con estos `clip.json` ya mergeados —
+son los mismos comandos que ya se probaron con el SFX solo.
+
 ## 4. Contrato de la libreria
 
 `studio/content/manim_extensions/transformadas.py`, dos mitades:

@@ -4,8 +4,20 @@
   "file": "escena.py",
   "description": "Una ventana desliza y pinta el espectrograma; estrecharla gana tiempo y pierde frecuencia.",
   "duracion_objetivo": 37.1,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "La onda sube de tono."},
+      {"t_inicio": 13.3, "texto": "Una ventana desliza y pinta el espectro."},
+      {"t_inicio": 17.55, "texto": "La raya que sube es el tono."},
+      {"t_inicio": 22.0, "texto": "Ventana corta: se sabe cuándo, no en qué frecuencia."},
+      {"t_inicio": 26.65, "texto": "Ventana larga: al revés."},
+      {"t_inicio": 31.5, "texto": "El producto de las dos borrosidades no baja nunca."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       35.95,

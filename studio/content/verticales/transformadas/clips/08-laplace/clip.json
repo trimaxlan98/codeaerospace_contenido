@@ -4,8 +4,19 @@
   "file": "escena.py",
   "description": "Una ecuacion diferencial se vuelve dos polos, y los polos predicen la respuesta.",
   "duracion_objetivo": 37.25,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 6.95, "texto": "El sistema sube, se pasa, y se asienta."},
+      {"t_inicio": 13.95, "texto": "La misma ecuación: dos puntos en un plano."},
+      {"t_inicio": 18.65, "texto": "Los polos ya predicen cuánto se va a pasar."},
+      {"t_inicio": 24.55, "texto": "Y la curva de verdad se pasa lo mismo."},
+      {"t_inicio": 31.25, "texto": "Una ecuación, dos caras, un solo número."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       36.1,

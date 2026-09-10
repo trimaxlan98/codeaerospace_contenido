@@ -4,8 +4,20 @@
   "file": "escena.py",
   "description": "Sombras desde muchos angulos, un sinograma, y el interior que aparece.",
   "duracion_objetivo": 39.65,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Un objeto opaco. Por fuera, solo su silueta."},
+      {"t_inicio": 17.3, "texto": "El haz recorrió todos los ángulos."},
+      {"t_inicio": 21.6, "texto": "Eso es lo que mide la máquina."},
+      {"t_inicio": 26.1, "texto": "Con pocos ángulos, apenas se adivina."},
+      {"t_inicio": 30.5, "texto": "Con muchos, aparece el interior."},
+      {"t_inicio": 35.15, "texto": "Casi idéntico al original."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       38.5,
