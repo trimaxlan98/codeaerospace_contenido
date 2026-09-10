@@ -298,3 +298,42 @@ avisos obsoletos de `estima()` en `verifica_vertical.py`.
 edge` para sintetizar las 18 piezas, `unir_vertical.py` (sin `--mudo`) para
 mezclar voz + SFX y muxear las 20 con marca, y `verifica_vertical.py` para
 confirmar costuras y picos. Ningun re-render hace falta primero.
+
+## 8. Cierre en el checkout principal (2026-09-09)
+
+`alinear_voz.py --proveedor edge` (`es-MX-JorgeNeural`) sobre las 18 piezas
+de contenido destapo **5 casos reales** donde la sintesis de verdad no
+cabia en el margen que la verificacion por palabras (seccion 7) daba por
+bueno -la diferencia entre estimar y medir-: `01-el-impulso` y
+`08-estabilidad` no dejaban los 0.8 s de cola minimos (en `08` la voz
+llegaba a durar MAS que el video, 34.55 s contra 34.50 s), y `03-la-
+convolucion`, `13-respuesta-en-frecuencia` y `14-fase-y-retardo` tenian una
+frase que entraba tarde porque la anterior corrio mas larga de lo estimado.
+El arreglo fue quirurgico y NO toco el reparto de frases ni sus `t_inicio`:
+cambiar puntos por comas o dos puntos (menos pausa de TTS) y cortar 1-2
+palabras sobrantes en la frase mas larga de cada pieza afectada
+(`08-estabilidad`: "Entrada acotada, salida acotada. Nada mas." -> "Entrada
+acotada, salida acotada."). Tras el ajuste, las 18 piezas sintetizan con
+**0 avisos** de solape o cola insuficiente.
+
+`unir_vertical.py` (sin `--mudo` ni `--sin-voz`): **649.06 s (10.82 min)**,
+1080x1920 @ 60 fps, pico del montaje **-1.0 dB** (linealidad, la mas alta;
+el resto entre -2.1 y -1.6 dB, intro/cierre solo SFX a -4.0 dB). No hizo
+falta re-mux por saturacion (serial +-0.5 dB): -1.0 dB deja margen de sobra.
+
+`verifica_vertical.py`: **0 fallos**, 19 costuras a 0.0000/255 (identico al
+32 y al 31 - el azul del LIENZO sigue siendo el mismo pixel a pixel en el
+corte). **90 avisos**, todos de `estima()` -la heuristica de
+palabras/segundo sobre el texto que corre ANTES de sintetizar y no sabe que
+`alinear_voz.py` ya coloco cada frase con su duracion real medida-. Son el
+mismo tipo de aviso obsoleto que dejo el 32 (60 avisos entonces): mas
+piezas y frases mas cortas aqui explican el numero mas alto, no un defecto
+nuevo. Confirmado por la sintesis real (0 avisos ahi) que son ruido, no
+señal.
+
+Backup del master mudo original conservado:
+`exports/verticales/sistemas/piezas_mudo/` y
+`exports/verticales/sistemas/sistemas_vertical_mudo.mp4`. Entrega final:
+`exports/verticales/sistemas/sistemas_vertical.mp4`, con voz + SFX.
+`curso.json` `"sonido"` paso de `"mudo"` a `"narrado"`. PR:
+`curso/sistemas-voz-vertical`.

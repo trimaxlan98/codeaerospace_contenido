@@ -17,10 +17,10 @@
     "secciones": [
       {"t_inicio": 5.5, "texto": "El mismo golpe, dos sistemas."},
       {"t_inicio": 9.45, "texto": "Este se apaga. Su suma es finita."},
-      {"t_inicio": 15.0, "texto": "Solo cambia un número. Y ya no para de crecer."},
+      {"t_inicio": 15.0, "texto": "Solo cambia un número: no para de crecer."},
       {"t_inicio": 20.95, "texto": "Misma altura en pantalla, escalas muy distintas."},
       {"t_inicio": 25.95, "texto": "Muchísimas veces más grande."},
-      {"t_inicio": 30.15, "texto": "Entrada acotada, salida acotada. Nada más."}
+      {"t_inicio": 30.15, "texto": "Entrada acotada, salida acotada."}
     ]
   },
   "audio": {

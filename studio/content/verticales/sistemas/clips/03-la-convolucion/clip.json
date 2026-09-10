@@ -18,7 +18,7 @@
   "voz": {
     "voz": "es-MX-JorgeNeural",
     "secciones": [
-      {"t_inicio": 5.5, "texto": "Desliza. Multiplica. Suma."},
+      {"t_inicio": 5.5, "texto": "Desliza, multiplica, suma."},
       {"t_inicio": 8.1, "texto": "Una señal corta entra."},
       {"t_inicio": 11.8, "texto": "Y la respuesta del sistema."},
       {"t_inicio": 14.75, "texto": "Se voltea."},

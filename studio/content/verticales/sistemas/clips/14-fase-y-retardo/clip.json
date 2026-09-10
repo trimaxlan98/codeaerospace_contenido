@@ -20,14 +20,14 @@
     "voz": "es-MX-JorgeNeural",
     "secciones": [
       {"t_inicio": 5.5, "texto": "La misma señal, entra."},
-      {"t_inicio": 8.6, "texto": "La misma forma. Más tarde."},
+      {"t_inicio": 8.6, "texto": "La misma forma, más tarde."},
       {"t_inicio": 11.3, "texto": "Retrasada, nada más."},
       {"t_inicio": 15.85, "texto": "Adelántala esas muestras."},
       {"t_inicio": 19.45, "texto": "Y cae justo encima."},
       {"t_inicio": 24.0, "texto": "Ahora muevo las fases de otro modo."},
       {"t_inicio": 29.0, "texto": "La forma ya no se parece en nada."},
       {"t_inicio": 34.3, "texto": "Y el número sigue diciendo cero."},
-      {"t_inicio": 37.2, "texto": "La amplitud no cambió. La forma, sí."}
+      {"t_inicio": 37.2, "texto": "La amplitud no cambió: la forma sí."}
     ]
   },
   "audio": {

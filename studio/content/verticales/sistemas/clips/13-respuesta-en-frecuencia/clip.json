@@ -17,7 +17,7 @@
   "voz": {
     "voz": "es-MX-JorgeNeural",
     "secciones": [
-      {"t_inicio": 6.0, "texto": "Entra un tono. Sale igual."},
+      {"t_inicio": 6.0, "texto": "Entra un tono, sale igual."},
       {"t_inicio": 8.9, "texto": "Otra amplitud, nada más."},
       {"t_inicio": 12.85, "texto": "Otro tono. Otra ganancia."},
       {"t_inicio": 17.0, "texto": "Y otro más."},
