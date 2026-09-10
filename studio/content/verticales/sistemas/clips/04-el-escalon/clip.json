@@ -3,5 +3,71 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El escalon se descompone en impulsos y su respuesta es la suma acumulada.",
-  "duracion_objetivo": 31.45
+  "duracion_objetivo": 31.45,
+  "guion_visual": [
+    "0.0  portada: EL ESCALON / la suma de infinitos impulsos",
+    "3.85 el escalon se enciende y se queda encendido",
+    "8.4  se descompone: cada muestra encendida es su propio impulso",
+    "13.4 entra en la caja del sistema",
+    "17.85 sale la respuesta: la suma acumulada, trazada",
+    "22.3  se enciende el nivel de asentamiento",
+    "22.8  cifra: el valor final"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.65, "texto": "El escalón. Se enciende y se queda."},
+      {"t_inicio": 10.8, "texto": "Cada muestra: su propio impulso."},
+      {"t_inicio": 15.05, "texto": "Es la suma de todos esos impulsos."},
+      {"t_inicio": 19.5, "texto": "Sale la suma acumulada de la respuesta."},
+      {"t_inicio": 23.9, "texto": "Y ahí se asienta: el valor final."},
+      {"t_inicio": 27.1, "texto": "El escalón no es más que impulsos, sumados."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.3,
+      31.45
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "tick",
+        8.4,
+        -15
+      ],
+      [
+        "blip_grave",
+        13.85,
+        -14
+      ],
+      [
+        "subrayado",
+        18.3,
+        -12
+      ],
+      [
+        "sting",
+        22.8,
+        -11
+      ]
+    ]
+  }
 }

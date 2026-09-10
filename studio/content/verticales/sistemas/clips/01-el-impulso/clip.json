@@ -3,5 +3,70 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un pulso que se estrecha y crece a area constante hasta ser una raya.",
-  "duracion_objetivo": 31.65
+  "duracion_objetivo": 31.65,
+  "guion_visual": [
+    "0.0  portada: EL IMPULSO / no dura nada, pesa uno",
+    "3.85 aparece el pulso ancho, escala 1x",
+    "7.7  se mide el area: no cambia",
+    "10.9 el pulso se estrecha a la mitad",
+    "12.1 el area se mide otra vez: sigue igual",
+    "15.5 nuevo cuadro, escala 4x declarada",
+    "19.05 el pulso se estrecha de nuevo",
+    "20.25 el area, tercera vez, no cambia",
+    "23.85 relevo: se vuelve EL IMPULSO, una sola muestra, ambar",
+    "28.1  cifra final: dura una muestra"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "No dura nada. Vale para todo."},
+      {"t_inicio": 8.5, "texto": "Un pulso ancho. Su área: uno."},
+      {"t_inicio": 13.1, "texto": "Más angosto. La misma área."},
+      {"t_inicio": 17.05, "texto": "Otra escala: cuatro veces más."},
+      {"t_inicio": 21.3, "texto": "Sigue estrechándose. El área no cede."},
+      {"t_inicio": 25.55, "texto": "Y en el límite: el impulso."},
+      {"t_inicio": 28.35, "texto": "No dura nada, pesa uno."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.5,
+      31.65
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "tick",
+        15.5,
+        -15
+      ],
+      [
+        "blip_agudo",
+        23.85,
+        -13
+      ],
+      [
+        "sting",
+        29.6,
+        -12
+      ]
+    ]
+  }
 }

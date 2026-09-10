@@ -3,5 +3,71 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una respuesta que empieza antes de cero, y por que es imposible.",
-  "duracion_objetivo": 31.9
+  "duracion_objetivo": 31.9,
+  "guion_visual": [
+    "0.0  portada: CAUSALIDAD / no responde antes del golpe",
+    "3.85 la marca del golpe, fija en el eje",
+    "8.8  aparece una respuesta simetrica, con muestras antes de la marca",
+    "13.45 se resalta en ambar el tramo antes del golpe",
+    "18.15 cifra: cuantas muestras hay antes del golpe",
+    "22.35 remate: la misma forma, pero causal de verdad",
+    "24.15 cifra: cero muestras antes del golpe"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.6, "texto": "Aquí cae el golpe."},
+      {"t_inicio": 10.45, "texto": "Esta respuesta ya suena antes de que llegue."},
+      {"t_inicio": 14.95, "texto": "Eso, antes del golpe, es imposible."},
+      {"t_inicio": 18.95, "texto": "Muestras que no pueden existir."},
+      {"t_inicio": 24.35, "texto": "La versión real: nada antes del golpe."},
+      {"t_inicio": 27.95, "texto": "No responde antes de que le peguen."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.75,
+      31.9
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        9.25,
+        -14
+      ],
+      [
+        "blip_agudo",
+        13.45,
+        -13
+      ],
+      [
+        "sting",
+        18.15,
+        -11
+      ],
+      [
+        "blip_medio",
+        22.85,
+        -14
+      ]
+    ]
+  }
 }

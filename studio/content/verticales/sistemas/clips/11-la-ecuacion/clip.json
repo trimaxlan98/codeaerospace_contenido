@@ -3,5 +3,69 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Cada muestra de salida se construye con las anteriores.",
-  "duracion_objetivo": 33.9
+  "duracion_objetivo": 33.9,
+  "guion_visual": [
+    "0.0  portada: ECUACION EN DIFERENCIAS / el sistema como receta",
+    "3.85 la ventana chica: la muestra nueva y sus dos padres, en ambar",
+    "7.5  el resalte avanza, muestra a muestra, seis veces",
+    "16.2 sigue avanzando el mismo truco",
+    "24.9 remate: la ventana entera, ya sin resaltar",
+    "25.35 cifra: cuantas muestras dura la receta"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "La caja se abre."},
+      {"t_inicio": 8.6, "texto": "Usa las dos anteriores."},
+      {"t_inicio": 23.1, "texto": "Muestra tras muestra, igual."},
+      {"t_inicio": 26.75, "texto": "La misma receta hace toda la forma."},
+      {"t_inicio": 30.15, "texto": "El sistema es su propia receta."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      32.75,
+      33.9
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "tick",
+        7.5,
+        -15
+      ],
+      [
+        "tick",
+        16.2,
+        -15
+      ],
+      [
+        "blip_agudo",
+        24.9,
+        -13
+      ],
+      [
+        "sting",
+        25.35,
+        -11
+      ]
+    ]
+  }
 }

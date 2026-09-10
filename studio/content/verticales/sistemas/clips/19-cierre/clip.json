@@ -3,5 +3,65 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La convolucion se recoge en el punto ambar de CO.DE.",
-  "duracion_objetivo": 13.68
+  "duracion_objetivo": 13.68,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      12.36,
+      13.68
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.05,
+        -16
+      ],
+      [
+        "barrido",
+        1.2,
+        -13
+      ],
+      [
+        "pulso",
+        3.8,
+        -13
+      ],
+      [
+        "blip_agudo",
+        6.1,
+        -13
+      ],
+      [
+        "blip_grave",
+        7.1,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.0,
+        -14
+      ],
+      [
+        "subrayado",
+        8.8,
+        -11
+      ],
+      [
+        "tick",
+        9.9,
+        -9
+      ],
+      [
+        "tick",
+        10.23,
+        -9
+      ],
+      [
+        "sting",
+        10.56,
+        -10
+      ]
+    ]
+  }
 }

@@ -219,3 +219,121 @@ aplicarlo hacia atras, a lo que se escribio antes de tenerlo.
 - **El acento traslucido no es solo cosa de masas**: un trazo grueso (7.0) al
   32 % da el mismo verde oliva ilegible. Una curva de referencia va en
   APAGADO opaco.
+
+## 7. Guion de SFX y voz (2026-09-09)
+
+El curso nacio MUDO y el dueño pidio que tuviera SFX + voz narrada, igual
+que ya tienen los vecinos `transformadas` (curso 32) y `esp32` (curso 31).
+Se siguio el mismo metodo documentado en la seccion 6 de
+`docs/plan_contenido/curso-32-transformadas-vertical.md`: nada de tiempos
+inventados, todo anclado a lo que mide `sonda_tiempos_voz.py` sobre el
+`scene.py` ya compuesto (`render_vertical.py --clip N --solo-componer`,
+sin Docker; la sonda corre dentro del contenedor manim pero no renderiza
+ni un frame). Se escribio en un worktree aparte
+(`.claude/worktrees/agent-aa1d27c782886d3f1`, rama
+`curso/sistemas-voz-vertical`), que no tiene `render_jobs/` ni `exports/`
+versionados: la sintesis real (`alinear_voz.py`), el mux (`unir_vertical.py`
+sin `--mudo`) y `verifica_vertical.py` quedan para el checkout principal,
+igual que en el 32.
+
+**Las 20 piezas midieron con la sonda sin ninguna sorpresa de render.**
+Las 20 componen y miden limpio, 0 errores. Las duraciones ya selladas en
+cada `clip.json` (identicas a las de este documento, con dos excepciones
+de 0.33 s y 0.05 s ya presentes antes de esta sesion: `03-la-convolucion`
+sella 35.70 y esta tabla decia 36.03; varias piezas selladas difieren en
+0.03-0.05 s de la tabla, redondeo de fps ya conocido) siguen siendo la
+referencia: la sonda mide 0.03-0.05 s por encima del sello en casi todas
+las piezas (acumulacion de `wait()` cortos en la coreografia de marca,
+mismo fenomeno que el 0.003 s de `05-dct` en el 32), nunca lo bastante
+para mover un evento de sitio. Ninguna pieza necesito re-render: las 20
+caben con la coreografia que ya tenian, igual que las 18 de transformadas.
+
+**SFX**, paleta de `studio/tools/sfx.py`: las 20 piezas llevan `aire` +
+`blip_hud` en la portada (los mismos dos golpes, mismos instantes ~0.7 y
+~1.85 s, porque la coreografia de portada es identica byte a byte en las
+18 piezas de contenido) y `barrido` cuando arranca el verbo visual
+principal (siempre ~4.4 s, el mismo motivo). Intro y cierre llevan su
+propia coreografia de marca, calcada del patron de `transformadas/00-intro`
+y `19-cierre` pero con los tiempos REALES de `sistemas` (15.08 s y 13.68 s
+respectivamente, identicos a los del 32 -el wordmark CO.DE se construye
+exactamente igual en los dos cursos-. Las 18 piezas de contenido llevan entre
+6 y 7 eventos ademas de los dos de portada: `blip_grave/medio/agudo` en
+relevos y cifras intermedias, `tick` en pasos discretos o conteos
+(`11-la-ecuacion`, la recursion muestra a muestra, es la que mas los usa),
+`subrayado` cuando se dibuja un trazo, `pulso` en acentos ritmicos, y
+`sting` cerca del final marcando la cifra o el golpe visual conclusivo.
+144 eventos en total (20 piezas, 7.2 de media; la intro lleva 11 y el
+cierre 10 por su propia coreografia de marca).
+
+**Voz**, `es-MX-JorgeNeural`, ancladas SIEMPRE dentro de un hueco de
+`Pieza.leer()` medido por la sonda (nunca en mitad de un `play`). Se
+redacto siguiendo la tabla de la seccion 2 (portada = gancho, verbo visual
+= frases intermedias, cifra = remate), frases de 2 a 11 palabras, cortas
+y que puntuan en vez de narrar de corrido -el mismo criterio que esp32 y
+transformadas. Las piezas de marca (00-intro, 19-cierre) se quedan SIN voz,
+la convencion de todo el catalogo para clips de identidad.
+
+**Huecos justos, medidos con la sonda y no adivinados**: la pieza
+`11-la-ecuacion` es la que tiene el ritmo mas apretado del curso -siete
+huecos de exactamente 2.0-2.2 s por la repeticion del resalte muestra a
+muestra- y se resolvio NO poniendo una frase en cada hueco (habria sido
+monotono y arriesgado): solo 5 lineas de voz sobre 9 huecos disponibles,
+dejando la mayoria de los pasos de la recursion sin voz y marcados solo
+con `tick`. El resto del curso tuvo huecos comodos (2.0-4.6 s), pero una
+verificacion aparte -contar palabras contra 2.5 palabras/segundo, el
+promedio documentado en el curso 32- encontro 21 frases que no cabian con
+holgura en su hueco a esa velocidad en doce piezas
+(`03,05,07,08,09,10,12,13,14,15,16,18`); se acortaron todas a 4-8 palabras
+sin perder el sentido (p. ej. en `08-estabilidad` "Entrada acotada, salida
+acotada: solo si la suma no se dispara" bajo a "Entrada acotada, salida
+acotada. Nada mas"). Tras el ajuste, las 18 piezas de contenido pasan la
+verificacion completa: ninguna frase se solapa con la siguiente y todas
+caben en su hueco medido a 2.5 palabras/segundo. La sintesis real en el
+checkout principal (`alinear_voz.py`) usa la duracion REAL del audio, no
+esta estimacion por palabras, asi que estos numeros son un margen de
+seguridad, no una promesa exacta -mismo aviso que dejo el 32 sobre los
+avisos obsoletos de `estima()` en `verifica_vertical.py`.
+
+**Siguiente paso, en el checkout principal**: `alinear_voz.py --proveedor
+edge` para sintetizar las 18 piezas, `unir_vertical.py` (sin `--mudo`) para
+mezclar voz + SFX y muxear las 20 con marca, y `verifica_vertical.py` para
+confirmar costuras y picos. Ningun re-render hace falta primero.
+
+## 8. Cierre en el checkout principal (2026-09-09)
+
+`alinear_voz.py --proveedor edge` (`es-MX-JorgeNeural`) sobre las 18 piezas
+de contenido destapo **5 casos reales** donde la sintesis de verdad no
+cabia en el margen que la verificacion por palabras (seccion 7) daba por
+bueno -la diferencia entre estimar y medir-: `01-el-impulso` y
+`08-estabilidad` no dejaban los 0.8 s de cola minimos (en `08` la voz
+llegaba a durar MAS que el video, 34.55 s contra 34.50 s), y `03-la-
+convolucion`, `13-respuesta-en-frecuencia` y `14-fase-y-retardo` tenian una
+frase que entraba tarde porque la anterior corrio mas larga de lo estimado.
+El arreglo fue quirurgico y NO toco el reparto de frases ni sus `t_inicio`:
+cambiar puntos por comas o dos puntos (menos pausa de TTS) y cortar 1-2
+palabras sobrantes en la frase mas larga de cada pieza afectada
+(`08-estabilidad`: "Entrada acotada, salida acotada. Nada mas." -> "Entrada
+acotada, salida acotada."). Tras el ajuste, las 18 piezas sintetizan con
+**0 avisos** de solape o cola insuficiente.
+
+`unir_vertical.py` (sin `--mudo` ni `--sin-voz`): **649.06 s (10.82 min)**,
+1080x1920 @ 60 fps, pico del montaje **-1.0 dB** (linealidad, la mas alta;
+el resto entre -2.1 y -1.6 dB, intro/cierre solo SFX a -4.0 dB). No hizo
+falta re-mux por saturacion (serial +-0.5 dB): -1.0 dB deja margen de sobra.
+
+`verifica_vertical.py`: **0 fallos**, 19 costuras a 0.0000/255 (identico al
+32 y al 31 - el azul del LIENZO sigue siendo el mismo pixel a pixel en el
+corte). **90 avisos**, todos de `estima()` -la heuristica de
+palabras/segundo sobre el texto que corre ANTES de sintetizar y no sabe que
+`alinear_voz.py` ya coloco cada frase con su duracion real medida-. Son el
+mismo tipo de aviso obsoleto que dejo el 32 (60 avisos entonces): mas
+piezas y frases mas cortas aqui explican el numero mas alto, no un defecto
+nuevo. Confirmado por la sintesis real (0 avisos ahi) que son ruido, no
+señal.
+
+Backup del master mudo original conservado:
+`exports/verticales/sistemas/piezas_mudo/` y
+`exports/verticales/sistemas/sistemas_vertical_mudo.mp4`. Entrega final:
+`exports/verticales/sistemas/sistemas_vertical.mp4`, con voz + SFX.
+`curso.json` `"sonido"` paso de `"mudo"` a `"narrado"`. PR:
+`curso/sistemas-voz-vertical`.

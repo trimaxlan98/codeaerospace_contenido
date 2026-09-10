@@ -3,5 +3,74 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La entrada se retrasa y la salida se retrasa igual, sin deformarse.",
-  "duracion_objetivo": 32.8
+  "duracion_objetivo": 32.8,
+  "guion_visual": [
+    "0.0  portada: INVARIANZA / manana hace exactamente lo mismo",
+    "3.85 un golpe entra hoy, panel de entrada arriba",
+    "7.9  aparece su respuesta abajo, alineada",
+    "11.5 el mismo golpe se desplaza: entrada y salida se retrasan igual",
+    "15.5 cifra: cuantas muestras de retardo",
+    "18.8 cuadro nuevo, las dos respuestas realineadas para comparar",
+    "22.55 la de encima se enciende: es la misma forma",
+    "25.95 cifra: el error de invarianza, casi cero"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "Un golpe, hoy."},
+      {"t_inicio": 8.9, "texto": "Y su respuesta."},
+      {"t_inicio": 13.1, "texto": "El mismo golpe, mañana."},
+      {"t_inicio": 16.2, "texto": "La salida se retrasa exactamente igual."},
+      {"t_inicio": 20.35, "texto": "Realineadas, para compararlas."},
+      {"t_inicio": 23.55, "texto": "Es la misma forma."},
+      {"t_inicio": 26.65, "texto": "El error: prácticamente cero."},
+      {"t_inicio": 29.45, "texto": "Mañana hace exactamente lo mismo."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.65,
+      32.8
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_agudo",
+        11.5,
+        -13
+      ],
+      [
+        "tick",
+        15.5,
+        -15
+      ],
+      [
+        "subrayado",
+        22.55,
+        -12
+      ],
+      [
+        "sting",
+        25.95,
+        -11
+      ]
+    ]
+  }
 }

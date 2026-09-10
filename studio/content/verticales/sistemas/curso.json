@@ -4,7 +4,7 @@
   "formato": "vertical",
   "curso": 33,
   "estilo": "lienzo",
-  "sonido": "mudo",
+  "sonido": "narrado",
   "description": "Curso vertical (9:16) en el estilo LIENZO sobre lo que un SISTEMA le hace a una señal. No re-explica las transformadas del curso 32 ni el procesamiento del 27: ocupa la capa de encima, la de la caja que convierte una entrada en una salida, y toda su gracia es que con UNA sola medida —la respuesta al impulso— la caja queda determinada para siempre. Cada pieza mete una señal por un lado y enseña que sale por el otro. Se publica MUDO —la musica la pone quien lo sube—, asi que la animacion tiene que explicar sola: portada con la tesis, UN verbo visual y UNA cifra. Toda cifra la calcula sistemas.py durante el render y esta demostrada por los invariantes de sonda_sistemas.py; lo que es un parametro elegido va rotulado en gris. Cada pieza esta hecha para subirse sola a Instagram.",
   "style_block": "style_block.py",
   "duracion_min": 30.0,

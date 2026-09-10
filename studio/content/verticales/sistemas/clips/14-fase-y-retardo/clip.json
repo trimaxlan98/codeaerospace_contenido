@@ -3,5 +3,77 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Mismas amplitudes y fases movidas: la senal deja de parecerse.",
-  "duracion_objetivo": 41.45
+  "duracion_objetivo": 41.45,
+  "guion_visual": [
+    "0.0  portada: FASE Y RETARDO / la forma se rompe sola",
+    "3.85 acto 1: entrada arriba, salida apagada abajo",
+    "7.5  la salida se enciende: la misma forma, mas tarde",
+    "10.6 cifra: cuantas muestras de retardo",
+    "14.3 remate: la referencia y la salida a trozos",
+    "18.45 la de encima se enciende: cae justo encima",
+    "22.45 acto 2: mismo tono, ahora se mueven las fases de otro modo",
+    "26.8  la forma se deshace, primer giro",
+    "32.1  la forma se deshace mas, segundo giro",
+    "34.1  la cifra del cambio de amplitud sigue en cero"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "La misma señal, entra."},
+      {"t_inicio": 8.6, "texto": "La misma forma, más tarde."},
+      {"t_inicio": 11.3, "texto": "Retrasada, nada más."},
+      {"t_inicio": 15.85, "texto": "Adelántala esas muestras."},
+      {"t_inicio": 19.45, "texto": "Y cae justo encima."},
+      {"t_inicio": 24.0, "texto": "Ahora muevo las fases de otro modo."},
+      {"t_inicio": 29.0, "texto": "La forma ya no se parece en nada."},
+      {"t_inicio": 34.3, "texto": "Y el número sigue diciendo cero."},
+      {"t_inicio": 37.2, "texto": "La amplitud no cambió: la forma sí."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      40.3,
+      41.45
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        7.5,
+        -14
+      ],
+      [
+        "sting",
+        18.45,
+        -11
+      ],
+      [
+        "blip_agudo",
+        22.45,
+        -13
+      ],
+      [
+        "pulso",
+        32.1,
+        -13
+      ]
+    ]
+  }
 }
