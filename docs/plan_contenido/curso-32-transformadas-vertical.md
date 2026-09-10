@@ -210,6 +210,24 @@ versionar, en el checkout principal). Sonorizar de verdad
 correrlo en el checkout principal, con estos `clip.json` ya mergeados —
 son los mismos comandos que ya se probaron con el SFX solo.
 
+**Cierre en el checkout principal (2026-09-10)**: sintetizadas las 18
+piezas con `alinear_voz.py --proveedor edge` (`es-MX-JorgeNeural`), 0
+avisos de solape reales en la sintesis. `unir_vertical.py` (sin `--mudo`
+ni `--sin-voz`) mezclo voz+SFX y concateno: **pico del montaje -2.0 dB**
+(18 piezas con voz entre -2.1 y -2.0 dB, intro/cierre solo SFX a -4.0 dB).
+`verifica_vertical.py`: **0 fallos**, 19 costuras a 0.0000/255, pero **60
+AVISOS** de "la frase entra antes de que la anterior deberia acabar" — son
+de `estima()`, una heuristica de palabras/segundo que corre sobre el TEXTO
+antes de sintetizar (mas lenta que el ritmo real de `es-MX-JorgeNeural`) y
+no sabe que `alinear_voz.py` ya coloco cada frase con su duracion REAL
+medida y confirmo 0 solapes de verdad. Son avisos obsoletos de una regla
+mas conservadora que la voz real, no un defecto del video entregado; si se
+quiere que `verifica_vertical.py` deje de acusarlos en falso, `estima()`
+tendria que leer la duracion real del wav en vez de contar palabras.
+Entrega: `exports/verticales/transformadas/transformadas_vertical.mp4`,
+11.05 min (662.86 s), con voz + SFX. PR:
+`curso/transformadas-voz-vertical` (#77).
+
 ## 4. Contrato de la libreria
 
 `studio/content/manim_extensions/transformadas.py`, dos mitades:
