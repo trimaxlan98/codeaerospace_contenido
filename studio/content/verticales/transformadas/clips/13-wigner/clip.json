@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El plano tiempo-frecuencia gira, y la raya diagonal del chirp se vuelve un pico.",
-  "duracion_objetivo": 30.45
+  "duracion_objetivo": 30.45,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.3,
+      30.45
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        9.2,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.9,
+        -15
+      ],
+      [
+        "sting",
+        28.45,
+        -12
+      ]
+    ]
+  }
 }

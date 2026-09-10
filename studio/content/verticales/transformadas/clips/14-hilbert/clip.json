@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La envolvente de una nota, recuperada sin conocer la portadora.",
-  "duracion_objetivo": 36.53
+  "duracion_objetivo": 36.53,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      35.38,
+      36.53
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        13.3,
+        -15
+      ],
+      [
+        "sting",
+        34.53,
+        -12
+      ]
+    ]
+  }
 }

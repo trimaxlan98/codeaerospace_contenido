@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Ondas cuadradas de mas y menos uno: la mariposa solo suma y resta.",
-  "duracion_objetivo": 31.65
+  "duracion_objetivo": 31.65,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.5,
+      31.65
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        16.0,
+        -15
+      ],
+      [
+        "sting",
+        29.65,
+        -12
+      ]
+    ]
+  }
 }

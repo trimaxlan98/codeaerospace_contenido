@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Sombras desde muchos angulos, un sinograma, y el interior que aparece.",
-  "duracion_objetivo": 39.65
+  "duracion_objetivo": 39.65,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      38.5,
+      39.65
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        14.4,
+        -15
+      ],
+      [
+        "blip_medio",
+        17.5,
+        -15
+      ],
+      [
+        "sting",
+        37.65,
+        -12
+      ]
+    ]
+  }
 }

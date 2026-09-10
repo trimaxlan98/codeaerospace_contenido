@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un polo cruza el circulo unidad y la respuesta deja de apagarse.",
-  "duracion_objetivo": 35.75
+  "duracion_objetivo": 35.75,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      34.6,
+      35.75
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        16.2,
+        -15
+      ],
+      [
+        "sting",
+        33.75,
+        -12
+      ]
+    ]
+  }
 }

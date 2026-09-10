@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Ondas anchas para lo lento y estrechas para lo rapido: el salto se localiza.",
-  "duracion_objetivo": 35.85
+  "duracion_objetivo": 35.85,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      34.7,
+      35.85
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        14.2,
+        -15
+      ],
+      [
+        "sting",
+        33.85,
+        -12
+      ]
+    ]
+  }
 }

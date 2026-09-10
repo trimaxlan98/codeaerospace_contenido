@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Cada punto vota una senoide entera; donde se cruzan todas esta la recta.",
-  "duracion_objetivo": 34.35
+  "duracion_objetivo": 34.35,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.2,
+      34.35
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        12.4,
+        -15
+      ],
+      [
+        "sting",
+        32.35,
+        -12
+      ]
+    ]
+  }
 }

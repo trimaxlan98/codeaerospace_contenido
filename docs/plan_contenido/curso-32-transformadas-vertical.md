@@ -19,7 +19,7 @@ y a mitad de la preparacion, el dato que lo cambia todo:
 | Angulo | **Lo que vuelve facil** | Cada pieza abre con un problema imposible en su dominio y lo resuelve al cambiarlo. La transformada es la herramienta, no el tema |
 | Tamaño | **20 piezas** = intro + 18 transformadas + cierre | ~10 min de montaje; 18 reels sueltos |
 | Identidad de la pieza | **El nombre, solo al abrir** (portada de ~3 s) | Luego se apaga y queda el lienzo limpio |
-| Sonido | **MUDO**, el dueño pone musica | Sin voz, sin cama de SFX. `unir_vertical.py --mudo` |
+| Sonido | **SFX**, sin voz | Cama de SFX propia por pieza, decidido el 2026-09-09 tras probar mudo. `unir_vertical.py --sin-voz` |
 
 ## 1. La regla que gobierna este curso
 
@@ -107,6 +107,21 @@ compromiso tiempo-frecuencia, 14-18 las que ya no son de frecuencia.
 **11.05 min (662.8 s), 1080x1920 @ 60 fps, SIN pista de audio**, mas las
 20 piezas sueltas en `piezas/`. No hay narracion por decision del dueño:
 la musica se pone encima en posproduccion.
+
+**Pase de SFX** (2026-09-09): el dueño decidió no seguir publicando la
+familia muda. Se escribió el bloque `"audio"` en los 20 `clip.json`
+(no traían `guion_visual`/`voz`/`audio`) leyendo cada `escena.py` para
+ubicar los golpes reales — portada, arranque del verbo visual, cifra
+final — con paleta consistente de `sfx.py` (`barrido` + `sting` en las
+20, `aire`/`blip_hud` en portada, `tick`/`blip_medio` como control,
+coreografía propia en intro/cierre). 122 eventos en total. Un ajuste:
+`05-dct` traía el `fade_out` 0.003 s más largo que el render real
+(36.17 vs 36.167 s). Verificación final: 0 fallos, 19 costuras a
+0.0000/255, picos entre −4.1 y −3.9 dB (tope −0.5 dB). Entrega oficial
+ahora: `exports/verticales/transformadas/transformadas_vertical.mp4`
+con audio (AAC 24 kHz mono); el máster mudo original queda de
+respaldo en `piezas_mudo/`/`transformadas_vertical_mudo.mp4`. Rama
+`curso/transformadas-sfx-vertical`.
 
 ## 4. Contrato de la libreria
 

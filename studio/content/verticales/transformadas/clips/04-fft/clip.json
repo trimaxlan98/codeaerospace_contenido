@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La malla de N cuadrado operaciones se parte por la mitad doce veces.",
-  "duracion_objetivo": 37.05
+  "duracion_objetivo": 37.05,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      35.9,
+      37.05
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        12.7,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.2,
+        -15
+      ],
+      [
+        "sting",
+        35.05,
+        -12
+      ]
+    ]
+  }
 }

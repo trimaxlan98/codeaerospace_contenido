@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Senos que se suman sobre una onda cuadrada: el error baja, el sobreimpulso de Gibbs no.",
-  "duracion_objetivo": 30.45
+  "duracion_objetivo": 30.45,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.3,
+      30.45
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        8.0,
+        -15
+      ],
+      [
+        "sting",
+        28.45,
+        -12
+      ]
+    ]
+  }
 }
