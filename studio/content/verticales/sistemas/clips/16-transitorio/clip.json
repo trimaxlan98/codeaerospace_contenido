@@ -3,5 +3,64 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La respuesta se parte en dos y una de las dos se apaga.",
-  "duracion_objetivo": 30.05
+  "duracion_objetivo": 30.05,
+  "guion_visual": [
+    "0.0  portada: TRANSITORIO / una parte se apaga",
+    "3.85 la curva completa, sube y oscila, cifra el maximo",
+    "9.1  aparece la banda de tolerancia, cifra el valor final",
+    "14.3 se marca el instante de asentamiento, cifra las muestras",
+    "19.9 remate: la mitad que oscilaba se apaga, la otra se queda",
+    "21.2 cifra: el valor que queda"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 6.1, "texto": "Sube, oscila, y empieza a calmarse."},
+      {"t_inicio": 11.1, "texto": "Aquí es donde se va a quedar."},
+      {"t_inicio": 16.9, "texto": "Y aquí entra, para no volver a salir."},
+      {"t_inicio": 22.7, "texto": "Esa parte se apaga. Esta se queda."},
+      {"t_inicio": 26.3, "texto": "Una se apaga. Otra se queda."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      28.9,
+      30.05
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        9.1,
+        -14
+      ],
+      [
+        "tick",
+        14.3,
+        -15
+      ],
+      [
+        "sting",
+        19.9,
+        -11
+      ]
+    ]
+  }
 }

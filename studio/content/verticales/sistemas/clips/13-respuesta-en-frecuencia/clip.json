@@ -3,5 +3,73 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Entra un tono y sale el mismo tono con otra amplitud.",
-  "duracion_objetivo": 33.5
+  "duracion_objetivo": 33.5,
+  "guion_visual": [
+    "0.0  portada: RESPUESTA EN FRECUENCIA / no puede inventar frecuencias",
+    "3.85 primer tono, entra cian y sale ambar",
+    "8.2  cifra: la ganancia de ese tono",
+    "11.3 segundo tono, releva al primero",
+    "15.45 tercer tono, releva al segundo",
+    "19.6  aparece la curva de la respuesta, con puntos escondidos",
+    "24.05 los tres puntos se encienden sobre la curva",
+    "28.65 cifra: diferencia entre medir y leer la curva"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 6.0, "texto": "Entra un tono. Sale igual."},
+      {"t_inicio": 8.9, "texto": "Otra amplitud, nada más."},
+      {"t_inicio": 12.85, "texto": "Otro tono. Otra ganancia."},
+      {"t_inicio": 17.0, "texto": "Y otro más."},
+      {"t_inicio": 21.85, "texto": "Cada ganancia, un punto."},
+      {"t_inicio": 25.85, "texto": "Los tres puntos caen sobre ella."},
+      {"t_inicio": 29.35, "texto": "Medir un tono o leer la curva."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      32.35,
+      33.5
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        11.3,
+        -14
+      ],
+      [
+        "blip_medio",
+        15.45,
+        -14
+      ],
+      [
+        "subrayado",
+        19.6,
+        -12
+      ],
+      [
+        "sting",
+        24.05,
+        -11
+      ]
+    ]
+  }
 }

@@ -3,5 +3,71 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Se cierra el lazo y la respuesta cambia de forma.",
-  "duracion_objetivo": 31.6
+  "duracion_objetivo": 31.6,
+  "guion_visual": [
+    "0.0  portada: REALIMENTACION / la salida vuelve a entrar",
+    "3.85 el lazo dibujado, con la vuelta apagada",
+    "8.1  cifra: cuantas muestras dura, sin memoria",
+    "11.9 se cierra el lazo y aparece un eco",
+    "17.65 se aprieta la vuelta: el eco dura mas",
+    "23.1  cuadro nuevo, escala declarada: se pasa de uno",
+    "23.55 cifra: cuanto multiplica cada muestra a la anterior"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "El lazo, con la vuelta cortada."},
+      {"t_inicio": 8.9, "texto": "Sin memoria: entra un golpe, sale uno."},
+      {"t_inicio": 14.45, "texto": "Se cierra el lazo. Y aparece un eco."},
+      {"t_inicio": 19.9, "texto": "Más vuelta, más dura el eco."},
+      {"t_inicio": 24.65, "texto": "Pasa de uno, y ya no para."},
+      {"t_inicio": 27.85, "texto": "La salida vuelve a entrar."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.45,
+      31.6
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "tick",
+        8.1,
+        -15
+      ],
+      [
+        "blip_agudo",
+        11.9,
+        -13
+      ],
+      [
+        "blip_medio",
+        17.65,
+        -14
+      ],
+      [
+        "sting",
+        23.55,
+        -11
+      ]
+    ]
+  }
 }

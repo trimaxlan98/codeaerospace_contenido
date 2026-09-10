@@ -3,5 +3,73 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La senal invertida desliza sobre la otra y el area barrida dibuja la salida.",
-  "duracion_objetivo": 35.7
+  "duracion_objetivo": 35.7,
+  "guion_visual": [
+    "0.0  portada: LA CONVOLUCION / deslizar, multiplicar, sumar",
+    "3.85 la entrada arriba, el carril de salida vacio abajo",
+    "9.9  la respuesta del sistema aparece encima, en ambar",
+    "13.6 la respuesta se da la vuelta",
+    "16.4 aparece el contador vivo de la suma del solape",
+    "17.4 desliza y crece un tallo, paso a paso, diez veces",
+    "27.85 la salida completa, quieta",
+    "30.65 se apaga la respuesta para comparar",
+    "31.05 cifra: cuantas muestras salen"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "Desliza. Multiplica. Suma."},
+      {"t_inicio": 8.1, "texto": "Una señal corta entra."},
+      {"t_inicio": 11.8, "texto": "Y la respuesta del sistema."},
+      {"t_inicio": 14.75, "texto": "Se voltea."},
+      {"t_inicio": 28.05, "texto": "Un producto en cada paso."},
+      {"t_inicio": 32.0, "texto": "Dura más que las dos entradas."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      34.55,
+      35.7
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_agudo",
+        13.6,
+        -13
+      ],
+      [
+        "tick",
+        16.8,
+        -15
+      ],
+      [
+        "pulso",
+        22.35,
+        -13
+      ],
+      [
+        "sting",
+        31.05,
+        -11
+      ]
+    ]
+  }
 }

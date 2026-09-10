@@ -3,5 +3,72 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un tono entra en una caja que satura y salen armonicos.",
-  "duracion_objetivo": 34.95
+  "duracion_objetivo": 34.95,
+  "guion_visual": [
+    "0.0  portada: SATURACION / aparecen tonos que no entraron",
+    "3.85 umbral alto: el tono entra y sale casi igual",
+    "8.2  cifra: cero por ciento de distorsion",
+    "11.6 el umbral se cierra, la onda se aplana",
+    "16.55 el mismo instante, visto en frecuencia",
+    "21.3  el umbral se cierra mas, aparecen armonicos que no entraron",
+    "26.25 se cierra aun mas, la distorsion sube otra vez"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.6, "texto": "Un tono puro entra."},
+      {"t_inicio": 9.0, "texto": "Y sale igual. Cero distorsión."},
+      {"t_inicio": 13.55, "texto": "Se cierra el umbral. La onda se aplana."},
+      {"t_inicio": 18.1, "texto": "El mismo instante, en frecuencia."},
+      {"t_inicio": 23.25, "texto": "Aparecen tonos que nadie metió."},
+      {"t_inicio": 28.2, "texto": "Cuanto más recorta, más aparecen."},
+      {"t_inicio": 31.4, "texto": "Solo lo lineal se conoce entero."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.8,
+      34.95
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "tick",
+        8.2,
+        -15
+      ],
+      [
+        "blip_agudo",
+        11.6,
+        -13
+      ],
+      [
+        "blip_medio",
+        16.55,
+        -14
+      ],
+      [
+        "sting",
+        26.25,
+        -11
+      ]
+    ]
+  }
 }

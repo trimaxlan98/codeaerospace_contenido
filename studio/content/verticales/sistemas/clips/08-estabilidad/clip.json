@@ -3,5 +3,70 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Dos sistemas: uno se apaga y el otro crece sin parar.",
-  "duracion_objetivo": 34.5
+  "duracion_objetivo": 34.5,
+  "guion_visual": [
+    "0.0  portada: ESTABILIDAD / entrada acotada, salida acotada",
+    "3.85 el mismo golpe, comun a los dos sistemas",
+    "7.9  primer sistema: se apaga, suma finita",
+    "13.45 segundo sistema, solo cambia a: crece sin techo",
+    "19.4  remate: los dos a la vez, escala declarada",
+    "24.75 cifra: cuantas veces mas grande es la suma"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "El mismo golpe, dos sistemas."},
+      {"t_inicio": 9.45, "texto": "Este se apaga. Su suma es finita."},
+      {"t_inicio": 15.0, "texto": "Solo cambia un número. Y ya no para de crecer."},
+      {"t_inicio": 20.95, "texto": "Misma altura en pantalla, escalas muy distintas."},
+      {"t_inicio": 25.95, "texto": "Muchísimas veces más grande."},
+      {"t_inicio": 30.15, "texto": "Entrada acotada, salida acotada. Nada más."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.35,
+      34.5
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        8.35,
+        -14
+      ],
+      [
+        "blip_agudo",
+        13.9,
+        -13
+      ],
+      [
+        "tick",
+        19.85,
+        -15
+      ],
+      [
+        "sting",
+        25.15,
+        -11
+      ]
+    ]
+  }
 }

@@ -3,5 +3,72 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La misma energia a la frecuencia justa levanta la respuesta.",
-  "duracion_objetivo": 34.6
+  "duracion_objetivo": 34.6,
+  "guion_visual": [
+    "0.0  portada: RESONANCIA / un empujon a tiempo",
+    "3.85 fuera de resonancia: la misma amplitud, sale poco",
+    "8.1  en resonancia: se dispara, cifra cuantas veces mas grande",
+    "12.55 la campana del sistema, en frecuencia",
+    "16.5  q sube a doce: la campana se estrecha",
+    "21.2  q sube a cuarenta: mas selectiva",
+    "26.1  remate: un empujon y su eco larguisimo"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "Fuera de tiempo. Casi no responde."},
+      {"t_inicio": 9.75, "texto": "El mismo empujón, a tiempo. Se dispara."},
+      {"t_inicio": 14.1, "texto": "Esta es la campana del sistema."},
+      {"t_inicio": 18.6, "texto": "Más selectivo. Más amplificación."},
+      {"t_inicio": 23.3, "texto": "Y todavía más."},
+      {"t_inicio": 27.85, "texto": "Un solo empujón deja un eco larguísimo."},
+      {"t_inicio": 31.25, "texto": "A tiempo, lo mueve todo."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.45,
+      34.6
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_agudo",
+        8.55,
+        -13
+      ],
+      [
+        "subrayado",
+        12.55,
+        -12
+      ],
+      [
+        "tick",
+        21.2,
+        -15
+      ],
+      [
+        "sting",
+        26.55,
+        -11
+      ]
+    ]
+  }
 }

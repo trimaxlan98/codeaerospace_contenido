@@ -3,5 +3,73 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una senal con dos tonos entra y sale con uno.",
-  "duracion_objetivo": 34.75
+  "duracion_objetivo": 34.75,
+  "guion_visual": [
+    "0.0  portada: UN FILTRO / unas pasan y otras no",
+    "3.85 el tono lento, solo",
+    "7.6  el tono agudo, releva al lento",
+    "11.25 la caja: el lento entra y sale, cifra en decibelios",
+    "15.4  la caja: el agudo entra y casi no sale, cifra en decibelios",
+    "19.95 los dos tonos sumados, la entrada emborronada",
+    "24.5  lo que sale de la caja: solo el lento",
+    "29.05 remate: la salida contra el tono lento, alineados"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.4, "texto": "El tono lento."},
+      {"t_inicio": 9.05, "texto": "Y el tono agudo."},
+      {"t_inicio": 12.8, "texto": "El lento entra y sale casi igual."},
+      {"t_inicio": 16.95, "texto": "El agudo entra, y casi no sale."},
+      {"t_inicio": 21.5, "texto": "Juntos, la entrada se ve así."},
+      {"t_inicio": 26.05, "texto": "Y de la caja sale solo esto."},
+      {"t_inicio": 30.6, "texto": "El lento de antes. Coinciden."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.6,
+      34.75
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        11.7,
+        -14
+      ],
+      [
+        "blip_agudo",
+        15.85,
+        -13
+      ],
+      [
+        "subrayado",
+        20.4,
+        -12
+      ],
+      [
+        "sting",
+        29.5,
+        -11
+      ]
+    ]
+  }
 }

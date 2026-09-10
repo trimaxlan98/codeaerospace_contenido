@@ -3,5 +3,76 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Dos cajas encadenadas; se intercambian y la salida es identica.",
-  "duracion_objetivo": 36.7
+  "duracion_objetivo": 36.7,
+  "guion_visual": [
+    "0.0  portada: EN CASCADA / el orden no importa",
+    "3.85 dos cajas en fila, ya conocidas",
+    "8.0  la señal entra cian y sale ambar",
+    "9.1  cifra: cuantas muestras de salida",
+    "12.7 se etiqueta el intercambio",
+    "13.2 las dos cajas cambian de sitio, en arco",
+    "17.6 la señal atraviesa otra vez, al reves",
+    "21.3 remate: las dos salidas, una encima de la otra",
+    "24.85 la de encima se enciende",
+    "28.25 cifra: diferencia entre los dos ordenes"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.6, "texto": "Dos sistemas, en fila."},
+      {"t_inicio": 9.9, "texto": "La señal los atraviesa enteros."},
+      {"t_inicio": 15.2, "texto": "Las dos cajas cambian de sitio."},
+      {"t_inicio": 18.7, "texto": "Y pasa otra vez, al revés."},
+      {"t_inicio": 22.85, "texto": "Las dos salidas, superpuestas."},
+      {"t_inicio": 25.85, "texto": "Coinciden."},
+      {"t_inicio": 29.55, "texto": "El orden no cambió nada."},
+      {"t_inicio": 33.0, "texto": "En cascada, el orden no importa."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      35.55,
+      36.7
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_agudo",
+        13.2,
+        -13
+      ],
+      [
+        "blip_medio",
+        17.6,
+        -14
+      ],
+      [
+        "subrayado",
+        21.75,
+        -12
+      ],
+      [
+        "sting",
+        24.85,
+        -11
+      ]
+    ]
+  }
 }

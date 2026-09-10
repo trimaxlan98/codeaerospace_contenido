@@ -3,5 +3,81 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una exponencial entra y sale identica salvo un factor.",
-  "duracion_objetivo": 41.85
+  "duracion_objetivo": 41.85,
+  "guion_visual": [
+    "0.0  portada: AUTOFUNCIONES / lo unico que no deforma",
+    "3.85 acto 1: un pulso entra, cifra cuanto dura",
+    "7.5  la salida se enciende: otra forma",
+    "10.6 cifra: cuanto dura la salida",
+    "13.7 acto 2: entra un coseno, cifra radianes por muestra",
+    "17.45 la salida se enciende: el mismo coseno",
+    "20.75 cifra: cuantas veces la amplitud",
+    "23.85 cifra: cuantos radianes se corre",
+    "26.75 acto 3: la entrada y la entrada por el factor",
+    "30.3  la entrada se multiplica por el factor, delante de quien mira",
+    "33.9  la salida real aterriza encima, a trozos",
+    "37.2  cifra: por ciento de error"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "Una señal cualquiera entra."},
+      {"t_inicio": 8.6, "texto": "Y sale con otra forma."},
+      {"t_inicio": 11.7, "texto": "Ni empieza, ni acaba igual."},
+      {"t_inicio": 15.25, "texto": "Ahora entra un coseno."},
+      {"t_inicio": 18.55, "texto": "Y sale el mismo coseno."},
+      {"t_inicio": 21.85, "texto": "Solo cambia de tamaño."},
+      {"t_inicio": 24.95, "texto": "Y se corre."},
+      {"t_inicio": 28.3, "texto": "Multiplícalo por ese número."},
+      {"t_inicio": 31.7, "texto": "Eso es toda la multiplicación."},
+      {"t_inicio": 35.0, "texto": "Y la salida real cae encima."},
+      {"t_inicio": 38.3, "texto": "Lo único que no deforma."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      40.7,
+      41.85
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        7.5,
+        -14
+      ],
+      [
+        "blip_medio",
+        17.45,
+        -14
+      ],
+      [
+        "sting",
+        33.9,
+        -11
+      ],
+      [
+        "tick",
+        37.2,
+        -15
+      ]
+    ]
+  }
 }

@@ -3,5 +3,65 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un golpe entra en la caja y sale una forma que se apaga.",
-  "duracion_objetivo": 32.35
+  "duracion_objetivo": 32.35,
+  "guion_visual": [
+    "0.0  portada: RESPUESTA AL IMPULSO / un golpe lo dice todo",
+    "3.85 la caja sola, sin nombre, nadie sabe que hace",
+    "9.8  entra el impulso cian por la izquierda",
+    "15.65 sale la respuesta ambar, la caja se enciende",
+    "17.2  cifra: cuantas muestras dura la cola",
+    "22.2  remate: la forma sola llena el cuadro",
+    "23.8  la caja ya no hace falta"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.5, "texto": "Una caja. Nadie sabe qué hace."},
+      {"t_inicio": 11.4, "texto": "Entra un golpe, una sola vez."},
+      {"t_inicio": 17.35, "texto": "Sale la respuesta. Ya la conoces entera."},
+      {"t_inicio": 23.95, "texto": "Esa forma. Ya es todo el sistema."},
+      {"t_inicio": 28.0, "texto": "Un golpe. Y ya sabes todo."}
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.2,
+      32.35
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.4,
+        -14
+      ],
+      [
+        "blip_grave",
+        10.25,
+        -14
+      ],
+      [
+        "sting",
+        16.1,
+        -11
+      ],
+      [
+        "blip_agudo",
+        22.7,
+        -13
+      ]
+    ]
+  }
 }
