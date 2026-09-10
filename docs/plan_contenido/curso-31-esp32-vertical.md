@@ -149,49 +149,53 @@ cuanto gasta.
 - Picos por pieza: -4.0 dB los clips, -4.5 dB intro y cierre. Suelo de
   seguridad -0.5 dB.
 
-### LO QUE FALTA: la voz
+### La voz llegó el 2026-09-09 (sin esperar a GCP)
 
-**La narracion esta bloqueada por algo ajeno al curso.** Vertex responde a
-TODO con `403 PERMISSION_DENIED: Lightning dunning decision is deny for
-project: projects/34992542254`. "Dunning" es cobro de morosidad: el proyecto
-de GCP tiene la facturacion en mora y la API deniega cualquier peticion, TTS
-incluido. No es cuota (eso seria 429) ni credenciales (la clave se lee bien).
-Comprobado dos veces, la segunda con una sola frase directa contra el TTS.
-
-Las 14 piezas con voz llevan su guion escrito y alineado en `clip.json`
-(`voz.secciones` con `t_inicio`), y el verificador confirma que ninguna
-frase pisa a la siguiente y que todas dejan cola. **En cuanto se arregle la
-facturacion, solo faltan dos comandos** (no hay que re-renderizar nada):
+**Vertex/Charon seguía en mora** (`403 PERMISSION_DENIED: Lightning
+dunning decision is deny`), pero para entonces el curso 32 (Transformadas)
+ya había validado `edge-tts` (`es-MX-JorgeNeural`) como proveedor sin GCP.
+Se aplicó el mismo camino aquí en vez de seguir esperando la facturación:
 
 ```bash
-bash studio/tools/narrar_esp32.sh    # serial, con sleep 45 entre piezas; se salta las ya bajadas
-studio/backend/venv/bin/python studio/tools/unir_vertical.py     studio/content/verticales/esp32          # sin --sin-voz esta vez
+studio/backend/venv/bin/python studio/tools/alinear_voz.py \
+    studio/content/verticales/esp32/clips/<pieza> \
+    exports/verticales/esp32/voz/<pieza>.wav \
+    --proveedor edge --voz es-MX-JorgeNeural
+studio/backend/venv/bin/python studio/tools/unir_vertical.py studio/content/verticales/esp32
+studio/backend/venv/bin/python studio/tools/verifica_vertical.py studio/content/verticales/esp32
 ```
 
-El montaje entregado hoy lleva solo la cama de SFX. Es publicable tal cual
-(el curso es mudo por diseño: la pantalla enseña y la voz solo remataria),
-pero la version con voz es la buena.
+Las 14 piezas ya traían el guion escrito y alineado desde el 2026-09-02
+(`voz.secciones` con `t_inicio`) — el campo `voz.voz` decía `"Charon"`
+(el nombre de la voz Vertex que nunca llegó a sintetizar) y se corrigió a
+`"es-MX-JorgeNeural"` en los 16 `clip.json` para que documente la voz real.
+**No hizo falta re-renderizar nada**: el guion ya cabía en el ritmo mudo
+original. Resultado: 0 solapes reales en las 14 piezas, montaje final
+508.79 s (8.48 min), pico **-2.0 dB**, **0 fallos, 0 avisos**, 15 costuras
+en 0.0000/255. Máster sin voz conservado de respaldo
+(`piezas_sin_voz/`, `esp32_vertical_sin_voz.mp4`). `curso.json` ganó el
+campo `"sonido": "narrado"` (no existía: el eje SONIDO es del curso 32).
 
 ### Estado pieza a pieza
 
 | Pieza | Duracion qh | Frases de voz | SFX | Estado |
 |---|---|---|---|---|
-| Intro | 10.70 s | — | 8 | entregada |
-| 01 · El reloj que no para | 30.30 s | 5 | 7 | entregada |
-| 02 · Dos nucleos | 31.25 s | 5 | 6 | entregada |
-| 03 · Lo que cabe en 520 KB | 30.95 s | 4 | 6 | entregada |
-| 04 · Un ciclo son metro y cuarto | 34.27 s | 4 | 7 | entregada |
-| 05 · Un pin es un bit | 36.15 s | 4 | 7 | entregada |
-| 06 · Voltajes que no existen | 37.75 s | 5 | 7 | entregada |
-| 07 · El mundo entra en escalones | 36.50 s | 5 | 7 | entregada |
-| 08 · Dos cables o cuatro | 31.00 s | 4 | 7 | entregada |
-| 09 · Doce centimetros y medio | 32.28 s | 4 | 6 | entregada |
-| 10 · Lo que de verdad viaja | 36.50 s | 5 | 8 | entregada |
-| 11 · Hablar poco para durar mucho | 35.15 s | 5 | 8 | entregada |
-| 12 · La linea que se interrumpe | 38.30 s | 5 | 6 | entregada |
-| 13 · El planificador | 35.55 s | 5 | 7 | entregada |
-| 14 · La vida de una pila | 40.95 s | 5 | 10 | entregada |
-| Cierre | 9.80 s | — | 6 | entregada |
+| Intro | 11.23 s | — | 8 | entregada, con voz |
+| 01 · El reloj que no para | 30.30 s | 5 | 7 | entregada, con voz |
+| 02 · Dos nucleos | 31.25 s | 5 | 6 | entregada, con voz |
+| 03 · Lo que cabe en 520 KB | 30.95 s | 4 | 6 | entregada, con voz |
+| 04 · Un ciclo son metro y cuarto | 34.27 s | 4 | 7 | entregada, con voz |
+| 05 · Un pin es un bit | 36.15 s | 4 | 7 | entregada, con voz |
+| 06 · Voltajes que no existen | 37.75 s | 5 | 7 | entregada, con voz |
+| 07 · El mundo entra en escalones | 36.50 s | 5 | 7 | entregada, con voz |
+| 08 · Dos cables o cuatro | 31.00 s | 4 | 7 | entregada, con voz |
+| 09 · Doce centimetros y medio | 32.28 s | 4 | 6 | entregada, con voz |
+| 10 · Lo que de verdad viaja | 36.50 s | 5 | 8 | entregada, con voz |
+| 11 · Hablar poco para durar mucho | 35.15 s | 5 | 8 | entregada, con voz |
+| 12 · La linea que se interrumpe | 38.30 s | 5 | 6 | entregada, con voz |
+| 13 · El planificador | 35.55 s | 5 | 7 | entregada, con voz |
+| 14 · La vida de una pila | 40.95 s | 5 | 10 | entregada, con voz |
+| Cierre | 10.62 s | — | 6 | entregada, con voz |
 
 ## 5. Cosecha de trampas
 
