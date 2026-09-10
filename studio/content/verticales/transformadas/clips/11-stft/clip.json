@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una ventana desliza y pinta el espectrograma; estrecharla gana tiempo y pierde frecuencia.",
-  "duracion_objetivo": 37.1
+  "duracion_objetivo": 37.1,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      35.95,
+      37.1
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        17.0,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.4,
+        -15
+      ],
+      [
+        "sting",
+        35.1,
+        -12
+      ]
+    ]
+  }
 }

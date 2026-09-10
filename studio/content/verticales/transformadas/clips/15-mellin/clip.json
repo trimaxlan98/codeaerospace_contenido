@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La forma se estira al triple: el espectro de Fourier se mueve, el de Mellin no.",
-  "duracion_objetivo": 37.7
+  "duracion_objetivo": 37.7,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      36.55,
+      37.7
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        16.1,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.5,
+        -15
+      ],
+      [
+        "sting",
+        35.7,
+        -12
+      ]
+    ]
+  }
 }

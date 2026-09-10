@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Una ecuacion diferencial se vuelve dos polos, y los polos predicen la respuesta.",
-  "duracion_objetivo": 37.25
+  "duracion_objetivo": 37.25,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      36.1,
+      37.25
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        13.9,
+        -15
+      ],
+      [
+        "blip_medio",
+        18.5,
+        -15
+      ],
+      [
+        "sting",
+        35.25,
+        -12
+      ]
+    ]
+  }
 }

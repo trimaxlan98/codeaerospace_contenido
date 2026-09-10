@@ -3,5 +3,65 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "El espectro se contrae en el punto ambar, que se vuelve el punto de CO.DE.",
-  "duracion_objetivo": 13.68
+  "duracion_objetivo": 13.68,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      12.5,
+      13.68
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.75,
+        -16
+      ],
+      [
+        "barrido",
+        1.3,
+        -13
+      ],
+      [
+        "pulso",
+        3.9,
+        -13
+      ],
+      [
+        "blip_agudo",
+        6.15,
+        -13
+      ],
+      [
+        "blip_grave",
+        7.15,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.05,
+        -14
+      ],
+      [
+        "subrayado",
+        8.85,
+        -11
+      ],
+      [
+        "tick",
+        9.95,
+        -9
+      ],
+      [
+        "tick",
+        10.12,
+        -9
+      ],
+      [
+        "sting",
+        10.3,
+        -10
+      ]
+    ]
+  }
 }

@@ -3,5 +3,45 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Un bloque de imagen, sus 64 coeficientes, y lo que sobrevive al tirar 58.",
-  "duracion_objetivo": 36.17
+  "duracion_objetivo": 36.17,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      35.0,
+      36.1
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        14.3,
+        -15
+      ],
+      [
+        "blip_medio",
+        17.7,
+        -15
+      ],
+      [
+        "sting",
+        34.17,
+        -12
+      ]
+    ]
+  }
 }

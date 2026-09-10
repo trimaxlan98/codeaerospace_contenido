@@ -3,5 +3,40 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Estrechar el pulso ensancha su espectro; el producto de los dos anchos no se mueve.",
-  "duracion_objetivo": 34.95
+  "duracion_objetivo": 34.95,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.8,
+      34.95
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.9,
+        -18
+      ],
+      [
+        "barrido",
+        4.0,
+        -14
+      ],
+      [
+        "tick",
+        6.0,
+        -15
+      ],
+      [
+        "sting",
+        32.95,
+        -12
+      ]
+    ]
+  }
 }

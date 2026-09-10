@@ -3,5 +3,70 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "La marca de la casa y el gesto del curso: una onda que se vuelve su espectro.",
-  "duracion_objetivo": 15.08
+  "duracion_objetivo": 15.08,
+  "audio": {
+    "pico_db": -4.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      13.9,
+      15.08
+    ],
+    "eventos": [
+      [
+        "blip_grave",
+        0.75,
+        -14
+      ],
+      [
+        "blip_agudo",
+        2.45,
+        -13
+      ],
+      [
+        "tick",
+        2.9,
+        -10
+      ],
+      [
+        "tick",
+        3.07,
+        -10
+      ],
+      [
+        "aire",
+        3.5,
+        -16
+      ],
+      [
+        "subrayado",
+        4.4,
+        -12
+      ],
+      [
+        "aire_largo",
+        5.7,
+        -15
+      ],
+      [
+        "blip_hud",
+        6.7,
+        -14
+      ],
+      [
+        "tick",
+        7.6,
+        -13
+      ],
+      [
+        "barrido",
+        9.4,
+        -12
+      ],
+      [
+        "sting",
+        11.1,
+        -10
+      ]
+    ]
+  }
 }
