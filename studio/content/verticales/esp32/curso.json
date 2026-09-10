@@ -4,6 +4,7 @@
   "formato": "vertical",
   "curso": 31,
   "estilo": "lienzo",
+  "sonido": "narrado",
   "description": "Curso vertical (9:16) sobre el microcontrolador ESP32, en el estilo LIENZO: una superficie lisa azul marino donde vive UNA cosa y UN dato, sin ruido visual y sin subtítulos. Catorce clips que van del silicio a lo que el chip hace con el mundo: los dos núcleos, la memoria, el reloj, los pines, el PWM, el ADC, los buses, la antena, el Wi-Fi, el BLE, las interrupciones, el planificador y la vida de una pila. Toda cifra en pantalla se calcula con numpy durante el render; lo que viene de la hoja de datos de Espressif se rotula en gris. Cada clip está hecho para subirse solo a Instagram.",
   "style_block": "style_block.py",
   "duracion_min": 30.0,
