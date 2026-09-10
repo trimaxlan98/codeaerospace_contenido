@@ -4,8 +4,21 @@
   "file": "escena.py",
   "description": "Un bloque de imagen, sus 64 coeficientes, y lo que sobrevive al tirar 58.",
   "duracion_objetivo": 36.17,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.35, "texto": "Un bloque de imagen: sesenta y cuatro números."},
+      {"t_inicio": 9.6, "texto": "Los mismos sesenta y cuatro, en otro dominio."},
+      {"t_inicio": 13.5, "texto": "Se comprime la escala para verlos a todos."},
+      {"t_inicio": 17.65, "texto": "Se apagan cincuenta y ocho. Quedan seis."},
+      {"t_inicio": 22.3, "texto": "Y con esos seis, la imagen vuelve."},
+      {"t_inicio": 26.75, "texto": "Casi nadie nota la diferencia."},
+      {"t_inicio": 30.95, "texto": "Noventa y nueve por ciento de la energía."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       35.0,

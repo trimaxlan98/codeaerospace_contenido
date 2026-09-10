@@ -4,8 +4,19 @@
   "file": "escena.py",
   "description": "La DFT solo sabe decir entre que dos enteros; la chirp-Z pone los puntos donde importan.",
   "duracion_objetivo": 36.25,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Dos tonos, muy cerca uno del otro."},
+      {"t_inicio": 10.7, "texto": "La dft solo distingue bins enteros."},
+      {"t_inicio": 16.8, "texto": "Entre el veintiuno y el veintidós, no hay nada."},
+      {"t_inicio": 22.65, "texto": "La chirp-Z mete quinientos doce puntos justo ahí."},
+      {"t_inicio": 29.25, "texto": "Y encuentra el tono exacto, no solo el bin."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       35.1,

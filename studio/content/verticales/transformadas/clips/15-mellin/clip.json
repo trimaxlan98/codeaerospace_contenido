@@ -4,8 +4,20 @@
   "file": "escena.py",
   "description": "La forma se estira al triple: el espectro de Fourier se mueve, el de Mellin no.",
   "duracion_objetivo": 37.7,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Esta es la forma."},
+      {"t_inicio": 9.75, "texto": "Se estira al triple."},
+      {"t_inicio": 14.7, "texto": "En escala logarítmica, estirar es solo deslizar."},
+      {"t_inicio": 20.1, "texto": "El espectro de Fourier tiene su pico aquí."},
+      {"t_inicio": 25.6, "texto": "Al estirar, el pico de Fourier se desplaza."},
+      {"t_inicio": 31.9, "texto": "Pero el pico de Mellin no se mueve nada."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       36.55,

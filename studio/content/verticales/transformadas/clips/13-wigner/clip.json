@@ -4,8 +4,19 @@
   "file": "escena.py",
   "description": "El plano tiempo-frecuencia gira, y la raya diagonal del chirp se vuelve un pico.",
   "duracion_objetivo": 30.45,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "En el tiempo, el chirp está repartido entero."},
+      {"t_inicio": 9.1, "texto": "En la frecuencia, también."},
+      {"t_inicio": 13.05, "texto": "Juntos, en un plano, son una raya."},
+      {"t_inicio": 19.75, "texto": "Se gira el plano hasta ponerla de canto."},
+      {"t_inicio": 23.45, "texto": "Y la sombra se cierra en un pico."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       29.3,

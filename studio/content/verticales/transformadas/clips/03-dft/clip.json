@@ -4,8 +4,20 @@
   "file": "escena.py",
   "description": "Un tono que cabe entero enciende un bin; uno que no cabe se derrama por todos.",
   "duracion_objetivo": 34.1,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Un coseno continuo, listo para muestrear."},
+      {"t_inicio": 10.35, "texto": "Sesenta y cuatro números. Eso es toda la integral."},
+      {"t_inicio": 15.0, "texto": "Este tono cabe entero: el corte casa."},
+      {"t_inicio": 19.45, "texto": "Una sola raya se enciende."},
+      {"t_inicio": 24.5, "texto": "Este no cabe: hay un salto en la costura."},
+      {"t_inicio": 29.3, "texto": "El salto se reparte en treinta y tres bins."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       32.95,

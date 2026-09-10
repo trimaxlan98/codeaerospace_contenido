@@ -4,8 +4,21 @@
   "file": "escena.py",
   "description": "Senos que se suman sobre una onda cuadrada: el error baja, el sobreimpulso de Gibbs no.",
   "duracion_objetivo": 30.45,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "La meta: una esquina hecha de curvas."},
+      {"t_inicio": 8.55, "texto": "Un seno. El error es grande."},
+      {"t_inicio": 11.65, "texto": "Tres senos. Ya baja."},
+      {"t_inicio": 14.75, "texto": "Siete senos, cada vez mas cerca."},
+      {"t_inicio": 17.85, "texto": "Veintiún senos. Casi no queda error."},
+      {"t_inicio": 21.65, "texto": "Pero el pico no cede."},
+      {"t_inicio": 25.25, "texto": "No se encoge: se estrecha."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       29.3,

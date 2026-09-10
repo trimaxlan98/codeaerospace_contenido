@@ -4,8 +4,20 @@
   "file": "escena.py",
   "description": "Los ejes giran hasta alinearse con la nube: la base que dicta la propia señal.",
   "duracion_objetivo": 37.35,
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {"t_inicio": 5.45, "texto": "Doscientos veinte puntos, alargados y torcidos."},
+      {"t_inicio": 10.55, "texto": "Los ejes de siempre no saben nada de ella."},
+      {"t_inicio": 16.95, "texto": "Giran solos, hasta alinearse con la nube."},
+      {"t_inicio": 21.55, "texto": "Ese es el ángulo que dicta la propia nube."},
+      {"t_inicio": 26.3, "texto": "Con un solo eje se guarda casi toda la información."},
+      {"t_inicio": 31.35, "texto": "Casi nada se pierde al aplanarla."}
+    ]
+  },
   "audio": {
     "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
     "fade_in": 0.3,
     "fade_out": [
       36.2,
