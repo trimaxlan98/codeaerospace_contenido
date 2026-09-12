@@ -3,5 +3,56 @@
   "scene": "Clip",
   "file": "escena.py",
   "description": "Las curvas se recogen en el punto ambar.",
-  "duracion_objetivo": 32.0
+  "duracion_objetivo": 12.58,
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      11.43,
+      12.58
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.05,
+        -16
+      ],
+      [
+        "barrido",
+        1.25,
+        -13
+      ],
+      [
+        "blip_medio",
+        4.75,
+        -14
+      ],
+      [
+        "aire",
+        6.05,
+        -16
+      ],
+      [
+        "subrayado",
+        8.35,
+        -12
+      ],
+      [
+        "tick",
+        8.85,
+        -10
+      ],
+      [
+        "tick",
+        9.18,
+        -10
+      ],
+      [
+        "sting",
+        9.9,
+        -10
+      ]
+    ]
+  }
 }

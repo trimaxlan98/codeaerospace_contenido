@@ -2,6 +2,89 @@
   "name": "Airy",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "El borde de la sombra no es un borde.",
-  "duracion_objetivo": 32.0
+  "description": "El escalon que promete la optica de rayos y las franjas que hay de verdad en el borde de una sombra.",
+  "duracion_objetivo": 30.2,
+  "guion_visual": [
+    "5.30 hueco de 3.40 s",
+    "12.25 hueco de 2.80 s",
+    "16.30 hueco de 3.40 s",
+    "20.70 hueco de 3.40 s",
+    "25.45 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "La optica de rayos promete un escalon."
+      },
+      {
+        "t_inicio": 12.5,
+        "texto": "Lo que hay son franjas."
+      },
+      {
+        "t_inicio": 16.55,
+        "texto": "El maximo no cae en el borde."
+      },
+      {
+        "t_inicio": 20.95,
+        "texto": "Justo ahi no llega ni la mitad."
+      },
+      {
+        "t_inicio": 25.7,
+        "texto": "Airy lo saco de mirar un arcoiris."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.05,
+      30.2
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        12.13,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.18,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.58,
+        -15
+      ],
+      [
+        "blip_agudo",
+        25.33,
+        -15
+      ],
+      [
+        "sting",
+        28.45,
+        -12
+      ]
+    ]
+  }
 }

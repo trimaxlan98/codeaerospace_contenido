@@ -2,6 +2,99 @@
   "name": "Cicloide",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Tres cuentas caen por tres curvas.",
-  "duracion_objetivo": 32.0
+  "description": "Tres cuentas caen por tres curvas a la velocidad de la gravedad; gana la cicloide.",
+  "duracion_objetivo": 30.45,
+  "guion_visual": [
+    "5.30 hueco de 3.20 s",
+    "12.10 hueco de 2.40 s",
+    "15.10 hueco de 2.60 s",
+    "18.70 hueco de 2.60 s",
+    "22.30 hueco de 2.60 s",
+    "25.90 hueco de 3.40 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Tres caminos, mismo principio y mismo final."
+      },
+      {
+        "t_inicio": 12.35,
+        "texto": "Caen a la vez."
+      },
+      {
+        "t_inicio": 15.35,
+        "texto": "La recta, la mas lenta."
+      },
+      {
+        "t_inicio": 18.95,
+        "texto": "El arco pierde por poco."
+      },
+      {
+        "t_inicio": 22.55,
+        "texto": "Gana la cicloide."
+      },
+      {
+        "t_inicio": 26.15,
+        "texto": "Desde cualquier altura, llegan juntas."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.3,
+      30.45
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        11.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        14.98,
+        -15
+      ],
+      [
+        "blip_medio",
+        18.58,
+        -15
+      ],
+      [
+        "blip_agudo",
+        22.18,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.78,
+        -15
+      ],
+      [
+        "sting",
+        28.7,
+        -12
+      ]
+    ]
+  }
 }

@@ -26,7 +26,13 @@
 #     `wait`, y durante un wait los updaters siguen corriendo: sin
 #     `clear_updaters` los pendulos seguirian moviendose mientras se apagan.
 class Clip(Pieza):
-    NOMBRE = "LA ELIPTICA"
+    # "ELIPTICA K" y no "LA ELIPTICA": lo destapo la hoja de contactos
+    # de las veinte portadas al cerrar el curso. Diecisiete llevan el
+    # nombre pelado —GAMMA, FRESNEL, BESSEL, CANTOR— y esta era la unica
+    # con articulo. Ver las veinte juntas hace visible una incoherencia
+    # que pieza a pieza no lo es. Y de paso nombra la funcion de verdad:
+    # la integral eliptica COMPLETA de primera especie, K.
+    NOMBRE = "ELIPTICA K"
     TESIS = "el pendulo real, medido"
 
     # PARAMETROS elegidos: las dos amplitudes y el largo del dibujo. La

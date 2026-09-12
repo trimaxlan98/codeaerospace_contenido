@@ -2,6 +2,89 @@
   "name": "Bessel",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "El modo de un tambor redondo y su circulo quieto.",
-  "duracion_objetivo": 32.0
+  "description": "El primer cero de J0 como cruce de una curva y como circulo quieto de un tambor que vibra.",
+  "duracion_objetivo": 32.85,
+  "guion_visual": [
+    "7.50 hueco de 3.20 s",
+    "11.95 hueco de 3.80 s",
+    "17.10 hueco de 3.40 s",
+    "24.50 hueco de 2.40 s",
+    "27.90 hueco de 3.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 7.75,
+        "texto": "Sus ceros no estan igual de lejos."
+      },
+      {
+        "t_inicio": 12.2,
+        "texto": "El primero: dos coma cuatro."
+      },
+      {
+        "t_inicio": 17.35,
+        "texto": "En el tambor es un circulo."
+      },
+      {
+        "t_inicio": 24.75,
+        "texto": "El circulo no se mueve."
+      },
+      {
+        "t_inicio": 28.15,
+        "texto": "Por eso un tambor no da notas."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.7,
+      32.85
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        11.83,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.98,
+        -15
+      ],
+      [
+        "blip_medio",
+        24.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        27.78,
+        -15
+      ],
+      [
+        "sting",
+        31.1,
+        -12
+      ]
+    ]
+  }
 }

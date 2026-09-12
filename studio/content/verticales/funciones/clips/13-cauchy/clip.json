@@ -2,6 +2,89 @@
   "name": "Cauchy",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Dos medias corriendo: una se asienta, la otra no.",
-  "duracion_objetivo": 32.0
+  "description": "Dos medias corriendo sobre 20 000 muestras: una se asienta y la otra no, en veinte semillas.",
+  "duracion_objetivo": 30.4,
+  "guion_visual": [
+    "7.50 hueco de 2.40 s",
+    "10.50 hueco de 3.20 s",
+    "16.30 hueco de 2.40 s",
+    "19.70 hueco de 3.40 s",
+    "24.45 hueco de 4.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 7.75,
+        "texto": "La gaussiana se asienta."
+      },
+      {
+        "t_inicio": 10.75,
+        "texto": "Ya no se mueve."
+      },
+      {
+        "t_inicio": 16.55,
+        "texto": "La de Cauchy, no."
+      },
+      {
+        "t_inicio": 19.95,
+        "texto": "Salta hasta la ultima muestra."
+      },
+      {
+        "t_inicio": 24.7,
+        "texto": "Veinte semillas. Ninguna se asienta."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.25,
+      30.4
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        10.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.18,
+        -15
+      ],
+      [
+        "blip_medio",
+        19.58,
+        -15
+      ],
+      [
+        "blip_agudo",
+        24.33,
+        -15
+      ],
+      [
+        "sting",
+        28.65,
+        -12
+      ]
+    ]
+  }
 }

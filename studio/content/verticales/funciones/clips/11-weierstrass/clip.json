@@ -2,6 +2,99 @@
   "name": "Weierstrass",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Cuatro zooms y nunca se alisa.",
-  "duracion_objetivo": 32.0
+  "description": "Tres zooms sobre el mismo punto: la curva no se alisa y la pendiente que se le pide no converge.",
+  "duracion_objetivo": 32.5,
+  "guion_visual": [
+    "5.30 hueco de 3.20 s",
+    "9.10 hueco de 3.40 s",
+    "13.85 hueco de 3.40 s",
+    "18.60 hueco de 3.40 s",
+    "23.35 hueco de 3.40 s",
+    "27.75 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Continua en todas partes."
+      },
+      {
+        "t_inicio": 9.35,
+        "texto": "Ampliamos trece veces."
+      },
+      {
+        "t_inicio": 14.1,
+        "texto": "Y no se alisa."
+      },
+      {
+        "t_inicio": 18.85,
+        "texto": "Otra vez. Sigue igual de quebrada."
+      },
+      {
+        "t_inicio": 23.6,
+        "texto": "Una curva normal ya seria una recta."
+      },
+      {
+        "t_inicio": 28.0,
+        "texto": "Sin derivada en ningun punto."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.35,
+      32.5
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        13.73,
+        -15
+      ],
+      [
+        "blip_medio",
+        18.48,
+        -15
+      ],
+      [
+        "blip_agudo",
+        23.23,
+        -15
+      ],
+      [
+        "blip_medio",
+        27.63,
+        -15
+      ],
+      [
+        "sting",
+        30.75,
+        -12
+      ]
+    ]
+  }
 }

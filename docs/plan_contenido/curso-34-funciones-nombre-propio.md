@@ -171,10 +171,19 @@ Siete cosas, y ninguna se habria visto en un fotograma:
 
 | Lote | Piezas | Estado |
 |------|--------|--------|
-| A | 00 intro, 01 gamma (MOLDE), 02, 03, 04 | pendiente |
-| B | 05, 06, 07, 08, 09 | pendiente |
-| C | 10, 11, 12, 13, 14 | pendiente |
-| D | 15, 16, 17, 18, 19 cierre | pendiente |
+| A | 00 intro, 01 gamma (MOLDE), 02, 03, 04 | **cerrado** |
+| B | 05, 06, 07, 08, 09 | **cerrado** |
+| C | 10, 11, 12, 13, 14 | **cerrado** |
+| D | 15, 16, 17, 18, 19 cierre | **cerrado** |
+
+**Las 20 escritas y revisadas fotograma a fotograma.** El reparto por
+subagentes se intento y NO salio: los cinco agentes de la primera ola
+murieron a la vez con un 429 de cuota de sesion, cada uno a mitad de la
+lectura de contexto y sin haber escrito una linea. Las veinte piezas se
+escribieron en serie en la sesion principal. La leccion no es nueva
+—esta en el catalogo de trampas desde el curso 22— pero si su tamaño:
+**una ola de cinco agentes puede agotar la cuota antes de producir
+nada**, y el trabajo parcial que deja en disco es cero, no la mitad.
 
 ## 5. Tablero de estado
 
@@ -184,13 +193,14 @@ Siete cosas, y ninguna se habria visto en un fotograma:
 | Libreria `especiales.py` | **hecha** |
 | Sonda (155 invariantes, 0 fallos) | **hecha** |
 | Portadas medidas (19/19 entran) | **hecho** |
-| `curso.json` + `style_block.py` + esqueletos | pendiente |
-| Molde (pieza 01) escrito y validado | pendiente |
-| Lotes A-D | pendiente |
-| Renders `qh` + sellado de duraciones | pendiente |
-| Guion de voz + SFX | pendiente |
-| Mux y verificacion | pendiente |
-| PR, catalogo, memoria | pendiente |
+| `curso.json` + `style_block.py` + esqueletos | **hecho** |
+| Molde (pieza 01) escrito y validado | **hecho** |
+| Lotes A-D (las 20 piezas) | **hecho** |
+| Renders `qh` (1080x1920 @ 60) | **hechos**, 20/20 |
+| Guion de voz (98 frases) + SFX (173 eventos) | **hecho** |
+| Mux y verificacion (0 fallos, costuras 0.0000) | **hecho** |
+| Hoja de contactos de las 20 portadas | **hecha** (destapo "LA ELIPTICA") |
+| PR, catalogo, memoria | en curso |
 
 ## 6. Storyboard pieza a pieza
 
@@ -318,3 +328,124 @@ problema, RESUME una familia de formas.
 La espiral de Cornu se dibuja entera y se recoge en su propio limite, que
 es el punto ambar de CO.DE. La marca no se posa encima del contenido: es
 el sitio al que el contenido tiende. **12.5 s.**
+
+## 7. Cierre (2026-09-12)
+
+**Entregado.** `exports/verticales/funciones/`:
+
+| | |
+|---|---|
+| Pelicula | `funciones_vertical.mp4`, **596.66 s (9.94 min)**, 1080x1920 @ 60 fps, 25 MB |
+| Piezas sueltas | `piezas/*.mp4` — **las 20 sonorizadas**, que son EL producto para Instagram |
+| Voz | `voz/*.wav` — 18 piezas, `es-MX-JorgeNeural` por `edge-tts` |
+| Pico del montaje | **-1.8 dB** (ninguna pieza paso de -1.8; no hizo falta re-muxear) |
+| Costuras | **19 a 0.0000/255**, igual que el 31, el 32 y el 33 |
+| Verificacion | `verifica_vertical.py`: **0 fallos**, 53 avisos (todos de `estima()`) |
+| Sonda | `sonda_especiales.py`: **177 invariantes, 0 fallos** |
+
+**La voz entro a la primera, y esa es la diferencia con el curso 33.** Alli,
+cinco de dieciocho piezas fallaron al sintetizar de verdad despues de pasar
+la verificacion por conteo de palabras. Aqui las 98 frases se escribieron
+contra los huecos MEDIDOS por `sonda_tiempos_voz.py` y con un tope de **2.2
+palabras por segundo de hueco** en vez de las 2.5 que documentaba el 32:
+`alinear_voz.py` no devolvio ni un solape ni una cola corta en las 18
+piezas. La cola mas corta quedo en 1.67 s sobre un minimo de 0.8. El
+margen del 12 % sobre la velocidad documentada es lo que compro las cinco
+correcciones que el 33 tuvo que hacer a mano.
+
+Los 53 avisos son los de siempre: `estima()` cuenta palabras sobre el texto
+ANTES de sintetizar y no sabe que `alinear_voz.py` ya coloco cada frase con
+su duracion real. Mismo ruido que el 32 (60 avisos) y el 33 (90).
+
+### La hoja de contactos, y por que es un paso fijo
+
+Las 20 portadas juntas destaparon que **diecisiete llevaban el nombre pelado
+—GAMMA, FRESNEL, BESSEL, CANTOR— y una llevaba articulo**: "LA ELIPTICA".
+Pieza a pieza no se ve; las veinte juntas, si. Se cambio a **"ELIPTICA K"**,
+que ademas nombra la funcion de verdad (la integral eliptica completa de
+primera especie). Costo un re-render y un re-mux de una pieza, y la
+duracion no se movio: la portada es una coreografia de tiempos fijos, no
+depende de lo larga que sea la palabra.
+
+## 8. Cosecha de trampas
+
+Lo que este curso añade al catalogo de la casa.
+
+### De la libreria y las cifras
+
+1. **La escalera de Cantor por expansion en base 3 no sobrevive a los
+   flotantes.** `v = v*3 - d` acumula error: bajaba en 41 sitios y en x=1
+   devolvia 0. Se construye de la definicion geometrica.
+2. **Por dos puntos pasan infinitas circunferencias, y la eleccion decide
+   el resultado.** El arco tangente a la horizontal tarda 4.11 s contra los
+   0.8053 de la cicloide —un espantapajaros—; el de Galileo, tangente a la
+   vertical, pierde por un 2.2 %. Elegir el competidor debil es una forma
+   de mentir que no deja rastro en ninguna cifra.
+3. **Weierstrass tiene un tope numerico.** Por encima de trece terminos el
+   argumento `b^k·pi·x` pasa de 1e13 y float64 pierde la FASE: el termino
+   fino sale con desfase aleatorio y, como su amplitud es pequeña, la curva
+   no sale ruidosa sino **SUAVE** — exactamente lo contrario de lo que la
+   pieza demuestra. `ventana_zoom` aborta.
+4. **Contar maximos comparando cada muestra con sus vecinas da uno de
+   menos** cuando el maximo cae entre dos muestras: tres de las cinco
+   formas de la superformula salian con un lobulo menos, y los lobulos que
+   se VEN eran los correctos. Se cuenta por el cambio de signo de la
+   pendiente, con envoltura.
+5. **`linspace` sobre una curva cerrada repite el punto final.** Si ese
+   punto es un maximo, se cuenta dos veces: el osciloscopio leia 4:2, que
+   no es ninguna razon.
+6. **Una malla impar pone x=0 sobre una muestra**, y `sign(0)` no es
+   negativo: los polinomios de Legendre de grado impar perdian un cero.
+7. **Una biseccion solo vale si el intervalo contiene UNA raiz.** El pico
+   del borde de sombra daba un punto con el intervalo (-4, 0) y otro
+   distinto con (-6, 0), los dos con toda la seguridad del mundo. Se barre
+   desde el borde hasta el primer cambio de signo.
+8. **Hay cifras cuyos decimales son de la truncatura.** La pendiente de
+   Weierstrass se mueve un 0.25 % al sumar dos terminos mas: se rotula
+   ENTERA. Lo que la pieza afirma no es el valor, es que la sucesion no se
+   para.
+
+### De composicion
+
+9. **Una copia de un mobject ya encajado, metida en un grupo nuevo, llega
+   descolocada**: el segundo `encajar` le aplica su desplazamiento encima.
+   En la pieza 08 el escalon de referencia salia flotando por encima de su
+   cuadro. Se reconstruye, no se copia.
+10. **Una curva con `stroke_opacity=0` se "crea" entera sin pintar un
+    pixel.** `Create` no enciende el trazo: el render sale limpio, sin
+    aviso y sin curva. El molde entero se renderizo una vez sin ninguna de
+    sus cinco curvas.
+11. **Un rotulo colocado con `next_to` sobre un punto cercano al borde
+    sobresale del grupo**, `encajar` lo encoge todo y el guardian de
+    legibilidad aborta con "el rotulo mas pequeño mide 0.143". El sintoma
+    no señala la causa. Los rotulos van con `move_to` sobre coordenadas de
+    datos elegidas en zona vacia.
+12. **El cuadro lo fija el dato mas extremo, no el mas importante.** El de
+    la carrera de la cicloide se ajusto a la meta (-1.0) y el arco de
+    Galileo baja a -1.25: se salia, el grupo medio mas que la franja y el
+    rotulo acabo encima de la curva.
+13. **Un punto ambar sobre una curva ambar no existe.** Las marcas que
+    señalan de donde sale una cifra van en TINTA, el color de la cifra.
+14. **Una cifra que habla de un objeto tridimensional junto a un dibujo que
+    es un corte, miente.** "4 paralelos quietos" sobre un perfil donde se
+    cuentan OCHO cruces: cada paralelo nodal corta el meridiano dos veces.
+    Se rotula lo que se puede contar en pantalla, y se marcan los puntos.
+15. **Un polinomio dibujado fuera del intervalo donde interpola se
+    dispara**, y contradice a su propia cifra de error: el de Chebyshev
+    salia con dos rayas verticales en los bordes junto al rotulo "0.0177
+    de error".
+
+### De proceso
+
+16. **Una ola de cinco subagentes puede agotar la cuota de sesion antes de
+    producir nada.** Los cinco murieron a la vez con un 429, cada uno a
+    mitad de la lectura de contexto, y dejaron cero trabajo parcial en
+    disco. Las veinte piezas se escribieron en serie en la sesion
+    principal.
+17. **La imagen de render puede no poder reconstruirse.** Debian bullseye
+    llego a su fin de vida: `deb.debian.org` devuelve 404 en todo
+    `bullseye-security` y el Release principal vencio. Se apunta al
+    snapshot del que salio la imagen base. Y **manim y numpy quedan
+    pineados**: una reconstruccion se trajo manim 0.21.0 donde produccion
+    corre 0.20.1, y el render local habria dejado de ser el de produccion
+    sin que nada avisara.

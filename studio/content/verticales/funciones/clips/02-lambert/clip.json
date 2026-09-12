@@ -2,6 +2,89 @@
   "name": "Lambert W",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La telarana cae al unico punto fijo.",
-  "duracion_objetivo": 32.0
+  "description": "La telarana de x -> e^-x cae al unico punto fijo, y ese numero resuelve x·e^x = 1.",
+  "duracion_objetivo": 31.6,
+  "guion_visual": [
+    "7.50 hueco de 2.60 s",
+    "13.65 hueco de 2.80 s",
+    "18.95 hueco de 2.60 s",
+    "22.90 hueco de 3.00 s",
+    "27.25 hueco de 3.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 7.75,
+        "texto": "Esta ecuacion no se despeja."
+      },
+      {
+        "t_inicio": 13.9,
+        "texto": "Pero el numero existe. Se itera."
+      },
+      {
+        "t_inicio": 19.2,
+        "texto": "Da igual por donde empieces."
+      },
+      {
+        "t_inicio": 23.15,
+        "texto": "El mismo numero, otro problema."
+      },
+      {
+        "t_inicio": 27.5,
+        "texto": "Por eso tiene nombre: uve doble."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.45,
+      31.6
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        13.53,
+        -15
+      ],
+      [
+        "blip_agudo",
+        18.83,
+        -15
+      ],
+      [
+        "blip_medio",
+        22.78,
+        -15
+      ],
+      [
+        "blip_agudo",
+        27.13,
+        -15
+      ],
+      [
+        "sting",
+        29.85,
+        -12
+      ]
+    ]
+  }
 }

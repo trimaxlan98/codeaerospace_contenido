@@ -2,6 +2,89 @@
   "name": "Chladni",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La arena dibuja la figura de la placa.",
-  "duracion_objetivo": 32.0
+  "description": "Dos modos que suenan igual y la arena que dibuja su mezcla.",
+  "duracion_objetivo": 31.9,
+  "guion_visual": [
+    "5.30 hueco de 3.60 s",
+    "9.50 hueco de 4.00 s",
+    "14.85 hueco de 4.20 s",
+    "20.50 hueco de 4.40 s",
+    "26.35 hueco de 4.40 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Un modo puro es una rejilla."
+      },
+      {
+        "t_inicio": 9.75,
+        "texto": "Este otro suena exactamente igual."
+      },
+      {
+        "t_inicio": 15.1,
+        "texto": "Y cualquier mezcla tambien es un modo."
+      },
+      {
+        "t_inicio": 20.75,
+        "texto": "La arena cae donde la placa no se mueve."
+      },
+      {
+        "t_inicio": 26.6,
+        "texto": "Otra mezcla, otra figura, el mismo sonido."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.75,
+      31.9
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        9.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        14.73,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        26.23,
+        -15
+      ],
+      [
+        "sting",
+        30.15,
+        -12
+      ]
+    ]
+  }
 }

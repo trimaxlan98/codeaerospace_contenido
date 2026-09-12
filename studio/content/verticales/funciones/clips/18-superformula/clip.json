@@ -2,6 +2,119 @@
   "name": "Superformula",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "Cuatro numeros y mil formas.",
-  "duracion_objetivo": 32.0
+  "description": "Cuatro numeros y la misma formula da circunferencia, flor, estrella, gota, diatomea y cuadrado.",
+  "duracion_objetivo": 37.6,
+  "guion_visual": [
+    "5.30 hueco de 2.80 s",
+    "8.70 hueco de 2.60 s",
+    "12.65 hueco de 2.80 s",
+    "16.80 hueco de 2.80 s",
+    "20.95 hueco de 2.80 s",
+    "25.10 hueco de 2.80 s",
+    "29.25 hueco de 2.80 s",
+    "33.05 hueco de 3.40 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Empezamos por una circunferencia."
+      },
+      {
+        "t_inicio": 8.95,
+        "texto": "Cambiamos cuatro numeros."
+      },
+      {
+        "t_inicio": 12.9,
+        "texto": "Una flor."
+      },
+      {
+        "t_inicio": 17.05,
+        "texto": "Una estrella de mar."
+      },
+      {
+        "t_inicio": 21.2,
+        "texto": "Una gota."
+      },
+      {
+        "t_inicio": 25.35,
+        "texto": "Una diatomea."
+      },
+      {
+        "t_inicio": 29.5,
+        "texto": "Y un cuadrado."
+      },
+      {
+        "t_inicio": 33.3,
+        "texto": "Cuatro numeros, y ya esta."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      36.45,
+      37.6
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.58,
+        -15
+      ],
+      [
+        "blip_agudo",
+        12.53,
+        -15
+      ],
+      [
+        "blip_medio",
+        16.68,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.83,
+        -15
+      ],
+      [
+        "blip_medio",
+        24.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        29.13,
+        -15
+      ],
+      [
+        "blip_medio",
+        32.93,
+        -15
+      ],
+      [
+        "sting",
+        35.85,
+        -12
+      ]
+    ]
+  }
 }

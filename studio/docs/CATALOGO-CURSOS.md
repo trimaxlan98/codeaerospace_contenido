@@ -413,3 +413,84 @@ piezas de este curso usan ese remate y las tres se ven iguales.
 
 Entrega: 20 piezas, **10.82 min** en 1080x1920 @ 60 fps, 19 costuras a
 0.0000/255, sin pista de audio.
+
+## Curso 34 — Funciones con nombre propio (vertical, estilo LIENZO, narrado)
+
+Dieciocho funciones más intro y cierre. Cada pieza presenta **una**, con el
+problema que la obligó a existir y una cifra que sólo ella sabe dar: gamma
+interpola el factorial (Γ(½) = 1.7725), la W de Lambert despeja lo que no se
+despeja (0.5671), la integral elíptica da el periodo de verdad de un péndulo
+(18.03 % más que la fórmula del instituto), Fresnel curva sin tirones,
+Chebyshev reparte el error por igual (59.82 → 0.0177), Bessel dibuja un
+tambor (2.4048), Chladni el sonido, Airy el borde de una sombra (−2.3381),
+Legendre la forma de un planeta (21.4 km), la catenaria un cable (20.94 % más
+que el vano), Weierstrass una curva sin pendiente, Cantor una escalera que
+sube sin subir, Cauchy una campana sin media, Lorenz una curva que no se
+repite, la cicloide el camino más rápido (0.8053 s), Lissajous una razón de
+frecuencias que se lee contando, zeta los primos (14.1347) y la superfórmula
+mil formas con cuatro números.
+
+**La capa que ocupa** es la decisión que más importa, porque "funciones
+llamativas" toca cuatro cursos publicados. El 11 cuenta qué patrón sale de
+repetir una regla; el 12, cuándo esa iteración deja de ser predecible; el 26,
+la autosemejanza y la dimensión; el 32, cómo se cambia de dominio. Éste
+cuenta **la función como personaje**: tiene nombre propio porque ninguna
+combinación de las elementales hacía su trabajo. La mariposa de Lorenz entra
+como *objeto* —una curva que no se corta nunca a sí misma— y su cifra es
+cuánto tarda una diferencia de una milmillonésima en notarse (19.44 s), no la
+dimensión ni el exponente de Lyapunov, que son de los otros dos cursos.
+
+**Primer curso narrado desde el principio con el ritmo del curso mudo.** Los
+cursos 32 y 33 nacieron mudos y se les añadió voz después; éste se escribió
+sabiendo que llevaría voz y aun así mantiene el suelo de 1.8 s de
+`Pieza.leer()`. Dos razones medidas: la voz de esta casa **puntúa** en vez de
+narrar de corrido y necesita huecos donde caber, y la mitad de Instagram ve
+los reels sin sonido, así que una pieza que sólo se entiende con voz está a
+medio hacer.
+
+### Lo que enseñó este curso, y trasciende al curso
+
+**Una función especial mal implementada no se ve mal**: dibuja una curva
+razonable y saca una cifra plausible con cuatro decimales. La única defensa
+es una sonda de invariantes escrita ANTES que los clips, que le pida a cada
+una la propiedad que sólo cumple si está bien —la reflexión de Euler, la
+recurrencia de Bessel, Ai'' = x·Ai, la ortogonalidad de Legendre, el periodo
+medido sobre un péndulo integrado de verdad— **y su contraejemplo**. La del
+curso 34 llegó a 177 invariantes y tumbó siete cosas antes de dibujar nada.
+
+Tres merecen quedar escritas porque no son de este curso:
+
+- **Por dos puntos pasan infinitas circunferencias, y elegir el competidor
+  débil es una forma de mentir que no deja rastro en ninguna cifra.** El arco
+  de la carrera de la cicloide, tangente a la horizontal, tardaba 4.11 s
+  contra 0.8053: un espantapájaros. El de Galileo, tangente a la vertical,
+  pierde por un 2.2 %, y que pierda por poco es lo que hace buena la pieza.
+- **Hay cifras cuyos decimales son de la truncatura y no de la función.** La
+  pendiente de Weierstrass se mueve un 0.25 % al sumar dos términos más, así
+  que se rotula entera: lo que la pieza afirma no es el valor, es que la
+  sucesión no se para.
+- **Una cifra que habla de un objeto y un dibujo que es un corte no dicen lo
+  mismo.** "4 paralelos quietos" junto a un perfil donde se cuentan ocho
+  cruces: cada paralelo nodal corta el meridiano dos veces. Se rotula lo que
+  se puede contar en pantalla, y se marcan los puntos para que se cuente.
+
+### La hoja de contactos de las portadas, como paso fijo del cierre
+
+Ver las veinte portadas juntas destapó que diecisiete llevaban el nombre
+pelado y una llevaba artículo ("LA ELIPTICA"). Pieza a pieza no se ve. El
+curso 33 dejó escrito que esa hoja merecía ser un paso fijo; aquí lo fue, y
+encontró lo que tenía que encontrar. Costó un re-render y un re-mux de una
+pieza — y ninguna duración se movió, porque la portada es una coreografía de
+tiempos fijos que no depende de lo larga que sea la palabra.
+
+### Dos cosas de infraestructura que no son del curso
+
+- **La imagen de render ya no se podía reconstruir.** Debian bullseye llegó a
+  su fin de vida: `deb.debian.org` devuelve 404 en todo `bullseye-security` y
+  el Release principal venció. Ahora apunta al *snapshot* del que salió la
+  imagen base. No se sube a bookworm a propósito: cambiaría Pango y las
+  fuentes, y con ellas las medidas sobre las que están calibrados los
+  guardianes de `lienzo.py`.
+- **`manim` y `numpy` quedan pineados a las versiones de producción** (0.20.1
+  y 2.5.1). Sin el pin, la reconstrucción se trajo manim 0.21.0 y el render
+  local habría dejado de ser el de producción sin que nada avisara.

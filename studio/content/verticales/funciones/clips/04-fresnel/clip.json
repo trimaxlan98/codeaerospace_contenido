@@ -2,6 +2,99 @@
   "name": "Fresnel",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La clotoide y su curvatura que sube recta.",
-  "duracion_objetivo": 32.0
+  "description": "El escalon de curvatura que ninguna via admite, la rampa que lo arregla y la espiral que sale.",
+  "duracion_objetivo": 31.8,
+  "guion_visual": [
+    "5.30 hueco de 3.00 s",
+    "9.65 hueco de 3.00 s",
+    "16.40 hueco de 2.00 s",
+    "21.00 hueco de 1.80 s",
+    "23.40 hueco de 3.00 s",
+    "27.65 hueco de 3.00 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "De recta a curva: un tiron."
+      },
+      {
+        "t_inicio": 9.9,
+        "texto": "Salvo que suba poco a poco."
+      },
+      {
+        "t_inicio": 16.65,
+        "texto": "Esa es la clotoide."
+      },
+      {
+        "t_inicio": 21.25,
+        "texto": "Curvatura recta."
+      },
+      {
+        "t_inicio": 23.65,
+        "texto": "Da vueltas sin llegar nunca."
+      },
+      {
+        "t_inicio": 27.9,
+        "texto": "Toda carretera lleva este trozo."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.65,
+      31.8
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        9.53,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.28,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.88,
+        -15
+      ],
+      [
+        "blip_agudo",
+        23.28,
+        -15
+      ],
+      [
+        "blip_medio",
+        27.53,
+        -15
+      ],
+      [
+        "sting",
+        30.05,
+        -12
+      ]
+    ]
+  }
 }

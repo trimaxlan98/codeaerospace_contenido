@@ -2,6 +2,79 @@
   "name": "Catenaria",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "La cadena y la parabola no son la misma curva.",
-  "duracion_objetivo": 32.0
+  "description": "Cadena y parabola con los mismos extremos, su resta aumentada y lo que cuesta en cable.",
+  "duracion_objetivo": 30.75,
+  "guion_visual": [
+    "7.10 hueco de 3.60 s",
+    "12.50 hueco de 4.00 s",
+    "17.85 hueco de 4.60 s",
+    "23.80 hueco de 5.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 7.35,
+        "texto": "Una cadena colgada de dos torres."
+      },
+      {
+        "t_inicio": 12.75,
+        "texto": "Galileo dijo que era una parabola."
+      },
+      {
+        "t_inicio": 18.1,
+        "texto": "Se separan siete milesimas del vano."
+      },
+      {
+        "t_inicio": 24.05,
+        "texto": "Y aun asi hace falta un veinte por ciento mas de cable."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.6,
+      30.75
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        12.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        17.73,
+        -15
+      ],
+      [
+        "blip_medio",
+        23.68,
+        -15
+      ],
+      [
+        "sting",
+        29.0,
+        -12
+      ]
+    ]
+  }
 }

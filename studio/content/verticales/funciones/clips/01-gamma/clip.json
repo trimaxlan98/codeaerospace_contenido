@@ -2,6 +2,99 @@
   "name": "Gamma",
   "scene": "Clip",
   "file": "escena.py",
-  "description": "El factorial deja de tener escalones.",
-  "duracion_objetivo": 32.0
+  "description": "El factorial deja de tener escalones: cuatro puntos sueltos y una curva que los enhebra y sigue.",
+  "duracion_objetivo": 30.95,
+  "guion_visual": [
+    "5.30 hueco de 2.80 s",
+    "10.10 hueco de 2.40 s",
+    "13.85 hueco de 3.20 s",
+    "18.05 hueco de 2.60 s",
+    "22.85 hueco de 2.60 s",
+    "26.80 hueco de 3.00 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "El factorial solo existe en enteros."
+      },
+      {
+        "t_inicio": 10.35,
+        "texto": "Gamma los enhebra todos."
+      },
+      {
+        "t_inicio": 14.1,
+        "texto": "Y da respuesta donde no habia ninguna."
+      },
+      {
+        "t_inicio": 18.3,
+        "texto": "El factorial de un medio."
+      },
+      {
+        "t_inicio": 23.1,
+        "texto": "Su cuadrado es pi."
+      },
+      {
+        "t_inicio": 27.05,
+        "texto": "Y sigue donde no hay factoriales."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.8,
+      30.95
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        9.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        13.73,
+        -15
+      ],
+      [
+        "blip_medio",
+        17.93,
+        -15
+      ],
+      [
+        "blip_agudo",
+        22.73,
+        -15
+      ],
+      [
+        "blip_medio",
+        26.68,
+        -15
+      ],
+      [
+        "sting",
+        29.2,
+        -12
+      ]
+    ]
+  }
 }
