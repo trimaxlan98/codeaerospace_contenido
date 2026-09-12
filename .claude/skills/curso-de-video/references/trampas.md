@@ -385,6 +385,29 @@ primera**, dos de ellos conceptuales:
   frecuencia va al doble (la correlación se toma a desfase 2m). La fórmula
   del ángulo óptimo puede estar bien y la respuesta salir mal por los ejes.
 
+## Curso 34 (funciones): tres que valen para cualquier curso
+
+- **Una curva con `stroke_opacity = 0` se "crea" entera sin pintar un
+  pixel.** `Create` anima el trazado, no enciende el trazo: el render sale
+  limpio, sin aviso y sin curva. El molde del curso 34 se renderizo una vez
+  con sus cinco curvas invisibles y solo se vio mirando los frames. El trazo
+  se enciende JUSTO antes del `play`; encenderlo fuera no lo enseña, porque
+  `Create` empieza en alpha=0 con el camino vacio.
+- **Una copia de un mobject que ya paso por `encajar`, metida en un grupo
+  nuevo, llega descolocada.** La copia se lleva encima el desplazamiento y la
+  escala que le dio aquel grupo, y el `encajar` del grupo nuevo se los aplica
+  OTRA VEZ. En el curso 34 el escalon de referencia de una pieza salia
+  flotando por encima de su propio cuadro. Las piezas de un plano nuevo se
+  CONSTRUYEN otra vez, no se copian.
+- **Elegir el competidor debil es una forma de mentir que no deja rastro en
+  ninguna cifra.** Por los dos puntos de la carrera de la braquistocrona
+  pasan infinitas circunferencias: la tangente a la horizontal tarda 4.11 s
+  contra los 0.8053 de la cicloide (un espantapajaros) y la de Galileo, la
+  que de verdad se propuso, pierde por un 2.2 %. Las dos son "un arco de
+  circunferencia" y las dos dan una cifra correcta. Cuando una pieza compara,
+  el rival lo elige el problema historico o el mejor disponible, no el que
+  hace quedar bien al protagonista.
+
 ## Manim: componer animaciones en un mismo `play`
 
 - **`Rotate(grupo, ...)` y `.animate.set_color(...)` sobre los hijos de ese
