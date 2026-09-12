@@ -120,6 +120,34 @@ studio/backend/venv/bin/python studio/tools/verifica_vertical.py \
 Necesita PIL y numpy: el venv del backend no los trae, así que para las
 costuras se corre con el `python3` del sistema o se mide aparte.
 
+## 4ter. Medir los huecos de voz (cursos VERTICALES)
+
+La voz se escribe DESPUÉS del render, dentro de los huecos que ya existen.
+`sonda_tiempos_voz.py` los mide sin renderizar: parchea `Scene.play/wait` y
+sólo acumula los `run_time` declarados.
+
+**Dos cosas muerden juntas y hay que esquivarlas a la vez**: `render_jobs` es
+un **enlace al segundo disco**, así que dentro del contenedor esa ruta NO
+existe; y si las escenas se copian **mientras** un render las está
+recomponiendo, alguna sale vieja y sus frases acaban colocadas contra planos
+que ya no están. Así que: copiar al scratchpad CUANDO EL RENDER HA TERMINADO,
+montarlo aparte, y comprobar pieza a pieza que la sonda y el render coinciden.
+
+```bash
+SC=<scratchpad>
+mkdir -p $SC/esc && for d in render_jobs/verticales/<slug>/*/; do
+  mkdir -p $SC/esc/$(basename $d); cp $d/scene.py $SC/esc/$(basename $d)/
+done
+docker run --rm --network none --user $(id -u):$(id -g) \
+  -v "$PWD:/workspace:ro" -v "$SC:/scratch" -w /workspace \
+  codeaerospace_contenido-manim python3 /scratch/huecos.py
+```
+
+(`huecos.py` recorre las escenas, llama a la sonda por cada una y guarda los
+`leer()` de ≥ 1.6 s con su `t0` y su duración.) Con eso se escribe el guion a
+**2.2 palabras por segundo de hueco** y cada frase entra 0.25 s después de que
+empiece el suyo.
+
 ## 5. Narración (TTS)
 
 **Desde 2026-09-03 la voz no necesita GCP** (`studio/docs/ESTUDIO-V3.md`,
@@ -156,6 +184,25 @@ ssh triage-vps "cd /var/www/codeaerospace_contenido && sudo -u manimstudio bash 
 Idempotente (salta los wav ya hechos), así que una re-pasada arregla un wav
 caído sin rehacer el lote. El guion se ajusta a la duración real del mp4, así
 que **se narra después de adoptar los `qh`**.
+
+En VERTICAL la secuencia entera, después del `qh`:
+
+```bash
+PY=studio/backend/venv/bin/python
+$PY studio/tools/sellar_duraciones.py studio/content/verticales/<slug> --fps 60
+for d in studio/content/verticales/<slug>/clips/*/; do          # SERIAL
+  n=$(basename $d); case "$n" in 00-*|*-cierre) continue;; esac
+  $PY studio/tools/alinear_voz.py "$d" \
+      "exports/verticales/<slug>/voz/$n.wav" --proveedor edge
+done
+$PY studio/tools/unir_vertical.py studio/content/verticales/<slug>
+$PY studio/tools/verifica_vertical.py studio/content/verticales/<slug>
+```
+
+`alinear_voz.py` avisa —y devuelve 1— si una frase pisa a la siguiente o si
+no queda cola de silencio. **Esa salida es la que vale**; los avisos de
+`estima()` de `verifica_vertical` son ruido conocido (cuenta palabras antes
+de sintetizar).
 
 Salida: `guiones/<slugify(NOMBRE)[:40]>/NN-<slug>.wav` — **no** es el slug del
 curso; para bajarlos usa el glob `guiones/<familia>-N-M-*/`.
