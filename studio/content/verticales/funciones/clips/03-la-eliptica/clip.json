@@ -1,0 +1,7 @@
+{
+  "name": "La eliptica",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El pendulo real se descuelga del de los libros.",
+  "duracion_objetivo": 32.0
+}

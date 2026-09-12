@@ -1,0 +1,7 @@
+{
+  "name": "Chladni",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La arena dibuja la figura de la placa.",
+  "duracion_objetivo": 32.0
+}

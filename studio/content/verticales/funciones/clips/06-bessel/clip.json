@@ -1,0 +1,7 @@
+{
+  "name": "Bessel",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El modo de un tambor redondo y su circulo quieto.",
+  "duracion_objetivo": 32.0
+}

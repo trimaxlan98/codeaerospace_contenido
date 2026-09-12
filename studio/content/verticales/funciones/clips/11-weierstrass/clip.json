@@ -1,0 +1,7 @@
+{
+  "name": "Weierstrass",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cuatro zooms y nunca se alisa.",
+  "duracion_objetivo": 32.0
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Catenaria",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La cadena y la parabola no son la misma curva.",
+  "duracion_objetivo": 32.0
+}

@@ -1,0 +1,76 @@
+{
+  "name": "Funciones con nombre propio · las que hubo que inventar",
+  "slug": "funciones",
+  "formato": "vertical",
+  "curso": 34,
+  "estilo": "lienzo",
+  "sonido": "narrado",
+  "description": "Curso vertical (9:16) en el estilo LIENZO sobre las funciones que tienen nombre propio: las que existen porque ninguna combinacion de las elementales hacia su trabajo. Cada pieza presenta UNA, con el problema que la obligo a existir y una cifra que solo ella sabe dar — gamma interpola el factorial, Lambert despeja lo indespejable, la eliptica da el periodo de verdad de un pendulo, Bessel dibuja un tambor, Airy el borde de una sombra, la cicloide el camino mas rapido. No re-explica el caos del curso 12, ni la dimension del 26, ni las transformadas del 32: la mariposa de Lorenz entra como OBJETO, una curva que no se corta nunca a si misma. Se publica narrado (voz es-MX-JorgeNeural) con cama de SFX, pero se escribe como si fuera mudo: portada con la tesis, UN verbo visual y UNA cifra, porque la mitad de Instagram lo ve sin sonido. Toda cifra la calcula especiales.py durante el render y esta demostrada por los 155 invariantes de sonda_especiales.py; lo que es un parametro elegido o un dato publico va rotulado en gris. Cada pieza esta hecha para subirse sola a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-gamma"
+    },
+    {
+      "dir": "clips/02-lambert"
+    },
+    {
+      "dir": "clips/03-la-eliptica"
+    },
+    {
+      "dir": "clips/04-fresnel"
+    },
+    {
+      "dir": "clips/05-chebyshev"
+    },
+    {
+      "dir": "clips/06-bessel"
+    },
+    {
+      "dir": "clips/07-chladni"
+    },
+    {
+      "dir": "clips/08-airy"
+    },
+    {
+      "dir": "clips/09-legendre"
+    },
+    {
+      "dir": "clips/10-catenaria"
+    },
+    {
+      "dir": "clips/11-weierstrass"
+    },
+    {
+      "dir": "clips/12-cantor"
+    },
+    {
+      "dir": "clips/13-cauchy"
+    },
+    {
+      "dir": "clips/14-lorenz"
+    },
+    {
+      "dir": "clips/15-cicloide"
+    },
+    {
+      "dir": "clips/16-lissajous"
+    },
+    {
+      "dir": "clips/17-zeta"
+    },
+    {
+      "dir": "clips/18-superformula"
+    },
+    {
+      "dir": "clips/19-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

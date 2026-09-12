@@ -1,0 +1,7 @@
+{
+  "name": "Cicloide",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Tres cuentas caen por tres curvas.",
+  "duracion_objetivo": 32.0
+}

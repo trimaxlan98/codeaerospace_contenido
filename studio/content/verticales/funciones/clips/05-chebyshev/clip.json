@@ -1,0 +1,7 @@
+{
+  "name": "Chebyshev",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El mismo grado, dos repartos de nodos.",
+  "duracion_objetivo": 32.0
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Lorenz",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La mariposa de un trazo y dos caminos que se separan.",
+  "duracion_objetivo": 32.0
+}

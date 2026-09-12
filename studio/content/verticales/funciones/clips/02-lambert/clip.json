@@ -1,0 +1,7 @@
+{
+  "name": "Lambert W",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La telarana cae al unico punto fijo.",
+  "duracion_objetivo": 32.0
+}

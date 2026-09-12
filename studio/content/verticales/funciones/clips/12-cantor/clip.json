@@ -1,0 +1,7 @@
+{
+  "name": "Cantor",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La escalera sube donde no hay escalones.",
+  "duracion_objetivo": 32.0
+}

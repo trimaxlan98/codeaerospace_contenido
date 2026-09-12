@@ -1,0 +1,7 @@
+{
+  "name": "Legendre",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La Tierra deformada por P2, P3 y P4.",
+  "duracion_objetivo": 32.0
+}

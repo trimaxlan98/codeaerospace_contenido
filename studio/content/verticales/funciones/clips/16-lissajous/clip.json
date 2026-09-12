@@ -1,0 +1,7 @@
+{
+  "name": "Lissajous",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La razon de frecuencias se cuenta en la pantalla.",
+  "duracion_objetivo": 32.0
+}

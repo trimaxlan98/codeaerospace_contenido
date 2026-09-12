@@ -1,0 +1,7 @@
+{
+  "name": "Zeta",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La curva de la recta critica pasa por el origen.",
+  "duracion_objetivo": 32.0
+}

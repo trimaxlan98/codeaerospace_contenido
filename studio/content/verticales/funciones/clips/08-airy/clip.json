@@ -1,0 +1,7 @@
+{
+  "name": "Airy",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El borde de la sombra no es un borde.",
+  "duracion_objetivo": 32.0
+}

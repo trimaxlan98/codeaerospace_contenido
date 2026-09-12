@@ -1,0 +1,7 @@
+{
+  "name": "Fresnel",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La clotoide y su curvatura que sube recta.",
+  "duracion_objetivo": 32.0
+}

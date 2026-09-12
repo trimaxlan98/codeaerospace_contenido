@@ -1,0 +1,7 @@
+{
+  "name": "Gamma",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El factorial deja de tener escalones.",
+  "duracion_objetivo": 32.0
+}

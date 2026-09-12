@@ -1,0 +1,7 @@
+{
+  "name": "Cauchy",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos medias corriendo: una se asienta, la otra no.",
+  "duracion_objetivo": 32.0
+}
