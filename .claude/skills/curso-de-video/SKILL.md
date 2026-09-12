@@ -1,13 +1,15 @@
 ---
 name: curso-de-video
-description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Courses are MUTE by default (no narrative subtitles on screen: only titles, short labels and measured figures); subtitles are opt-in and only if the owner asks for them. Covers both FORMATS (horizontal familia of 4-clip lessons, and vertical 9:16 pieces for Instagram) and both visual STYLES (CONSOLA, the flight-console look of courses 1-30; and LIENZO, the flat navy 'one thing, one figure' look of course 31 — ask for it by name). Default style is CONSOLA.
+description: Use when creating, extending, or publishing a CO.DE Academy video course in this repo — planning the arc of a course family, writing its manim_extensions library, producing lesson clips (alone or with subagents), validating frames, rendering qh locally, publishing to the VPS, narrating with TTS, and muxing with the brand intro/outro. Courses are MUTE by default (no narrative subtitles on screen: only titles, short labels and measured figures); subtitles are opt-in and only if the owner asks for them. Covers both FORMATS (horizontal familia of 4-clip lessons, and vertical 9:16 pieces for Instagram) and both visual STYLES (CONSOLA, the flight-console look of courses 1-30; and LIENZO, the flat navy 'one thing, one figure' look of courses 31-35 — ask for it by name). Default style is CONSOLA for horizontal, LIENZO for vertical. A new vertical is NARRATED but written as if it were mute: the render comes first and the voice is written afterwards, phrase by phrase, into the measured gaps.
 ---
 
 # Curso de video CO.DE Academy
 
 Cómo se produce un curso completo de punta a punta. Es el proceso destilado
-de 31 cursos publicados; el más extenso es el 27, Procesamiento de señales:
-30 lecciones, 120 clips y 74 minutos de vídeo. Complementa la skill
+de 35 cursos publicados; el más extenso es el 27, Procesamiento de señales:
+30 lecciones, 120 clips y 74 minutos de vídeo. Los ocho verticales (26, 28,
+29, 31–35) son los que mejor recepción tienen, y los cinco últimos comparten
+formato exacto: 9:16, estilo LIENZO, 20 piezas de 30–45 s. Complementa la skill
 `manimstudio` (esa explica la app; ésta, el contenido).
 
 El proceso es **el mismo para los dos formatos y los dos estilos**: cambia el
@@ -61,11 +63,13 @@ por curso, no por clip:
 | Estilo | Qué se ve | Módulo | Cursos |
 |---|---|---|---|
 | **CONSOLA** | Estética de consola de vuelo de la marca: fondo casi negro `#05070a`, escuadras HUD en las esquinas, telemetría en Space Mono repartida por el frame, cifra con pie de tres renglones. **Denso a propósito.** | `code_brand.py` + `promo.py` | todos hasta el 30 |
-| **LIENZO** | Superficie lisa azul marino `#0B1B33` con **una cosa y un dato**, cuatro carriles de un solo ocupante, paleta de cuatro colores con un acento, y nada más que la marca de agua (el número de pieza es opcional). **Vacío a propósito.** | `lienzo.py` | 31, 32 |
+| **LIENZO** | Superficie lisa azul marino `#0B1B33` con **una cosa y un dato**, cuatro carriles de un solo ocupante, paleta de cuatro colores con un acento, y nada más que la marca de agua (el número de pieza es opcional). **Vacío a propósito.** | `lienzo.py` | 31–35 |
 
 Para pedir uno u otro basta con nombrarlo: *«un curso vertical en estilo
 LIENZO sobre X»*. Si no se dice nada, **el estilo por defecto es CONSOLA**
-(es el de 30 de los 31 cursos y el que arrastra la identidad del canal).
+(es el de 30 de los 35 cursos y el que arrastra la identidad del canal).
+Pero **para un VERTICAL suelto el que funciona es LIENZO**: los cinco
+ultimos lo usan y son los que mejor recepcion tienen.
 
 El estilo se declara en `curso.json` con `"estilo": "lienzo"`, y la guía
 completa de LIENZO —medidas del lienzo, guardianes, convención de color,
@@ -77,11 +81,12 @@ intentes deducir el estilo mirando un clip.
 
 | Sonido | Qué lleva | Cursos |
 |---|---|---|
-| **narrado** | voz TTS alineada a mano + cama de SFX | todos hasta el 31 |
-| **mudo** | ninguna pista de audio: el dueño le pone música al publicar | 32 |
+| **narrado clásico** | el guion se escribe primero y la animación lo acompaña | todos hasta el 31 |
+| **mudo** | ninguna pista de audio: el dueño le pone música al publicar | 32, 33 |
+| **narrado con ritmo mudo** | se escribe COMO SI fuera mudo y la voz se añade encima, sin tocar el render | **34, 35 — el modo por defecto de un vertical nuevo** |
 
-Se declara en `curso.json` con `"sonido": "mudo"` y se entrega con
-`unir_vertical.py <curso> --mudo`.
+Se declara en `curso.json` con `"sonido": "mudo"` o `"narrado"`; un curso
+mudo se entrega con `unir_vertical.py <curso> --mudo`.
 
 **Un curso mudo NO es un curso narrado al que se le quita la voz.** Sin
 narrador, la pantalla es lo único que explica, y este estilo no admite
@@ -98,6 +103,24 @@ LIENZO. Se compensa con tres cosas y ninguna más:
 Y cambia el ritmo: el hueco entre planos ya no lo llena una frase hablada,
 así que es el único momento en que se puede entender lo que acaba de pasar.
 `Pieza.leer(t)` sostiene el estado y **no admite menos de 1.8 s**.
+
+### Narrado con ritmo mudo (el modo por defecto desde el curso 34)
+
+Es lo que pide el dueño cuando dice *"otro igual, con voz y sonidos"*, y no
+es un término medio: **se escribe como si fuera mudo —portada con la tesis,
+UN verbo visual, UNA cifra, `leer()` con suelo de 1.8 s— y la voz se añade
+DESPUÉS, encima, sin tocar el render.** Dos razones, las dos medidas:
+
+1. **La voz de esta casa puntúa, no narra de corrido.** Se escribe frase a
+   frase DENTRO de los huecos que deja la animación, y `alinear_voz.py` las
+   coloca en su instante exacto. Un ritmo apretado no deja dónde ponerlas: si
+   los huecos bajan de ~2.5 s, la pieza sólo se puede narrar
+   re-renderizándola.
+2. **La mitad de Instagram ve los reels sin sonido.** Una pieza que sólo se
+   entiende con voz está a medio hacer.
+
+La consecuencia operativa es que **el orden se invierte**: primero el render,
+después el guion. Nunca al revés.
 
 **Cuándo elegir cuál.** CONSOLA sostiene bien la densidad: muchas cifras a la
 vez, mobiliario de figura, varias señales conviviendo. LIENZO se rompe con la
@@ -166,8 +189,17 @@ en cualquier frontera de lote sin dejar nada a medias.
    la conversación. Plantilla: `references/plantilla-plan.md`.
 2. **Librería** → `studio/content/manim_extensions/<tema>.py`. Piezas de
    dibujo + funciones numéricas, deterministas (`default_rng(semilla)`),
-   reutilizando el sustrato de familias vecinas. **Se valida en el contenedor
-   (cifras impresas + PNGs con PIL) ANTES de escribir un solo clip.**
+   reutilizando el sustrato de familias vecinas (el curso 35 se apoyó en la
+   mitad de dibujo del 34: es sustrato del ESTILO, no del tema).
+   **Se valida con una SONDA DE INVARIANTES en el contenedor, ANTES de
+   escribir un solo clip** (`studio/tools/sonda_<tema>.py`): cada función
+   tiene que cumplir la propiedad que sólo cumple si está bien **y su
+   contraejemplo**, las cifras que van a pantalla se miden con DOS mallas, y
+   scipy entra como oráculo independiente — nunca como implementación. Es el
+   paso de mayor rendimiento de todo el proceso: en los cursos 32–35 tumbó
+   entre cuatro y nueve cosas cada vez, y **ninguna se habría visto en un
+   fotograma** (un dibujo perfecto puede demostrar lo contrario de lo que
+   dice: la escalera del curso 35 medía 2π en vez de 4).
 3. **Molde**: la primera lección del lote la escribes TÚ entera (curso.json +
    style_block.py + 4 clips), la validas y la corriges. Es el molde que
    copian las demás.
@@ -177,6 +209,11 @@ en cualquier frontera de lote sin dejar nada a medias.
 5. **Producción**: una lección por subagente (Sonnet las mecánicas, Opus las
    conceptualmente delicadas), contrato en el scratchpad. Los agentes NO
    tocan la librería ni git. Ver `references/contrato-agente.md`.
+   **Olas de dos o tres, nunca de cinco**: en el curso 34 los cinco de la
+   primera ola murieron a la vez con un 429 de cuota de sesión, cada uno a
+   mitad de la lectura de contexto, y dejaron **cero** trabajo parcial en
+   disco. Un vertical de 20 piezas se escribe en serie sin drama (~8–10 min
+   por pieza incluyendo render de validación y revisión del fotograma).
 6. **Revisión tuya** de los frames de todas las lecciones + `pytest -q` del
    Studio. Si un agente encontró un bug de la librería, corrígelo y **revisa
    los rodeos que otros clips hicieron para compensarlo** (y los `final_state`,
@@ -187,12 +224,52 @@ en cualquier frontera de lote sin dejar nada a medias.
    **`qh` se renderizan LOCAL** (3 en paralelo), se suben al staging y se
    adoptan con `adoptar_renders.py`.
 9. **Narración**: `guiones.py` en el VPS, **SERIAL** (en paralelo el TTS da
-   429), detached. Es idempotente.
+   429), detached. Es idempotente. En vertical no se usa `guiones.py` sino
+   `alinear_voz.py` (ver "La voz de un vertical", más abajo).
 10. **Mux local** con intro/cierre de marca, medir picos, re-muxear los que
     pasen de −0.5 dB, y **actualizar el tablero, `PLAN.md` y la memoria de la
     familia** antes de cerrar el lote.
 
 Comandos exactos de los pasos 2 y 8–10: `references/comandos.md`.
+
+## Los mismos pasos, en VERTICAL
+
+Un curso vertical (26, 28, 29, 31–35) no pasa por la base de datos ni por el
+VPS: se renderiza pieza a pieza y se entrega como archivos. Los pasos 1–7 son
+idénticos; los tres últimos cambian de herramienta y **de orden**:
+
+| # | Horizontal | Vertical |
+|---|---|---|
+| 8 | `subir_curso.py` + `adoptar_renders.py` en el VPS | `render_vertical.py --todos --calidad qh` en local (3 lotes en paralelo, ~1.5 min/pieza) |
+| 8bis | — | `verifica_vertical.py` y `sellar_duraciones.py --fps 60` |
+| 9 | `guiones.py` (el guion se escribe antes) | `alinear_voz.py` por pieza (el guion se escribe DESPUÉS del render) |
+| 10 | `mux.sh` | `unir_vertical.py` (sonoriza las piezas y las concatena) |
+
+**El orden importa**: `sellar_duraciones` va DESPUÉS del `qh` y nunca antes
+—el redondeo a fotograma de 60 fps no es el de 30— y la voz va después de
+sellar, porque se alinea contra el manifiesto.
+
+### La voz de un vertical
+
+Se escribe **frase a frase, dentro de los huecos que ya existen**, y el
+presupuesto es duro:
+
+- **Los huecos se MIDEN, no se estiman**: `sonda_tiempos_voz.py` sobre el
+  `scene.py` recién compuesto dice en qué instante cae cada `leer()` y cuánto
+  dura, sin renderizar nada.
+- **2.2 palabras por segundo de hueco.** El curso 33 escribió contra las 2.5
+  que documentaba el 32 y **cinco de dieciocho piezas fallaron** al sintetizar
+  de verdad; el 34 y el 35 bajaron a 2.2 y entraron a la primera las 18, con
+  la cola más corta en 1.5 s sobre un mínimo de 0.8. Ese 12 % de margen es lo
+  que compra no corregir piezas a mano.
+- La frase entra **0.25 s después** de que empiece el hueco.
+- **Antes de narrar, comprueba que la sonda y el render coinciden al
+  centésimo** en TODAS las piezas. Si una se desvía, sus frases están
+  colocadas contra planos que ya no existen (pasó en el 35: las escenas se
+  copiaron al scratchpad mientras un render las recomponía).
+- Los avisos de `estima()` de `verifica_vertical` son ruido conocido: cuenta
+  palabras antes de sintetizar y no sabe que `alinear_voz.py` ya colocó cada
+  frase con su duración real. Lo que vale es la salida de `alinear_voz.py`.
 
 ## Reglas duras (no se renegocian por clip)
 
@@ -256,3 +333,23 @@ trampas.
 Y **la entrega se comprueba EN EL DISCO**, no en el tablero. `exports/` no
 está versionado y vive en el segundo disco: que el plan diga "entregado" no
 prueba que los mp4 sigan ahí. Lista el directorio del curso antes de cerrar.
+
+### Las DOS hojas de contactos (paso fijo, no opcional)
+
+Antes de dar un curso por cerrado se miran **dos** hojas, y hacen falta las
+dos porque cazan cosas distintas:
+
+1. **Portadas** — un fotograma de cada portada, todas juntas. Caza lo que
+   pieza a pieza es invisible: un nombre con artículo entre diecisiete
+   pelados, un registro que no rima, una tesis que se pasa de larga. (Curso
+   34: "LA ELIPTICA" → "ELIPTICA K".)
+2. **Interiores** — un fotograma al ~62 % de cada pieza, sacado de la
+   película **ya entregada**. Caza defectos de composición que ningún
+   guardián ve, porque un guardián de maquetación no sabe si la curva está
+   DENTRO del cuadro que la acompaña. (Curso 34: la resta de la catenaria
+   caía entera fuera de su cuadro y cruzaba su rótulo; duración correcta,
+   costuras a cero, nadie se enteró hasta la hoja.)
+
+Corregir una portada cuesta un re-render y un re-mux de una pieza, y **la
+duración no se mueve**: la portada es una coreografía de tiempos fijos que no
+depende de lo larga que sea la palabra.
