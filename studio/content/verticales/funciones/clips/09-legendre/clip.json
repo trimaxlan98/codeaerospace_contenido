@@ -1,0 +1,100 @@
+{
+  "name": "Legendre",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Una circunferencia deformada por P2, P3, P4 y P5, con sus puntos quietos marcados y contados.",
+  "duracion_objetivo": 33.05,
+  "guion_visual": [
+    "5.30 hueco de 3.20 s",
+    "9.10 hueco de 3.60 s",
+    "14.05 hueco de 3.40 s",
+    "18.80 hueco de 3.40 s",
+    "23.55 hueco de 3.40 s",
+    "28.30 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "La Tierra no es una esfera."
+      },
+      {
+        "t_inicio": 9.35,
+        "texto": "Se ensancha por el ecuador."
+      },
+      {
+        "t_inicio": 14.3,
+        "texto": "El siguiente armonico, otra capa."
+      },
+      {
+        "t_inicio": 19.05,
+        "texto": "Cada uno tiene sus puntos quietos."
+      },
+      {
+        "t_inicio": 23.8,
+        "texto": "Se miden por separado, sin estorbarse."
+      },
+      {
+        "t_inicio": 28.55,
+        "texto": "Una parte entre doscientas noventa y ocho."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.9,
+      33.05
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        13.93,
+        -15
+      ],
+      [
+        "blip_medio",
+        18.68,
+        -15
+      ],
+      [
+        "blip_agudo",
+        23.43,
+        -15
+      ],
+      [
+        "blip_medio",
+        28.18,
+        -15
+      ],
+      [
+        "sting",
+        31.3,
+        -12
+      ]
+    ]
+  }
+}

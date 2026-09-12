@@ -1,0 +1,100 @@
+{
+  "name": "La eliptica",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos pendulos sueltos a la vez, 10 y 90 grados, se descuelgan: la formula del libro solo vale para angulos pequenos.",
+  "duracion_objetivo": 30.7,
+  "guion_visual": [
+    "5.30 hueco de 2.40 s",
+    "7.70 hueco de 6.00 s",
+    "14.30 hueco de 1.80 s",
+    "16.10 hueco de 5.50 s",
+    "22.60 hueco de 2.20 s",
+    "26.15 hueco de 3.40 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Dos pendulos, mismo instante."
+      },
+      {
+        "t_inicio": 7.95,
+        "texto": "Uno a diez grados. El otro a noventa. Sueltos a la vez."
+      },
+      {
+        "t_inicio": 14.55,
+        "texto": "Ya se descuelgan."
+      },
+      {
+        "t_inicio": 16.35,
+        "texto": "La formula del instituto solo vale para angulos pequeños."
+      },
+      {
+        "t_inicio": 22.85,
+        "texto": "Noventa grados tarda mas."
+      },
+      {
+        "t_inicio": 26.4,
+        "texto": "Dieciocho por ciento mas lento."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.55,
+      30.7
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        7.58,
+        -15
+      ],
+      [
+        "blip_agudo",
+        14.18,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.98,
+        -15
+      ],
+      [
+        "blip_agudo",
+        22.48,
+        -15
+      ],
+      [
+        "blip_medio",
+        26.03,
+        -15
+      ],
+      [
+        "sting",
+        28.95,
+        -12
+      ]
+    ]
+  }
+}

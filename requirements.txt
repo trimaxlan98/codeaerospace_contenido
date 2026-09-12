@@ -1,8 +1,16 @@
 # Core animation engine
-manim
+#
+# PINNED a proposito. La imagen de produccion del VPS corre manim 0.20.1 y
+# numpy 2.5.1; sin el pin, cualquier reconstruccion local se trae la ultima
+# version (el 2026-09-11 se trajo manim 0.21.0) y el render local deja de ser
+# el mismo render que el de produccion. Los 33 cursos publicados, los
+# guardianes de lienzo.py y el catalogo de trampas estan medidos contra
+# 0.20.1: subir de version es una decision de proyecto, no un efecto
+# colateral de reconstruir la imagen.
+manim==0.20.1
 
 # Scientific computing
-numpy
+numpy==2.5.1
 
 # Jupyter support for scene preview
 jupyter

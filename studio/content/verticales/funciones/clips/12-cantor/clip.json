@@ -1,0 +1,90 @@
+{
+  "name": "Cantor",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El peine que se come el segmento y la escalera que sube por sus huecos.",
+  "duracion_objetivo": 31.15,
+  "guion_visual": [
+    "5.30 hueco de 2.60 s",
+    "11.25 hueco de 3.40 s",
+    "18.60 hueco de 2.60 s",
+    "21.80 hueco de 3.60 s",
+    "26.40 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Se quita el tercio central."
+      },
+      {
+        "t_inicio": 11.5,
+        "texto": "Y otra vez. Casi no queda nada."
+      },
+      {
+        "t_inicio": 18.85,
+        "texto": "La escalera sube por ahi."
+      },
+      {
+        "t_inicio": 22.05,
+        "texto": "Casi todo el camino es llano."
+      },
+      {
+        "t_inicio": 26.65,
+        "texto": "Y aun asi llega arriba."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.0,
+      31.15
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        11.13,
+        -15
+      ],
+      [
+        "blip_agudo",
+        18.48,
+        -15
+      ],
+      [
+        "blip_medio",
+        21.68,
+        -15
+      ],
+      [
+        "blip_agudo",
+        26.28,
+        -15
+      ],
+      [
+        "sting",
+        29.4,
+        -12
+      ]
+    ]
+  }
+}

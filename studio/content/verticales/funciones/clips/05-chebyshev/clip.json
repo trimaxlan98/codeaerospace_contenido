@@ -1,0 +1,90 @@
+{
+  "name": "Chebyshev",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Los mismos 21 nodos, dos repartos: uno se sale del cuadro y el otro se pega a la curva.",
+  "duracion_objetivo": 30.9,
+  "guion_visual": [
+    "5.30 hueco de 3.60 s",
+    "9.50 hueco de 3.60 s",
+    "14.45 hueco de 4.20 s",
+    "20.00 hueco de 4.20 s",
+    "25.55 hueco de 4.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Nueve puntos de apoyo. Va bien."
+      },
+      {
+        "t_inicio": 9.75,
+        "texto": "Con veintiuno va mucho peor."
+      },
+      {
+        "t_inicio": 14.7,
+        "texto": "Mas puntos, mas error. Nadie lo espera."
+      },
+      {
+        "t_inicio": 20.25,
+        "texto": "Los mismos, apiñados en los bordes."
+      },
+      {
+        "t_inicio": 25.8,
+        "texto": "Tres mil veces menos error, gratis."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.75,
+      30.9
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        9.38,
+        -15
+      ],
+      [
+        "blip_agudo",
+        14.33,
+        -15
+      ],
+      [
+        "blip_medio",
+        19.88,
+        -15
+      ],
+      [
+        "blip_agudo",
+        25.43,
+        -15
+      ],
+      [
+        "sting",
+        29.15,
+        -12
+      ]
+    ]
+  }
+}

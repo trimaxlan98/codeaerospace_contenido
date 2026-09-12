@@ -1,0 +1,90 @@
+{
+  "name": "Lorenz",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La mariposa dibujada de un trazo y dos trayectorias que tardan 19 segundos en separarse.",
+  "duracion_objetivo": 30.8,
+  "guion_visual": [
+    "9.10 hueco de 2.60 s",
+    "12.30 hueco de 3.20 s",
+    "16.50 hueco de 2.80 s",
+    "20.65 hueco de 3.40 s",
+    "25.05 hueco de 4.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 9.35,
+        "texto": "Nunca se corta."
+      },
+      {
+        "t_inicio": 12.55,
+        "texto": "Veintiseis cambios de ala."
+      },
+      {
+        "t_inicio": 16.75,
+        "texto": "En cuarenta y ocho segundos."
+      },
+      {
+        "t_inicio": 20.9,
+        "texto": "Dos que empiezan casi iguales."
+      },
+      {
+        "t_inicio": 25.3,
+        "texto": "Tardan diecinueve segundos en separarse."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.65,
+      30.8
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        12.18,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.38,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.53,
+        -15
+      ],
+      [
+        "blip_agudo",
+        24.93,
+        -15
+      ],
+      [
+        "sting",
+        29.05,
+        -12
+      ]
+    ]
+  }
+}

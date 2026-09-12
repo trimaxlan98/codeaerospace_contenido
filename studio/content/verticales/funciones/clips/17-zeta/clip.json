@@ -1,0 +1,90 @@
+{
+  "name": "Zeta",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La suma de Basilea y la curva de la recta critica pasando exactamente por el origen.",
+  "duracion_objetivo": 30.55,
+  "guion_visual": [
+    "5.30 hueco de 3.00 s",
+    "8.90 hueco de 3.20 s",
+    "16.55 hueco de 2.40 s",
+    "20.20 hueco de 3.40 s",
+    "24.60 hueco de 4.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.55,
+        "texto": "Uno, un cuarto, un noveno."
+      },
+      {
+        "t_inicio": 9.15,
+        "texto": "Suma pi cuadrado partido por seis."
+      },
+      {
+        "t_inicio": 16.8,
+        "texto": "Zeta, sobre la recta critica."
+      },
+      {
+        "t_inicio": 20.45,
+        "texto": "Y pasa exactamente por el cero."
+      },
+      {
+        "t_inicio": 24.85,
+        "texto": "Donde estan esos ceros, estan los primos."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.4,
+      30.55
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        8.78,
+        -15
+      ],
+      [
+        "blip_agudo",
+        16.43,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.08,
+        -15
+      ],
+      [
+        "blip_agudo",
+        24.48,
+        -15
+      ],
+      [
+        "sting",
+        28.8,
+        -12
+      ]
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "name": "Lissajous",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La razon de frecuencias se cuenta en los toques con la caja, y una razon irracional no cierra la figura.",
+  "duracion_objetivo": 30.15,
+  "guion_visual": [
+    "7.90 hueco de 2.60 s",
+    "11.75 hueco de 3.00 s",
+    "16.00 hueco de 3.20 s",
+    "20.55 hueco de 3.20 s",
+    "25.20 hueco de 3.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 8.15,
+        "texto": "Un tono en cada eje."
+      },
+      {
+        "t_inicio": 12.0,
+        "texto": "Toca tres veces el lado."
+      },
+      {
+        "t_inicio": 16.25,
+        "texto": "Y dos el techo: tres a dos."
+      },
+      {
+        "t_inicio": 20.8,
+        "texto": "Otra razon, otra figura."
+      },
+      {
+        "t_inicio": 25.45,
+        "texto": "Si no es fraccion, no se cierra."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.0,
+      30.15
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.85,
+        -18
+      ],
+      [
+        "barrido",
+        4.45,
+        -14
+      ],
+      [
+        "blip_medio",
+        11.63,
+        -15
+      ],
+      [
+        "blip_agudo",
+        15.88,
+        -15
+      ],
+      [
+        "blip_medio",
+        20.43,
+        -15
+      ],
+      [
+        "blip_agudo",
+        25.08,
+        -15
+      ],
+      [
+        "sting",
+        28.4,
+        -12
+      ]
+    ]
+  }
+}
