@@ -1,0 +1,95 @@
+{
+  "name": "13 · Cavalieri",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "A cualquier altura, el circulo de la esfera y el del cono suman el del cilindro.",
+  "duracion_objetivo": 30.1,
+  "guion_visual": [
+    "5.60 hueco de 3.00 s",
+    "10.25 hueco de 3.00 s",
+    "14.90 hueco de 3.00 s",
+    "19.55 hueco de 3.40 s",
+    "23.95 hueco de 5.00 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Cilindro, esfera y dos conos."
+      },
+      {
+        "t_inicio": 10.5,
+        "texto": "A esta altura, esfera mas cono."
+      },
+      {
+        "t_inicio": 15.15,
+        "texto": "Da el circulo del cilindro. Exacto."
+      },
+      {
+        "t_inicio": 19.8,
+        "texto": "A cualquier altura, la barra sigue llena."
+      },
+      {
+        "t_inicio": 24.2,
+        "texto": "Asi que la esfera es dos tercios de su cilindro."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      28.95,
+      30.1
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.2,
+        -15
+      ],
+      [
+        "blip_medio",
+        14.85,
+        -15
+      ],
+      [
+        "blip_agudo",
+        19.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        23.9,
+        -15
+      ],
+      [
+        "sting",
+        28.25,
+        -12
+      ]
+    ]
+  }
+}

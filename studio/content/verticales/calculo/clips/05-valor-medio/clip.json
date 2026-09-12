@@ -1,0 +1,95 @@
+{
+  "name": "05 · Valor medio",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La cuerda del viaje baja paralela hasta tocar la curva. Dos veces.",
+  "duracion_objetivo": 30.85,
+  "guion_visual": [
+    "6.20 hueco de 3.00 s",
+    "10.55 hueco de 3.40 s",
+    "15.60 hueco de 3.00 s",
+    "20.35 hueco de 4.00 s",
+    "26.10 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 6.45,
+        "texto": "Un viaje de dos horas."
+      },
+      {
+        "t_inicio": 10.8,
+        "texto": "No fue a velocidad constante."
+      },
+      {
+        "t_inicio": 15.85,
+        "texto": "La media sale de los extremos."
+      },
+      {
+        "t_inicio": 20.6,
+        "texto": "Baja sin inclinarse, y toca dos veces."
+      },
+      {
+        "t_inicio": 26.35,
+        "texto": "El velocimetro marco esa media, exacta."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.7,
+      30.85
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        6.15,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.3,
+        -15
+      ],
+      [
+        "blip_medio",
+        26.05,
+        -15
+      ],
+      [
+        "sting",
+        29.0,
+        -12
+      ]
+    ]
+  }
+}

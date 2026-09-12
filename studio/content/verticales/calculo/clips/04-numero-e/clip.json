@@ -1,0 +1,95 @@
+{
+  "name": "04 · Numero e",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Cuatro tangentes, y las cuatro cortan el eje una unidad antes.",
+  "duracion_objetivo": 30.2,
+  "guion_visual": [
+    "5.60 hueco de 3.20 s",
+    "10.50 hueco de 2.80 s",
+    "14.65 hueco de 3.20 s",
+    "19.90 hueco de 3.60 s",
+    "24.85 hueco de 4.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Esta curva crece como su altura."
+      },
+      {
+        "t_inicio": 10.75,
+        "texto": "Una tangente en un punto cualquiera."
+      },
+      {
+        "t_inicio": 14.9,
+        "texto": "Corta el eje una unidad antes."
+      },
+      {
+        "t_inicio": 20.15,
+        "texto": "En las cuatro pasa lo mismo."
+      },
+      {
+        "t_inicio": 25.1,
+        "texto": "Donde la altura es e, la pendiente tambien."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.05,
+      30.2
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.45,
+        -15
+      ],
+      [
+        "blip_medio",
+        14.6,
+        -15
+      ],
+      [
+        "blip_agudo",
+        19.85,
+        -15
+      ],
+      [
+        "blip_medio",
+        24.8,
+        -15
+      ],
+      [
+        "sting",
+        28.35,
+        -12
+      ]
+    ]
+  }
+}

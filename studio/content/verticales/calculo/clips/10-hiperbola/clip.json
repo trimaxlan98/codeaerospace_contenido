@@ -1,0 +1,95 @@
+{
+  "name": "10 · Hiperbola",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La franja se estira al doble y se encoge a la mitad: misma area.",
+  "duracion_objetivo": 31.2,
+  "guion_visual": [
+    "5.60 hueco de 2.60 s",
+    "9.65 hueco de 3.60 s",
+    "16.00 hueco de 3.60 s",
+    "21.25 hueco de 3.60 s",
+    "25.85 hueco de 4.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Uno partido por equis."
+      },
+      {
+        "t_inicio": 9.9,
+        "texto": "El area de uno a dos."
+      },
+      {
+        "t_inicio": 16.25,
+        "texto": "Estirar al doble, encoger a la mitad."
+      },
+      {
+        "t_inicio": 21.5,
+        "texto": "Y cae encima otra vez. Misma area."
+      },
+      {
+        "t_inicio": 26.1,
+        "texto": "Multiplicar por fuera es sumar por dentro."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.05,
+      31.2
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        9.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.95,
+        -15
+      ],
+      [
+        "blip_agudo",
+        21.2,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.8,
+        -15
+      ],
+      [
+        "sting",
+        29.35,
+        -12
+      ]
+    ]
+  }
+}

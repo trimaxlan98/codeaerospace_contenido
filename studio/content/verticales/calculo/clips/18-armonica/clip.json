@@ -1,0 +1,85 @@
+{
+  "name": "18 · Armonica",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Las columnas se apoyan en el area de la hiperbola y la pasan siempre.",
+  "duracion_objetivo": 30.1,
+  "guion_visual": [
+    "7.85 hueco de 3.80 s",
+    "13.10 hueco de 3.80 s",
+    "19.35 hueco de 3.80 s",
+    "24.15 hueco de 4.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 8.1,
+        "texto": "Uno, un medio, un tercio: doce sumandos."
+      },
+      {
+        "t_inicio": 13.35,
+        "texto": "Ninguna columna cabe bajo la curva."
+      },
+      {
+        "t_inicio": 19.6,
+        "texto": "El area crece sin parar. La suma tambien."
+      },
+      {
+        "t_inicio": 24.4,
+        "texto": "Con un millon de sumandos, catorce y pico."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      28.95,
+      30.1
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        7.8,
+        -15
+      ],
+      [
+        "blip_agudo",
+        13.05,
+        -15
+      ],
+      [
+        "blip_medio",
+        19.3,
+        -15
+      ],
+      [
+        "blip_agudo",
+        24.1,
+        -15
+      ],
+      [
+        "sting",
+        28.25,
+        -12
+      ]
+    ]
+  }
+}

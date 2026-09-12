@@ -494,3 +494,94 @@ tiempos fijos que no depende de lo larga que sea la palabra.
 - **`manim` y `numpy` quedan pineados a las versiones de producción** (0.20.1
   y 2.5.1). Sin el pin, la reconstrucción se trajo manim 0.21.0 y el render
   local habría dejado de ser el de producción sin que nada avisara.
+
+## Curso 35 — Cálculo visible (vertical, estilo LIENZO, narrado)
+
+Dieciocho piezas más intro y cierre. Cada una es **una afirmación del
+cálculo de una variable cuya prueba se puede mirar**, y termina en una cifra
+que el render calcula: la secante que deja de girar (1.0000), la banda de
+tolerancia que siempre encuentra respuesta (0.0166), la curva que de cerca
+es su tangente y se despega cuatro veces menos en cada zoom, las cuatro
+tangentes de e^x que cortan el eje exactamente una unidad antes (1.0000), el
+radar que te pilla dos veces a 87.5 km/h, el zigzag de Newton que duplica
+los decimales, la lata que gasta 264.4 cm² y el valle plano que hace que
+fallar un 10 % cueste 1.07 %, la pinza de Riemann que se cierra sobre
+0.3333, el área que crece al ritmo de la altura (2.1093 = 2.1093), la franja
+de la hipérbola que se estira al doble sin cambiar de área (0.6931), la
+escalera que se pega a la circunferencia y sigue midiendo 4.0000 cuando ella
+mide 3.1416, la campana que gira para poder integrarse (√π = 1.7725), la
+esfera que es dos tercios de su cilindro rebanada a rebanada (0.6667), el
+círculo que se desenrolla en un triángulo (78.5398), el anillo de servilleta
+que no depende de su esfera (113.10 cm³), la trompeta que se llena con π y
+no se puede pintar, el polinomio de Taylor que abraza el seno hasta 4.00 y
+la serie armónica que con un millón de sumandos va por 14.39.
+
+**La capa que ocupa.** El cálculo toca cuatro cursos publicados. El 21
+cuenta el espacio que *fluye* —campos, gradiente, divergencia, Green,
+Stokes—, el 26 la dimensión, el 32 el cambio de dominio y el 34 las
+funciones con nombre propio. Éste ocupa **el cálculo de una variable contado
+por el dibujo que lo demuestra**: no es un temario ordenado por capítulos,
+es el catálogo de sus demostraciones visuales. La única pieza que sale al
+plano es la campana, y sale para volver a entrar: gira la curva para poder
+integrarla en una sola variable.
+
+### Lo que enseñó este curso, y trasciende al curso
+
+**Un dibujo correcto puede demostrar lo contrario de lo que dice.** La
+escalera que envuelve la circunferencia sale de repetir el primer cuadrante
+girado; al invertir además el orden de los puntos, el camino volvía sobre
+sus pasos y aparecían tramos en diagonal —que es justo lo que una escalera
+no tiene—. Medía 6.82, o sea 2π. El fotograma se veía perfecto. La sonda de
+`calculo.py` (**231 invariantes, 0 fallos**) lo cazó antes de dibujar nada,
+junto con otras tres cosas.
+
+Tres merecen quedar escritas porque no son de este curso:
+
+- **Una resta de dos números gigantes miente antes de fallar.** La corona
+  del anillo de servilleta es `(R²−y²)−c²`. Con R = 10⁶ devuelve 113.0996 en
+  vez de 113.0973: un número creíble, con dos decimales, que nadie
+  discutiría. Con el radio de un planeta en centímetros devuelve cero. El
+  guardián no se pone donde sale cero, se pone donde empieza a desviarse.
+- **`plomada` cuelga del cero, y no todos los cuadros lo contienen.** En una
+  curva de coste que va de 250 a 322 se iba siete unidades por debajo del
+  dibujo; el grupo pasaba a medir el triple de lo que se ve, `encajar` lo
+  encogía entero y el render abortaba por el guardián de *legibilidad* con
+  "el rótulo más pequeño mide 0.101". El síntoma no señalaba la causa.
+- **Un destino de `Transform` construido fuera del grupo llega
+  descolocado**, porque no ha pasado por `encajar`. Los destinos viajan
+  dentro del grupo con el trazo apagado y se sacan justo después de
+  `L.escena`; de propina, mientras están dentro fijan el *bounding box* y el
+  encaje no cambia de un estado a otro.
+
+### El zoom se gasta una vez
+
+El curso 34 hizo cuatro *zooms* sobre Weierstrass para enseñar la excepción
+—una curva que no se alisa nunca—. Aquí se hace uno, en la pieza 03, para
+enseñar la regla. Y tiene que ser **isótropo**: si en cada ventana se
+reajusta el rango vertical al recorrido de la curva, la curva sale igual de
+curvada en las cuatro y la pieza demuestra lo contrario de lo que dice.
+
+### La entrega
+
+| | |
+|---|---|
+| Película | `exports/verticales/calculo/calculo_vertical.mp4`, **591.81 s (9.86 min)**, 1080x1920 @ 60 fps, 25 MB |
+| Piezas sueltas | las **20 sonorizadas**, que son el producto para Instagram |
+| Pico del montaje | **−2.0 dB** |
+| Costuras | **19 a 0.0000/255** |
+| Verificación | 0 fallos, 63 avisos (todos de `estima()`, que cuenta palabras antes de sintetizar) |
+
+**La voz entró a la primera otra vez.** 97 frases escritas contra los huecos
+*medidos* con `sonda_tiempos_voz.py` y a **2.2 palabras por segundo de
+hueco**; `alinear_voz.py` no devolvió ni un solape ni una cola corta en las
+18 piezas, y la cola más corta quedó en 1.53 s sobre un mínimo de 0.8. Es la
+segunda vez que ese margen del 12 % sobre la velocidad documentada compra no
+tener que corregir piezas a mano.
+
+Con un matiz nuevo que conviene dejar escrito: **esa sonda hay que correrla
+sobre el `scene.py` recién compuesto**. Aquí las escenas se copiaron al
+scratchpad *mientras* el render de validación todavía las estaba
+recomponiendo, y una pieza se midió con una versión vieja: el manifiesto
+decía 29.9 s y el render dio 30.5. Lo avisó `render_vertical` ("la voz se
+alinea con el manifiesto: cuádralos antes de narrar"). Tras volver a medir,
+las 18 piezas de contenido coinciden **al centésimo** con su render.

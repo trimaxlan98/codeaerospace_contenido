@@ -1,0 +1,105 @@
+{
+  "name": "06 · Newton",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Tangente, eje, subir, tangente: los decimales se duplican.",
+  "duracion_objetivo": 31.25,
+  "guion_visual": [
+    "6.10 hueco de 2.80 s",
+    "10.15 hueco de 2.60 s",
+    "14.40 hueco de 2.60 s",
+    "18.65 hueco de 2.60 s",
+    "22.90 hueco de 2.60 s",
+    "26.50 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 6.35,
+        "texto": "Esta curva cruza el cero aqui."
+      },
+      {
+        "t_inicio": 10.4,
+        "texto": "Se empieza por donde sea."
+      },
+      {
+        "t_inicio": 14.65,
+        "texto": "Se baja por la tangente."
+      },
+      {
+        "t_inicio": 18.9,
+        "texto": "Otra vez, y otra."
+      },
+      {
+        "t_inicio": 23.15,
+        "texto": "Cada paso los duplica."
+      },
+      {
+        "t_inicio": 26.75,
+        "texto": "Cuatro pasos, y ya no se mueve."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.1,
+      31.25
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        6.05,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.1,
+        -15
+      ],
+      [
+        "blip_medio",
+        14.35,
+        -15
+      ],
+      [
+        "blip_agudo",
+        18.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        22.85,
+        -15
+      ],
+      [
+        "blip_agudo",
+        26.45,
+        -15
+      ],
+      [
+        "sting",
+        29.4,
+        -12
+      ]
+    ]
+  }
+}

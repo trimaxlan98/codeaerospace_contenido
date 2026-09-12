@@ -1,0 +1,76 @@
+{
+  "name": "Calculo visible · lo que se demuestra mirando",
+  "slug": "calculo",
+  "formato": "vertical",
+  "curso": 35,
+  "estilo": "lienzo",
+  "sonido": "narrado",
+  "description": "Curso vertical (9:16) en el estilo LIENZO sobre las ideas del calculo de una variable que se DEMUESTRAN MIRANDO. Cada pieza es una afirmacion cuya prueba es un dibujo que se puede ver pasar: la secante que deja de girar, la banda de tolerancia que siempre encuentra respuesta, las tangentes de e^x que cortan el eje una unidad antes, el area que crece al ritmo de la altura, la franja de la hiperbola que se estira sin cambiar de area, la escalera que se pega a la circunferencia y sigue midiendo 4, la campana que gira para poder integrarse, la esfera que se rebana contra su cilindro, el circulo que se desenrolla en un triangulo, el anillo que no depende de su esfera y la trompeta que se llena y no se pinta. No re-explica los campos del curso 21, ni las transformadas del 32, ni las funciones especiales del 34: aqui todo es de una variable. Se publica narrado (voz es-MX-JorgeNeural) con cama de SFX, pero se escribe como si fuera mudo: portada con la tesis, UN verbo visual y UNA cifra, porque la mitad de Instagram lo ve sin sonido. Toda cifra la calcula calculo.py durante el render y esta demostrada por los 231 invariantes de sonda_calculo.py; lo que es un parametro elegido o un dato publico va rotulado en gris. Cada pieza esta hecha para subirse sola a Instagram.",
+  "style_block": "style_block.py",
+  "duracion_min": 30.0,
+  "duracion_max": 45.0,
+  "piezas": [
+    {
+      "dir": "clips/00-intro",
+      "tipo": "marca"
+    },
+    {
+      "dir": "clips/01-secante"
+    },
+    {
+      "dir": "clips/02-epsilon-delta"
+    },
+    {
+      "dir": "clips/03-recta-escondida"
+    },
+    {
+      "dir": "clips/04-numero-e"
+    },
+    {
+      "dir": "clips/05-valor-medio"
+    },
+    {
+      "dir": "clips/06-newton"
+    },
+    {
+      "dir": "clips/07-lata"
+    },
+    {
+      "dir": "clips/08-riemann"
+    },
+    {
+      "dir": "clips/09-teorema-fundamental"
+    },
+    {
+      "dir": "clips/10-hiperbola"
+    },
+    {
+      "dir": "clips/11-escalera"
+    },
+    {
+      "dir": "clips/12-campana"
+    },
+    {
+      "dir": "clips/13-cavalieri"
+    },
+    {
+      "dir": "clips/14-cebolla"
+    },
+    {
+      "dir": "clips/15-anillo"
+    },
+    {
+      "dir": "clips/16-gabriel"
+    },
+    {
+      "dir": "clips/17-taylor"
+    },
+    {
+      "dir": "clips/18-armonica"
+    },
+    {
+      "dir": "clips/19-cierre",
+      "tipo": "marca"
+    }
+  ]
+}

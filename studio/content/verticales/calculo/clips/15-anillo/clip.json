@@ -1,0 +1,95 @@
+{
+  "name": "15 · Anillo",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Dos esferas muy distintas con el mismo taladro dejan el mismo anillo.",
+  "duracion_objetivo": 30.5,
+  "guion_visual": [
+    "6.20 hueco de 3.00 s",
+    "11.05 hueco de 3.00 s",
+    "15.70 hueco de 3.20 s",
+    "20.55 hueco de 3.20 s",
+    "24.75 hueco de 4.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 6.45,
+        "texto": "Dos esferas muy distintas."
+      },
+      {
+        "t_inicio": 11.3,
+        "texto": "Se taladran hasta dejar seis centimetros."
+      },
+      {
+        "t_inicio": 15.95,
+        "texto": "Las dos coronas miden lo mismo."
+      },
+      {
+        "t_inicio": 20.8,
+        "texto": "Y mas arriba, tambien."
+      },
+      {
+        "t_inicio": 25.0,
+        "texto": "No manda la esfera: manda el agujero."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.35,
+      30.5
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        6.15,
+        -15
+      ],
+      [
+        "blip_agudo",
+        11.0,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.65,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.5,
+        -15
+      ],
+      [
+        "blip_medio",
+        24.7,
+        -15
+      ],
+      [
+        "sting",
+        28.65,
+        -12
+      ]
+    ]
+  }
+}
