@@ -293,6 +293,20 @@ xs, inten = E.borde_de_sombra()
 ok("el maximo de luz NO esta en el borde geometrico",
    xs[np.argmax(inten)] < -0.9,
    f"el pico cae en x = {xs[np.argmax(inten)]:.3f}")
+pico = E.pico_de_sombra()
+ok("el punto mas brillante cae DENTRO de la luz, no en el borde",
+   -1.5 < pico < -0.5, f"en x = {pico:.4f}")
+ok("y no depende del paso del barrido",
+   abs(E.pico_de_sombra(paso=0.005) - pico) < 1e-9
+   and abs(E.pico_de_sombra(paso=0.05) - pico) < 1e-9,
+   f"{E.pico_de_sombra(paso=0.005):.6f} / {E.pico_de_sombra(paso=0.05):.6f}")
+ok("es el primer maximo desde el borde, no uno cualquiera",
+   pico > E.ceros_Ai(1)[0], f"{pico:.4f} > {E.ceros_Ai(1)[0]:.4f}")
+luz = E.luz_en_el_borde()
+ok("en el borde geometrico no hay ni la mitad de la luz",
+   0.30 < luz < 0.50, f"{luz * 100:.2f} % del maximo")
+ok("contraejemplo: la optica de rayos diria 0.5 exacto",
+   abs(luz - 0.5) > 0.02, f"se aparta {abs(luz - 0.5) * 100:.1f} puntos")
 ok("y hay franjas: mas de un maximo local",
    int(np.sum((inten[1:-1] > inten[:-2]) & (inten[1:-1] > inten[2:]))) >= 3)
 
@@ -315,6 +329,15 @@ casi("pero int P3 P3 = 2/7 (no es cero)", E.ortogonalidad(3, 3),
 ok("P_l tiene exactamente l ceros en [-1,1]",
    all(E.cruces_por_cero(l) == l for l in range(1, 9)),
    " ".join(str(E.cruces_por_cero(l)) for l in range(1, 9)))
+for l in (2, 3, 4, 5):
+    cr = E.cruces_perfil(l)
+    ok(f"el perfil de P{l} cruza la esfera 2l = {2 * l} veces",
+       len(cr) == 2 * l, f"{len(cr)} cruces")
+ok("contraejemplo: NO son l (seria la cuenta del objeto, no la del corte)",
+   len(E.cruces_perfil(4)) != 4, f"{len(E.cruces_perfil(4))} != 4")
+ok("y en cada cruce el armonico vale cero de verdad",
+   np.max(np.abs(E.legendre_P(4, np.cos(E.cruces_perfil(4))))) < 1e-12)
+
 casi("el abultamiento ecuatorial sale de a*f", E.abultamiento_km(),
      6378.137 / 298.257223563, 1e-9, "km")
 ok("y son unos 21 km", 21.0 < E.abultamiento_km() < 21.5,
@@ -562,6 +585,8 @@ cifras = [
     ("07 lineas nodales del modo (3,2)", f"{E.lineas_nodales(3, 2)}"),
     ("07bis frecuencia del modo (3,2)", f"{E.frecuencia_modo(3, 2):.4f}"),
     ("08 primer cero de Ai", f"{E.ceros_Ai(1)[0]:.4f}"),
+    ("08bis luz en el borde geometrico",
+     f"{E.luz_en_el_borde() * 100:.2f} % / pico en {E.pico_de_sombra():.4f}"),
     ("09 abultamiento ecuatorial", f"{E.abultamiento_km():.1f} km"),
     ("10 exceso de cable", f"{E.exceso_de_cable(2.0, 0.6):.2f} %"),
     ("10bis separacion cadena/parabola",

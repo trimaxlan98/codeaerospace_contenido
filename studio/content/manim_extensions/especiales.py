@@ -413,13 +413,24 @@ def bessel_J(n, x, M=2000):
     tambor."""
     x = np.asarray(x, dtype=float)
     escalar = x.ndim == 0
-    x = np.atleast_1d(x).astype(float)
+    forma = x.shape
+    x = np.atleast_1d(x).astype(float).ravel()
     t = np.linspace(0.0, np.pi, int(M) + 1)
     peso = np.full_like(t, 1.0)
     peso[0] = peso[-1] = 0.5
-    arg = int(n) * t[None, :] - x[:, None] * np.sin(t)[None, :]
-    y = (np.cos(arg) * peso[None, :]).sum(axis=1) * (np.pi / int(M)) / np.pi
-    return float(y[0]) if escalar else y
+    sen = np.sin(t)
+    # POR TROZOS. La matriz intermedia es (puntos x M): el modo de un
+    # tambor sobre una malla de 140x140 son 15 400 puntos dentro del
+    # circulo, que con M=2000 pedirian 246 MB de una sentada. En trozos de
+    # 4096 el pico se queda en 65 MB y el resultado es identico.
+    y = np.empty_like(x)
+    paso = 4096
+    for i in range(0, len(x), paso):
+        trozo = x[i:i + paso]
+        arg = int(n) * t[None, :] - trozo[:, None] * sen[None, :]
+        y[i:i + paso] = ((np.cos(arg) * peso[None, :]).sum(axis=1)
+                         * (np.pi / int(M)) / np.pi)
+    return float(y[0]) if escalar else y.reshape(forma)
 
 
 def ceros_J(n, cuantos=4, xmax=30.0, N=4000):
@@ -448,7 +459,7 @@ def ceros_J(n, cuantos=4, xmax=30.0, N=4000):
     return np.array(raices)
 
 
-def modo_tambor(m, k, radio=1.0, N=220):
+def modo_tambor(m, k, radio=1.0, N=220, M=400):
     """El modo (m, k) de una membrana circular sobre una malla cuadrada.
 
     Devuelve (X, Y, U) con U = J_m(alpha r) cos(m theta) dentro del
@@ -461,7 +472,7 @@ def modo_tambor(m, k, radio=1.0, N=220):
     TH = np.arctan2(Y, X)
     U = np.full_like(R, np.nan)
     dentro = R <= radio
-    U[dentro] = (bessel_J(m, alpha * R[dentro] / radio)
+    U[dentro] = (bessel_J(m, alpha * R[dentro] / radio, M=M)
                  * np.cos(int(m) * TH[dentro]))
     return X, Y, U
 
@@ -613,6 +624,46 @@ def borde_de_sombra(x0=-9.0, x1=3.0, N=2400):
     return xs, inten / float(np.max(inten))
 
 
+def pico_de_sombra(paso=0.02, xmin=-4.0):
+    """Donde esta el punto MAS brillante del borde de una sombra.
+
+    No cae en el borde geometrico sino DENTRO de la zona iluminada. Se
+    busca por biseccion sobre la derivada, no por el maximo de una malla:
+    el maximo de una malla es el punto mas alto de esa malla y cambiaria
+    al afinarla.
+
+    Y se BARRE desde el borde hacia dentro hasta el PRIMER cambio de
+    signo, en vez de bisecar sobre un intervalo grande. La derivada de
+    Ai^2 tiene varias raices ahi (los ceros de Ai y los de Ai'): una
+    biseccion sobre (-6, 0) converge a una distinta que sobre (-4, 0), y
+    las dos con toda la seguridad del mundo. Lo destapo la sonda al pedir
+    el mismo numero con dos intervalos."""
+    def d(x, h=1e-4):
+        return float(airy_Ai(x + h) ** 2 - airy_Ai(x - h) ** 2)
+    x = 0.0
+    while x > float(xmin):
+        a, b = x - float(paso), x
+        if d(a) * d(b) <= 0:
+            for _ in range(90):
+                c = 0.5 * (a + b)
+                if d(a) * d(c) <= 0:
+                    b = c
+                else:
+                    a = c
+            return 0.5 * (a + b)
+        x = a
+    return float("nan")
+
+
+def luz_en_el_borde():
+    """Que fraccion del maximo de luz hay JUSTO en el borde geometrico.
+
+    La optica de rayos dice que ahi hay un escalon: todo de un lado, nada
+    del otro. Lo que hay es esta fraccion, ni 1 ni 0 ni 1/2."""
+    pico = pico_de_sombra()
+    return float(airy_Ai(0.0) ** 2 / airy_Ai(pico) ** 2)
+
+
 # --- 09 · LEGENDRE ----------------------------------------------------
 def legendre_P(l, x):
     """P_l por la recurrencia de Bonnet. Vectorizada en x."""
@@ -657,6 +708,37 @@ def cruces_por_cero(l):
     x = np.linspace(-1.0, 1.0, 20000)
     y = legendre_P(int(l), x)
     return int(np.sum(np.sign(y[1:]) * np.sign(y[:-1]) < 0))
+
+
+def cruces_perfil(l, N=8000):
+    """Los angulos del PERFIL donde el armonico no deforma nada.
+
+    Ojo con la cifra: en el corte de polo a polo que se dibuja son **2l**,
+    no l. Cada paralelo nodal del armonico corta el meridiano DOS veces,
+    una por hemisferio del dibujo. Rotular "l paralelos" junto a un dibujo
+    donde se cuentan 2l es exactamente el error que el curso 33 cazo nueve
+    veces: la cifra hablando del objeto y el dibujo enseñando el corte.
+
+    Se devuelven los angulos para poder MARCARLOS, que es lo que convierte
+    la cifra en algo que el espectador puede comprobar."""
+    th = np.linspace(0.0, 2 * np.pi, int(N), endpoint=False)
+    v = legendre_P(int(l), np.cos(th))
+    sg = np.sign(v)
+    idx = np.flatnonzero(sg * np.roll(sg, -1) < 0)
+    raices = []
+    for i in idx:
+        a, b = th[i], th[(i + 1) % len(th)]
+        if b < a:
+            b += 2 * np.pi
+        for _ in range(60):
+            c = 0.5 * (a + b)
+            if (legendre_P(int(l), np.cos(np.array([a])))[0]
+                    * legendre_P(int(l), np.cos(np.array([c])))[0]) <= 0:
+                b = c
+            else:
+                a = c
+        raices.append(0.5 * (a + b) % (2 * np.pi))
+    return np.array(sorted(raices))
 
 
 # Datos DADOS (WGS84), no medidos aqui: van en gris en pantalla.
