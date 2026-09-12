@@ -837,6 +837,15 @@ def weierstrass(x, a=W_A, b=W_B, terminos=None):
     return y
 
 
+# Tope de terminos: por encima de este, el argumento b^k*pi*x pasa de
+# 1e13 y un float64 ya no tiene cifras para la FASE del coseno. El termino
+# sale con un desfase aleatorio, y como su amplitud es pequeña el efecto
+# no es ruido visible: es que la curva deja de tener detalle fino y sale
+# SUAVE. O sea, exactamente lo contrario de lo que esta funcion existe
+# para demostrar, y sin ningun aviso.
+TERMINOS_MAX = 13
+
+
 def ventana_zoom(centro, ancho, N=4000, **kw):
     """Un trozo de W centrado en `centro` y de anchura `ancho`.
 
@@ -847,13 +856,27 @@ def ventana_zoom(centro, ancho, N=4000, **kw):
     ancho = float(ancho)
     necesarios = int(np.ceil(np.log(4000.0 / max(ancho, 1e-12))
                              / np.log(W_B))) + 6
+    if necesarios > TERMINOS_MAX:
+        raise ValueError(
+            f"zoom demasiado profundo: una ventana de {ancho:.2e} pediria "
+            f"{necesarios} terminos y el tope numerico son {TERMINOS_MAX}. "
+            f"Por encima, float64 pierde la fase de los terminos finos y la "
+            f"curva saldria SUAVE — lo contrario de lo que demuestra. No "
+            f"subas el tope: amplia menos.")
     x = np.linspace(centro - ancho / 2, centro + ancho / 2, int(N))
-    return x, weierstrass(x, terminos=max(necesarios, 20), **kw)
+    return x, weierstrass(x, terminos=max(necesarios, 12), **kw)
 
 
-def cociente_incremental(x0=0.3, h=1e-3, **kw):
-    """|W(x0+h) - W(x0)| / h: la pendiente que se le pide a la curva."""
-    terminos = int(np.ceil(np.log(4000.0 / h) / np.log(W_B))) + 6
+def cociente_incremental(x0=0.3, h=1e-3, terminos=None, **kw):
+    """|W(x0+h) - W(x0)| / h: la pendiente que se le pide a la curva.
+
+    La cifra depende un poco de cuantos terminos se sumen —la cola que se
+    deja fuera aporta del orden del 0.25 %—, asi que se rotula ENTERA: los
+    decimales serian de la truncatura, no de la funcion. Lo que la pieza
+    afirma no es el valor exacto sino que la sucesion no se para."""
+    if terminos is None:
+        terminos = min(int(np.ceil(np.log(4000.0 / h) / np.log(W_B))) + 6,
+                       TERMINOS_MAX)
     a = weierstrass(np.array([x0]), terminos=terminos, **kw)[0]
     b = weierstrass(np.array([x0 + h]), terminos=terminos, **kw)[0]
     return float(abs(b - a) / h)
@@ -1198,6 +1221,26 @@ def toques(a=3, b=2, N=200000):
     return picos(x), picos(y)
 
 
+def puntos_de_toque(a=3, b=2):
+    """Donde toca la curva cada lado de la caja, para poder MARCARLO.
+
+    Devuelve (lado, techo): dos arrays de puntos (x, y). Sin los puntos
+    marcados, la cifra "3 toques" es una afirmacion que el espectador
+    tiene que creerse; con ellos, la cuenta."""
+    T = cierra_en(int(a), int(b))
+    t = np.linspace(0.0, T, 400000, endpoint=False)
+    x, y = np.sin(a * t + np.pi / 2), np.sin(b * t)
+
+    def picos(v, otro):
+        izq, der = np.roll(v, 1), np.roll(v, -1)
+        i = np.flatnonzero((v > izq) & (v >= der) & (v > 0.9999))
+        return np.column_stack([v[i], otro[i]])
+
+    lado = picos(x, y)
+    techo = picos(y, x)
+    return lado, np.column_stack([techo[:, 1], techo[:, 0]])
+
+
 # --- 17 · ZETA --------------------------------------------------------
 def zeta(s, N=48):
     """Zeta de Riemann por el algoritmo de Borwein (eta alternante).
@@ -1280,6 +1323,29 @@ def primer_cero_zeta(t0=10.0, t1=20.0, N=400):
                     a = c
             return float(0.5 * (a + b))
     return float("nan")
+
+
+def ceros_zeta(t0=0.5, t1=32.0, N=900):
+    """Todos los ceros de zeta en la recta critica dentro de (t0, t1).
+
+    Por cambio de signo de la Z de Hardy y biseccion. Buscar minimos de
+    |zeta| sobre una malla daria los puntos mas bajos de la malla, que no
+    son ceros: la malla decide."""
+    ts = np.linspace(float(t0), float(t1), int(N))
+    zs = hardy_Z(ts)
+    raices = []
+    for i in range(len(ts) - 1):
+        if zs[i] * zs[i + 1] < 0:
+            a, b = ts[i], ts[i + 1]
+            for _ in range(80):
+                c = 0.5 * (a + b)
+                if (hardy_Z(np.array([a]))[0]
+                        * hardy_Z(np.array([c]))[0]) <= 0:
+                    b = c
+                else:
+                    a = c
+            raices.append(0.5 * (a + b))
+    return np.array(raices)
 
 
 def basilea(terminos=200000):

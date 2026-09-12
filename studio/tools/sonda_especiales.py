@@ -396,6 +396,23 @@ def rugosidad(yy):
 ok("al ampliar, la curva NO se alisa",
    rugosidad(y2) > rugosidad(y1) * 0.5,
    f"{rugosidad(y1):.4f} -> {rugosidad(y2):.4f}")
+# El guardian del zoom: tiene que ABORTAR, no devolver una curva suave.
+try:
+    E.ventana_zoom(0.3, 1e-7, 500)
+    ok("el zoom demasiado profundo aborta", False, "no aborto")
+except ValueError as e:
+    ok("el zoom demasiado profundo ABORTA en vez de alisar la curva",
+       "suave" in str(e).lower() or "SUAVE" in str(e))
+ok("y el zoom mas profundo que si se usa en el curso pasa",
+   E.ventana_zoom(0.3, 1.0 / E.W_B ** 3, 500)[1].shape == (500,))
+# Las pendientes no pueden depender del numero de terminos, o la cifra de
+# pantalla seria de la implementacion y no de la funcion.
+p1 = E.cociente_incremental(0.3, 1.0 / E.W_B ** 4, terminos=11)
+p2 = E.cociente_incremental(0.3, 1.0 / E.W_B ** 4, terminos=13)
+ok("la pendiente cambia menos del 1 % al sumar dos terminos mas",
+   abs(p1 - p2) / p2 < 0.01, f"{p1:.1f} vs {p2:.1f}")
+ok("por eso la cifra va ENTERA y no con decimales",
+   abs(p1 - p2) > 0.5, f"se mueve {abs(p1 - p2):.2f} unidades")
 ok("la funcion es continua (sin saltos entre muestras vecinas)",
    np.max(np.abs(np.diff(y1))) < 0.2 * (np.max(y1) - np.min(y1)))
 
@@ -509,6 +526,13 @@ ok("y con 5:4 sale 5 y 4", E.toques(5, 4) == (5, 4), f"{E.toques(5, 4)}")
 ok("contraejemplo: 1:1 toca una vez cada lado (es una elipse)",
    E.toques(1, 1) == (1, 1), f"{E.toques(1, 1)}")
 x, y = E.lissajous(3, 2, N=4000)
+lado_p, techo_p = E.puntos_de_toque(3, 2)
+ok("los puntos marcados son tantos como dice la cifra",
+   len(lado_p) == lado and len(techo_p) == techo,
+   f"{len(lado_p)} y {len(techo_p)}")
+ok("y todos caen de verdad sobre el borde de la caja",
+   np.allclose(np.abs(lado_p[:, 0]), 1.0, atol=1e-6)
+   and np.allclose(np.abs(techo_p[:, 1]), 1.0, atol=1e-6))
 ok("la curva se cierra sobre si misma",
    np.hypot(x[0] - x[-1], y[0] - y[-1]) < 1e-9)
 ok("y cabe en el cuadrado unidad",
@@ -538,6 +562,15 @@ ok("contraejemplo: medio punto mas alla NO vale cero",
 t, z = E.zeta_en_recta(0.0, 32.0, 900)
 ok("la curva de la recta critica pasa por el origen",
    float(np.min(np.abs(z))) < 0.05, f"minimo |zeta| = {np.min(np.abs(z)):.4f}")
+ceros = E.ceros_zeta(0.5, 32.0)
+ok("hay cuatro ceros por debajo de t = 32", len(ceros) == 4,
+   " ".join(f"{v:.4f}" for v in ceros))
+casi("y son los conocidos (el segundo)", ceros[1], 21.022039638771555, 1e-6)
+casi("y el tercero", ceros[2], 25.010857580145688, 1e-6)
+ok("en todos ellos zeta vale cero de verdad",
+   max(abs(E.zeta(0.5 + 1j * c)) for c in ceros) < 1e-6)
+ok("contraejemplo: NO hay ninguno por debajo de t = 14",
+   len(E.ceros_zeta(0.5, 14.0)) == 0)
 ok("Z de Hardy es real sobre la recta critica",
    np.max(np.abs(np.imag(np.exp(1j * 0) * 1.0))) < 1e-12)
 
