@@ -1,0 +1,59 @@
+{
+  "name": "19 · Cierre",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Los anillos se recogen en el punto ambar.",
+  "duracion_objetivo": 12.38,
+  "tipo": "marca",
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      11.23,
+      12.38
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.05,
+        -16
+      ],
+      [
+        "barrido",
+        1.2,
+        -13
+      ],
+      [
+        "blip_medio",
+        4.4,
+        -14
+      ],
+      [
+        "aire",
+        5.8,
+        -16
+      ],
+      [
+        "subrayado",
+        8.1,
+        -12
+      ],
+      [
+        "tick",
+        8.6,
+        -10
+      ],
+      [
+        "tick",
+        8.93,
+        -10
+      ],
+      [
+        "sting",
+        10.53,
+        -10
+      ]
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "name": "07 · Lata",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La lata se estira y se achata; el aluminio dibuja su valle, y el valle es plano.",
+  "duracion_objetivo": 30.25,
+  "guion_visual": [
+    "6.70 hueco de 2.80 s",
+    "11.35 hueco de 3.00 s",
+    "16.20 hueco de 2.80 s",
+    "20.85 hueco de 3.00 s",
+    "25.50 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 6.95,
+        "texto": "Trescientos treinta mililitros, siempre."
+      },
+      {
+        "t_inicio": 11.6,
+        "texto": "Esta gasta el minimo aluminio."
+      },
+      {
+        "t_inicio": 16.45,
+        "texto": "Si se achata, vuelve a subir."
+      },
+      {
+        "t_inicio": 21.1,
+        "texto": "La lata real es mas esbelta."
+      },
+      {
+        "t_inicio": 25.75,
+        "texto": "Cerca del minimo, la curva es plana."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.1,
+      30.25
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        6.65,
+        -15
+      ],
+      [
+        "blip_agudo",
+        11.3,
+        -15
+      ],
+      [
+        "blip_medio",
+        16.15,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.8,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.45,
+        -15
+      ],
+      [
+        "sting",
+        28.4,
+        -12
+      ]
+    ]
+  }
+}

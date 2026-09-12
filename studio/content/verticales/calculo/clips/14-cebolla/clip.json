@@ -1,0 +1,95 @@
+{
+  "name": "14 · Cebolla",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Los anillos salen del circulo y se apilan en un triangulo.",
+  "duracion_objetivo": 30.4,
+  "guion_visual": [
+    "5.60 hueco de 3.40 s",
+    "10.85 hueco de 3.00 s",
+    "16.05 hueco de 3.20 s",
+    "20.25 hueco de 3.80 s",
+    "25.05 hueco de 4.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Un circulo es una pila de anillos."
+      },
+      {
+        "t_inicio": 11.1,
+        "texto": "El de fuera, estirado."
+      },
+      {
+        "t_inicio": 16.3,
+        "texto": "Los demas debajo, cada uno mas corto."
+      },
+      {
+        "t_inicio": 20.5,
+        "texto": "Sale un triangulo, y su area se sabe."
+      },
+      {
+        "t_inicio": 25.3,
+        "texto": "Por eso derivar el area da el borde."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.25,
+      30.4
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.8,
+        -15
+      ],
+      [
+        "blip_medio",
+        16.0,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.2,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.0,
+        -15
+      ],
+      [
+        "sting",
+        28.55,
+        -12
+      ]
+    ]
+  }
+}

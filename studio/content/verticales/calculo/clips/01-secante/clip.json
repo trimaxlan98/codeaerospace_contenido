@@ -1,0 +1,105 @@
+{
+  "name": "01 · Secante",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "El segundo punto se acerca y la recta deja de girar.",
+  "duracion_objetivo": 31.35,
+  "guion_visual": [
+    "5.70 hueco de 3.00 s",
+    "10.80 hueco de 2.80 s",
+    "15.05 hueco de 2.20 s",
+    "18.70 hueco de 2.20 s",
+    "22.35 hueco de 2.60 s",
+    "26.60 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.95,
+        "texto": "Una curva y un punto."
+      },
+      {
+        "t_inicio": 11.05,
+        "texto": "Para la pendiente hacen falta dos."
+      },
+      {
+        "t_inicio": 15.3,
+        "texto": "El punto se acerca."
+      },
+      {
+        "t_inicio": 18.95,
+        "texto": "La recta gira menos."
+      },
+      {
+        "t_inicio": 22.6,
+        "texto": "Casi ha dejado de girar."
+      },
+      {
+        "t_inicio": 26.85,
+        "texto": "La pendiente en un solo punto."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      30.2,
+      31.35
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.65,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.75,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.0,
+        -15
+      ],
+      [
+        "blip_agudo",
+        18.65,
+        -15
+      ],
+      [
+        "blip_medio",
+        22.3,
+        -15
+      ],
+      [
+        "blip_agudo",
+        26.55,
+        -15
+      ],
+      [
+        "sting",
+        29.5,
+        -12
+      ]
+    ]
+  }
+}

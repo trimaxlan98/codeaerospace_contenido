@@ -419,3 +419,34 @@ primera**, dos de ellos conceptuales:
   frame suelto parece que simplemente no se giró.
   Se arregla partiéndolo en dos `self.play()` seguidos: primero girar,
   después recolorear. Cazado en el curso 32 (pieza 18).
+
+## Curso 35 (cálculo visible): tres que valen para cualquier curso
+
+- **Una línea de referencia que cuelga del CERO se va fuera del cuadro
+  cuando el cuadro no contiene el cero, y el guardián que salta no es el que
+  señala la causa.** `plomada(P, x, y)` dibuja desde `y=0`; en una curva de
+  coste que va de 250 a 322 eso son siete unidades por debajo del dibujo. El
+  grupo pasa a medir el triple de lo que se ve, `encajar` lo encoge entero
+  para que quepa, y el render aborta por el guardián de **legibilidad**: "el
+  rótulo más pequeño mide 0.101". Se pierde media hora buscando un problema
+  de tipografía que no existe. Cuando el cuadro no contiene el cero, la
+  referencia es su SUELO (`calculo.colgante`).
+- **Un destino de `Transform` construido fuera del grupo llega
+  descolocado.** `Transform(a, b)` lleva `a` a donde está `b` *ahora*, y `b`
+  sólo está en su sitio si pasó por `encajar` — o sea, si viajaba dentro del
+  grupo cuando `L.escena` lo colocó. El patrón: los destinos entran en el
+  grupo con el trazo apagado y se sacan justo después de `L.escena`
+  (`soltar()` en el curso 35). De propina, mientras están dentro fijan el
+  *bounding box*, así que el encaje no cambia de un estado a otro y el
+  dibujo no da saltos — que es lo mismo que consigue meter un `recuadro`
+  invisible como ancla.
+- **La sonda de tiempos de voz hay que correrla sobre el `scene.py` recién
+  compuesto, y `render_jobs` es un enlace al segundo disco.** Dos cosas que
+  muerden juntas: dentro del contenedor esa ruta no existe (hay que copiar
+  las escenas al scratchpad y montarlo aparte), y si se copian **mientras**
+  un render las está recomponiendo, alguna sale vieja. El síntoma llega
+  tarde y disfrazado: `render_vertical` avisa de que "el manifiesto dice
+  29.9 s y el render dio 30.5", que en realidad significa que las frases de
+  esa pieza están colocadas contra planos que ya no existen. Se vuelve a
+  medir TODO y se comprueba pieza a pieza que la sonda y el render coinciden
+  al centésimo antes de narrar.

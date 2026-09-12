@@ -1,0 +1,105 @@
+{
+  "name": "11 · Escalera",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La escalera se pega a la circunferencia y su perimetro no baja de cuatro.",
+  "duracion_objetivo": 34.7,
+  "guion_visual": [
+    "6.20 hueco de 3.00 s",
+    "11.05 hueco de 3.00 s",
+    "15.90 hueco de 3.00 s",
+    "20.75 hueco de 3.40 s",
+    "25.75 hueco de 3.20 s",
+    "29.95 hueco de 3.60 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 6.45,
+        "texto": "Un cuadrado alrededor de la circunferencia."
+      },
+      {
+        "t_inicio": 11.3,
+        "texto": "Se dobla por las esquinas."
+      },
+      {
+        "t_inicio": 16.15,
+        "texto": "Y otra vez. Se van pegando."
+      },
+      {
+        "t_inicio": 21.0,
+        "texto": "Estan pegadas, y sigue midiendo cuatro."
+      },
+      {
+        "t_inicio": 26.0,
+        "texto": "La circunferencia mide otra cosa."
+      },
+      {
+        "t_inicio": 30.2,
+        "texto": "Parecerse mucho no es medir lo mismo."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      33.55,
+      34.7
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        6.15,
+        -15
+      ],
+      [
+        "blip_agudo",
+        11.0,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.85,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.7,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.7,
+        -15
+      ],
+      [
+        "blip_agudo",
+        29.9,
+        -15
+      ],
+      [
+        "sting",
+        32.85,
+        -12
+      ]
+    ]
+  }
+}

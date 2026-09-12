@@ -1,0 +1,105 @@
+{
+  "name": "12 · Campana",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "La campana gira y se corta en anillos; el anillo si se integra.",
+  "duracion_objetivo": 33.05,
+  "guion_visual": [
+    "5.60 hueco de 2.80 s",
+    "10.05 hueco de 3.20 s",
+    "15.05 hueco de 2.80 s",
+    "19.30 hueco de 2.80 s",
+    "23.90 hueco de 3.20 s",
+    "28.10 hueco de 3.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Esta area no tiene formula."
+      },
+      {
+        "t_inicio": 10.3,
+        "texto": "Se mide con rectangulos, y sale eso."
+      },
+      {
+        "t_inicio": 15.3,
+        "texto": "Asi que se gira la campana."
+      },
+      {
+        "t_inicio": 19.55,
+        "texto": "Vista asi, son anillos."
+      },
+      {
+        "t_inicio": 24.15,
+        "texto": "Y el anillo trae un radio delante."
+      },
+      {
+        "t_inicio": 28.35,
+        "texto": "Con ese radio, la cuenta si sale."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.9,
+      33.05
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.0,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.0,
+        -15
+      ],
+      [
+        "blip_agudo",
+        19.25,
+        -15
+      ],
+      [
+        "blip_medio",
+        23.85,
+        -15
+      ],
+      [
+        "blip_agudo",
+        28.05,
+        -15
+      ],
+      [
+        "sting",
+        31.2,
+        -12
+      ]
+    ]
+  }
+}

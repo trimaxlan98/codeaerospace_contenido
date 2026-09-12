@@ -1,0 +1,105 @@
+{
+  "name": "09 · Teorema fundamental",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Arriba el area se llena; abajo crece a la altura de arriba.",
+  "duracion_objetivo": 32.5,
+  "guion_visual": [
+    "5.60 hueco de 2.60 s",
+    "9.95 hueco de 2.60 s",
+    "14.30 hueco de 2.60 s",
+    "18.65 hueco de 2.60 s",
+    "22.90 hueco de 3.00 s",
+    "27.55 hueco de 3.80 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "Una curva. Debajo, nada."
+      },
+      {
+        "t_inicio": 10.2,
+        "texto": "Se llena. Abajo se cuenta."
+      },
+      {
+        "t_inicio": 14.55,
+        "texto": "Mas area, mas altura abajo."
+      },
+      {
+        "t_inicio": 18.9,
+        "texto": "Hasta el final."
+      },
+      {
+        "t_inicio": 23.15,
+        "texto": "A que ritmo crece."
+      },
+      {
+        "t_inicio": 27.8,
+        "texto": "A la altura de arriba, siempre."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      31.35,
+      32.5
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        9.9,
+        -15
+      ],
+      [
+        "blip_medio",
+        14.25,
+        -15
+      ],
+      [
+        "blip_agudo",
+        18.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        22.85,
+        -15
+      ],
+      [
+        "blip_agudo",
+        27.5,
+        -15
+      ],
+      [
+        "sting",
+        30.65,
+        -12
+      ]
+    ]
+  }
+}

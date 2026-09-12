@@ -1,0 +1,95 @@
+{
+  "name": "17 · Taylor",
+  "scene": "Clip",
+  "file": "escena.py",
+  "description": "Grado a grado, el polinomio abraza el seno un poco mas lejos.",
+  "duracion_objetivo": 30.55,
+  "guion_visual": [
+    "5.60 hueco de 3.20 s",
+    "10.65 hueco de 3.00 s",
+    "15.50 hueco de 3.00 s",
+    "20.35 hueco de 3.00 s",
+    "25.20 hueco de 4.20 s"
+  ],
+  "voz": {
+    "voz": "es-MX-JorgeNeural",
+    "secciones": [
+      {
+        "t_inicio": 5.85,
+        "texto": "El seno, y un polinomio."
+      },
+      {
+        "t_inicio": 10.9,
+        "texto": "Grado uno: lo suelta enseguida."
+      },
+      {
+        "t_inicio": 15.75,
+        "texto": "Grado tres: aguanta un poco mas."
+      },
+      {
+        "t_inicio": 20.6,
+        "texto": "Grado siete: ya llega lejos."
+      },
+      {
+        "t_inicio": 25.45,
+        "texto": "Y el de grado once acierta hasta cuatro."
+      }
+    ]
+  },
+  "audio": {
+    "pico_db": -4.0,
+    "pico_db_con_voz": -17.0,
+    "fade_in": 0.3,
+    "fade_out": [
+      29.4,
+      30.55
+    ],
+    "eventos": [
+      [
+        "aire",
+        0.7,
+        -17
+      ],
+      [
+        "blip_hud",
+        1.55,
+        -18
+      ],
+      [
+        "barrido",
+        4.35,
+        -14
+      ],
+      [
+        "blip_medio",
+        5.55,
+        -15
+      ],
+      [
+        "blip_agudo",
+        10.6,
+        -15
+      ],
+      [
+        "blip_medio",
+        15.45,
+        -15
+      ],
+      [
+        "blip_agudo",
+        20.3,
+        -15
+      ],
+      [
+        "blip_medio",
+        25.15,
+        -15
+      ],
+      [
+        "sting",
+        28.7,
+        -12
+      ]
+    ]
+  }
+}
