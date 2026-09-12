@@ -1678,7 +1678,19 @@ def telarana(f, x0, pasos, punto, color=None, grosor=TRAZO_FINO):
     return linea
 
 
-class Pendulo(VGroup):
+if not _HAY_MANIM:                       # la sonda importa sin manim
+    def Pendulo(*_a, **_kw):
+        """Sello para cuando no hay manim: ver la clase de abajo.
+
+        Una clase que hereda de `VGroup` evalua `VGroup` al IMPORTAR el
+        modulo, no al instanciarse: con manim ausente, `import especiales`
+        reventaba entero con `NameError: VGroup`, y con el la mitad
+        numerica que existe precisamente para poder importarse sin manim.
+        Cazado al cerrar el curso, midiendo una cifra desde el host."""
+        _exige_manim()
+
+
+class Pendulo(VGroup if _HAY_MANIM else object):
     """Una varilla y su lenteja, colgadas del origen del grupo.
 
     `colocar(theta)` la pone en su angulo (radianes, 0 = abajo). Existe

@@ -87,16 +87,22 @@ class Clip(Pieza):
         self.leer(4.0)
 
         # --- 3. la resta, aumentada y declarada ----------------------
+        # El rango va de -1 a 0, no de 0 a 1: la resta es NEGATIVA en todo
+        # el vano porque la cadena cuelga por DEBAJO de la parabola (es la
+        # curva de minima energia, y eso es lo que significa). Con el
+        # cuadro puesto de cero para arriba, la curva entera caia fuera por
+        # abajo y cruzaba su propio rotulo. Llego asi al montaje y lo
+        # destapo mirar un fotograma de la pelicula ya entregada.
         Q = esp.marco((-self.VANO / 2 - 0.10, self.VANO / 2 + 0.10),
-                      (-0.05, 1.05), ancho=self.ANCHO_CAJA, alto=3.6)
+                      (-1.08, 0.08), ancho=self.ANCHO_CAJA, alto=3.6)
         xc, yc = esp.catenaria(self.VANO, self.FLECHA, 1601)
         xp, yp = esp.parabola_equivalente(self.VANO, self.FLECHA, 1601)
         dif = (yc - yp) / self.VANO * 100.0        # en % del vano
         resta = esp.curva(xc, dif / float(np.max(np.abs(dif))), Q,
                           color=AMBAR, grosor=esp.TRAZO)
         eti_dif = rot(f"LA RESTA, X{medido(self.AUMENTO, 0)}", color=AMBAR)
-        eti_dif.next_to(Q(0.0, -0.05), DOWN, buff=0.26)
-        panel = lz.agrupar(esp.recuadro(Q), resta, eti_dif)
+        eti_dif.next_to(Q(0.0, -1.08), DOWN, buff=0.26)
+        panel = lz.agrupar(esp.recuadro(Q), esp.eje_x(Q), resta, eti_dif)
 
         L.relevo(escena=panel,
                  dato=(medido(esp.separacion_maxima(self.VANO,

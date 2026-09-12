@@ -85,7 +85,7 @@ a salir en pantalla.
 | 07 | CHLADNI | el sonido dibuja | La arena huye de donde vibra y dibuja la figura de la placa | **3** lineas nodales |
 | 08 | AIRY | el borde de la sombra | El escalon de luz que la optica promete, y las franjas que salen | **-2.3381** |
 | 09 | LEGENDRE | la Tierra no es esfera | Una circunferencia deformada por P2, P3, P4: las capas de un planeta | **21.4 km** |
-| 10 | CATENARIA | la cadena no es parabola | Cadena y parabola con los mismos extremos, superpuestas | **20.94 %** de cable |
+| 10 | CATENARIA | la cadena no es parabola | Cadena y parabola con los mismos extremos, superpuestas | **22.19 %** de cable |
 | 11 | WEIERSTRASS | continua y sin pendiente | Cuatro zooms seguidos: nunca se alisa | **16936** |
 | 12 | CANTOR | sube sin subir nunca | El peine se va comiendo el segmento y la escalera crece | **99.23 %** plano |
 | 13 | CAUCHY | la campana sin media | Dos medias corriendo: una se asienta, la otra salta siempre | **0.282** |
@@ -270,9 +270,9 @@ P5: las capas con las que se escribe la forma de un planeta. `legendre_P`,
 
 ### 10 · CATENARIA — la cadena no es parabola
 Las dos curvas con los MISMOS extremos y la MISMA flecha, superpuestas: se
-separan un **0.71 %** del vano, casi nada. Y aun asi la cadena es la que
+separan un **0.78 %** del vano, casi nada. Y aun asi la cadena es la que
 cuelga mas bajo (minima energia). `catenaria`, `parabola_equivalente`,
-`exceso_de_cable`, `separacion_maxima`. Cifra de remate: **20.94 %** de
+`exceso_de_cable`, `separacion_maxima`. Cifra de remate: **22.19 %** de
 cable de mas que el vano — lo que paga el que compra el cable.
 
 ### 11 · WEIERSTRASS — continua y sin pendiente

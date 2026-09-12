@@ -423,7 +423,7 @@ despeja (0.5671), la integral elíptica da el periodo de verdad de un péndulo
 (18.03 % más que la fórmula del instituto), Fresnel curva sin tirones,
 Chebyshev reparte el error por igual (59.82 → 0.0177), Bessel dibuja un
 tambor (2.4048), Chladni el sonido, Airy el borde de una sombra (−2.3381),
-Legendre la forma de un planeta (21.4 km), la catenaria un cable (20.94 % más
+Legendre la forma de un planeta (21.4 km), la catenaria un cable (22.19 % más
 que el vano), Weierstrass una curva sin pendiente, Cantor una escalera que
 sube sin subir, Cauchy una campana sin media, Lorenz una curva que no se
 repite, la cicloide el camino más rápido (0.8053 s), Lissajous una razón de
