@@ -1,34 +1,40 @@
-"""Divulgacion (20-30 s): el ciclo PADA y el margen adaptativo que lo valida.
+"""Divulgacion (20-30 s), v2 -- casi sin texto: el ciclo PADA y el gate G1.
 
-Para el seminario de divulgacion de tesis (25-nov-2026), NO para el curso.
-Dos piezas encadenadas:
+Rehecho a partir de PROMPT_MANIM_REHACER_VISUAL_2026-09-17.md (tesis-doctorado
+-6g): la v1 (commit anterior de esta rama) tenia titulo, subtitulo, un
+statement completo ("SE VALIDA EN UN GEMELO DIGITAL / antes de tocar la red
+real"), dos lineas de formula/veredicto y un cierre de dos lineas -- "texto
+de figura de paper, no de video" (feedback textual del doctorando). Esta
+version NO tiene titulo, subtitulo NI statements: solo los rotulos que son el
+CONTENIDO del propio dibujo (los cuatro nombres del lazo PADA, los numeros de
+los ejes, "G1 PASA" como rotulo minimo en el punto que cruza el umbral) --
+igual que los numeros de un eje no cuentan como "texto explicativo" en una
+figura de paper.
 
-  1. El ciclo cognitivo PADA (Percepcion, Analisis, Decision, Accion) en
-     cuatro bloques de `bloques.py`, dispuesto en rombo porque `bloques.py`
-     esta pensado para pipelines lineales y no trae layout circular (se
-     reviso antes de escribir uno nuevo, regla de la casa): un rombo con
-     `conectar()` en las cuatro aristas ya cierra el lazo sin helper nuevo.
-  2. El margen adaptativo (`ntn.margen_adaptativo` / gate G1) como el
-     instrumento que valida esa gobernanza en un gemelo digital ANTES de
-     tocar la red real.
+Lo nuevo respecto de la v1, con primitivas que YA existian y no se habian
+usado:
 
-Ninguna cifra de la curva de sensibilidad esta inventada: es la serie
-1/5/10/30 episodios -> MA 0.199/0.288/0.307/0.318 de
-`02_TEORIA/TEOREMA_MARGEN_ADAPTATIVO.md` (tesis-doctorado-6g), monotona
-creciente, verificada contra el archivo fuente el 2026-09-17 -- ver
-GUIA_CIFRAS.md en esta misma carpeta para la procedencia exacta de cada
-numero y por que NO se llama al bootstrap de `ntn.gate()` aqui (no hay
-desglose por semilla de este barrido en concreto en este repo: el veredicto
-"pasa" que se rotula es el de G1 en GATES.md, citado, no recalculado).
+  - `particulas.materializar` / `Desintegrar`: los cuatro bloques del lazo
+    aparecen como polvo que converge (no `FadeIn`) y el lazo entero se
+    disuelve para dar paso a la curva de MA (no `FadeOut`).
+  - `bloques.flujo()` recorre el ciclo TRES veces, con un SEGUNDO destello a
+    medio ciclo del primero (`AnimationGroup(..., lag_ratio=0.5)` dentro del
+    bucle): un lazo se siente ciclico cuando dos cosas lo recorren a la vez,
+    no con una sola pasada.
+  - Un punto brillante (`brillo.punto_brillante`) sube por la curva de MA
+    mientras esta se traza (`Create`), en vez de aparecer ya dibujada con
+    dos lineas de texto explicando el veredicto al lado.
+  - Una fila de compuertas (G0-G3): circulos llenos para las que pasaron,
+    uno solo con contorno para G3 (desbloqueada, sin correr) -- el estado se
+    lee en el relleno, no en una frase.
 
-PADA, el margen adaptativo y "NTNEnv-v2" son aportes de la tesis SIN
-validar a escala (regla editorial del proyecto de curso "Satelites e IA",
-que aplica aqui tal cual): el chip `fg.etiqueta()` se muestra al abrir el
-clip, antes del rombo. NO queda pegado en pantalla durante todo el tramo:
-el lienzo de video es fisicamente chico (2 in de alto, fijo por
-`Figura.pantalla`) y un chip fijo en una esquina se montaba sobre el
-titulo, sobre PERCEPCION y sobre la curva de MA en las tres etapas
-siguientes (medido en el -ql, tres solapes distintos, corregido).
+Ninguna cifra cambio respecto de la v1 (ver GUIA_CIFRAS.md de esta carpeta,
+esa tabla sigue valiendo): la sensibilidad 1/5/10/30 episodios -> MA
+0.199/0.288/0.307/0.318 sigue citada de TEOREMA_MARGEN_ADAPTATIVO.md, el
+umbral y el veredicto de G1 siguen citados de GATES.md, y el estado de
+G0-G2b/G3 tambien. El par [0.095, 0.318] SI se quito de esta version (ya no
+hay sitio para una cifra que necesita una frase para explicarse sin texto):
+sigue documentado en GUIA_CIFRAS.md si se quiere recuperar como rotulo aparte.
 
     manim render -qh --media_dir media 07-pada-gemelo-digital.py PadaGemeloDigital
 """
@@ -37,38 +43,24 @@ import sys
 sys.path.insert(0, "/workspace/studio/content/manim_extensions")
 
 import numpy as np
-from manim import FadeIn, FadeOut, Scene, VGroup
+from manim import (AnimationGroup, Circle, Create, FadeIn, FadeOut, Indicate,
+                   Scene, UpdateFromAlphaFunc, VGroup, linear)
 
 import bloques
+import brillo
 import figura as fg
 import ntn
+import particulas
 
 fg.Figura.pantalla(tema="marca")
 
 RADIO = 2.35
-# 1/5/10/30 episodios -> MA, y el umbral de la compuerta G1 (ambos citados,
-# no recalculados: ver GUIA_CIFRAS.md).
+# 1/5/10/30 episodios -> MA, y el umbral de la compuerta G1 (citados, no
+# recalculados: ver GUIA_CIFRAS.md).
 EPISODIOS = np.array([1.0, 5.0, 10.0, 30.0])
 MA_SENSIBILIDAD = np.array([0.199, 0.288, 0.307, 0.318])
 UMBRAL_G1 = ntn.UMBRAL_MA               # 0.25
-MA_PAR = (0.095, 0.318)                 # [MA_dec inferior, MA envolvente]
-
-
-def _lineas(textos, puntos, color_, margen_pt=16.0, minimo_pt=9.0,
-           hueco_pt=2.5):
-    """Varias lineas CORTAS apiladas: el lienzo de video es fisicamente
-    pequeno (2 in de alto, fijo por `Figura.pantalla`) y una sola frase larga
-    se encoge por debajo del suelo de legibilidad antes de caber a lo ancho
-    (medido: 'el margen adaptativo: cuanto...' a 9.5 pt bajaba a 4.4 pt)."""
-    grupo = VGroup(*[fg.texto(t, puntos, color_) for t in textos])
-    for linea in grupo:
-        fg.encoger_a_ancho(linea, margen_pt=margen_pt, minimo_pt=minimo_pt,
-                           que=f"linea '{linea.text}'")
-    for i in range(1, len(grupo)):
-        fg.pegar(grupo[i], grupo[i - 1], fg.ABJ, hueco_pt / fg.activa()
-                .puntos_por_unidad())
-        fg.poner(grupo[i], [0.0, fg.centro(grupo[i])[1], 0.0])
-    return grupo
+GATES = (("G0", True), ("G1", True), ("G2a", True), ("G2b", True), ("G3", False))
 
 
 class PadaGemeloDigital(Scene):
@@ -76,31 +68,19 @@ class PadaGemeloDigital(Scene):
         fg.fondo(self)
         ppu = fg.activa().puntos_por_unidad()
 
-        titulo = fg.titulo("PADA", puntos=20.0, arriba_pt=8.0)
-        subt = fg.texto("el ciclo cognitivo de la gobernanza autonoma",
-                        10.0, fg.tema()["apagado"])
-        fg.pegar(subt, titulo, fg.ABJ, 5.0 / ppu)
-        self.play(FadeIn(titulo, shift=0.15 * np.array([0.0, -1.0, 0.0])),
-                  FadeIn(subt), run_time=0.9)
-
-        # El chip se muestra UNA vez, centrado, en su propio respiro: el
-        # lienzo de video es fisicamente chico (2 in de alto, fijo) y
-        # pegarlo arriba a la derecha lo montaba sobre el titulo y el
-        # subtitulo (medido: se solapaban en el -ql). PADA y el margen
-        # adaptativo son aportes sin validar a escala; este aviso cubre
-        # las dos piezas del clip.
+        # El chip de aviso editorial va PRIMERO y SOLO, en su propio respiro:
+        # el lienzo de video es fisicamente chico (2 in de alto, fijo por
+        # `Figura.pantalla`) y un chip fijo en una esquina durante todo el
+        # clip se montaba sobre el lazo PADA y sobre la curva de MA (medido
+        # en la v1, tres solapes distintos).
         chip = fg.etiqueta("EN DESARROLLO - TESIS DOCTORAL IPN", puntos=11.0)
         fg.poner(chip, [0.0, 0.0, 0.0])
         fg.exigir_dentro(chip, margen_pt=10.0, que="chip de desarrollo")
         self.play(FadeIn(chip, scale=1.05), run_time=0.6)
-        self.wait(1.3)
-        # El titulo, el subtitulo y el chip se despejan ANTES del rombo: se
-        # quedaban en pantalla todo el clip y quedaban detras (y encima) de
-        # PERCEPCION, del texto del gemelo digital y de la curva de MA —
-        # medido en el -ql, tres solapes distintos. El aviso ya se dio.
-        self.play(FadeOut(chip), FadeOut(titulo), FadeOut(subt), run_time=0.6)
+        self.wait(1.1)
+        self.play(FadeOut(chip), run_time=0.5)
 
-        # --- el rombo PADA ---------------------------------------------
+        # --- el lazo PADA: aparece como polvo, gira dos veces -------------
         colores = [fg.color(0), fg.color(1), fg.color(2), fg.color(3)]
         percibe = bloques.bloque("PERCEPCION", color=colores[0])
         analiza = bloques.bloque("ANALISIS", color=colores[1])
@@ -112,97 +92,101 @@ class PadaGemeloDigital(Scene):
         actua.move_to([-RADIO, 0.0, 0.0])
         bloques_pada = VGroup(percibe, analiza, decide, actua)
 
+        self.play(particulas.materializar(percibe),
+                  particulas.materializar(analiza),
+                  particulas.materializar(decide),
+                  particulas.materializar(actua), run_time=1.1)
+
         c_pa = bloques.conectar(percibe, analiza)
         c_ad = bloques.conectar(analiza, decide)
         c_da = bloques.conectar(decide, actua)
         c_ap = bloques.conectar(actua, percibe)
         conexiones = VGroup(c_pa, c_ad, c_da, c_ap)
-
-        self.play(FadeIn(bloques_pada), run_time=0.8)
         self.play(FadeIn(conexiones), run_time=0.5)
-        for _ in range(2):
-            self.play(bloques.flujo([c_pa, c_ad, c_da, c_ap]))
-        self.wait(0.6)
 
-        etiqueta_ciclo = _lineas(
-            ("percibe la red, analiza el estado,",
-             "decide una politica, actua -- y vuelve a percibir"),
-            9.5, fg.tema()["apagado"], margen_pt=18.0)
-        fg.poner(etiqueta_ciclo, [0.0, -fg.activa().frame_height / 2
-                                  + 16.0 / ppu, 0.0], anclaje=fg.ABJ)
-        self.play(FadeIn(etiqueta_ciclo), run_time=0.6)
-        self.wait(1.1)
-        self.play(FadeOut(bloques_pada), FadeOut(conexiones),
-                  FadeOut(etiqueta_ciclo), run_time=0.6)
+        # Dos destellos por vuelta, el segundo a medio ciclo del primero: asi
+        # se ve un LAZO (algo que se persigue a si mismo), no un pipeline.
+        for _ in range(3):
+            self.play(AnimationGroup(
+                bloques.flujo([c_pa, c_ad, c_da, c_ap], color=fg.color(0)),
+                bloques.flujo([c_pa, c_ad, c_da, c_ap], color=fg.color(2)),
+                lag_ratio=0.5))
 
-        # --- el gemelo digital -------------------------------------------
-        gemelo = fg.texto("SE VALIDA EN UN GEMELO DIGITAL", 16.0, fg.color(0),
-                          peso="BOLD")
-        gemelo2 = fg.texto("antes de tocar la red real", 13.0,
-                           fg.tema()["tinta"])
-        fg.encoger_a_ancho(gemelo, margen_pt=18.0, que="gemelo digital")
-        fg.encoger_a_ancho(gemelo2, margen_pt=18.0, que="gemelo digital (2)")
-        fg.poner(gemelo, [0.0, 0.5, 0.0])
-        fg.pegar(gemelo2, gemelo, fg.ABJ, 8.0 / ppu)
-        self.play(FadeIn(gemelo, scale=1.05), run_time=0.7)
-        self.play(FadeIn(gemelo2), run_time=0.6)
-        self.wait(1.2)
-        self.play(FadeOut(gemelo), FadeOut(gemelo2), run_time=0.6)
+        self.play(particulas.Desintegrar(bloques_pada, semilla=11),
+                  FadeOut(conexiones), run_time=0.9)
+        self.remove(bloques_pada, conexiones)
 
-        # --- el margen adaptativo: el instrumento de esa validacion ------
-        # Las cuatro piezas se apilan relativas entre si y se ESCALAN juntas
-        # con `encajar` (como en 01-margen-adaptativo-con-ic.py): apilarlas
-        # con offsets en puntos desde un ancla absoluta, sin encajar, se salia
-        # del lienzo por abajo -7.78 contra un limite de -3.56 (medido).
-        pie2 = _lineas(("el margen adaptativo:",
-                       "cuanto se gana, como maximo, por adaptarse"),
-                      10.0, fg.tema()["apagado"])
-        fg.poner(pie2, [0.0, 0.0, 0.0])
-
+        # --- la curva de MA: un punto que sube mientras se traza ---------
         curva = ntn.curva_ma(EPISODIOS, MA_SENSIBILIDAD, umbral=UMBRAL_G1,
-                             xlabel="episodios (1 a 30)",
-                             ylabel="margen adaptativo MA",
-                             puntos_marca=11.0, ancho_=9.6, alto_=3.0)
-        fg.pegar(curva, pie2, fg.ABJ, 10.0 / ppu)
-        fg.poner(curva, [0.0, fg.centro(curva)[1], 0.0])
-
-        veredicto = _lineas(
-            ("G1 (IC95 % sobre semillas 42/43/44):",
-             f"MA = {MA_SENSIBILIDAD[-1]:.3f} >= {UMBRAL_G1:.2f} -> PASA"),
-            10.5, fg.color(1))
-        fg.pegar(veredicto, curva, fg.ABJ, 12.0 / ppu)
-        fg.poner(veredicto, [0.0, fg.centro(veredicto)[1], 0.0])
-
-        par = _lineas(
-            (f"se reporta el par [{MA_PAR[0]:.3f}, {MA_PAR[1]:.3f}]:",
-             "minimo demostrado (G2b), envolvente estimada (G1)"),
-            9.5, fg.tema()["apagado"])
-        fg.pegar(par, veredicto, fg.ABJ, 8.0 / ppu)
-        fg.poner(par, [0.0, fg.centro(par)[1], 0.0])
-
-        bloque_ma = VGroup(pie2, curva, veredicto, par)
-        fg.encajar(bloque_ma, margen_pt=10.0, que="bloque del margen",
+                             xlabel="episodios", ylabel="MA",
+                             etiquetas=[int(e) for e in EPISODIOS],
+                             puntos_marca=9.0, ancho_=9.8, alto_=3.6)
+        fg.poner(curva, [0.0, 0.2, 0.0])
+        fg.encajar(curva, margen_pt=10.0, que="curva MA",
                   reservar_arriba_pt=6.0, reservar_abajo_pt=6.0)
-        fg.exigir_dentro(bloque_ma, margen_pt=6.0, que="bloque del margen")
+        fg.exigir_dentro(curva, margen_pt=6.0, que="curva MA")
 
-        self.play(FadeIn(pie2), run_time=0.6)
-        self.play(FadeIn(curva), run_time=1.1)
+        ax, linea_curva, linea_umbral, etiqueta_umbral = curva[0:4]
+        self.play(Create(ax.marco, introducer=False),
+                  FadeIn(ax.rejilla, ax.marcas_x, ax.marcas_y,
+                         ax.rotulo_x, ax.rotulo_y), run_time=0.8)
+        self.play(FadeIn(linea_umbral, etiqueta_umbral), run_time=0.4)
+
+        xs_full = np.linspace(float(EPISODIOS[0]), float(EPISODIOS[-1]), 240)
+        ys_full = np.interp(xs_full, EPISODIOS, MA_SENSIBILIDAD)
+        puntos_curva = np.array([ax.c2p(float(x), float(y))
+                                 for x, y in zip(xs_full, ys_full)])
+        punto = brillo.punto_brillante(color=fg.color(1), radio=0.05)
+        punto.move_to(puntos_curva[0])
+
+        def _subir(mob, alpha):
+            i = int(round(alpha * (len(puntos_curva) - 1)))
+            mob.move_to(puntos_curva[i])
+
+        self.add(punto)
+        self.play(Create(linea_curva), UpdateFromAlphaFunc(punto, _subir),
+                  run_time=3.0, rate_func=linear)
+
+        etiqueta_g1 = fg.texto("G1 PASA", 11.0, fg.color(2))
+        fg.poner(etiqueta_g1, puntos_curva[-1] + fg.ARR * (10.0 / ppu),
+                anclaje=fg.DER + fg.ABJ)
+        fg.exigir_dentro(etiqueta_g1, margen_pt=4.0, que="etiqueta G1")
+        self.play(Indicate(punto, scale_factor=1.6, color=fg.color(2)),
+                  FadeIn(etiqueta_g1), run_time=0.7)
         self.wait(1.3)
-        self.play(FadeIn(veredicto), run_time=0.7)
-        self.wait(1.4)
-        self.play(FadeIn(par), run_time=0.6)
-        self.wait(1.6)
-        self.play(FadeOut(pie2), FadeOut(curva), FadeOut(veredicto),
-                  FadeOut(par), run_time=0.7)
+        self.play(FadeOut(curva), FadeOut(punto), FadeOut(etiqueta_g1),
+                  run_time=0.7)
 
-        # --- cierre, sin sobreclaim --------------------------------------
-        cierre = _lineas(("compuertas G0 a G2b: aprobadas",
-                         "G3 (50k episodios): desbloqueada, sin correr"),
-                        10.5, fg.tema()["apagado"], margen_pt=18.0)
-        fg.poner(cierre, [0.0, 0.3, 0.0])
-        self.play(FadeIn(cierre), run_time=0.7)
-        self.wait(1.6)
-        self.play(FadeOut(cierre), run_time=0.7)
-        self.wait(0.3)
+        # --- la fila de compuertas: el relleno ES el estado --------------
+        paso = 1.55
+        fichas = VGroup()
+        for i, (nombre, pasada) in enumerate(GATES):
+            x = (i - (len(GATES) - 1) / 2.0) * paso
+            if pasada:
+                circulo = Circle(radius=0.24, stroke_width=1.6,
+                                 color=fg.color(0), fill_color=fg.color(0),
+                                 fill_opacity=0.9)
+            else:
+                circulo = Circle(radius=0.24, stroke_width=1.6,
+                                 color=fg.tema()["apagado"], fill_opacity=0.0)
+            circulo.move_to([x, 0.5, 0.0])
+            etiqueta_g = fg.texto(
+                nombre, 8.0,
+                fg.tema()["tinta"] if pasada else fg.tema()["apagado"])
+            fg.pegar(etiqueta_g, circulo, fg.ABJ, 4.0 / ppu)
+            fg.poner(etiqueta_g, [x, fg.centro(etiqueta_g)[1], 0.0])
+            fichas.add(VGroup(circulo, etiqueta_g))
+        fg.encajar(fichas, margen_pt=14.0, que="compuertas")
+        fg.exigir_dentro(fichas, margen_pt=6.0, que="compuertas")
+        halo_g3 = brillo.con_brillo(fichas[-1][0], color=fg.tema()["apagado"],
+                                    capas=3, ancho_max=6, opacidad=0.18)
+
+        self.play(AnimationGroup(*[FadeIn(f, scale=1.25) for f in fichas],
+                                 lag_ratio=0.22), run_time=1.4)
+        self.play(FadeIn(halo_g3), run_time=0.4)
+        self.wait(1.4)
+        self.play(FadeOut(fichas), FadeOut(halo_g3), run_time=0.6)
+
+        self.wait(0.2)
         self.add(fg.sello(extra="MA citado de TEOREMA_MARGEN_ADAPTATIVO/GATES"))
         self.wait(1.3)
