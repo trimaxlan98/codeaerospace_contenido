@@ -77,8 +77,8 @@ import os
 from pathlib import Path
 
 import numpy as np
-from manim import (Axes, DashedLine, Dot, Line, Polygon, Rectangle, Text,
-                   VGroup, VMobject, config)
+from manim import (Axes, DashedLine, Dot, Line, Polygon, Rectangle,
+                   RoundedRectangle, Text, VGroup, VMobject, config)
 
 VERSION = "1.0"
 
@@ -1132,6 +1132,32 @@ def leyenda(entradas, puntos=6.0, columnas=1, hueco_pt=5.0, tipo="linea"):
         poner(it, [(i // filas) * ancho_col, -(i % filas) * alto_fila, 0.0],
               anclaje=IZQ)
     return VGroup(*items)
+
+
+def etiqueta(cadena, puntos=6.0, relleno_pt=3.0, color_fondo=None,
+            color_texto=None):
+    """Chip solido de aviso editorial (p.ej. "EN DESARROLLO - TESIS ...").
+
+    Rectangulo redondeado ajustado a la caja de TINTA del texto (ver «El
+    espacio infla la caja»): mide con `caja()`, no con `.width`, asi que un
+    rotulo de varias palabras no se come el relleno. El relleno es en puntos,
+    para que el chip salga igual de apretado en paper y en video.
+    """
+    th = tema()
+    t = texto(cadena, puntos, color_texto or th["fondo"], peso="BOLD")
+    ppu = activa().puntos_por_unidad()
+    m = float(relleno_pt) / ppu
+    c = caja(t)
+    ancho_r = (c[1][0] - c[0][0]) + 2 * m
+    alto_r = (c[1][1] - c[0][1]) + 2 * m
+    fondo_chip = RoundedRectangle(
+        corner_radius=min(alto_r, ancho_r) * 0.28, width=ancho_r,
+        height=alto_r, stroke_width=0)
+    fondo_chip.set_fill(color=color_fondo or th["series"][0], opacity=1.0)
+    poner(fondo_chip, centro(t))
+    grupo = VGroup(fondo_chip, t)
+    grupo.set_z_index(50)
+    return grupo
 
 
 def encajar(mob, margen_pt=5.0, minimo_pt=PT_MINIMO, que="figura",
