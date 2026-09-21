@@ -171,8 +171,16 @@ const StarfieldBackground = () => {
       className="pointer-events-none fixed inset-0 -z-10 transition-colors duration-300"
       style={{ background: 'var(--canvas)' }}
     >
+      {/* Las particulas son ORNAMENTO: no llevan informacion y se mueven.
+          `data-ornamento` es su marca para el instrumento de auditoria, que
+          las apaga antes de fotografiar el fondo — una estrella de 2 px bajo
+          una letra da un contraste que no existe en el fotograma siguiente
+          (sprint 11). El fondo de verdad —el lienzo, los velos— lo pinta el
+          div de fuera y ese SI se mide. */}
       <canvas
         ref={canvasRef}
+        aria-hidden="true"
+        data-ornamento="estrellas"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.85 }}
       />
     </div>

@@ -27,8 +27,11 @@ contra el destino real).
 from __future__ import annotations
 
 import os
+import re
 import struct
+import unicodedata
 from pathlib import Path
+from typing import Callable
 
 # Extension -> (tipo, media type). El tipo es lo que la interfaz usa para
 # decidir si pinta un reproductor, una imagen o un enlace.
@@ -69,6 +72,34 @@ NOMBRES = {
     "sfx": "Banco de efectos",
     "promos": "Promos de redes",
 }
+
+# Orden de la raiz: primero lo que produce el propio Estudio, en el orden en
+# que se trabaja (el curso montado, sus variantes, lo que lo acompaña), y
+# despues las carpetas de cursos muxeados a mano.
+ORDEN = list(NOMBRES)
+
+
+def slugs_de(nombre: str) -> set[str]:
+    """Los slugs con que el pipeline ha escrito carpetas para un proyecto.
+
+    Conviven TRES familias en `exports/` y ninguna se puede reescribir sin
+    romper enlaces ya entregados:
+      - `narracion.slugify` / `importar.slug` normalizan a ASCII y cortan a 40
+        («Satélites» → `satelites`);
+      - `projects.project_slug` corta a 40 pero NO normaliza: el acento se
+        vuelve guion («Satélites» → `sat-lites`). Con esa salen los cursos
+        narrados a mano;
+      - las herramientas de terminal (`empaquetar_presentacion.slugify`, los
+        cursos muxeados con `mux.sh`) normalizan pero NO cortan
+        (`algebra-lineal-2-1-la-matriz-es-un-movimiento`, 45 caracteres).
+    Asi que el nombre de la carpeta no basta para leer el curso: se resuelve
+    contra la base probando las cuatro combinaciones.
+    """
+    ascii_ = unicodedata.normalize("NFKD", nombre).encode("ascii", "ignore").decode()
+    completos = {re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-") for t in (ascii_, nombre)}
+    return (completos | {c[:40].strip("-") for c in completos}
+            | {re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-")[:40] for t in (ascii_, nombre)}) - {""}
+
 
 # Un listado no debe costar minutos: tope de entradas por carpeta y de
 # duraciones medidas (leer el `moov` de un mp4 son dos o tres seeks, pero
@@ -140,8 +171,13 @@ def _mvhd(moov: bytes) -> float | None:
 class EntregasService:
     """Explorador de solo lectura de `exports/`."""
 
-    def __init__(self, cfg) -> None:
+    def __init__(self, cfg,
+                 proyectos: Callable[[], list[dict]] | None = None) -> None:
         self.cfg = cfg
+        # Fuente de {id, name} de los proyectos: con ella las carpetas se
+        # nombran por su curso y no por su id o su slug (la misma regla que
+        # el sprint 9 puso a los renders). Sin ella, el nombre crudo.
+        self._proyectos = proyectos
         self._dur: dict[tuple[str, int, int], float | None] = {}
 
     @property
@@ -204,10 +240,36 @@ class EntregasService:
                 break
         return {"archivos": archivos, "bytes": bytes_}
 
+    def _indice_nombres(self) -> dict[str, str]:
+        """id y slugs de cada proyecto → su nombre. Se construye por listado:
+        son unas decenas de filas y asi un proyecto renombrado se ve al
+        momento."""
+        if not self._proyectos:
+            return {}
+        indice: dict[str, str] = {}
+        try:
+            filas = self._proyectos()
+        except Exception:  # la biblioteca no cae porque falle la base
+            return {}
+        for p in filas:
+            nombre = (p.get("name") or "").strip()
+            if not nombre:
+                continue
+            for slug in slugs_de(nombre):
+                indice.setdefault(slug, nombre)
+            if p.get("id"):
+                indice[str(p["id"])] = nombre
+        return indice
+
+    @staticmethod
+    def _titulo(nombre: str, indice: dict[str, str]) -> str | None:
+        return NOMBRES.get(nombre) or indice.get(nombre)
+
     def listar(self, ruta: str | None = None) -> dict:
         destino = self.resolver(ruta)
         if not destino.is_dir():
             raise FileNotFoundError(ruta or "")
+        indice = self._indice_nombres()
         carpetas, archivos = [], []
         try:
             entradas = sorted(os.scandir(destino), key=lambda e: e.name.lower())
@@ -220,7 +282,7 @@ class EntregasService:
                     resumen = self._resumen_carpeta(Path(e.path))
                     carpetas.append({
                         "nombre": e.name, "ruta": rel,
-                        "titulo": NOMBRES.get(e.name),
+                        "titulo": self._titulo(e.name, indice),
                         "modificado": e.stat().st_mtime, **resumen,
                     })
                 elif e.is_file():
@@ -242,9 +304,26 @@ class EntregasService:
         rel_actual = self._rel(destino)
         if rel_actual:
             padre = str(Path(rel_actual).parent) if "/" in rel_actual else ""
+        # En la raiz, lo del Estudio primero y el resto por el nombre que se
+        # lee, reducido a slug ASCII: ordenar el titulo tal cual manda
+        # «Aerodinámica» detras de la «z» (la «á» va despues del ASCII) y
+        # separa un curso con nombre de sus vecinos que solo tienen slug.
+        if not rel_actual:
+            def clave(c):
+                visto = c["titulo"] or c["nombre"]
+                ascii_ = unicodedata.normalize("NFKD", visto).encode("ascii", "ignore").decode()
+                return (ORDEN.index(c["nombre"]) if c["nombre"] in ORDEN else len(ORDEN),
+                        re.sub(r"[^a-z0-9]+", "-", ascii_.lower()).strip("-"))
+            carpetas.sort(key=clave)
+        partes = rel_actual.split("/") if rel_actual else []
+        migas = [{"nombre": "Biblioteca", "ruta": "", "titulo": "Biblioteca"}] + [
+            {"nombre": p, "ruta": "/".join(partes[:i + 1]),
+             "titulo": self._titulo(p, indice)}
+            for i, p in enumerate(partes)]
         return {
             "ruta": rel_actual, "padre": padre,
-            "titulo": NOMBRES.get(destino.name) if rel_actual else "Biblioteca",
+            "titulo": self._titulo(destino.name, indice) if rel_actual else "Biblioteca",
+            "migas": migas,
             "carpetas": carpetas, "archivos": archivos,
             "bytes": sum(a["bytes"] for a in archivos)
                      + sum(c["bytes"] for c in carpetas),

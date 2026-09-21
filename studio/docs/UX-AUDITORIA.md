@@ -437,3 +437,166 @@ transición termine, o se inventará defectos.
 
 **0 fallos** en las 64 combinaciones de vistas y las 40 de overlays, tras los
 arreglos. Contraste, desborde, consola, capas, Escape y foco.
+
+---
+
+# Quinta auditoría — 2026-09-14 (sprint 11: las superficies de Estudio v3)
+
+El sprint 10 cerró el 2026-09-01. Dos días después entró **Estudio v3** y, con
+él, unas 2 500 líneas de interfaz que no pasaron por los criterios:
+Laboratorio, la Biblioteca de entregas, Fotogramas, los diálogos de guion,
+importar, duplicar, historial de script y render por lotes, y los selectores
+de voz y música. Es la misma forma de regresión que abrió el sprint 10.
+
+## El instrumento: del ancestro al píxel
+
+`studio/tools/ux_auditoria.mjs` (commit `ba44fa6`, 2026-09-09) ya no compone
+el fondo subiendo por los ancestros. **Lee el píxel**: pinta todo el texto en
+transparente, captura la página y muestrea el fondo real bajo cada nodo de
+texto, con sus velos, desenfoques, degradados y lo que haya debajo aunque no
+sea ancestro. `studio/tools/ux_instancia.py` levanta un backend aislado en
+`/tmp` y lo siembra con cursos, un promo, guiones, una narración y un
+historial de renders, porque una vista vacía no pinta texto que medir.
+
+Cobertura: 4 temas × 10 vistas × 2 viewports + 14 overlays × 4 temas × 2
+viewports = **192 escenas**, **8 099 nodos de texto**.
+
+## Línea base: 315 fallos
+
+| familia | fallos | ¿real? |
+|---------|--------|--------|
+| contraste dentro de diálogos, tema claro | 229 | **sí** |
+| contraste en el resto | 62 | en parte (ver abajo) |
+| oclusión | 16 | no: contenido plegado |
+| foco sin anillo | 8 | **sí** |
+
+### 1. En el tema claro, todo lo que flota era gris (229)
+
+`DialogContent` usaba `bg-surface`, que en `daylight` es blanco al 55 %. Ese
+velo está calibrado para apoyarse en el lienzo claro; un diálogo se apoya en
+el overlay `bg-black/70`. Resultado: panel gris `#acadad` y `muted`, `faint`,
+los rótulos `eyebrow`, los botones *Cancelar* y *Cerrar* y hasta el aviso en
+`warn` entre **2,17 y 3,38:1**, en los 14 diálogos. La paleta de comandos, la
+hoja de atajos, importar, nuevo proyecto, estilo, duplicar, lotes, guion y
+mezcla: todos.
+
+El sprint 10 midió 5 overlays en `daylight` y dio 0 fallos. No se equivocó en
+lo que miraba: componía el fondo **por ancestros**, y el overlay es **hermano**
+del panel, no ancestro. El píxel sí lo ve.
+
+**Arreglo:** token `--elevated`, opaco, para todo lo que flota (diálogo,
+cajón del asistente, menú de `Select`, tooltip y avisos de fin de render).
+En los temas oscuros vale `surface-2` compuesto sobre el lienzo, así que el
+aspecto sobre fondo limpio no cambia; en `daylight`, blanco.
+
+### 2. La barra con siete vistas no cabía en un portátil
+
+No lo detecta la auditoría general, que mide 1440 y 390. Con Biblioteca y
+Laboratorio la nav pasó de cinco a siete entradas, y la barra se rompía
+**entre medias**. Instrumento nuevo, `studio/tools/ux_barra.mjs`: cada ancho
+de 320 a 1920 px con cada vista activa. Sobre el build de producción, en solo
+cuatro anchos: **112 fallos**.
+
+| ancho | antes |
+|-------|-------|
+| 390 | la nav hace scroll y esconde «Admin» |
+| 900 | esconde «Laboratorio» y «Admin» |
+| 1024 / 1280 | «Admin» cortado; el reloj `15:08:15 UTC` y `Ctrl K` partidos en dos líneas |
+| 1536 | los medidores CPU/RAM vuelven a cortar «Admin» |
+
+**Arreglo:** por debajo de `xl` solo la vista activa lleva rótulo (las demás,
+icono con `title` y el rótulo en `sr-only`); reloj y rótulos de *Buscar*
+ceden a `2xl`, medidores a 1680 px; en móvil, relleno y separación más
+estrechos. **0 fallos de 360 a 1920 px con cualquier vista activa.** A 320 px
+también se pliega el rótulo de la activa.
+
+### 3. Foco invisible en el buscador de la paleta (8)
+
+El `input` de la paleta de comandos llevaba `focus-visible:outline-none` sin
+anillo que lo sustituyera: la única parada de foco del sistema sin indicador
+(WCAG 2.4.7). Ahora lleva el `ring-2 ring-cyan` de todos.
+
+### 4. Contraste fuera de los diálogos: lo real y el ruido (62)
+
+Reales:
+
+- **CodeMirror en claro.** `defaultHighlightStyle` pinta f-strings y regex en
+  `#e40` (3,06:1 sobre `#e1e6eb`), tipos en `#085` (3,59) y lo inválido en
+  `#f00` (3,18). Lo cazó el Laboratorio, cuya plantilla usa f-strings. Se
+  oscurecen dentro de su familia (`#b83300`, `#06703d`, `#b91c1c`).
+- **`text-accent/70`** en la resolución del detalle de curso (`1280×720`):
+  3,2–4,0:1 en `ion`, `nebula` y `daylight`. Un dato no va al 70 %.
+- **`derivado`** del render por lotes en `text-faint` sobre chip: 3,7–4,05:1.
+  Es un estado que se lee → `muted`.
+
+Ruido del instrumento: una veintena de «fallos» sobre fondos como
+`rgb(14,88,104)` o `rgb(129,50,143)`. Son **estrellas del fondo animado**
+—puntos de 2 px y enlaces de 0,6 px— vistas a través del vidrio justo bajo una
+letra en ese fotograma. Cambian de sitio en cada captura. Primer intento:
+muestrear **cinco** puntos por nodo y juzgar por el **segundo peor**, con el
+argumento de que un fondo real (chip, velo, degradado) cubre la caja entera y
+hunde los cinco a la vez.
+
+**No bastó, y el fallo del argumento se midió el 21.** JSX corta el texto en
+un nodo por cada expresión, así que media interfaz son nodos de **un
+carácter**: el ` s` de `· 12 s`, el `2` de `2/8`, cada token del editor. En
+una caja de 5 px de ancho los cinco puntos caben dentro de la misma estrella
+de 2 px. Tres pasadas seguidas sobre las mismas escenas dieron **un fallo
+distinto cada vez**, siempre con un «fondo» del color del acento:
+
+| pasada | escena | texto | ratio | «fondo» |
+|--------|--------|-------|-------|---------|
+| completa | `laboratorio · nebula · escritorio` | `i` | 4,48 | `rgb(59,31,68)` |
+| completa | `promo-detalle · ion · móvil` | `s` | 1,71 | `rgb(22,116,84)` |
+| completa | `proyectos · nebula · móvil` | `2` | 4,38 | `rgb(29,25,36)` |
+| 1 | `laboratorio · nebula · móvil` | `=` | 3,00 | `rgb(127,61,141)` |
+| 2 | `laboratorio · ion · escritorio` | `,` | 2,65 | `rgb(23,117,86)` |
+| 3 | `laboratorio · ion · móvil` | `3` | 3,31 | `rgb(25,116,86)` |
+
+La regla nueva separa **ornamento** de **fondo**. Las partículas son
+decoración: no llevan información, se mueven y el usuario no lee sobre ellas
+dos fotogramas seguidos. Llevan `data-ornamento="estrellas"` (y `aria-hidden`,
+que les faltaba) y la auditoría las apaga junto con el texto antes de
+fotografiar. El lienzo NO se pierde: lo pinta el `div` de fuera, y el `canvas`
+solo dibuja estrellas y enlaces sobre transparente. Con `--con-ornamento` se
+mide también la capa decorativa. El muestreo de cinco puntos se queda, que
+para un fondo parcial de verdad —el borde de un chip bajo media palabra—
+sigue haciendo falta.
+
+Regla para el futuro: **un fallo que no se repite en dos pasadas no es un
+fallo, es el instrumento**. Antes de tocar un token, repetir la escena.
+
+### 5. Oclusión (16): contenido plegado
+
+Las 16 eran el texto de *Continuidad* de cada clip, dentro de un `<details>`
+cerrado. Chromium le sigue dando caja aunque no se pinte. El instrumento
+descarta ya lo que cuelga de un `<details>` cerrado (salvo su `<summary>`).
+
+## La Biblioteca nombraba por id
+
+Fuera del contraste, el recorrido encontró un defecto de flujo que el sprint 9
+ya había cerrado para los renders y que volvió por la vista nueva: la
+Biblioteca de entregas enseñaba `peliculas/20e9c6bd920e47f9` y carpetas como
+`sat-lites-e-ia-la-red-que-aprende-a-gobe` (el slug sin normalizar vuelve
+guion el acento, y corta a 40 caracteres). Ahora el backend resuelve cada
+carpeta contra los proyectos, por id o por las dos familias de slug que
+conviven en `exports/`. Contra los datos reales de producción (184 proyectos,
+10 carpetas con nombre de curso posible): **10 de 10 resueltas**.
+
+## Cierre del sprint 11 (2026-09-21)
+
+La corrida del 14 dejó el diagnóstico y los arreglos escritos en el árbol de
+trabajo y **sin verificar**. El 21 se retomaron tal cual y se cerró con
+medida:
+
+| instrumento | cobertura | fallos |
+|-------------|-----------|--------|
+| `ux_auditoria.mjs` | 192 escenas (4 temas × 10 vistas × 2 viewports + 14 overlays × 4 temas × 2 viewports), 7 539 nodos de texto | **0** |
+| `ux_barra.mjs` | 15 anchos de 360 a 1920 px × 8 vistas activas = 120 combinaciones | **0** |
+| `pytest -q` | backend completo | **386/386** |
+| `vite build` | bundle de producción | verde |
+
+Comprobado además mirando la captura, en 1440×900 y 390×844: el diálogo de
+`daylight` es blanco opaco (`rgb(255,255,255)`) igual que el menú de `Select`;
+a 1280 px caben las siete vistas rotuladas con «Admin» entero; en móvil la nav
+baja a su línea con la vista activa rotulada y las demás como icono.

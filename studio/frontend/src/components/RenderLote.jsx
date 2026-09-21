@@ -183,7 +183,7 @@ export function LoteProgreso({ lote }) {
           </span>
         )}
         {lote.derivado && (
-          <span className="font-mono text-[10.5px] text-faint"
+          <span className="font-mono text-[10.5px] text-muted"
             title="el backend se reinició: el lote se reconstruye desde los jobs del proyecto">
             derivado
           </span>

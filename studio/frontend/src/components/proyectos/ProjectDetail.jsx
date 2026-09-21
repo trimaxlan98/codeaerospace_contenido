@@ -424,7 +424,7 @@ export default function ProjectDetail({ projectId, jobs, onEditClip, onBack, onO
                 title={project.specs ? `${project.specs.resolution} a ${project.specs.fps} fps` : undefined}>
                 {QUALITY_LABEL[project.quality] || project.quality}
                 {project.specs && (
-                  <span className="text-accent/70"> · {project.specs.resolution.replace('x', '×')}</span>
+                  <span> · {project.specs.resolution.replace('x', '×')}</span>
                 )}
               </span>
               <Select value={project.formato || 'horizontal'} onValueChange={saveFormato}

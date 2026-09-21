@@ -37,6 +37,7 @@ leer el resultado. Todo el rediseño se juzga contra esa tarea.
 | 8 | Auditoría de los 4 temas en las 8 vistas + cero solapes de menús (encargos 3 y 4) | ✅ hecho 2026-08-15 | ver `UX-AUDITORIA.md` |
 | 9 | Densidad y flujo: un render se identifica por su curso, narración visible en el índice, saltar al contenido (encargos 5 y 6) | ✅ hecho 2026-08-20 | ver abajo |
 | 10 | Regresión de las superficies nuevas: Estudio v2, presentaciones y sonido contra los 12 criterios (encargos 3 y 4) | ✅ hecho 2026-09-01 | ver abajo |
+| 11 | Regresión de Estudio v3: lo que flota es opaco, la barra cabe en cualquier ancho, la Biblioteca nombra por curso (encargos 3, 4, 5 y 7) | ✅ hecho 2026-09-21 | ver abajo |
 
 Leyenda: ✅ hecho · 🟡 parcial · ⏳ pendiente.
 
@@ -371,9 +372,15 @@ secciones en 1440×900 y 390×844, tema oscuro y claro. Sin errores de consola
 - La web usa Space Grotesk donde el video usa Rajdhani: el wordmark de la
   consola no es tipográficamente idéntico al del render. Traer la TTF del repo
   a `public/` es viable si algún día se quiere fidelidad exacta.
-- El bundle principal pasa de 900 kB (CodeMirror + Radix + la app). Sin
-  `manualChunks` extra ni carga diferida del editor; en una consola de un solo
-  usuario tras login no duele, pero es el siguiente ahorro obvio.
+- El bundle principal pasa de 900 kB (CodeMirror + Radix + la app); con
+  Estudio v3 ya son **1 047 kB** (332 kB gzip) y `vite build` avisa en cada
+  compilación. Sin `manualChunks` extra ni carga diferida del editor; en una
+  consola de un solo usuario tras login no duele, pero es el siguiente ahorro
+  obvio.
+- **Una vista nueva en la barra obliga a correr `studio/tools/ux_barra.mjs`.**
+  Y cualquier superficie nueva, a `ux_auditoria.mjs` sobre `ux_instancia.py`:
+  es la tercera vez (sprints 10 y 11) que la app crece por otra vía y la
+  regresión solo aparece al volver a medir.
 
 Cerrados en el sprint 9: la identificación de los jobs por escena, la
 narración ausente del índice de cursos y la pasada de temas (esta última en el
@@ -809,3 +816,97 @@ automática **0 fallos** en 4 temas × 8 vistas × 2 viewports y en 5 overlays �
 existen en reposo — el primer informe acusó al botón del login de 1,26:1, y
 era mentira. Cualquier medición automática de color aquí tiene que esperar a
 que la transición acabe.
+
+---
+
+## Sprint 11 — la regresión de Estudio v3 (hecho 2026-09-21)
+
+Mismo motivo que el sprint 10, dos semanas después: el 2026-09-03 entró
+Estudio v3 con ~2 500 líneas de interfaz (Laboratorio, Biblioteca de
+entregas, Fotogramas, importar, duplicar, guion, historial, lotes, voz y
+música) que no pasaron por los criterios. La corrida del cron del 3 de
+septiembre ya lo había dejado escrito: *cuando vuelva a entrar interfaz nueva,
+toca un sprint 11 de regresión*. Método y tablas: `UX-AUDITORIA.md`, quinta
+auditoría.
+
+### Dos instrumentos, y por qué hacen falta los dos
+
+- `studio/tools/ux_auditoria.mjs` **lee el píxel** en vez de componer el fondo
+  por ancestros. Con eso aparecieron 229 fallos que el método del sprint 10 no
+  podía ver: el overlay de un diálogo es hermano del panel, no ancestro.
+- `studio/tools/ux_barra.mjs` (nuevo) mide la barra de 320 a 1920 px con cada
+  vista activa. La auditoría general mide 1440 y 390, y la barra se rompía
+  **entre medias**.
+
+### Lo que se arregló
+
+1. **Lo que flota es opaco.** En `daylight` los 14 diálogos eran grises
+   (`#acadad`: blanco al 55 % sobre overlay negro) y su texto secundario
+   quedaba entre 2,2 y 3,4:1. Token nuevo `--elevated` para diálogos, cajón
+   del asistente, menú de `Select`, tooltips y avisos.
+2. **La barra cabe.** Con siete vistas, a 1280 px «Admin» salía cortado y el
+   reloj se partía en dos líneas; a 900 px desaparecían dos vistas sin rastro.
+   Por debajo de 1280 px solo la vista activa lleva rótulo; lo que cede
+   primero es la telemetría.
+3. **La Biblioteca nombra por curso.** Enseñaba `peliculas/20e9c6bd920e47f9`
+   y `sat-lites-e-ia-la-red-que-aprende-a-gobe`: la misma regla que el sprint
+   9 impuso a los renders, perdida en una vista nueva. El backend resuelve
+   cada carpeta por id o por las dos familias de slug de `exports/`; migas y
+   búsqueda usan el nombre. Contra los datos de producción: 10 de 10.
+4. **CodeMirror en claro:** tres colores del resaltado por defecto bajo AA
+   (f-strings `#e40` a 3,06:1), oscurecidos.
+5. **Foco visible en el buscador de la paleta**, la única parada de foco del
+   sistema sin anillo.
+6. `text-accent/70` en la resolución del curso y `derivado` en `text-faint`
+   sobre chip: datos que se leen, subidos de tono.
+
+### El instrumento también se corrigió
+
+Dos clases de falso positivo, documentadas para que nadie las «arregle» en la
+interfaz: el texto dentro de un `<details>` cerrado (16 «oclusiones») y las
+**estrellas del fondo animado** vistas a través del vidrio bajo una letra
+(~20 fallos de contraste que cambiaban de sitio en cada captura). Contra lo
+segundo se puso primero un muestreo de cinco puntos juzgado por el segundo
+peor, y **no bastó**: el nodo de texto que JSX corta alrededor de una
+expresión mide **un carácter** (`· 12 s`, `2/8`, un token del editor), y en
+una caja de 5 px los cinco puntos caben dentro de la misma estrella de 2 px.
+La corrida del 21 encontró así tres fallos que **cambiaban de escena en cada
+pasada** (4,48:1 en `laboratorio·nebula`, 1,71:1 en `promo-detalle·ion`,
+4,38:1 en `proyectos·nebula`), siempre con un «fondo» del color del acento.
+
+La regla nueva separa **ornamento** de fondo: las partículas llevan
+`data-ornamento="estrellas"` (y `aria-hidden`), y la auditoría las apaga junto
+con el texto antes de fotografiar el fondo. Lo que se mide es el fondo que
+sostiene la letra —lienzo, velos, chips, degradados—, todo quieto y
+reproducible; el lienzo lo pinta el `div` de fuera, así que no se pierde. Con
+`--con-ornamento` se vuelve al comportamiento anterior. El muestreo de cinco
+puntos se queda: sigue haciendo falta para un fondo parcial de verdad (el
+borde de un chip bajo la mitad de una palabra).
+
+### Por qué el sprint cierra el 21 y no el 14
+
+La corrida del 14 dejó el trabajo **escrito y sin verificar**: 22 archivos
+modificados en el árbol, sin compilar, sin tests, sin commit y sin desplegar
+(la sesión se quedó sin cuota antes del cierre). El 21 se retomó tal cual —el
+diagnóstico era correcto y se conservó entero— y se cerró el sprint: build,
+tests, las dos auditorías, QA visual, commit, PR y despliegue. Es la misma
+lección del sprint 0 con el agente anterior: **el trabajo sin commitear no
+existe**; lo primero de cada corrida es mirar `git status`.
+
+### Verificación (2026-09-21)
+
+- `npm run build` verde (1 048 kB / 332 kB gzip, el aviso de tamaño de
+  siempre) · `venv/bin/pytest -q` **386/386**.
+- `ux_auditoria.mjs` contra `ux_instancia.py` sembrada: **192 escenas, 7 539
+  nodos de texto, 0 fallos** (4 temas × 10 vistas × 2 viewports + 14 overlays
+  × 4 temas × 2 viewports). Contraste, oclusión, desborde, consola, foco y
+  Escape.
+- `ux_barra.mjs`: **0 fallos** en 15 anchos de 360 a 1920 px × 8 vistas
+  activas (120 combinaciones). La barra mide 56 px de alto desde 768 px y 85
+  px por debajo, donde la nav baja a su propia línea.
+- QA visual mirando la captura, escritorio (1440×900) y móvil (390×844): el
+  diálogo de `daylight` es blanco opaco (`rgb(255,255,255)`, antes gris
+  `#acadad`) y lo mismo el menú de `Select`; a 1280 px las siete vistas caben
+  rotuladas con «Admin» entero; en móvil la nav baja a su línea con la activa
+  rotulada y las demás como icono.
+

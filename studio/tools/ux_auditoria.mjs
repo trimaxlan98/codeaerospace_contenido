@@ -21,7 +21,7 @@
 //     --base http://127.0.0.1:4173 --cookie "$(cat cookie.txt)" \
 //     [--temas orbital,daylight] [--vistas estudio,proyectos] \
 //     [--overlays paleta,guion|ninguno] [--viewports escritorio,movil] \
-//     [--json informe.json] [--capturas dir/]
+//     [--json informe.json] [--capturas dir/] [--con-ornamento]
 //
 // El instrumento vive en el repo a proposito: cada sprint del rediseno vuelve
 // a medir con el mismo criterio (ver studio/docs/UX-AUDITORIA.md).
@@ -109,8 +109,12 @@ const RECOGER = (selRaiz) => {
   }
 
   const oculto = (el) => {
-    for (let n = el; n; n = n.parentElement) {
+    for (let n = el, hijo = null; n; hijo = n, n = n.parentElement) {
       if (n.nodeType !== 1) continue
+      // Lo plegado dentro de un <details> cerrado no se pinta, pero Chromium
+      // le sigue dando caja: el sprint 11 conto como «oclusion» la
+      // continuidad de cada clip, que esta plegada. El <summary> si se ve.
+      if (n.tagName === 'DETAILS' && !n.open && hijo?.tagName !== 'SUMMARY') return true
       if (n.getAttribute('aria-hidden') === 'true') return true
       if (n.classList.contains('sr-only')) return true
       const cs = getComputedStyle(n)
@@ -144,16 +148,20 @@ const RECOGER = (selRaiz) => {
     const tam = px(cs.fontSize)
     const peso = parseInt(cs.fontWeight, 10) || 400
     // Puntos de muestreo dentro de la caja del texto (con el texto en
-    // transparente son fondo puro). Se juzga por el peor de los tres.
+    // transparente son fondo puro). Cinco a lo ancho; ver MEDIR para por
+    // que no se juzga por el peor.
     const dentro = (x, y) => [
       Math.min(Math.max(x, 1), innerWidth - 2),
       Math.min(Math.max(y, 1), innerHeight - 2),
     ]
     const cy = caja.top + caja.height / 2
+    const borde = Math.min(6, caja.width / 4)
     const puntos = [
-      dentro(caja.left + Math.min(6, caja.width / 4), cy),
+      dentro(caja.left + borde, cy),
+      dentro(caja.left + caja.width / 4, cy),
       dentro(caja.left + caja.width / 2, cy),
-      dentro(caja.right - Math.min(6, caja.width / 4), cy),
+      dentro(caja.left + (3 * caja.width) / 4, cy),
+      dentro(caja.right - borde, cy),
     ]
 
     nodos.push({
@@ -166,7 +174,7 @@ const RECOGER = (selRaiz) => {
     })
 
     // Oclusion: el punto central del texto debe pertenecer al propio texto.
-    const [x, y] = puntos[1]
+    const [x, y] = puntos[2]
     const arriba = dentroDelRecorte(x, y) ? document.elementFromPoint(x, y) : null
     if (arriba && arriba !== el && !el.contains(arriba) && !arriba.contains(el)) {
       fallos.push({
@@ -239,12 +247,16 @@ const MEDIR = async ({ nodos, captura }) => {
   const fallos = []
   for (const n of nodos) {
     const fgDecl = parseColor(n.color)
-    let peor = null
-    for (const [x, y] of n.puntos) {
-      const bg = pixel(x, y)
-      const c = ratio(sobre(fgDecl, bg), bg)
-      if (!peor || c < peor.c) peor = { c, bg }
-    }
+    // Se juzga por el SEGUNDO peor de cinco puntos. El fondo animado dibuja
+    // estrellas de 2 px y enlaces de 1 px que se ven a traves del vidrio: el
+    // sprint 11 conto una veintena de «fallos» que eran una estrella debajo
+    // de una letra en ese fotograma (fondos rgb(14,88,104), rgb(129,50,143)).
+    // Un fondo REAL —un chip, un velo, un degradado— cubre la caja entera y
+    // hunde los cinco puntos a la vez, asi que tolerar uno no lo esconde.
+    const medidas = n.puntos
+      .map(([x, y]) => { const bg = pixel(x, y); return { c: ratio(sobre(fgDecl, bg), bg), bg } })
+      .sort((a, b) => a.c - b.c)
+    const peor = medidas[Math.min(1, medidas.length - 1)]
     if (peor.c < n.minimo - 0.005) {
       fallos.push({
         tipo: 'contraste',
@@ -339,9 +351,19 @@ async function ir(page, hash, tema) {
 async function contraste(page, selRaiz) {
   const { nodos, fallos } = await page.evaluate(RECOGER, selRaiz)
   if (!nodos.length) return { fallos, medidos: 0 }
+  // El texto se apaga para que la captura sea fondo puro. Y con el se apaga
+  // el ORNAMENTO animado (`[data-ornamento]`: las estrellas del fondo): son
+  // puntos de 2 px y enlaces de 0,6 px que se MUEVEN, asi que el «fondo» que
+  // dan bajo una letra no existe en el fotograma siguiente. Medirlos daba un
+  // fallo distinto en cada pasada —otra vista, otra letra, siempre un fondo
+  // saturado del acento— y ninguno reproducible. Lo que queda fotografiado es
+  // el fondo que sostiene al texto de verdad: lienzo, velos, chips y
+  // degradados, todos ellos quietos. Con `--con-ornamento` se mide tambien la
+  // capa decorativa (util solo para juzgar el ornamento en si).
   const estilo = await page.addStyleTag({
     content: '*,*::before,*::after{color:transparent !important;'
-      + 'text-shadow:none !important;caret-color:transparent !important}',
+      + 'text-shadow:none !important;caret-color:transparent !important}'
+      + (args['con-ornamento'] ? '' : '[data-ornamento]{display:none !important}'),
   })
   await page.waitForTimeout(150)
   const captura = (await page.screenshot({ type: 'png' })).toString('base64')

@@ -38,12 +38,19 @@ function fecha(ts) {
   })
 }
 
-// Migas: "" → Biblioteca; "verticales/sistemas" → Biblioteca / verticales / sistemas
-function migas(ruta) {
+// Migas: "" → Biblioteca; "peliculas/<id>" → Biblioteca / Películas de curso /
+// <nombre del curso>. El backend ya las manda con título; esto es el respaldo
+// mientras llega la respuesta (o si viene de un backend anterior).
+function migas(ruta, datos) {
+  if (datos?.migas && datos.ruta === ruta) return datos.migas
   const partes = ruta ? ruta.split('/') : []
   return [{ nombre: 'Biblioteca', ruta: '' },
     ...partes.map((p, i) => ({ nombre: p, ruta: partes.slice(0, i + 1).join('/') }))]
 }
+
+// Una carpeta se lee por el curso al que pertenece, no por su id ni por su
+// slug truncado (la regla del sprint 9 para los renders, sprint 11 aquí).
+const nombreDe = (c) => c.titulo || c.nombre
 
 export default function Biblioteca({ active }) {
   const [ruta, setRuta] = useState('')
@@ -68,7 +75,8 @@ export default function Biblioteca({ active }) {
 
   const q = query.trim().toLowerCase()
   const carpetas = useMemo(
-    () => (datos?.carpetas || []).filter((c) => !q || c.nombre.toLowerCase().includes(q)),
+    () => (datos?.carpetas || []).filter((c) => !q
+      || c.nombre.toLowerCase().includes(q) || (c.titulo || '').toLowerCase().includes(q)),
     [datos, q])
   const archivos = useMemo(
     () => (datos?.archivos || []).filter((a) => !q || a.nombre.toLowerCase().includes(q)),
@@ -79,15 +87,19 @@ export default function Biblioteca({ active }) {
       <section className="panel shrink-0" aria-label="biblioteca de entregas">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
           <div className="flex min-w-0 flex-wrap items-center gap-1">
-            {migas(ruta).map((m, i, todas) => (
-              <span key={m.ruta} className="flex items-center gap-1">
+            {migas(ruta, datos).map((m, i, todas) => (
+              <span key={m.ruta} className="flex min-w-0 items-center gap-1">
                 {i > 0 && <ChevronRight className="h-3 w-3 shrink-0 text-faint" aria-hidden="true" />}
                 {i === todas.length - 1 ? (
-                  <span className="eyebrow">{datos?.titulo || m.nombre}</span>
+                  // Un nombre de curso es largo: se corta con elipsis y el
+                  // completo queda en el title, sin empujar la búsqueda.
+                  <span className="eyebrow max-w-[46ch] truncate" title={nombreDe(m)}>
+                    {(datos?.ruta === ruta && datos.titulo) || nombreDe(m)}
+                  </span>
                 ) : (
-                  <button type="button" onClick={() => ir(m.ruta)}
-                    className="rounded px-1 text-[12.5px] text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
-                    {m.nombre}
+                  <button type="button" onClick={() => ir(m.ruta)} title={nombreDe(m)}
+                    className="max-w-[28ch] truncate rounded px-1 text-[12.5px] text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
+                    {nombreDe(m)}
                   </button>
                 )}
               </span>
@@ -133,7 +145,9 @@ export default function Biblioteca({ active }) {
                         className="flex w-full items-center gap-2.5 rounded-lg border border-line bg-canvas/40 px-3 py-2.5 text-left transition-colors hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan">
                         <Folder className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[13.5px] text-ink">{c.titulo || c.nombre}</span>
+                          <span className="block truncate text-[13.5px] text-ink" title={c.titulo ? `${c.titulo} — ${c.nombre}` : c.nombre}>
+                            {nombreDe(c)}
+                          </span>
                           <span className="block font-mono text-[11px] text-muted">
                             {c.archivos} archivo{c.archivos === 1 ? '' : 's'} · {tam(c.bytes)}
                           </span>
