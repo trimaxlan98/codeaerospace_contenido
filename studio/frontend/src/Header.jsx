@@ -47,7 +47,10 @@ function MeterChip({ label, pct }) {
     // que cede es la telemetria. Medido con Playwright a 1024/1180/1280/1366/
     // 1440/1600/1920: recorte 0 en todas salvo 1024, donde la nav ya
     // scrolleaba antes de este sprint.
-    <div className="hidden items-center gap-2 rounded-md border border-line bg-surface-2/50 px-2.5 py-1.5 2xl:flex">
+    // Y de 2xl a 1680 px: con el reloj y los rótulos de Buscar a 1536, los
+    // medidores volvían a cortar «Admin» (60 px, sprint 11). Medido de 360 a
+    // 1920 con studio/tools/ux_barra.mjs.
+    <div className="hidden items-center gap-2 rounded-md border border-line bg-surface-2/50 px-2.5 py-1.5 min-[1680px]:flex">
       <span className="eyebrow">{label}</span>
       <span className="font-mono text-xs tabular-nums text-ink">{pct.toFixed(0)}%</span>
       <span className="block h-1 w-8 overflow-hidden rounded-full bg-canvas">
@@ -77,7 +80,7 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
       </div>
 
       <nav aria-label="vistas"
-        className="order-last -mx-1 flex w-full items-center gap-1 overflow-x-auto p-1 md:order-none md:mx-0 md:ml-1 md:w-auto md:rounded-lg md:border md:border-line md:bg-canvas/40">
+        className="order-last -mx-1 flex w-full items-center gap-0.5 overflow-x-auto px-0.5 py-1 md:order-none md:gap-1 md:p-1 md:mx-0 md:ml-1 md:w-auto md:rounded-lg md:border md:border-line md:bg-canvas/40">
         {NAV.map((n) => {
           const active = view === n.id
           const Icon = n.icon
@@ -86,13 +89,20 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
               key={n.id}
               onClick={() => onView(n.id)}
               aria-current={active ? 'page' : undefined}
+              title={n.label}
               className={cn(
-                'flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                'flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium md:px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                 active ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
               )}
             >
-              {Icon && <Icon className="h-3.5 w-3.5" />}
-              {n.label}
+              {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
+              {/* Siete vistas no caben rotuladas por debajo de 1280 px (sprint
+                  11: a 1280 «Admin» salía cortado, a 900 se escondían tres
+                  vistas sin que nada lo dijera). Por debajo de xl solo la
+                  vista ACTIVA lleva rótulo —se sabe dónde se está— y las
+                  demás son icono con `title`; el rótulo sigue en el árbol
+                  accesible (`sr-only`), así que el nombre no cambia. */}
+              <span className={active ? 'max-[359px]:sr-only' : 'sr-only xl:not-sr-only'}>{n.label}</span>
             </button>
           )
         })}
@@ -117,7 +127,9 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
           </>
         )}
         {telemetry && (
-          <span className="hidden font-mono text-xs tabular-nums tracking-wide text-muted xl:inline">
+          // 2xl: a 1280 el reloj se partía en dos líneas y le quitaba a la
+          // nav el sitio de «Admin». Es telemetría: cede antes que la nav.
+          <span className="hidden whitespace-nowrap font-mono text-xs tabular-nums tracking-wide text-muted 2xl:inline">
             {clock} <span className="text-faint">UTC</span>
           </span>
         )}
@@ -132,8 +144,8 @@ export default function Header({ view, onView, metrics, orbitState, staleSince, 
             {/* Los rotulos de las dos acciones de la derecha ceden antes que
                 la nav (ver MeterChip): por debajo de xl quedan como iconos con
                 `title`, que es lo que la cabecera ya hacia por debajo de sm. */}
-            <span className="hidden xl:inline">Buscar</span>
-            <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline">Ctrl K</kbd>
+            <span className="hidden 2xl:inline">Buscar</span>
+            <kbd className="hidden whitespace-nowrap rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint 2xl:inline">Ctrl K</kbd>
           </button>
         )}
         {/* La barra ya no lleva ajustes (encargo 8): ni selector de tema ni

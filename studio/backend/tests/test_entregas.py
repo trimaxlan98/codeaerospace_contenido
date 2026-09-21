@@ -106,3 +106,55 @@ def test_duracion_sin_cargar_el_archivo(tmp_path):
     assert duracion_mp4(tmp_path / "no-existe.mp4") is None
     (tmp_path / "roto.mp4").write_bytes(b"no soy un mp4")
     assert duracion_mp4(tmp_path / "roto.mp4") is None
+
+
+def test_las_carpetas_se_nombran_por_su_curso(authed, tmp_path):
+    """Sprint 11 del rediseño: `peliculas/<id>` y los slugs truncados
+    («sat-lites-e-ia-…», el acento vuelto guion) no se leen. La carpeta
+    lleva el nombre del proyecto al que pertenece."""
+    ex = _sembrar(tmp_path)
+    nombre = "Satélites e IA: la red que aprende a gobernarse sola"
+    r = authed.post("/api/projects", json={"name": nombre, "description": "d", "quality": "ql"})
+    assert r.status_code == 201, r.text
+    p = r.json()
+    (ex / "peliculas" / p["id"]).mkdir()
+    (ex / "peliculas" / p["id"] / "pelicula.mp4").write_bytes(_mp4(12.0))
+    # Las dos familias de slug que conviven en exports/ (ver `slugs_de`).
+    (ex / "sat-lites-e-ia-la-red-que-aprende-a-gobe").mkdir()
+    (ex / "verticales" / "satelites-e-ia-la-red-que-aprende-a-gobe").mkdir()
+    (ex / "sin-proyecto").mkdir()
+    # Tercera familia: normalizada y SIN cortar (herramientas de terminal).
+    (ex / "satelites-e-ia-la-red-que-aprende-a-gobernarse-sola").mkdir()
+
+    raiz = authed.get("/api/entregas").json()
+    titulos = {c["nombre"]: c["titulo"] for c in raiz["carpetas"]}
+    assert titulos["sat-lites-e-ia-la-red-que-aprende-a-gobe"] == nombre
+    assert titulos["sin-proyecto"] is None  # sin dueño: el nombre crudo
+    assert titulos["satelites-e-ia-la-red-que-aprende-a-gobernarse-sola"] == nombre
+    # Lo del Estudio va antes que los cursos muxeados a mano
+    orden = [c["nombre"] for c in raiz["carpetas"]]
+    assert orden.index("peliculas") < orden.index("sat-lites-e-ia-la-red-que-aprende-a-gobe")
+    assert orden.index("musica") < orden.index("sin-proyecto")
+    # El orden es el del nombre que se lee, sin que la tilde lo mande al final:
+    # ordenado tal cual, «Álgebra…» caeria detras de «zeta» (la «á» va despues
+    # del ASCII). Su carpeta es el slug sin normalizar, «lgebra-…».
+    r = authed.post("/api/projects", json={"name": "Álgebra lineal · 2.1 La matriz",
+                                           "description": "d", "quality": "ql"})
+    assert r.status_code == 201, r.text
+    for extra in ("lgebra-lineal-2-1-la-matriz", "beta", "zeta"):
+        (ex / extra).mkdir()
+    orden = [c["nombre"] for c in authed.get("/api/entregas").json()["carpetas"]]
+    cursos = [n for n in orden if n in ("beta", "lgebra-lineal-2-1-la-matriz", "zeta")]
+    assert cursos == ["lgebra-lineal-2-1-la-matriz", "beta", "zeta"]
+
+    d = authed.get("/api/entregas", params={"ruta": "peliculas"}).json()
+    assert {c["nombre"]: c["titulo"] for c in d["carpetas"]}[p["id"]] == nombre
+    d = authed.get("/api/entregas", params={"ruta": "verticales"}).json()
+    assert {c["nombre"]: c["titulo"] for c in d["carpetas"]}[
+        "satelites-e-ia-la-red-que-aprende-a-gobe"] == nombre
+
+    # Dentro de la carpeta, la miga y el título también dicen el curso
+    d = authed.get("/api/entregas", params={"ruta": f"peliculas/{p['id']}"}).json()
+    assert d["titulo"] == nombre
+    assert [m["titulo"] for m in d["migas"]] == ["Biblioteca", "Películas de curso", nombre]
+    assert d["migas"][-1]["ruta"] == f"peliculas/{p['id']}"

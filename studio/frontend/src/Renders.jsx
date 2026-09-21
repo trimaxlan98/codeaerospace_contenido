@@ -250,7 +250,9 @@ export default function Renders({ jobs, storage, onJobsChanged, onOpenProject })
                     'rounded-[5px] px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     filter === f.id ? 'bg-surface-2 text-accent shadow-sm' : 'text-muted hover:text-ink',
                   )}>
-                  {f.label} <span className="font-mono text-[10px] text-faint">{countOf(f.id)}</span>
+                  {/* muted y no faint: es un contador que se lee, y sobre la ficha activa
+                      (surface-2 dentro de canvas dentro del panel) faint daba 4,35:1 */}
+                  {f.label} <span className="font-mono text-[10px] text-muted">{countOf(f.id)}</span>
                 </button>
               ))}
             </div>

@@ -147,7 +147,9 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }) {
             onKeyDown={onKeyDown}
             placeholder="Ir a un curso o a una sección…"
             aria-label="Buscar en la consola"
-            className="w-full bg-transparent pr-8 text-[14px] text-ink placeholder:text-faint focus-visible:outline-none" />
+            // Anillo propio (sprint 11): es la parada de foco de la paleta y
+            // sin él era la única del sistema sin indicador visible (2.4.7).
+            className="-my-1 w-full rounded-md bg-transparent px-1.5 py-1 pr-8 text-[14px] text-ink placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan" />
         </div>
 
         <div ref={listaRef} className="max-h-[52vh] overflow-y-auto py-1">

@@ -92,7 +92,7 @@ export default function Assistant({ open, mode, onMode, onClose, job, jobLogs,
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
         <DialogPrimitive.Content
-          className="fixed inset-y-0 right-0 z-[61] flex w-[min(560px,100%)] flex-col border-l border-line bg-surface shadow-2xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right">
+          className="fixed inset-y-0 right-0 z-[61] flex w-[min(560px,100%)] flex-col border-l border-line bg-elevated shadow-2xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right">
           <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
             <DialogPrimitive.Title className="flex items-center gap-2 font-display text-sm font-semibold text-ink">
               <Sparkles className="h-4 w-4 text-accent" /> Asistente

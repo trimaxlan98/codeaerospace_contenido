@@ -238,8 +238,10 @@ export default function App() {
         {toasts.map(({ key, job }) => {
           const m = TOAST_META[job.status] || TOAST_META.cancelled
           const curso = cursoDeJob(job, catalogo)
+          // Opaco (sprint 11): el aviso flota SOBRE contenido, y el vidrio
+          // dejaba el texto de debajo entre las letras del aviso.
           return (
-            <div key={key} className="panel flex items-center gap-2.5 px-3 py-2.5 shadow-xl">
+            <div key={key} className="panel bg-elevated! flex items-center gap-2.5 px-3 py-2.5 shadow-xl">
               <span className={cn('h-2 w-2 shrink-0 rounded-full', m.dot)} />
               {/* El aviso lleva al sitio donde se sigue trabajando: al curso
                   si el render es un clip, al Estudio si es un render libre. */}

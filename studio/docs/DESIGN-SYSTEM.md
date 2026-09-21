@@ -31,6 +31,7 @@ runtime funcione (los utilitarios referencian `var()`, no el valor).
 |-------|----------|------|
 | `--canvas` | fondo del documento | |
 | `--surface` / `--surface-2` | vidrio de panel / elemento elevado | **velo claro sobre lienzo oscuro**; un velo oscuro sobre fondo oscuro no se ve |
+| `--elevated` | fondo **opaco** de lo que flota: diálogos, cajón del asistente, menú de `Select`, tooltip, avisos | = `surface-2` compuesto sobre el lienzo en los temas oscuros; blanco en `daylight`. Existe porque un velo se apoya en lo que tenga debajo, y debajo de un diálogo está el overlay negro: en `daylight` el panel salía gris `#acadad` y el texto secundario a 2,2–3,4:1 (sprint 11) |
 | `--line` / `--line-strong` | bordes, separadores, **barra de scroll** | **nunca `transparent`**: toda la estructura de la app se dibuja con `border-line` y el scrollbar usa `--line-strong` |
 | `--ink` / `--muted` / `--faint` | texto principal / secundario / terciario | los tres cumplen **AA como texto normal** (4,5:1) sobre el fondo más claro donde aparecen. `faint` NO es un token de adorno: sus 59 usos son contadores, unidades y pistas de teclado |
 | `--code-ink` | salida monoespaciada: registro de render, script generado | rol propio, ni `ink` ni `muted`. Existe porque era un literal `#a8bcd4` que en `daylight` daba 1,77:1 |
@@ -83,7 +84,17 @@ llegan al VPS y producción se queda sin favicon sin que nada falle.
 | Contenido | auto | vistas y `.panel` |
 | Cabecera pegajosa | `40` | `Header` |
 | Avisos de fin de render | `50` | toasts de `App.jsx` |
-| Diálogos | portal de Radix | `components/ui/dialog` |
+| Overlay de diálogo / diálogo | `60` / `61` | `components/ui/dialog`, `Assistant` (portal de Radix) |
+| Menú de `Select` | `70` | `components/ui/select` |
+| Tooltip | `80` | `components/ui/tooltip` |
+
+**Lo que flota es opaco (`bg-elevated`), nunca vidrio.** El vidrio (`surface`,
+`.panel`) está calibrado para apoyarse en el lienzo. Un diálogo se apoya en el
+overlay `bg-black/70`, un menú o un aviso en contenido cualquiera: con vidrio,
+el color del panel depende de lo que haya debajo y ningún token de texto puede
+garantizar contraste. Una auditoría que compone el fondo **subiendo por los
+ancestros** no lo ve —el overlay es hermano del panel, no ancestro—; la que lee
+el píxel pintado sí (sprint 11).
 
 **Trampa:** `StarfieldBackground` es una capa **opaca** (pinta `var(--canvas)`).
 Con `z-0` se colocaba por encima de cualquier contenido **no posicionado**
@@ -93,7 +104,7 @@ fondo nueva va con z negativo.
 
 ## Mapa de navegación
 
-Una entrada por **tarea**, no por endpoint (sprint 4). Cinco secciones más
+Una entrada por **tarea**, no por endpoint (sprint 4). Siete secciones más
 Configuración:
 
 | Vista | Hash | Tarea |
@@ -101,6 +112,7 @@ Configuración:
 | Proyectos | `#/proyectos[/<id>]` | construir y vigilar un curso (el hub: ~60 cursos en familias) |
 | Estudio | `#/estudio` | escribir y renderizar una escena o el clip de un curso |
 | Renders | `#/renders` | el archivo de todo lo que salió de la cola, con o sin video |
+| Biblioteca | `#/biblioteca[/…]` | lo que se **entrega**: el árbol de `exports/` (películas, verticales, presentaciones, bancos), en solo lectura. Renders es la cocina; Biblioteca, el mostrador |
 | Aprender | `#/aprender[/<id>]` | teoría del curso de Manim **y** animaciones de ejemplo, un solo índice |
 | Laboratorio | `#/laboratorio` | ejecutar Python de validación en el sandbox: las sondas de las librerías, y numpy/PIL a mano (sprint R3b) |
 | Admin | `#/admin[/<tab>]` | salud del host, jobs y disco |
@@ -109,8 +121,19 @@ Configuración:
 Reglas al tocar esto:
 
 - **Los hash viejos no se rompen.** `router.js` mantiene alias
-  (`#/animaciones` → Aprender, `#/biblioteca` → Renders) y `prefs.js` traduce
-  las preferencias de *vista al abrir* guardadas con ids antiguos.
+  (`#/animaciones` → Aprender, `#/entregas` → Biblioteca) y `prefs.js` traduce
+  las preferencias de *vista al abrir* guardadas con ids antiguos. `#/biblioteca`
+  llevó a Renders hasta que existió la Biblioteca de entregas (Estudio v3);
+  desde entonces vuelve a significar lo que dice.
+- **La barra cabe en cualquier ancho, o la entrada nueva no entra.** Con siete
+  vistas, por debajo de `xl` (1280 px) solo la vista **activa** lleva rótulo y
+  las demás son icono con `title` (el rótulo sigue en `sr-only`); por debajo de
+  360 px, ni la activa. Lo que cede antes que la nav es la telemetría: reloj y
+  rótulos de *Buscar* desde `2xl`, medidores desde 1680 px. Una vista más en
+  `NAV` obliga a volver a correr `studio/tools/ux_barra.mjs`, que recorre de
+  320 a 1920 px con cada vista activa y falla si algo se corta, hace scroll o
+  se parte en dos líneas. La auditoría general mide 1440 y 390, y la barra se
+  rompía **entre medias**: a 1280, «Admin» salía cortado.
 - **Fusionar solo si las dos vistas sirven a la misma tarea.** Aprender y
   Animaciones sí (mismo índice del backend, ids 1:1, y la búsqueda partida era
   un fallo). Renders y Proyectos no: Renders incluye renders sueltos sin
@@ -154,6 +177,12 @@ ornamento — **no es el logotipo**), `ErrorBoundary`.
   `refreshCatalogo()`; el índice además revalida al montarse
   (*stale-while-revalidate*), porque en el detalle de un curso se pudo
   renderizar, narrar o borrar.
+- **Una entrega también se nombra por su curso.** `exports/peliculas/<id>` y
+  las carpetas con slug truncado (`sat-lites-e-ia-la-red-que-aprende-a-gobe`,
+  con el acento vuelto guion) no se leen. `EntregasService` recibe la lista de
+  proyectos y resuelve cada carpeta por id o por cualquiera de las **dos
+  familias de slug** que conviven en `exports/` (`entregas.slugs_de`); la
+  interfaz enseña `titulo` y deja el nombre crudo en el `title`.
 - **Un render se identifica por su curso, no por su escena.** Las escenas del
   catálogo se llaman `Clip1`…`Clip8`: cualquier sitio que enseñe un job
   (fichas de la cola, cabecera del registro, resultado, avisos, tarjetas de
@@ -210,12 +239,30 @@ inyectado por instancia.
   `bg-surface-2` dentro de un panel `bg-surface`): ~4,05:1. Ahí, o el texto es
   dato y sube a `muted`, o es un separador puro y lleva `aria-hidden="true"`.
 - **Medir lo que se pinta, no lo que se declara.** Comparar pares de tokens da
-  falsos aprobados; hay que recorrer los nodos de texto reales y componer el
-  fondo subiendo por los ancestros. Y **esperar a que acabe la transición de
-  tema** (`transition: all .3s`) o se miden colores interpolados inexistentes.
+  falsos aprobados; componer el fondo subiendo por los ancestros también
+  (no ve un overlay hermano ni un degradado). El instrumento vigente,
+  `studio/tools/ux_auditoria.mjs`, **lee el píxel**: captura la página con
+  todo el texto en transparente y muestrea el fondo real bajo cada nodo. Y
+  **esperar a que acabe la transición de tema** (`transition: all .3s`) o se
+  miden colores interpolados inexistentes.
+- **El ornamento no es fondo.** Una capa decorativa y en movimiento (hoy solo
+  las partículas de `StarfieldBackground`) lleva `data-ornamento` y
+  `aria-hidden`, y la auditoría la apaga antes de fotografiar el fondo: una
+  estrella de 2 px bajo una letra da un contraste que no existe en el
+  fotograma siguiente, y media interfaz son nodos de **un carácter** (JSX
+  corta el texto en cada expresión), donde no hay sitio para muestrear
+  alrededor. Regla del sprint 11: **un fallo que no se repite en dos pasadas
+  es del instrumento, no de la interfaz**. Lo que sí es fondo —el lienzo, los
+  velos, los chips, los degradados— lo pintan elementos quietos y se sigue
+  midiendo.
 - **CodeMirror sigue al tema de la app** (`useEditorTheme()` en `themes.js`).
   `.cm-editor` tiene el fondo transparente para heredar el panel, así que un
-  `theme="dark"` fijo pinta One Dark sobre el lienzo claro: 1,60:1.
+  `theme="dark"` fijo pinta One Dark sobre el lienzo claro: 1,60:1. En claro
+  no basta con `'light'`: el `defaultHighlightStyle` de CodeMirror trae tres
+  colores bajo AA (`#e40` de f-strings, `#085` de tipos, `#f00` de lo
+  inválido), así que `useEditorTheme()` devuelve un estilo entero con esos
+  tres oscurecidos. Entero, porque un resaltador no-`fallback` anula al de
+  `basicSetup`.
 
 ## Convenciones de contenido
 

@@ -12,6 +12,14 @@
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  /* Lo que FLOTA (dialogos, cajon del asistente, menus de select, tooltips)
+     es opaco. `surface` es un velo pensado para apoyarse en el lienzo; un
+     dialogo se apoya en el velo NEGRO del overlay, y ahi el blanco al 55 %
+     del tema claro se volvia gris #acadad con el texto secundario a 2,2-3,4:1
+     (sprint 11). Cada tema lo fija al color que tendria surface-2 sobre su
+     lienzo: el panel flotante se ve igual que antes sobre fondo limpio, pero
+     ya no depende de lo que tenga debajo. */
+  --color-elevated: var(--elevated);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-ink: var(--ink);
@@ -55,6 +63,7 @@
        indistinguibles del fondo. */
     --surface: rgba(255, 255, 255, 0.045);
     --surface-2: rgba(255, 255, 255, 0.075);
+    --elevated: #161a24;  /* = surface-2 sobre canvas, opaco */
     /* --line NO puede ser transparent: toda la estructura de la app
        (cabeceras de panel, separadores de fila, bordes de input, tarjetas)
        se dibuja con `border-line`, y la barra de scroll usa --line-strong. */
@@ -74,7 +83,7 @@
     --cyan: #3b82f6;
     --ok: #10b981;
     --warn: #f59e0b;
-    --err: #f43f5e;
+    --err: #f65670;  /* antes #f43f5e: 4,49:1 como etiqueta de estado de 10 px sobre la ficha de la cola (sprint 11) */
     /* Ambar CO.DE Academy: NO es el acento del tema, es la marca del canal
        (la misma de code_brand.py). Constante en los tres temas oscuros. */
     --brand: #f59e0b;
@@ -102,11 +111,12 @@
     --canvas: #010c08;
     --surface: rgba(209, 250, 229, 0.05);
     --surface-2: rgba(209, 250, 229, 0.085);
+    --elevated: #13201b;  /* = surface-2 sobre canvas, opaco */
     --line: rgba(167, 243, 208, 0.11);
     --line-strong: rgba(167, 243, 208, 0.22);
     --ink: #dcfce7;
     --muted: #6ebd93;
-    --faint: #4b9369;  /* 4,53:1 sobre surface-2 */
+    --faint: #519b70;  /* 5,02:1 sobre surface-2; 4,84 donde el resplandor del lienzo lo aclara. Antes #4b9369: 4,38 ahi (sprint 11) */
     --code-ink: #a8bcd4;
     --accent: #10b981;      /* signature: Emerald Mint */
     --accent-ink: #022c22;
@@ -139,15 +149,16 @@
     --canvas: #06010d;
     --surface: rgba(243, 232, 255, 0.05);
     --surface-2: rgba(243, 232, 255, 0.085);
+    --elevated: #1a1522;  /* = surface-2 sobre canvas, opaco */
     --line: rgba(233, 213, 255, 0.11);
     --line-strong: rgba(233, 213, 255, 0.22);
     --ink: #f3e8ff;
     --muted: #a78bfa;
     --faint: #9762f1;  /* 4,55:1 sobre surface-2 */
     --code-ink: #a8bcd4;
-    --accent: #d946ef;      /* signature: Electric Magenta */
+    --accent: #df5ff2;      /* signature: Electric Magenta. Antes #d946ef: 4,19:1 en la tarjeta elegida de un dialogo (sprint 11) */
     --accent-ink: #0d0716;
-    --cyan: #a855f7;
+    --cyan: #b06cf8;  /* antes #a855f7: «en cola #1» a 4,3:1 sobre la ficha de la cola (sprint 11) */
     --ok: #10b981;
     --warn: #e8b84b;
     --err: #e86a6a;
@@ -176,6 +187,7 @@
     --canvas: #f1f5f9;
     --surface: rgba(255, 255, 255, 0.55);
     --surface-2: rgba(255, 255, 255, 0.78);
+    --elevated: #ffffff;  /* blanco: sobre #f1f5f9 el panel flotante se despega sin sombra dura */
     --line: rgba(15, 23, 42, 0.13);
     --line-strong: rgba(15, 23, 42, 0.28);
     --ink: #0f172a;
