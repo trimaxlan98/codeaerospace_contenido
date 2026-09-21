@@ -61,6 +61,18 @@ secciones, las cuatro miniaturas de tema con lienzos distintos y la barra sin
 falla con `/usr/bin/env: 'node': No such file or directory` si no se antepone
 `export PATH=/root/.nvm/versions/node/v24.15.0/bin:$PATH`.
 
+El **sprint 11** se desplegó el 2026-09-21 (PR #84 a `main`, `git pull` +
+`npm install` + `vite build` en el VPS y reinicio del backend, que también
+cambiaba). Producción sirve `index-CyonwZHn.js`, el mismo hash que el build
+local sometido a QA, con `--elevated` en el CSS servido y `/api/health` con
+`runner: true`. Comprobado con **carga real y sesión** en 1440×900 y 390×844:
+la Biblioteca nombra las dos películas por su curso («Sistemas ATP · 3.3…»,
+«Procesamiento de señales · 9.1…») y las ocho carpetas de la raíz por su
+nombre, el diálogo de `daylight` es `rgb(255,255,255)`, en móvil la barra no
+desborda y solo la vista activa lleva rótulo, sin errores de consola.
+`npm install` hace falta en el VPS: el sprint añade `@codemirror/language` y
+`@codemirror/view` como dependencias directas.
+
 ---
 
 ## Sprint 0 — la base visual estaba rota (hecho 2026-08-15)
@@ -851,8 +863,10 @@ auditoría.
 3. **La Biblioteca nombra por curso.** Enseñaba `peliculas/20e9c6bd920e47f9`
    y `sat-lites-e-ia-la-red-que-aprende-a-gobe`: la misma regla que el sprint
    9 impuso a los renders, perdida en una vista nueva. El backend resuelve
-   cada carpeta por id o por las dos familias de slug de `exports/`; migas y
-   búsqueda usan el nombre. Contra los datos de producción: 10 de 10.
+   cada carpeta por id o por las **tres** familias de slug de `exports/`;
+   migas y búsqueda usan el nombre. Contra la base de producción (184
+   proyectos): **10 de 10** — las 8 carpetas de la raíz y las 2 de
+   `peliculas/`, que eran ids crudos.
 4. **CodeMirror en claro:** tres colores del resaltado por defecto bajo AA
    (f-strings `#e40` a 3,06:1), oscurecidos.
 5. **Foco visible en el buscador de la paleta**, la única parada de foco del
