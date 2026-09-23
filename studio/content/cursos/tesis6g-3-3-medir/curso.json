@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 3.3 Medir sin engañarse",
+  "description": "Lección 3.3 del curso La tesis 6G por dentro (módulo 3: el corazón), en 4 clips: el oráculo voraz no es el techo (el de dos pasos gana entre 0.03 y 0.77 %), la huella que deja una acción en el estado siguiente (por qué NTNEnv-v2 no es exógeno), la maldición del ganador que deprime el margen con pocos episodios, y la regla R5 que invalidó un piloto que daba casi tres veces el oráculo. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-oraculo.py", "title": "1 · El oráculo no es el techo", "scene": "Clip1",
+     "final_state": "Por semilla, el oráculo voraz y el de dos pasos con su ganancia en cian sobre un eje recortado y declarado; en el pie la corrección transferida a G1 como dato."},
+    {"file": "clips/02-la-huella.py", "title": "2 · La acción deja huella", "scene": "Clip2",
+     "final_state": "Dos ramas desde el mismo estado con la interferencia resultante, y a la derecha la huella que decae como 0.75·0.7^t; en el pie que el entorno no es exógeno."},
+    {"file": "clips/03-el-ganador.py", "title": "3 · La maldición del ganador", "scene": "Clip3",
+     "final_state": "Las 27 estáticas con 30 episodios pegadas a la mejor real, y a la derecha la curva de la tesis del MA contra episodios cruzando el umbral; en el pie 0.199 a 0.318 como dato."},
+    {"file": "clips/04-la-guardia.py", "title": "4 · La guardia R5", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Un protocolo que nunca invalida' (blanca) y 'no esta midiendo nada.' (cian)."}
+  ]
+}
