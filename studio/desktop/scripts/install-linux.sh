@@ -112,7 +112,9 @@ update-desktop-database -q "$APPS" 2>/dev/null || true
 ESCRITORIO="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$TARGET_HOME/Desktop")"
 if [[ -d "$ESCRITORIO" ]]; then
   echo "$DESKTOP_ENTRY" > "$ESCRITORIO/code-studio.desktop"
-  chmod +x "$ESCRITORIO/code-studio.desktop"
+  # 755 y no +x: con la umask 002 quedaria escribible por el grupo, y DING
+  # (iconos del escritorio de Ubuntu) no muestra ni lanza lanzadores asi.
+  chmod 755 "$ESCRITORIO/code-studio.desktop"
   # GNOME solo lanza accesos directos del escritorio marcados como confiables.
   gio set "$ESCRITORIO/code-studio.desktop" metadata::trusted true 2>/dev/null || true
 fi
