@@ -290,6 +290,39 @@ ok("la media final supera a la estatica de la semilla 42",
 k = T6.pasos_hasta_eps(0.05, 0.999)
 casi("eps llega a 0.05 en ln(0.05)/ln(0.999) episodios", k, 2995, 1)
 
+# =============================================================================
+print("\n== 10 - Muchos agentes ==")
+ind, con = T6.coordinacion_estadistica(400)
+ok("independientes tardan mas en coordinarse que el conjunto (mediana, 400 semillas)",
+   np.median(ind) > np.median(con), f"{np.median(ind):.0f} > {np.median(con):.0f}")
+ok("y en la cola (p90) tambien", np.percentile(ind, 90) > np.percentile(con, 90),
+   f"{np.percentile(ind, 90):.0f} > {np.percentile(con, 90):.0f}")
+a, c = T6.aprendices_independientes(semilla=89)
+ok("la semilla del clip (89) es de la mediana", T6.pasos_para_coordinar(c) == int(np.median(
+   T6.coordinacion_estadistica(1000)[0])), str(T6.pasos_para_coordinar(c)))
+g = np.linspace(-1, 1, 41)
+Q1g, Q2g = np.meshgrid(g, g, indexing="ij")
+for t in ("vdn", "qmix"):
+    M = T6.mezcla(Q1g, Q2g, t)
+    ok(f"{t}: Q_tot monotona en Q1 y en Q2", (np.diff(M, axis=0) >= -1e-12).all()
+       and (np.diff(M, axis=1) >= -1e-12).all())
+M = T6.mezcla(Q1g, Q2g, "roto")
+ok("contraejemplo: el mezclador 'roto' NO es monotono", (np.diff(M, axis=0) < 0).any())
+rng = np.random.default_rng(1)
+fallos_igm = {t: 0 for t in ("vdn", "qmix", "roto")}
+for _ in range(500):
+    Q1, Q2 = rng.uniform(-1, 1, 3), rng.uniform(-1, 1, 3)
+    for t in fallos_igm:
+        fallos_igm[t] += not T6.igm(Q1, Q2, t)[0]
+ok("IGM: vdn y qmix aciertan siempre el maximo conjunto (500 casos)",
+   fallos_igm["vdn"] == 0 and fallos_igm["qmix"] == 0, str(fallos_igm))
+ok("contraejemplo: el roto falla IGM en algun caso", fallos_igm["roto"] > 0, str(fallos_igm["roto"]))
+V = T6.vdn_contra_qmix()
+ok("VDN y QMIX superan a la estatica en las 3 semillas", all(v["vdn"] > v["estatica"] and
+   v["qmix"] > v["estatica"] for v in V))
+ok("y ninguno pasa del oraculo (R5 sin disparar)", all(max(v["vdn"], v["qmix"]) <= 1.05 * v["oraculo"]
+   for v in V))
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)

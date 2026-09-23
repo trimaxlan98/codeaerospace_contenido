@@ -465,6 +465,22 @@ def trayectorias(n=6, pasos=120, azar=0.0, semilla=42):
     return t, np.array(out)
 
 
+def vdn_contra_qmix() -> list:
+    """Brazo 3 de la fase 0 de G2b (ablacion del mezclador): la MEJOR
+    evaluacion greedy de VDN (suma) y de QMIX (monotono no lineal), mismo
+    protocolo y semillas. Ojo: 'mejor evaluacion' es un maximo sobre puntos
+    de control, no la evaluacion final de la compuerta."""
+    g1 = {s: _leer(f"g1_{s}.json") for s in (42, 43, 44)}
+    out = []
+    for s in (42, 43, 44):
+        v = _leer(f"historia_vdn_{s}.json")["best_greedy"]
+        q = _leer(f"historia_g2b_{s}.json")["best_greedy"]
+        out.append({"semilla": s, "vdn": float(v), "qmix": float(q),
+                    "estatica": float(g1[s]["best_static_reward"]),
+                    "oraculo": float(g1[s]["oracle_reward"])})
+    return out
+
+
 def curva_entrenamiento(semilla=42, suavizado=100) -> dict:
     """La curva de entrenamiento de QMIX de la fase 0 de G2b (mismas huellas
     de codigo que la re-cualificacion v7): recompensa por episodio, su media
@@ -631,3 +647,75 @@ def q_juguete(pasos=600, alfa=0.1, eps=0.2, semilla=42, E=None):
 def pasos_hasta_eps(eps_final, decaimiento, eps0=1.0):
     """Episodios hasta que eps0 * d^k cae a eps_final."""
     return int(np.ceil(np.log(eps_final / eps0) / np.log(decaimiento)))
+
+
+def aprendices_independientes(pasos=400, alfa=0.3, eps=0.1, semilla=3, conjunto=False):
+    """Dos satelites, dos canales: si eligen el mismo, colisionan (r = -1);
+    si no, r = +1. Con aprendices INDEPENDIENTES cada uno ve un entorno que
+    cambia porque el otro aprende: empiezan persiguiendose (cambian a la vez
+    y vuelven a chocar). `conjunto=True` es el contraejemplo: un unico
+    aprendiz sobre las 4 acciones conjuntas. Devuelve acciones (pasos, 2) y
+    colision por paso."""
+    rng = np.random.default_rng(semilla)
+    acc, col = [], []
+    if conjunto:
+        Q = np.zeros(4)
+        for _ in range(pasos):
+            j = int(rng.integers(4)) if rng.random() < eps else int(np.argmax(Q))
+            a = (j // 2, j % 2)
+            r = 1.0 if a[0] != a[1] else -1.0
+            Q[j] += alfa * (r - Q[j])
+            acc.append(a)
+            col.append(float(r < 0))
+    else:
+        Q = np.zeros((2, 2))
+        for _ in range(pasos):
+            a = tuple(int(rng.integers(2)) if rng.random() < eps else int(np.argmax(Q[i]))
+                      for i in range(2))
+            r = 1.0 if a[0] != a[1] else -1.0
+            for i in range(2):
+                Q[i, a[i]] += alfa * (r - Q[i, a[i]])
+            acc.append(a)
+            col.append(float(r < 0))
+    return np.array(acc), np.array(col)
+
+
+def mezcla(q1, q2, tipo):
+    """Mezcladores de Q_tot sobre (Q1, Q2): 'vdn' suma; 'qmix' uno monotono
+    no lineal (log-suma-exp: sube con cada Q_i); 'roto' uno NO monotono
+    (tiene un termino cruzado que baja Q_tot cuando los dos suben)."""
+    q1, q2 = np.asarray(q1, float), np.asarray(q2, float)
+    if tipo == "vdn":
+        return q1 + q2
+    if tipo == "qmix":
+        return np.logaddexp(1.6 * q1, 1.1 * q2) + 0.3 * q2
+    if tipo == "roto":
+        return q1 + q2 - 1.8 * q1 * q2
+    raise ValueError(tipo)
+
+
+def igm(Q1, Q2, tipo):
+    """¿El maximo de cada agente por separado da el maximo conjunto? (la
+    condicion IGM que la monotonicidad garantiza)."""
+    Q1, Q2 = np.asarray(Q1, float), np.asarray(Q2, float)
+    T = mezcla(Q1[:, None], Q2[None, :], tipo)
+    conj = np.unravel_index(np.argmax(T), T.shape)
+    return (int(np.argmax(Q1)), int(np.argmax(Q2))) == tuple(int(x) for x in conj), T
+
+
+def pasos_para_coordinar(col, racha=10):
+    """Primer paso a partir del cual hay `racha` pasos seguidos sin choque."""
+    for i in range(len(col) - racha):
+        if not col[i:i + racha].any():
+            return i
+    return len(col)
+
+
+def coordinacion_estadistica(n=1000, **kw):
+    """Pasos hasta coordinarse, independientes frente a conjunto, en n
+    semillas: la cifra honesta no es la de una tirada."""
+    ind = np.array([pasos_para_coordinar(aprendices_independientes(semilla=s, **kw)[1])
+                    for s in range(n)])
+    con = np.array([pasos_para_coordinar(aprendices_independientes(semilla=s, conjunto=True, **kw)[1])
+                    for s in range(n)])
+    return ind, con

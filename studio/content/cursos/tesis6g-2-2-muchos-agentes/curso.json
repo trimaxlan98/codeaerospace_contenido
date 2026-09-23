@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 2.2 Muchos agentes",
+  "description": "Lección 2.2 del curso La tesis 6G por dentro (módulo 2: las herramientas), en 4 clips: aprendices independientes que se persiguen frente a un aprendiz conjunto (mediana de 1000 semillas), el paradigma CTDE de QMIX, por qué el mezclador tiene que ser monótono (la prueba IGM en 500 casos) y la ablación de la tesis que cambió QMIX por VDN sin perder nada. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-perseguirse.py", "title": "1 · Aprender a la vez", "scene": "Clip1",
+     "final_state": "Dos pares de filas de 40 pasos (independientes arriba, conjunto abajo) con los canales elegidos y las marcas rojas de choque; en el pie que la cifra es la mediana de 1000 semillas."},
+    {"file": "clips/02-ctde.py", "title": "2 · Entrenar juntos, decidir solos", "scene": "Clip2",
+     "final_state": "Tres agentes con su observación y su acción, el mezclador apagado a trazos arriba; en el pie la referencia de QMIX como dato."},
+    {"file": "clips/03-mezclar.py", "title": "3 · Mezclar sin romper", "scene": "Clip3",
+     "final_state": "Tres mapas de Q_tot (suma, monótona, no monótona) con el tercero tachado, el recuento de fallos IGM debajo de cada uno y la condición IGM en el pie."},
+    {"file": "clips/04-no-paga.py", "title": "4 · La complejidad no paga", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Se entrena en equipo' (blanca) y 'y se decide por separado.' (cian)."}
+  ]
+}

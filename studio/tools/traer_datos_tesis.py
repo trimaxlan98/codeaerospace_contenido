@@ -41,6 +41,11 @@ FICHEROS = {
     "entorno_v2.yaml": "03_IMPLEMENTACION/mvp3_qmix/configs/env_v2_dynamic.yaml",
     "gh_heuristica.json": "03_IMPLEMENTACION/results/gates/G-H_HEURISTICA_v1.json",
     "historia_g2b_42.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b/fase0_g2b_backup/history_seed42.json",
+    "historia_vdn_42.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b_arm3_vdn/history_seed42.json",
+    "historia_g2b_43.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b/fase0_g2b_backup/history_seed43.json",
+    "historia_vdn_43.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b_arm3_vdn/history_seed43.json",
+    "historia_g2b_44.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b/fase0_g2b_backup/history_seed44.json",
+    "historia_vdn_44.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b_arm3_vdn/history_seed44.json",
 }
 
 
