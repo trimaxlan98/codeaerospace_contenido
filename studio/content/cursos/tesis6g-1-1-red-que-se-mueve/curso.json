@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 1.1 La red que se mueve",
+  "description": "Lección 1.1 del curso La tesis 6G por dentro (módulo 1: el problema), en 4 clips —una idea por clip—: más de dieciséis mil satélites que nadie vigila uno a uno, un pase LEO a 600 km con la Tierra a escala, la vuelta entera en la que la estación se queda sin enlace, y el tren que se releva (y el hueco que abre la rotación terrestre). Formato mudo: la pantalla pone la cosa y su cifra medida.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-dieciseis-mil.py", "title": "1 · Dieciséis mil satélites", "scene": "Clip1",
+     "final_state": "Un operador con sus decenas de satélites a la izquierda; a la derecha la malla de 163 puntos (cada uno, 100 satélites), 107 en ámbar; en el pie la proporción de una sola constelación."},
+    {"file": "clips/02-un-pase.py", "title": "2 · Un pase LEO", "scene": "Clip2",
+     "final_state": "La Tierra y la órbita de 600 km a escala, el cono de elevación de 10 grados con AOS, TCA y LOS; en el pie el retardo de ida entre el cenit y el borde del cono."},
+    {"file": "clips/03-la-red-que-se-va.py", "title": "3 · La red que se va", "scene": "Clip3",
+     "final_state": "La vuelta entera a escala con el arco visible sobre la estación; la línea de tiempo de una vuelta con el tramo de contacto encendido; en el pie los minutos sin enlace."},
+    {"file": "clips/04-el-relevo.py", "title": "4 · El relevo", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'La red no esta siempre ahi.' (blanca) y 'Se gobierna, no se fija.' (cian)."}
+  ]
+}
