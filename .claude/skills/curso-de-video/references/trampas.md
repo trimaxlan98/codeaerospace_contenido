@@ -41,6 +41,14 @@ parecida a la que vas a producir.
   Lo único irreproducible en local es esa `voz/` (la sintetiza el VPS); todo
   lo demás se rehace desde el fuente, y rehacerlo dio cifras idénticas.
 
+- **`rsync -a origen/ vps:/root/` BLOQUEA el SSH de root.** Con la barra
+  final, rsync aplica los atributos de la carpeta de origen a `/root` mismo
+  (propietario uid 1000, modo 775) y sshd, por StrictModes, deja de aceptar
+  `authorized_keys`. Pasó en el curso 36 y solo se arregla desde la consola
+  web del proveedor (`chown root:root /root && chmod 700 /root`). Para
+  subir a staging: `rsync -r --no-perms --no-owner --no-group` hacia una
+  ruta HIJA (`vps:/root/staging-x/`), o `scp -r`.
+
 ## Animación
 
 - **`Transform` solo entre gemelas de estructura IDÉNTICA.** Distinta

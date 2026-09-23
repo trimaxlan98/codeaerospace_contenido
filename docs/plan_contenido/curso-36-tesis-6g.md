@@ -260,7 +260,7 @@ Curso: `plan · librería · clips · ql ✔ · PR · subida · qh · narrada ·
 
 | lección | plan | lib | clips | ql | PR | subida | qh | voz | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1–3.4 (las 12) | ✔ | ✔ | ✔ | ✔ | #87 | — | ~ | — | — |
+| 1.1–3.4 (las 12) | ✔ | ✔ | ✔ | ✔ | #87 ✔ | ✔ | ✔ local, adopción pendiente | ✔ (edge local) | ✔ |
 
 ## 13. Storyboard del curso
 
@@ -401,3 +401,12 @@ Lote C (curso), medida:
   (56 slides cada uno). Molde del curso (1.1) en ql revisado. pytest 386 ✔.
 - 2026-09-23 — **las 12 lecciones escritas y revisadas en ql** (48 clips,
   28–36 s), sonda de 120 invariantes; qh local en marcha.
+- 2026-09-23 — PR #87 fusionado (6e8cb93); VPS en main y las 12 lecciones
+  subidas a la base de producción. Voz sintetizada EN LOCAL con edge
+  (es-MX-JorgeNeural, 48/48 dentro de su clip) y **12 montajes con intro y
+  cierre en `exports/tesis6g-*/curso_narrado.mp4`**: 27.7 min, picos ≤ −0.9 dB,
+  marca sonora −6.0 dB, sin atempo. **Adopción de los qh en el VPS
+  PENDIENTE**: un `rsync -a` a `/root/` cambió el dueño de `/root` y bloqueó
+  el SSH (ver trampas.md). Los qh ya están en `/root/staging-tesis6g-*/`;
+  falta `python3 /root/adoptar_renders.py "Tesis 6G · N.M" /root/staging-<slug>`
+  por lección cuando el dueño restaure `/root`.
