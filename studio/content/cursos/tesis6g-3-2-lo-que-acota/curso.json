@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 3.2 Lo que el margen acota",
+  "description": "Lección 3.2 del curso La tesis 6G por dentro (módulo 3: el corazón), en 4 clips: las tres clases de políticas anidadas y los dos márgenes que la tesis reporta como par, la jerarquía de cotas de Oliehoek, Spaan y Vlassis (2008) de la que sale la envolvente, el piso de falsabilidad (Teorema 4.7.1, la aportación propia) y el juego de coordinación que muestra que la condición es necesaria pero no suficiente. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-tres-clases.py", "title": "1 · Tres clases de políticas", "scene": "Clip1",
+     "final_state": "Tres cajas anidadas (estáticas, desplegables, privilegiadas) y a su lado el eje de valor con los tres óptimos y las llaves de MA ≥ 31.8 % y MA_dec ≥ 9.5 %; en el pie que son cotas inferiores."},
+    {"file": "clips/02-la-envolvente.py", "title": "2 · La envolvente ya existía", "scene": "Clip2",
+     "final_state": "La escalera de cotas Q* ≤ Q_BG ≤ Q_POMDP ≤ Q_MDP enmarcada; en el pie que lo propio de la tesis es el uso."},
+    {"file": "clips/03-el-piso.py", "title": "3 · El piso de falsabilidad", "scene": "Clip3",
+     "final_state": "La opción que domina siempre, el oráculo a trazos encima y una adaptativa que solo pierde; en el pie el Teorema 4.7.1 como dato."},
+    {"file": "clips/04-la-holgura.py", "title": "4 · Una holgura sin techo", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'El margen no promete ganancia.' (blanca) y 'Sin margen, no hay ganancia posible.' (cian)."}
+  ]
+}
