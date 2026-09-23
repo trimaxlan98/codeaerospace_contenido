@@ -94,6 +94,9 @@ exec "$OPT/code-studio" "\${FLAGS[@]}" "\$@"
 EOF
 chmod +x "$BIN"
 
+# StartupWMClass = app_id que Electron pone a la ventana (derivado de
+# productName "CO.DE Studio" -> "co-de-studio"). Si no coincide, GNOME no
+# asocia la ventana al lanzador y el dock la enseña con icono generico.
 DESKTOP_ENTRY="[Desktop Entry]
 Type=Application
 Name=CO.DE Studio
@@ -104,10 +107,19 @@ Icon=$ICONS/512x512/apps/code-studio.png
 Terminal=false
 Categories=AudioVideo;Video;Development;Education;
 Keywords=manim;video;curso;claude;render;
-StartupWMClass=code-studio
+StartupWMClass=co-de-studio
 StartupNotify=true"
 echo "$DESKTOP_ENTRY" > "$APPS/code-studio.desktop"
 update-desktop-database -q "$APPS" 2>/dev/null || true
+
+# Anclar al dock de GNOME (idempotente).
+if command -v gsettings >/dev/null && gsettings get org.gnome.shell favorite-apps >/dev/null 2>&1; then
+  FAVS="$(gsettings get org.gnome.shell favorite-apps)"
+  if [[ "$FAVS" != *"'code-studio.desktop'"* ]]; then
+    [[ "$FAVS" == "@as []" ]] && FAVS="[]"
+    gsettings set org.gnome.shell favorite-apps "${FAVS%]}${FAVS:+$([[ "$FAVS" == "[]" ]] || echo ", ")}'code-studio.desktop']"
+  fi
+fi
 
 ESCRITORIO="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$TARGET_HOME/Desktop")"
 if [[ -d "$ESCRITORIO" ]]; then
