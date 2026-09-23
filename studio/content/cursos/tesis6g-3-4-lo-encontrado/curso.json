@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 3.4 Lo que ya se encontró",
+  "description": "Lección 3.4 y cierre del curso La tesis 6G por dentro (módulo 3: el corazón), en 4 clips: el banco de pruebas de la tesis medido con su propio termómetro (1.7 % contra 31.8 % y el margen alcanzado de 9.5 %), la compuerta G2b por semilla, las compuertas G0 a G4 como esclusas con G3 sin correr, y lo que viene: si el margen sobrevive a las órbitas reales, y el reloj del estándar 6G. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-recorrido.py", "title": "1 · Mi termómetro, medido", "scene": "Clip1",
+     "final_state": "Dos termómetros: v1 en rojo bajo la raya del 25 % y v2 en verde por encima, con el tramo alcanzado en ámbar; en el pie el par reportado [0.095, 0.318]."},
+    {"file": "clips/02-g2b.py", "title": "2 · La compuerta G2b", "scene": "Clip2",
+     "final_state": "Por semilla: estática, QMIX con su mejora y el oráculo a trazos; en el pie que el oráculo es cota inferior."},
+    {"file": "clips/03-las-compuertas.py", "title": "3 · Las compuertas", "scene": "Clip3",
+     "final_state": "Seis esclusas G0 a G4 con las cuatro primeras abiertas y sus cifras, el barco detenido ante G3 a trazos; en el pie que G3 está desbloqueada y sin correr."},
+    {"file": "clips/04-lo-que-viene.py", "title": "4 · Lo que viene", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre del curso en dos líneas: 'Que gane o que pierda.' (blanca) y 'Que la medicion signifique algo.' (cian)."}
+  ]
+}
