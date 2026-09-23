@@ -546,3 +546,38 @@ def interferencia_v2(usa_degradado, E=None, bump=0.35, i0=0.0):
         i = min(1.0, max(0.0, rho * i + bump * float(u)))
         out.append(i)
     return np.array(out)
+
+
+# Que ve quien (env_adapter.py::_update_global_state y _build_observations).
+ESTADO_V2 = ["latencia", "carga", "congestion espectro", "fase sin", "fase cos",
+             "demanda", "interferencia", "respaldo", "congestion gw", "canal degradado"]
+OBS_V2 = ["latencia", "espectro", "carga", "interferencia", "visibilidad",
+          "congestion gw"]
+
+
+def creencia_canal(interf, umbral=0.3, acierto=0.85, riesgo=1 / 80, semilla=42):
+    """Filtro bayesiano de dos hipotesis sobre «mi canal esta degradado».
+
+    Observacion ruidosa y_t = [I_t > umbral] que acierta con prob. `acierto`
+    (se voltea con semilla fija); transicion: el canal cambia de estado con
+    probabilidad `riesgo` por paso (1/80: la rotacion de la tesis vista por
+    alguien que no sabe cuando toca). Devuelve (y, creencia)."""
+    rng = np.random.default_rng(semilla)
+    verdad = np.asarray(interf) > umbral
+    y = np.where(rng.random(len(verdad)) < acierto, verdad, ~verdad)
+    b, out = 0.5, []
+    for yt in y:
+        b = b * (1 - riesgo) + (1 - b) * riesgo              # prediccion
+        l1 = acierto if yt else 1 - acierto                  # p(y | degradado)
+        l0 = 1 - acierto if yt else acierto                  # p(y | sano)
+        b = b * l1 / (b * l1 + (1 - b) * l0)
+        out.append(b)
+    return y.astype(int), np.array(out)
+
+
+def log10_politicas_dec(n_agentes, n_acciones, n_obs, horizonte):
+    """log10 del numero de politicas conjuntas deterministas de un Dec-POMDP
+    de horizonte T: cada agente elige una accion en cada nodo de su arbol de
+    historias, (|O|^T - 1)/(|O| - 1) nodos."""
+    nodos = (n_obs ** horizonte - 1) // (n_obs - 1) if n_obs > 1 else horizonte
+    return n_agentes * nodos * np.log10(n_acciones)

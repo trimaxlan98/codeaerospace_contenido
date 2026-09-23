@@ -254,6 +254,22 @@ i = T6.interferencia_v2(np.r_[np.ones(10), np.zeros(10)], E)
 ok("interferencia satura en 1 usando el canal degradado", abs(i[9] - 1.0) < 1e-9, f"{i[9]:.3f}")
 casi("y decae como 0.7^t al dejarlo", i[14], 1.0 * 0.7 ** 5, 1e-9)
 
+# =============================================================================
+print("\n== 08 - Creer sin ver y el coste de descentralizar ==")
+ok("estado de 10 y observacion de 6, como el YAML", len(T6.ESTADO_V2) == E["dim_estado"]
+   and len(T6.OBS_V2) == E["dim_obs"])
+ok("el canal degradado esta en el estado y en NINGUNA observacion",
+   "canal degradado" in T6.ESTADO_V2 and "canal degradado" not in T6.OBS_V2)
+canal = T6.canal_degradado_v2(480, E)
+y, b = T6.creencia_canal(T6.interferencia_v2(canal == 0, E))
+acierta = float(((b > 0.5) == (canal == 0)).mean())
+ok("la creencia sigue al estado oculto > 90 % del tiempo", acierta > 0.9, f"{acierta:.3f}")
+_, b_ciego = T6.creencia_canal(T6.interferencia_v2(canal == 0, E), acierto=0.5)
+ok("contraejemplo: con observacion sin informacion la creencia no sale de 0.5",
+   np.allclose(b_ciego, 0.5), f"{b_ciego.min():.3f}-{b_ciego.max():.3f}")
+casi("politicas conjuntas a horizonte 1: 3^3 = 27", 10 ** T6.log10_politicas_dec(3, 3, 2, 1), 27, 1e-6)
+casi("a horizonte 2: cada agente 3 nodos -> 3^9 conjuntas", 10 ** T6.log10_politicas_dec(3, 3, 2, 2), 3 ** 9, 1e-3)
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)
