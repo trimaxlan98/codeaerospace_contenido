@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 2.3 Consenso con traidores",
+  "description": "Lección 2.3 del curso La tesis 6G por dentro (módulo 2: las herramientas), en 4 clips: por qué hacen falta 3f+1 réplicas y por qué el quórum no es siempre 2f+1, las tres fases de PBFT y su tráfico cuadrático, la propuesta 5G-PBFT de la tesis que decide por grupos, y el líder elegido por reputación que desplaza a un traidor sin votación global. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-tres-f-mas-uno.py", "title": "1 · Tres f más uno", "scene": "Clip1",
+     "final_state": "Un anillo de 4 réplicas con sus dos quórums superpuestos y otro de 6 réplicas, un traidor rojo en cada uno; en el pie que con n = 7 f sube a 2."},
+    {"file": "clips/02-tres-fases.py", "title": "2 · Tres fases", "scene": "Clip2",
+     "final_state": "Las cuatro réplicas en filas con las flechas de pre-prepare, prepare y commit y sus cuentas en cian; en el pie el total con n = 1000."},
+    {"file": "clips/03-por-grupos.py", "title": "3 · Decidir por grupos", "scene": "Clip3",
+     "final_state": "Mensajes por decisión contra satélites en escala log: PBFT plano en rojo, grupos de 10 en verde y la brecha a 1000 satélites; en el pie el coste de latencia como dato."},
+    {"file": "clips/04-quien-manda.py", "title": "4 · Quién manda", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Decidir entre muchos' (blanca) y 'aunque alguno mienta.' (cian)."}
+  ]
+}

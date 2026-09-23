@@ -719,3 +719,22 @@ def coordinacion_estadistica(n=1000, **kw):
     con = np.array([pasos_para_coordinar(aprendices_independientes(semilla=s, conjunto=True, **kw)[1])
                     for s in range(n)])
     return ind, con
+
+
+def mensajes_por_grupos(n, tam=10):
+    """Mensajes de una decision con PBFT plano frente a 5G-PBFT por grupos
+    (Cap. 4 §4.2.2 de la tesis): m = n/tam grupos que corren PBFT dentro
+    (2 tam (tam-1) cada uno, `ntn.quorum_pbft`) y m mensajes de propagacion
+    entre grupos."""
+    import ntn
+    plano = ntn.quorum_pbft(n)["mensajes_total"]
+    m = int(np.ceil(n / tam))
+    grupos = m * ntn.quorum_pbft(tam)["mensajes_total"] + m
+    return {"n": n, "plano": plano, "grupos": grupos, "m": m,
+            "ahorro": 1.0 - grupos / plano}
+
+
+def reputacion(uptime, calidad, fallos, w=(1.0, 1.0, 0.5)):
+    """reputation(L) = w1 uptime + w2 calidad - w3 fallos (Cap. 4 §4.2.3).
+    La tesis no fija los pesos: estos son un PARAMETRO elegido (gris)."""
+    return w[0] * np.asarray(uptime) + w[1] * np.asarray(calidad) - w[2] * np.asarray(fallos)

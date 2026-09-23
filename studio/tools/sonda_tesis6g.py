@@ -323,6 +323,29 @@ ok("VDN y QMIX superan a la estatica en las 3 semillas", all(v["vdn"] > v["estat
 ok("y ninguno pasa del oraculo (R5 sin disparar)", all(max(v["vdn"], v["qmix"]) <= 1.05 * v["oraculo"]
    for v in V))
 
+# =============================================================================
+print("\n== 11 - Consenso ==")
+import ntn as _ntn
+q4, q6, q7 = (_ntn.quorum_pbft(n) for n in (4, 6, 7))
+ok("n=6 tolera lo mismo que n=4 (f=1); n=7 sube a f=2", q4["f"] == q6["f"] == 1 and q7["f"] == 2)
+ok("con n=6 el quorum es 4, no 2f+1 = 3", q6["quorum"] == 4 and q6["quorum_2f1"] == 3)
+# interseccion de dos quorums: 2q - n >= f + 1 (al menos un honesto en comun)
+for n in range(4, 30):
+    q = _ntn.quorum_pbft(n)
+    if 2 * q["quorum"] - n < q["f"] + 1:
+        ok(f"interseccion de quorums n={n}", False)
+        break
+else:
+    ok("para n = 4..29 dos quorums comparten >= f+1 replicas", True)
+ok("contraejemplo: con n=6 y quorum 2f+1=3 dos quorums pueden no compartir nada",
+   2 * 3 - 6 < 1 + 1)
+g = T6.mensajes_por_grupos(1000, 10)
+ok("1000 satelites en grupos de 10: ahorro > 99 %", g["ahorro"] > 0.99,
+   f"{g['plano']} -> {g['grupos']} ({100 * g['ahorro']:.2f} %)")
+g1 = T6.mensajes_por_grupos(10, 10)
+ok("contraejemplo: con un solo grupo no hay ahorro (solo el mensaje de propagacion)",
+   g1["grupos"] == g1["plano"] + 1)
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)
