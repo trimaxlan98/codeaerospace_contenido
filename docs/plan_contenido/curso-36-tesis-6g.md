@@ -260,8 +260,7 @@ Curso: `plan · librería · clips · ql ✔ · PR · subida · qh · narrada ·
 
 | lección | plan | lib | clips | ql | PR | subida | qh | voz | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1 (molde) | ✔ | ✔ | ✔ | ✔ | — | — | — | — | — |
-| 1.2–3.4 | ✔ | ~ | — | — | — | — | — | — | — |
+| 1.1–3.4 (las 12) | ✔ | ✔ | ✔ | ✔ | #87 | — | ~ | — | — |
 
 ## 13. Storyboard del curso
 
@@ -363,6 +362,32 @@ Lote P (piezas), medida, no supuesta:
 - Las piezas no llevan marca de agua ni escuadras: sobre el slide no se ve
   el borde del vídeo (fondo idéntico al del slide).
 
+Lote C (curso), medida:
+
+- **La malla decide también aquí**: NTNEnv-v2 avanza en pasos enteros. El
+  eclipse ocupa 25 de 60 pasos (41.7 %, no el 40.3 % de la fórmula
+  continua) y el pico del gateway 14 de 45 (31.1 %, no 30 %). En pantalla,
+  las cifras discretas: son las que vive el entorno.
+- **VDN no tiene 3/3**: la semilla 44 del brazo 3 no encontró política
+  adaptativa. Para comparar VDN con QMIX se usa la MEJOR evaluación greedy de
+  la fase 0 (mismo protocolo en las dos) y se rotula así, porque es un máximo
+  sobre puntos de control.
+- **La heurística del rival importa** (compuerta G-H): la ingenua de umbral
+  0.35 queda POR DEBAJO de la estática (7 718 < 9 504) y la afinada, de 270
+  probadas, la supera por poco (+1.2 a +5.1 %). Es el clip 1.3.4.
+- **Una demo de una semilla no es una demo**: los aprendices independientes
+  «se persiguen» solo en algunas semillas. La cifra es la mediana de 1000
+  (13-14 pasos contra 1 del aprendiz conjunto) y el dibujo es la semilla de
+  la mediana (89).
+- **Los números con espacios cuentan como palabras** en el guardián
+  («1 998 000» son tres): se escribe `n=1000: 1 998 000` o se acorta el pie.
+- **Mis duraciones salen cortas por sistema** (~4 s): lo que funcionó fue
+  subir 1.5 s cada pausa de lectura de 1 s o más, no alargar al final.
+- `set_opacity` sobre un grupo casilla+texto enciende el relleno y tapa el
+  texto (clip 1.4.1): se apaga el trazo y el texto por separado.
+- Un mapa de calor de Q_tot no distingue un mezclador monótono de la suma:
+  los cortes a Q2 fija sí (la curva que BAJA delata al no monótono).
+
 ## 16. Hitos
 
 - 2026-09-22 — exploración de la tesis, decisiones del dueño (12 lecciones,
@@ -371,3 +396,5 @@ Lote P (piezas), medida, no supuesta:
   66 invariantes en verde, decks combinados en
   `exports/presentaciones/tesis-6g/{navy,blanco}/piezas-*-{video,gif}.pptx`
   (56 slides cada uno). Molde del curso (1.1) en ql revisado. pytest 386 ✔.
+- 2026-09-23 — **las 12 lecciones escritas y revisadas en ql** (48 clips,
+  28–36 s), sonda de 120 invariantes; qh local en marcha.

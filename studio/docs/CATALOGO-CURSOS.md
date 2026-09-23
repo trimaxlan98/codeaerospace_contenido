@@ -152,6 +152,7 @@ prefijo delante del `·` y son más de una:
 | Comunicaciones digitales | 18 | 24 |
 | Protocolos de Internet | 24 | 25 |
 | **Procesamiento de señales** | **30** | **27** |
+| Tesis 6G | 12 | 36 |
 
 `Procesamiento de señales` es la familia más grande del índice: 30 proyectos
 numerados de 1.1 a 10.3, que la vista de Proyectos ordena por etiqueta y por
