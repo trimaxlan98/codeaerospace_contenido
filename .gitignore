@@ -57,3 +57,7 @@ studio/backend/gcp-key.json
 # Cursos montados con narracion (mux.sh) — binarios, fuera del repo
 exports
 exports.pre-migration-*/
+
+# Resultados de la tesis 6G (repo privado, licencia restrictiva): no se publican.
+# Los copia studio/tools/traer_datos_tesis.py
+studio/content/datos/tesis-6g-privado/

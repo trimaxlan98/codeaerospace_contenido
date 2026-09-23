@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 1.3 Gobernar no es controlar",
+  "description": "Lección 1.3 del curso La tesis 6G por dentro (módulo 1: el problema), en 4 clips: las tres eras de la gestión de red (a mano, SON, autónoma), ASTREA y la lección de ritmo medida en órbita, los tres lazos de O-RAN por escala de tiempo, y la política como cartucho intercambiable, con la heurística ingenua y la afinada medidas por la compuerta G-H de la tesis. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-tres-eras.py", "title": "1 · Tres eras", "scene": "Clip1",
+     "final_state": "Seis nodos con sus lazos SON girando dentro de un lazo ámbar que abraza a todos; en el pie la escala de autonomía TM Forum como dato."},
+    {"file": "clips/02-el-ritmo.py", "title": "2 · El ritmo equivocado", "scene": "Clip2",
+     "final_state": "La órbita con el satélite y su lazo de control; tres barras de violaciones térmicas (base, 15 min en rojo, 90 min en verde); en el pie el −66.2 % como dato."},
+    {"file": "clips/03-dos-lazos.py", "title": "3 · Tres lazos, tres ritmos", "scene": "Clip3",
+     "final_state": "Tres anillos concéntricos con sus pulsos a razón 16:4:1, sus nombres y escalas de O-RAN y los módulos de PADA sobre cada uno."},
+    {"file": "clips/04-politicas.py", "title": "4 · Políticas como software", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Separar al que piensa' (blanca) y 'del que actua.' (cian)."}
+  ]
+}

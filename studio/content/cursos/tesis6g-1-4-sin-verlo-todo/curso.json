@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 1.4 Decidir sin verlo todo",
+  "description": "Lección 1.4 del curso La tesis 6G por dentro (módulo 1: el problema), en 4 clips: el estado de 10 dimensiones frente a las observaciones de 6 de cada agente, la creencia bayesiana sobre el canal que nadie ve, las 27 acciones conjuntas de tres agentes y la mejor fija de la tesis, y la explosión del número de políticas descentralizadas (con el aviso de que coste de cómputo no es brecha de valor). Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-estado.py", "title": "1 · Lo que cada uno ve", "scene": "Clip1",
+     "final_state": "La columna del estado (10 casillas, violeta) apagada salvo el canal degradado, enmarcado en rojo; tres columnas de observación (6 casillas, ámbar); en el pie que nadie observa el canal."},
+    {"file": "clips/02-creer.py", "title": "2 · Creer sin ver", "scene": "Clip2",
+     "final_state": "Tres franjas: el canal oculto a trazos, la observación ruidosa en puntos ámbar y la creencia en cian cruzando 0.5; en el pie los pasos que tarda en darse cuenta."},
+    {"file": "clips/03-tres-deciden.py", "title": "3 · Tres que deciden", "scene": "Clip3",
+     "final_state": "Las 27 acciones conjuntas en tres capas de 3x3 con las cinco mejores fijas encendidas y la [2,2,2] enmarcada; en el pie su recompensa como dato."},
+    {"file": "clips/04-el-coste.py", "title": "4 · El coste de descentralizar", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Nadie ve el estado entero.' (blanca) y 'Y hay que decidir igual.' (cian)."}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 3.1 El termómetro roto",
+  "description": "Lección 3.1 del curso La tesis 6G por dentro (módulo 3: el corazón), en 4 clips: la analogía del termómetro que marca siempre 37, la política de lazo abierto que ganaba escenarios de SMAC, dos algoritmos idénticos cuyo orden se invierte al pasar de 5 a 10 semillas (uno de cada cuatro experimentos), y la definición del Margen Adaptativo. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-el-termometro.py", "title": "1 · El termómetro roto", "scene": "Clip1",
+     "final_state": "La temperatura verdadera ondulando a la izquierda, el termómetro clavado en 37 grados con su raya roja, y las dos barras A y B apagadas con un signo igual; en el pie que no hay nada que medir."},
+    {"file": "clips/02-politica-ciega.py", "title": "2 · La política que no mira", "scene": "Clip2",
+     "final_state": "Dos paneles: seis episodios idénticos con el plan de lazo abierto encima, y seis episodios con azar donde el mismo plan ya no encaja; en el pie que el margen era casi cero y nadie lo midió."},
+    {"file": "clips/03-cinco-semillas.py", "title": "3 · Cinco semillas no bastan", "scene": "Clip3",
+     "final_state": "Diez semillas de A y de B con sus medias, B ya por encima; en el pie la probabilidad teórica de inversión, 0.25."},
+    {"file": "clips/04-el-margen.py", "title": "4 · El margen adaptativo", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Primero medir el termometro.' (blanca) y 'Despues comparar algoritmos.' (cian)."}
+  ]
+}
