@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Tesis 6G · 1.1 La red que se mueve". Bloque de estilo
+# CO.DE Academy - "Tesis 6G · 1.2 Una red, dos mundos". Bloque de estilo
 # del proyecto: se antepone al script de CADA clip; los clips NO repiten
 # imports, solo definen su ClipN(Scene).
 #
@@ -112,20 +112,24 @@ def fmt(x, dec=1):
 
 # --- Numeros de la leccion --------------------------------------------
 H_KM = 600.0
-PASE = ntn.pase_leo(H_KM, 53.0, lat_gs=19.43, lon_gs=-99.13)
-PERIODO_MIN = sat.periodo_orbital(H_KM)["minutos"]            # 96.5
-DUR_MIN = PASE["duracion_s"] / 60.0                            # 8.8
-ELEV_MAX = PASE["elev_max_deg"]                                # 89.6
-FRAC_CONTACTO = DUR_MIN / PERIODO_MIN                          # 0.092
 R_T = ntn.R_TIERRA_KM
 EL_MIN = ntn.ELEVACION_MINIMA_DEG
 LAMBDA = np.degrees(np.arccos(R_T * np.cos(np.radians(EL_MIN))
-                              / (R_T + H_KM))) - EL_MIN        # 15.84 grados
-RET_CENIT = ntn.retardo_ida_ms(H_KM)                           # 2.0 ms
-RET_BORDE = ntn.retardo_ida_ms(ntn.distancia_oblicua_km(EL_MIN, H_KM))  # 6.4
-HO_SOLAPE = ntn.handover(4, solape=0.25)        # tren que se releva sin hueco
-HO_TOCAN = ntn.handover(4, solape=0.0)          # "se tocan"... y ya hay hueco
-ESC = T6.ESCALA                                 # dato McDowell
+                              / (R_T + H_KM))) - EL_MIN
+E = T6.entorno_v2()                    # parametros del YAML de las compuertas
+PASOS = 2 * E["orbita_periodo"]        # dos orbitas en pantalla
+VIS = T6.visibilidad_v2(PASOS, E)      # (2, 120), formula de env_adapter.py
+ECL = VIS < E["eclipse_umbral"]
+FRAC_ECL = float(ECL[0].mean())        # 25 de 60 pasos: 0.417
+FRAC_AMBOS = float(ECL.all(axis=0).mean())
+CONG = T6.congestion_v2(4 * E["gw_periodo"], E)          # sin jitter
+CONG_J = T6.congestion_v2(4 * E["gw_periodo"], E, semilla=42)
+FRAC_CONG = float(T6.congestion_v2(E["gw_periodo"], E).mean())   # 14/45
+REPITE = math.lcm(E["orbita_periodo"], E["gw_periodo"])  # 180 pasos
+CANAL = T6.canal_degradado_v2(3 * E["canal_periodo"], E)
+INTERF = T6.interferencia_v2(CANAL == 0, E)              # un agente fiel al canal 0
+VIDA_MEDIA = math.log(0.5) / math.log(E["decaimiento"])  # 1.94 pasos
+RET_CENIT = ntn.retardo_ida_ms(H_KM)
 
 
 # --- Rotulos ----------------------------------------------------------

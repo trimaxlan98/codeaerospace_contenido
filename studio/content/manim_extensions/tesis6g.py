@@ -338,7 +338,15 @@ def datos_tesis() -> dict:
     filas = [(f["episodios"], f["ma_mean"]) for f in sens["filas"]]
     filas.append((sens["referencia_G1"]["episodios"], sens["referencia_G1"]["ma_mean"]))
     umbral = _num_inicial(por_id["G1"]["criterio"].split("≥")[-1])
+    gh = _leer("gh_heuristica.json")
     return {
+        # G-H: heuristica ingenua (umbral 0.35) y afinada (grid de 270) contra
+        # la mejor estatica, por semilla de evaluacion
+        "heuristica": [{"semilla": p["seed"], "estatica": p["best_static"]["reward_mean"],
+                        "ingenua": p["current"]["reward_mean"], "afinada": p["tuned"]["reward_mean"],
+                        "afinada_vs_estatica": p["delta_vs_static_pct"] / 100.0}
+                       for p in gh["per_seed"]],
+        "heuristica_configs": gh["grid"]["n_configs"],
         "g0_ma": _num_inicial(por_id["G0"]["valor"]),
         "g1_ma": float(np.mean([x["ma"] for x in g1])),
         "g1_por_semilla": {x["seed"]: x["ma"] for x in g1},
@@ -474,4 +482,67 @@ def entorno_v2() -> dict:
         "canal_factor": c["channel_degradation"]["factor"],
         "canal_observable": c["channel_degradation"]["observable"],
         "orbita_periodo": c["dynamics"]["orbit_period"],
+        "canal_periodo": c["channel_degradation"]["period"],
+        "gw_ciclo": c["gw_congestion"]["duty_cycle"],
+        "gw_jitter": c["gw_congestion"]["jitter"],
+        "decaimiento": c["dynamics"]["interference_decay"],
+        "tabla_tp": list(c["dynamics"]["throughput_table"]),
+        "lat_baja": c["dynamics"]["latency_low"],
+        "lat_alta": c["dynamics"]["latency_high"],
+        "dim_estado": c["state_dim"], "dim_obs": c["obs_dim"],
+        "pasos_episodio": c["max_steps"],
     }
+
+
+# =============================================================================
+# La mecanica de NTNEnv-v2, reproducida (env_adapter.py / env_adapter_v2.py)
+# =============================================================================
+# Solo lo que dibujan las piezas y el curso, con las MISMAS formulas del
+# codigo de la tesis. La sonda las comprueba contra lo que dicen sus
+# docstrings (eclipse ~40 % del tiempo, pico del gateway al 30 %...).
+
+def visibilidad_v2(pasos, E=None, fase0=0.0):
+    """vis_i(t) = 0.5 (1 + sin(fase + desfase_i)), fase += 2 pi / periodo.
+    Desfases linspace(0, pi, 3): satelite 1 = 0, satelite 2 = pi/2 (el
+    gateway reporta 1.0 siempre). Devuelve (2, pasos)."""
+    E = E or entorno_v2()
+    t = np.arange(pasos)
+    fase = fase0 + 2 * np.pi * t / E["orbita_periodo"]
+    off = np.linspace(0, np.pi, E["agentes"])[:2]
+    return 0.5 * (1.0 + np.sin(fase[None, :] + off[:, None]))
+
+
+def congestion_v2(pasos, E=None, semilla=None):
+    """Nivel del gateway en {0,1}: pico de duty*periodo pasos por ciclo. Sin
+    semilla el pico empieza al inicio de cada ciclo; con semilla, con el
+    jitter de la tesis (inicio ~ U(0, jitter*periodo) en cada ciclo)."""
+    E = E or entorno_v2()
+    per, duty = E["gw_periodo"], E["gw_ciclo"]
+    rng = np.random.default_rng(semilla) if semilla is not None else None
+    out = np.zeros(pasos)
+    inicio = 0.0
+    for t in range(pasos):
+        k = t % per
+        if k == 0 and rng is not None:
+            inicio = float(rng.uniform(0.0, E["gw_jitter"] * per))
+        out[t] = 1.0 if inicio <= k < inicio + duty * per else 0.0
+    return out
+
+
+def canal_degradado_v2(pasos, E=None):
+    """Indice del canal degradado {0,1}: rota cada `canal_periodo` pasos."""
+    E = E or entorno_v2()
+    return (np.arange(pasos) // E["canal_periodo"]) % 2
+
+
+def interferencia_v2(usa_degradado, E=None, bump=0.35, i0=0.0):
+    """I <- clip(decaimiento*I + bump*[usa el canal degradado], 0, 1): la
+    parte determinista de la interferencia de la tesis (sin colisiones ni
+    ruido). Es lo que DELATA al canal que no se observa."""
+    E = E or entorno_v2()
+    rho = E["decaimiento"]
+    out, i = [], float(i0)
+    for u in usa_degradado:
+        i = min(1.0, max(0.0, rho * i + bump * float(u)))
+        out.append(i)
+    return np.array(out)

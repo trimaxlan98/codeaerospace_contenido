@@ -1,5 +1,5 @@
 # =====================================================================
-# CO.DE Academy - "Tesis 6G · 1.1 La red que se mueve". Bloque de estilo
+# CO.DE Academy - "Tesis 6G · 1.3 Gobernar no es controlar". Bloque de estilo
 # del proyecto: se antepone al script de CADA clip; los clips NO repiten
 # imports, solo definen su ClipN(Scene).
 #
@@ -112,20 +112,19 @@ def fmt(x, dec=1):
 
 # --- Numeros de la leccion --------------------------------------------
 H_KM = 600.0
-PASE = ntn.pase_leo(H_KM, 53.0, lat_gs=19.43, lon_gs=-99.13)
-PERIODO_MIN = sat.periodo_orbital(H_KM)["minutos"]            # 96.5
-DUR_MIN = PASE["duracion_s"] / 60.0                            # 8.8
-ELEV_MAX = PASE["elev_max_deg"]                                # 89.6
-FRAC_CONTACTO = DUR_MIN / PERIODO_MIN                          # 0.092
 R_T = ntn.R_TIERRA_KM
 EL_MIN = ntn.ELEVACION_MINIMA_DEG
 LAMBDA = np.degrees(np.arccos(R_T * np.cos(np.radians(EL_MIN))
-                              / (R_T + H_KM))) - EL_MIN        # 15.84 grados
-RET_CENIT = ntn.retardo_ida_ms(H_KM)                           # 2.0 ms
-RET_BORDE = ntn.retardo_ida_ms(ntn.distancia_oblicua_km(EL_MIN, H_KM))  # 6.4
-HO_SOLAPE = ntn.handover(4, solape=0.25)        # tren que se releva sin hueco
-HO_TOCAN = ntn.handover(4, solape=0.0)          # "se tocan"... y ya hay hueco
-ESC = T6.ESCALA                                 # dato McDowell
+                              / (R_T + H_KM))) - EL_MIN
+A = T6.ASTREA                          # dato publicado (arXiv:2509.13380)
+D = T6.datos_tesis()
+GH = D["heuristica"][0]                # semilla 42 de la compuerta G-H
+N_CONFIGS = D["heuristica_configs"]    # 270 heuristicas probadas
+GH_RANGO = (min(h["afinada_vs_estatica"] for h in D["heuristica"]),
+            max(h["afinada_vs_estatica"] for h in D["heuristica"]))
+# Lazos de O-RAN (dato: O-RAN WG1/WG3; COMPATIBILIDAD_PROTOCOLAR de la tesis)
+LAZOS = [("tiempo real", "< 10 ms"), ("near-RT RIC", "10 ms - 1 s"),
+         ("non-RT RIC", "> 1 s")]
 
 
 # --- Rotulos ----------------------------------------------------------

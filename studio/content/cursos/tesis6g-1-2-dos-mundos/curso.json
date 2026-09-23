@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 1.2 Una red, dos mundos",
+  "description": "Lección 1.2 del curso La tesis 6G por dentro (módulo 1: el problema), en 4 clips: la red integrada satélite-tierra del banco de pruebas de la tesis (dos satélites, un gateway y una ruta terrestre alterna), el eclipse que desploma el enlace, el gateway que se congestiona a otro ritmo que la órbita, y el canal degradado que nadie observa pero la interferencia delata. Formato mudo: la pantalla pone la cosa y su cifra.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-satelite-y-tierra.py", "title": "1 · Satélite y tierra", "scene": "Clip1",
+     "final_state": "Dos satélites enlazados a un gateway y la ruta terrestre alterna hacia la red; arriba a la derecha los tres caminos; en el pie el número de agentes que deciden."},
+    {"file": "clips/02-el-eclipse.py", "title": "2 · El eclipse", "scene": "Clip2",
+     "final_state": "Las dos curvas de visibilidad con el umbral 0.35 y las franjas de eclipse; la franja común de los dos a la vez resaltada; en el pie su porcentaje."},
+    {"file": "clips/03-el-gateway.py", "title": "3 · El gateway se llena", "scene": "Clip3",
+     "final_state": "La visibilidad orbital (60 pasos) sobre el ciclo del gateway (45 pasos) con jitter, en una ventana de 180 pasos; en el pie el jitter como dato."},
+    {"file": "clips/04-el-canal-oculto.py", "title": "4 · El canal que no se ve", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Tres ritmos que no coinciden.' (blanca) y 'Adaptarse puede pagar.' (cian)."}
+  ]
+}

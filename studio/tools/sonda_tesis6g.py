@@ -187,6 +187,13 @@ if D:
        ", ".join(f"{v['semilla']}:{v['gate']:.3f}/{v['heldout']:.3f}" for v in ev)
        + f"  ({len(ev)}/{len(D['vdn'])} semillas con politica)")
 
+    for h in D["heuristica"]:
+        ok(f"G-H semilla {h['semilla']}: ingenua < estatica < afinada (el rival importa)",
+           h["ingenua"] < h["estatica"] < h["afinada"],
+           f"{h['ingenua']:.0f} < {h['estatica']:.0f} < {h['afinada']:.0f}")
+        casi(f"G-H semilla {h['semilla']}: la estatica de G-H es la de G1/G2b",
+             h["estatica"], [g["estatica"] for g in D["g2b"] if g["semilla"] == h["semilla"]][0], 1.0)
+
 # =============================================================================
 print("\n== 05 - Guardian de etiquetas ==")
 pal = T6.Paleta.de(T6.FONDO_OSCURO)
@@ -215,6 +222,37 @@ lam = np.degrees(np.arccos(ntn.R_TIERRA_KM * np.cos(np.radians(10)) / (ntn.R_TIE
 ok("la duracion cenital cae cerca de la geometria sin rotacion terrestre (+-10 %)",
    abs(p["duracion_s"] - per * 2 * lam / 360) / (per * 2 * lam / 360) < 0.10,
    f"geometria {per * 2 * lam / 360 / 60:.2f} min, semiangulo {lam:.2f} grados")
+
+# =============================================================================
+print("\n== 07 - Mecanica de NTNEnv-v2 reproducida ==")
+E = T6.entorno_v2()
+ok("YAML: 3 agentes, eclipse 0.35, factor 0.10, pico 35 %",
+   E["agentes"] == 3 and E["eclipse_umbral"] == 0.35 and E["eclipse_factor"] == 0.10
+   and abs(E["gw_capacidad_pico"] - 0.35) < 1e-9)
+v = T6.visibilidad_v2(60 * 200, E)
+fr = float((v < E["eclipse_umbral"]).mean())
+# LA MALLA DECIDE: el entorno avanza 6 grados por paso. sin(6k) < -0.3 para
+# 6k entre 197.46 y 342.54 grados -> k = 33..57: 25 de 60 pasos. La formula
+# continua (pi - 2 asin 0.3)/2pi = 40.3 % NO es lo que vive el entorno.
+k_ecl = [k for k in range(60) if 197.4576 < 6 * k < 342.5424]
+casi("eclipse: 25 de 60 pasos (41.7 %), no el 40.3 % continuo", fr, len(k_ecl) / 60, 1e-9)
+ok("contraejemplo: la formula continua NO coincide con el entorno discreto",
+   abs(fr - (np.pi - 2 * np.arcsin(0.3)) / (2 * np.pi)) > 0.01)
+ok("visibilidad en [0, 1] y periodo de 60 pasos",
+   v.min() >= 0 and v.max() <= 1 and np.allclose(v[:, :60], v[:, 60:120]))
+ambos = float(((v < E["eclipse_umbral"]).all(axis=0)).mean())
+ok("los dos satelites a la vez en eclipse MENOS que uno solo", ambos < fr, f"{ambos:.3f} < {fr:.3f}")
+cg = T6.congestion_v2(45 * 100, E)
+# pico = pasos k con k < 0.3*45 = 13.5 -> 14 de 45 (31.1 %), no 30 %
+casi("congestion sin jitter: 14 de 45 pasos (31.1 %)", cg.mean(), 14 / 45, 1e-9)
+cj = T6.congestion_v2(45 * 400, E, semilla=42)
+casi("congestion con jitter: ~30 % (el inicio fraccionario reparte el paso extra)",
+     cj.mean(), 0.30, 5e-3)
+cd = T6.canal_degradado_v2(320, E)
+ok("canal degradado rota cada 80 pasos", (cd[:80] == 0).all() and (cd[80:160] == 1).all())
+i = T6.interferencia_v2(np.r_[np.ones(10), np.zeros(10)], E)
+ok("interferencia satura en 1 usando el canal degradado", abs(i[9] - 1.0) < 1e-9, f"{i[9]:.3f}")
+casi("y decae como 0.7^t al dejarlo", i[14], 1.0 * 0.7 ** 5, 1e-9)
 
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
