@@ -59,3 +59,4 @@ class Clip2(Scene):
                     run_time=0.5)
         self.wait(4.0)
         self.wait(0.8)
+        self.wait(1.8)

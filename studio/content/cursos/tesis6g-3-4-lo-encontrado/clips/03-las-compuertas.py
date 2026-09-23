@@ -57,3 +57,4 @@ class Clip3(Scene):
         self.play(puertas["G3"].animate.set_stroke(C_TENUE), run_time=0.4)
         rot.mostrar(dato_pie("G3: desbloqueada, sin correr"), zona="abajo", run_time=0.5)
         self.wait(4.0)
+        self.wait(1.2)

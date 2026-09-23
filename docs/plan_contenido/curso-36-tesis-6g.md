@@ -383,6 +383,9 @@ Lote C (curso), medida:
   («1 998 000» son tres): se escribe `n=1000: 1 998 000` o se acorta el pie.
 - **Mis duraciones salen cortas por sistema** (~4 s): lo que funcionó fue
   subir 1.5 s cada pausa de lectura de 1 s o más, no alargar al final.
+- **Un clip de muchos `play` cortísimos dura MENOS en qh que en ql**: el
+  redondeo a fotograma de 60 fps no es el de 30. 2.2.1 (40 celdas a 0.07 s)
+  bajó de 29.1 a 26.8 s. Se deja 1.5 s de margen sobre el mínimo en ql.
 - `set_opacity` sobre un grupo casilla+texto enciende el relleno y tapa el
   texto (clip 1.4.1): se apaga el trazo y el texto por separado.
 - Un mapa de calor de Q_tot no distingue un mezclador monótono de la suma:

@@ -63,3 +63,4 @@ class Clip1(Scene):
         self.wait(3.6)
         rot.mostrar(dato_pie("mediana de 1000 semillas"), zona="abajo", run_time=0.5)
         self.wait(3.2)
+        self.wait(2.4)
