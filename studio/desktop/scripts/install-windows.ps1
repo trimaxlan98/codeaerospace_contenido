@@ -12,7 +12,7 @@
 #   -Distro   distro de WSL (defecto: Ubuntu)
 #   -RepoWsl  ruta del checkout DENTRO de WSL (defecto: ~/codeaerospace_contenido)
 #   -RepoUrl  URL de git para clonarlo si no existe
-#   -Rama     rama con la app de escritorio (defecto: feat/escritorio; main cuando se fusione)
+#   -Rama     rama a usar (defecto: main)
 #   -Password contraseña del Estudio local, solo si falta studio/backend/.env
 #
 # Por que asi: el runner de ManimStudio habla por un socket Unix y lanza
@@ -28,7 +28,7 @@ param(
   [string]$Distro = 'Ubuntu',
   [string]$RepoWsl = '',
   [string]$RepoUrl = 'https://github.com/trimaxlan98/codeaerospace_contenido.git',
-  [string]$Rama = 'feat/escritorio',
+  [string]$Rama = 'main',
   # Contraseña del Estudio local (usuario admin). Solo se usa si aun no
   # existe studio/backend/.env dentro de WSL.
   [string]$Password = ''

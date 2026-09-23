@@ -10,8 +10,8 @@ En la máquina Windows, abre Claude Code en PowerShell (en cualquier carpeta) y 
 
 > Instala y construye la app de escritorio CO.DE Studio en esta máquina Windows. Las
 > instrucciones completas están en el repo `https://github.com/trimaxlan98/codeaerospace_contenido`,
-> rama `feat/escritorio`, archivo `studio/desktop/INSTALAR-WINDOWS.md`: léelo entero primero
-> (puedes verlo con `gh api` o en `https://github.com/trimaxlan98/codeaerospace_contenido/blob/feat/escritorio/studio/desktop/INSTALAR-WINDOWS.md`).
+> rama `main`, archivo `studio/desktop/INSTALAR-WINDOWS.md`: léelo entero primero
+> (en `https://github.com/trimaxlan98/codeaerospace_contenido/blob/main/studio/desktop/INSTALAR-WINDOWS.md`).
 > Sigue los pasos 0 a 5 en orden y verifica cada uno antes de avanzar. Pregúntame la
 > contraseña del Estudio local antes del paso 2 y si quiero copiar los exports (paso 6).
 > Los pasos que necesiten que yo intervenga (reiniciar tras instalar WSL, crear el usuario de
@@ -87,12 +87,11 @@ El script vive en el repo, que todavía no está en la máquina. Clónalo primer
 (el paso 2 lo detecta y no lo vuelve a clonar):
 
 ```powershell
-wsl -d Ubuntu -- bash -lc "git clone https://github.com/trimaxlan98/codeaerospace_contenido.git ~/codeaerospace_contenido && cd ~/codeaerospace_contenido && git checkout feat/escritorio"
+wsl -d Ubuntu -- bash -lc "git clone https://github.com/trimaxlan98/codeaerospace_contenido.git ~/codeaerospace_contenido"
 ```
 
-> La app está en la rama `feat/escritorio` hasta que se fusione a `main`. Si
-> `git checkout feat/escritorio` falla porque la rama ya no existe, usa `main` y pasa
-> `-Rama main` a todos los pasos siguientes.
+La app de escritorio está en `main`. Si hay que probar una rama con cambios a la app,
+pasa `-Rama <rama>` a los pasos siguientes.
 
 Copia el script a Windows para ejecutarlo:
 
