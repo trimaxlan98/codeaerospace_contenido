@@ -113,6 +113,15 @@ El proceso web nunca toca `docker.sock`. El runner expone cuatro comandos
 compose file. Cada render corre en un contenedor sin red, con el repo montado
 en solo lectura y escritura únicamente en el directorio de su propio job.
 
+## App de escritorio (`studio/desktop/`)
+
+**CO.DE Studio** empaqueta el Estudio local como app de escritorio: levanta runner y
+backend, ordena `exports/` por tema y proyecto, y trae una terminal integrada con Claude
+Code y un asistente de *Nuevo curso*. Instalar en Linux:
+`bash studio/desktop/scripts/install-linux.sh`. En Windows (servicios en WSL2), seguir
+[`studio/desktop/INSTALAR-WINDOWS.md`](studio/desktop/INSTALAR-WINDOWS.md), escrita para que
+la ejecute un agente. Detalle: [`studio/desktop/README.md`](studio/desktop/README.md).
+
 ## Desarrollo local
 
 ```bash

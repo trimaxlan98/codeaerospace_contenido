@@ -8,6 +8,11 @@ description: Use when working on ManimStudio (studio/ in this repo, prod at code
 Private single-user web console to render Manim Community scenes at **https://coderesearch.space**.
 Lives in `studio/`. Full docs: `studio/docs/README.md` and `studio/docs/AUDITORIA.md`.
 
+**Desktop app (CO.DE Studio)** lives in `studio/desktop/` — Electron shell that runs the studio
+locally, browses `exports/` by topic/project and embeds a terminal with Claude Code. Install on
+Linux with `studio/desktop/scripts/install-linux.sh`; **to install it on Windows, follow
+`studio/desktop/INSTALAR-WINDOWS.md` step by step** (services run inside WSL2).
+
 ## Architecture (who talks to whom)
 
 ```

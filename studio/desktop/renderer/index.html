@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' file:; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data: http://127.0.0.1:*; media-src http://127.0.0.1:*; connect-src 'none'"
+    />
+    <title>CO.DE Studio</title>
+    <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="rail" aria-label="Secciones">
+      <div class="rail__brand" title="CO.DE Studio">
+        <img src="../build/icon.png" alt="" width="34" height="34" />
+      </div>
+      <button class="rail__btn is-active" data-view="estudio" title="Estudio (Ctrl+1)">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H4z" /><path d="M8 20h8M12 16v4" /><path d="m10 8.5 4 2-4 2z" /></svg>
+        <span>Estudio</span>
+      </button>
+      <button class="rail__btn" data-view="exports" title="Exports (Ctrl+2)">
+        <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m10 11 4 2-4 2z" /></svg>
+        <span>Exports</span>
+      </button>
+      <button class="rail__btn" data-view="terminal" title="Terminal (Ctrl+3)">
+        <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" /><path d="m7 10 3 2-3 2M12 15h5" /></svg>
+        <span>Terminal</span>
+      </button>
+      <button class="rail__btn" data-view="sistema" title="Sistema (Ctrl+4)">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /><circle cx="8" cy="6" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="10" cy="18" r="1.6" /></svg>
+        <span>Sistema</span>
+      </button>
+      <div class="rail__spacer"></div>
+      <button class="rail__status" id="railStatus" data-view="sistema" title="Servicios">
+        <i class="dot" data-state="stopped"></i>
+        <span id="railStatusText">—</span>
+      </button>
+    </nav>
+
+    <main class="views">
+      <!-- ─── Estudio ─────────────────────────────────────────── -->
+      <section class="view is-active" id="view-estudio">
+        <header class="bar">
+          <div class="seg" role="tablist" aria-label="Instancia">
+            <button class="seg__btn is-active" data-target="local">Local</button>
+            <button class="seg__btn" data-target="prod">Producción</button>
+          </div>
+          <button class="icon-btn" id="stBack" title="Atrás">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <button class="icon-btn" id="stReload" title="Recargar (F5)">
+            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>
+          </button>
+          <span class="bar__url" id="stUrl"></span>
+          <div class="bar__spacer"></div>
+          <button class="btn btn--ghost" id="stDevtools" title="Herramientas de desarrollo del Estudio">DevTools</button>
+          <button class="btn btn--ghost" id="stExternal">Abrir en navegador</button>
+        </header>
+        <div class="estudio">
+          <div class="estudio__wait" id="stWait">
+            <div class="spinner"></div>
+            <p id="stWaitText">Levantando runner y backend…</p>
+            <button class="btn" id="stWaitSistema" hidden>Ver Sistema</button>
+          </div>
+          <div class="estudio__frames" id="stFrames"></div>
+        </div>
+      </section>
+
+      <!-- ─── Exports ─────────────────────────────────────────── -->
+      <section class="view" id="view-exports">
+        <div class="exp">
+          <aside class="exp__temas">
+            <div class="exp__search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+              <input id="expSearch" type="search" placeholder="Buscar curso, tema o archivo…" autocomplete="off" />
+            </div>
+            <div class="exp__total" id="expTotal"></div>
+            <ul class="temas" id="expTemas"></ul>
+            <button class="btn btn--ghost exp__refresh" id="expRefresh">Volver a escanear</button>
+          </aside>
+          <div class="exp__main">
+            <header class="exp__head">
+              <div>
+                <p class="eyebrow" id="expEyebrow">Exports</p>
+                <h1 id="expTitle">—</h1>
+              </div>
+              <div class="exp__headActions">
+                <div class="seg seg--sm">
+                  <button class="seg__btn is-active" data-sort="orden">Orden</button>
+                  <button class="seg__btn" data-sort="reciente">Recientes</button>
+                  <button class="seg__btn" data-sort="peso">Peso</button>
+                </div>
+                <button class="btn btn--ghost" id="expRevealTema">Abrir carpeta</button>
+              </div>
+            </header>
+            <div class="proyectos" id="expProyectos"></div>
+          </div>
+          <aside class="exp__detail" id="expDetail" hidden>
+            <header class="detail__head">
+              <div>
+                <p class="eyebrow" id="detEyebrow"></p>
+                <h2 id="detTitle"></h2>
+                <p class="muted" id="detMeta"></p>
+              </div>
+              <button class="icon-btn" id="detClose" title="Cerrar (Esc)">
+                <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+              </button>
+            </header>
+            <div class="player" id="detPlayer"></div>
+            <div class="detail__actions">
+              <button class="btn" id="detOpen">Abrir entrega</button>
+              <button class="btn btn--ghost" id="detReveal">Mostrar en carpeta</button>
+              <button class="btn btn--ghost" id="detCopy">Copiar ruta</button>
+            </div>
+            <nav class="crumbs" id="detCrumbs"></nav>
+            <ul class="files" id="detFiles"></ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ─── Terminal ────────────────────────────────────────── -->
+      <section class="view" id="view-terminal">
+        <header class="bar">
+          <div class="tabs" id="termTabs" role="tablist"></div>
+          <div class="bar__spacer"></div>
+          <button class="btn btn--accent" id="termCurso">
+            <svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" /></svg>
+            Nuevo curso con Claude
+          </button>
+          <button class="btn" id="termClaude">Claude Code</button>
+          <button class="btn btn--ghost" id="termContinue" title="claude --continue">Continuar sesión</button>
+          <button class="btn btn--ghost" id="termShell" title="Nueva terminal en el repo (Ctrl+Shift+T)">+ Shell</button>
+        </header>
+        <div class="term" id="termHost">
+          <div class="term__empty" id="termEmpty">
+            <h2>Terminal en el repo</h2>
+            <p class="muted">Las terminales se abren en <code id="termRepo"></code>, donde viven las skills
+              <code>curso-de-video</code> y <code>manimstudio</code>.</p>
+            <div class="term__cards">
+              <button class="card-btn" data-act="curso"><b>Nuevo curso</b><span>Arma el encargo y Claude Code lo produce de punta a punta</span></button>
+              <button class="card-btn" data-act="claude"><b>Claude Code</b><span>Sesión interactiva en el repo</span></button>
+              <button class="card-btn" data-act="continue"><b>Continuar</b><span>Retoma la última conversación</span></button>
+              <button class="card-btn" data-act="shell"><b>Shell</b><span>bash -l en el repo</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Sistema ─────────────────────────────────────────── -->
+      <section class="view" id="view-sistema">
+        <div class="sys">
+          <div class="sys__grid">
+            <article class="panel">
+              <header class="panel__head">
+                <h2>Servicios</h2>
+                <span class="pill" id="sysState">—</span>
+              </header>
+              <p class="muted" id="sysDetail">runner (Docker) + backend FastAPI, como en producción pero en esta máquina.</p>
+              <div class="row">
+                <button class="btn" id="sysStart">Iniciar</button>
+                <button class="btn btn--ghost" id="sysRestart">Reiniciar</button>
+                <button class="btn btn--ghost" id="sysStop">Detener</button>
+                <button class="btn btn--ghost" id="sysCheck">Verificar requisitos</button>
+              </div>
+              <pre class="check" id="sysCheckOut" hidden></pre>
+            </article>
+
+            <article class="panel">
+              <header class="panel__head"><h2>Esta máquina</h2></header>
+              <dl class="kv" id="sysInfo"></dl>
+            </article>
+
+            <article class="panel">
+              <header class="panel__head"><h2>Tareas</h2></header>
+              <p class="muted">Se ejecutan en una pestaña de la Terminal, así ves la salida completa.</p>
+              <div class="tasks" id="sysTasks"></div>
+            </article>
+
+            <article class="panel">
+              <header class="panel__head"><h2>Configuración</h2></header>
+              <dl class="kv">
+                <dt>Repositorio</dt>
+                <dd><code id="cfgRepo">—</code></dd>
+                <dt>Exports</dt>
+                <dd><code id="cfgExports">—</code></dd>
+                <dt>Ejecución</dt>
+                <dd id="cfgRuntime">—</dd>
+              </dl>
+              <label class="check-row">
+                <input type="checkbox" id="cfgStopOnQuit" />
+                Detener los servicios al cerrar la app
+              </label>
+              <div class="row">
+                <button class="btn btn--ghost" id="cfgChoose">Cambiar repositorio…</button>
+                <button class="btn btn--ghost" id="cfgOpenRepo">Abrir carpeta del repo</button>
+              </div>
+            </article>
+          </div>
+
+          <article class="panel panel--log">
+            <header class="panel__head">
+              <h2>Registro de servicios</h2>
+              <button class="btn btn--ghost btn--sm" id="sysLogClear">Limpiar vista</button>
+            </header>
+            <pre class="log" id="sysLog"></pre>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- Asistente de nuevo curso -->
+    <dialog class="modal" id="cursoDlg">
+      <form method="dialog" id="cursoForm">
+        <header class="modal__head">
+          <div>
+            <p class="eyebrow">Claude Code · skill curso-de-video</p>
+            <h2>Nuevo curso</h2>
+          </div>
+        </header>
+        <div class="modal__body">
+          <label class="field field--wide">
+            <span>Tema del curso</span>
+            <input name="tema" required placeholder="p. ej. Mecánica orbital: de Kepler a la maniobra de Hohmann" />
+          </label>
+          <label class="field">
+            <span>Área / familia</span>
+            <input name="area" list="areasList" placeholder="Existente o nueva" />
+            <datalist id="areasList"></datalist>
+          </label>
+          <label class="field">
+            <span>Formato</span>
+            <select name="formato">
+              <option value="horizontal">Horizontal 16:9 · lecciones de 4 clips</option>
+              <option value="vertical">Vertical 9:16 · piezas de 30–45 s</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Estilo</span>
+            <select name="estilo">
+              <option value="">Por defecto del formato</option>
+              <option value="CONSOLA">CONSOLA · consola de vuelo, denso</option>
+              <option value="LIENZO">LIENZO · azul marino, una cosa y un dato</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Sonido</span>
+            <select name="sonido">
+              <option value="">Por defecto del formato</option>
+              <option value="narrado">Narrado</option>
+              <option value="narrado con ritmo mudo">Narrado con ritmo mudo</option>
+              <option value="mudo">Mudo</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Tamaño</span>
+            <input name="tamano" placeholder="p. ej. 12 lecciones · 20 piezas" />
+          </label>
+          <label class="field">
+            <span>Permisos de Claude</span>
+            <select name="modo">
+              <option value="manual">Preguntar antes de actuar</option>
+              <option value="acceptEdits">Aceptar ediciones de archivos</option>
+              <option value="auto">Automático</option>
+              <option value="plan">Solo planear primero</option>
+            </select>
+          </label>
+          <label class="field field--wide">
+            <span>Indicaciones</span>
+            <textarea name="notas" rows="4" placeholder="Qué capa ocupa, qué asume, a quién va dirigido, fuentes, lo que NO debe repetir…"></textarea>
+          </label>
+          <label class="check-row field--wide">
+            <input type="checkbox" name="subtitulos" /> Con subtítulos narrativos en pantalla (por defecto, mudo en pantalla)
+          </label>
+          <details class="field--wide">
+            <summary>Ver el encargo que recibirá Claude</summary>
+            <pre class="preview" id="cursoPreview"></pre>
+          </details>
+        </div>
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" value="cancel" formnovalidate>Cancelar</button>
+          <button class="btn btn--accent" value="ok">Abrir en la terminal</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
+    <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+    <script src="../node_modules/@xterm/addon-web-links/lib/addon-web-links.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
