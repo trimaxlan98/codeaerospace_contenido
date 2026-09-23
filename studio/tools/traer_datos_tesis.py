@@ -40,7 +40,7 @@ FICHEROS = {
     "oraculo_k2.json": "03_IMPLEMENTACION/mvp3_qmix/results/teoria/ORACULO_K2_VS_K1.json",
     "entorno_v2.yaml": "03_IMPLEMENTACION/mvp3_qmix/configs/env_v2_dynamic.yaml",
     "gh_heuristica.json": "03_IMPLEMENTACION/results/gates/G-H_HEURISTICA_v1.json",
-    "historia_42.json": "03_IMPLEMENTACION/mvp3_qmix/results/c1_train_v2/history_seed42.json",
+    "historia_g2b_42.json": "03_IMPLEMENTACION/mvp3_qmix/results/fase0_g2b/fase0_g2b_backup/history_seed42.json",
 }
 
 

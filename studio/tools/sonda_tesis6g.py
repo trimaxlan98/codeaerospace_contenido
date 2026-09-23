@@ -270,6 +270,26 @@ ok("contraejemplo: con observacion sin informacion la creencia no sale de 0.5",
 casi("politicas conjuntas a horizonte 1: 3^3 = 27", 10 ** T6.log10_politicas_dec(3, 3, 2, 1), 27, 1e-6)
 casi("a horizonte 2: cada agente 3 nodos -> 3^9 conjuntas", 10 ** T6.log10_politicas_dec(3, 3, 2, 2), 3 ** 9, 1e-3)
 
+# =============================================================================
+print("\n== 09 - Aprender por refuerzo (juguete) ==")
+q = T6.q_juguete()
+ok("Q aprende: visible -> espectro alto, eclipse -> ruta alterna",
+   int(q["Q"][-1][0].argmax()) == 1 and int(q["Q"][-1][1].argmax()) == 2,
+   f"{np.round(q['Q'][-1], 1).tolist()}")
+ok("la mejor estatica del juguete es la ruta alterna (como la [2,2,2] de la tesis)",
+   q["estatica"] == 2)
+casi("MA del juguete = (p_v*80 + p_e*70)/70 - 1", q["MA"],
+     (q["p"][0] * 80 + q["p"][1] * 70) / 70 - 1, 1e-9)
+ok("contraejemplo: sin exploracion (eps=0) Q se queda en la primera accion",
+   int(T6.q_juguete(eps=0.0)["Q"][-1][0].argmax()) != 1)
+C = T6.curva_entrenamiento()
+ok("curva de G2b: 5000 episodios con eps 0.999 -> 0.05", C["episodios"] == 5000
+   and C["eps_decay"] == 0.999 and C["eps_min"] == 0.05)
+ok("la media final supera a la estatica de la semilla 42",
+   C["media"][-1] > D["g2b"][0]["estatica"], f"{C['media'][-1]:.0f} > {D['g2b'][0]['estatica']:.0f}")
+k = T6.pasos_hasta_eps(0.05, 0.999)
+casi("eps llega a 0.05 en ln(0.05)/ln(0.999) episodios", k, 2995, 1)
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)

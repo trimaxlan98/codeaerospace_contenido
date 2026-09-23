@@ -465,6 +465,21 @@ def trayectorias(n=6, pasos=120, azar=0.0, semilla=42):
     return t, np.array(out)
 
 
+def curva_entrenamiento(semilla=42, suavizado=100) -> dict:
+    """La curva de entrenamiento de QMIX de la fase 0 de G2b (mismas huellas
+    de codigo que la re-cualificacion v7): recompensa por episodio, su media
+    movida, las evaluaciones greedy y el programa de exploracion."""
+    h = _leer(f"historia_g2b_{semilla}.json")
+    r = np.asarray(h["train_rewards"], dtype=float)
+    k = np.ones(suavizado) / suavizado
+    media = np.convolve(r, k, mode="valid")
+    cfg = h["config_d1"]
+    return {"recompensas": r, "media": media, "suavizado": suavizado,
+            "greedy": np.asarray(h["greedy_evals"], dtype=float),
+            "eps_decay": cfg["epsilon_decay"], "eps_min": cfg["epsilon_min"],
+            "episodios": h["num_episodes"]}
+
+
 def entorno_v2() -> dict:
     """Los parametros de NTNEnv-v2 que dibuja la pieza «red integrada»,
     leidos del YAML de las compuertas (configs/env_v2_dynamic.yaml)."""
@@ -581,3 +596,38 @@ def log10_politicas_dec(n_agentes, n_acciones, n_obs, horizonte):
     historias, (|O|^T - 1)/(|O| - 1) nodos."""
     nodos = (n_obs ** horizonte - 1) // (n_obs - 1) if n_obs > 1 else horizonte
     return n_agentes * nodos * np.log10(n_acciones)
+
+
+def q_juguete(pasos=600, alfa=0.1, eps=0.2, semilla=42, E=None):
+    """Q-learning en un juguete de NTNEnv-v2: dos estados (satelite visible /
+    en eclipse, con el reparto REAL de 35 y 25 pasos de cada 60), tres
+    acciones (espectro bajo, alto, ruta alterna) que pagan la tabla de la
+    tesis, y el eclipse que multiplica el espectro por 0.10. La transicion
+    no depende de la accion (bandido contextual): Q aprende r(s, a).
+
+    Devuelve la historia de Q (pasos+1, 2, 3), la recompensa verdadera
+    r(s, a), la mejor estatica y el MA de este juguete."""
+    E = E or entorno_v2()
+    tp = np.asarray(E["tabla_tp"], dtype=float)
+    r = np.vstack([tp, np.where(np.arange(3) < 2, tp * E["eclipse_factor"], tp)])
+    vis = visibilidad_v2(E["orbita_periodo"], E)[0]
+    estados = (vis < E["eclipse_umbral"]).astype(int)     # 0 visible, 1 eclipse
+    p = np.array([np.mean(estados == 0), np.mean(estados == 1)])
+    rng = np.random.default_rng(semilla)
+    Q = np.zeros((2, 3))
+    hist = [Q.copy()]
+    for k in range(pasos):
+        s = estados[k % len(estados)]
+        a = int(rng.integers(3)) if rng.random() < eps else int(np.argmax(Q[s]))
+        ruido = rng.normal(0.0, 3.0)
+        Q[s, a] += alfa * (r[s, a] + ruido - Q[s, a])
+        hist.append(Q.copy())
+    v_est = float((p[:, None] * r).sum(axis=0).max())
+    v_opt = float((p * r.max(axis=1)).sum())
+    return {"Q": np.array(hist), "r": r, "p": p, "estatica": int((p[:, None] * r).sum(axis=0).argmax()),
+            "V_est": v_est, "V_opt": v_opt, "MA": (v_opt - v_est) / v_est}
+
+
+def pasos_hasta_eps(eps_final, decaimiento, eps0=1.0):
+    """Episodios hasta que eps0 * d^k cae a eps_final."""
+    return int(np.ceil(np.log(eps_final / eps0) / np.log(decaimiento)))

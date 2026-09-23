@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 2.1 Aprender por refuerzo",
+  "description": "Lección 2.1 del curso La tesis 6G por dentro (módulo 2: las herramientas), en 4 clips: la recompensa de la tesis como suma de throughput, latencia e interferencia; Q-learning en un juguete de dos estados con la tabla de throughput real; por qué sin explorar no se aprende y el programa de exploración de QMIX; y la curva de entrenamiento real de G2b entre la mejor estática y el oráculo. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-la-recompensa.py", "title": "1 · La recompensa", "scene": "Clip1",
+     "final_state": "La fórmula de la recompensa arriba y la cascada de un paso de ejemplo (throughput, latencia, interferencia y el total en cian); en el pie los pasos por episodio como dato."},
+    {"file": "clips/02-el-valor.py", "title": "2 · Aprender el valor", "scene": "Clip2",
+     "final_state": "La tabla Q de 2x3 con sus valores aprendidos y la mejor acción de cada estado enmarcada en cian; en el pie el margen del juguete."},
+    {"file": "clips/03-explorar.py", "title": "3 · Explorar para aprender", "scene": "Clip3",
+     "final_state": "A la izquierda los tres valores Q del estado visible aprendidos con exploración; a la derecha el decaimiento de ε de QMIX hasta su piso; en el pie los episodios hasta el piso."},
+    {"file": "clips/04-la-curva.py", "title": "4 · La curva de verdad", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Un numero por paso.' (blanca) y 'Y mucha paciencia.' (cian)."}
+  ]
+}
