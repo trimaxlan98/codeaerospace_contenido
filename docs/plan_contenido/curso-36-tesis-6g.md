@@ -260,7 +260,7 @@ Curso: `plan · librería · clips · ql ✔ · PR · subida · qh · narrada ·
 
 | lección | plan | lib | clips | ql | PR | subida | qh | voz | mux |
 |---|---|---|---|---|---|---|---|---|---|
-| 1.1–3.4 (las 12) | ✔ | ✔ | ✔ | ✔ | #87 ✔ | ✔ | ✔ local, adopción pendiente | ✔ (edge local) | ✔ |
+| 1.1–3.4 (las 12) | ✔ | ✔ | ✔ | ✔ | #87 ✔ | ✔ | ✔ adoptados 48/48 | ✔ (edge, local y VPS) | ✔ |
 
 ## 13. Storyboard del curso
 
@@ -407,6 +407,9 @@ Lote C (curso), medida:
   cierre en `exports/tesis6g-*/curso_narrado.mp4`**: 27.7 min, picos ≤ −0.9 dB,
   marca sonora −6.0 dB, sin atempo. **Adopción de los qh en el VPS
   PENDIENTE**: un `rsync -a` a `/root/` cambió el dueño de `/root` y bloqueó
-  el SSH (ver trampas.md). Los qh ya están en `/root/staging-tesis6g-*/`;
-  falta `python3 /root/adoptar_renders.py "Tesis 6G · N.M" /root/staging-<slug>`
-  por lección cuando el dueño restaure `/root`.
+  el SSH (ver trampas.md).
+- 2026-09-23 — **CURSO 36 PUBLICADO**: `/root` restaurado (root 700, vía
+  contraseña que dio el dueño), md5 de los 48 qh verificados en el VPS, 48/48
+  adoptados (job `done` en la base de prod) y voz re-sintetizada en el VPS con
+  `guiones.py --solo-audio --proveedor edge` (48/48 ✓), para que la app la
+  muestre. Staging borrado.
