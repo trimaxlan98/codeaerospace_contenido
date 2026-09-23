@@ -346,6 +346,16 @@ g1 = T6.mensajes_por_grupos(10, 10)
 ok("contraejemplo: con un solo grupo no hay ahorro (solo el mensaje de propagacion)",
    g1["grupos"] == g1["plano"] + 1)
 
+# =============================================================================
+print("\n== 12 - Cuello de botella de informacion ==")
+b = np.linspace(0, 8, 400)
+cg = T6.cuello_gaussiano(b, 0.9)
+ok("IB gaussiano: sube con los bits enviados y empieza en 0", abs(cg[0]) < 1e-12 and (np.diff(cg) > 0).all())
+casi("satura en I(X;Y) = -1/2 log2(1 - rho^2)", cg[-1], T6.info_mutua_gauss(0.9), 1e-4)
+ok("nunca conserva mas de lo que envia (desigualdad de procesamiento)", (cg <= b + 1e-12).all())
+ok("contraejemplo: con rho = 0 no hay nada relevante que conservar",
+   np.allclose(T6.cuello_gaussiano(b, 0.0), 0.0))
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)

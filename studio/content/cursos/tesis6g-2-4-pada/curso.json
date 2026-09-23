@@ -1,0 +1,16 @@
+{
+  "name": "Tesis 6G · 2.4 La arquitectura PADA",
+  "description": "Lección 2.4 del curso La tesis 6G por dentro (módulo 2: las herramientas), en 4 clips: el lazo Percepción-Análisis-Decisión-Acción, el cuello de botella de información que dice cuánto de lo relevante sobrevive a cada bit, el mapa de PADA sobre O-RAN (y por qué CTDE es la partición que O-RAN ya induce) y la regla de la tesis: ninguna política toca la red sin pasar antes por su gemelo digital y su compuerta. Formato mudo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-cuatro-modulos.py", "title": "1 · Cuatro módulos", "scene": "Clip1",
+     "final_state": "El lazo PADA con sus cuatro módulos y un pulso ámbar dando vueltas alrededor de la red; en el pie que es una capa de gobernanza."},
+    {"file": "clips/02-comprimir.py", "title": "2 · Comprimir lo que se dice", "scene": "Clip2",
+     "final_state": "La curva del cuello de botella gaussiano bajo su techo I(X;Y), la diagonal y el punto de 2 bits; en el pie el objetivo del cuello de botella."},
+    {"file": "clips/03-mapa-oran.py", "title": "3 · El mapa sobre O-RAN", "scene": "Clip3",
+     "final_state": "Las tres capas de O-RAN (non-RT RIC, near-RT RIC, nodos E2) con A1 y E2, y los cuatro módulos de PADA apuntando a su anclaje; en el pie el hueco inter-RIC como dato."},
+    {"file": "clips/04-primero-el-gemelo.py", "title": "4 · Primero el gemelo", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'Pensar despacio por fuera,' (blanca) y 'actuar rapido por dentro.' (cian)."}
+  ]
+}

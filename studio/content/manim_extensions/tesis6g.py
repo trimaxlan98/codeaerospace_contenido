@@ -738,3 +738,16 @@ def reputacion(uptime, calidad, fallos, w=(1.0, 1.0, 0.5)):
     """reputation(L) = w1 uptime + w2 calidad - w3 fallos (Cap. 4 §4.2.3).
     La tesis no fija los pesos: estos son un PARAMETRO elegido (gris)."""
     return w[0] * np.asarray(uptime) + w[1] * np.asarray(calidad) - w[2] * np.asarray(fallos)
+
+
+def cuello_gaussiano(bits_x, rho):
+    """Curva del cuello de botella de informacion para X, Y gaussianas
+    escalares con correlacion rho (Chechik et al. 2005): mandar I(T;X) bits
+    sobre X conserva I(T;Y) = -1/2 log2(1 - rho^2 (1 - 2^(-2 I(T;X)))) bits
+    de lo relevante, que satura en I(X;Y) = -1/2 log2(1 - rho^2)."""
+    b = np.asarray(bits_x, dtype=float)
+    return -0.5 * np.log2(1.0 - rho ** 2 * (1.0 - 2.0 ** (-2.0 * b)))
+
+
+def info_mutua_gauss(rho):
+    return -0.5 * np.log2(1.0 - rho ** 2)
