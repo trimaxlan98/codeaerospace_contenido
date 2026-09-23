@@ -4,6 +4,23 @@ Guía escrita para que la siga **un agente de Claude Code en la máquina Windows
 y verificando cada uno. Si eres ese agente: lee el documento entero antes de empezar,
 ejecuta los pasos en orden y no pases al siguiente si la verificación del anterior falla.
 
+## Encargo para pegarle al agente
+
+En la máquina Windows, abre Claude Code en PowerShell (en cualquier carpeta) y pégale:
+
+> Instala y construye la app de escritorio CO.DE Studio en esta máquina Windows. Las
+> instrucciones completas están en el repo `https://github.com/trimaxlan98/codeaerospace_contenido`,
+> rama `feat/escritorio`, archivo `studio/desktop/INSTALAR-WINDOWS.md`: léelo entero primero
+> (puedes verlo con `gh api` o en `https://github.com/trimaxlan98/codeaerospace_contenido/blob/feat/escritorio/studio/desktop/INSTALAR-WINDOWS.md`).
+> Sigue los pasos 0 a 5 en orden y verifica cada uno antes de avanzar. Pregúntame la
+> contraseña del Estudio local antes del paso 2 y si quiero copiar los exports (paso 6).
+> Los pasos que necesiten que yo intervenga (reiniciar tras instalar WSL, crear el usuario de
+> Ubuntu, iniciar sesión en Claude Code dentro de WSL) dímelos claramente y espera.
+> Al terminar, dame el resultado de `-Paso Verificar` y lo que comprobaste en la app.
+
+La app se construye en esta máquina (paso 4): no hace falta traer ningún instalador desde
+Linux.
+
 ## Qué se va a instalar y por qué así
 
 CO.DE Studio es la app de escritorio de ManimStudio: el Estudio local, los exports ordenados
