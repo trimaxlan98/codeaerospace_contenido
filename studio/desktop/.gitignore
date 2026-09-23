@@ -1,0 +1,5 @@
+node_modules/
+release/
+# El .gitignore raiz ignora *.png (salidas de render); los iconos de la app si van.
+!build/icon.png
+!build/icons/*.png
