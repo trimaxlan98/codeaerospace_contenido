@@ -356,6 +356,22 @@ ok("nunca conserva mas de lo que envia (desigualdad de procesamiento)", (cg <= b
 ok("contraejemplo: con rho = 0 no hay nada relevante que conservar",
    np.allclose(T6.cuello_gaussiano(b, 0.0), 0.0))
 
+# =============================================================================
+print("\n== 13 - Medir sin enganarse ==")
+si = T6.semillas_invierten()
+ok("dos algoritmos identicos: 5 semillas y 10 discrepan en ~1/5 de los casos",
+   0.15 < si["p_inversion"] < 0.30, f"{si['p_inversion']:.3f}")
+ok("el ejemplo dibujado se invierte de verdad", si["a"][:5].mean() > si["b"][:5].mean()
+   and si["a"].mean() < si["b"].mean())
+k2 = T6.oraculo_k2()
+ok("k=2 gana a k=1 en las tres semillas (el voraz NO es el techo)",
+   all(p["k2"] > p["k1"] for p in k2["por_semilla"]),
+   ", ".join(f"{100 * p['ganancia']:.2f} %" for p in k2["por_semilla"]))
+ok("y la ganancia es < 1 %: el voraz es una cota inferior ajustada",
+   all(p["ganancia"] < 0.01 for p in k2["por_semilla"]))
+ok("la correccion transferida a G1 no la acerca al umbral (factor >= 4)",
+   k2["correccion_G1"]["factor_min"] >= 4)
+
 print(f"\n{n_ok} ok, {len(fallos)} fallos")
 for f in fallos:
     print("  -", f)

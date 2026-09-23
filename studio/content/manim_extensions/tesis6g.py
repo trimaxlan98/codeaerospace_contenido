@@ -751,3 +751,27 @@ def cuello_gaussiano(bits_x, rho):
 
 def info_mutua_gauss(rho):
     return -0.5 * np.log2(1.0 - rho ** 2)
+
+
+def semillas_invierten(n_exp=20000, sigma=1.0, semilla=42):
+    """Dos algoritmos IDENTICOS (misma distribucion de resultado por
+    semilla). ¿Con que frecuencia el orden que dan 5 semillas se invierte al
+    anadir otras 5? Devuelve la probabilidad y un caso de ejemplo (el
+    primero que se invierte) para dibujarlo."""
+    rng = np.random.default_rng(semilla)
+    a = rng.normal(0.0, sigma, (n_exp, 10))
+    b = rng.normal(0.0, sigma, (n_exp, 10))
+    gana5 = a[:, :5].mean(1) > b[:, :5].mean(1)
+    gana10 = a.mean(1) > b.mean(1)
+    inv = gana5 != gana10
+    k = int(np.argmax(inv & gana5))          # un caso en que A gana con 5 y pierde con 10
+    return {"p_inversion": float(inv.mean()), "a": a[k], "b": b[k]}
+
+
+def oraculo_k2():
+    """Oraculo voraz (k=1) contra horizonte 2 por fuerza bruta, por semilla
+    (ORACULO_K2_VS_K1.json de la tesis)."""
+    d = _leer("oraculo_k2.json")
+    return {"por_semilla": [{"semilla": p["seed"], "k1": p["J_k1"], "k2": p["J_k2"],
+                             "ganancia": p["ganancia_pct"] / 100.0} for p in d["por_semilla"]],
+            "correccion_G1": d["resumen"]["correccion_transferida_a_G1"]}
