@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 3.1 El orden de las llaves",
+  "description": "Lección 3.1 del curso Rendimiento de SQL Server (módulo 3: índices a la medida), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-dos-ordenes.py",
+      "title": "1 · Dos órdenes",
+      "scene": "Clip1",
+      "final_state": "Dos listas de la misma tabla lado a lado, con la leyenda de los cuatro estatus arriba (tonos de azul, cancelado con borde claro): a la izquierda por (fecha, estatus) con un recuadro marcando un día donde se mezclan los estatus, rotulado a su lado; a la derecha por (estatus, fecha) con un recuadro marcando el bloque de cancelados, todos juntos, rotulado a su lado."
+    },
+    {
+      "file": "clips/02-entregado.py",
+      "title": "2 · Entregado casi no cambia",
+      "scene": "Clip2",
+      "final_state": "Las mismas dos listas, ahora con 'entregado' resaltado en rojo en ambos órdenes; un corchete cian abraza casi toda la izquierda y casi todo el bloque de la derecha (largos casi iguales); abajo, en cian, '91.55% entregados'."
+    },
+    {
+      "file": "clips/03-cancelado.py",
+      "title": "3 · Cancelado sí",
+      "scene": "Clip3",
+      "final_state": "El duelo completo en pantalla: a la izquierda la lista de 2025 con cancelados dispersos en rojo, corchete cian sobre toda ella ('418,481 en 2025') y '1,978 lecturas' en ámbar; a la derecha el salto directo al bloque de cancelados con el tramo de 2025 resaltado, corchete cian ('33,275 cancelados') y '161 lecturas' en ámbar; abajo, en cian, '12x menos lecturas'."
+    },
+    {
+      "file": "clips/04-igualdad-primero.py",
+      "title": "4 · Igualdad primero",
+      "scene": "Clip4",
+      "final_state": "Pantalla en negro con las dos líneas del cierre: 'El orden de las llaves importa.' en blanco y 'Igualdad primero, rango despues.' en cian; el fotograma previo mostraba dos casillas grandes ('estatus' con cuatro puntos de estatus y uno anillado en rojo —un valor fijo—, '=' debajo; 'fecha_pedido' con una franja azul sobre una línea —un rango—, 'rango' debajo) sobre el CREATE INDEX (estatus, fecha_pedido), con 'estatus' recuadrado en verde y 'fecha_pedido' en azul dentro del código."
+    }
+  ]
+}

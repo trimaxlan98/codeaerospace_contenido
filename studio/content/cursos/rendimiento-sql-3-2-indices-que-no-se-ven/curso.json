@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 3.2 Índices que no se ven",
+  "description": "Un índice no tiene que cubrir toda la tabla: uno filtrado sobre los 2,791 pedidos pendientes cabe en 14 páginas, y el mismo principio expone la llave que nadie indexó —detalle_pedido sin índice en id_pedido— donde armar un ticket de una sola línea cuesta 18,016 lecturas en vez de 3.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-pendientes.py",
+      "title": "1 · Pocos pendientes",
+      "scene": "Clip1",
+      "final_state": "Muro de pedidos casi apagado salvo un racimo cian en la esquina inferior derecha (pedidos recientes), 0.19% de la tabla en cian abajo, y una guia punteada que lo conecta con un panel 'WHERE estatus = pendiente' con un piloto verde parpadeando, rotulado 'se consulta seguido'."
+    },
+    {
+      "file": "clips/02-indice-filtrado.py",
+      "title": "2 · Índice filtrado",
+      "scene": "Clip2",
+      "final_state": "Codigo CREATE INDEX filtrado arriba; a la izquierda un muro azul sin cifra rotulado 'indice completo', a la derecha un arbol pequeno rotulado 'indice filtrado' con '14 paginas' en ambar, y '13 lecturas' en ambar en el pie."
+    },
+    {
+      "file": "clips/03-la-llave-olvidada.py",
+      "title": "3 · La llave olvidada",
+      "scene": "Clip3",
+      "final_state": "La consulta del ticket por id_pedido con el WHERE marcado en rojo ('llave sin indice'); el contador ámbar en las 17,606 páginas de detalle_pedido, el muro ya atenuado y, aparte, una sola página verde ('el ticket cabe aqui'); en el pie, los 3,750,000 renglones de la tabla."
+    },
+    {
+      "file": "clips/04-el-ticket.py",
+      "title": "4 · El ticket",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: 'Toda llave foranea pide indice.' en blanco y 'Y lo raro, un indice filtrado.' en cian, tras el duelo de barras log (18,016 rojo contra 3 verde, 6,005x en cian)."
+    }
+  ]
+}

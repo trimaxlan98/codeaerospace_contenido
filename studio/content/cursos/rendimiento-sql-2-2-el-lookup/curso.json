@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 2.2 El viaje de vuelta: lookup",
+  "description": "Un índice por cliente ahorra lecturas solo si trae pocas filas de vuelta: el mismo lookup que cuesta 597 páginas para el cliente 501 dispararía casi medio millón para el mayorista, así que el optimizador cambia de plan; la lección cierra con el punto exacto —0.50% de la tabla— donde conviene dejar de saltar y escanear.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-indice-por-cliente.py",
+      "title": "1 · Un índice por cliente",
+      "scene": "Clip1",
+      "final_state": "El código CREATE INDEX arriba; a la izquierda el árbol del índice delgado con su hoja ampliada rotulada 'cliente y llave', a la derecha el muro de la tabla completa con su página ampliada rotulada 'todas las columnas'."
+    },
+    {
+      "file": "clips/02-191-viajes.py",
+      "title": "2 · Ciento noventa y un viajes",
+      "scene": "Clip2",
+      "final_state": "El contador ámbar en 597 lecturas junto al rótulo cian 'modelo 576', sobre el árbol agrupado con sus hojas visitadas en verde; a la izquierda la cola de filas consumida y el aviso 'modelo: 3 por fila'; abajo el pie ámbar '597 lecturas'."
+    },
+    {
+      "file": "clips/03-el-mayorista.py",
+      "title": "3 · El mayorista",
+      "scene": "Clip3",
+      "final_state": "Duelo de barras en escala logarítmica: arriba en rojo el camino del lookup con su modelo cian de 449,913 lecturas, abajo en verde el scan que elige el optimizador con sus 22,363 lecturas medidas; abajo el pie cian '20x menos lecturas'."
+    },
+    {
+      "file": "clips/04-punto-de-inflexion.py",
+      "title": "4 · Punto de inflexión",
+      "scene": "Clip4",
+      "final_state": "Pantalla de cierre con las dos líneas del final: 'Un lookup es barato.' en blanco y 'Ciento cincuenta mil, no.' en cian, sobre fondo limpio tras apagar la gráfica de la recta del lookup contra la horizontal del scan."
+    }
+  ]
+}
