@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 2.1 El árbol B",
+  "description": "Lección 2.1 del curso Rendimiento de SQL Server: un índice es un orden que permite saltar en vez de revisar, se ve como un árbol de tres niveles que baja hasta la fila buscada, crece muy despacio al agregar filas, y ahorra miles de lecturas frente a un scan completo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-ordenar-es-encontrar.py",
+      "title": "1 · Ordenar es encontrar",
+      "scene": "Clip1",
+      "final_state": "Composición centrada verticalmente con dos filas de cartas: a la izquierda, ocho cartas en rojo tenue (el costo de revisarlas) y la carta 58 con contorno blanco (donde se encontró); a la derecha, la misma carta en verde con la flecha del índice que saltó directo a ella; abajo, bien dentro de la mitad inferior, el rótulo 'saltar, no revisar'."
+    },
+    {
+      "file": "clips/02-bajar-tres-niveles.py",
+      "title": "2 · Bajar tres niveles",
+      "scene": "Clip2",
+      "final_state": "El árbol B completo con la ruta raíz-intermedio-hoja iluminada en verde; a la izquierda, separada del árbol, la página intermedia ampliada con sus entradas simbólicas 'llave -> página hija' y el rótulo cian '622 entradas por pagina' debajo, sin tocar ninguna arista; el contador ámbar en 3 lecturas y el pie cian '3 niveles para bajar'."
+    },
+    {
+      "file": "clips/03-el-arbol-crece-lento.py",
+      "title": "3 · El árbol crece lento",
+      "scene": "Clip3",
+      "final_state": "La escalera completa (2, 3 y 4 niveles) dibujada a mano sobre el rango de 10³ a 10¹⁰ filas, con el punto marcado en 1,500,000 filas = 3 niveles y el pie cian '16,272 millones con 4 niveles'."
+    },
+    {
+      "file": "clips/04-seek-contra-scan.py",
+      "title": "4 · Seek contra scan",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: 'Un indice es un orden.' en blanco y, debajo, 'Y el orden ahorra lecturas.' en cian; sin barras ni cifras en pantalla."
+    }
+  ]
+}

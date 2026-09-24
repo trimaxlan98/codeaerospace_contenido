@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 1.3 Leer un plan",
+  "description": "Lección 1.3 del curso Rendimiento de SQL Server (módulo 1: medir antes de tocar), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-derecha-a-izquierda.py",
+      "title": "1 · De derecha a izquierda",
+      "scene": "Clip1",
+      "final_state": "Los tres operadores del plan (Select, Filter, Scan) iluminados, con las dos flechas que los unen (1,500,000 filas y 191 filas) y la cifra 'veces menos filas' en cian abajo."
+    },
+    {
+      "file": "clips/02-scan-seek-lookup.py",
+      "title": "2 · Scan, seek, lookup",
+      "scene": "Clip2",
+      "final_state": "Tres columnas grandes y centradas, cada una con su caja de operador y su cifra debajo: Scan con el muro entero en rojo (22,363 lecturas), Seek con su ruta verde de tres paginas (3 lecturas), y Lookup con la misma ruta mas la pagina de datos aparte unida por el viaje de vuelta (597 lecturas)."
+    },
+    {
+      "file": "clips/03-tres-formas-de-unir.py",
+      "title": "3 · Tres formas de unir",
+      "scene": "Clip3",
+      "final_state": "Despues de mostrar cada metodo grande y solo (con la fila de puntos del hash cayendo de verdad en sus cubetas), quedan tres columnas chicas para comparar: Nested Loops con las filas de afuera y de adentro en verde, Merge con las dos listas ordenadas ya emparejadas en verde, y Hash con los puntos repartidos por tono dentro de sus cuatro cubetas."
+    },
+    {
+      "file": "clips/04-ocho-hilos.py",
+      "title": "4 · Ocho hilos",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'El plan es un mapa.' en blanco y 'Las flechas gruesas son el costo.' en cian debajo."
+    }
+  ]
+}

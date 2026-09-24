@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 2.3 El índice que cubre",
+  "description": "La hoja de índice engorda con INCLUDE hasta traer fecha, estatus y total: el lookup de 597 lecturas cae a 4, el mayorista pasa de 22,363 a 785, y un SELECT * que pide una columna ausente (comentarios) hace que el lookup vuelva.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-include.py",
+      "title": "1 · INCLUDE",
+      "scene": "Clip1",
+      "final_state": "La hoja ancha con sus 5 columnas (id_cliente, id_pedido, fecha_pedido, estatus, total) en azul, con el codigo CREATE INDEX...INCLUDE marcado; arriba, comentarios queda solo, en gris, con el rotulo 'no esta aqui'."
+    },
+    {
+      "file": "clips/02-597-a-4.py",
+      "title": "2 · De 597 a 4",
+      "scene": "Clip2",
+      "final_state": "Dos barras logaritmicas: roja 'con lookup' en 597 lecturas contra verde 'con la hoja' en 4 lecturas, con la razon cian '149x menos lecturas' en el pie."
+    },
+    {
+      "file": "clips/03-el-mayorista-tambien.py",
+      "title": "3 · El mayorista también",
+      "scene": "Clip3",
+      "final_state": "El muro entero de pedidos (22,363, rojo) junto a una columna angosta de hojas del indice cubriente con un tramo contiguo encendido en verde (785); pie cian '28x menos lecturas'."
+    },
+    {
+      "file": "clips/04-select-estrella.py",
+      "title": "4 · SELECT * lo rompe",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Pide solo lo que usas.' en blanco y 'El indice ya lo tiene.' en cian."
+    }
+  ]
+}

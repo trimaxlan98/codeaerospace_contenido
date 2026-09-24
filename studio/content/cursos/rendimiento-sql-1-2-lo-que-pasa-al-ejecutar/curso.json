@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 1.2 Lo que pasa al ejecutar",
+  "description": "Lección 1.2 del curso Rendimiento de SQL Server (módulo 1: medir antes de tocar), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-de-texto-a-plan.py",
+      "title": "1 · De texto a plan",
+      "scene": "Clip1",
+      "final_state": "La tubería de cuatro cajas se apaga y queda un plan horizontal leído de derecha a izquierda: Select ← Filter ← Scan pedidos (con flechas de S.flecha_plan dimensionadas con las 191 filas del cliente 501), rotulado 'plan' junto a la consulta rotulada 'texto'."
+    },
+    {
+      "file": "clips/02-muchos-planes.py",
+      "title": "2 · Muchos planes, un costo",
+      "scene": "Clip2",
+      "final_state": "Duelo de lecturas en escala logarítmica (rotulada) para id_cliente = 501: 'scan' en rojo con 22,363 lecturas contra 'seek + lookup' en verde con 597, enmarcado en verde con el rótulo 'gana el mas barato'."
+    },
+    {
+      "file": "clips/03-el-plan-guardado.py",
+      "title": "3 · El plan guardado",
+      "scene": "Clip3",
+      "final_state": "Caché grande a la derecha con el plan legible Seek → Lookup dentro; a la izquierda, la línea de tiempo de ejecuciones muestra 3 barras (1a larga y tenue 'compilar', 2 cortas y verdes 'reusar') y el contador (tinta) marca 3, con la tercera consulta (otro valor, id_cliente = 1) subrayada dentro del panel."
+    },
+    {
+      "file": "clips/04-estimado-contra-real.py",
+      "title": "4 · Estimado contra real",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: 'El plan se decide antes de leer.' en tinta y 'Con lo que el motor cree.' en cian."
+    }
+  ]
+}

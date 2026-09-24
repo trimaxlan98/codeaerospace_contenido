@@ -1,0 +1,16 @@
+{
+  "name": "Rendimiento SQL · 1.1 La página: lo que cuesta leer",
+  "description": "Lección 1.1 del curso Rendimiento de SQL Server (módulo 1: medir antes de tocar), en 4 clips —una idea por clip—: una tienda en línea con millón y medio de pedidos, la tabla partida en páginas de 8 KB, la búsqueda por llave que abre tres páginas y la búsqueda sin índice que las abre todas. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-la-tienda.py", "title": "1 · La tienda", "scene": "Clip1",
+     "final_state": "Las tres tablas de la tienda con sus filas (clientes, pedidos, detalle) y la consulta por cliente en su panel; a la derecha, tiempo tachado y páginas leídas en ámbar."},
+    {"file": "clips/02-un-muro-de-paginas.py", "title": "2 · Un muro de páginas", "scene": "Clip2",
+     "final_state": "La tabla de pedidos como un muro de páginas con una página ampliada (8 KB, filas por página) y el contador ámbar con las páginas de la tabla."},
+    {"file": "clips/03-buscar-por-la-llave.py", "title": "3 · Buscar por la llave", "scene": "Clip3",
+     "final_state": "Un árbol de tres niveles con la ruta raíz-intermedia-hoja en verde, la consulta por id_pedido y el contador ámbar en 3 lecturas."},
+    {"file": "clips/04-buscar-sin-indice.py", "title": "4 · Buscar sin índice", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'El motor no lee filas: lee paginas.' (blanca) y 'Optimizar es leer menos.' (cian)."}
+  ]
+}
