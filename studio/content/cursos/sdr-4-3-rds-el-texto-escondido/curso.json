@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 4.3 RDS: el texto escondido",
+  "description": "Lección 4.3 del curso Radio definida por software (módulo 4: FM de radiodifusión), en 4 clips —una idea por clip—: la subportadora de 57 kHz que es tres veces el piloto, la fase que salta con cada bit, los bloques de 26 bits con su síndrome y el nombre de la emisora que se arma dos letras cada vez. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-57-khz.py",
+      "title": "1 · 57 kHz",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-la-fase-que-salta.py",
+      "title": "2 · La fase que salta",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-bloques-y-sindrome.py",
+      "title": "3 · Bloques y síndrome",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-nombre-de-la-emisora.py",
+      "title": "4 · El nombre de la emisora",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

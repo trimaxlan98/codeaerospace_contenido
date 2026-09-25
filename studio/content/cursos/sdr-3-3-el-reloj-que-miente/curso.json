@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 3.3 El reloj que miente",
+  "description": "Lección 3.3 del curso Radio definida por software (módulo 3: del flujo al canal), en 4 clips —una idea por clip—: el error del cristal en partes por millón convertido en hercios a 100, 437 y 1090 MHz, la medida del error con una portadora de frecuencia conocida, la deriva térmica que inclina el waterfall y la corrección que la devuelve a su sitio. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-las-ppm.py",
+      "title": "1 · Las ppm",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-medir-el-error.py",
+      "title": "2 · Medir el error",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-deriva.py",
+      "title": "3 · La deriva",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-corregir.py",
+      "title": "4 · Corregir",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

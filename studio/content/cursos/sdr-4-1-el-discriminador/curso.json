@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 4.1 El discriminador",
+  "description": "Lección 4.1 del curso Radio definida por software (módulo 4: FM de radiodifusión), en 4 clips —una idea por clip—: la frecuencia como velocidad del fasor, el discriminador polar que recupera el mensaje con una resta de fases, la regla de Carson frente al ancho medido y el deénfasis que baja el ruido de los agudos. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-velocidad-del-fasor.py",
+      "title": "1 · La velocidad del fasor",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-discriminador-polar.py",
+      "title": "2 · El discriminador polar",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-carson.py",
+      "title": "3 · Carson",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-deenfasis.py",
+      "title": "4 · El deénfasis",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

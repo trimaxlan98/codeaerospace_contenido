@@ -8,25 +8,25 @@
       "file": "clips/01-poca-ganancia.py",
       "title": "1 · Poca ganancia",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Zoom a la rejilla de niveles cerca de cero: la onda real (ambar, casi plana) y su escalera cuantizada (blanca) saltan solo entre 2 niveles adyacentes de la rejilla. A la derecha el medidor con la zona roja 'techo' arriba y una barra ambar corta cerca del fondo en -60 dBFS; debajo 'SNR entrada 30 dB' en gris. Pie cian: 'SINAD 6.3 dB' (la cifra anterior fue '2 de 256 niveles')."
     },
     {
       "file": "clips/02-demasiada-ganancia.py",
       "title": "2 · Demasiada ganancia",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "El espectro completo del tono recortado (ambar), con una marca punteada ambar en el tono ('tono') y otra roja en el mayor espurio ('espurio'), visiblemente el segundo pico mas alto del peine. Pie cian: 'espurio -12.9 dBc'. (La onda recortada contra el techo y el medidor a fondo en la zona roja ya se apagaron.)"
     },
     {
       "file": "clips/03-el-punto-dulce.py",
       "title": "3 · El punto dulce",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Cuadro propio (marco a mano) con la curva cian de SINAD vs ganancia completa, tramo 48-60 dB sombreado en verde; el punto cian que recorrio la curva descansa en su extremo derecho (ganancia 75, SINAD baja). A la derecha el medidor con la barra a tope en rojo, dentro de su propia zona 'techo'. Pie cian: 'SINAD max 30.3 dB' (la cifra anterior fue '48 a 60 dB')."
     },
     {
       "file": "clips/04-el-control-automatico.py",
       "title": "4 · El control automático",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Ni tanta que recorte,' en blanco y 'ni tan poca que se hunda.' en cian, centradas; el cuadro con la envolvente ambar (variacion amplia), la salida verde del AGC (franja angosta), la banda 'medido aqui' y las cifras ya se apagaron."
     }
   ]
 }

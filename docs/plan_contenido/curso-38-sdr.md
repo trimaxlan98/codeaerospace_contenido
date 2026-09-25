@@ -155,8 +155,8 @@ Dibujo:
 
 | Lote | Módulos | Lecciones | Aporta a la librería | Estado |
 |---|---|---|---|---|
-| 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ~ en curso |
-| 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | — |
+| 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ~ clips (5/6 aprobadas) |
+| 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | ~ esqueletos listos, agentes 3.1/3.2 |
 | 3 | 5–6 | 5.1–6.3 | Costas, Gardner, ADS-B, AIS, LoRa | — |
 | 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | — |
 
@@ -177,13 +177,13 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 | Lección | plan | clips | ql ✔ frames | PR | qh | voz | mux |
 |---|---|---|---|---|---|---|---|
 | 1.1 | ✔ | ✔ | ✔ | — | — | — | — |
-| 1.2 | ✔ | — | — | — | — | — | — |
-| 1.3 | ✔ | — | — | — | — | — | — |
-| 2.1 | ✔ | — | — | — | — | — | — |
-| 2.2 | ✔ | — | — | — | — | — | — |
-| 2.3 | ✔ | — | — | — | — | — | — |
-| 3.1 | ✔ | — | — | — | — | — | — |
-| 3.2 | ✔ | — | — | — | — | — | — |
+| 1.2 | ✔ | ✔ | ✔ | — | — | — | — |
+| 1.3 | ✔ | ✔ | ✔ | — | — | — | — |
+| 2.1 | ✔ | ✔ | ✔ | — | — | — | — |
+| 2.2 | ✔ | ✔ | ✔ | — | — | — | — |
+| 2.3 | ✔ | ~ | — | — | — | — | — |
+| 3.1 | ✔ | ~ | — | — | — | — | — |
+| 3.2 | ✔ | ~ | — | — | — | — | — |
 | 3.3 | ✔ | — | — | — | — | — | — |
 | 4.1 | ✔ | — | — | — | — | — | — |
 | 4.2 | ✔ | — | — | — | — | — | — |
@@ -405,7 +405,24 @@ Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20�
 
 ## 15. Cosecha de trampas del lote 1
 
-(se escribe durante la producción)
+La sonda (126 invariantes al cierre de la librería) tumbó antes de escribir clips:
+- La **IRR tras la corrección ciega depende de la malla** (82 dB con 8192 muestras, 130 con 12000: el tono que no cierra ciclos sesga los momentos) → se rotula «más de 80 dB» (suelo del barrido). La del desbalance sin corregir sí es estable (fórmula = medida al centésimo).
+- El **pico de DC** se rotula en dBc (coherente), nunca como altura sobre el piso (crece con nfft).
+- El **espurio del NCO** reiniciado se medía entre rayas espectrales: la señal es periódica de periodo `bloque`, así que la FFT de UN periodo da las rayas exactas (−9.5 dBc a 240 Hz; con bloque 1024 el ciclo cierra y no hay espurio: contraejemplo).
+- La **fuga de la vecina con filtro** baila de −62 a −90 dBc con la longitud → «menos de −60 dBc».
+- AIS no decodificaba ni un barco con ruido: decidía cada bit con UNA muestra del discriminador; lo correcto es el giro de fase a lo largo del bit tras un filtro de canal (y el primer corte que puse era la mitad del necesario: 3.6 kHz en vez de ~7).
+- ADS-B: el correlador encuentra falsos preámbulos dentro de los datos; como un decodificador real, se prueban candidatos y **el CRC decide** (5 falsos rechazados en 10 capturas).
+- El lazo de reloj arrancaba con el desfase ya compensado (bug de signo/arranque); Costas con criterio de enganche sin media móvil hacía parecer más lento el lazo ancho.
+- Meteor a Es/N0 = 3 dB estaba en el borde (24 errores en una semilla) → la demo va a 4 dB (0 errores en 10 de 10).
+- GPS con 1 ms: el pico (14 dB sobre la media) apenas se distingue del máximo de puro ruido con otro PRN (12 dB) → 10 ms no coherentes (13.2 contra 4.5 dB).
+
+La revisión de fotogramas del orquestador devolvió (los agentes aprobaban su propio trabajo en todos los casos):
+- 1.1 (molde, propio): un `Contador` cuyo número nunca se añadió a la escena; llaves que cruzaban el círculo del LO; la idea «solo I ve la mitad» era falsa (con una rama los lados se PLIEGAN, no se pierden).
+- 1.2: el título desaparecía (`rot.limpiar()` sin `zona=` borra también «arriba»); el desplazamiento digital se dibujaba bajo un eje de MHz de RF (falso: se rotula en banda base).
+- 1.3: la elipse del desbalance (5 %, 3°) era invisible: se exagera SOLO el dibujo y se declara («dibujo exagerado»).
+- 2.1: una cifra vieja bajo un dibujo ya reordenado; la escalera de sensibilidad sin el escalón de SNR; luego, al rehacerla, **escalas locales** que ponían −107.9 y −133.9 dBm a la misma altura.
+- 2.2: renderizó con 6 fotogramas en vez de 8.
+- Los agentes reportan a veces «la hoja 2×2 parece encimada pero el PNG está limpio»: en las hojas del orquestador no se vio tal efecto; si se repite, mirar los PNG sueltos.
 
 ## 16. Hitos globales
 
