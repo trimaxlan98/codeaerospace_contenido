@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 8.1 Transmitir",
+  "description": "Lección 8.1 del curso Radio definida por software (módulo 8: más allá de escuchar), en 4 clips —una idea por clip—: el conversor digital analógico que devuelve escalones, las imágenes que aparecen en múltiplos de la frecuencia de muestreo con la envolvente sinc, el filtro de reconstrucción y la máscara espectral, y las reglas para transmitir. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-dac.py",
+      "title": "1 · El DAC",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-las-imagenes.py",
+      "title": "2 · Las imágenes",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-mascara.py",
+      "title": "3 · La máscara",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-la-licencia.py",
+      "title": "4 · La licencia",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 5.1 La constelación que gira",
+  "description": "Lección 5.1 del curso Radio definida por software (módulo 5: sincronizar), en 4 clips —una idea por clip—: el desfase de frecuencia que hace girar la constelación QPSK, la cuarta potencia que borra la modulación y deja una sola raya, la estimación del giro y lo poco que queda tras corregirlo. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-giro.py",
+      "title": "1 · El giro",
+      "scene": "Clip1",
+      "final_state": "Titulo 'El giro' arriba. Plano IQ centrado con sus ejes y el circulo unidad: la nube de 400 simbolos de RX (10 tandas de 40, ambar oscuro a claro) forma un anillo grueso alrededor del origen (el desfase acumulado hizo que cada tanda cayera girada respecto a la anterior). Pie gris: '1.33 grados por simbolo  - dato' (GRADOS)."
+    },
+    {
+      "file": "clips/02-a-la-cuarta-potencia.py",
+      "title": "2 · A la cuarta potencia",
+      "scene": "Clip2",
+      "final_state": "Titulo 'A la cuarta potencia' arriba. Espectro de RX**4 (ambar, ejes -0.05 a 0.05 ciclos/simb): un piso de ruido irregular con UNA raya limpia y alta, marcada con una linea punteada cian y el rotulo cian '4 x el giro' en 4*DF_EST. Antes en el clip: los 4 puntos QPSK (naranja, 45/135/225/315) colapsan en un unico punto a 180 grados en un segundo plano IQ, con la formula z -> z^4."
+    },
+    {
+      "file": "clips/03-la-estimacion.py",
+      "title": "3 · La estimación",
+      "scene": "Clip3",
+      "final_state": "Titulo 'La estimacion' arriba. Mismo espectro de RX**4 que el clip anterior, con la raya marcada en cian punteado. Pie cian: 'error 0.3 ppm' (abs(DF_EST-DF_RS)*1e6). Antes en el clip: la formula 'Df_est = f_pico / 4' y la cifra cian '1.332 grados/simbolo' (GRADOS_EST) pasaron por el mismo carril."
+    },
+    {
+      "file": "clips/04-lo-que-queda.py",
+      "title": "4 · Lo que queda",
+      "scene": "Clip4",
+      "final_state": "Cierre de la leccion a pantalla limpia (titulo y plano ya apagados): 'Cada receptor mide su propio error' en blanco arriba y 'antes de leer un solo bit.' en cian debajo. Antes en el clip: el anillo de RX (ambar) se transformaba en 4 nubes compactas alrededor de los puntos QPSK ideales (RX_CORR), con el pie cian 'corrige 1.332 grados' (GRADOS_EST)."
+    }
+  ]
+}

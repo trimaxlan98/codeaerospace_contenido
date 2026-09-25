@@ -156,9 +156,9 @@ Dibujo:
 | Lote | Módulos | Lecciones | Aporta a la librería | Estado |
 |---|---|---|---|---|
 | 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ✔ qh, voz y mux (13.9 min) |
-| 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | ~ esqueletos listos, agentes 3.1/3.2 |
-| 3 | 5–6 | 5.1–6.3 | Costas, Gardner, ADS-B, AIS, LoRa | — |
-| 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | — |
+| 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | ✔ qh, voz y mux |
+| 3 | 5–6 | 5.1–6.3 | Costas, Gardner, ADS-B, AIS, LoRa | ✔ qh, voz y mux |
+| 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | ~ 7.2 y 7.3 entregadas; 7.1, 8.1–8.3 en agentes |
 
 ## 11. Receta de lote
 
@@ -176,30 +176,30 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 
 | Lección | plan | clips | ql ✔ frames | PR | qh | voz | mux |
 |---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 1.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 1.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 2.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 2.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 2.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 3.1 | ✔ | ✔ | ✔ | — | — | — | — |
-| 3.2 | ✔ | ~ | — | — | — | — | — |
-| 3.3 | ✔ | ✔ | ✔ | — | — | — | — |
-| 4.1 | ✔ | — | — | — | — | — | — |
-| 4.2 | ✔ | — | — | — | — | — | — |
-| 4.3 | ✔ | — | — | — | — | — | — |
-| 5.1 | ✔ | — | — | — | — | — | — |
-| 5.2 | ✔ | — | — | — | — | — | — |
-| 5.3 | ✔ | — | — | — | — | — | — |
-| 6.1 | ✔ | — | — | — | — | — | — |
-| 6.2 | ✔ | — | — | — | — | — | — |
-| 6.3 | ✔ | — | — | — | — | — | — |
-| 7.1 | ✔ | — | — | — | — | — | — |
-| 7.2 | ✔ | — | — | — | — | — | — |
-| 7.3 | ✔ | — | — | — | — | — | — |
-| 8.1 | ✔ | — | — | — | — | — | — |
-| 8.2 | ✔ | — | — | — | — | — | — |
-| 8.3 | ✔ | — | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 1.2 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 1.3 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 2.1 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 2.2 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 2.3 | ✔ | ✔ | ✔ | #94 ✔ | ✔ | ✔ | ✔ |
+| 3.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 3.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 3.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 4.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 4.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 4.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 5.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 5.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 5.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 6.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 6.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 6.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 7.1 | ✔ | ~ | — | — | — | — | — |
+| 7.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 7.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 8.1 | ✔ | ~ | — | — | — | — | — |
+| 8.2 | ✔ | ~ | — | — | — | — | — |
+| 8.3 | ✔ | ~ | — | — | — | — | — |
 
 (Los storyboards de los 24 ya llevan las cifras que dio la sonda; las funciones de los lotes 2–4 entran en `sdr.py` al abrir cada lote.)
 
@@ -363,11 +363,11 @@ Números: Meteor-M N2-4, 137.9 MHz, 72 k símbolos/s, código convolucional k = 
 4. **La imagen** — la imagen se arma línea a línea en verde; al lado, la misma con los errores crudos del canal (rojo). Cierre: «Una imagen del planeta» / «desde un aparato de 30 dolares.»
 
 #### 7.3 GPS bajo el ruido
-Números: C/A de 1023 chips (tabla ICD verificada: PRN 1–5 = 1440, 1620, 1710, 1744, 1133 octal), SNR por muestra −20 dB (gris), Doppler 2.5 kHz, 10 ms sumados (gris); ganancia de correlación **30.1 dB**; pico sobre la media de la rejilla **13.2 dB** contra **4.5 dB** con el PRN equivocado.
+Números: C/A de 1023 chips (tabla ICD verificada: PRN 1–5 = 1440, 1620, 1710, 1744, 1133 octal), SNR por muestra −20 dB (gris), Doppler 2.5 kHz, 10 ms sumados (gris); ganancia de correlación **30.1 dB**; pico sobre la media de la rejilla **12.6 dB** en la captura dibujada (mediana de 8 semillas: 13.2) contra **4.5 dB** con el PRN equivocado.
 1. **La señal no se ve** — la captura: ruido puro a la vista; espectro plano.
 2. **El código C/A** — 1023 chips; autocorrelación de tres valores (63, −1, −65) con un pico de 1023.
 3. **La rejilla** — Doppler × fase de código: la superficie se barre.
-4. **El pico** — un único pico: cian 13.2 dB vs 4.5 dB con otro satélite. Cierre: «Veinte decibelios bajo el ruido» / «y aun asi se encuentra.»
+4. **El pico** — un único pico: cian 12.6 dB vs 4.5 dB con otro satélite. Cierre: «Veinte decibelios bajo el ruido» / «y aun asi se encuentra.»
 
 ### Módulo 8 · Más allá de escuchar
 
@@ -425,7 +425,16 @@ La revisión de fotogramas del orquestador devolvió (los agentes aprobaban su p
 - **La prosa en `dato_pie` fue la falta más repetida** (2.3 ×3, 3.3, 3.1, y una que se me pasó a mí en 1.3.4 y solo cazó la hoja de interiores): el gris no es un carril de narración. Ya está en el contrato.
 - Los agentes reportan a veces «la hoja 2×2 parece encimada pero el PNG está limpio»: en las hojas del orquestador no se vio tal efecto; si se repite, mirar los PNG sueltos.
 
+## 15bis. Cosecha de los lotes 2 a 4
+
+- **Dos defectos reales de la librería los cazaron agentes**: `para_dibujar` tiraba la cola del espectro cuando la longitud no era múltiplo de `puntos` (un filtro simétrico salía asimétrico: 3.2) y `espectro_db` reventaba con `nfft > len(x)` en vez de rellenar con ceros (5.1). Los dos corregidos con invariante nuevo en la sonda (130 en total).
+- **Honestidad que salió en la revisión**: el comentario de `JIT_MED` decía «mediana» y era media (5.2); el storyboard citaba 13.2 dB del GPS (mediana de 8 semillas) y la captura dibujada da 12.6 (7.3) — se rotula lo de la captura dibujada.
+- Un agente (5.3) no rotuló «tiempo de enganche» porque la convergencia del reloj sale y entra de la franja con el ruido: rotuló el residuo medido en la ventana visible. Mejor criterio que el storyboard.
+- **Error de revisión mío**: devolví el clip 3 de la 7.3 porque el pico «se veía antes del barrido»; el barrido iba de abajo arriba y mis 8 fotogramas no cayeron en ningún punto intermedio. Un fotograma que contradice una animación no basta para devolver un clip: mirar los intermedios.
+- Un **corte de cuota** mató a los cuatro agentes del lote 4 a la vez (7.1, 8.1, 8.2, 8.3) con trabajo parcial en disco; se retomaron con «re-valida todo» tras el reinicio.
+
 ## 16. Hitos globales
 
 - 2026-09-24 · plan y rama `curso/sdr-completo`.
+- 2026-09-25 · **lotes 2 y 3 entregados, y 7.2/7.3**: 14 lecciones más con `qh`, voz edge y montaje (20 de 24 en `exports/sdr-*/curso_narrado.mp4`, 2:15–2:43 cada una, picos ≤ −1.5 dB).
 - 2026-09-25 · **lote 1 entregado**: 6 lecciones / 24 clips en `qh` (`render_jobs/qh/sdr-1-*`, `sdr-2-*`), voz edge es-MX-JorgeNeural sintetizada en local (24 wavs, ninguno acelerado), 6 montajes con intro y cierre en `exports/sdr-*/curso_narrado.mp4` = **13.9 min** (2:16–2:22 cada uno), picos de los clips entre −2.9 y −1.5 dB, marca sonora −6.0 dB. La hoja de interiores de las 24 piezas cazó una frase metida en el carril gris (1.3.4) que la revisión pieza a pieza había dejado pasar.

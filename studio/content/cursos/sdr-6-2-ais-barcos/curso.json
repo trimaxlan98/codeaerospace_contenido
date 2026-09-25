@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 6.2 AIS: barcos",
+  "description": "Lección 6.2 del curso Radio definida por software (módulo 6: paquetes en el aire), en 4 clips —una idea por clip—: la modulación GMSK a 9600 baudios, la regla NRZI que codifica en los cambios, la bandera HDLC y el bit de relleno, y el barco decodificado con su posición. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-gmsk-a-9600.py",
+      "title": "1 · GMSK a 9600",
+      "scene": "Clip1",
+      "final_state": "Pantalla partida en dos paneles ambar. Arriba, la fase de X_GMSK (16 bits de la trama, np.unwrap+np.angle) sube y baja suave, con el rotulo 'fase'. Abajo, la frecuencia instantanea (derivada de la fase) trazada sobre los niveles NRZ crudos en gris (escalones), con el rotulo 'frecuencia': se ve como el filtro gaussiano redondea los escalones. Pie gris: 'canal 161.975 MHz · dato' (antes goto 'filtro gaussiano BT 0.4 · dato')."
+    },
+    {
+      "file": "clips/02-nrzi.py",
+      "title": "2 · NRZI",
+      "scene": "Clip2",
+      "final_state": "Fila de 10 bits reales de TRAMA arriba (blanco), fila de niveles NRZI (S.nrzi) debajo con una celda 'antes' de contexto a la izquierda; las celdas de nivel donde el bit fue 0 quedan marcadas en fucsia (cambio), las que corresponden a un bit 1 quedan en su color normal (igual); rotulos 'cambio' e 'igual' bajo el primer ejemplo de cada caso. Pie gris: 'regla NRZI de HDLC · dato'."
+    },
+    {
+      "file": "clips/03-la-bandera-y-el-relleno.py",
+      "title": "3 · La bandera y el relleno",
+      "scene": "Clip3",
+      "final_state": "Arriba, la barra de los 5 tramos de la trama a proporcion (entrenamiento, bandera, cuerpo, bandera, cierre). Abajo, bandera 01111110 (gris) - puntos suspensivos - zoom de 9 celdas con la corrida real de cinco unos (llave 'cinco unos') y el bit insertado resaltado en cian con el rotulo 'relleno' - puntos suspensivos - bandera 01111110 (gris). Pie cian: '1 bit de relleno' (antes: '233 bits en la trama')."
+    },
+    {
+      "file": "clips/04-el-barco.py",
+      "title": "4 · El barco",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Los barcos se anuncian solos.' en blanco y 'Cualquiera puede escucharlos.' en cian, tras apagarse la tarjeta verde (mmsi 345070001, posicion 19.4326 N / 99.1332 O, velocidad 12.3 nudos, rumbo 87.5 grados) y los pies 'CRC valido' (cian) y 'barco ficticio · dato' (gris)."
+    }
+  ]
+}

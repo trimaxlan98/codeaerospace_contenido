@@ -8,25 +8,25 @@
       "file": "clips/01-el-filtro-de-canal.py",
       "title": "1 · El filtro de canal",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Espectro de la captura de 2.4 MS/s, con la emisora mas fuerte centrada en 0 por el NCO de la leccion 3.1, ya filtrado: esa emisora entera sobrevive dentro de la respuesta del FIR (fucsia), las otras cuatro quedan hundidas en el piso; cifra '59.3 dB de rechazo' en cian."
     },
     {
       "file": "clips/02-diezmar-sin-filtro.py",
       "title": "2 · Diezmar sin filtro",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Espectro decimado (-120 a 120 kHz) con filtro aplicado: solo queda el tono del canal en -40 kHz, la vecina que antes se plegaba en +20 kHz ya no se ve; cifra 'menos de -60 dBc' en cian."
     },
     {
       "file": "clips/03-la-cascada.py",
       "title": "3 · La cascada",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Arriba, mitad superior, tres formas de filtro fucsia grandes, simetricas alrededor de 0, con eje en kHz (un solo rotulo 'kHz' al final): una etapa de 219 coeficientes y, a la MISMA escala de frecuencia (+-240 kHz), las dos etapas de la cascada (39 ancha, 45 estrecha); abajo, mitad inferior, dos barras cian en la misma escala, dentro del cuadro: 52.6 M MAC/s la de una etapa, 29.5 M MAC/s la de dos etapas, casi la mitad."
     },
     {
       "file": "clips/04-de-2-4-m-a-48-k.py",
       "title": "4 · De 2.4 M a 48 k",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Primero se recorta,' (blanca) y 'despues se tira lo que sobra.' (cian)."
     }
   ]
 }

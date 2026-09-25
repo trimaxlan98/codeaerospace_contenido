@@ -8,25 +8,25 @@
       "file": "clips/01-la-velocidad-del-fasor.py",
       "title": "1 · La velocidad del fasor",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'La velocidad del fasor'. Plano IQ a la izquierda con el fasor ambar en reposo apuntando al eje I (angulo 0); separada a la derecha, la curva del mensaje (un tono lento en forma de joroba, ambar, rotulada 'mensaje') con el punto sincronizado de vuelta en su extremo izquierdo (t=0). Pie gris 'escala ilustrativa · dato'."
     },
     {
       "file": "clips/02-el-discriminador-polar.py",
       "title": "2 · El discriminador polar",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'El discriminador polar'. La curva recuperada (verde) trazada entera sobre el mensaje original (ambar a trozos, ahora casi tapado por coincidir con la verde); un marcador vertical gris se posa en el extremo derecho (t=1) junto a un punto verde. Pie: formula cian angulo(x[n] x*[n-1])."
     },
     {
       "file": "clips/03-carson.py",
       "title": "3 · Carson",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'Carson'. Espectro (ambar) de la FM de un tono de 15 kHz en banda base, -114 a 114 kHz, con la banda de Carson marcada (rectangulo cian traslucido, -90 a 90 kHz) que encierra casi todas las rayas de Bessel; un par de rayas menores asoman fuera del rectangulo a ambos lados. Pie cian 'estereo: 256 kHz'."
     },
     {
       "file": "clips/04-el-deenfasis.py",
       "title": "4 · El deénfasis",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia de cierre (marca de agua y escuadras solamente): 'La FM se oye en el angulo.' en blanco y, debajo, 'Una resta de fases basta.' en cian."
     }
   ]
 }

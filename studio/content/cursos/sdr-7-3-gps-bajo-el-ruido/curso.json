@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 7.3 GPS bajo el ruido",
+  "description": "Lección 7.3 del curso Radio definida por software (módulo 7: satélites), en 4 clips —una idea por clip—: una señal GPS veinte decibelios por debajo del ruido, el código C/A de 1023 chips con su autocorrelación de tres valores, la rejilla de Doppler y fase de código que se barre y el pico que emerge. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-senal-no-se-ve.py",
+      "title": "1 · La señal no se ve",
+      "scene": "Clip1",
+      "final_state": "Titulo «La senal no se ve». Arriba, 200 muestras de la parte real de la captura (rojo, SNR -20 dB por muestra) con la senal limpia de la misma captura (ambar, S.gps_captura con SNR enorme) a la MISMA escala: casi una raya. Abajo, el espectro de 1 ms (S.espectro_db(X[:2046], 2.046e6, nfft=2046), rojo, eje -1..+1 MHz) y el de la senal sola con la misma referencia, en ambar, muy por debajo. Pie gris «portadora 1575.42 MHz · dato» (antes, en cian, «ruido: x9.8 en amplitud» y «senal 19.8 dB por debajo», medidos sobre lo dibujado)."
+    },
+    {
+      "file": "clips/02-el-codigo-c-a.py",
+      "title": "2 · El código C/A",
+      "scene": "Clip2",
+      "final_state": "Titulo «El codigo C/A». Arriba, los primeros 64 de 1023 chips del PRN 7 (S.codigo_ca) como escalones +1/-1 en ambar. Abajo a la izquierda, la autocorrelacion circular a escala completa con el pico cian «1023»; a la derecha, zoom de los retardos 1 a 40 con los tres unicos niveles en cian (+63, -1, -65). Pie cian «ganancia 30.1 dB» (S.ganancia_correlacion_db; antes la formula 10 log10(1023) = 30.1 dB)."
+    },
+    {
+      "file": "clips/03-la-rejilla.py",
+      "title": "3 · La rejilla",
+      "scene": "Clip3",
+      "final_state": "Titulo «La rejilla». Mapa de calor de 21 Doppler (-5..+5 kHz, pasos de 500 Hz) x fase de codigo (0..1023 chips), |corr|^2 sumada en 10 ms en dB sobre la media (S.gps_adquirir), ya barrido entero; barra de color 0-10 dB; un unico punto blanco cerca de +2.5 kHz y ~420 chips. Gris arriba a la derecha «dibujo: max de 22 muestras». Pie cian «21 x 2046 = 42966 celdas»."
+    },
+    {
+      "file": "clips/04-el-pico.py",
+      "title": "4 · El pico",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre: «Veinte decibelios bajo el ruido» (blanco) / «y aun asi se encuentra.» (cian). Antes: el pico circulado en el mapa (cian «2.5 kHz / 423 chips», DOPS[I_D] y J_F/2) y los perfiles de la fila del pico (PRN 7, ambar) y de la mejor fila buscando el PRN 3 (rojo) en la MISMA escala de dB sobre la media: cian «12.6 dB» (PICO_DB) contra «4.5 dB» (OTRO_DB), pie gris «10 ms sumados»."
+    }
+  ]
+}

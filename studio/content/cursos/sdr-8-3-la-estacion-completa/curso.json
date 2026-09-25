@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 8.3 La estación completa",
+  "description": "Lección 8.3 del curso Radio definida por software (módulo 8: más allá de escuchar), en 4 clips —una idea por clip—: la cadena del receptor encendida eslabón a eslabón con la cifra que midió cada lección, el presupuesto de enlace del satélite meteorológico, el pase y la imagen recibida. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-cadena-entera.py",
+      "title": "1 · La cadena entera",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-presupuesto.py",
+      "title": "2 · El presupuesto",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-el-pase.py",
+      "title": "3 · El pase",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-la-imagen.py",
+      "title": "4 · La imagen",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

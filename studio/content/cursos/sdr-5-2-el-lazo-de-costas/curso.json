@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 5.2 El lazo de Costas",
+  "description": "Lección 5.2 del curso Radio definida por software (módulo 5: sincronizar), en 4 clips —una idea por clip—: el detector de Costas que mide el giro con el producto de I por Q, el lazo que persigue la fase hasta engancharse, el compromiso entre engancharse rápido y temblar poco, y la ambigüedad de 180 grados que resuelve la codificación diferencial. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-detector.py",
+      "title": "1 · El detector",
+      "scene": "Clip1",
+      "final_state": "Plano IQ con los dos símbolos BPSK (ámbar) de vuelta sobre el eje I, su proyección I en azul y el rectángulo I·Q (fucsia) ya plano; a la derecha la curva del detector e contra el giro (−90 a 90 grados) con el punto fucsia en el cero y los signos + y − en sus lóbulos; abajo la fórmula e = I · Q (cian)."
+    },
+    {
+      "file": "clips/02-enganchar.py",
+      "title": "2 · Enganchar",
+      "scene": "Clip2",
+      "final_state": "Arriba la fase real (ámbar) y la del NCO (fucsia) pegadas desde el enganche; debajo el error de fase (fucsia, ±90 grados, 400 símbolos) que cae de −63 a cero, con la marca cian del enganche y el dato gris Bn T = 0.02; a la derecha el plano IQ de la salida con dos puntos; cifra 'enganche: 113 simbolos' (ENG_MED, mediana de 8 semillas de S.tiempo_enganche)."
+    },
+    {
+      "file": "clips/03-el-ancho-del-lazo.py",
+      "title": "3 · El ancho del lazo",
+      "scene": "Clip3",
+      "final_state": "Tres trazas del error de fase en la misma escala (±90 grados, 1500 símbolos): estrecho Bn T = 0.005 (con dos saltos de 180 antes de engancharse), medio 0.02 y ancho 0.08; tabla cian enganche/temblor: 918 / 1.4, 113 / 2.5, 30 / 5.2 (ENG_MED y JIT_MED de S.costas_bpsk + S.tiempo_enganche + S.jitter_fase); dato gris 'SNR 10 dB'."
+    },
+    {
+      "file": "clips/04-la-ambiguedad-de-180.py",
+      "title": "4 · La ambigüedad de 180",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos líneas: 'El lazo encuentra la fase,' (blanca) y 'no cual es cual.' (cian)."
+    }
+  ]
+}
