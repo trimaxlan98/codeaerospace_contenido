@@ -17,7 +17,9 @@ número del **curso** es el de `PLAN.md` — no siempre coinciden; decláralo.
    porque es lo que leen los subagentes. Si no los pidió, esta sección lleva
    la tabla de lo que puede aparecer en pantalla y la nota de que el guardián
    del `style_block` aborta el render — ver la §2 del plan del curso 27
-   (`curso-24-procesamiento-senales.md`), que sirve de plantilla.
+   (`curso-24-procesamiento-senales.md`), que sirve de plantilla. Siempre:
+   **sin etiqueta «Modulo 0N»** en pantalla (`hud_modulo()` aborta); la §2
+   del plan del curso 37 (`curso-37-rendimiento-sql.md`) ya lo recoge.
 3. **Ángulo editorial**: la idea que hilvana el curso entero, en dos frases.
    Y el arco: dónde empieza y dónde termina.
 4. **Público y qué asume**: qué cursos previos da por sabidos.

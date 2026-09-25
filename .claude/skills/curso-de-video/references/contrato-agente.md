@@ -35,9 +35,11 @@ NO toques: curso.json, style_block.py, la librería, git.
 
 ## Reglas duras
 - 28–45 s por clip (tope duro por ambos lados).
+- **SIN etiqueta «Modulo 0N»**: no llames `hud_modulo` (aborta el render a
+  propósito) ni pongas ningún otro rótulo fijo de módulo o lección.
 - **FORMATO MUDO (por defecto): no hay pie narrativo.** La palabra la pone la
   voz; la pantalla pone la cosa y su cifra. Solo pueden aparecer: título del
-  clip (≤ 6 palabras), etiqueta del módulo, rótulos de mobiliario (≤ 4),
+  clip (≤ 6 palabras), rótulos de mobiliario (≤ 4),
   cifras medidas (≤ 5), fórmulas y el cierre del clip 4. `pie_curso` NO existe
   y los helpers ABORTAN el render si escribes una frase — no intentes
   rodearlo con `Text(...)` a mano: si el render pasa pero hay prosa en
