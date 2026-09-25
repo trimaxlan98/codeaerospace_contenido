@@ -340,7 +340,14 @@ presupuesto es duro:
 - Commits: asunto **sin acentos**, rutas explícitas, nunca `git add -A`. Los
   mp4 de `exports/` no se versionan.
 - Si el checkout principal está ocupado (otra rama, un cron), trabaja en un
-  **git worktree** aparte usando el venv del checkout principal.
+  **git worktree** aparte usando el venv del checkout principal. Al crearlo,
+  enlaza `render_jobs` y `exports` al segundo disco (ver `comandos.md`): si
+  no, los `qh` quedan SOLO dentro del worktree y se pierden al quitarlo.
+- **Worktree fusionado = worktree quitado**, en la misma sesión del merge
+  (ver "Cierre de familia"). Un worktree es una copia ENTERA del repo en otra
+  rama —por eso muestra todos los cursos, no solo el nuevo— y el dueño los
+  vio acumularse (`-tesis`, `-sql`, cuatro de agentes) y creyó que los cursos
+  se duplicaban.
 - Deja el **tablero al día** antes de que se agote la sesión: la siguiente
   corrida debe poder continuar sin rehacer nada.
 
@@ -361,6 +368,27 @@ trampas.
 Y **la entrega se comprueba EN EL DISCO**, no en el tablero. `exports/` no
 está versionado y vive en el segundo disco: que el plan diga "entregado" no
 prueba que los mp4 sigan ahí. Lista el directorio del curso antes de cerrar.
+
+### Quitar el worktree (último paso, obligatorio)
+
+Cuando la rama ya está en `main`, el worktree sobra. Antes de quitarlo:
+
+1. `git -C <wt> rev-list --count main..HEAD` tiene que dar **0** (si no, hay
+   trabajo sin fusionar: no se quita).
+2. `git -C <wt> status --porcelain` limpio de versionados. Lo que valga y no
+   esté versionado se MUEVE al segundo disco, nunca se borra:
+   `render_jobs/qh/*` → `~/data/codeaerospace/render_jobs/qh/` (los necesita
+   `adoptar_renders.py`), y el audio de `guiones/<curso>/` →
+   `~/data/codeaerospace/archivo-worktrees/<tema>/`. `render_jobs/validacion`
+   es desechable. Ojo: parte de `guiones/` SÍ está versionada; mueve solo la
+   carpeta del curso, no `guiones/` entera.
+3. `git worktree remove <wt>` + `git branch -d curso/<tema>` (y
+   `git worktree prune`). Lo mismo para los `.claude/worktrees/agent-*` que
+   dejen los subagentes con `isolation: "worktree"`.
+
+Si hay archivos de root (renders hechos por Docker), `worktree remove` falla:
+se borran con el propio contenedor. Si el clasificador bloquea el borrado,
+pásale al dueño los comandos exactos para que los corra con `!`.
 
 ### Las DOS hojas de contactos (paso fijo, no opcional)
 
