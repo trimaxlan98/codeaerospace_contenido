@@ -8,25 +8,25 @@
       "file": "clips/01-la-diferencia-de-fase.py",
       "title": "1 · La diferencia de fase",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el titulo 'La diferencia de fase' arriba. Dos senoides ambar apiladas, rotuladas 'antena 1' (arriba) y 'antena 2' (abajo), la de abajo desfasada respecto a la de arriba. Una marca vertical punteada cian en el primer pico de cada una, unidas por una flecha doble cian entre los dos paneles. Cifra cian abajo: '76.1 grados' (fmt(math.degrees(DPHI_05),1), la diferencia de fase medida por S.doa_estimar(THETA, 0.5))."
     },
     {
       "file": "clips/02-el-angulo.py",
       "title": "2 · El ángulo",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el titulo 'El angulo' arriba. Dos antenas separadas d = lambda/2, una linea vertical punteada gris 'normal' (broadside), una flecha ambar de llegada y un arco gris entre ambas marcando el angulo; tres frentes de onda ambar tenues LLEGANDO POR ARRIBA (del lado de la flecha, perpendiculares a ella), sin bajar de la base de las antenas. Rotulo cian '25.0 grados' junto al arco. Cifra cian abajo: '25.0 grados' (fmt(ANG_05[0],1), S.doa_estimar(THETA, 0.5))."
     },
     {
       "file": "clips/03-la-ambiguedad.py",
       "title": "3 · La ambigüedad",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el titulo 'La ambiguedad' arriba. Dos antenas separadas d = lambda (el doble que en los clips 1-2, gris 'd = lambda' bajo la base), una normal punteada gris, y DOS flechas cian en V desde el mismo par de antenas, rotuladas '25.0 grados' y '-35.2 grados'. Cifra cian abajo: '-35.2 y 25.0 grados' (fmt(ANG_1,1), S.doa_estimar(THETA, 1.0)): la misma fase medida admite dos direcciones con d = lambda."
     },
     {
       "file": "clips/04-el-barrido.py",
       "title": "4 · El barrido",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el titulo 'El barrido' arriba, seguida (tras el cierre) de dos lineas centradas sobre fondo limpio: 'Dos antenas bastan' (blanco) y 'para saber de donde viene.' (cian). Antes del cierre: dos diagramas cian gemelos en la MISMA escala (grados -90 a 90, dB -30 a 0) del factor de arreglo (S.factor_arreglo) con apuntamiento 0: arriba '2 antenas' con un lobulo ancho, abajo '8 antenas' con un lobulo estrecho y varios laterales; cifras cian '60 grados' y '13 grados' (ancho a -3 dB, medido con malla fina) y abajo '60 y 13 grados'."
     }
   ]
 }

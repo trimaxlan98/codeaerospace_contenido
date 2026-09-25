@@ -325,3 +325,17 @@ Esas imágenes no se pueden emitir. Un filtro de reconstrucción, después del c
 
 ### 8.1.4
 La cadena de transmisión completa: software, conversor, filtro, amplificador y antena. Técnicamente cualquier SDR que transmite puede hacerlo, pero legalmente no: transmitir requiere licencia y respetar la máscara. Recibir es libre; transmitir tiene reglas.
+
+## 8.2 Dos antenas: de dónde viene
+
+### 8.2.1
+Con dos antenas y dos receptores sincronizados, un SDR puede saber de dónde viene una señal. Si la onda llega inclinada, alcanza antes a una antena que a la otra, y esa distancia extra se convierte en una diferencia de fase entre las dos señales. Aquí la medimos: setenta y seis punto un grados.
+
+### 8.2.2
+La diferencia de fase depende de la separación entre antenas, de la longitud de onda y del seno del ángulo de llegada. Despejando el ángulo, con las antenas a media longitud de onda y algo de ruido, la estimación da veinticinco punto cero grados: exactamente la dirección de la que venía.
+
+### 8.2.3
+Pero si separamos más las antenas, a una longitud de onda completa, aparece un problema: la misma diferencia de fase la producen dos direcciones distintas, veinticinco y menos treinta y cinco punto dos grados. Por eso las antenas de un arreglo se ponen a media longitud de onda o menos.
+
+### 8.2.4
+Y con varias antenas, además de escuchar se puede apuntar: el arreglo suma las señales con el desfase justo y forma un haz que se orienta sin mover nada. Con dos antenas, el haz mide sesenta grados; con ocho, trece. Dos antenas bastan para saber de dónde viene.
