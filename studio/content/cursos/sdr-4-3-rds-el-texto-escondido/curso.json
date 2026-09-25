@@ -8,25 +8,25 @@
       "file": "clips/01-57-khz.py",
       "title": "1 · 57 kHz",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Espectro del MPX (ámbar) de 0 a 60 kHz con picos en 0, 19 (piloto, gris, marcado), 38 y los cuatro picos del RDS junto a 57 kHz, resaltado en una banda cian con marca punteada. Encima, tres flechas cian de 19 kHz cada una (0→19→38→57) con la etiqueta 'x3'. Pie gris: '1187.5 bit/s'. Cifra cian mostrada antes: '57 = 3 x 19'."
     },
     {
       "file": "clips/02-la-fase-que-salta.py",
       "title": "2 · La fase que salta",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Portadora ilustrativa (ambar, declarada 'escala ilustrativa' en gris) de 6 bits, un ciclo por medio bit, modulada por el signo real del bifase de S.rds_banda_base: una linea vertical roja de pico a valle marca cada cambio de signo real (9 de 11 fronteras), y donde el signo no cambia la onda sigue lisa sin marca. Debajo, 6 casillas grandes con los bits '0 0 0 1 1 0' (1 en ambar, 0 en gris). Pie cian: '192 muestras por bit'. Pie gris final: 'salto de 180 grados'."
     },
     {
       "file": "clips/03-bloques-y-sindrome.py",
       "title": "3 · Bloques y síndrome",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Fila de 26 casillas (16 datos en ambar, 10 de comprobacion en gris tenue) con el bit volteado en rojo y su celda marcada; debajo una flecha cian hacia el sindrome recalculado 'sindrome 0001111100' y una X roja grande con el pie cian 'ningun offset'. (Estado alterno, antes del bit volteado: marco verde en la fila, letra 'A' verde y pie 'offset A'.)"
     },
     {
       "file": "clips/04-el-nombre-de-la-emisora.py",
       "title": "4 · El nombre de la emisora",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia de cierre: 'La radio de siempre' en blanco y 'lleva datos escondidos.' en cian, centradas, sin ningun otro elemento (marco, casillas, cifras y bloques hex ya apagados)."
     }
   ]
 }
