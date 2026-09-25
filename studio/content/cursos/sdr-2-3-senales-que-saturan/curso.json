@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 2.3 Señales que saturan",
+  "description": "Lección 2.3 del curso Radio definida por software (módulo 2: ganancia y ruido), en 4 clips —una idea por clip—: dos tonos fuertes que al pasar por un amplificador no lineal siembran productos de intermodulación, la recta de 3 a 1 medida con su punto de intersección, una emisora de FM que desensibiliza al satélite débil y el filtro de banda que lo devuelve. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-intermodulacion.py",
+      "title": "1 · Intermodulación",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-la-recta-de-3-a-1.py",
+      "title": "2 · La recta de 3 a 1",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-el-bloqueo.py",
+      "title": "3 · El bloqueo",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-filtro-de-banda.py",
+      "title": "4 · El filtro de banda",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

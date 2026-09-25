@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 1.3 Las cicatrices del cero-IF",
+  "description": "Lección 1.3 del curso Radio definida por software (módulo 1: el receptor por dentro), en 4 clips —una idea por clip—: el pico en el centro del espectro que deja la fuga del oscilador y el bloqueador de DC que lo hunde, la imagen espejo que dejan I y Q desiguales, la corrección ciega que devuelve la elipse a círculo y la sintonía desplazada que aparta las cicatrices del canal. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-pico-del-centro.py",
+      "title": "1 · El pico del centro",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-i-y-q-desiguales.py",
+      "title": "2 · I y Q desiguales",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-corregir-el-desbalance.py",
+      "title": "3 · Corregir el desbalance",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-sintonizar-al-lado.py",
+      "title": "4 · Sintonizar al lado",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

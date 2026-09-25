@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 1.2 Mezclar es multiplicar",
+  "description": "Lección 1.2 del curso Radio definida por software (módulo 1: el receptor por dentro), en 4 clips —una idea por clip—: multiplicar dos ondas y ver la suma y la diferencia, la frecuencia imagen que un mezclador real no distingue, el mezclador complejo que desliza el espectro entero y cómo I y Q separan los dos lados del cero. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-suma-y-diferencia.py",
+      "title": "1 · Suma y diferencia",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-la-frecuencia-imagen.py",
+      "title": "2 · La frecuencia imagen",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-el-mezclador-complejo.py",
+      "title": "3 · El mezclador complejo",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-i-y-q-separan-los-lados.py",
+      "title": "4 · I y Q separan los lados",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

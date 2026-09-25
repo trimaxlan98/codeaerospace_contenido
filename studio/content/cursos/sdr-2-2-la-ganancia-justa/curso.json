@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 2.2 La ganancia justa",
+  "description": "Lección 2.2 del curso Radio definida por software (módulo 2: ganancia y ruido), en 4 clips —una idea por clip—: con poca ganancia la señal usa dos de los 256 niveles del conversor, con demasiada se recorta y siembra espurios, la curva medida de SINAD frente a ganancia con su punto dulce, y el control automático que sostiene una señal que se desvanece. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-poca-ganancia.py",
+      "title": "1 · Poca ganancia",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-demasiada-ganancia.py",
+      "title": "2 · Demasiada ganancia",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-el-punto-dulce.py",
+      "title": "3 · El punto dulce",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-control-automatico.py",
+      "title": "4 · El control automático",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

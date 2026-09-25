@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 2.1 El piso de ruido",
+  "description": "Lección 2.1 del curso Radio definida por software (módulo 2: ganancia y ruido), en 4 clips —una idea por clip—: el ruido térmico kTB que pone el piso y cómo sube con el ancho de banda, la cascada de Friis que decide quién pone el ruido, la sensibilidad como escalera de piso, figura de ruido y SNR mínima, y el amplificador de bajo ruido puesto en la antena. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-ktb.py",
+      "title": "1 · kTB",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-la-cascada-de-friis.py",
+      "title": "2 · La cascada de Friis",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-sensibilidad.py",
+      "title": "3 · La sensibilidad",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-lna-en-la-antena.py",
+      "title": "4 · El LNA en la antena",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

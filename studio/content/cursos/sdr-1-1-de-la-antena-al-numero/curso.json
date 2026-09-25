@@ -1,0 +1,16 @@
+{
+  "name": "SDR · 1.1 De la antena al número",
+  "description": "Lección 1.1 del curso Radio definida por software (módulo 1: el receptor por dentro), en 4 clips —una idea por clip—: la cadena de un receptor SDR y el corte del ADC, la ventana de 2.4 MHz que el oscilador local desliza por la banda de FM, los ocho bits del conversor y su relación señal-ruido medida, y el caudal de 38.4 Mbit/s que sale por el USB. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la hoja de datos.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {"file": "clips/01-la-cadena.py", "title": "1 · La cadena", "scene": "Clip1",
+     "final_state": "La cadena ANTENA→LNA→MEZCLADOR(LO)→FILTRO→ADC→USB→SOFTWARE con el ADC en ámbar, llaves 'circuito' y 'numeros' debajo, la hoja de datos en gris (24-1766 MHz, 2.4 MS/s, 8 bits) y el dato del precio abajo."},
+    {"file": "clips/02-una-ventana-que-se-mueve.py", "title": "2 · Una ventana que se mueve", "scene": "Clip2",
+     "final_state": "Espectro de la banda FM de 88 a 108 MHz con la ventana fucsia de 2.4 MHz en 96.4 MHz, cinco emisoras marcadas en ámbar, los bordes 95.2 y 97.6 MHz en fucsia y la cifra 'de 95.2 a 97.6 MHz'."},
+    {"file": "clips/03-ocho-bits.py", "title": "3 · Ocho bits", "scene": "Clip3",
+     "final_state": "Onda ámbar con su escalera de 8 bits y el carril de error rojo casi plano; panel con la SQNR medida de 8 bits (49.9 dB) y 12 bits (74 dB) y la cifra '6 dB por cada bit'."},
+    {"file": "clips/04-el-caudal.py", "title": "4 · El caudal", "scene": "Clip4",
+     "final_state": "Pantalla limpia con el cierre en dos líneas: 'La radio termina en el ADC.' (blanca) y 'Lo demas es aritmetica.' (cian)."}
+  ]
+}
