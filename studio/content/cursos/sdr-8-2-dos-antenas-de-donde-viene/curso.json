@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 8.2 Dos antenas: de dónde viene",
+  "description": "Lección 8.2 del curso Radio definida por software (módulo 8: más allá de escuchar), en 4 clips —una idea por clip—: la diferencia de fase entre dos antenas separadas media longitud de onda, el ángulo de llegada que se despeja de ella, la ambigüedad que aparece si se separan más y el barrido del arreglo. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-diferencia-de-fase.py",
+      "title": "1 · La diferencia de fase",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-angulo.py",
+      "title": "2 · El ángulo",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-ambiguedad.py",
+      "title": "3 · La ambigüedad",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-barrido.py",
+      "title": "4 · El barrido",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

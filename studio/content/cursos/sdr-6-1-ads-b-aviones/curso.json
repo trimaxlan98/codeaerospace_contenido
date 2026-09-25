@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 6.1 ADS-B: aviones",
+  "description": "Lección 6.1 del curso Radio definida por software (módulo 6: paquetes en el aire), en 4 clips —una idea por clip—: los pulsos de 1090 MHz con que cada avión anuncia quién es, el preámbulo que se busca por correlación y los falsos candidatos que el CRC descarta, los 112 bits por campos y el avión decodificado. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-pulsos-a-1090.py",
+      "title": "1 · Pulsos a 1090",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-preambulo.py",
+      "title": "2 · El preámbulo",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-112-bits.py",
+      "title": "3 · 112 bits",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-avion.py",
+      "title": "4 · El avión",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

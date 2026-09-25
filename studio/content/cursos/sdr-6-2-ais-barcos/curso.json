@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 6.2 AIS: barcos",
+  "description": "Lección 6.2 del curso Radio definida por software (módulo 6: paquetes en el aire), en 4 clips —una idea por clip—: la modulación GMSK a 9600 baudios, la regla NRZI que codifica en los cambios, la bandera HDLC y el bit de relleno, y el barco decodificado con su posición. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-gmsk-a-9600.py",
+      "title": "1 · GMSK a 9600",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-nrzi.py",
+      "title": "2 · NRZI",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-bandera-y-el-relleno.py",
+      "title": "3 · La bandera y el relleno",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-barco.py",
+      "title": "4 · El barco",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

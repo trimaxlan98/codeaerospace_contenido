@@ -8,25 +8,25 @@
       "file": "clips/01-el-espectro-del-mpx.py",
       "title": "1 · El espectro del MPX",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Espectro del MPX de 0 a 60 kHz, en ambar, con las cuatro regiones rotuladas en gris (L+R sombreada 0-15 kHz, piloto marcado en 19 kHz, L-R sombreada 23-53 kHz con sus cuatro lobulos, y la posicion vacia del RDS en 57 kHz). Dos lineas cian marcan los lobulos internos de L-R con la cifra '37.0 y 39.0 kHz' en el pie (S.pico)."
     },
     {
       "file": "clips/02-el-piloto.py",
       "title": "2 · El piloto",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Dos trazas fucsia apiladas, ya enganchado el PLL: arriba el piloto reconstruido (19 kHz, cos de la fase del NCO), abajo la subportadora regenerada (38 kHz, cos del doble de la fase) con el doble de ciclos. Formula cian en el pie: 38 = 2 x 19."
     },
     {
       "file": "clips/03-l-y-r.py",
       "title": "3 · L y R",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Dos trazas verdes apiladas (L 1 kHz arriba, R 3 kHz abajo, ya separadas de la matriz S+D/S-D) con el desfase de 5 grados introducido en el piloto; cifra cian en el pie: '48.4 dB' (S.separacion_db con la fase corrida)."
     },
     {
       "file": "clips/04-el-precio-del-estereo.py",
       "title": "4 · El precio del estéreo",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'El estereo viaja escondido,' en blanco y 'colgado de un piloto.' en cian, sobre fondo vacio (el triangulo de ruido rojo y su cifra +15.4 dB ya se apagaron)."
     }
   ]
 }

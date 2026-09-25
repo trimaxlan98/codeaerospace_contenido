@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 7.1 El Doppler de un pase",
+  "description": "Lección 7.1 del curso Radio definida por software (módulo 7: satélites), en 4 clips —una idea por clip—: la curva de Doppler de un satélite en órbita baja, el oscilador numérico que la sigue desde la predicción, la tasa máxima en el cenit y el residuo que deja un reloj adelantado. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-curva.py",
+      "title": "1 · La curva",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-receptor-la-sigue.py",
+      "title": "2 · El receptor la sigue",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-tasa.py",
+      "title": "3 · La tasa",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-lo-que-queda.py",
+      "title": "4 · Lo que queda",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

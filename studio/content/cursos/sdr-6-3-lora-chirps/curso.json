@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 6.3 LoRa: chirps",
+  "description": "Lección 6.3 del curso Radio definida por software (módulo 6: paquetes en el aire), en 4 clips —una idea por clip—: el chirp que barre la banda y cuyo punto de partida es el símbolo, el chirp conjugado que lo vuelve un tono, el factor de dispersión que alarga el símbolo y la decodificación por debajo del ruido. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-chirp.py",
+      "title": "1 · El chirp",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-quitar-el-chirp.py",
+      "title": "2 · Quitar el chirp",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-el-factor-de-dispersion.py",
+      "title": "3 · El factor de dispersión",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-bajo-el-ruido.py",
+      "title": "4 · Bajo el ruido",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

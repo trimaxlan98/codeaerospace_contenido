@@ -62,6 +62,22 @@ ok(np.allclose(10 ** (d1 / 10), po, rtol=1e-6),
 p = S.potencia_tono(3 * S.tono(1234.5, fs, 10000), 1234.5, fs)
 ok(abs(p - 9) < 1e-9, "potencia_tono exacta fuera de bin", p)
 
+xc = S.tono(0.125, 1.0, 2048)
+fz, dz = S.espectro_db(xc, 1.0, nfft=8192)
+ok(len(fz) == 8192 and abs(S.pico(fz, dz)[0] - 0.125) < 1e-4,
+   "espectro_db con nfft > len(x): rellena con ceros (no revienta)")
+f1_, d1_ = S.espectro_db(xc, 1.0, nfft=2048, ref="abs")
+fz_, dz_ = S.espectro_db(xc, 1.0, nfft=8192, ref="abs")
+ok(abs(d1_.max() - dz_.max()) < 0.01, "el relleno no cambia el nivel del tono en bin")
+
+ff = np.linspace(-240e3, 240e3, 1639)
+dd = -np.abs(ff) / 1e3
+fr, dr = S.para_dibujar(ff, dd, puntos=300)
+ok(fr[0] == ff[0] and fr[-1] == ff[-1] and len(fr) == 300,
+   "para_dibujar conserva los dos extremos (no tira la cola)")
+ok(abs(dr[0] - dr[-1]) <= abs(dd[1] - dd[0]) + 1e-9,
+   "para_dibujar de algo simetrico sale simetrico (a una muestra)")
+
 # ---------------------------------------------------------------------
 print("== 1.1 De la antena al numero ==")
 ok(S.caudal_bps() == 38.4e6, "caudal RTL = 38.4 Mbit/s", S.caudal_bps())

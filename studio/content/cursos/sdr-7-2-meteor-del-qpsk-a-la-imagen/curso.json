@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 7.2 Meteor: del QPSK a la imagen",
+  "description": "Lección 7.2 del curso Radio definida por software (módulo 7: satélites), en 4 clips —una idea por clip—: la constelación QPSK de 72 mil símbolos por segundo de Meteor-M, la palabra de sincronía que resuelve la ambigüedad de fase, el decodificador de Viterbi que borra los errores del canal y la imagen que se arma línea a línea. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-72-k-simbolos.py",
+      "title": "1 · 72 k símbolos",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-la-palabra-de-sincronia.py",
+      "title": "2 · La palabra de sincronía",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-viterbi.py",
+      "title": "3 · Viterbi",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-la-imagen.py",
+      "title": "4 · La imagen",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

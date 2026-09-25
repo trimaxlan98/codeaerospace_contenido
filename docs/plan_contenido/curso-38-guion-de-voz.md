@@ -87,3 +87,87 @@ El caso real: una emisora de FM potente y un satélite débil en ciento treinta 
 
 ### 2.3.4
 La solución es un filtro antes del amplificador que rechace la banda de FM. Con cuarenta decibelios de rechazo, la emisora llega convertida en casi nada y el satélite recupera toda su ganancia: cero decibelios de pérdida. Lo fuerte también estorba; por eso se filtra antes de amplificar.
+
+## 3.1 Sintonizar en software
+
+### 3.1.1
+El oscilador numérico es un contador de fase. En cada muestra le suma un paso fijo, que depende de la frecuencia que queremos, y da la vuelta al completar el círculo. De esa aguja salen dos columnas de números: el coseno, I, y el seno, Q. Eso es todo un oscilador en software.
+
+### 3.1.2
+Multiplicamos la captura entera por ese fasor. El espectro se desliza sin deformarse: la emisora más fuerte, que estaba en menos setecientos kilohercios, queda exactamente en cero. Sintonizar ya no es mover un circuito: es elegir el paso del contador.
+
+### 3.1.3
+Y como es solo aritmética, se puede hacer varias veces sobre la misma captura. Tres osciladores, tres desplazamientos: menos setecientos, más cien y más mil cien kilohercios. Cada copia pone su emisora en cero, con su propio filtro de canal. Tres receptores en uno.
+
+### 3.1.4
+Un detalle que muerde: si el contador se reinicia en cada bloque de muestras, la fase salta en cada frontera. En el espectro aparecen rayas falsas cada doscientos cuarenta hercios, a solo nueve punto cinco decibelios de la portadora. Con la fase continua, desaparecen.
+
+## 3.2 Filtrar y diezmar
+
+### 3.2.1
+Con la emisora ya en cero, falta aislarla. Un filtro de doscientos diecinueve coeficientes deja pasar el canal y hunde todo lo demás cincuenta y nueve punto tres decibelios. Las otras cuatro emisoras siguen en la captura, pero ya no molestan.
+
+### 3.2.2
+¿Para qué filtrar, si al final nos quedamos con menos muestras? Porque diezmar sin filtro pliega el espectro. Una emisora vecina, en quinientos kilohercios, cae dentro del canal, igual de fuerte que la nuestra. Con el filtro antes, queda más de sesenta decibelios por debajo.
+
+### 3.2.3
+Filtrar cuesta multiplicaciones. Un solo filtro que diezma por diez necesita cincuenta y dos punto seis millones por segundo. Partido en dos etapas, una ancha y barata y otra estrecha a menor tasa, bastan veintinueve punto cinco millones. Casi la mitad.
+
+### 3.2.4
+Así se baja por la escalera: de dos punto cuatro millones de muestras por segundo a doscientas cuarenta mil para el canal, y a cuarenta y ocho mil para el audio. Cincuenta veces menos datos. Primero se recorta, después se tira lo que sobra.
+
+## 3.3 El reloj que miente
+
+### 3.3.1
+El reloj del receptor no es perfecto. Un cristal barato puede equivocarse veinticinco partes por millón: a cien megahercios son dos punto cinco kilohercios de error; a mil noventa, más de veintisiete. Con un oscilador compensado de una parte por millón, el error casi desaparece.
+
+### 3.3.2
+¿Cómo se mide? Con una señal de frecuencia conocida. Esperábamos la referencia justo en cincuenta kilohercios y aparece tres mil ochocientos noventa y ocho hercios más arriba. Dividido entre su frecuencia, el error del cristal: veintisiete partes por millón.
+
+### 3.3.3
+Y el error no se queda quieto. Al calentarse, el cristal deriva, y en el waterfall la señal se inclina con los minutos. A cuatrocientos treinta y siete megahercios medimos novecientos veintiséis hercios de deriva en diez minutos.
+
+### 3.3.4
+La corrección es otra vez un oscilador numérico que resta, fila a fila, el error medido. La traza se endereza y queda un residuo de dos punto cuatro hercios. El cristal miente un poco; una señal conocida lo delata.
+
+## 4.1 El discriminador
+
+### 4.1.1
+En FM, el mensaje no cambia la amplitud: cambia la velocidad a la que gira el fasor. Cuando el mensaje sube, el fasor acelera; cuando baja, frena. Aquí lo mostramos a escala ilustrativa, mucho más lento que en una emisora real. La frecuencia instantánea es la velocidad de ese giro.
+
+### 4.1.2
+Para recuperar el mensaje basta comparar dos muestras seguidas. El ángulo entre una muestra y la anterior dice cuánto giró el fasor; multiplicado por la frecuencia de muestreo, es la frecuencia instantánea. La curva recuperada, en verde, cae exactamente sobre el mensaje original.
+
+### 4.1.3
+¿Cuánto ancho ocupa una FM? Con setenta y cinco kilohercios de desviación y un tono de quince, la regla de Carson dice ciento ochenta kilohercios. Medimos el ancho que contiene el noventa y ocho por ciento de la potencia: ciento ochenta punto cero. Con estéreo, la regla sube a doscientos cincuenta y seis.
+
+### 4.1.4
+Una rareza de la FM: el ruido a la salida del discriminador crece con la frecuencia, y los agudos llegan más sucios. Por eso la emisora refuerza los agudos y el receptor los atenúa con un filtro de setenta y cinco microsegundos. El ruido de audio baja doce punto dos decibelios.
+
+## 4.2 El múltiplex estéreo
+
+### 4.2.1
+Lo que sale del discriminador de una emisora de FM no es solo audio: es una señal múltiplex. De cero a quince kilohercios va la suma de los dos canales, lo que oye un radio mono. En diecinueve, un tono piloto. Entre veintitrés y cincuenta y tres, la diferencia entre izquierda y derecha. Y en cincuenta y siete, los datos.
+
+### 4.2.2
+El piloto es la clave. Un lazo de enganche de fase se sincroniza con él, y el error de fase cae por debajo de una centésima de radián. Al duplicar su fase sale la subportadora de treinta y ocho kilohercios, justo la que hace falta para bajar la diferencia a la banda de audio.
+
+### 4.2.3
+Con la suma y la diferencia, la matriz es aritmética: izquierda es suma más diferencia; derecha, suma menos diferencia. El tono de un kilohercio queda solo en el canal izquierdo y el de tres en el derecho, separados cincuenta y nueve punto tres decibelios. Con cinco grados de error de fase, aún quedan cuarenta y ocho.
+
+### 4.2.4
+Pero el estéreo tiene un precio. El ruido de la FM crece con la frecuencia, y la diferencia viaja justamente arriba, entre veintitrés y cincuenta y tres kilohercios. Ahí el ruido es quince punto cuatro decibelios mayor que en la banda mono. Por eso una emisora débil se oye mejor en mono.
+
+## 4.3 RDS: el texto escondido
+
+### 4.3.1
+La emisora esconde datos en cincuenta y siete kilohercios, justo tres veces el piloto. Así el receptor no necesita otro oscilador: le basta multiplicar por tres la fase del piloto que ya tiene enganchado. Por ahí viajan mil ciento ochenta y siete punto cinco bits por segundo.
+
+### 4.3.2
+Cada bit se codifica como un salto de fase: la subportadora da media vuelta, ciento ochenta grados. Con la portadora recuperada del piloto, el receptor ve esos saltos y lee los unos y los ceros. Cada bit ocupa ciento noventa y dos muestras.
+
+### 4.3.3
+Los bits vienen en bloques de veintiséis: dieciséis de datos y diez de comprobación. Con esos diez, el receptor calcula un síndrome; si coincide con una de cuatro palabras conocidas, el bloque está sano y además sabe qué bloque es. Basta un bit volteado para que no coincida con ninguna.
+
+### 4.3.4
+Cuatro grupos, cada uno con un bloque que trae dos letras: C y O, luego D y E, un espacio y F, y M con otro espacio. Se arma el nombre de la emisora, ficticia en este ejemplo: CODE FM, sin un solo bit errado. Y aun con doce bits errados por el ruido, las repeticiones devuelven el mismo nombre.

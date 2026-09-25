@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 5.3 El reloj de símbolo",
+  "description": "Lección 5.3 del curso Radio definida por software (módulo 5: sincronizar), en 4 clips —una idea por clip—: el precio en errores de muestrear a destiempo, el detector de Gardner y su curva S, el lazo que lleva el instante de muestreo al centro del ojo y la nube de la constelación que se aprieta. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-muestrear-a-destiempo.py",
+      "title": "1 · Muestrear a destiempo",
+      "scene": "Clip1",
+      "final_state": "Diagrama de ojo ambar (48 trazas de 2 simbolos, BPSK con raiz de coseno alzado en TX y RX, S.senal_con_pulsos) con la linea de muestreo fucsia y sus 48 muestras en 0.3 de simbolo; a la derecha la tabla desfase (gris 0.0-0.4) / BER medida a 7 dB en cian (S.ber_vs_desfase): 0.11 %, 0.22 %, 1.17 %, 4.79 %, 12.86 %, con las filas 0.0 y 0.3 encendidas y la marca fucsia en 0.3; gris beta = 0.35 y SNR 7 dB; cifra_pie cian 'x46 errores a 0.3 simbolo' (BER[3]/BER[0])."
+    },
+    {
+      "file": "clips/02-el-detector-de-gardner.py",
+      "title": "2 · El detector de Gardner",
+      "scene": "Clip2",
+      "final_state": "Curva S del detector de Gardner en cian (21 puntos de S.gardner_curva_s de -0.5 a 0.5 de simbolo, sin ruido): e < 0 a la izquierda, e > 0 a la derecha, flechas fucsia que empujan hacia el cero estable (punto verde en 0) y los ceros inestables en -0.5 y +0.5 marcados en rojo; formula_pie e = (y_k - y_{k-1}) y_{k-1/2}. (Antes, sobre una traza, las tres muestras dieron e = -0.02 a tiempo y e = 0.81 con 0.2 de simbolo de retraso, S.muestrear_en.)"
+    },
+    {
+      "file": "clips/03-el-lazo-converge.py",
+      "title": "3 · El lazo converge",
+      "scene": "Clip3",
+      "final_state": "Desfase efectivo del reloj (fucsia, TAU_L de S.lazo_reloj) en los primeros 400 simbolos: arranca en 0.37 (gris, guia punteada) y cae a la franja gris de +-0.05 alrededor de cero; ventana cian de los simbolos 200-400 y cifra_pie cian 'residuo 0.01 +- 0.02 simbolo' (media y desviacion de TAU_L[200:400])."
+    },
+    {
+      "file": "clips/04-la-nube-se-aprieta.py",
+      "title": "4 · La nube se aprieta",
+      "scene": "Clip4",
+      "final_state": "Cierre a pantalla limpia: 'Tres relojes que ajustar:' en blanco y 'frecuencia, fase y simbolo.' en cian. (Antes: plano IQ con la nube de los simbolos 1-59 ancha a lo largo de I y luego los ultimos 300 apretados en +-1; TAU_L entero a la derecha con la ventana cian; EVM medido (S.evm_pct) 35.4 % -> 6.4 % en cifra_pie.)"
+    }
+  ]
+}

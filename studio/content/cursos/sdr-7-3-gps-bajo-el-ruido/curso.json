@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 7.3 GPS bajo el ruido",
+  "description": "Lección 7.3 del curso Radio definida por software (módulo 7: satélites), en 4 clips —una idea por clip—: una señal GPS veinte decibelios por debajo del ruido, el código C/A de 1023 chips con su autocorrelación de tres valores, la rejilla de Doppler y fase de código que se barre y el pico que emerge. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-senal-no-se-ve.py",
+      "title": "1 · La señal no se ve",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-codigo-c-a.py",
+      "title": "2 · El código C/A",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-rejilla.py",
+      "title": "3 · La rejilla",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-pico.py",
+      "title": "4 · El pico",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

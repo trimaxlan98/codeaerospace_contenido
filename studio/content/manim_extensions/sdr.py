@@ -91,13 +91,21 @@ def espectro_db(x, fs, nfft=None, ventana_nombre="hann", ref=None,
     """
     x = np.asarray(x)
     nfft = int(nfft or min(len(x), 4096))
-    nseg = len(x) // nfft if promedios is None else int(promedios)
-    nseg = max(1, min(nseg, len(x) // nfft))
-    w = ventana(ventana_nombre, nfft)
-    acc = np.zeros(nfft)
-    for k in range(nseg):
-        seg = x[k * nfft:(k + 1) * nfft] * w
-        acc += np.abs(np.fft.fft(seg)) ** 2
+    if len(x) < nfft:
+        # senal mas corta que nfft: UN segmento con la ventana de su largo
+        # y FFT rellenada con ceros hasta nfft (interpola el espectro, no
+        # anade resolucion). Antes reventaba por el broadcast.
+        w = ventana(ventana_nombre, len(x))
+        acc = np.abs(np.fft.fft(x * w, nfft)) ** 2
+        nseg = 1
+    else:
+        nseg = len(x) // nfft if promedios is None else int(promedios)
+        nseg = max(1, min(nseg, len(x) // nfft))
+        w = ventana(ventana_nombre, nfft)
+        acc = np.zeros(nfft)
+        for k in range(nseg):
+            seg = x[k * nfft:(k + 1) * nfft] * w
+            acc += np.abs(np.fft.fft(seg)) ** 2
     p = np.fft.fftshift(acc / (nseg * np.sum(w) ** 2))
     f = np.fft.fftshift(np.fft.fftfreq(nfft, 1.0 / fs))
     if ref is None:
@@ -143,10 +151,14 @@ def para_dibujar(f, db, puntos=900, f_lo=None, f_hi=None):
     f, db = f[m], db[m]
     if len(f) <= puntos:
         return f, db
-    k = len(f) // puntos
-    n = k * puntos
-    return (f[:n].reshape(puntos, k).mean(axis=1),
-            db[:n].reshape(puntos, k).max(axis=1))
+    # array_split reparte TODAS las muestras (la version con reshape tiraba
+    # la cola derecha cuando len no era multiplo de `puntos`: un 8.5 % del
+    # espectro en un caso real del curso, y el dibujo salia asimetrico).
+    trozos_f = np.array_split(f, puntos)
+    trozos_d = np.array_split(db, puntos)
+    fc = np.array([t.mean() for t in trozos_f])
+    fc[0], fc[-1] = f[0], f[-1]          # conserva los extremos exactos
+    return fc, np.array([t.max() for t in trozos_d])
 
 
 def potencia_tono(x, f, fs):
