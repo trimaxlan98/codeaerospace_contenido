@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 4.2 El múltiplex estéreo",
+  "description": "Lección 4.2 del curso Radio definida por software (módulo 4: FM de radiodifusión), en 4 clips —una idea por clip—: el espectro de la señal múltiplex con sus cuatro habitantes, el lazo que se engancha al piloto de 19 kHz y regenera la subportadora de 38, la matriz que separa izquierda y derecha y el precio en ruido del estéreo. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-espectro-del-mpx.py",
+      "title": "1 · El espectro del MPX",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-el-piloto.py",
+      "title": "2 · El piloto",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-l-y-r.py",
+      "title": "3 · L y R",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-el-precio-del-estereo.py",
+      "title": "4 · El precio del estéreo",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

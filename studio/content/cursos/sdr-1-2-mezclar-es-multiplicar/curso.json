@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 1.2 Mezclar es multiplicar",
+  "description": "Lección 1.2 del curso Radio definida por software (módulo 1: el receptor por dentro), en 4 clips —una idea por clip—: multiplicar dos ondas y ver la suma y la diferencia, la frecuencia imagen que un mezclador real no distingue, el mezclador complejo que desliza el espectro entero y cómo I y Q separan los dos lados del cero. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-suma-y-diferencia.py",
+      "title": "1 · Suma y diferencia",
+      "scene": "Clip1",
+      "final_state": "Espectro del producto (0 a 250 MHz) con dos rayas ambar: 10.7 MHz y 189.9 MHz; abajo, en gris, 'FI de FM: 10.7 MHz · dato'."
+    },
+    {
+      "file": "clips/02-la-frecuencia-imagen.py",
+      "title": "2 · La frecuencia imagen",
+      "scene": "Clip2",
+      "final_state": "Eje de RF con la imagen (rojo, 78.9 MHz), el LO (fucsia, 89.6 MHz) y la deseada (ambar, 100.3 MHz); dos flechas caen a la misma raya de FI (10.7 MHz, gris, rotulo 'cae en la FI'); abajo, en cian, la formula f_LO - f_IF = f_imagen."
+    },
+    {
+      "file": "clips/03-el-mezclador-complejo.py",
+      "title": "3 · El mezclador complejo",
+      "scene": "Clip3",
+      "final_state": "Titulo visible arriba. Espectro de la captura real en BANDA BASE (eje de -1200 a 1200 kHz, offset del LO, con el 0 Hz marcado en gris): la emisora mas fuerte (S.emisoras_captura, -700 kHz) ya desplazada por el NCO hasta caer justo sobre el 0; abajo, en cian, '-700 kHz -> 0'."
+    },
+    {
+      "file": "clips/04-i-y-q-separan-los-lados.py",
+      "title": "4 · I y Q separan los lados",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre en dos lineas: 'Mezclar es mover el espectro.' (blanca) y 'Con I y Q, hacia un solo lado.' (cian)."
+    }
+  ]
+}

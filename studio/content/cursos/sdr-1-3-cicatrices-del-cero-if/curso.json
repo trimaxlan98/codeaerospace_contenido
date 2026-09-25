@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 1.3 Las cicatrices del cero-IF",
+  "description": "Lección 1.3 del curso Radio definida por software (módulo 1: el receptor por dentro), en 4 clips —una idea por clip—: el pico en el centro del espectro que deja la fuga del oscilador y el bloqueador de DC que lo hunde, la imagen espejo que dejan I y Q desiguales, la corrección ciega que devuelve la elipse a círculo y la sintonía desplazada que aparta las cicatrices del canal. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-pico-del-centro.py",
+      "title": "1 · El pico del centro",
+      "scene": "Clip1",
+      "final_state": "Espectro -400 a 400 kHz: tono en +180 kHz (ambar); marcador punteado gris en 0 Hz rotulado 'ya no hay pico' (ya no sobresale del piso de ruido); cifra cian 'quitar DC: -73.8 dBc'."
+    },
+    {
+      "file": "clips/02-i-y-q-desiguales.py",
+      "title": "2 · I y Q desiguales",
+      "scene": "Clip2",
+      "final_state": "Plano IQ a la izquierda (elipse punteada ambar, leve pero visible contra el circulo de referencia gris) y espectro -400 a 400 kHz a la derecha con el tono en +180 kHz y su imagen en -180 kHz marcada en rojo punteado, rotulada 'imagen'; cifra cian 'IRR = 28.9 dB'."
+    },
+    {
+      "file": "clips/03-corregir-el-desbalance.py",
+      "title": "3 · Corregir el desbalance",
+      "scene": "Clip3",
+      "final_state": "Plano IQ a la izquierda: circulo verde (corregido, ajustado al circulo de referencia); espectro -400 a 400 kHz a la derecha con el tono en +180 kHz y un marcador gris tenue en -180 kHz (la imagen, ya hundida); cifra cian 'mas de 80 dB'."
+    },
+    {
+      "file": "clips/04-sintonizar-al-lado.py",
+      "title": "4 · Sintonizar al lado",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia, cierre de leccion: 'El hardware barato deja cicatrices.' (blanco) y 'El software las cura.' (cian), a fondo negro con la marca de agua."
+    }
+  ]
+}

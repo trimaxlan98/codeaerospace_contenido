@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 3.3 El reloj que miente",
+  "description": "Lección 3.3 del curso Radio definida por software (módulo 3: del flujo al canal), en 4 clips —una idea por clip—: el error del cristal en partes por millón convertido en hercios a 100, 437 y 1090 MHz, la medida del error con una portadora de frecuencia conocida, la deriva térmica que inclina el waterfall y la corrección que la devuelve a su sitio. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-las-ppm.py",
+      "title": "1 · Las ppm",
+      "scene": "Clip1",
+      "final_state": "Tres barras cian en la misma escala (100/437/1090 MHz): 0.1/0.4/1.1 kHz, bajitas -- el TCXO de 1 ppm. Dato gris 'TCXO: 1 ppm' arriba a la izquierda."
+    },
+    {
+      "file": "clips/02-medir-el-error.py",
+      "title": "2 · Medir el error",
+      "scene": "Clip2",
+      "final_state": "Espectro 40-60 kHz: raya punteada gris 'esperada' en 50 kHz, pico ambar 'medida' corrido a la derecha con flecha cian entre ambas; cifra cian '+3898 Hz = 27.0 ppm'."
+    },
+    {
+      "file": "clips/03-la-deriva.py",
+      "title": "3 · La deriva",
+      "scene": "Clip3",
+      "final_state": "Waterfall completo (eje -24 a 24 kHz, 0 a 10 min) con la traza ambar inclinandose y su sobrepuesta cian trazando la misma curva; panel gris '437 MHz'/'2.2 ppm'; cifra cian '926 Hz en 10 min'."
+    },
+    {
+      "file": "clips/04-corregir.py",
+      "title": "4 · Corregir",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia, cierre de leccion: 'El cristal miente un poco.' (blanco) y 'Una senal conocida lo delata.' (cian), a fondo negro con la marca de agua."
+    }
+  ]
+}

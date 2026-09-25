@@ -92,6 +92,8 @@ def main() -> int:
     problemas = 0
     for d in sorted(CURSOS.glob(f"{a.prefijo}-*")):
         m = re.match(rf"{re.escape(a.prefijo)}-(\d+)-(\d+)-", d.name)
+        if not m:          # otro curso con el mismo prefijo (sdr-la-radio-...)
+            continue
         mod, lec = int(m.group(1)), int(m.group(2))
         if solo and f"{mod}.{lec}" not in solo:
             continue

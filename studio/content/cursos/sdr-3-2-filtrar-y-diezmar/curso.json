@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 3.2 Filtrar y diezmar",
+  "description": "Lección 3.2 del curso Radio definida por software (módulo 3: del flujo al canal), en 4 clips —una idea por clip—: el filtro de canal sobre la captura de 2.4 MS/s, la vecina que se pliega dentro del canal si se diezma sin filtrar, la cascada de dos etapas que cuesta casi la mitad y la escalera de tasas de 2.4 millones a 48 mil muestras por segundo. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-filtro-de-canal.py",
+      "title": "1 · El filtro de canal",
+      "scene": "Clip1",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/02-diezmar-sin-filtro.py",
+      "title": "2 · Diezmar sin filtro",
+      "scene": "Clip2",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/03-la-cascada.py",
+      "title": "3 · La cascada",
+      "scene": "Clip3",
+      "final_state": "PENDIENTE"
+    },
+    {
+      "file": "clips/04-de-2-4-m-a-48-k.py",
+      "title": "4 · De 2.4 M a 48 k",
+      "scene": "Clip4",
+      "final_state": "PENDIENTE"
+    }
+  ]
+}

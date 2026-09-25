@@ -1,0 +1,32 @@
+{
+  "name": "SDR · 3.1 Sintonizar en software",
+  "description": "Lección 3.1 del curso Radio definida por software (módulo 3: del flujo al canal), en 4 clips —una idea por clip—: el oscilador numérico que gira, el espectro que se desliza hasta poner una emisora en cero, tres receptores sacados de una sola captura y el espurio que deja un acumulador de fase que se reinicia. Formato mudo: la pantalla pone la cosa y su cifra; en cian lo calculado aquí, en gris la norma o el parámetro elegido.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-oscilador-numerico.py",
+      "title": "1 · El oscilador numérico",
+      "scene": "Clip1",
+      "final_state": "Pantalla quieta: a la izquierda el círculo del acumulador de fase con la aguja fucsia en su última posición y la estela de las 26 muestras visitadas (S.nco(37.5 kHz, 240 kS/s, n)); a la derecha la tabla n/I/Q con las 8 primeras muestras (I azul, Q violeta): n=0 → 1.00/-0.00 … n=7 → 0.83/-0.56. Abajo, en cian, la fórmula e^{-j2πfn/fs}."
+    },
+    {
+      "file": "clips/02-mover-el-espectro.py",
+      "title": "2 · Mover el espectro",
+      "scene": "Clip2",
+      "final_state": "Pantalla quieta con el espectro (ámbar) de la captura de 96.4 MHz en banda base (kHz relativos, -1200 a 1200): la emisora más fuerte, que estaba en -700 kHz, quedó centrada en 0 con su marca vertical; las otras cuatro emisoras siguen en sus offsets originales. Abajo, en cian, la cifra medida '-700 kHz -> 0' (S.pico antes/después del NCO)."
+    },
+    {
+      "file": "clips/03-tres-receptores-en-uno.py",
+      "title": "3 · Tres receptores en uno",
+      "scene": "Clip3",
+      "final_state": "Pantalla quieta con tres espectros ámbar apilados de la MISMA captura, cada uno con una banda verde de canal (±100 kHz) centrada en 0: fila 1 con el NCO en -700 kHz, fila 2 en 100 kHz y fila 3 en 1100 kHz (S.emisoras_captura, vía TRES), cada offset rotulado en cian a la derecha de su fila. Abajo, en gris, 'una sola captura'."
+    },
+    {
+      "file": "clips/04-la-fase-continua.py",
+      "title": "4 · La fase continua",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: dos líneas centradas, 'Sintonizar ya no es girar un dial.' en blanco y 'Es multiplicar por un fasor.' en cian, sin ningún otro elemento en pantalla."
+    }
+  ]
+}
