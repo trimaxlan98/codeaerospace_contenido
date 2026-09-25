@@ -8,25 +8,25 @@
       "file": "clips/01-intermodulacion.py",
       "title": "1 · Intermodulación",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Espectro 96-100.5 MHz (ventana rectangular, bins exactos) dibujado como cuatro rayas limpias: dos tonos ambar en 98.1/98.5 MHz (gris) y dos productos de intermodulacion rojos en 97.7/98.9 MHz, ya crecidos tras subir la entrada; rotulos de frecuencia bajo cada raya (gris/cian) y cifra_pie cian '97.7 y 98.9 MHz'."
     },
     {
       "file": "clips/02-la-recta-de-3-a-1.py",
       "title": "2 · La recta de 3 a 1",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Marco a mano entrada dB / salida dB con puntos medidos de la fundamental (ambar) y el IM3 (rojo), sus rectas ajustadas extendidas en punteado hasta cruzarse en un punto cian arriba a la derecha; cifra_pie cian 'IIP3 = 11.2 dB' (antes se mostro 'pendiente 1.00 y 3.00')."
     },
     {
       "file": "clips/03-el-bloqueo.py",
       "title": "3 · El bloqueo",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Eje de frecuencia 90-145 MHz con la raya ambar de la emisora en 98.1 MHz (grande, rotulo 'emisora FM') y la raya verde del satelite en 137.1 MHz ya hundida (rotulo 'satelite'); bloque AMPLIFICADOR como contexto arriba a la izquierda, sin flecha desde el eje; cifra_pie cian '-11.2 dB'."
     },
     {
       "file": "clips/04-el-filtro-de-banda.py",
       "title": "4 · El filtro de banda",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Lo fuerte tambien estorba.' en blanco y 'Filtra antes de amplificar.' en cian."
     }
   ]
 }

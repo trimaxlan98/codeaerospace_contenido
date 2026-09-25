@@ -71,8 +71,8 @@ class Clip4(Scene):
                   Transform(tag_marca, tag_marca2),
                   FadeOut(flecha), run_time=2.0)
         self.wait(1.2)
-        rot.mostrar(dato_pie("canal centrado en cero"), zona="abajo",
-                    run_time=0.5)
+        rot.mostrar(cifra_pie(f"canal: +{OFFSET / 1e3:.0f} kHz -> 0"),
+                    zona="abajo", run_time=0.5)
         self.wait(5.0)
 
         cierre_leccion(self, rot, "El hardware barato deja cicatrices.",

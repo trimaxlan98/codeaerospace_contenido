@@ -155,7 +155,7 @@ Dibujo:
 
 | Lote | Módulos | Lecciones | Aporta a la librería | Estado |
 |---|---|---|---|---|
-| 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ~ clips (5/6 aprobadas) |
+| 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ✔ qh, voz y mux (13.9 min) |
 | 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | ~ esqueletos listos, agentes 3.1/3.2 |
 | 3 | 5–6 | 5.1–6.3 | Costas, Gardner, ADS-B, AIS, LoRa | — |
 | 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | — |
@@ -176,15 +176,15 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 
 | Lección | plan | clips | ql ✔ frames | PR | qh | voz | mux |
 |---|---|---|---|---|---|---|---|
-| 1.1 | ✔ | ✔ | ✔ | — | — | — | — |
-| 1.2 | ✔ | ✔ | ✔ | — | — | — | — |
-| 1.3 | ✔ | ✔ | ✔ | — | — | — | — |
-| 2.1 | ✔ | ✔ | ✔ | — | — | — | — |
-| 2.2 | ✔ | ✔ | ✔ | — | — | — | — |
-| 2.3 | ✔ | ~ | — | — | — | — | — |
-| 3.1 | ✔ | ~ | — | — | — | — | — |
+| 1.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 1.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 1.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 2.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 2.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 2.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 3.1 | ✔ | ✔ | ✔ | — | — | — | — |
 | 3.2 | ✔ | ~ | — | — | — | — | — |
-| 3.3 | ✔ | — | — | — | — | — | — |
+| 3.3 | ✔ | ✔ | ✔ | — | — | — | — |
 | 4.1 | ✔ | — | — | — | — | — | — |
 | 4.2 | ✔ | — | — | — | — | — | — |
 | 4.3 | ✔ | — | — | — | — | — | — |
@@ -422,8 +422,10 @@ La revisión de fotogramas del orquestador devolvió (los agentes aprobaban su p
 - 1.3: la elipse del desbalance (5 %, 3°) era invisible: se exagera SOLO el dibujo y se declara («dibujo exagerado»).
 - 2.1: una cifra vieja bajo un dibujo ya reordenado; la escalera de sensibilidad sin el escalón de SNR; luego, al rehacerla, **escalas locales** que ponían −107.9 y −133.9 dBm a la misma altura.
 - 2.2: renderizó con 6 fotogramas en vez de 8.
+- **La prosa en `dato_pie` fue la falta más repetida** (2.3 ×3, 3.3, 3.1, y una que se me pasó a mí en 1.3.4 y solo cazó la hoja de interiores): el gris no es un carril de narración. Ya está en el contrato.
 - Los agentes reportan a veces «la hoja 2×2 parece encimada pero el PNG está limpio»: en las hojas del orquestador no se vio tal efecto; si se repite, mirar los PNG sueltos.
 
 ## 16. Hitos globales
 
 - 2026-09-24 · plan y rama `curso/sdr-completo`.
+- 2026-09-25 · **lote 1 entregado**: 6 lecciones / 24 clips en `qh` (`render_jobs/qh/sdr-1-*`, `sdr-2-*`), voz edge es-MX-JorgeNeural sintetizada en local (24 wavs, ninguno acelerado), 6 montajes con intro y cierre en `exports/sdr-*/curso_narrado.mp4` = **13.9 min** (2:16–2:22 cada uno), picos de los clips entre −2.9 y −1.5 dB, marca sonora −6.0 dB. La hoja de interiores de las 24 piezas cazó una frase metida en el carril gris (1.3.4) que la revisión pieza a pieza había dejado pasar.
