@@ -311,3 +311,17 @@ El pase de Meteor dura unos quince minutos y medio sobre el horizonte. En ese ti
 
 ### 8.3.4
 Y al final del pase, la imagen. Sintética en este ejemplo, pero con la misma cadena que recibiría una real: sin un solo error. Desde la antena hasta el último píxel, todo fue aritmética. Una radio es aritmética; ahora sabes leerla.
+
+## 8.1 Transmitir
+
+### 8.1.1
+Hasta ahora solo escuchamos. Para transmitir, la cadena va al revés, y el primer eslabón es el conversor digital analógico. No dibuja la onda suave: sostiene cada muestra hasta la siguiente y entrega escalones. Esa forma de escalera tiene una firma en frecuencia: una envolvente sinc.
+
+### 8.1.2
+Los escalones crean copias del tono en cada múltiplo de la frecuencia de muestreo, a los dos lados: son imágenes. La más fuerte queda a diecinueve punto uno decibelios del tono, justo lo que predice la envolvente sinc. Medido y teoría coinciden.
+
+### 8.1.3
+Esas imágenes no se pueden emitir. Un filtro de reconstrucción, después del conversor, deja pasar el tono y hunde todas las copias. Solo entonces el espectro cabe dentro de la máscara, el límite de emisiones que marca la norma.
+
+### 8.1.4
+La cadena de transmisión completa: software, conversor, filtro, amplificador y antena. Técnicamente cualquier SDR que transmite puede hacerlo, pero legalmente no: transmitir requiere licencia y respetar la máscara. Recibir es libre; transmitir tiene reglas.
