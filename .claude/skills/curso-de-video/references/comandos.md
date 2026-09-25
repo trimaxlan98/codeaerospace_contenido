@@ -13,6 +13,8 @@ para los worktrees.
 | Env del backend en el VPS | `/etc/manimstudio/env` (fuera del repo; hay que cargarlo a mano) |
 | ffmpeg | **solo local**; el VPS no lo tiene |
 | Worktree para no estorbar al checkout principal | `git worktree add ../codeaerospace_contenido-<tema> -b curso/<tema> origin/main` |
+| …y enlazar sus renders al segundo disco | `cd ../codeaerospace_contenido-<tema> && ln -s ~/data/codeaerospace/render_jobs render_jobs && ln -s ~/data/codeaerospace/exports exports` |
+| Quitar el worktree tras el merge | `git worktree remove ../codeaerospace_contenido-<tema> && git branch -d curso/<tema>` (ver SKILL.md, «Quitar el worktree») |
 
 ## 1. Validar la librería ANTES de escribir clips
 
