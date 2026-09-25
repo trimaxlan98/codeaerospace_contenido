@@ -8,25 +8,25 @@
       "file": "clips/01-pulsos-a-1090.py",
       "title": "1 · Pulsos a 1090",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "La traza |IQ| completa (600 muestras, 300 us) arriba en ambar; debajo, el zoom a los 8 primeros bits (DF+CA) con sus valores leidos muestra a muestra en cian: 1 0 0 0 1 1 0 1. Abajo, gris: 'SNR 12 dB'."
     },
     {
       "file": "clips/02-el-preambulo.py",
       "title": "2 · El preámbulo",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "El patron del preambulo (gris, arriba-izq) y la curva de correlacion completa (cian) sobre las 585 posiciones. Dos marcas: verde 'aceptado' en el offset 137 (el CRC lo confirma) y rojo 'rechazado' en el pico mas alto, offset 251 (el CRC lo descarta). Abajo, rojo: '1 candidato falso'."
     },
     {
       "file": "clips/03-112-bits.py",
       "title": "3 · 112 bits",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Los 112 bits como fila de casillas por campo: DF+CA gris, ICAO+datos ambar, CRC cian (recuadrado). Debajo, una flecha baja a los 24 bits reales del campo CRC (TrenBits, cian: 1 1 0 1 1 1 0 1 1 1 0 1 1 0 1 0 0 0 0 1 1 1 1 0). Abajo, cian: 'CRC: 0 errores'."
     },
     {
       "file": "clips/04-el-avion.py",
       "title": "4 · El avión",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre de la leccion, dos lineas centradas: 'Cada avion dice quien es' (blanco) y 'un par de veces por segundo.' (cian). Las dos tarjetas verdes (0D0C38/CODE101 ficticia y 4840D6/KLM1023 real) ya se apagaron."
     }
   ]
 }

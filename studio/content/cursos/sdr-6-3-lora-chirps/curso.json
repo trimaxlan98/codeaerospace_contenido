@@ -8,25 +8,25 @@
       "file": "clips/01-el-chirp.py",
       "title": "1 · El chirp",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el eje tiempo/frecuencia (+62.5/-62.5 kHz) y los 4 dientes de sierra de SF7 ya dibujados (simbolos 0, 40, 90, 17), cada uno con un punto y una etiqueta cian en su inicio. Abajo, cifra_pie cian 'T simbolo 1.02 ms'."
     },
     {
       "file": "clips/02-quitar-el-chirp.py",
       "title": "2 · Quitar el chirp",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "El espectro (128 bins, eje 0-127) con un unico pico agudo en el bin 90, marcado con una linea discontinua cian; abajo, cifra_pie cian 'simbolo 90'."
     },
     {
       "file": "clips/03-el-factor-de-dispersion.py",
       "title": "3 · El factor de dispersión",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Dos carriles acortados y desplazados a la izquierda, en la misma escala de tiempo: arriba 32 dientes de SF7 apretados, abajo un unico diente de SF12 que ocupa el mismo ancho; entre ambos, bajo los dientes, la etiqueta cian '32x'. A la derecha, en la franja libre junto a los carriles (sin cruzar ninguna linea), el panel cian con SF7 1.02 ms / SF9 4.10 ms / SF12 32.8 ms. Abajo, cifra_pie cian '32x mas largo'."
     },
     {
       "file": "clips/04-bajo-el-ruido.py",
       "title": "4 · Bajo el ruido",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Mas lento, mas lejos.' en blanco y 'Por debajo del ruido.' en cian, sin ningun otro elemento en pantalla."
     }
   ]
 }

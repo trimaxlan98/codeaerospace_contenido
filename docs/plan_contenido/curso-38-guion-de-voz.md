@@ -171,3 +171,87 @@ Los bits vienen en bloques de veintiséis: dieciséis de datos y diez de comprob
 
 ### 4.3.4
 Cuatro grupos, cada uno con un bloque que trae dos letras: C y O, luego D y E, un espacio y F, y M con otro espacio. Se arma el nombre de la emisora, ficticia en este ejemplo: CODE FM, sin un solo bit errado. Y aun con doce bits errados por el ruido, las repeticiones devuelven el mismo nombre.
+
+## 5.1 La constelación que gira
+
+### 5.1.1
+Una señal QPSK debería dar cuatro puntos. Pero el reloj del transmisor y el del receptor nunca coinciden del todo, y esa pequeña diferencia de frecuencia hace que cada símbolo llegue girado un poco más que el anterior: aquí, uno punto tres grados. Símbolo a símbolo, los cuatro puntos se estiran en un anillo.
+
+### 5.1.2
+El truco es elevar cada muestra a la cuarta potencia. Los cuatro puntos de la QPSK, a cuarenta y cinco, ciento treinta y cinco, doscientos veinticinco y trescientos quince grados, caen en el mismo sitio. La modulación desaparece, y en el espectro queda una sola raya: en cuatro veces el giro.
+
+### 5.1.3
+Basta medir dónde está esa raya y dividir entre cuatro. La estimación da uno punto tres tres dos grados por símbolo, con un error de tres décimas por millón de la tasa de símbolos. Sin saber nada de los datos, el receptor ya conoce su propio error.
+
+### 5.1.4
+Se corrige girando cada símbolo en sentido contrario, y el anillo vuelve a ser cuatro racimos. Pero fíjate: quedan girados un ángulo fijo. La frecuencia ya está; la fase todavía no. De eso se encarga el siguiente lazo.
+
+## 5.2 El lazo de Costas
+
+### 5.2.1
+Para la fase se usa un detector muy simple. En BPSK los símbolos deberían estar sobre el eje I. Si llegan girados, aparece una componente Q, y el producto de I por Q dice cuánto y hacia qué lado: positivo si giró hacia un lado, negativo hacia el otro, cero cuando está en su sitio.
+
+### 5.2.2
+Ese error alimenta un oscilador numérico que corrige la fase poco a poco. La fase del oscilador, en fucsia, persigue a la real hasta pegarse a ella, y el anillo de la constelación se convierte en dos puntos. Con este ancho de lazo, engancha en unos ciento trece símbolos.
+
+### 5.2.3
+El ancho del lazo es un compromiso. Un lazo estrecho tarda en engancharse, unos novecientos símbolos, pero luego apenas tiembla: un grado y medio. Uno ancho engancha en treinta símbolos, pero tiembla más de cinco grados. No hay un ajuste gratis: se elige según la señal.
+
+### 5.2.4
+Y hay una trampa. El detector no distingue un giro de cero grados de uno de ciento ochenta, así que si la fase arranca lejos, el lazo engancha al revés y todos los bits salen negados. La solución es codificar la diferencia entre bits: aunque todo llegue invertido, las diferencias no cambian, y los datos salen limpios.
+
+## 5.3 El reloj de símbolo
+
+### 5.3.1
+Queda un tercer reloj: el de los símbolos. El diagrama de ojo muestra cuándo conviene muestrear, justo en el centro, donde el ojo está más abierto. Si muestreamos a destiempo, los errores se disparan: con tres décimas de símbolo de retraso, cuarenta y seis veces más errores que en el centro.
+
+### 5.3.2
+El detector de Gardner mide ese desfase con tres muestras: la anterior, la del medio y la actual. Si muestreamos a tiempo, el error es casi cero; si vamos retrasados, sale positivo. Su curva cruza el cero en el centro del símbolo, que es un punto estable, y otra vez en los bordes, que son inestables.
+
+### 5.3.3
+Con ese error, un lazo ajusta el instante de muestreo. Arranca con treinta y siete centésimas de símbolo de desfase y en unos cien símbolos se asienta cerca de cero. Medido en la ventana final, queda un residuo de una centésima, con dos de temblor.
+
+### 5.3.4
+Se nota en la constelación. Con el reloj desfasado, la nube es ancha: un error de treinta y cinco por ciento. Cuando el lazo converge, se aprieta en dos puntos: seis punto cuatro por ciento. Tres relojes que ajustar antes de leer un bit: frecuencia, fase y símbolo.
+
+## 6.1 ADS-B: aviones
+
+### 6.1.1
+Cada avión comercial transmite su identidad en mil noventa megahercios. La señal es una ráfaga de pulsos: un bit por microsegundo, codificado por la posición del pulso. Alto y luego bajo es un uno; bajo y luego alto, un cero. Un receptor de treinta dólares los ve sin esfuerzo.
+
+### 6.1.2
+Primero hay que encontrar dónde empieza el mensaje, correlacionando la captura con el preámbulo, un patrón fijo de cuatro pulsos. El pico más alto no siempre es el bueno: aquí, un trozo de datos se parecía al preámbulo. La comprobación lo rechaza, y acepta el verdadero.
+
+### 6.1.3
+El mensaje tiene ciento doce bits, por campos: el tipo, la dirección única del avión, cincuenta y seis bits de datos y veinticuatro de comprobación. El receptor recalcula esos veinticuatro con el resto del mensaje: si coinciden, el mensaje llegó sin errores.
+
+### 6.1.4
+Y aparece el avión: su dirección única y su indicativo, CODE uno cero uno. Es un avión ficticio, pero el mismo decodificador lee un mensaje real: el vuelo KLM mil veintitrés. Cada avión dice quién es un par de veces por segundo.
+
+## 6.3 LoRa: chirps
+
+### 6.3.1
+LoRa usa otro truco: cada símbolo es un chirp, una señal cuya frecuencia sube por todo el canal de ciento veinticinco kilohercios y da la vuelta. El dato no está en la forma, sino en dónde empieza la subida. Aquí, los símbolos cero, cuarenta, noventa y diecisiete; cada uno dura un milisegundo.
+
+### 6.3.2
+Para leerlo, el receptor multiplica por un chirp que baja. Las dos rampas se cancelan y queda un tono puro, de frecuencia constante. Su transformada de Fourier tiene un solo pico, justo en el símbolo transmitido: noventa.
+
+### 6.3.3
+El factor de dispersión decide cuánto dura cada chirp. Con factor doce, el chirp es treinta y dos veces más largo que con factor siete: casi treinta y tres milisegundos por símbolo. Se transmite más lento, pero cada símbolo acumula mucha más energía.
+
+### 6.3.4
+Esa energía permite algo sorprendente. Aquí el chirp está veinte decibelios por debajo del ruido: la señal no se ve. Pero tras quitar el chirp, la transformada muestra un pico claro en el símbolo correcto. En simulación ideal, el factor doce aguanta hasta menos veintitrés decibelios.
+
+## 6.2 AIS: barcos
+
+### 6.2.1
+Los barcos también se anuncian: el sistema AIS transmite en dos canales cerca de ciento sesenta y dos megahercios, a nueve mil seiscientos bits por segundo. Usa GMSK: la frecuencia cambia con cada bit, pero suavizada por un filtro gaussiano, así la fase sube y baja sin saltos.
+
+### 6.2.2
+Los bits no van tal cual. Con la regla NRZI, un cero cambia el nivel y un uno lo mantiene. Así, al receptor no le importa si la señal llegó invertida: solo mira dónde hay cambios.
+
+### 6.2.3
+El mensaje va entre dos banderas: cero, seis unos, cero. Para que esa secuencia nunca aparezca dentro de los datos, tras cinco unos seguidos el transmisor mete un cero de relleno, que el receptor quita. En esta trama de doscientos treinta y tres bits hizo falta uno.
+
+### 6.2.4
+Con la comprobación correcta, sale el barco: su identificación, su posición, diecinueve grados norte y noventa y nueve oeste, doce punto tres nudos y rumbo de ochenta y siete grados. Es un barco ficticio, pero así se anuncian todos.
