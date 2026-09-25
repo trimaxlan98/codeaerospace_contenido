@@ -154,6 +154,7 @@ prefijo delante del `·` y son más de una:
 | **Procesamiento de señales** | **30** | **27** |
 | Tesis 6G | 12 | 36 |
 | Rendimiento SQL | 21 | 37 |
+| SDR | 24 | 38 |
 
 `Procesamiento de señales` es la familia más grande del índice: 30 proyectos
 numerados de 1.1 a 10.3, que la vista de Proyectos ordena por etiqueta y por
@@ -607,3 +608,23 @@ logicas, segundos). El cian sigue siendo «calculado aqui»: la libreria
 reproduce fila por fila el generador determinista de la base de ejemplo, y
 sus conteos coinciden con el motor (el cliente 1 da 149,970 filas, el
 EQ_ROWS del histograma real).
+
+
+## Curso 38 — Radio definida por software (familia «SDR»)
+
+Familia horizontal de **24 lecciones / 96 clips** (8 modulos x 3), estilo
+CONSOLA, narrada sin subtitulos y sin «Modulo 0N», ~57 min. Libreria `sdr.py`
+con sonda de 130 invariantes. Es la version completa del curso 8 («SDR: la
+radio hecha software», 8 clips), que queda como introduccion divulgativa.
+
+El arco: *una radio es una cadena de aritmetica y cada eslabon deja una huella
+medible*. Del ADC de 8 bits y el caudal de 38.4 Mbit/s (1.1) a la estacion
+completa que recibe una imagen de Meteor-M con margen de 16.9 dB (8.3), pasando
+por mezcla e IQ, ruido y ganancia, NCO y diezmado, FM estereo con RDS,
+Costas y Gardner, ADS-B, AIS, LoRa, Doppler, Viterbi y GPS bajo el ruido.
+
+Roles de color propios: fucsia = lo que PONE el receptor (LO, NCO, lazo);
+gris = norma, hoja de datos o parametro elegido. Las senales «reales» se
+construyen a norma y se decodifican en pantalla (aviones, barcos y emisoras
+ficticios, declarados como tales; un mensaje ADS-B real sirve de oraculo).
+

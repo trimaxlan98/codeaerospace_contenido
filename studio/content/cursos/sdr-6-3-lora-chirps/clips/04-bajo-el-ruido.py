@@ -72,9 +72,9 @@ class Clip4(Scene):
         self.wait(3.2)
 
         # --- los tres umbrales, en cian -------------------------------------
-        panel = panel_cifras(f"SF7  {fmt(UMBRAL[7], 1)}",
-                             f"SF9  {fmt(UMBRAL[9], 1)}",
-                             f"SF12 {fmt(UMBRAL[12], 1)}")
+        panel = panel_cifras(f"SF7  {fmt(UMBRAL[7], 1)} dB",
+                             f"SF9  {fmt(UMBRAL[9], 1)} dB",
+                             f"SF12 {fmt(UMBRAL[12], 1)} dB")
         self.play(FadeIn(panel), run_time=0.6)
         self.wait(4.4)
 
