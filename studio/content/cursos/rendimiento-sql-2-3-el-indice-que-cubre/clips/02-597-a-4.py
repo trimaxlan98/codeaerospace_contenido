@@ -86,7 +86,7 @@ class Clip2(Scene):
         primero = VGroup(q, cont, arbol, et_hojas, hoja, guia, tabla, t_tabla,
                          flecha, cruz, et_sin)
         self.play(FadeOut(primero), run_time=0.7)
-        rot.limpiar(run_time=0.3)
+        rot.limpiar("abajo", run_time=0.3)
 
         largo = 8.0
         maximo = M["c501_lookup"]

@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 7.1 La caja negra",
+  "description": "Lección 7.1 del curso Rendimiento de SQL Server (módulo 7: en producción), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-query-store.py",
+      "title": "1 · Query Store",
+      "scene": "Clip1",
+      "final_state": "Línea de tiempo de 6 intervalos dentro de la caja del recorder, cada uno con su caja de 'planes' y su barra de 'métricas' resaltados; rótulo 'un registro por intervalo'."
+    },
+    {
+      "file": "clips/02-la-regresion.py",
+      "title": "2 · La regresión",
+      "scene": "Clip2",
+      "final_state": "Línea de tiempo con 3 barras verdes (22,363 lecturas, ámbar) y 3 barras rojas (459,555 lecturas, ámbar) separadas por 'entra el plan B'; pie cian '21x mas lecturas'."
+    },
+    {
+      "file": "clips/03-forzar-el-plan.py",
+      "title": "3 · Forzar el plan",
+      "scene": "Clip3",
+      "final_state": "Línea de tiempo con 2 barras rojas (459,555) y 4 barras verdes (22,363, ámbar) tras 'se fuerza aqui'; pie 'mismo plan, cada vez'."
+    },
+    {
+      "file": "clips/04-abortar.py",
+      "title": "4 · Abortar una consulta",
+      "scene": "Clip4",
+      "final_state": "Pantalla de cierre, dos líneas: 'Lo que no se registra' / 'no se puede arreglar.' (cian)."
+    }
+  ]
+}

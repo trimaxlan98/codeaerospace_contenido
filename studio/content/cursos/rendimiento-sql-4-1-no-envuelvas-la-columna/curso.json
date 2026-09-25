@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 4.1 No envuelvas la columna",
+  "description": "Lección 4.1 del curso Rendimiento de SQL Server: por qué envolver la columna fecha_pedido en una función (YEAR, CONVERT, DATEADD) apaga el índice y obliga a leer la lista entera, mientras que un rango o un CAST bien puesto la dejan intacta. Formato mudo: en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-que-es-sargable.py",
+      "title": "1 · Qué es sargable",
+      "scene": "Clip1",
+      "final_state": "El índice ordenado por fecha_pedido, código arriba y la franja centrados como un bloque: seis años rotulados en zigzag debajo de sus tramos (ancho real), el de 2025 encendido en verde entre sus dos marcas con el rótulo SARG y, debajo, en cian, sus 418,481 filas."
+    },
+    {
+      "file": "clips/02-year.py",
+      "title": "2 · YEAR() lo lee todo",
+      "scene": "Clip2",
+      "final_state": "El duelo en escala logarítmica: barra roja 'índice completo' con 7,182 lecturas contra barra verde 'solo el rango' con 1,975 lecturas (ambas ámbar); abajo, en cian, 418,481 filas de 2025."
+    },
+    {
+      "file": "clips/03-cast-si-convert-no.py",
+      "title": "3 · CAST sí, CONVERT no",
+      "scene": "Clip3",
+      "final_state": "La consulta con CONVERT(CHAR(10), ...) en rojo, arriba, y la fila del índice —más grande y más abajo, llenando el cuadro— encendida entera en rojo con los rótulos 'no hay rango' y 'scan'; sin cifra ámbar inventada, porque no hay medición para ese caso."
+    },
+    {
+      "file": "clips/04-mover-el-calculo.py",
+      "title": "4 · Mover el cálculo",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección: pantalla limpia con las dos líneas 'La columna va sola.' (blanco) y 'El cálculo, del otro lado.' (cian)."
+    }
+  ]
+}

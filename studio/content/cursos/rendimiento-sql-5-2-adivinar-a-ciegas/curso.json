@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 5.2 Adivinar a ciegas",
+  "description": "Un mismo WHERE id_cliente = 1: escrito como literal el optimizador lee el histograma y acierta con un scan; escrito como variable local adivina 8 filas de la densidad promedio, elige seek + lookup, y le llegan 149,970: el duelo final mide el costo de esa mala apuesta.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-literal.py",
+      "title": "1 · El literal",
+      "scene": "Clip1",
+      "final_state": "Histograma esquematico violeta con su torre iluminada en cian (149,970 filas, cliente 1); abajo el operador Scan con el borde ya en ambar y el pie ambar 22,363 lecturas."
+    },
+    {
+      "file": "clips/02-variable.py",
+      "title": "2 · La variable: estima 8",
+      "scene": "Clip2",
+      "final_state": "El histograma apagado (gris) detras de una barra plana violeta rotulada 'el promedio' con la cifra cian ~8 filas; abajo el plan elegido Lookup <- Seek, con el Lookup resaltado en violeta."
+    },
+    {
+      "file": "clips/03-llegan-149970.py",
+      "title": "3 · Llegan 149,970",
+      "scene": "Clip3",
+      "final_state": "Dos flechas entrando al mismo operador Lookup (ya con el borde en ambar): la violeta delgada '~8 filas / lo que creia' y la cian gruesa '149,970 filas / lo que llego'; debajo el contador ambar en 450,173 (lecturas reales) y el pie cian ~18,900x de error."
+    },
+    {
+      "file": "clips/04-el-costo-de-errar.py",
+      "title": "4 · El costo de errar",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia de cierre con las dos lineas: 'Una mala estimacion' (blanco) y 'es un mal plan.' (cian)."
+    }
+  ]
+}

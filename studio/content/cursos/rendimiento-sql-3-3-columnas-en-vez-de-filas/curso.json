@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 3.3 Columnas en vez de filas",
+  "description": "La misma tabla de detalle guardada por filas o por columnas: una suma que solo necesita dos columnas abre todas las páginas en el almacén por filas pero solo dos segmentos en el de columnas; los 3.75 millones de renglones se reparten en cuatro rowgroups, el motor procesa en lotes de ~900 en vez de fila por fila, y termina contando las lecturas distinto: 16,468 contra 6,512 con un solo hilo.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-filas-contra-columnas.py",
+      "title": "1 · Filas contra columnas",
+      "scene": "Clip1",
+      "final_state": "Los segmentos 'cantidad' y 'precio_unitario' llenos en verde a la derecha (por columnas) junto a las 4 páginas encendidas en rojo a la izquierda (por filas); abajo 'una pagina, 4 columnas' y '2 de 4 columnas' en verde, con 'solo 2 columnas' remarcado sobre el código."
+    },
+    {
+      "file": "clips/02-rowgroups.py",
+      "title": "2 · Grupos de filas",
+      "scene": "Clip2",
+      "final_state": "Los 4 rowgroups (el último más angosto) con el primero enmarcado y, debajo, sus 4 segmentos de columna comprimidos con los nombres reales; pie 'comprimido' junto a '604,272 en el ultimo' y '4 rowgroups' en cian."
+    },
+    {
+      "file": "clips/03-lotes.py",
+      "title": "3 · Lotes",
+      "scene": "Clip3",
+      "final_state": "Dos pistas horizontales: arriba el punto de 'modo fila' al final de su recorrido paso a paso, abajo el cuadro de 'modo batch' tras sus saltos de ~900; pie cian '~4,167 lotes'."
+    },
+    {
+      "file": "clips/04-columnstore.py",
+      "title": "4 · Leer menos columnas",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: 'Para sumar millones:' en blanco y 'guarda columnas, no filas.' en cian."
+    }
+  ]
+}

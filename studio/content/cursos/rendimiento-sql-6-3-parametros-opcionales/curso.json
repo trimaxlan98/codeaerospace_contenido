@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 6.3 Parámetros opcionales",
+  "description": "Una consulta con filtros opcionales (IS NULL OR) usa un plan genérico que cuesta 20,010 lecturas para un cliente; SQL Server 2025 lo bifurca con OPPO a 6, y el SQL dinámico llega al mismo 6 sin depender de esa función, con la honestidad de que los filtros sin índice propio siguen costando 20,005.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-la-consulta-comodin.py",
+      "title": "1 · La consulta comodín",
+      "scene": "Clip1",
+      "final_state": "El procedimiento buscar_pedidos, resaltado, con el rótulo 'un solo plan' arriba; a su izquierda las tres llamadas (solo cliente, solo estatus, solo fecha), cada una con su flecha entrando a la misma caja."
+    },
+    {
+      "file": "clips/02-plan-generico.py",
+      "title": "2 · Plan genérico",
+      "scene": "Clip2",
+      "final_state": "El plan Select <- Filter <- Scan pedidos, en rojo, con el contador en 20,010 lecturas (ámbar) y el rótulo 'para el cliente 501' encima."
+    },
+    {
+      "file": "clips/03-oppo.py",
+      "title": "3 · OPPO",
+      "scene": "Clip3",
+      "final_state": "Un muro de páginas en rojo con los rótulos 'estatus y fecha' arriba y 'sin índice propio' debajo, y la cifra 20,005 lecturas en ámbar en el pie; el duelo previo (20,010 contra 6) ya se apagó."
+    },
+    {
+      "file": "clips/04-sql-dinamico.py",
+      "title": "4 · SQL dinámico",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la lección: 'Un plan por forma de pregunta,' en blanco y 'no uno para todas.' en cian."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 7.3 La tienda está lenta",
+  "description": "Cierre del curso: la tienda entera, 300 peticiones de cuatro tipos, pasa de 53 a 3.9 segundos aplicando los cuatro arreglos de las lecciones anteriores (la llave olvidada, el índice que cubre, el tipo del parámetro y no envolver la columna).",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-en-que-se-espera.py",
+      "title": "1 · En qué se espera",
+      "scene": "Clip1",
+      "final_state": "Los cuatro tipos de consulta de la tienda (login, mis pedidos, el ticket, reporte) listados dentro de un panel de Query Store, con una flecha cian y el rótulo 'ordenar por lecturas' señalando que el motor puede compararlas; las barras ilustrativas de espera (leer paginas / esperar a otro / CPU) ya se apagaron."
+    },
+    {
+      "file": "clips/02-53-segundos.py",
+      "title": "2 · 53 segundos",
+      "scene": "Clip2",
+      "final_state": "Un reloj con la manecilla detenida y el contador ámbar en 53, rótulo 'segundos' debajo: el tiempo medido que tarda el servidor, sin los arreglos, en atender las 300 peticiones (también medidas, mostradas antes en el mismo contador ámbar) de los cuatro tipos de la tienda."
+    },
+    {
+      "file": "clips/03-cuatro-arreglos.py",
+      "title": "3 · Cuatro arreglos",
+      "scene": "Clip3",
+      "final_state": "Cuatro filas apiladas, una por tipo de petición (el ticket, mis pedidos, login, reporte), cada una con el ícono rojo de su problema (llave, viaje de ida y vuelta, N' tachada, YEAR( tachado), una línea corta de código con el arreglo y una palomita verde: los cuatro arreglos de lecciones anteriores, sin nombrarlas ni mostrar cifras nuevas."
+    },
+    {
+      "file": "clips/04-3-9-segundos.py",
+      "title": "4 · 3.9 segundos",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con las dos líneas de cierre del CURSO completo: 'Medir, leer el plan, leer menos.' en blanco y 'Eso es optimizar.' en cian, después del duelo lineal de barras (53 s en rojo contra 3.9 s en verde, ambas ámbar) y la razón 13.6x en cian."
+    }
+  ]
+}

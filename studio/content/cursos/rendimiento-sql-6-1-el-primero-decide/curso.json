@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 6.1 El primero decide",
+  "description": "Lección 6.1 del curso Rendimiento de SQL Server (módulo 6: parámetros), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-un-plan-para-todos.py",
+      "title": "1 · Un plan para todos",
+      "scene": "Clip1",
+      "final_state": "La cache de planes queda con una unica caja 'Plan' y el rotulo 'mismo plan, otro valor'; tres llamadas con id_cliente distintos (501, 2500, 1) ya la alimentaron: la primera en gris (compilar), las otras dos en verde (reusar)."
+    },
+    {
+      "file": "clips/02-501-primero.py",
+      "title": "2 · El 501 primero",
+      "scene": "Clip2",
+      "final_state": "Duelo logaritmico: barra verde 'cliente 501' en 597 lecturas contra barra roja 'cliente 1' en 459,555 lecturas (ambar), con '770x mas lecturas' en cian en el carril inferior."
+    },
+    {
+      "file": "clips/03-mayorista-primero.py",
+      "title": "3 · El mayorista primero",
+      "scene": "Clip3",
+      "final_state": "Duelo logaritmico de barras IGUALES: 'cliente 1' en verde y 'cliente 501' en rojo, ambas en 22,363 lecturas (ambar), con el rotulo 'mismo costo, dos clientes'."
+    },
+    {
+      "file": "clips/04-el-sesgo.py",
+      "title": "4 · El sesgo",
+      "scene": "Clip4",
+      "final_state": "Cierre de la leccion sobre pantalla limpia: 'El primero que llega' en tinta y 'decide por todos.' en cian."
+    }
+  ]
+}
