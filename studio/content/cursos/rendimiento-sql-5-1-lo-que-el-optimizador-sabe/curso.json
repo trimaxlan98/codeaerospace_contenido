@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 5.1 Lo que el optimizador sabe",
+  "description": "Lección 5.1 del curso Rendimiento de SQL Server (módulo 5: lo que el optimizador cree), en 4 clips —una idea por clip—. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-histograma.py",
+      "title": "1 · El histograma",
+      "scene": "Clip1",
+      "final_state": "181 barras violeta (escala lineal) con una recortada y marcada 'sigue'; un paso de ejemplo señalado con RANGE_HI_KEY/EQ_ROWS; abajo, 181 pasos (cian) y maximo 200 pasos (gris, dato)."
+    },
+    {
+      "file": "clips/02-el-paso-del-mayorista.py",
+      "title": "2 · El paso del mayorista",
+      "scene": "Clip2",
+      "final_state": "La torre real del cliente 1 sin recortar junto a la pared plana del resto; 149,970 EQ_ROWS en cian (del histograma) y 149,970 EQ_ROWS en ambar (medido) con el tag 'coincide con el motor'; panel DBCC SHOW_STATISTICS."
+    },
+    {
+      "file": "clips/03-densidad.py",
+      "title": "3 · Densidad",
+      "scene": "Clip3",
+      "final_state": "Duelo logaritmico: barra cian 149,970 filas (cliente real) contra barra violeta plana 7.9 filas (cualquier cliente, 'mismo para todos'); formula 1500000/189248 ≈ 7.9 abajo."
+    },
+    {
+      "file": "clips/04-cuando-se-actualiza.py",
+      "title": "4 · Cuándo se actualiza",
+      "scene": "Clip4",
+      "final_state": "Cierre de la leccion: 'El optimizador no lee la tabla:' / 'lee su resumen.' sobre pantalla limpia, tras la barra lineal de filas modificadas cruzando el umbral nuevo (38,729) mucho antes que el viejo (300,500)."
+    }
+  ]
+}

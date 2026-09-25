@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 4.3 LIKE, ISNULL y OR",
+  "description": "Lección 4.3 del curso Rendimiento de SQL Server (módulo 4: sargabilidad), en 4 clips —una idea por clip—: LIKE 'Gar%' salta a un tramo de una lista ordenada de apellidos mientras LIKE '%cia' la revisa entera aunque el resultado final sea el mismo; ISNULL envuelve la columna y convierte un seek en un scan; sobre una columna que no admite nulos el optimizador quita el ISNULL por su cuenta; y un OR entre dos columnas con índice se resuelve con dos seeks que se unen. Formato mudo: la pantalla pone la cosa y su cifra; en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-prefijo-y-sufijo.py",
+      "title": "1 · Prefijo y sufijo",
+      "scene": "Clip1",
+      "final_state": "Las dos columnas de la lista ordenada de apellidos, todas en rojo (revisadas por completo tras LIKE '%cia'), con el pie cian mostrando los 10,165 clientes que en verdad se apellidan Garcia."
+    },
+    {
+      "file": "clips/02-isnull.py",
+      "title": "2 · ISNULL",
+      "scene": "Clip2",
+      "final_state": "El código con ISNULL(telefono, '') marcado en rojo, el duelo de barras en escala logarítmica (envuelta en rojo, comparación directa en verde, cada una con su lectura ámbar) y el pie cian con los 39,854 teléfonos nulos que motivaron el ISNULL."
+    },
+    {
+      "file": "clips/03-not-null.py",
+      "title": "3 · La columna NOT NULL",
+      "scene": "Clip3",
+      "final_state": "El código ya con 'WHERE email' (el ISNULL desvanecido), el árbol grande del índice con su ruta raíz-intermedio-hoja encendida en verde, el contador ámbar en 3 lecturas y el rótulo violeta 'el optimizador lo quita'."
+    },
+    {
+      "file": "clips/04-dos-seeks.py",
+      "title": "4 · Dos seeks",
+      "scene": "Clip4",
+      "final_state": "Pantalla de cierre con las dos líneas finales: 'El motor busca rangos.' en blanco y 'Dale rangos que pueda ver.' en cian, tras apagar el plan horizontal completo (Select, Concatenation y los dos Index Seek con su árbol y su ruta verde)."
+    }
+  ]
+}

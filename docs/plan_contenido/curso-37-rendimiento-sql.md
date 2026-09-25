@@ -69,14 +69,14 @@ Público general de YouTube: sabe qué es una tabla y ha escrito un `SELECT ... 
 
 | Lección | Proyecto | 4 clips |
 |---|---|---|
-| 1.1 | La página: lo que cuesta leer | tienda · muro de páginas · buscar por llave · buscar sin índice |
-| 1.2 | Lo que pasa al ejecutar | de texto a plan · muchos planes, un costo · el plan guardado · estimado contra real |
-| 1.3 | Leer un plan | derecha a izquierda · scan, seek, lookup · tres formas de unir · ocho hilos |
-| 2.1 | El árbol B | ordenar es encontrar · bajar tres niveles · el árbol crece lento · seek contra scan |
-| 2.2 | El viaje de vuelta: lookup | índice por cliente · 191 viajes · el mayorista · punto de inflexión |
-| 2.3 | El índice que cubre | INCLUDE · 597 a 4 · el mayorista también · SELECT * lo rompe |
-| 3.1 | El orden de las llaves | dos órdenes · entregado casi no cambia · cancelado sí · igualdad primero |
-| 3.2 | Índices que no se ven | 2,791 pendientes · índice filtrado · la llave olvidada · el ticket: 18,016 a 3 |
+| 1.1 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 1.2 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 1.3 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 2.1 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 2.2 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 2.3 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 3.1 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
+| 3.2 | ✔ | ✔ | ✔ | #90 ✔ | — | ✔ | ✔ | ✔ |
 | 3.3 | Columnas en vez de filas | filas contra columnas · rowgroups · lotes · 16,468 contra 6,512 |
 | 4.1 | No envuelvas la columna | qué es sargable · YEAR() · CAST sí, CONVERT no · mover el cálculo |
 | 4.2 | El tipo equivocado | VARCHAR y NVARCHAR · CONVERT_IMPLICIT · 960 contra 3 · el arreglo |
@@ -137,9 +137,9 @@ Dibujo:
 
 | Lote | Lecciones | Estado |
 |---|---|---|
-| 1 | 1.1–3.1 (7) + 3.2 | clips ✔ revisados; PR del lote |
-| 2 | 3.2–5.2 (7) | esqueletos ✔ |
-| 3 | 5.3–7.3 (7) | esqueletos ✔ |
+| 1 | 1.1–3.2 (8) | ✔ PR #90, qh, voz y mux |
+| 2 | 3.3–5.3 (7) | ✔ qh, voz y mux; PR 2 |
+| 3 | 6.1–7.3 (6) | ✔ qh, voz y mux; PR 2 |
 
 ## 11. Receta de lote
 
@@ -165,19 +165,19 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 | 2.3 | ✔ | ✔ | ✔ | ~ | — | — | — | — |
 | 3.1 | ✔ | ✔ | ✔ | ~ | — | — | — | — |
 | 3.2 | ✔ | ✔ | ✔ | ~ | — | — | — | — |
-| 3.3 | ✔ | ~ | — | — | — | — | — | — |
-| 4.1 | ✔ | ~ | — | — | — | — | — | — |
-| 4.2 | ✔ | ~ | — | — | — | — | — | — |
-| 4.3 | ✔ | — | — | — | — | — | — | — |
-| 5.1 | ✔ | — | — | — | — | — | — | — |
-| 5.2 | ✔ | — | — | — | — | — | — | — |
-| 5.3 | ✔ | — | — | — | — | — | — | — |
-| 6.1 | ✔ | — | — | — | — | — | — | — |
-| 6.2 | ✔ | — | — | — | — | — | — | — |
-| 6.3 | ✔ | — | — | — | — | — | — | — |
-| 7.1 | ✔ | — | — | — | — | — | — | — |
-| 7.2 | ✔ | — | — | — | — | — | — | — |
-| 7.3 | ✔ | — | — | — | — | — | — | — |
+| 3.3 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 4.1 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 4.2 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 4.3 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 5.1 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 5.2 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 5.3 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 6.1 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 6.2 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 6.3 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 7.1 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 7.2 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
+| 7.3 | ✔ | ✔ | ✔ | ~ | — | ✔ | ✔ | ✔ |
 
 ## 13. Storyboard
 
@@ -342,6 +342,21 @@ Intención: el espectador sale sabiendo que el motor lee **páginas de 8 KB** y 
 - `Indicate(color=X)` hace ida y vuelta de color y deshace un `set_color` en el mismo `play`.
 - A 480p (`ql`) Rajdhani junta «cl» y «cliente» parece «diente»; la `@` de Space Mono parece «ä». A 1080p se leen bien: no se corrige en `ql`.
 
+## 15bis. Cosecha de trampas de los lotes 2 y 3
+
+- **`rot.limpiar()` sin zona borra también el título**: dos agentes lo usaron a mitad de clip y el título desaparecía; la hoja de interiores lo cazó (pieza a pieza no se notaba). A mitad de clip, `rot.limpiar("abajo")`.
+- **`S.operador` encoge el nombre si no cabe**, y bajo 22 px Rajdhani se come el espacio («Variantecliente»). Nombres de dos palabras con `ancho=` suficiente.
+- **El ámbar se cuela como resaltado**: bordes de operadores, tachas y hasta un rótulo «sobre 200,000 clientes» salieron en ámbar. Solo cifras medidas.
+- **`dato_pie` no es para frases ni para nombres del motor**: «el orden ya no sirve · dato» y «LCK_M_IX · dato». Frases fuera; nombres del motor como `tag_hud` gris junto a lo que nombran.
+- **Un detalle técnico falso en el código de pantalla**: `VARCHAR(50)` para una columna que es `VARCHAR(120)`. Los agentes no leen el esquema: el orquestador lo revisa.
+- **Precisión falsa**: `~4,167 lotes` sobre un `~900` aproximado → `~4,200`.
+- **Paneles de código que tapan el título** (`move_to(UP * 2.15)` con 4–5 líneas) y **operadores en el carril de la cifra**: los dos defectos de maquetación más repetidos después de «deja media pantalla vacía».
+- Dos agentes redondearon con buen criterio lo que el storyboard no fijaba (la escala lineal con torre recortada en el histograma, no repetir la razón de 5.2 en 5.1): el storyboard puede dejar elecciones abiertas si el contrato dice qué no se negocia.
+
 ## 16. Hitos
 
 - 2026-09-24: plan, librería `sqlperf.py` y sonda (0 fallos).
+- 2026-09-24: molde 1.1 escrito y revisado; 20 lecciones por agentes Sonnet (olas de 3), cada una revisada por el orquestador fotograma a fotograma y devuelta con correcciones cuando hizo falta (1.2, 1.3, 2.1, 2.3, 3.1, 4.1, 4.3, 6.3, 7.2 volvieron al agente; otras las corrigió el orquestador).
+- 2026-09-24: PR #90 fusionado (lote 1, 1.1–3.2).
+- 2026-09-25: **las 21 lecciones producidas**: 84 clips en `qh` 1080p60 (`render_jobs/qh/rendimiento-sql-*`), voz edge es-MX-JorgeNeural sintetizada EN LOCAL desde `curso-37-guion-de-voz.md` (84 wavs, ninguno acelerado por el mux), y **21 montajes con intro y cierre en `exports/rendimiento-sql-*/curso_narrado.mp4`: 48.1 min**, de 2:13 a 2:23 cada uno, picos de los clips entre −1.1 y −3.0 dB, marca sonora −6.0 dB. Hojas de interiores de las 84 piezas revisadas (cazaron un título borrado por `rot.limpiar()` y cajas tapadas por un `Indicate`).
+- Pendiente (a decisión del dueño): subir las 21 lecciones a la base de producción de ManimStudio (`subir_curso.py` + adopción de los `qh`) y la voz en el VPS.

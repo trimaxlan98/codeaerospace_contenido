@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 4.2 El tipo equivocado",
+  "description": "La columna email es VARCHAR pero la aplicación la busca con un parámetro NVARCHAR; por precedencia de tipos SQL Server convierte la columna entera, no el parámetro, y el índice ordenado deja de servir para un seek: el plan pasa de Index Seek a Index Scan con el aviso CONVERT_IMPLICIT, las lecturas suben de 3 a 960, y el arreglo es declarar el parámetro con el tipo de la columna.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-varchar-nvarchar.py",
+      "title": "1 · VARCHAR y NVARCHAR",
+      "scene": "Clip1",
+      "final_state": "Las cinco entradas del indice ordenado por email, ya en rojo (convertidas), bajo las cajas VARCHAR/NVARCHAR con la flecha de precedencia; abajo, 'el orden ya no sirve'."
+    },
+    {
+      "file": "clips/02-convert-implicit.py",
+      "title": "2 · CONVERT_IMPLICIT",
+      "scene": "Clip2",
+      "final_state": "El plan con Index Scan email en rojo, el aviso triangular ambar junto a Select con el rotulo CONVERT_IMPLICIT, y el tag 'recorre todo'."
+    },
+    {
+      "file": "clips/03-960-contra-3.py",
+      "title": "3 · 960 contra 3",
+      "scene": "Clip3",
+      "final_state": "El duelo en escala logaritmica: barra verde '3 lecturas' (con VARCHAR) contra barra roja '960 lecturas' (con NVARCHAR, sobre 200,000 clientes); abajo, '320x menos lecturas' en cian."
+    },
+    {
+      "file": "clips/04-el-arreglo.py",
+      "title": "4 · El arreglo",
+      "scene": "Clip4",
+      "final_state": "El cierre de la leccion: 'El tipo del parametro' / 'es el tipo de la columna.' sobre fondo limpio."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 5.3 El motor que aprende",
+  "description": "Lección 5.3: una variable de tabla que el optimizador viejo supone de 1 fila (plan violeta delgado) hasta que el motor la compila después de llenarla; y una función escalar que se llama 500 veces por separado hasta que el motor la funde en la consulta (inlining). Dos duelos de tiempo medido: 1.8 s a 0.67 s, y 17.6 s a 0.85 s.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-variable-de-tabla.py",
+      "title": "1 · Variable de tabla",
+      "scene": "Clip1",
+      "final_state": "La caja @t llena con 149,970 filas (cian) y, abajo, el plan Join <- Scan @t con una flecha delgada violeta rotulada 'cree 1 fila'."
+    },
+    {
+      "file": "clips/02-compilacion-diferida.py",
+      "title": "2 · Compilación diferida",
+      "scene": "Clip2",
+      "final_state": "Duelo lineal de tiempos: barra verde 0.67 s (compila despues) contra barra roja 1.8 s (compila antes), ambas ambar, con '2.7x menos tiempo' en cian."
+    },
+    {
+      "file": "clips/03-funcion-escalar.py",
+      "title": "3 · Función escalar",
+      "scene": "Clip3",
+      "final_state": "El contador gris de llamadas detenido en 500 junto a la caja de fn_TotalCliente con su bucle, y abajo el tiempo medido 17.6 s en ambar."
+    },
+    {
+      "file": "clips/04-inlining.py",
+      "title": "4 · Inlining",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia con el cierre de la leccion: 'Actualizar el motor' en blanco y 'tambien es optimizar.' en cian."
+    }
+  ]
+}

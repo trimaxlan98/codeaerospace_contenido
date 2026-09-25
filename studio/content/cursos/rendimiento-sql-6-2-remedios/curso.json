@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 6.2 Remedios",
+  "description": "Lección 6.2 del curso Rendimiento de SQL Server: cuatro remedios al sesgo de 6.1, del más quirúrgico al de fondo —RECOMPILE, OPTIMIZE FOR, un índice para los dos clientes, y por qué el PSP automático no bastó—. Formato mudo: en ámbar lo que midió SQL Server 2025, en cian lo calculado aquí.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-recompile.py",
+      "title": "1 · RECOMPILE",
+      "scene": "Clip1",
+      "final_state": "Dos carriles verdes (501 y el mayorista), cada uno con su propia barra de compilar y su propio plan bueno (Seek + Lookup / Scan); el rótulo 'no hay plan guardado' y la cifra 22.363 lecturas en el pie."
+    },
+    {
+      "file": "clips/02-optimize-for.py",
+      "title": "2 · OPTIMIZE FOR",
+      "scene": "Clip2",
+      "final_state": "El duelo de barras en escala logarítmica: verde 597 lecturas (el típico) contra roja 459.555 (el mayorista, forzado al mismo plan); cifra '770x mas caro' en el pie."
+    },
+    {
+      "file": "clips/03-un-indice-para-todos.py",
+      "title": "3 · Un índice para todos",
+      "scene": "Clip3",
+      "final_state": "El duelo antes/despues del mayorista con el nuevo indice: roja 459.555 (el remedio anterior) contra verde 1.974; cifra '233x menos lecturas' en el pie."
+    },
+    {
+      "file": "clips/04-psp.py",
+      "title": "4 · La ayuda que no llegó",
+      "scene": "Clip4",
+      "final_state": "Cierre de la lección a pantalla limpia: 'El mejor remedio' en blanco y 'es un indice que sirva a todos.' en cian."
+    }
+  ]
+}

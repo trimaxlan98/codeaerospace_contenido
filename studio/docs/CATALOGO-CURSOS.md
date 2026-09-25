@@ -153,6 +153,7 @@ prefijo delante del `·` y son más de una:
 | Protocolos de Internet | 24 | 25 |
 | **Procesamiento de señales** | **30** | **27** |
 | Tesis 6G | 12 | 36 |
+| Rendimiento SQL | 21 | 37 |
 
 `Procesamiento de señales` es la familia más grande del índice: 30 proyectos
 numerados de 1.1 a 10.3, que la vista de Proyectos ordena por etiqueta y por
@@ -586,3 +587,23 @@ recomponiendo, y una pieza se midió con una versión vieja: el manifiesto
 decía 29.9 s y el render dio 30.5. Lo avisó `render_vertical` ("la voz se
 alinea con el manifiesto: cuádralos antes de narrar"). Tras volver a medir,
 las 18 piezas de contenido coinciden **al centésimo** con su render.
+
+
+## Curso 37 — Rendimiento de SQL Server
+
+Familia horizontal de **21 lecciones / 84 clips** (7 modulos x 3), estilo
+CONSOLA, narrada sin subtitulos, ~48 min. Libreria `sqlperf.py`. Primer
+curso de la coleccion sobre bases de datos y primero **sin la etiqueta
+«Modulo 0N»** en pantalla: el dueño la considero ruido visual y
+`hud_modulo()` aborta el render en estos `style_block`.
+
+El arco: *una consulta no se paga en segundos, se paga en paginas*. De la
+pagina de 8 KB (1.1) a una tienda que baja de 53 s a 3.9 s (7.3), pasando
+por arboles B, lookups, indices que cubren, sargabilidad, histogramas,
+parameter sniffing, Query Store y bloqueos.
+
+Rol de color nuevo: **ambar = lo que midio SQL Server 2025** (lecturas
+logicas, segundos). El cian sigue siendo «calculado aqui»: la libreria
+reproduce fila por fila el generador determinista de la base de ejemplo, y
+sus conteos coinciden con el motor (el cliente 1 da 149,970 filas, el
+EQ_ROWS del histograma real).

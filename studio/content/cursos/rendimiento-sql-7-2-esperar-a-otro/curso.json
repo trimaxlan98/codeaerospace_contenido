@@ -1,0 +1,32 @@
+{
+  "name": "Rendimiento SQL · 7.2 Esperar a otro",
+  "description": "Lección 7.2 del curso Rendimiento de SQL Server (módulo 7: en producción): dos carriles de tiempo, uno por usuario (A y B), muestran cuánto dura abierta una transacción y cuánto espera la otra. Lección de dibujo —casi sin cifras medidas—: candados, un almacén de versiones y los nombres reales que muestra el motor (LCK_M_S, OBJECT X, XACT) junto a lo que nombran, en gris.",
+  "quality": "qh",
+  "style_block": "style_block.py",
+  "clips": [
+    {
+      "file": "clips/01-el-bloqueo.py",
+      "title": "1 · El bloqueo",
+      "scene": "Clip1",
+      "final_state": "Dos carriles de tiempo: la barra de A (transaccion abierta) termina y pasa a gris tras el COMMIT; la barra de B, que crecio en rojo junto al rotulo LCK_M_S, se vuelve verde con 'continua'."
+    },
+    {
+      "file": "clips/02-rcsi.py",
+      "title": "2 · Leer sin esperar",
+      "scene": "Clip2",
+      "final_state": "La barra de A sigue creciendo en rojo (su transaccion sigue abierta); entre los dos carriles, el pedido junto a su 'version anterior' en el almacen de versiones; la barra de B es corta y verde desde el inicio, con 'no espera'."
+    },
+    {
+      "file": "clips/03-escalamiento.py",
+      "title": "3 · Escalamiento",
+      "scene": "Clip3",
+      "final_state": "Entre los dos carriles, un solo candado rojo grande (OBJECT X) reemplazo la rejilla de candados de fila; las barras de A y B siguen creciendo juntas en rojo, la de B junto al rotulo LCK_M_IX: tambien quedo atrapada."
+    },
+    {
+      "file": "clips/04-optimized-locking.py",
+      "title": "4 · Optimized locking",
+      "scene": "Clip4",
+      "final_state": "Pantalla limpia (cierre_leccion): 'Leer no deberia esperar' en blanco y 'a escribir.' en cian, tras ver las dos barras verdes (OBJECT IX y XACT en A, una barra corta 'de inmediato' en B)."
+    }
+  ]
+}
