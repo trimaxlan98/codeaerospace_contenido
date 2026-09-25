@@ -386,7 +386,7 @@ Números: dos antenas a λ/2: la diferencia de fase da **25.0°** (SNR 10 dB, gr
 4. **El barrido** — el diagrama del arreglo apuntando a distintos ángulos. Cierre: «Dos antenas bastan» / «para saber de donde viene.»
 
 #### 8.3 La estación completa
-Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20° de elevación, QFH 3 dBi, 3 dB de pérdidas, NF 1.04 dB del 2.1, 72 k símbolos): alcance **1822.6 km**, pérdida **140.5 dB**, recibida **−103.5 dBm**, ruido **−124.4 dBm**, Es/N0 **20.9 dB**, margen **17.9 dB** sobre los 4 dB del 7.2 (`S.presupuesto`).
+Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20° de elevación, QFH 3 dBi, 3 dB de pérdidas, NF 1.04 dB del 2.1, 72 k símbolos): alcance **1822.6 km**, pérdida **140.5 dB**, recibida **−103.5 dBm**, ruido **−124.4 dBm**, Es/N0 **20.9 dB**, margen **16.9 dB** sobre los 4 dB del 7.2 (`S.presupuesto`).
 1. **La cadena entera** — la `S.Cadena` del 1.1 se enciende eslabón a eslabón con la cifra que cada lección midió.
 2. **El presupuesto** — escalera de dB desde el transmisor hasta el receptor; cian cada escalón.
 3. **El pase** — el Doppler del pase y la ventana de recepción.

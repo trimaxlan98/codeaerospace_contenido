@@ -8,25 +8,25 @@
       "file": "clips/01-la-cadena-entera.py",
       "title": "1 · La cadena entera",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'La cadena entera'. La cadena ANTENA-LNA-MEZCLADOR-FILTRO-ADC-USB-SOFTWARE encendida en ambar (SOFTWARE en verde), LO fucsia bajo el mezclador; junto a cada eslabon su cifra, alternando arriba/abajo: QFH 3 dBi (gris, P['g_rx_dbi']), NF 1.04 dB (cian, friis LNA+CABLE+RECEPTOR), IRR > 80 dB (cian, irr_corregida_minima), rechazo 59.3 dB (cian, aten_minima del FIR Kaiser), SQNR 49.9 dB (cian, sqnr_adc(8)), caudal 38.4 Mbit/s (cian, caudal_bps), Viterbi 0 errores (cian, MET). Pie cian: '0 errores tras Viterbi'."
     },
     {
       "file": "clips/02-el-presupuesto.py",
       "title": "2 · El presupuesto",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'El presupuesto'. Vista acercada de la misma escala en dBm (-128 a -98, eje rehecho tras la escalera completa +40 a -130 con TX 37 dBm = 5 W gris, espacio libre -140.5 dB a 1822.6 km cian, +3 dBi -3 dB gris): raya ambar 'recibida -103.5 dBm', raya roja 'ruido -124.4 dBm' con 'NF 1.04 dB, 72 kHz' gris, raya gris discontinua 'pide 4 dB'; flecha cian Es/N0 20.9 dB entre recibida y ruido y flecha cian 'margen 16.9 dB' entre la raya de 4 dB y la recibida (S.presupuesto). Pie cian: 'margen 16.9 dB'."
     },
     {
       "file": "clips/03-el-pase.py",
       "title": "3 · El pase",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'El pase'. Curva S ambar del Doppler (kHz, -5 a +5) contra minutos (-12 a +12) del pase de Meteor; panel gris 137.9 MHz / 830 km / 60 grados max. Ventana verde translucida sobre todo el pase ('sobre el horizonte'), a los lados 'bajo el horizonte' sin curva; extremos cian +3.00 kHz y -3.00 kHz (max |DOP|) y llave verde con '15.5 min' cian (duracion de T_P). Pie cian: 'ventana de 15.5 min'."
     },
     {
       "file": "clips/04-la-imagen.py",
       "title": "4 · La imagen",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Cierre del curso a pantalla limpia: 'Una radio es aritmetica.' (blanco) / 'Ahora sabes leerla.' (cian). Antes: IMG_RX 48 x 32 grande y centrada con marco verde, llegando linea a linea, gris '48 x 32 / 8 bits' a la izquierda, 'Viterbi 0 errores' cian a la derecha y pie gris 'imagen sintetica'."
     }
   ]
 }

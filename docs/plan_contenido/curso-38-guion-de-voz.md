@@ -283,3 +283,31 @@ Pero el receptor no sabe ni el Doppler ni en qué punto del código está. Así 
 
 ### 7.3.4
 Y en una sola celda aparece el pico: dos punto cinco kilohercios de Doppler y cuatrocientos veintitrés chips de retardo, doce punto seis decibelios sobre la media. Con el código de otro satélite, nada: cuatro punto cinco. Veinte decibelios bajo el ruido, y aun así se encuentra.
+
+## 7.1 El Doppler de un pase
+
+### 7.1.1
+Un satélite en órbita baja pasa sobre nosotros en unos doce minutos, y su frecuencia no se queda quieta. Mientras se acerca llega más alta; al alejarse, más baja. A cuatrocientos treinta y siete megahercios, el corrimiento va de más diez a menos diez kilohercios, y cruza por cero justo en el cenit.
+
+### 7.1.2
+Si no hacemos nada, la señal recorre el waterfall más de veinte kilohercios. Pero la órbita se conoce de antemano, así que un oscilador numérico sigue la curva predicha y la resta. La señal queda quieta en el centro, con un error de apenas tres hercios.
+
+### 7.1.3
+Lo difícil es el cenit. Ahí la frecuencia cambia más rápido: ciento veintitrés hercios por segundo. En ese momento, cualquier error en la predicción se paga caro.
+
+### 7.1.4
+Si el reloj del receptor va dos segundos adelantado, la curva predicha y la medida casi coinciden. El residuo es pequeño en los extremos y crece en el cenit, hasta doscientos cuarenta y seis hercios: dos segundos por ciento veintitrés hercios por segundo. El satélite cambia de frecuencia, y el receptor lo persigue.
+
+## 8.3 La estación completa
+
+### 8.3.1
+La cadena del principio, ahora con cada cifra que medimos. La antena gana tres decibelios; el amplificador en la antena deja la figura de ruido en uno punto cero cuatro; la corrección de I y Q, más de ochenta decibelios de rechazo; el filtro de canal, cincuenta y nueve; ocho bits, cuarenta y nueve punto nueve; treinta y ocho megabits por el USB. Y al final, Viterbi: cero errores.
+
+### 8.3.2
+¿Alcanza la señal? El satélite transmite cinco vatios, treinta y siete dBm. A mil ochocientos kilómetros, el espacio se come ciento cuarenta decibelios, y llegan menos ciento tres punto cinco dBm. El piso de ruido está en menos ciento veinticuatro. La diferencia, veinte punto nueve decibelios; la cadena necesita cuatro. Sobran casi diecisiete de margen.
+
+### 8.3.3
+El pase de Meteor dura unos quince minutos y medio sobre el horizonte. En ese tiempo el Doppler recorre tres kilohercios arriba y tres abajo, y el receptor lo persigue como vimos. Antes y después, el satélite está bajo el horizonte y no hay nada que recibir.
+
+### 8.3.4
+Y al final del pase, la imagen. Sintética en este ejemplo, pero con la misma cadena que recibiría una real: sin un solo error. Desde la antena hasta el último píxel, todo fue aritmética. Una radio es aritmética; ahora sabes leerla.
