@@ -182,26 +182,26 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 | 2.1 | ✔ | — | — | — | — | — | — |
 | 2.2 | ✔ | — | — | — | — | — | — |
 | 2.3 | ✔ | — | — | — | — | — | — |
-| 3.1 | ~ | — | — | — | — | — | — |
-| 3.2 | ~ | — | — | — | — | — | — |
-| 3.3 | ~ | — | — | — | — | — | — |
-| 4.1 | ~ | — | — | — | — | — | — |
-| 4.2 | ~ | — | — | — | — | — | — |
-| 4.3 | ~ | — | — | — | — | — | — |
-| 5.1 | ~ | — | — | — | — | — | — |
-| 5.2 | ~ | — | — | — | — | — | — |
-| 5.3 | ~ | — | — | — | — | — | — |
-| 6.1 | ~ | — | — | — | — | — | — |
-| 6.2 | ~ | — | — | — | — | — | — |
-| 6.3 | ~ | — | — | — | — | — | — |
-| 7.1 | ~ | — | — | — | — | — | — |
-| 7.2 | ~ | — | — | — | — | — | — |
-| 7.3 | ~ | — | — | — | — | — | — |
-| 8.1 | ~ | — | — | — | — | — | — |
-| 8.2 | ~ | — | — | — | — | — | — |
-| 8.3 | ~ | — | — | — | — | — | — |
+| 3.1 | ✔ | — | — | — | — | — | — |
+| 3.2 | ✔ | — | — | — | — | — | — |
+| 3.3 | ✔ | — | — | — | — | — | — |
+| 4.1 | ✔ | — | — | — | — | — | — |
+| 4.2 | ✔ | — | — | — | — | — | — |
+| 4.3 | ✔ | — | — | — | — | — | — |
+| 5.1 | ✔ | — | — | — | — | — | — |
+| 5.2 | ✔ | — | — | — | — | — | — |
+| 5.3 | ✔ | — | — | — | — | — | — |
+| 6.1 | ✔ | — | — | — | — | — | — |
+| 6.2 | ✔ | — | — | — | — | — | — |
+| 6.3 | ✔ | — | — | — | — | — | — |
+| 7.1 | ✔ | — | — | — | — | — | — |
+| 7.2 | ✔ | — | — | — | — | — | — |
+| 7.3 | ✔ | — | — | — | — | — | — |
+| 8.1 | ✔ | — | — | — | — | — | — |
+| 8.2 | ✔ | — | — | — | — | — | — |
+| 8.3 | ✔ | — | — | — | — | — | — |
 
-(`plan ~` = storyboard en borrador; se cierra al abrir su lote, cuando la sonda ya dio las cifras.)
+(Los storyboards de los 24 ya llevan las cifras que dio la sonda; las funciones de los lotes 2–4 entran en `sdr.py` al abrir cada lote.)
 
 ## 13. Storyboard
 
@@ -254,41 +254,143 @@ Números: amplificador `y = 10x − x³` (gris, parámetros); `S.dos_tonos_im(a)
 3. **El bloqueo** — una emisora de FM fuerte (98.1, ámbar grande) y un satélite débil en 137.1 MHz (verde); al encender la emisora, la raya del satélite baja: cian «−11.2 dB».
 4. **El filtro de banda** — un filtro (rechaza 88–108, gris «40 dB») delante del amplificador; la emisora baja y el satélite vuelve: cian «0.0 dB de perdida». Cierre: «Lo fuerte tambien estorba.» / «Filtra antes de amplificar.»
 
-### Módulo 3 · Del flujo al canal (borrador; se cierra con la sonda del lote 2)
+### Módulo 3 · Del flujo al canal
 
-- **3.1 Sintonizar en software** — el NCO como fasor fucsia; el espectro se desliza hasta poner la emisora en 0; tres NCO sobre la misma captura = tres receptores; un acumulador de fase que se reinicia por bloque deja un espurio (rojo) medido. Cierre: «Sintonizar ya no es girar un dial.» / «Es multiplicar por un fasor.»
-- **3.2 Filtrar y diezmar** — filtro de canal sobre 2.4 MS/s; diezmar sin filtro pliega emisoras vecinas (rojo, medidas); la cascada CIC + FIR y su coste en MAC por muestra frente a un FIR único (cian); de 2.4 M a 48 k (×50). Cierre: «Primero se recorta,» / «despues se tira lo que sobra.»
-- **3.3 El reloj que miente** — ppm → Hz a 100 MHz, 437 MHz y 1090 MHz (cian); medir el error con un tono conocido (interpolación parabólica de la FFT); la deriva térmica en un waterfall inclinado; corregir. Cierre: «El cristal miente un poco.» / «Una señal conocida lo delata.»
+#### 3.1 Sintonizar en software
+Números: la captura del 1.1 (`S.captura_banda(96.4e6)`) con 5 emisoras en offsets **−700, −300, +100, +900, +1100 kHz** (`S.emisoras_captura()`); `S.nco(f, fs, n)`; NCO reiniciado por bloques de 1000 muestras a 240 kS/s: espurio **−9.5 dBc** a **240 Hz** (`S.espurio_nco_dbc()`; con bloque 1024 el ciclo cierra y el espurio desaparece: contraejemplo).
+1. **El oscilador numérico** — un fasor fucsia girando y su acumulador de fase (una aguja que da vueltas); a su lado la tabla de muestras cos/sin (I azul, Q violeta) saliendo del acumulador. `formula_pie` e^{-j2π f n / fs}.
+2. **Mover el espectro** — espectro de la captura; el NCO con f = −700 kHz: el espectro se desliza hasta poner la emisora más fuerte en 0 (gemela `con_db`). Cian: «−700 kHz → 0».
+3. **Tres receptores en uno** — tres copias del espectro apiladas, cada una con su NCO (−700, +100, +1100 kHz) y su emisora en 0 con un filtro de canal verde. Cian: los tres offsets. La captura es UNA sola.
+4. **La fase continua** — el acumulador que se reinicia por bloque: la fase dibujada salta (rojo) en cada frontera; en el espectro aparecen rayas cada 240 Hz: cian «−9.5 dBc a 240 Hz». El acumulador continuo: rayas fuera. Cierre: «Sintonizar ya no es girar un dial.» / «Es multiplicar por un fasor.»
 
-### Módulo 4 · FM de radiodifusión (borrador)
+#### 3.2 Filtrar y diezmar
+Números: diezmar 2.4 MS/s por 10 → 240 kS/s; canal en −40 kHz y vecina en +500 kHz del mismo nivel; sin filtro la vecina se pliega a **+20 kHz** con **0.0 dBc** (`S.fuga_vecina(False)`); con filtro de Kaiser: «menos de −60 dBc» (`S.fuga_vecina_suelo()`: el nivel exacto depende de la longitud, −62 a −90 dB: NO se rotula exacto); filtro de una etapa **219 coeficientes**, atenuación medida en los lóbulos **59.3 dB** (`S.aten_minima`), coste **52.6 M MAC/s** (`S.coste_una_etapa()`); dos etapas (÷5 con 39 coef., ÷2 con 45): **29.5 M MAC/s** (`S.coste_dos_etapas()`).
+1. **El filtro de canal** — espectro de la captura y la respuesta del FIR (`S.respuesta_db`) superpuesta en fucsia; lo que queda fuera se apaga. Cian «219 coeficientes», «59.3 dB de rechazo».
+2. **Diezmar sin filtro** — la ventana de 2.4 MHz se corta a 240 kHz: la vecina de +500 kHz aparece plegada en +20 kHz, dentro del canal (rojo). Cian «0.0 dBc: igual de fuerte». Con filtro: «menos de −60 dBc».
+3. **La cascada** — dos barras de MAC/s: una etapa 52.6 M vs dos etapas 29.5 M (cian). Dibujo de las dos transiciones: la primera ancha, la segunda estrecha.
+4. **De 2.4 M a 48 k** — la cadena de tasas 2.4 M → 240 k (canal) → 48 k (audio) como escalera de rectángulos que se estrechan; cian «÷50». Cierre: «Primero se recorta,» / «despues se tira lo que sobra.»
 
-- **4.1 El discriminador** — la frecuencia es la velocidad del fasor; `angle(x[n]·conj(x[n−1]))` recupera el tono (cian: error medido); Carson para mono y estéreo (gris 75 kHz, cian el ancho); deénfasis 75 µs (gris) y el ruido de alta que baja (cian). Cierre: «La FM se oye en el angulo.» / «Una resta de fases basta.»
-- **4.2 El múltiplex estéreo** — espectro del MPX sintetizado a norma (L+R, piloto 19 k, L−R en 38 k, RDS en 57 k, gris) medido; PLL al piloto ×2; matriz L/R y separación medida (cian); el estéreo cuesta SNR (cian). Cierre: «El estereo viaja escondido,» / «colgado de un piloto.»
-- **4.3 RDS: el texto escondido** — 57 = 3×19 y 1187.5 = 57000/48 (gris); BPSK bifase; bloques de 26 bits con palabra de comprobación y síndrome medido; el nombre de la emisora decodificado en verde (`CODE FM`, sintético). Cierre: «La radio de siempre» / «lleva datos desde 1984.»
+#### 3.3 El reloj que miente
+Números: `S.ppm_a_hz(25, f)`: con un cristal de 25 ppm (gris) el error es **2.5 kHz** a 100 MHz, **10.9 kHz** a 437 MHz, **27.3 kHz** a 1090 MHz; con 1 ppm (TCXO, gris): 0.1 / 0.44 / 1.09 kHz. `S.estimar_ppm(27.0)`: una portadora de referencia conocida (144.39 MHz, gris) medida a **+3898 Hz** → **27.0 ppm** estimados (error < 0.01 ppm). `S.waterfall_deriva()`: deriva de **927 Hz** en 10 minutos a 437 MHz (2.2 ppm, gris), medida fila a fila **926 Hz**.
+1. **Las ppm** — tres barras (100, 437, 1090 MHz) cuyo error crece con la frecuencia: cian 2.5 / 10.9 / 27.3 kHz; al pasar a 1 ppm (gemelas), se encogen.
+2. **Medir el error** — espectro con la referencia esperada (línea gris) y la medida (ámbar) corrida; flecha y cian «+3898 Hz = 27.0 ppm».
+3. **La deriva** — waterfall de 10 minutos con la traza que se inclina al calentarse el cristal (`S.waterfall`, en `Group`); cian «926 Hz en 10 min».
+4. **Corregir** — el NCO resta el error medido: la traza vuelve a su sitio (gemela del espectro). Cierre: «El cristal miente un poco.» / «Una senal conocida lo delata.»
 
-### Módulo 5 · Sincronizar (borrador)
+### Módulo 4 · FM de radiodifusión
 
-- **5.1 La constelación que gira** — un desfase de frecuencia hace girar la QPSK; elevar a la cuarta potencia borra la modulación y deja una raya en 4Δf (cian: Δf estimado y error); lo que queda tras corregir, girando despacio.
-- **5.2 El lazo de Costas** — detector I·Q para BPSK; transitorio de enganche medido; ancho del lazo: rápido y ruidoso vs lento y limpio (cian: tiempo de enganche y jitter); ambigüedad de 180° → codificación diferencial.
-- **5.3 El reloj de símbolo** — muestrear a destiempo cuesta BER (cian, medido); curva S del detector de Gardner; el lazo converge (μ en el tiempo); EVM antes/después.
+#### 4.1 El discriminador
+Números: `S.FS_MPX` 228 kHz; `S.fm_modular`, `S.discriminador` (error cero salvo la primera muestra: exacto); Carson mono **180 kHz** y estéreo **256 kHz** (`S.carson`, con 75 kHz de desviación y 15/53 kHz, gris); ancho ocupado medido al 98 % de un tono de 15 kHz: **180.0 kHz** (`S.ancho_ocupado`); deénfasis 75 µs (gris): el ruido de audio baja **12.2 dB** (`S.mejora_deenfasis()`).
+1. **La velocidad del fasor** — plano IQ con el fasor de una FM girando más rápido y más lento; debajo, la frecuencia instantánea (el mensaje).
+2. **El discriminador polar** — dos fasores consecutivos x[n] y x[n−1], el ángulo entre ellos (arco fucsia) → una muestra del mensaje; la curva recuperada (verde) cae encima del mensaje (ámbar, a trozos). `formula_pie` ∠(x[n] · x*[n−1]).
+3. **Carson** — espectro de la FM de un tono de 15 kHz; banda de Carson marcada: cian «180 kHz» Carson y «180.0 kHz» medido al 98 %; estéreo 256 kHz.
+4. **El deénfasis** — espectro del ruido a la salida del discriminador (triángulo que sube con f) y con deénfasis (baja en agudos); cian «−12.2 dB de ruido». Cierre: «La FM se oye en el angulo.» / «Una resta de fases basta.»
 
-### Módulo 6 · Paquetes en el aire (borrador)
+#### 4.2 El múltiplex estéreo
+Números: `S.mpx()` (L = 1 kHz, R = 3 kHz, piloto 19 kHz, gris); picos medidos del MPX: 1.0, **19.0** y **38 ± 1/3 kHz**; `S.pll_piloto` engancha con fase residual < 0.01 rad; `S.separar_lr` → separación **59.3 dB** (`S.separacion_db`); con 5° de error de fase aún **48.4 dB**; precio del estéreo: el ruido en la banda de L−R (23–53 kHz) es **15.4 dB** mayor que en la mono (`S.precio_estereo()`).
+1. **El espectro del MPX** — espectro 0–60 kHz con sus cuatro habitantes rotulados (L+R, piloto, L−R, RDS) y sus frecuencias de norma en gris; los picos medidos en cian.
+2. **El piloto** — el PLL (fucsia) se engancha al piloto: la fase de error cae a cero; al doblarla sale la subportadora de 38 kHz (fucsia).
+3. **L y R** — la matriz: S + D y S − D; dos canales con su tono (L 1 kHz, R 3 kHz); cian «separacion 59.3 dB».
+4. **El precio del estéreo** — el triángulo de ruido de la FM: la banda de L−R vive donde el ruido es mayor; cian «+15.4 dB de ruido». Cierre: «El estereo viaja escondido,» / «colgado de un piloto.»
 
-- **6.1 ADS-B** — PPM a 1 Mbit/s en 1090 MHz (gris), preámbulo de 8 µs por correlación, 112 bits con CRC-24 = 0 (cian), el ICAO y el indicativo decodificados en verde (sintéticos).
-- **6.2 AIS** — GMSK a 9600 baudios en 161.975/162.025 MHz (gris), NRZI, bandera 0x7E y bits de relleno contados (cian), CRC-16 y la posición del barco en verde (sintética).
-- **6.3 LoRa** — el chirp; multiplicar por el chirp conjugado lo vuelve un tono y la FFT da el símbolo; SF7→SF12 (cian: bits/símbolo, tiempo en el aire); decodificar a SNR negativa (cian: SNR medida y símbolo correcto).
+#### 4.3 RDS: el texto escondido
+Números: 57 = 3 × 19 kHz y 1187.5 bit/s = 57000/48 (norma, gris; las divisiones se hacen en pantalla); `S.grupos_ps("CODE FM ")` → 4 grupos × 4 bloques × 26 bits = 416 bits; `S.bloque_rds`, `S.sindrome`, `S.que_offset`; `S.cadena_rds()` → nombre **CODE FM** con **0 errores** (y a CNR 8 dB aún lo recupera con 12 bits errados gracias a la repetición: `S.cadena_rds(cnr_db=8)`).
+1. **57 kHz** — el espectro del MPX con el RDS en 57 kHz; tres flechas desde el piloto (×3); cian «57 = 3 x 19»; gris «1187.5 bit/s».
+2. **La fase que salta** — la onda de 57 kHz con saltos de fase de 180° (bifase) y los bits debajo; la subportadora recuperada ×3 del piloto (fucsia).
+3. **Bloques y síndrome** — un bloque de 26 bits (16 datos + 10 de comprobación) como fila de casillas; el síndrome cae en el offset A (verde); un bit volteado (rojo) → síndrome que no es ningún offset.
+4. **El nombre de la emisora** — los bloques D de cuatro grupos entregan dos letras cada uno: «CO», «DE», « F», «M »; el nombre se arma en verde. Cierre: «La radio de siempre» / «lleva datos escondidos.»
 
-### Módulo 7 · Satélites (borrador)
+### Módulo 5 · Sincronizar
 
-- **7.1 El Doppler de un pase** — la curva de Doppler de un pase a 437 MHz (se usa, no se explica: curso 24), el NCO la sigue desde la predicción, la tasa máxima (Hz/s), el residuo tras corregir (cian).
-- **7.2 Meteor: del QPSK a la imagen** — Meteor-M N2-4, 137.9 MHz, 72 k símbolos/s (gris; NOAA APT se apagó en 2025, dato); Costas + reloj de 5.x; correlación con la palabra de sincronía 0x1ACFFC1D; Viterbi como caja; la imagen sintética se arma línea a línea en verde.
-- **7.3 GPS bajo el ruido** — la señal C/A está ~20 dB bajo el piso (cian: SNR por muestra medida); código Gold de 1023 chips; rejilla Doppler × fase de código; el pico emerge (cian: ganancia de correlación).
+#### 5.1 La constelación que gira
+Números: QPSK con un desfase de **0.0037 ciclos/símbolo = 1.33°/símbolo** (gris: parámetro), SNR 15 dB; `S.estimar_desfase_x4(rx)` → **1.332°/símbolo** (error 0.3 ppm de la tasa de símbolo); contraejemplo: x² no deja raya con QPSK.
+1. **El giro** — plano IQ: los cuatro puntos de la QPSK se vuelven un anillo que gira (nube acumulándose símbolo a símbolo). Gris «1.33 grados por simbolo».
+2. **A la cuarta potencia** — cada punto elevado a la 4.ª cae en el mismo sitio (los cuatro ángulos ×4 = 180°+k·360°): la modulación desaparece; el espectro de rx⁴ tiene UNA raya en 4Δf.
+3. **La estimación** — la raya medida /4: cian «1.332 grados/simbolo».
+4. **Lo que queda** — se corrige: la nube vuelve a cuatro puntos (con el residuo que gira muy despacio). Cierre: «Cada receptor mide su propio error» / «antes de leer un solo bit.»
 
-### Módulo 8 · Más allá de escuchar (borrador)
+#### 5.2 El lazo de Costas
+Números: BPSK con desfase 0.002 ciclos/símbolo y fase inicial 1.1 rad, SNR 10 dB (gris); ancho del lazo Bn·T = 0.005 / 0.02 / 0.08: enganche en **918 / 113 / 30 símbolos** (mediana de 8 semillas) y ruido de fase **1.4° / 2.5° / 5.2°** (`S.costas_bpsk`, `S.tiempo_enganche`, `S.jitter_fase`); si la fase inicial pasa de 90° engancha invertido (`S.ambiguedad_180`); la codificación diferencial (`S.diferencial`/`S.dediferencial`) sobrevive.
+1. **El detector** — plano IQ: un punto BPSK fuera del eje I; el error I·Q (fucsia) mide cuánto está girado; `formula_pie` e = I · Q.
+2. **Enganchar** — la fase del NCO (fucsia) persigue a la real (ámbar) hasta pegarse; cian «enganche: 113 simbolos».
+3. **El ancho del lazo** — tres trazas de error de fase apiladas (estrecho/medio/ancho): cian enganche y temblor de cada una.
+4. **La ambigüedad de 180°** — con la fase inicial > 90° el lazo engancha al revés: los bits salen negados (rojo); con codificación diferencial se recuperan (verde). Cierre: «El lazo encuentra la fase,» / «no cual es cual.»
 
-- **8.1 Transmitir** — el DAC y sus imágenes a múltiplos de fs; el filtro de reconstrucción; la máscara espectral (gris); `dato_pie` «requiere licencia».
-- **8.2 Dos antenas: de dónde viene** — diferencia de fase entre dos antenas a λ/2; ángulo de llegada medido; la ambigüedad si d > λ/2; barrido.
-- **8.3 La estación completa** — la cadena del 1.1 entera, encendida eslabón a eslabón con la cifra que cada lección midió; presupuesto de enlace de Meteor; el pase y la imagen final. Cierre del curso.
+#### 5.3 El reloj de símbolo
+Números: BPSK con coseno alzado (β = 0.35, gris), SNR 7 dB: BER **0.11 %** al centro y **4.8 %** con 0.3 de símbolo de desfase (`S.ber_vs_desfase`); curva S de Gardner (`S.gardner_curva_s`): cero en el centro, signo del desfase, ceros inestables en ±½; el lazo (`S.lazo_reloj`) lleva un desfase de 0.37 a ~0 y el EVM pasa de **35.4 %** a **6.4 %**.
+1. **Muestrear a destiempo** — el diagrama de ojo y una línea vertical de muestreo que se desplaza; cian la BER medida en cada posición.
+2. **El detector de Gardner** — tres muestras (antes, medio, después); `formula_pie` e = (y_k − y_{k−1})·y_{k−½}; la curva S medida.
+3. **El lazo converge** — la traza del desfase estimado cayendo de 0.37 a 0.
+4. **La nube se aprieta** — plano IQ: la nube ancha del principio se aprieta en dos puntos; cian EVM 35.4 % → 6.4 %. Cierre: «Tres relojes que ajustar:» / «frecuencia, fase y simbolo.»
+
+### Módulo 6 · Paquetes en el aire
+
+#### 6.1 ADS-B: aviones
+Números: PPM a 1 Mbit/s en 1090 MHz, preámbulo de 8 µs, 112 bits, CRC-24 (norma, gris); oráculo: el mensaje REAL `8D4840D6202CC371C32CE0576098` decodifica **4840D6 / KLM1023**; mensaje propio (avión ficticio) ICAO **0D0C38**, indicativo **CODE101**, 10/10 semillas a 12 dB; la correlación da falsos candidatos dentro de los datos que el CRC rechaza (**5** en 10 capturas) (`S.adsb_buscar`).
+1. **Pulsos a 1090** — la magnitud |IQ| de la captura: ráfaga de pulsos; los bits como pares alto-bajo / bajo-alto.
+2. **El preámbulo** — correlación con el patrón de 4 pulsos: el pico verdadero y candidatos falsos (rojo) que el CRC descarta.
+3. **112 bits** — la fila de bits por campos (DF, ICAO, datos, CRC); cian «CRC: 0 = valido».
+4. **El avión** — el ICAO y el indicativo en verde; `dato_pie` «avion ficticio». Cierre: «Cada avion dice quien es» / «un par de veces por segundo.»
+
+#### 6.2 AIS: barcos
+Números: GMSK BT 0.4 a 9600 bit/s, canales 161.975/162.025 MHz (gris); `S.cadena_ais()`: trama de **233 bits** con **1** bit de relleno, CRC-16 correcto, barco ficticio MMSI **345070001**, 19.4326 N, 99.1332 O, 12.3 nudos; 20/20 a 10 dB.
+1. **GMSK a 9600** — la fase que sube y baja suavemente; la frecuencia instantánea con el filtro gaussiano.
+2. **NRZI** — la regla: un 0 cambia el nivel, un 1 lo mantiene; fila de niveles y bits.
+3. **La bandera y el relleno** — 01111110 al principio y al final; tras cinco unos, un cero insertado (resaltado); cian «1 bit de relleno».
+4. **El barco** — los campos decodificados en verde (MMSI, posición, velocidad), `dato_pie` «barco ficticio». Cierre: «Los barcos se anuncian solos.» / «Cualquiera puede escucharlos.»
+
+#### 6.3 LoRa: chirps
+Números: chirp de 2^SF muestras a BW = 125 kHz (gris); umbral de SER 1 % medido: **SF7 −8.5 dB**, **SF9 −14.5 dB**, **SF12 −23.0 dB** (SNR en BW, simulación ideal, `S.umbral_lora`); tiempo por símbolo **1.02 / 4.10 / 32.8 ms** (`S.tiempo_simbolo_ms`).
+1. **El chirp** — frecuencia instantánea en diente de sierra; el símbolo es dónde empieza.
+2. **Quitar el chirp** — multiplicar por el chirp conjugado → tono → la FFT da UN pico en el símbolo.
+3. **El factor de dispersión** — SF7 vs SF12: chirp 32× más largo; cian ms por símbolo.
+4. **Bajo el ruido** — a −20 dB el chirp no se ve, pero el pico de la FFT sí (SF12); cian los tres umbrales. Cierre: «Mas lento, mas lejos.» / «Por debajo del ruido.»
+
+### Módulo 7 · Satélites
+
+#### 7.1 El Doppler de un pase
+Números: pase LEO a 550 km, 60° de elevación máxima, 437 MHz (gris; curva del curso 24): Doppler máximo **±10.11 kHz**, tasa máxima **123.1 Hz/s** (`S.doppler_pase`); con la predicción 2 s adelantada, residuo máximo **246.3 Hz** = 2 s × tasa (`S.residuo_seguimiento`).
+1. **La curva** — la S del Doppler en el tiempo del pase; cian ±10.11 kHz.
+2. **El receptor la sigue** — el NCO (fucsia) recorre la curva predicha y la señal queda en 0.
+3. **La tasa** — la pendiente máxima en el cenit: cian «123.1 Hz/s».
+4. **Lo que queda** — el residuo si el reloj va 2 s adelantado: cian «246.3 Hz». Cierre: «El satelite cambia de frecuencia» / «y el receptor lo persigue.»
+
+#### 7.2 Meteor: del QPSK a la imagen
+Números: Meteor-M N2-4, 137.9 MHz, 72 k símbolos/s, código convolucional k = 7 tasa ½ (norma, gris; NOAA APT se apagó en agosto de 2025: dato); palabra de sincronía 0x1ACFFC1D; `S.cadena_meteor()` a Es/N0 = 4 dB (gris): **5.6 %** de bits crudos errados → **0 errores** tras Viterbi (10/10 semillas); la correlación del ASM en las cuatro rotaciones (+1.05 en la buena, −1.05 en la opuesta, ±0.2 en las otras) encuentra la ambigüedad; imagen SINTÉTICA de 48×32 (se declara).
+1. **72 k símbolos** — la constelación QPSK ruidosa tras Costas y reloj (de 5.x).
+2. **La palabra de sincronía** — las cuatro rotaciones y su correlación: una destaca; cian la rotación hallada.
+3. **Viterbi** — caja k=7; cian «5.6 % → 0 errores».
+4. **La imagen** — la imagen se arma línea a línea en verde; al lado, la misma con los errores crudos del canal (rojo). Cierre: «Una imagen del planeta» / «desde un aparato de 30 dolares.»
+
+#### 7.3 GPS bajo el ruido
+Números: C/A de 1023 chips (tabla ICD verificada: PRN 1–5 = 1440, 1620, 1710, 1744, 1133 octal), SNR por muestra −20 dB (gris), Doppler 2.5 kHz, 10 ms sumados (gris); ganancia de correlación **30.1 dB**; pico sobre la media de la rejilla **13.2 dB** contra **4.5 dB** con el PRN equivocado.
+1. **La señal no se ve** — la captura: ruido puro a la vista; espectro plano.
+2. **El código C/A** — 1023 chips; autocorrelación de tres valores (63, −1, −65) con un pico de 1023.
+3. **La rejilla** — Doppler × fase de código: la superficie se barre.
+4. **El pico** — un único pico: cian 13.2 dB vs 4.5 dB con otro satélite. Cierre: «Veinte decibelios bajo el ruido» / «y aun asi se encuentra.»
+
+### Módulo 8 · Más allá de escuchar
+
+#### 8.1 Transmitir
+Números: DAC con retención de orden cero, tono en 0.1 fs: imágenes medidas a 0.9 fs **−19.1 dBc**, 1.1 fs −20.8, 1.9 fs −25.6… (= sinc, `S.imagenes_dac`); la máscara espectral y la licencia: gris.
+1. **El DAC** — la escalera que sale del DAC; `formula_pie` sinc.
+2. **Las imágenes** — espectro con las copias en k·fs ± f; cian −19.1 dBc.
+3. **La máscara** — el filtro de reconstrucción y la máscara (gris) que el transmisor tiene que respetar.
+4. **La licencia** — `dato_pie` «transmitir requiere licencia»; cierre: «Recibir es libre.» / «Transmitir tiene reglas.»
+
+#### 8.2 Dos antenas: de dónde viene
+Números: dos antenas a λ/2: la diferencia de fase da **25.0°** (SNR 10 dB, gris); a λ la misma diferencia admite **−35.2° y 25.0°** (ambigüedad) (`S.doa_estimar`); factor de arreglo (`S.factor_arreglo`).
+1. **La diferencia de fase** — frentes de onda llegando en ángulo a dos antenas; la onda llega antes a una.
+2. **El ángulo** — `formula_pie` Δφ = 2π d sen θ / λ; cian 25.0°.
+3. **La ambigüedad** — con d = λ, dos direcciones dan la misma fase; cian −35.2 y 25.0.
+4. **El barrido** — el diagrama del arreglo apuntando a distintos ángulos. Cierre: «Dos antenas bastan» / «para saber de donde viene.»
+
+#### 8.3 La estación completa
+Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20° de elevación, QFH 3 dBi, 3 dB de pérdidas, NF 1.04 dB del 2.1, 72 k símbolos): alcance **1822.6 km**, pérdida **140.5 dB**, recibida **−103.5 dBm**, ruido **−124.4 dBm**, Es/N0 **20.9 dB**, margen **17.9 dB** sobre los 4 dB del 7.2 (`S.presupuesto`).
+1. **La cadena entera** — la `S.Cadena` del 1.1 se enciende eslabón a eslabón con la cifra que cada lección midió.
+2. **El presupuesto** — escalera de dB desde el transmisor hasta el receptor; cian cada escalón.
+3. **El pase** — el Doppler del pase y la ventana de recepción.
+4. **La imagen** — la imagen del 7.2 completa. Cierre del curso: «Una radio es aritmetica.» / «Ahora sabes leerla.»
 
 ## 14. Cosecha heredada (lo que más riesgo tiene aquí)
 

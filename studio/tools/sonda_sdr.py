@@ -19,6 +19,7 @@ from scipy import signal as sps
 
 sys.path.insert(0, "studio/content/manim_extensions")
 import sdr as S  # noqa: E402
+from sdr import db10  # noqa: E402
 
 fallos = []
 cifras = {}
@@ -298,8 +299,323 @@ fim = (2 * S.F_IM1 - S.F_IM2, 2 * S.F_IM2 - S.F_IM1)
 cifra("im3_mhz", (round(fim[0] / 1e6, 1), round(fim[1] / 1e6, 1)))
 
 # ---------------------------------------------------------------------
+print("== 3.1 Sintonizar en software ==")
+y = np.conj(S.nco_por_bloques(37.5e3, 240e3, 24000, 1000, True))
+ok(np.allclose(y, np.conj(S.nco(37.5e3, 240e3, 24000))),
+   "NCO por bloques con fase continua = NCO de una pieza")
+esp_nco, sep_nco = S.espurio_nco_dbc()
+ok(-15 < esp_nco < -5 and sep_nco == 240.0,
+   "NCO reiniciado: espurio exacto a fs/bloque", (round(esp_nco, 2), sep_nco))
+ok(S.espurio_nco_dbc(bloque=1024)[0] < -200,
+   "contraejemplo: si el bloque cierra ciclos enteros no hay espurio")
+cifra("nco_espurio_dbc", round(esp_nco, 1))
+off, niv = S.emisoras_captura()
+ok(len(off) == 5, "5 emisoras en la captura", list(np.round(off / 1e3)))
+cap = S.captura_banda(96.4e6)
+f0, d0 = S.espectro_db(cap, S.RTL["fs"], nfft=2048)
+def centroide(f, d, c, ancho=150e3):
+    m = np.abs(f - c) < ancho
+    p = 10 ** (d[m] / 10)
+    return float(np.sum(f[m] * p) / np.sum(p))
+
+
+fuerte = off[np.argmax(niv)]
+c0 = centroide(f0, d0, fuerte)
+ok(abs(c0 - fuerte) < 10e3, "el canal de la mas fuerte esta centrado en -700 kHz",
+   round(c0 / 1e3, 1))
+f1, d1 = S.espectro_db(cap * S.nco(fuerte, S.RTL["fs"], len(cap)),
+                       S.RTL["fs"], nfft=2048)
+ok(abs(centroide(f1, d1, 0.0)) < 10e3, "el NCO la trae a 0 Hz",
+   round(centroide(f1, d1, 0.0) / 1e3, 1))
+
+print("== 3.2 Filtrar y diezmar ==")
+fs0 = S.RTL["fs"]
+nt = S.kaiser_taps(60, 40e3, fs0)
+h = S.fir_paso_bajo(nt, 120e3, fs0)
+ho = sps.firwin(nt, 120e3, window=("kaiser", S.kaiser_beta(60)), fs=fs0)
+ok(np.allclose(h, ho / ho.sum(), atol=1e-12), "fir_paso_bajo = firwin (oraculo)")
+at = S.aten_minima(h, fs0, 140e3)
+ok(58.5 < at < 61, "atenuacion de lobulos ~60 dB", round(at, 2))
+cifra("fir_taps", nt)
+cifra("fir_aten_db", round(at, 1))
+fs_, fp_ = S.fuga_vecina(False)
+ok(abs(fs_) < 0.01 and fp_ == 20e3, "sin filtro la vecina se pliega entera a +20 kHz",
+   (round(fs_, 3), fp_))
+techo, mn, mx = S.fuga_vecina_suelo()
+ok(techo <= -60, "con filtro: menos de -60 dBc (se rotula el techo)",
+   (techo, round(mn, 1), round(mx, 1)))
+cifra("fuga_con_filtro_techo", techo)
+n1, c1 = S.coste_una_etapa()
+a1, a2, c2 = S.coste_dos_etapas()
+ok(c2 < c1, "dos etapas cuestan menos", (c1 / 1e6, c2 / 1e6))
+h1 = S.fir_paso_bajo(a1, 120e3, fs0)
+ok(S.aten_minima(h1, fs0, 480e3 - 140e3) > 58,
+   "la primera etapa protege lo que se pliega sobre el canal")
+cifra("mac_una_etapa_M", round(c1 / 1e6, 1))
+cifra("mac_dos_etapas_M", round(c2 / 1e6, 1))
+
+print("== 3.3 El reloj que miente ==")
+for fr in (100e6, 437e6, 1090e6):
+    cifra(f"err25ppm_{int(fr / 1e6)}_khz", round(S.ppm_a_hz(25, fr) / 1e3, 2))
+for p_ in (27.0, 3.0, -12.5):
+    e1 = S.estimar_ppm(p_)[0]
+    e2 = S.estimar_ppm(p_, n=1 << 14, semilla=3)[0]
+    ok(abs(e1 - p_) < 0.05 and abs(e2 - p_) < 0.05,
+       f"estimar_ppm recupera {p_} ppm (dos mallas)", (round(e1, 3), round(e2, 3)))
+est, hz = S.estimar_ppm(27.0)
+cifra("ppm_estimado", round(est, 1))
+cifra("ppm_hz", round(hz))
+_, _, dh, med = S.waterfall_deriva()
+ok(np.sqrt(np.mean((med - dh) ** 2)) < 10, "la deriva medida sigue a la real",
+   round(float(np.sqrt(np.mean((med - dh) ** 2))), 1))
+cifra("deriva_hz", round(float(dh[-1])))
+cifra("deriva_medida_hz", round(float(med[-1])))
+
+print("== 4.1 El discriminador ==")
+fsm = S.FS_MPX
+t = np.arange(1 << 15) / fsm
+m = np.sin(2 * np.pi * 1e3 * t)
+d = S.discriminador(S.fm_modular(m, fsm), fsm)
+ok(np.max(np.abs(d[1:] - 75e3 * m[1:])) < 1e-6, "discriminador exacto (salvo n=0)")
+x15 = S.fm_modular(np.sin(2 * np.pi * 15e3 * t), fsm)
+occ = S.ancho_ocupado(x15, fsm)
+occ2 = S.ancho_ocupado(x15, fsm, nfft=16384)
+ok(abs(occ - S.carson(75e3, 15e3)) < 3e3 and abs(occ - occ2) < 1e3,
+   "Carson ~ ancho ocupado al 98 % medido (dos mallas)", (occ, occ2))
+cifra("carson_mono_khz", S.carson(75e3, 15e3) / 1e3)
+cifra("carson_estereo_khz", S.carson(75e3, 53e3) / 1e3)
+cifra("ocupado_khz", round(occ / 1e3, 1))
+de1, de2 = S.mejora_deenfasis(), S.mejora_deenfasis(semilla=9, n=1 << 17)
+ok(10 < de1 < 14 and abs(de1 - de2) < 0.3, "deenfasis baja el ruido ~12 dB",
+   (round(de1, 2), round(de2, 2)))
+cifra("deenfasis_db", round(de1, 1))
+
+print("== 4.2 El multiplex estereo ==")
+y, L, R = S.mpx()
+f, db = S.espectro_db(y, fsm, nfft=8192)
+ok(abs(S.pico(f, db, 18e3, 20e3)[0] - 19e3) < 20, "piloto en 19 kHz")
+fase, _ = S.pll_piloto(y)
+res = np.unwrap(fase) - 2 * np.pi * 19e3 * np.arange(len(fase)) / fsm
+res = (res[20000:] + np.pi) % (2 * np.pi) - np.pi
+ok(np.std(res) < 0.02, "PLL enganchado al piloto", round(float(np.std(res)), 4))
+Lr, Rr = S.separar_lr(y, fase)
+sep = S.separacion_db(Lr, Rr)
+ok(sep > 40, "separacion L/R > 40 dB", round(sep, 1))
+Lr0, _ = S.separar_lr(y, fase + np.pi / 2)
+ok(S.separacion_db(Lr0, Rr) < 1, "contraejemplo: subportadora a 90 grados = mono")
+cifra("separacion_db", round(sep, 1))
+Lr5, Rr5 = S.separar_lr(y, fase + math.radians(5))
+cifra("separacion_5grados_db", round(S.separacion_db(Lr5, Rr5), 1))
+pe1, pe2 = S.precio_estereo(), S.precio_estereo(semilla=11, n=1 << 17)
+ok(abs(pe1 - pe2) < 0.4, "precio del estereo estable", (round(pe1, 2), round(pe2, 2)))
+teo = 10 * math.log10((53 ** 3 - 23 ** 3) / 15 ** 3)
+ok(abs(pe1 - teo) < 1.0, "precio ~ integral de f^2 (16.1 dB)", round(teo, 2))
+cifra("precio_estereo_db", round(pe1, 1))
+
+print("== 4.3 RDS ==")
+ok(S.que_offset(S.bloque_rds(0xC0DE, "A")) == "A", "bloque A se reconoce")
+ok(S.que_offset(S.bloque_rds(0xC0DE, "A") ^ (1 << 7)) is None,
+   "contraejemplo: un bit volteado rompe el sindrome")
+buenas = 0
+for sem in range(1, 9):
+    r = S.cadena_rds(semilla=sem)
+    buenas += int(r["ps"] == "CODE FM " and r["errores"] == 0)
+ok(buenas == 8, "RDS decodifica CODE FM sin errores en 8 semillas", buenas)
+r8 = S.cadena_rds(cnr_db=8, semilla=1)
+cifra("rds_cnr8_errores", r8["errores"])
+cifra("rds_cnr8_ps", r8["ps"])
+
+# ---------------------------------------------------------------------
+print("== 5.1 La constelacion que gira ==")
+for df in (0.0037, -0.011, 0.02):
+    _, rx = S.escenario_giro(df_rs=df, semilla=11)
+    e = S.estimar_desfase_x4(rx)
+    _, rx2 = S.escenario_giro(n=1024, df_rs=df, semilla=5)
+    e2 = S.estimar_desfase_x4(rx2)
+    ok(abs(e - df) < 1e-5 and abs(e2 - df) < 5e-5,
+       f"x^4 estima {df} ciclos/simbolo (dos mallas)", (round(e, 6), round(e2, 6)))
+_, rx = S.escenario_giro()
+df_est = S.estimar_desfase_x4(rx)
+cifra("giro_grados_simbolo", round(360 * 0.0037, 2))
+cifra("giro_estimado_grados", round(360 * df_est, 3))
+cifra("giro_error_ppm_de_rs", round(abs(df_est - 0.0037) * 1e6, 2))
+# contraejemplo: al cuadrado (BPSK) no borra la QPSK
+z = rx ** 2
+Z = np.abs(np.fft.fft(z, 4 * len(z)))
+ok(Z.max() / np.median(Z) < 20, "contraejemplo: x^2 no deja raya con QPSK",
+   round(float(Z.max() / np.median(Z)), 1))
+
+print("== 5.2 El lazo de Costas ==")
+res_c = {}
+for bn in (0.005, 0.02, 0.08):
+    tes, js = [], []
+    for sem in range(1, 9):
+        sim, rx, fr = S.escenario_costas(semilla=sem)
+        out, fase, err = S.costas_bpsk(rx, bn)
+        te = S.tiempo_enganche(fase, fr)
+        tes.append(te if te is not None else 10 ** 6)
+        js.append(S.jitter_fase(fase, fr, 1000))
+    res_c[bn] = (float(np.median(tes)), float(np.mean(js)))
+ok(res_c[0.005][0] > res_c[0.02][0] > res_c[0.08][0],
+   "lazo mas ancho engancha antes", [res_c[b][0] for b in res_c])
+ok(res_c[0.005][1] < res_c[0.02][1] < res_c[0.08][1],
+   "lazo mas ancho tiembla mas", [round(res_c[b][1], 3) for b in res_c])
+for bn in res_c:
+    cifra(f"costas_{bn}_enganche_simb", int(res_c[bn][0]))
+    cifra(f"costas_{bn}_jitter_grados", round(math.degrees(res_c[bn][1]), 1))
+inv = []
+for f0 in (0.3, 1.1, 1.4, 1.8, 2.3, 2.8):
+    sim, rx, fr = S.escenario_costas(fase0=f0, df_rs=0.0, semilla=3)
+    out, _, _ = S.costas_bpsk(rx, 0.02)
+    inv.append(S.ambiguedad_180(sim, out))
+ok(inv == [False, False, False, True, True, True],
+   "engancha invertido si la fase inicial pasa de 90 grados", inv)
+b = np.random.default_rng(1).integers(0, 2, 60)
+ok(np.array_equal(S.dediferencial(1 - S.diferencial(b))[1:], b[1:]),
+   "la codificacion diferencial sobrevive a la inversion")
+
+print("== 5.3 El reloj de simbolo ==")
+taus = np.array([0.0, 0.1, 0.2, 0.3, 0.4])
+ber = S.ber_vs_desfase(taus)
+ok(np.all(np.diff(ber) > 0), "la BER crece al muestrear a destiempo",
+   list(np.round(ber, 4)))
+ber2 = S.ber_vs_desfase(taus, semilla=8, n=40000)
+ok(np.all(np.abs(ber2 - ber) < 0.25 * ber + 0.002), "BER estable con otra semilla",
+   list(np.round(ber2, 4)))
+cifra("ber_tau0", round(float(ber[0]), 4))
+cifra("ber_tau03", round(float(ber[3]), 4))
+tt = np.linspace(-0.5, 0.5, 11)
+sc = S.gardner_curva_s(tt)
+ok(abs(sc[5]) < 1e-3 and sc[7] > 0 and sc[3] < 0,
+   "curva S de Gardner: cero en el centro, signo del desfase")
+ok(abs(sc[0]) < 1e-3 and abs(sc[-1]) < 1e-3, "cero inestable en +-1/2")
+tl, ys, sm = S.lazo_reloj()
+fin = float(np.mean(tl[-300:]))
+ok(abs(fin) < 0.05 and tl[0] > 0.3, "el lazo lleva 0.37 a ~0", round(fin, 4))
+ev0, ev1 = S.evm_pct(ys[1:60], sm[1:60]), S.evm_pct(ys[-300:], sm[-300:])
+ok(ev1 < ev0 / 3, "EVM baja al converger", (round(ev0, 1), round(ev1, 1)))
+cifra("evm_antes_pct", round(ev0, 1))
+cifra("evm_despues_pct", round(ev1, 1))
+
+print("== 6.1 ADS-B ==")
+h = "8D4840D6202CC371C32CE0576098"
+bb = [int(c) for c in bin(int(h, 16))[2:].zfill(112)]
+ok(S.crc24(bb[:88]) == int(h[-6:], 16), "CRC-24 de un mensaje REAL (KLM1023)")
+klm = S.adsb_decodificar(S.adsb_captura(np.array(bb), snr_db=40), 137)
+ok(klm["indicativo"].startswith("KLM1023") and klm["icao"] == "4840D6",
+   "decodifica el mensaje real: 4840D6 KLM1023 (oraculo)", klm["indicativo"])
+bits = S.adsb_identificacion()
+okk, rech = 0, []
+for sem in range(1, 11):
+    mag = S.adsb_captura(bits, semilla=sem)
+    off, d, rj = S.adsb_buscar(mag)
+    okk += bool(d) and off == 137 and d["indicativo"] == "CODE101 "
+    rech.append(len(rj))
+ok(okk == 10, "ADS-B: 10 de 10 semillas (el CRC decide)", rech)
+cifra("adsb_icao", d["icao"])
+cifra("adsb_indicativo", d["indicativo"])
+cifra("adsb_rechazados_por_crc", int(sum(rech)))
+
+print("== 6.2 AIS ==")
+okk = 0
+for sem in range(1, 21):
+    r, ins, tr = S.cadena_ais(snr_db=10, semilla=sem)
+    okk += bool(r and r["crc_ok"])
+ok(okk == 20, "AIS decodifica 20 de 20 a 10 dB", okk)
+r, ins, tr = S.cadena_ais()
+ok(r["mmsi"] == 345070001 and abs(r["lat"] - 19.4326) < 1e-4, "AIS: MMSI y posicion")
+ok(S.quitar_relleno(S.relleno([1] * 12)[0]) == [1] * 12, "relleno ida y vuelta")
+cifra("ais_relleno", ins)
+cifra("ais_trama_bits", len(tr))
+cifra("ais_mmsi", r["mmsi"])
+
+print("== 6.3 LoRa ==")
+for sf in (7, 9):
+    s_ = int(np.random.default_rng(sf).integers(0, 2 ** sf))
+    ok(S.lora_demodular(S.chirp_lora(sf, s_), sf) == s_, f"LoRa SF{sf} sin ruido")
+u = {sf: S.umbral_lora(sf, n_sim=200) for sf in (7, 9, 12)}
+ok(u[7] > u[9] > u[12], "cada SF baja el umbral", u)
+u2 = {sf: S.umbral_lora(sf, n_sim=200, semilla=5) for sf in (7, 12)}
+ok(abs(u2[7] - u[7]) <= 1.0 and abs(u2[12] - u[12]) <= 1.0,
+   "umbral estable con otra semilla", u2)
+for sf in (7, 9, 12):
+    cifra(f"lora_sf{sf}_umbral_db", u[sf])
+    cifra(f"lora_sf{sf}_ms", S.tiempo_simbolo_ms(sf))
+
+print("== 7.1 Doppler ==")
+t, d, tasa = S.doppler_pase()
+t2, d2, tasa2 = S.doppler_pase(n=2401)
+ok(abs(d.max() - d2.max()) < 5 and abs(np.abs(tasa).max() - np.abs(tasa2).max()) < 1,
+   "Doppler y tasa estables con la malla", (round(d.max()), round(np.abs(tasa).max(), 1)))
+cifra("doppler_max_khz", round(d.max() / 1e3, 2))
+cifra("doppler_tasa_hz_s", round(float(np.abs(tasa).max()), 1))
+_, res = S.residuo_seguimiento(2.0)
+cifra("residuo_2s_hz", round(float(np.abs(res).max()), 1))
+ok(abs(np.abs(res).max() - 2 * np.abs(tasa).max()) < 5, "residuo = error x tasa")
+
+print("== 7.2 Meteor ==")
+bits = np.random.default_rng(2).integers(0, 2, 200)
+cod = S.conv_k7(np.concatenate([bits, np.zeros(6, int)]))
+ok(np.array_equal(S.viterbi_k7(1 - 2 * cod.astype(float))[:200], bits),
+   "Viterbi k=7 sin ruido")
+rs = [S.cadena_meteor(semilla=s, rotacion=s % 4) for s in range(1, 11)]
+ok(all(q["errores_viterbi"] == 0 and q["rotacion_hallada"] == s % 4
+       for q, s in zip(rs, range(1, 11))), "Meteor a Es/N0 = 4 dB: 0 errores y rotacion hallada (10 semillas)")
+m = S.cadena_meteor()
+cifra("meteor_ber_cruda_pct", round(100 * m["ber_cruda"], 1))
+cifra("meteor_errores_viterbi", m["errores_viterbi"])
+m1 = S.cadena_meteor(esn0_db=1.0)
+ok(m1["errores_viterbi"] > 0, "contraejemplo: a 1 dB Viterbi ya no alcanza",
+   m1["errores_viterbi"])
+
+print("== 7.3 GPS ==")
+def oct10(c):
+    return oct(int("".join(map(str, c[:10])), 2))
+ok([oct10(S.codigo_ca(p)) for p in (1, 2, 3, 4, 5)] ==
+   ["0o1440", "0o1620", "0o1710", "0o1744", "0o1133"], "C/A PRN1-5 = tabla ICD (oraculo)")
+c1 = 1 - 2 * S.codigo_ca(1)
+ok(sorted(set(int(np.dot(c1, np.roll(c1, k))) for k in range(1, 1023))) == [-65, -1, 63],
+   "autocorrelacion de Gold de tres valores")
+esp = (-600 * 2) % 2046
+okk, sobre = 0, []
+for sem in range(1, 9):
+    x = S.gps_captura(semilla=sem)
+    dop, rej, (i, j), _ = S.gps_adquirir(x)
+    okk += dop[i] == 2500 and j == esp
+    sobre.append(float(db10(rej.max() / rej.mean())))
+ok(okk == 8, "GPS: Doppler y fase hallados en 8 de 8", round(min(sobre), 1))
+cifra("gps_pico_sobre_media_db", round(float(np.median(sobre)), 1))
+cifra("gps_ganancia_db", round(S.ganancia_correlacion_db(), 1))
+x = S.gps_captura()
+g3 = S.gps_adquirir(x, prn=3)[1]
+malo = float(db10(g3.max() / g3.mean()))
+ok(malo < min(sobre) - 6, "contraejemplo: con el PRN equivocado no hay pico",
+   (round(malo, 1), round(min(sobre), 1)))
+cifra("gps_prn_equivocado_db", round(malo, 1))
+
+print("== 8.1 Transmitir ==")
+im = S.imagenes_dac()
+ok(all(abs(m_ - t_) < 0.1 for _, m_, t_ in im), "imagenes del DAC = sinc")
+cifra("dac_imagen_0.9_dbc", round(im[0][1], 1))
+
+print("== 8.2 Dos antenas ==")
+a1, _ = S.doa_estimar(25.0)
+a2, _ = S.doa_estimar(25.0, d_lambda=1.0)
+ok(len(a1) == 1 and abs(a1[0] - 25) < 0.5, "lambda/2: un solo angulo", a1)
+ok(len(a2) == 2, "lambda: dos angulos (ambiguo)", [round(v, 1) for v in a2])
+cifra("doa_estimado", round(a1[0], 1))
+cifra("doa_ambiguo", [round(v, 1) for v in a2])
+
+print("== 8.3 Presupuesto ==")
+p = S.presupuesto()
+for k_ in ("alcance_km", "fspl_db", "prx_dbm", "ruido_dbm", "snr_db", "margen_db"):
+    cifra(f"pres_{k_}", round(p[k_], 1))
+ok(abs(p["prx_dbm"] - p["ruido_dbm"] - p["snr_db"]) < 1e-9, "presupuesto cierra")
+
+
+# ---------------------------------------------------------------------
 print()
-print("== CIFRAS DEL LOTE 1 ==")
+print("== CIFRAS ==")
 for k, v in cifras.items():
     print(f"  {k:28s} {v}")
 print()
