@@ -8,25 +8,25 @@
       "file": "clips/01-72-k-simbolos.py",
       "title": "1 · 72 k símbolos",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Constelacion QPSK en el plano I/Q a la izquierda: 400 simbolos ambar (bits aleatorios con ruido a Es/N0 = 4 dB) alrededor de los 4 puntos ideales blancos; tag gris 'tras Costas y reloj' sobre el plano. A la derecha la norma en gris: Meteor-M N2-4, 137.9 MHz, 72 k simbolos/s, QPSK. Pie gris: 'NOAA APT: apagado en 2025 · dato'."
     },
     {
       "file": "clips/02-la-palabra-de-sincronia.py",
       "title": "2 · La palabra de sincronía",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Arriba la palabra de sincronia 1ACFFC1D y sus 32 bits (gris). Debajo, cuatro barras horizontales de correlacion del ASM por rotacion (0, 90, 180, 270 grados) desde una linea de cero: 0.19, 1.04 (verde, enmarcada), -0.19, -1.04 (roja), valores en cian (S.cadena_meteor corr_asm). Pie cian: 'rotacion: 90 grados'."
     },
     {
       "file": "clips/03-viterbi.py",
       "title": "3 · Viterbi",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Caja VITERBI con 'k = 7 tasa 1/2' en gris; a la izquierda 24 bits crudos codificados en dos filas con sus 2 errores en rojo, a la derecha los 12 bits de datos decodificados en verde. Debajo, contadores: 1380 de 24652 errores crudos (cian) y 0 tras Viterbi (verde). Pie cian: '5.6 % -> 0 errores'."
     },
     {
       "file": "clips/04-la-imagen.py",
       "title": "4 · La imagen",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Cierre a pantalla limpia: 'Una imagen del planeta' en blanco y 'desde un aparato de 30 dolares.' en cian. Antes del cierre: imagen sintetica 48x32 recibida tras Viterbi (marco verde, '0 de 1536 pixeles') junto a la misma sin codigo (marco rojo, '551 de 1536 pixeles'), pie cian '5.6 % -> 0 errores'."
     }
   ]
 }

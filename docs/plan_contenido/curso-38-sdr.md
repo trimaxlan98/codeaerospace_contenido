@@ -363,11 +363,11 @@ Números: Meteor-M N2-4, 137.9 MHz, 72 k símbolos/s, código convolucional k = 
 4. **La imagen** — la imagen se arma línea a línea en verde; al lado, la misma con los errores crudos del canal (rojo). Cierre: «Una imagen del planeta» / «desde un aparato de 30 dolares.»
 
 #### 7.3 GPS bajo el ruido
-Números: C/A de 1023 chips (tabla ICD verificada: PRN 1–5 = 1440, 1620, 1710, 1744, 1133 octal), SNR por muestra −20 dB (gris), Doppler 2.5 kHz, 10 ms sumados (gris); ganancia de correlación **30.1 dB**; pico sobre la media de la rejilla **13.2 dB** contra **4.5 dB** con el PRN equivocado.
+Números: C/A de 1023 chips (tabla ICD verificada: PRN 1–5 = 1440, 1620, 1710, 1744, 1133 octal), SNR por muestra −20 dB (gris), Doppler 2.5 kHz, 10 ms sumados (gris); ganancia de correlación **30.1 dB**; pico sobre la media de la rejilla **12.6 dB** en la captura dibujada (mediana de 8 semillas: 13.2) contra **4.5 dB** con el PRN equivocado.
 1. **La señal no se ve** — la captura: ruido puro a la vista; espectro plano.
 2. **El código C/A** — 1023 chips; autocorrelación de tres valores (63, −1, −65) con un pico de 1023.
 3. **La rejilla** — Doppler × fase de código: la superficie se barre.
-4. **El pico** — un único pico: cian 13.2 dB vs 4.5 dB con otro satélite. Cierre: «Veinte decibelios bajo el ruido» / «y aun asi se encuentra.»
+4. **El pico** — un único pico: cian 12.6 dB vs 4.5 dB con otro satélite. Cierre: «Veinte decibelios bajo el ruido» / «y aun asi se encuentra.»
 
 ### Módulo 8 · Más allá de escuchar
 

@@ -255,3 +255,31 @@ El mensaje va entre dos banderas: cero, seis unos, cero. Para que esa secuencia 
 
 ### 6.2.4
 Con la comprobación correcta, sale el barco: su identificación, su posición, diecinueve grados norte y noventa y nueve oeste, doce punto tres nudos y rumbo de ochenta y siete grados. Es un barco ficticio, pero así se anuncian todos.
+
+## 7.2 Meteor: del QPSK a la imagen
+
+### 7.2.1
+Los satélites meteorológicos NOAA de señal analógica se apagaron en dos mil veinticinco, pero Meteor sigue transmitiendo imágenes en ciento treinta y siete punto nueve megahercios. Es QPSK a setenta y dos mil símbolos por segundo. Tras los lazos de frecuencia, fase y reloj, la constelación queda así: cuatro nubes con mucho ruido.
+
+### 7.2.2
+Primero hay que resolver la ambigüedad: el lazo de fase puede quedar girado noventa, ciento ochenta o doscientos setenta grados. Por eso el satélite repite una palabra de sincronía de treinta y dos bits. Se prueba en las cuatro rotaciones y solo una correlaciona fuerte: aquí, noventa grados.
+
+### 7.2.3
+Con tanto ruido, el cinco punto seis por ciento de los bits llegan mal: mil trescientos ochenta errores. Pero el satélite los envió con un código convolucional, y el decodificador de Viterbi busca la secuencia más probable. A la salida: cero errores.
+
+### 7.2.4
+Y con los bits limpios, la imagen se arma línea a línea. Es una imagen sintética, pero la cadena es la misma. Sin el código, quinientos cincuenta y un píxeles saldrían dañados; con él, ninguno. Una imagen del planeta, desde un aparato de treinta dólares.
+
+## 7.3 GPS bajo el ruido
+
+### 7.3.1
+La señal del GPS llega al suelo casi veinte decibelios por debajo del ruido. En la captura solo se ve ruido, y en el espectro, un piso plano: la señal está ahí, pero diez veces más pequeña en amplitud que el ruido que la cubre.
+
+### 7.3.2
+La clave es el código. Cada satélite repite su propia secuencia de mil veintitrés chips cada milisegundo. Correlacionada consigo misma da un pico de mil veintitrés, y desplazada solo toma tres valores pequeños. Esa suma coherente aporta treinta decibelios de ganancia.
+
+### 7.3.3
+Pero el receptor no sabe ni el Doppler ni en qué punto del código está. Así que prueba todo: veintiún valores de Doppler por dos mil cuarenta y seis posiciones del código, más de cuarenta y dos mil celdas, sumando diez milisegundos. La rejilla se barre fila a fila.
+
+### 7.3.4
+Y en una sola celda aparece el pico: dos punto cinco kilohercios de Doppler y cuatrocientos veintitrés chips de retardo, doce punto seis decibelios sobre la media. Con el código de otro satélite, nada: cuatro punto cinco. Veinte decibelios bajo el ruido, y aun así se encuentra.
