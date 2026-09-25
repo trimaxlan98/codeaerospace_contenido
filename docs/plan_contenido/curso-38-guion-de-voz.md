@@ -283,3 +283,59 @@ Pero el receptor no sabe ni el Doppler ni en qué punto del código está. Así 
 
 ### 7.3.4
 Y en una sola celda aparece el pico: dos punto cinco kilohercios de Doppler y cuatrocientos veintitrés chips de retardo, doce punto seis decibelios sobre la media. Con el código de otro satélite, nada: cuatro punto cinco. Veinte decibelios bajo el ruido, y aun así se encuentra.
+
+## 7.1 El Doppler de un pase
+
+### 7.1.1
+Un satélite en órbita baja pasa sobre nosotros en unos doce minutos, y su frecuencia no se queda quieta. Mientras se acerca llega más alta; al alejarse, más baja. A cuatrocientos treinta y siete megahercios, el corrimiento va de más diez a menos diez kilohercios, y cruza por cero justo en el cenit.
+
+### 7.1.2
+Si no hacemos nada, la señal recorre el waterfall más de veinte kilohercios. Pero la órbita se conoce de antemano, así que un oscilador numérico sigue la curva predicha y la resta. La señal queda quieta en el centro, con un error de apenas tres hercios.
+
+### 7.1.3
+Lo difícil es el cenit. Ahí la frecuencia cambia más rápido: ciento veintitrés hercios por segundo. En ese momento, cualquier error en la predicción se paga caro.
+
+### 7.1.4
+Si el reloj del receptor va dos segundos adelantado, la curva predicha y la medida casi coinciden. El residuo es pequeño en los extremos y crece en el cenit, hasta doscientos cuarenta y seis hercios: dos segundos por ciento veintitrés hercios por segundo. El satélite cambia de frecuencia, y el receptor lo persigue.
+
+## 8.3 La estación completa
+
+### 8.3.1
+La cadena del principio, ahora con cada cifra que medimos. La antena gana tres decibelios; el amplificador en la antena deja la figura de ruido en uno punto cero cuatro; la corrección de I y Q, más de ochenta decibelios de rechazo; el filtro de canal, cincuenta y nueve; ocho bits, cuarenta y nueve punto nueve; treinta y ocho megabits por el USB. Y al final, Viterbi: cero errores.
+
+### 8.3.2
+¿Alcanza la señal? El satélite transmite cinco vatios, treinta y siete dBm. A mil ochocientos kilómetros, el espacio se come ciento cuarenta decibelios, y llegan menos ciento tres punto cinco dBm. El piso de ruido está en menos ciento veinticuatro. La diferencia, veinte punto nueve decibelios; la cadena necesita cuatro. Sobran casi diecisiete de margen.
+
+### 8.3.3
+El pase de Meteor dura unos quince minutos y medio sobre el horizonte. En ese tiempo el Doppler recorre tres kilohercios arriba y tres abajo, y el receptor lo persigue como vimos. Antes y después, el satélite está bajo el horizonte y no hay nada que recibir.
+
+### 8.3.4
+Y al final del pase, la imagen. Sintética en este ejemplo, pero con la misma cadena que recibiría una real: sin un solo error. Desde la antena hasta el último píxel, todo fue aritmética. Una radio es aritmética; ahora sabes leerla.
+
+## 8.1 Transmitir
+
+### 8.1.1
+Hasta ahora solo escuchamos. Para transmitir, la cadena va al revés, y el primer eslabón es el conversor digital analógico. No dibuja la onda suave: sostiene cada muestra hasta la siguiente y entrega escalones. Esa forma de escalera tiene una firma en frecuencia: una envolvente sinc.
+
+### 8.1.2
+Los escalones crean copias del tono en cada múltiplo de la frecuencia de muestreo, a los dos lados: son imágenes. La más fuerte queda a diecinueve punto uno decibelios del tono, justo lo que predice la envolvente sinc. Medido y teoría coinciden.
+
+### 8.1.3
+Esas imágenes no se pueden emitir. Un filtro de reconstrucción, después del conversor, deja pasar el tono y hunde todas las copias. Solo entonces el espectro cabe dentro de la máscara, el límite de emisiones que marca la norma.
+
+### 8.1.4
+La cadena de transmisión completa: software, conversor, filtro, amplificador y antena. Técnicamente cualquier SDR que transmite puede hacerlo, pero legalmente no: transmitir requiere licencia y respetar la máscara. Recibir es libre; transmitir tiene reglas.
+
+## 8.2 Dos antenas: de dónde viene
+
+### 8.2.1
+Con dos antenas y dos receptores sincronizados, un SDR puede saber de dónde viene una señal. Si la onda llega inclinada, alcanza antes a una antena que a la otra, y esa distancia extra se convierte en una diferencia de fase entre las dos señales. Aquí la medimos: setenta y seis punto un grados.
+
+### 8.2.2
+La diferencia de fase depende de la separación entre antenas, de la longitud de onda y del seno del ángulo de llegada. Despejando el ángulo, con las antenas a media longitud de onda y algo de ruido, la estimación da veinticinco punto cero grados: exactamente la dirección de la que venía.
+
+### 8.2.3
+Pero si separamos más las antenas, a una longitud de onda completa, aparece un problema: la misma diferencia de fase la producen dos direcciones distintas, veinticinco y menos treinta y cinco punto dos grados. Por eso las antenas de un arreglo se ponen a media longitud de onda o menos.
+
+### 8.2.4
+Y con varias antenas, además de escuchar se puede apuntar: el arreglo suma las señales con el desfase justo y forma un haz que se orienta sin mover nada. Con dos antenas, el haz mide sesenta grados; con ocho, trece. Dos antenas bastan para saber de dónde viene.

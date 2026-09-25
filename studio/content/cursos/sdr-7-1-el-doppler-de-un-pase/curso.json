@@ -8,25 +8,25 @@
       "file": "clips/01-la-curva.py",
       "title": "1 · La curva",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Cuadro limpio con la curva S del Doppler completa (cian) en su marco propio, minutos en x y kHz en y: entra en +10.11 kHz (punto y etiqueta arriba a la izquierda), cruza cero en el punto marcado 'cenit' (etiqueta a su derecha, sin tocar la curva) y sale en -10.11 kHz (etiqueta encima de la meseta final, sin tocar el eje). Arriba a la derecha el panel gris 437 MHz / 550 km / 60 grados. Abajo, cifra_pie cian '+-10.11 kHz' (DOP_MAX de S.doppler_pase)."
     },
     {
       "file": "clips/02-el-receptor-la-sigue.py",
       "title": "2 · El receptor la sigue",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Dos waterfalls esquematicos lado a lado (ambar la raya, ruido/fondo negro), cada uno con su eje de frecuencia (-15/0/15 kHz) debajo y, a la izquierda del primero, una flecha con el rotulo 'tiempo' senalando hacia abajo: a la izquierda 'sin corregir' (titulo encima del panel), la raya sigue la curva S del Doppler con el trazo punteado fucsia del NCO exactamente encima; una flecha gris apunta al panel derecho 'corregida', donde la raya queda una linea vertical fija en el centro. Debajo de cada eje, cian: '20.2 kHz' (excursion medida de los picos, sin corregir) y '3 Hz' (maximo medido tras corregir), ambas de S.pico() sobre las filas construidas con S.tono/S.ruido_complejo/S.espectro_db. Sin ninguna linea de barrido horizontal."
     },
     {
       "file": "clips/03-la-tasa.py",
       "title": "3 · La tasa",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Cuadro limpio con la curva de la tasa (cian, siempre negativa, forma de V suave) en su marco propio, minutos en x, Hz/s en y (etiquetado 'Hz/s' arriba a la izquierda). El punto mas bajo, en el cenit (linea punteada vertical), esta marcado y rotulado cian '123.1 Hz/s'. Abajo, cifra_pie cian '123.1 Hz/s en el cenit' (TASA_MAX de S.doppler_pase)."
     },
     {
       "file": "clips/04-lo-que-queda.py",
       "title": "4 · Lo que queda",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia de cierre: 'El satelite cambia de frecuencia' en blanco y, debajo, 'y el receptor lo persigue.' en cian, sin ningun otro elemento (la curva, el panel del residuo, el dato y la formula ya se apagaron)."
     }
   ]
 }

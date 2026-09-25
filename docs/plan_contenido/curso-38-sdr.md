@@ -158,7 +158,7 @@ Dibujo:
 | 1 | 1–2 | 1.1–2.3 | hardware, mezcla, IQ, ruido, ganancia, IM3 | ✔ qh, voz y mux (13.9 min) |
 | 2 | 3–4 | 3.1–4.3 | NCO, diezmado, ppm, FM, MPX, RDS | ✔ qh, voz y mux |
 | 3 | 5–6 | 5.1–6.3 | Costas, Gardner, ADS-B, AIS, LoRa | ✔ qh, voz y mux |
-| 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | ~ 7.2 y 7.3 entregadas; 7.1, 8.1–8.3 en agentes |
+| 4 | 7–8 | 7.1–8.3 | Doppler, LRPT, GPS C/A, TX, DOA, cierre | ✔ qh, voz y mux |
 
 ## 11. Receta de lote
 
@@ -194,12 +194,12 @@ Leyenda: — pendiente · ~ en curso · ✔ hecho.
 | 6.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
 | 6.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
 | 6.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 7.1 | ✔ | ~ | — | — | — | — | — |
+| 7.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
 | 7.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
 | 7.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
-| 8.1 | ✔ | ~ | — | — | — | — | — |
-| 8.2 | ✔ | ~ | — | — | — | — | — |
-| 8.3 | ✔ | ~ | — | — | — | — | — |
+| 8.1 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 8.2 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
+| 8.3 | ✔ | ✔ | ✔ | ~ | ✔ | ✔ | ✔ |
 
 (Los storyboards de los 24 ya llevan las cifras que dio la sonda; las funciones de los lotes 2–4 entran en `sdr.py` al abrir cada lote.)
 
@@ -386,7 +386,7 @@ Números: dos antenas a λ/2: la diferencia de fase da **25.0°** (SNR 10 dB, gr
 4. **El barrido** — el diagrama del arreglo apuntando a distintos ángulos. Cierre: «Dos antenas bastan» / «para saber de donde viene.»
 
 #### 8.3 La estación completa
-Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20° de elevación, QFH 3 dBi, 3 dB de pérdidas, NF 1.04 dB del 2.1, 72 k símbolos): alcance **1822.6 km**, pérdida **140.5 dB**, recibida **−103.5 dBm**, ruido **−124.4 dBm**, Es/N0 **20.9 dB**, margen **17.9 dB** sobre los 4 dB del 7.2 (`S.presupuesto`).
+Números: presupuesto de Meteor (todos los insumos gris: 5 W, 0 dBi, 830 km, 20° de elevación, QFH 3 dBi, 3 dB de pérdidas, NF 1.04 dB del 2.1, 72 k símbolos): alcance **1822.6 km**, pérdida **140.5 dB**, recibida **−103.5 dBm**, ruido **−124.4 dBm**, Es/N0 **20.9 dB**, margen **16.9 dB** sobre los 4 dB del 7.2 (`S.presupuesto`).
 1. **La cadena entera** — la `S.Cadena` del 1.1 se enciende eslabón a eslabón con la cifra que cada lección midió.
 2. **El presupuesto** — escalera de dB desde el transmisor hasta el receptor; cian cada escalón.
 3. **El pase** — el Doppler del pase y la ventana de recepción.
@@ -431,9 +431,12 @@ La revisión de fotogramas del orquestador devolvió (los agentes aprobaban su p
 - **Honestidad que salió en la revisión**: el comentario de `JIT_MED` decía «mediana» y era media (5.2); el storyboard citaba 13.2 dB del GPS (mediana de 8 semillas) y la captura dibujada da 12.6 (7.3) — se rotula lo de la captura dibujada.
 - Un agente (5.3) no rotuló «tiempo de enganche» porque la convergencia del reloj sale y entra de la franja con el ruido: rotuló el residuo medido en la ventana visible. Mejor criterio que el storyboard.
 - **Error de revisión mío**: devolví el clip 3 de la 7.3 porque el pico «se veía antes del barrido»; el barrido iba de abajo arriba y mis 8 fotogramas no cayeron en ningún punto intermedio. Un fotograma que contradice una animación no basta para devolver un clip: mirar los intermedios.
+- El storyboard llevaba un margen de 17.9 dB de cuando la demo de Meteor iba a 3 dB; con 4 dB el margen es **16.9** — lo cazó el agente de la 8.3 al leer la librería en vez del plan.
 - Un **corte de cuota** mató a los cuatro agentes del lote 4 a la vez (7.1, 8.1, 8.2, 8.3) con trabajo parcial en disco; se retomaron con «re-valida todo» tras el reinicio.
 
 ## 16. Hitos globales
+
+- 2026-09-25 · **CURSO COMPLETO**: 24 lecciones / 96 clips, **24 montajes en `exports/sdr-*/curso_narrado.mp4` = 57.4 min** (2:14–2:43 cada uno), voz edge es-MX-JorgeNeural, picos de clips ≤ −1.3 dB, marca sonora −6.0 dB verificada. Hojas de interiores de las 96 piezas sobre las películas entregadas: cazaron una frase en el carril gris (1.3.4) y una cifra sin unidad (6.3.4, «SF7 -8.5» → «dB»), las dos corregidas y re-montadas. No subido al VPS/ManimStudio: a decisión del dueño.
 
 - 2026-09-24 · plan y rama `curso/sdr-completo`.
 - 2026-09-25 · **lotes 2 y 3 entregados, y 7.2/7.3**: 14 lecciones más con `qh`, voz edge y montaje (20 de 24 en `exports/sdr-*/curso_narrado.mp4`, 2:15–2:43 cada una, picos ≤ −1.5 dB).

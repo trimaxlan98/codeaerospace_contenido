@@ -8,25 +8,25 @@
       "file": "clips/01-el-dac.py",
       "title": "1 · El DAC",
       "scene": "Clip1",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'El DAC'. Dos periodos de un tono de 0.1 fs: la onda ideal (ambar tenue) con sus muestras (puntos ambar) y la escalera de retencion de orden cero del DAC (blanca) sobrepuesta. Formula cian |H(f)| = |sinc(f/fs)| en el pie."
     },
     {
       "file": "clips/02-las-imagenes.py",
       "title": "2 · Las imágenes",
       "scene": "Clip2",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'Las imagenes'. Espectro de 0 a 3.5 fs: el tono en 0.1 fs (raya ambar) y sus 6 imagenes en k*fs +- 0.1 (rayas rojas), con la envolvente sinc teorica (curva gris a trozos) tocando sus puntas. Cifra cian 'imagen: -19.1 dBc' y panel arriba a la derecha con 'medido -19.1 dBc' / 'teoria -19.1 dBc' coincidiendo."
     },
     {
       "file": "clips/03-la-mascara.py",
       "title": "3 · La máscara",
       "scene": "Clip3",
-      "final_state": "PENDIENTE"
+      "final_state": "Titulo 'La mascara'. Espectro con el tono ambar intacto y las 6 imagenes (rojo) ya colapsadas al piso tras pasar por el filtro de reconstruccion paso bajo (curva fucsia, misma respuesta con la que se les resto la atenuacion en su frecuencia); mascara espectral esquematica en escalon (linea gris a trozos) por encima, ahora sin violarse. Pie gris 'escala ilustrativa'."
     },
     {
       "file": "clips/04-la-licencia.py",
       "title": "4 · La licencia",
       "scene": "Clip4",
-      "final_state": "PENDIENTE"
+      "final_state": "Pantalla limpia (cadena y titulo ya retirados): dos lineas de cierre, 'Recibir es libre.' en blanco arriba y 'Transmitir tiene reglas.' en cian abajo."
     }
   ]
 }
