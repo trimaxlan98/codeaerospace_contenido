@@ -32,7 +32,7 @@ familia            ManimStudio                       DB
 ---------------    ------------------------------    -----------------
 módulo   (K)   →   —  agrupación editorial            no existe
 lección  (N)   →   proyecto "Familia · N.M Título"    projects
-idea     (4N)  →   clip, HUD "MODULO 0K"              clips
+idea     (4N)  →   clip (SIN etiqueta de módulo)      clips
 ```
 
 - **Formato vigente (familias, desde 2026-08-14)**: un proyecto = una
@@ -142,7 +142,6 @@ Lo que puede haber en pantalla:
 | Elemento | Helper | Límite |
 |---|---|---|
 | Título del clip (arriba) | `titulo_curso()` | ≤ 6 palabras |
-| Etiqueta del módulo (UL) | `hud_modulo("Modulo 0N")` | fija |
 | Rótulo de mobiliario (ejes, `x[n]`, `dB`) | `tag_junto()` | ≤ 4 palabras |
 | **Cifra medida** (carril inferior) | `cifra_pie()` | ≤ 5 palabras |
 | Cifra flotante | `tag_hud()` | ≤ 5 palabras |
@@ -163,8 +162,35 @@ tiene que pasar.
 menos `wait` largo y vacío. La duración sigue en 28–45 s.
 
 **Implementación de referencia**, para copiar tal cual:
-`studio/content/cursos/procesamiento-senales-1-1-muestreo/style_block.py`
-(helpers, guardián y suelos tipográficos) y sus cuatro clips.
+`studio/content/cursos/rendimiento-sql-1-1-la-pagina/style_block.py`
+(helpers, guardián, suelos tipográficos y `hud_modulo()` que aborta) y sus
+cuatro clips. El molde anterior (`procesamiento-senales-1-1-muestreo`) sigue
+siendo válido para los helpers, pero **trae la etiqueta de módulo: no lo
+copies sin quitarla**.
+
+### SIN etiqueta «Modulo 0N» (desde el curso 37)
+
+Los cursos 1–36 llevaban `hud_modulo("Modulo 0N")` en la esquina superior
+izquierda de cada clip. **Ya no se pone.** El dueño lo llamó «ruido visual»
+y, al ver el curso 37 terminado sin ella: *"me gustó mucho más de esta
+manera, ya sin ese texto de «modulo XX»"*. El módulo es una agrupación
+editorial del plan, no algo que el espectador necesite leer mientras
+escucha la explicación.
+
+No se deja a la disciplina: en el `style_block` de un curso nuevo
+`hud_modulo()` existe **solo para abortar el render** si alguien la llama
+(un subagente que copie un clip de una familia vieja revienta en el primer
+render). Los cursos 1–36 ya publicados no se tocan.
+
+```python
+def hud_modulo(*_a, **_k):
+    raise RuntimeError("Sin etiqueta 'Modulo 0N' en pantalla (pedido del "
+                       "dueño). Quita la llamada a hud_modulo().")
+```
+
+Tampoco se sustituye por otra cosa (ni número de lección, ni «parte 2»,
+ni un contador): lo fijo en pantalla es solo la marca de agua y las
+escuadras de `code_brand`.
 
 ### Si el dueño SÍ pide subtítulos
 
@@ -296,6 +322,8 @@ presupuesto es duro:
 **Forma**
 - Tema oficial `code_brand` en todos los clips (branding automático salvo que
   el script mencione `code_brand`).
+- **Sin etiqueta «Modulo 0N»** ni ningún otro rótulo fijo de posición en el
+  curso: `hud_modulo()` aborta (ver «SIN etiqueta Modulo 0N»).
 - **Sin acentos en el texto renderizado** (Rajdhani/Space Mono); los acentos
   viven en `curso.json`, que no se renderiza. Superíndices, griegas y `≈`
   solo en `MathTex`.
