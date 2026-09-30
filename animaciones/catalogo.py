@@ -1,0 +1,90 @@
+"""Catálogo de la ponencia: bloques en orden narrativo y guía de uso de cada pieza.
+
+(clase, qué muestra, cuándo usarla, recomendada)  — la carpeta va en el bloque
+Fuente única para empaquetar_ponencia.py y GUIA_PONENCIA.md. No borra nada:
+'recomendada' solo marca la selección sugerida para una charla de ~20-25 min.
+"""
+
+BLOQUES = [
+    ("Espacio y órbitas", "espacio_orbitas", [
+        ("CaidaLibreNewton", "Cañón de Newton: al subir la velocidad el proyectil cierra la órbita", "Abrir: por qué un satélite no se cae", True),
+        ("OrbitasLEOMEOGEO", "Tres órbitas con altitud y periodo", "Presentar las familias de órbita", True),
+        ("LeyesKepler", "Áreas iguales en tiempos iguales, velocidad en perigeo y apogeo", "Apoyo teórico (mecánica orbital)", False),
+        ("TransferenciaHohmann", "Dos quemadas para subir de órbita", "Cómo se llega a GEO / cambiar de órbita", False),
+        ("PuntosLagrange", "Puntos L1–L5 y órbita halo en L2", "Misiones de espacio profundo", False),
+        ("HuellaCobertura", "El cono de visión crece con la altura", "Por qué LEO exige constelaciones", True),
+        ("TrazaTerrestre", "Traza sinusoidal sobre el mapa", "Cómo se ve un satélite desde el suelo", False),
+        ("BasuraEspacial", "Cascada de colisiones (efecto Kessler)", "Riesgos de las megaconstelaciones", True),
+        ("Tierra3DSatelites", "Tierra 3D con planos orbitales inclinados", "Fondo/transición entre secciones", False),
+    ]),
+    ("Constelaciones satelitales", "constelaciones", [
+        ("WalkerDelta3D", "Constelación Walker Delta 3×6 a 55°", "Presentar la idea de constelación", True),
+        ("PlanosOrbitales", "Planos orbitales y cobertura que crece con cada satélite", "Cuántos satélites hacen falta", True),
+        ("EnjambreDespliegue", "Tren de satélites que se abre en abanico", "Cómo se despliega una constelación", False),
+        ("HandoverSatelital", "El enlace salta al siguiente satélite (mín. 25°)", "Continuidad de servicio", True),
+        ("MallaISL", "Enlaces intersatélite en malla toroidal", "Red en el espacio", True),
+        ("EnrutamientoMalla", "Ruta Bogotá–Madrid con falla y recálculo", "Resiliencia de la malla", False),
+        ("CoberturaHexagonal", "Celdas hexagonales y reúso de frecuencias", "Haces y capacidad", False),
+        ("ComparaLatencia", "Latencia LEO/MEO/GEO (ida y vuelta)", "Por qué se prefiere LEO", True),
+        ("TopologiaRespira", "Topología dinámica: enlaces que aparecen y desaparecen", "Puente hacia la IA (la red no se queda quieta)", True),
+    ]),
+    ("NTN, 6G y enlaces", "ntn_6g", [
+        ("ZoologicoOrbital", "HAPS, LEO, MEO y GEO con retardo de ida y vuelta", "Panorama de plataformas NTN", True),
+        ("ArquitecturaNTN", "UE ↔ satélite ↔ gateway ↔ núcleo ↔ Internet", "Arquitectura NTN (3GPP)", True),
+        ("EspacioAireTierra", "Red integrada en tres niveles", "Visión 6G integrada", True),
+        ("HandoverTerrestreNTN", "Del terrestre al satélite sin corte", "Continuidad terrestre–NTN", False),
+        ("Beamforming", "Haz que gira hacia cada usuario", "Antenas activas / conformación de haz", False),
+        ("Modulacion", "Portadora, bits, ASK/PSK y constelación QPSK", "Fundamentos de comunicaciones", False),
+        ("PerdidaEspacioLibre", "La potencia se reparte en más área con la distancia", "Por qué el enlace es difícil", False),
+        ("PresupuestoEnlace", "Cascada de ganancias y pérdidas hasta el margen", "Cerrar el enlace", False),
+        ("Interferencia", "Solape de haces y coordinación de frecuencia", "Coexistencia entre constelaciones", False),
+    ]),
+    ("Antenas y radio", "antenas_robots", [
+        ("PatronRadiacion", "Dipolo y antena directiva, ancho de haz −3 dB", "Qué es una antena directiva", False),
+        ("ParabolaFoco", "Rayos paralelos convergen en el foco", "Antena parabólica", True),
+        ("ArregloFases", "Ondas que inclinan el haz sin partes móviles", "Phased array", True),
+        ("PolarizacionCircular", "Campo eléctrico que gira en hélice", "Polarización en enlaces satelitales", False),
+        ("SDRAntenaANumero", "De la antena al espectro: muestreo, I/Q y FFT", "Radio definida por software", True),
+        ("EspectroFourier", "Una onda cuadrada como suma de senoides", "Base matemática del espectro", False),
+    ]),
+    ("Seguidor satelital (ATP)", "seguidor_satelital", [
+        ("VistaPolarPase", "Pase en gráfico polar con AOS/TCA/LOS", "Abrir el tema del seguimiento", True),
+        ("CadenaTLEaAntena", "TLE → SGP4 → Az/El → controlador → motores", "Arquitectura del seguidor", True),
+        ("AntenaSiguiendo", "El plato sigue al satélite sobre la máscara de elevación", "Demostración visual del seguimiento", True),
+        ("MontajeAzEl", "Montura azimut–elevación y sus dos ejes", "Hardware del seguidor", False),
+        ("LazoPID", "Lazo de control: la antena persigue la referencia", "Control del apuntamiento", True),
+        ("Keyhole", "Pase cenital: el azimut no alcanza", "Limitación conocida y su solución", False),
+        ("DopplerEnS", "Curva de frecuencia en S durante el pase", "Compensación Doppler", False),
+        ("GemeloDigitalATP", "Antena real y gemelo digital sincronizados", "Puente hacia el banco de pruebas", True),
+        ("NochePases", "Varios pases en una noche y ventanas útiles", "Planeación de operación", False),
+    ]),
+    ("Banco de pruebas", "banco_pruebas", [
+        ("PipelineCompuertas", "Embudo: solo lo validado pasa a evaluación", "Filosofía: validar el banco antes de evaluar", True),
+        ("BancoHardwareEnLaLazo", "Hardware bajo prueba en lazo con simulador y canal", "Banco hardware-in-the-loop", True),
+        ("GemeloDigitalSync", "Satélite real y gemelo que se corrige con telemetría", "Gemelo digital", True),
+        ("EmuladorCanal", "Retardo, Doppler, atenuación y ruido sobre la señal", "Emulación del canal", True),
+        ("TelemetriaEnVivo", "Tablero con anomalía detectada y resuelta", "Operación y monitoreo", False),
+        ("CamaraTermoVacio", "Ciclado térmico en cámara termo-vacío", "Pruebas ambientales", False),
+        ("MesaVibracion", "Barrido de vibración y pico de resonancia", "Pruebas de lanzamiento", False),
+        ("CubeSatDespiece", "CubeSat 3U en vista explotada", "Presentar el satélite bajo prueba", True),
+        ("RuedasReaccionActitud", "Control de actitud sobre cojinete de aire", "Banco de actitud", False),
+    ]),
+    ("IA y gobernanza autónoma", "ia_satelites", [
+        ("RedNeuronalPropaga", "Activación que recorre una red neuronal", "Introducir la IA", True),
+        ("AgenteAprende", "Ciclo agente–entorno y curva de recompensa", "Aprendizaje por refuerzo", True),
+        ("CicloPADA", "Percepción → Análisis → Decisión → Acción", "Arquitectura PADA de la tesis", True),
+        ("MuchosAgentesCTDE", "Entrenamiento centralizado, ejecución descentralizada", "MARL sobre la constelación", True),
+        ("GrafoGNN", "Paso de mensajes sobre la topología dinámica", "GNN para topología cambiante", False),
+        ("PoliticaEnrutaTrafico", "Política estática vs adaptativa ante congestión", "Beneficio de una política adaptativa", True),
+        ("IAaBordo", "Detección a bordo y ahorro de enlace de bajada", "IA en el borde (satélite)", True),
+        ("SateliteMiente", "Consenso con un nodo bizantino aislado", "Robustez y confianza", True),
+        ("MargenAdaptativo", "Banco inválido vs banco corregido frente al umbral", "Falsabilidad: el aporte metodológico", True),
+        ("CompuertasValidacion", "Compuertas G0–G3: una falla y corrección", "Protocolo de validación", True),
+    ]),
+    ("Robots y servicio en órbita", "antenas_robots", [
+        ("BrazoRoboticoIK", "Brazo de 3 articulaciones con cinemática inversa", "Robótica: fundamentos", False),
+        ("ServicioEnOrbita", "Satélite servidor captura y acopla a un cliente", "Servicio en órbita", True),
+        ("EnjambreRobots", "Agentes que se organizan en anillo y estrella", "Enjambres / coordinación", True),
+        ("RoverLunar", "Rover con antena apuntando a la Tierra", "Exploración e enlace Tierra–Luna", False),
+    ]),
+]

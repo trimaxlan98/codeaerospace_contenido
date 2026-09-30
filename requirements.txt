@@ -16,3 +16,7 @@ numpy==2.5.1
 jupyter
 jupyterlab
 ipywidgets
+
+# Presentaciones y post-proceso de imagen
+python-pptx
+Pillow

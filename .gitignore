@@ -61,3 +61,6 @@ exports.pre-migration-*/
 # Resultados de la tesis 6G (repo privado, licencia restrictiva): no se publican.
 # Los copia studio/tools/traer_datos_tesis.py
 studio/content/datos/tesis-6g-privado/
+
+# Salidas de las animaciones (videos, PNG, presentaciones, guiones generados)
+exports/
