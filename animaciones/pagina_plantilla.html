@@ -1,0 +1,295 @@
+<title>Presentaciones Co.De</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&family=Orbitron:wght@600;700&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Tema Órbita (oscuro, marca codeaerospace.com) por defecto; Estación (claro) con prefers-color-scheme: light o el botón de tema. */
+:root {
+  --bg: #0a0e27; --fondo-img: url(fondo-oscuro.jpg);
+  --panel: rgba(14, 21, 52, .74); --panel-solid: #10183a; --ink: #E8EEF8; --ink-soft: #9DB0C7; --line: rgba(112, 146, 230, .24);
+  --accent: #00D9FF; --accent-ink: #04121c; --accent-2: #37CFA0; --warm: #F59E0B; --veil: rgba(10, 14, 39, .55);
+  --f-titulo: "Rajdhani", "Segoe UI", system-ui, sans-serif; --f-cuerpo: "DM Sans", system-ui, sans-serif;
+  --f-mono: "Space Mono", ui-monospace, monospace; --f-marca: "Orbitron", "Rajdhani", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F6FB; --fondo-img: url(fondo-claro.jpg);
+    --panel: rgba(255, 255, 255, .86); --panel-solid: #FFFFFF; --ink: #0B1530; --ink-soft: #55657F; --line: rgba(29, 78, 216, .2);
+    --accent: #1D4ED8; --accent-ink: #FFFFFF; --accent-2: #C2410C; --warm: #C2410C; --veil: rgba(243, 246, 251, .6);
+    --f-titulo: "Space Grotesk", "Segoe UI", system-ui, sans-serif; --f-cuerpo: "IBM Plex Sans", system-ui, sans-serif;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F6FB; --fondo-img: url(fondo-claro.jpg);
+  --panel: rgba(255, 255, 255, .86); --panel-solid: #FFFFFF; --ink: #0B1530; --ink-soft: #55657F; --line: rgba(29, 78, 216, .2);
+  --accent: #1D4ED8; --accent-ink: #FFFFFF; --accent-2: #C2410C; --warm: #C2410C; --veil: rgba(243, 246, 251, .6);
+  --f-titulo: "Space Grotesk", "Segoe UI", system-ui, sans-serif; --f-cuerpo: "IBM Plex Sans", system-ui, sans-serif;
+  color-scheme: light;
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); background-image: var(--fondo-img); background-size: cover; background-position: center top;
+  background-attachment: fixed; color: var(--ink); font-family: var(--f-cuerpo); font-size: 17px; line-height: 1.55;
+  padding-inline: 16px; padding-block: 22px 56px;
+}
+main { max-width: 860px; margin-inline: auto; display: flex; flex-direction: column; gap: 26px; }
+.barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.marca { font-family: var(--f-marca); font-weight: 700; font-size: .78rem; letter-spacing: .34em; margin: 0; }
+h1 { font-family: var(--f-titulo); font-weight: 700; font-size: clamp(2.2rem, 9vw, 3.6rem); line-height: 1; margin: 0; text-wrap: balance; letter-spacing: .005em; }
+h2 { font-family: var(--f-titulo); font-size: 1.35rem; margin: 0 0 10px; letter-spacing: .02em; }
+h3 { font-family: var(--f-titulo); font-size: 1.2rem; margin: 0; }
+.lema { color: var(--accent); font-size: 1.12rem; margin: 8px 0 0; }
+.autores { color: var(--ink-soft); margin: 8px 0 0; font-size: .95rem; }
+.kicker { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.regla { height: 2px; width: min(220px, 50%); background: linear-gradient(90deg, var(--accent), transparent); border: 0; margin: 14px 0 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { font: inherit; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: 10px 14px; min-height: 44px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; backdrop-filter: blur(8px); }
+.tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.tab:hover:not([aria-pressed="true"]) { border-color: var(--accent); }
+.tabs.chico .tab { min-height: 40px; }
+.tema-btn { font: inherit; font-family: var(--f-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; background: var(--panel); color: var(--ink-soft);
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; min-height: 40px; cursor: pointer; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.tarjeta { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; backdrop-filter: blur(10px); }
+.meta { font-family: var(--f-mono); font-size: .74rem; color: var(--ink-soft); margin: 0; letter-spacing: .03em; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: inherit; font-family: var(--f-titulo); font-weight: 700; font-size: 1.02rem; letter-spacing: .05em; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--accent);
+  cursor: pointer; text-decoration: none; text-align: center; min-height: 44px; display: inline-flex; align-items: center; }
+.btn.primario { background: var(--accent); color: var(--accent-ink); }
+.btn.sec { background: transparent; color: var(--accent); }
+.btn:focus-visible, summary:focus-visible, .tab:focus-visible, .tema-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn[disabled] { opacity: .6; cursor: progress; }
+.estado { font-size: .9rem; color: var(--ink-soft); min-height: 1.3em; margin: 0; }
+.estado.ok { color: var(--accent-2); }
+.nota { color: var(--ink-soft); font-size: .93rem; margin: 0; }
+.bloque { background: var(--veil); border-radius: 14px; padding: 4px 0; }
+details.paso { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); }
+details.paso + details.paso { margin-top: 8px; }
+details.paso[open] { border-color: var(--accent); }
+details.paso > summary { cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: baseline; list-style: none; }
+details.paso > summary::-webkit-details-marker { display: none; }
+.hora { font-family: var(--f-mono); font-size: .76rem; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.tit { font-family: var(--f-titulo); font-weight: 700; font-size: 1.12rem; min-width: 0; }
+.voz { grid-column: 2; font-size: .85rem; color: var(--ink-soft); }
+.texto { padding: 0 14px 14px; margin: 0; white-space: pre-wrap; }
+.cuidado { margin: 0 14px 14px; padding: 10px 12px; border-left: 3px solid var(--warm); background: var(--veil); font-size: .92rem; border-radius: 0 8px 8px 0; }
+.cuidado b { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .14em; color: var(--warm); text-transform: uppercase; }
+.diapos { display: flex; flex-direction: column; gap: 14px; }
+.diapos figure { margin: 0; }
+.diapos img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-solid); }
+.diapos figcaption { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); margin-top: 4px; letter-spacing: .05em; }
+.pie { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .08em; color: var(--ink-soft); margin: 0; }
+.cargando { color: var(--ink-soft); padding: 12px 14px; }
+</style>
+
+<main>
+  <div class="barra">
+    <p class="marca">CO.DE AEROSPACE</p>
+    <button class="tema-btn" id="b-tema" type="button" aria-label="Cambiar entre tema oscuro y claro">Tema</button>
+  </div>
+
+  <header>
+    <p class="kicker">Presentaciones · guiones · diapositivas</p>
+    <h1 id="h-titulo"></h1>
+    <p class="lema" id="h-lema"></p>
+    <p class="autores" id="h-autores"></p>
+    <hr class="regla">
+  </header>
+
+  <nav class="tabs" id="selector" aria-label="Presentación"></nav>
+
+  <section aria-labelledby="h-desc">
+    <h2 id="h-desc">PDF para leer y repasar</h2>
+    <div class="tarjetas" id="tarjetas"></div>
+    <p class="nota" style="margin-top:12px" id="nota-pdf"></p>
+  </section>
+
+  <section aria-labelledby="h-dia">
+    <h2 id="h-dia">Diapositivas</h2>
+    <p class="nota" style="margin-bottom:12px" id="nota-dia"></p>
+    <div class="tabs chico" id="t-tema" style="margin-bottom:14px"></div>
+    <div class="diapos" id="diapos"></div>
+  </section>
+
+  <section aria-labelledby="h-guion">
+    <h2 id="h-guion"></h2>
+    <div class="acciones" style="margin-bottom:12px">
+      <button class="btn sec" id="b-guion" type="button">Guardar guion (.md)</button>
+    </div>
+    <p class="estado" id="e-guion" role="status"></p>
+    <div id="guion" class="bloque"><p class="cargando">Cargando guion…</p></div>
+  </section>
+
+  <p class="pie">Tema Órbita / Estación · Rajdhani, DM Sans, Space Mono · /*PIE*/</p>
+</main>
+
+<script>
+(function () {
+  var PRES = /*MANIFEST*/[];
+  var TEMAS = [
+    { id: "orbita", nombre: "Órbita · fondo oscuro", corto: "Oscuro · Órbita", en: "Órbita · dark background" },
+    { id: "estacion", nombre: "Estación · fondo claro", corto: "Claro · Estación", en: "Estación · light background" }
+  ];
+  var descargas = null, actual = null, temaDia = "orbita";
+
+  function el(id) { return document.getElementById(id); }
+  function msg(id, texto, ok) { var e = el(id); e.textContent = texto; e.className = "estado" + (ok ? " ok" : ""); }
+  function guardarLocal(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function leerLocal(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function L(p, es, en) { return p.lang === "en" ? en : es; }
+  function nodo(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
+
+  // ---- tema oscuro/claro de la página
+  function aplicarTema(t) {
+    if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme");
+    var claro = t ? t === "light" : window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+    el("b-tema").textContent = claro ? "Tema claro · Estación" : "Tema oscuro · Órbita";
+  }
+  el("b-tema").addEventListener("click", function () {
+    var claro = document.documentElement.getAttribute("data-theme") === "light" ||
+      (!document.documentElement.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: light)").matches);
+    var nuevo = claro ? "dark" : "light"; aplicarTema(nuevo); guardarLocal("tema-pagina", nuevo);
+  });
+  aplicarTema(leerLocal("tema-pagina"));
+
+  // ---- presentación elegida
+  function pintarSelector() {
+    var caja = el("selector"); caja.textContent = "";
+    PRES.forEach(function (p) {
+      var b = nodo("button", "tab", p.etiqueta); b.type = "button"; b.setAttribute("aria-pressed", p === actual);
+      b.addEventListener("click", function () { elegir(p.clave, true); });
+      caja.appendChild(b);
+    });
+  }
+
+  function elegir(clave, guardar) {
+    actual = PRES.filter(function (p) { return p.clave === clave; })[0] || PRES[0];
+    if (guardar) { guardarLocal("pres-pagina", actual.clave); try { history.replaceState(null, "", "#" + actual.clave); } catch (e) {} }
+    document.documentElement.lang = actual.lang;
+    el("h-titulo").textContent = actual.titulo;
+    el("h-lema").textContent = actual.lema;
+    el("h-autores").textContent = actual.autores + " · " + actual.resumen;
+    pintarSelector(); pintarTarjetas(); pintarDiapos(); cargarGuion();
+    el("h-desc").textContent = L(actual, "PDF para leer y repasar", "PDFs for reading and review");
+    el("h-dia").textContent = L(actual, "Diapositivas", "Slides");
+    el("h-guion").textContent = L(actual, "Guion (unos " + actual.minutos + " minutos)", "Script (about " + actual.minutos + " minutes)");
+    el("b-guion").textContent = L(actual, "Guardar guion (.md)", "Save script (.md)");
+    el("nota-pdf").textContent = L(actual,
+      "Los PDF no traen videos ni notas: sirven para leer en el celular. Los PowerPoint con videos pesan entre 20 y 60 MB y siguen en la computadora (exports/presentaciones/espaciales). El guion también va en las notas del orador de esos archivos.",
+      "The PDFs carry no videos or speaker notes; they are for reading on a phone. The PowerPoint files with videos are 20–60 MB and stay on the computer (exports/presentaciones/espaciales). The script is also in their speaker notes.");
+    el("nota-dia").textContent = L(actual,
+      "Si el PDF no se descarga, las diapositivas se leen directo en esta página. Mantén pulsada una imagen para guardarla.",
+      "If the PDF won't download, the slides can be read right here. Long-press an image to save it.");
+  }
+
+  function pintarTarjetas() {
+    var caja = el("tarjetas"); caja.textContent = "";
+    TEMAS.forEach(function (t) {
+      var a = nodo("article", "tarjeta");
+      a.appendChild(nodo("h3", null, L(actual, t.nombre, t.en)));
+      var info = actual.pdf[t.id];
+      a.appendChild(nodo("p", "meta", actual.n + L(actual, " diapositivas · PDF sin videos · ", " slides · PDF without videos · ") + info.mb + " MB"));
+      var acc = nodo("div", "acciones");
+      var ver = nodo("a", "btn primario", L(actual, "Ver PDF", "View PDF")); ver.href = info.archivo; ver.target = "_blank"; ver.rel = "noopener";
+      var gu = nodo("button", "btn sec", L(actual, "Guardar PDF", "Save PDF")); gu.type = "button";
+      var est = nodo("p", "estado"); est.setAttribute("role", "status");
+      gu.addEventListener("click", function () { guardarPdf(info, gu, est); });
+      acc.appendChild(ver); acc.appendChild(gu); a.appendChild(acc); a.appendChild(est); caja.appendChild(a);
+    });
+  }
+
+  async function guardarPdf(info, boton, est) {
+    function m(t, ok) { est.textContent = t; est.className = "estado" + (ok ? " ok" : ""); }
+    if (!descargas) { m(L(actual, "Este visor no permite guardar archivos. Usa Ver PDF y guárdalo desde el navegador.", "This viewer can't save files. Use View PDF and save it from the browser.")); return; }
+    boton.disabled = true;
+    try {
+      var r = await fetch(info.archivo);
+      if (!r.ok) throw new Error("No se pudo leer el archivo");
+      await descargas.save({ filename: info.archivo.split("/").pop(), data: await r.blob() });
+      m(L(actual, "Guardado.", "Saved."), true);
+    } catch (err) {
+      m(err && err.code === "declined" ? L(actual, "Cancelaste el guardado.", "Saving cancelled.") :
+        L(actual, "No se pudo guardar. Mira las diapositivas más abajo.", "Couldn't save. See the slides below."));
+    } finally { boton.disabled = false; }
+  }
+
+  function pintarDiapos() {
+    var tabs = el("t-tema"); tabs.textContent = "";
+    TEMAS.forEach(function (t) {
+      var b = nodo("button", "tab", L(actual, t.corto, t.id === "orbita" ? "Dark · Órbita" : "Light · Estación")); b.type = "button";
+      b.setAttribute("aria-pressed", t.id === temaDia);
+      b.addEventListener("click", function () { temaDia = t.id; pintarDiapos(); });
+      tabs.appendChild(b);
+    });
+    var caja = el("diapos"); caja.textContent = "";
+    for (var i = 1; i <= actual.n; i++) {
+      var num = (i < 10 ? "0" : "") + i;
+      var f = nodo("figure"), im = nodo("img");
+      im.loading = "lazy"; im.src = "dia/" + actual.clave + "-" + temaDia + "-" + num + ".jpg";
+      im.alt = L(actual, "Diapositiva ", "Slide ") + i;
+      f.appendChild(im); f.appendChild(nodo("figcaption", null, i + " / " + actual.n)); caja.appendChild(f);
+    }
+  }
+
+  // ---- guion
+  function esHora(t) { return /^\d+:\d\d$/.test(t) || /^(respaldo|backup)$/i.test(t); }
+  function pintarGuion(md) {
+    var caja = el("guion"); caja.textContent = "";
+    var bloques = md.split(/\n(?=## \d+\. )/).slice(1);
+    bloques.forEach(function (b) {
+      var lineas = b.split("\n");
+      var titulo = lineas[0].replace(/^## \d+\.\s*/, "");
+      var num = lineas[0].match(/^## (\d+)\./)[1];
+      var partes = (lineas[1] || "").split("·").map(function (x) { return x.replace(/[*`]/g, "").trim(); });
+      var hora = "", sub = partes[0] || "", voz = "";
+      partes.slice(1).forEach(function (x) {
+        if (esHora(x)) hora = x; else if (x && !/^video /i.test(x) && !voz) voz = x;
+      });
+      var cuerpo = [], avisos = [];
+      lineas.slice(2).forEach(function (l) {
+        if (/^>\s*⚠️/.test(l)) avisos.push(l.replace(/^>\s*⚠️\s*/, "").replace(/\*\*/g, "")); else cuerpo.push(l);
+      });
+      var d = nodo("details", "paso"), s = nodo("summary");
+      s.appendChild(nodo("span", "hora", hora || "—"));
+      s.appendChild(nodo("span", "tit", num + ". " + titulo));
+      var v = nodo("span", "voz", [voz, sub].filter(Boolean).join(" · ")); s.appendChild(v);
+      d.appendChild(s);
+      d.appendChild(nodo("p", "texto", cuerpo.join("\n").trim()));
+      avisos.forEach(function (a) {
+        var c = nodo("div", "cuidado"), t = nodo("b", null, L(actual, "Cuidado", "Caution"));
+        c.appendChild(t); c.appendChild(document.createTextNode("  " + a.replace(/^(Cuidado|Caution):\s*/i, "")));
+        d.appendChild(c);
+      });
+      caja.appendChild(d);
+    });
+    if (!bloques.length) caja.appendChild(nodo("p", "cargando", L(actual, "No se pudo leer el guion.", "Couldn't read the script.")));
+  }
+  function cargarGuion() {
+    var p = actual;
+    el("guion").textContent = ""; el("guion").appendChild(nodo("p", "cargando", L(p, "Cargando guion…", "Loading script…")));
+    fetch(p.guion).then(function (r) { return r.text(); }).then(function (t) { if (p === actual) pintarGuion(t); })
+      .catch(function () { el("guion").textContent = L(p, "No se pudo cargar el guion.", "Couldn't load the script."); });
+    msg("e-guion", "");
+  }
+  el("b-guion").addEventListener("click", async function () {
+    if (!descargas) { msg("e-guion", L(actual, "Este visor no permite guardar archivos. Puedes leer el guion aquí abajo.", "This viewer can't save files. You can read the script below.")); return; }
+    try {
+      var r = await fetch(actual.guion);
+      await descargas.save({ filename: actual.guion.split("/").pop(), data: await r.text() });
+      msg("e-guion", L(actual, "Guardado.", "Saved."), true);
+    } catch (err) {
+      msg("e-guion", err && err.code === "declined" ? L(actual, "Cancelaste el guardado.", "Saving cancelled.") : L(actual, "No se pudo guardar el guion.", "Couldn't save the script."));
+    }
+  });
+
+  var inicial = (location.hash || "").replace("#", "") || leerLocal("pres-pagina") || PRES[0].clave;
+  elegir(inicial, false);
+
+  if (window.claude && window.claude.use) {
+    window.claude.use("downloads").then(function (d) { descargas = d; }).catch(function () {});
+  }
+})();
+</script>

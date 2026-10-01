@@ -181,31 +181,43 @@ def hacer(prs, tema, d, n, total, num_seccion, cfg):
     return s
 
 
-def titulo_de(d):
-    return {"portada": lambda: "Portada", "seccion": lambda: d[1], "video": lambda: d[2], "texto": lambda: d[1],
-            "cita": lambda: d[1], "cierre": lambda: "Cierre", "respaldo": lambda: "Respaldo · " + d[1]}[d[0]]()
+def titulo_de(d, en=False):
+    return {"portada": lambda: "Cover" if en else "Portada", "seccion": lambda: d[1], "video": lambda: d[2], "texto": lambda: d[1],
+            "cita": lambda: d[1], "cierre": lambda: "Closing" if en else "Cierre",
+            "respaldo": lambda: ("Backup · " if en else "Respaldo · ") + d[1]}[d[0]]()
 
 
 def guion_md(cfg, diapos):
+    en = cfg.get("idioma") == "en"
     ritmo = cfg["ritmo"]
     principales = [d for d in diapos if d[0] != "respaldo"]
     tot = sum(minutos(d, ritmo) for d in principales)
     pal = sum(palabras(guion_de(d)[0]) for d in principales)
-    L = [f"# Guion — {cfg['titulo_plano']}", "",
-         f"**{cfg['autor']}** · {cfg['instit']}. Ritmo {ritmo} palabras/min → **{tot:.1f} min** de guion "
-         f"({pal} palabras, {len(principales)} diapositivas), más {sum(1 for d in diapos if d[0] == 'respaldo')} "
-         f"diapositivas de respaldo para preguntas (fuera del tiempo).", "",
-         cfg["nota_md"], "",
-         "Los videos ya existen y arrancan con clic; duran 13–27 s y se puede seguir hablando sobre el último cuadro. "
-         "Las líneas ⚠️ son advertencias de lo que **no** se puede afirmar: van también en las notas del orador.", "",
-         "| # | Hora | Diapositiva |", "|---|---|---|"]
+    nresp = sum(1 for d in diapos if d[0] == "respaldo")
+    if en:
+        L = [f"# Script — {cfg['titulo_plano']}", "",
+             f"**{cfg['autor']}** · {cfg['instit']}. Pace {ritmo} words/min → **{tot:.1f} min** of script "
+             f"({pal} words, {len(principales)} slides), plus {nresp} backup slides for questions (outside the timing).", "",
+             cfg["nota_md"], "",
+             "The videos already exist and start on click; they run 13–27 s and you can keep talking over the last frame. "
+             "Lines marked ⚠️ are warnings about what must **not** be claimed: they are also in the speaker notes.", "",
+             "| # | Time | Slide |", "|---|---|---|"]
+    else:
+        L = [f"# Guion — {cfg['titulo_plano']}", "",
+             f"**{cfg['autor']}** · {cfg['instit']}. Ritmo {ritmo} palabras/min → **{tot:.1f} min** de guion "
+             f"({pal} palabras, {len(principales)} diapositivas), más {nresp} "
+             f"diapositivas de respaldo para preguntas (fuera del tiempo).", "",
+             cfg["nota_md"], "",
+             "Los videos ya existen y arrancan con clic; duran 13–27 s y se puede seguir hablando sobre el último cuadro. "
+             "Las líneas ⚠️ son advertencias de lo que **no** se puede afirmar: van también en las notas del orador.", "",
+             "| # | Hora | Diapositiva |", "|---|---|---|"]
     t, filas, cuerpo, n = 0.0, [], [], 0
     for d in diapos:
         n += 1
-        titulo = titulo_de(d)
+        titulo = titulo_de(d, en)
         if d[0] == "respaldo":
             filas.append(f"| {n} | — | {titulo} |")
-            h = "respaldo"
+            h = "backup" if en else "respaldo"
         else:
             h = f"{int(t)}:{int((t % 1) * 60):02d}"
             filas.append(f"| {n} | {h} | {titulo} |")
@@ -213,7 +225,7 @@ def guion_md(cfg, diapos):
         sub = d[3] if d[0] == "video" else d[2] if d[0] in ("seccion", "texto", "cita", "respaldo") else ""
         cuerpo += [f"## {n}. {titulo}", f"*{sub}*  ·  {h}" + (f"  ·  video `{d[1]}`" if d[0] == "video" else ""), "", g, ""]
         if cuidado:
-            cuerpo += [f"> ⚠️ **Cuidado:** {cuidado}", ""]
+            cuerpo += [f"> ⚠️ **{'Caution' if en else 'Cuidado'}:** {cuidado}", ""]
         t += minutos(d, ritmo)
     return "\n".join(L + filas + [""] + cuerpo)
 
@@ -242,6 +254,8 @@ def main(cfg, diapos):
     sin_uso = {p[0] for _, c, ps in BLOQUES if c.startswith(cfg["prefijo"]) for p in ps} - usadas
     if sin_uso:
         print("piezas sin diapositiva:", ", ".join(sorted(sin_uso)))
-    if "--solo-guion" not in sys.argv:
+    if cfg.get("idioma") == "en":
+        print("Versión en inglés: solo el guion. Las presentaciones salen de `python3 decks_espaciales.py --en` (temas espaciales).")
+    elif "--solo-guion" not in sys.argv:
         for t in ("oscuro", "claro"):
             construir(cfg, diapos, t)

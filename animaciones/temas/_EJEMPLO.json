@@ -1,0 +1,8 @@
+{
+  "id": "aurora",
+  "nombre": "Aurora",
+  "base": "orbita",
+  "tinte": 140,
+  "descripcion": "Plantilla: renombra este archivo sin «_» para activarlo",
+  "fuentes": {"titulo": "Orbitron"}
+}

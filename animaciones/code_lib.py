@@ -19,7 +19,18 @@ import numpy as np
 from manim import *
 
 FUENTE = "Carlito"
+FUENTE_CIFRA, PESO_CIFRA, ESCALA_TEXTO = FUENTE, "NORMAL", 1.0
 TEMA = os.environ.get("CODE_TEMA", "oscuro").lower()
+
+# CODE_TEMA_VISUAL=<id de tema>  dibuja el video con la fuente, el fondo y los colores del tema espacial (temas_espaciales.py,
+# campo Tema.manim): Órbita = Rajdhani sobre #0a0e27 con el cian de la marca. Sin la variable, todo sigue como siempre (Carlito).
+_TV = os.environ.get("CODE_TEMA_VISUAL", "")
+_MANIM_TEMA = {}
+if _TV:
+    import temas_espaciales as _TE
+    _t = _TE.obtener(_TV)
+    TEMA = _t.modo
+    _MANIM_TEMA = dict(_t.manim or {})
 OSCURO = TEMA != "claro"
 
 if OSCURO:
@@ -35,14 +46,51 @@ else:
     C_MAL, C_OK = "#E11D48", "#059669"
     C_PANEL = "#E2E8F0"
 
+for _k, _v in _MANIM_TEMA.items():  # paleta y fuente del tema sobre los valores de tema oscuro/claro
+    globals()[_k] = _v
+
 config.background_color = FONDO
+
+# ---------- idioma de los textos dentro de los videos ----------
+# CODE_IDIOMA=en  traduce cada Text() con traducciones_en.py (estricto: una cadena sin traducción aborta el render).
+# CODE_LOG_TEXTOS=<ruta.jsonl>  registra {clase, texto} de cada Text() para extraer lo que hay que traducir.
+IDIOMA = os.environ.get("CODE_IDIOMA", "es").lower()
+_LOG_TEXTOS = os.environ.get("CODE_LOG_TEXTOS")
+# Con tema visual el texto se dibuja _SUPER veces más grande y se reduce: Pango coloca mal las letras a tamaños chicos
+# (huecos como «Model o», tildes corridas); así el espaciado sale limpio. Sin tema (Carlito) todo queda como siempre.
+_SUPER = 4 if _TV else 1
+if IDIOMA != "es" or _LOG_TEXTOS or ESCALA_TEXTO != 1 or _SUPER != 1:
+    import json as _json
+    import re as _re
+    _text_init = Text.__init__
+
+    def _text_traducido(self, text, *a, **kw):
+        t = str(text)
+        if _re.search(r"[^\W\d_]", t):
+            clase = config.output_file or ""
+            if _LOG_TEXTOS:
+                with open(_LOG_TEXTOS, "a", encoding="utf-8") as f:
+                    f.write(_json.dumps({"clase": clase, "texto": t}, ensure_ascii=False) + "\n")
+            if IDIOMA == "en":
+                from traducciones_en import traducir
+                t = traducir(t, clase)
+        if ESCALA_TEXTO != 1 and "font_size" in kw:  # compensa fuentes más anchas o angostas que Carlito
+            kw["font_size"] = kw["font_size"] * ESCALA_TEXTO
+        if _SUPER != 1:
+            kw["font_size"] = kw.get("font_size", 48) * _SUPER
+        _text_init(self, t, *a, **kw)
+        if _SUPER != 1:
+            self.scale(1 / _SUPER)
+
+    Text.__init__ = _text_traducido
 
 
 class _Glifo(Text):
     """Dígito/signo en la tipografía de marca (Text) para DecimalNumber."""
 
     def __init__(self, texto, **kw):
-        kw.setdefault("font", FUENTE)
+        kw.setdefault("font", FUENTE_CIFRA)
+        kw.setdefault("weight", PESO_CIFRA)
         super().__init__(texto, **kw)
 
 

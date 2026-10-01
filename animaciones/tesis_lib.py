@@ -33,13 +33,13 @@ def trazo(xs, ys, color, ancho=3, op=1.0):
 def cifra_viva(fn, unidad="", tam=26, color=None, dec=0, centro=ORIGIN, borde=ORIGIN):
     """Cifra que se actualiza sola con fn() (Carlito, sin LaTeX). Para animarla: ValueTracker + fn."""
     col = color or C_ANT
-    g = VGroup(Text("0", font=FUENTE, font_size=tam, color=col))
+    g = VGroup(Text("0", font=FUENTE_CIFRA, weight=PESO_CIFRA, font_size=tam, color=col))
     if unidad:
         g.add(Text(unidad, font=FUENTE, font_size=tam * 0.7, color=TENUE))
 
     def act(m):
         txt = f"{fn():.{dec}f}".replace("-", "−")
-        m[0].become(Text(txt, font=FUENTE, font_size=tam, color=col))
+        m[0].become(Text(txt, font=FUENTE_CIFRA, weight=PESO_CIFRA, font_size=tam, color=col))
         if len(m) > 1:
             m.arrange(RIGHT, buff=0.1, aligned_edge=DOWN)
         m.move_to(centro, aligned_edge=borde)

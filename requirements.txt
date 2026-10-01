@@ -17,6 +17,10 @@ jupyter
 jupyterlab
 ipywidgets
 
+# Desktop app
+PySide6
+
 # Presentaciones y post-proceso de imagen
 python-pptx
 Pillow
+fonttools  # instalar_fuentes.py (nombres de familia de las fuentes de los temas)
