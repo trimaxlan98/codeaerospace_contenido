@@ -30,7 +30,7 @@ CALIDAD = 70
 PRES = [
     dict(clave="redes", deck="divulgacion", idioma="es", etiqueta="Redes Orbitales", lang="es",
          titulo="Redes Orbitales", lema="El siguiente salto de la economía espacial",
-         autores="Alan Rosas Palacios · Yuritsi Elena Ordaz Huerta · Co.De Aerospace", guion="GUION_REDES_ORBITALES.md"),
+         autores="Alan Rosas Palacios · Yuritzi Elena Ordaz Huerta · Co.De Aerospace", guion="GUION_REDES_ORBITALES.md"),
     dict(clave="seminario", deck="seminario", idioma="es", etiqueta="Seminario · ES", lang="es",
          titulo="Agentes de inteligencia artificial en órbita", lema="…y el problema de saber si funcionan",
          autores="Alan Rosas Palacios · Doctorado, Instituto Politécnico Nacional", guion="GUION_SEMINARIO_AGENTES_IA_ORBITA.md"),

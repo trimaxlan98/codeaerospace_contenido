@@ -112,7 +112,7 @@ def _cargar(deck, idioma):
     if deck == "divulgacion":
         import ponencia_divulgacion as P
         cfg = dict(archivo="redes_orbitales_divulgacion", kicker="PONENCIA DE DIVULGACIÓN  ·  DOS VOCES",
-                   titulo=P.TITULO, lema=P.LEMA, autor="Alan Rosas Palacios  ·  Yuritsi Elena Ordaz Huerta",
+                   titulo=P.TITULO, lema=P.LEMA, autor="Alan Rosas Palacios  ·  Yuritzi Elena Ordaz Huerta",
                    instit="Co.De Aerospace  ·  codeaerospace.com", pie="Redes Orbitales · Co.De Aerospace",
                    cierre_titulo="El siguiente salto empieza en órbita", ritmo=P.RITMO, marca=True, tam_titulo=66)
         out = []

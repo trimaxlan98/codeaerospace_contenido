@@ -1,7 +1,7 @@
 """Ponencia de divulgación «Redes Orbitales: el siguiente salto de la economía espacial».
 
 ~30 min, dos voces: Alan Rosas Palacios (red propia de satélites con IA 6G) y
-Yuritsi Elena Ordaz Huerta (seguidor satelital inteligente que la red necesita).
+Yuritzi Elena Ordaz Huerta (seguidor satelital inteligente que la red necesita).
 
 NO renderiza nada: incrusta los mp4 ya existentes y les pone título y subtítulo en la diapositiva.
 El guión completo va en las notas de cada diapositiva y en exports/GUION_REDES_ORBITALES.md
@@ -28,7 +28,7 @@ CARPETA = {p[0]: c for _, c, ps in BLOQUES for p in ps}
 MUESTRA = {p[0]: p[1] for _, _, ps in BLOQUES for p in ps}
 TITULO = "Redes Orbitales"
 LEMA = "El siguiente salto de la economía espacial"
-A, Y, AY = "Alan", "Yuritsi", "Alan y Yuritsi"
+A, Y, AY = "Alan", "Yuritzi", "Alan y Yuritzi"
 
 # Tipos: portada · texto · seccion · video · cierre
 # portada: (tipo, quien, guion)
@@ -37,7 +37,7 @@ A, Y, AY = "Alan", "Yuritsi", "Alan y Yuritsi"
 # video  : (tipo, quien, pieza, titulo, subtitulo, guion)
 DIAPOS = [
     ("portada", AY,
-     "Buenas tardes. Somos Alan Rosas Palacios y Yuritsi Elena Ordaz Huerta, y venimos de Co.De Aerospace. "
+     "Buenas tardes. Somos Alan Rosas Palacios y Yuritzi Elena Ordaz Huerta, y venimos de Co.De Aerospace. "
      "Hoy queremos contarles algo que ya está pasando sobre nuestras cabezas: el espacio se está convirtiendo en una red. "
      "No en un lugar al que se va de visita, sino en infraestructura, como las carreteras o la fibra óptica. "
      "Y cuando una infraestructura nueva aparece, la economía suele dar un salto. Vamos a ver por qué, y qué hace falta para que ocurra. "
@@ -46,12 +46,12 @@ DIAPOS = [
 
     ("texto", AY, "Dos tesis, una misma red", "Quiénes somos y qué construimos",
      ["Alan: una red propia de satélites gobernada con inteligencia artificial 6G",
-      "Yuritsi: el seguidor satelital inteligente que esa red necesita para conectarse",
+      "Yuritzi: el seguidor satelital inteligente que esa red necesita para conectarse",
       "Dos tesis distintas que se necesitan la una a la otra"], "CubeSatDespiece",
      "Estamos trabajando en dos tesis distintas sobre tecnología satelital. "
      "Yo, Alan, trabajo en la red: cómo se organiza una red propia de satélites y cómo puede gobernarse con inteligencia artificial, "
      "en el marco de la sexta generación de redes móviles, el 6G. "
-     "Y yo, Yuritsi, trabajo en el seguidor satelital inteligente: la estación en tierra que apunta la antena y sigue al satélite sin perderlo. "
+     "Y yo, Yuritzi, trabajo en el seguidor satelital inteligente: la estación en tierra que apunta la antena y sigue al satélite sin perderlo. "
      "Sin ese seguimiento, la mejor red del mundo no tiene con qué conectarse a tierra. "
      "Por eso decimos que son dos tesis, pero una sola red. La charla sigue ese camino: de la física básica, a la red, a la inteligencia, y de vuelta a la antena."),
 
@@ -66,7 +66,7 @@ DIAPOS = [
      "Esta es la ruta. Empezamos con lo esencial: por qué un satélite se queda arriba. "
      "Después pasamos de un satélite a muchos, y de muchos a una red que integra tierra, aire y espacio. "
      "Luego viene la parte de inteligencia: cómo una red así puede gobernarse sola, y por qué no basta con decir que funciona, hay que demostrarlo. "
-     "En la segunda mitad, Yuritsi nos lleva a la antena en tierra. Y cerramos con lo que sigue: probar antes de lanzar, nuevos servicios, y los límites que no podemos ignorar."),
+     "En la segunda mitad, Yuritzi nos lleva a la antena en tierra. Y cerramos con lo que sigue: probar antes de lanzar, nuevos servicios, y los límites que no podemos ignorar."),
 
     # ── 1
     ("seccion", Y, "El espacio ya es infraestructura", "Lo que la economía da por hecho hasta que falta",
@@ -248,7 +248,7 @@ DIAPOS = [
      "Hay un caso especial que da dolores de cabeza. Cuando el satélite pasa casi justo encima, el acimut tiene que girar muy rápido, más rápido de lo que el motor puede. "
      "Se le llama efecto ojo de cerradura, o keyhole. "
      "Es una limitación conocida de las monturas de acimut y elevación, y es uno de los puntos donde un seguidor inteligente marca la diferencia frente a uno ingenuo. "
-     "[YURITSI: aquí explicar la estrategia propia para el keyhole y mencionar el resultado medido, si lo hay.]"),
+     "[YURITZI: aquí explicar la estrategia propia para el keyhole y mencionar el resultado medido, si lo hay.]"),
     ("video", Y, "DopplerEnS", "La frecuencia también se mueve", "Compensación Doppler durante el pase",
      "Además de moverse en el cielo, el satélite mueve su frecuencia. Al acercarse, la señal se percibe más aguda. Al alejarse, más grave. Es el efecto Doppler. "
      "Si el receptor no lo compensa, deja de escuchar al satélite aunque la antena apunte perfecto. "
@@ -269,7 +269,7 @@ DIAPOS = [
       "Una base para operar una red propia"], "AntenaSiguiendo",
      "Resumiendo mi parte: el seguidor le da a la red un enlace confiable en cada pase, reduce la intervención humana, y con el gemelo digital permite ensayar sin riesgo. "
      "Es, en pocas palabras, lo que hace posible operar una red propia desde tierra. "
-     "[YURITSI: aquí añadir el resultado propio de la tesis, con su alcance.] "
+     "[YURITZI: aquí añadir el resultado propio de la tesis, con su alcance.] "
      "Y ahora, juntos, veamos cómo se prueba todo esto antes de lanzar."),
 
     # ── 7
@@ -311,11 +311,11 @@ DIAPOS = [
      "Y talento con lugares donde probar. Esto último es lo que más nos importa a nosotros."),
     ("texto", AY, "Dónde entramos nosotros", "Co.De Aerospace",
      ["Alan: una red satelital gobernada con IA, validada con evidencia",
-      "Yuritsi: un seguidor satelital inteligente para conectarse a ella",
+      "Yuritzi: un seguidor satelital inteligente para conectarse a ella",
       "Un banco de pruebas donde ambas se encuentran",
       "El camino: del modelo al hardware"], "CubeSatDespiece",
      "Nosotros estamos en ese camino. Alan trabaja en la red y en cómo demostrar que una inteligencia artificial la mejora de verdad. "
-     "Yuritsi, en el seguidor que permite que esa red se conecte con la tierra. "
+     "Yuritzi, en el seguidor que permite que esa red se conecte con la tierra. "
      "Y compartimos un banco de pruebas donde ambos trabajos se encuentran, del modelo al hardware. "
      "Lo hacemos en Co.De Aerospace porque creemos que este conocimiento tiene que crecer aquí, con gente joven y con lugares para probar."),
     ("texto", AY, "Tres ideas para llevarse", "Si solo recuerdan tres cosas",
@@ -398,7 +398,7 @@ def hacer(prs, tema, d, n, num_seccion):
     if tipo == "portada":
         texto(s, TITULO, Inches(0.9), Inches(1.9), Inches(11.5), Inches(1.6), 72, TINTA[tema], True)
         texto(s, LEMA, Inches(0.9), Inches(3.6), Inches(11.5), Inches(1.4), 34, ACENTO[tema])
-        texto(s, "Alan Rosas Palacios  ·  Yuritsi Elena Ordaz Huerta", Inches(0.9), Inches(5.6), Inches(11.5),
+        texto(s, "Alan Rosas Palacios  ·  Yuritzi Elena Ordaz Huerta", Inches(0.9), Inches(5.6), Inches(11.5),
               Inches(0.6), 24, TINTA[tema])
         texto(s, "Co.De Aerospace", Inches(0.9), Inches(6.2), Inches(6), Inches(0.6), 20, TINTA[tema])
         notas(s, d)
@@ -447,7 +447,7 @@ def hacer(prs, tema, d, n, num_seccion):
     elif tipo == "cierre":
         texto(s, "El siguiente salto empieza en órbita", Inches(0.9), Inches(2.4), Inches(11.5), Inches(1.4), 48, TINTA[tema], True)
         subtexto(s, tema, "Gracias · Preguntas", Inches(0.9), Inches(4.0), Inches(11.5), 30)
-        texto(s, "Alan Rosas Palacios  ·  Yuritsi Elena Ordaz Huerta  ·  Co.De Aerospace", Inches(0.9), Inches(6.3),
+        texto(s, "Alan Rosas Palacios  ·  Yuritzi Elena Ordaz Huerta  ·  Co.De Aerospace", Inches(0.9), Inches(6.3),
               Inches(11.5), Inches(0.6), 18, TINTA[tema])
         notas(s, d)
     return s
@@ -456,12 +456,12 @@ def hacer(prs, tema, d, n, num_seccion):
 def guion_md():
     tot = sum(minutos(d) for d in DIAPOS)
     L = [f"# Guion — {TITULO}: {LEMA}", "",
-         f"Voces: **Alan Rosas Palacios** (red propia de satélites con IA 6G) y **Yuritsi Elena Ordaz Huerta** "
+         f"Voces: **Alan Rosas Palacios** (red propia de satélites con IA 6G) y **Yuritzi Elena Ordaz Huerta** "
          f"(seguidor satelital inteligente). Ritmo: {RITMO} palabras/min → **{tot:.1f} min** de guion "
          f"({sum(palabras(d[-1]) for d in DIAPOS)} palabras), más el tiempo de las preguntas.", "",
          "Los videos ya existen y no se vuelven a renderizar; en PowerPoint arrancan con clic. "
          "Cada video dura 13–27 s: se puede seguir hablando sobre el último cuadro.", "",
-         "> Las líneas `[YURITSI: …]` son huecos para que complete ella misma con su resultado medido.", "",
+         "> Las líneas `[YURITZI: …]` son huecos para que complete ella misma con su resultado medido.", "",
          "| # | Hora | Voz | Diapositiva |", "|---|---|---|---|"]
     t = 0.0
     filas, cuerpo = [], []

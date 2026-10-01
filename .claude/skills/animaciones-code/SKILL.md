@@ -54,7 +54,7 @@ Variables útiles: `JOBS` (paralelo, def. 4), `CALIDAD` (def. `-r 1920,1080 --fp
 Cuando la charla es para público general, la diapositiva sí lleva **título-afirmación y subtítulo**, y las notas llevan el **guion**; el video no se toca ni se vuelve a renderizar (ahorra mucho cómputo).
 - Todo sale de la lista `DIAPOS` de `ponencia_divulgacion.py`: tuplas `portada · texto · seccion · video · cierre`, con quién habla y el guion. `AMPLIA` añade analogías al final del guion de una pieza. Para otra charla, copia el archivo y cambia `TITULO`, `LEMA`, `DIAPOS`; el diseño (título arriba, subtítulo en acento, video 16:9 de 5.5 in, etiqueta de voz abajo) ya está resuelto.
 - **Tiempo**: `RITMO` (140 palabras/min) × palabras del guion. El script imprime minutos totales y por voz; ajusta hasta el objetivo (30 min ≈ 4 100 palabras, unas 55 diapositivas). Los videos no suman: se habla encima.
-- **Dos voces**: reparte por tema de tesis, con relevos explícitos («le paso la palabra a…»). Pronombres solo si el dueño los dio (ella para Yuritsi); para Alan usar el nombre.
+- **Dos voces**: reparte por tema de tesis, con relevos explícitos («le paso la palabra a…»). Pronombres solo si el dueño los dio (ella para Yuritzi); para Alan usar el nombre.
 - **Honestidad**: no inventar hechos de una tesis ajena. Lo que no se sepa va como hueco `[NOMBRE: …]` en el guion y se avisa al usuario. Sin cifras de mercado. Marcar lo ilustrativo y decir lo pendiente (G3).
 - Genera además `exports/GUION_REDES_ORBITALES.md` con hora estimada por diapositiva. Revisar con `soffice` → PDF → `pdftoppm` → hoja de contacto, y mirar la imagen.
 - El título de la charla lo fija el dueño; si lo cambia, edita `TITULO`/`LEMA` y regenera (tarda ~5 min por los videos embebidos).
