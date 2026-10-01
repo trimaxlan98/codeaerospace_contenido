@@ -80,6 +80,7 @@ details.paso > summary::-webkit-details-marker { display: none; }
 .diapos { display: flex; flex-direction: column; gap: 14px; }
 .diapos figure { margin: 0; }
 .diapos img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-solid); }
+.diapos details.paso.en-diapo { margin-top: 8px; }
 .diapos figcaption { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); margin-top: 4px; letter-spacing: .05em; }
 .pie { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .08em; color: var(--ink-soft); margin: 0; }
 .cargando { color: var(--ink-soft); padding: 12px 14px; }
@@ -133,7 +134,7 @@ details.paso > summary::-webkit-details-marker { display: none; }
     { id: "orbita", nombre: "Órbita · fondo oscuro", corto: "Oscuro · Órbita", en: "Órbita · dark background" },
     { id: "estacion", nombre: "Estación · fondo claro", corto: "Claro · Estación", en: "Estación · light background" }
   ];
-  var descargas = null, actual = null, temaDia = "orbita";
+  var descargas = null, actual = null, temaDia = "orbita", pasos = null, verGuion = leerLocal("pres-guion-diapos") !== "no";
 
   function el(id) { return document.getElementById(id); }
   function msg(id, texto, ok) { var e = el(id); e.textContent = texto; e.className = "estado" + (ok ? " ok" : ""); }
@@ -172,6 +173,7 @@ details.paso > summary::-webkit-details-marker { display: none; }
     el("h-titulo").textContent = actual.titulo;
     el("h-lema").textContent = actual.lema;
     el("h-autores").textContent = actual.autores + " · " + actual.resumen;
+    pasos = null;
     pintarSelector(); pintarTarjetas(); pintarDiapos(); cargarGuion();
     el("h-desc").textContent = L(actual, "PDF para leer y repasar", "PDFs for reading and review");
     el("h-dia").textContent = L(actual, "Diapositivas", "Slides");
@@ -181,8 +183,8 @@ details.paso > summary::-webkit-details-marker { display: none; }
       "Los PDF no traen videos ni notas: sirven para leer en el celular. Los PowerPoint con videos pesan entre 20 y 60 MB y siguen en la computadora (exports/presentaciones/espaciales). El guion también va en las notas del orador de esos archivos.",
       "The PDFs carry no videos or speaker notes; they are for reading on a phone. The PowerPoint files with videos are 20–60 MB and stay on the computer (exports/presentaciones/espaciales). The script is also in their speaker notes.");
     el("nota-dia").textContent = L(actual,
-      "Si el PDF no se descarga, las diapositivas se leen directo en esta página. Mantén pulsada una imagen para guardarla.",
-      "If the PDF won't download, the slides can be read right here. Long-press an image to save it.");
+      "Cada diapositiva trae debajo su guion (se puede ocultar con el botón). Si el PDF no se descarga, las diapositivas se leen directo en esta página; mantén pulsada una imagen para guardarla.",
+      "Each slide carries its script underneath (hide it with the button). If the PDF won't download, the slides can be read right here; long-press an image to save it.");
   }
 
   function pintarTarjetas() {
@@ -224,53 +226,66 @@ details.paso > summary::-webkit-details-marker { display: none; }
       b.addEventListener("click", function () { temaDia = t.id; pintarDiapos(); });
       tabs.appendChild(b);
     });
+    var sw = nodo("button", "tab", L(actual, verGuion ? "Guion bajo cada diapositiva: sí" : "Guion bajo cada diapositiva: no", verGuion ? "Script under each slide: on" : "Script under each slide: off"));
+    sw.type = "button"; sw.setAttribute("aria-pressed", verGuion);
+    sw.addEventListener("click", function () { verGuion = !verGuion; guardarLocal("pres-guion-diapos", verGuion ? "si" : "no"); pintarDiapos(); });
+    tabs.appendChild(sw);
     var caja = el("diapos"); caja.textContent = "";
     for (var i = 1; i <= actual.n; i++) {
       var num = (i < 10 ? "0" : "") + i;
       var f = nodo("figure"), im = nodo("img");
       im.loading = "lazy"; im.src = "dia/" + actual.clave + "-" + temaDia + "-" + num + ".jpg";
       im.alt = L(actual, "Diapositiva ", "Slide ") + i;
-      f.appendChild(im); f.appendChild(nodo("figcaption", null, i + " / " + actual.n)); caja.appendChild(f);
+      f.appendChild(im); f.appendChild(nodo("figcaption", null, i + " / " + actual.n));
+      var it = verGuion && pasos ? pasos.filter(function (x) { return x.num === i; })[0] : null;
+      if (it) f.appendChild(nodoPaso(it, true));
+      caja.appendChild(f);
     }
   }
 
   // ---- guion
   function esHora(t) { return /^\d+:\d\d$/.test(t) || /^(respaldo|backup)$/i.test(t); }
-  function pintarGuion(md) {
-    var caja = el("guion"); caja.textContent = "";
-    var bloques = md.split(/\n(?=## \d+\. )/).slice(1);
-    bloques.forEach(function (b) {
+  // un bloque «## N. título» por diapositiva: hora, voz, texto y avisos (⚠️)
+  function parsear(md) {
+    return md.split(/\n(?=## \d+\. )/).slice(1).map(function (b) {
       var lineas = b.split("\n");
-      var titulo = lineas[0].replace(/^## \d+\.\s*/, "");
-      var num = lineas[0].match(/^## (\d+)\./)[1];
       var partes = (lineas[1] || "").split("·").map(function (x) { return x.replace(/[*`]/g, "").trim(); });
-      var hora = "", sub = partes[0] || "", voz = "";
+      var it = { num: +lineas[0].match(/^## (\d+)\./)[1], titulo: lineas[0].replace(/^## \d+\.\s*/, ""),
+                 hora: "", sub: partes[0] || "", voz: "", cuerpo: [], avisos: [] };
       partes.slice(1).forEach(function (x) {
-        if (esHora(x)) hora = x; else if (x && !/^video /i.test(x) && !voz) voz = x;
+        if (esHora(x)) it.hora = x; else if (x && !/^video /i.test(x) && !it.voz) it.voz = x;
       });
-      var cuerpo = [], avisos = [];
       lineas.slice(2).forEach(function (l) {
-        if (/^>\s*⚠️/.test(l)) avisos.push(l.replace(/^>\s*⚠️\s*/, "").replace(/\*\*/g, "")); else cuerpo.push(l);
+        if (/^>\s*⚠️/.test(l)) it.avisos.push(l.replace(/^>\s*⚠️\s*/, "").replace(/\*\*/g, "")); else it.cuerpo.push(l);
       });
-      var d = nodo("details", "paso"), s = nodo("summary");
-      s.appendChild(nodo("span", "hora", hora || "—"));
-      s.appendChild(nodo("span", "tit", num + ". " + titulo));
-      var v = nodo("span", "voz", [voz, sub].filter(Boolean).join(" · ")); s.appendChild(v);
-      d.appendChild(s);
-      d.appendChild(nodo("p", "texto", cuerpo.join("\n").trim()));
-      avisos.forEach(function (a) {
-        var c = nodo("div", "cuidado"), t = nodo("b", null, L(actual, "Cuidado", "Caution"));
-        c.appendChild(t); c.appendChild(document.createTextNode("  " + a.replace(/^(Cuidado|Caution):\s*/i, "")));
-        d.appendChild(c);
-      });
-      caja.appendChild(d);
+      return it;
     });
-    if (!bloques.length) caja.appendChild(nodo("p", "cargando", L(actual, "No se pudo leer el guion.", "Couldn't read the script.")));
+  }
+  // enDiapo = el guion va pegado bajo su diapositiva (abierto); si no, es la lista completa del final (cerrada)
+  function nodoPaso(it, enDiapo) {
+    var d = nodo("details", "paso" + (enDiapo ? " en-diapo" : "")), s = nodo("summary");
+    if (enDiapo) d.open = true;
+    s.appendChild(nodo("span", "hora", it.hora || "—"));
+    s.appendChild(nodo("span", "tit", enDiapo ? L(actual, "Guion · diapositiva ", "Script · slide ") + it.num : it.num + ". " + it.titulo));
+    s.appendChild(nodo("span", "voz", [it.voz, it.sub].filter(Boolean).join(" · ")));
+    d.appendChild(s);
+    d.appendChild(nodo("p", "texto", it.cuerpo.join("\n").trim()));
+    it.avisos.forEach(function (a) {
+      var c = nodo("div", "cuidado"), t = nodo("b", null, L(actual, "Cuidado", "Caution"));
+      c.appendChild(t); c.appendChild(document.createTextNode("  " + a.replace(/^(Cuidado|Caution):\s*/i, "")));
+      d.appendChild(c);
+    });
+    return d;
+  }
+  function pintarGuion() {
+    var caja = el("guion"); caja.textContent = "";
+    if (!pasos || !pasos.length) { caja.appendChild(nodo("p", "cargando", L(actual, "No se pudo leer el guion.", "Couldn't read the script."))); return; }
+    pasos.forEach(function (it) { caja.appendChild(nodoPaso(it, false)); });
   }
   function cargarGuion() {
     var p = actual;
     el("guion").textContent = ""; el("guion").appendChild(nodo("p", "cargando", L(p, "Cargando guion…", "Loading script…")));
-    fetch(p.guion).then(function (r) { return r.text(); }).then(function (t) { if (p === actual) pintarGuion(t); })
+    fetch(p.guion).then(function (r) { return r.text(); }).then(function (t) { if (p === actual) { pasos = parsear(t); pintarGuion(); pintarDiapos(); } })
       .catch(function () { el("guion").textContent = L(p, "No se pudo cargar el guion.", "Couldn't load the script."); });
     msg("e-guion", "");
   }
