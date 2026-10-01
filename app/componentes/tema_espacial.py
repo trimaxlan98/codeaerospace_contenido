@@ -33,6 +33,10 @@ QListWidget::item {{ padding: 8px 6px; border-radius: 6px; }}
 QListWidget::item:selected {{ background: {BORDE}; color: {TINTA}; }}
 QListWidget::item:hover {{ background: #16214a; }}
 QPlainTextEdit {{ font-family: "Space Mono", "DejaVu Sans Mono"; font-size: 11px; background: #060922; border: 1px solid {BORDE}; border-radius: 8px; color: #B8C7E0; }}
+QPlainTextEdit#editor {{ font-family: "DM Sans", "Inter", sans-serif; font-size: 13px; color: {TINTA}; background: {FONDO}; }}
+QPlainTextEdit#editor:focus {{ border-color: {ACENTO}; }}
+QMenu {{ background: {PANEL}; border: 1px solid {BORDE}; padding: 4px; }} QMenu::item {{ padding: 6px 18px; }}
+QMenu::item:selected {{ background: {ACENTO}; color: {FONDO}; }}
 QRadioButton, QCheckBox {{ spacing: 8px; }}
 QRadioButton::indicator, QCheckBox::indicator {{ width: 16px; height: 16px; border: 1px solid #4a5c99; background: {FONDO}; }}
 QRadioButton::indicator {{ border-radius: 9px; }} QCheckBox::indicator {{ border-radius: 4px; }}

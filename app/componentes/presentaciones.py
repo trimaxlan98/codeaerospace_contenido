@@ -4,12 +4,13 @@ Elige presentación (con su idioma), uno o varios temas y cómo usarlos:
   · un deck por tema, o
   · un solo deck que mezcla los temas marcados (uno por sección o uno por diapositiva).
 También lista los temas registrados (incluidos los plugins de animaciones/temas/), muestra su vista previa,
-avisa qué fuentes faltan en este equipo y crea temas derivados nuevos con «Nuevo tema…».
+avisa qué fuentes faltan en este equipo (y las instala con «Instalar fuentes») y crea temas derivados con «Nuevo tema…».
+Las presentaciones propias (pestaña «Nueva presentación», animaciones/presentaciones/*.json) aparecen al final de la lista.
 """
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QColor, QDesktopServices, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QButtonGroup, QComboBox, QDialog, QDialogButtonBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
     QListWidget, QListWidgetItem, QMessageBox, QPlainTextEdit, QPushButton, QRadioButton, QSlider, QVBoxLayout, QWidget,
@@ -18,7 +19,7 @@ from PySide6.QtWidgets import (
 from . import tema_espacial as tema
 from .base import ANIM, EXPORTS, Ejecutor, animaciones_en_path, python
 
-# (presentación, idioma) → etiqueta. Debe coincidir con DECKS de animaciones/decks_espaciales.py.
+# (presentación, idioma) → etiqueta de las incluidas (DECKS de decks_espaciales.py); las del usuario se agregan al recargar.
 PRESENTACIONES = [
     ("seminario", "es", "Seminario de divulgación  ·  ES"),
     ("seminario", "en", "Public seminar  ·  EN"),
@@ -136,11 +137,7 @@ class PresentacionesPanel(QWidget):
         nota.setObjectName("nota")
 
         self.lista_pres = QListWidget()
-        for k, idioma, etiqueta in PRESENTACIONES:
-            it = QListWidgetItem(etiqueta)
-            it.setData(Qt.UserRole, (k, idioma))
-            self.lista_pres.addItem(it)
-        self.lista_pres.setCurrentRow(0)
+        self.recargar_presentaciones()
         g1 = QGroupBox("PRESENTACIÓN")
         QVBoxLayout(g1).addWidget(self.lista_pres)
 
@@ -193,10 +190,13 @@ class PresentacionesPanel(QWidget):
         self.b_prev.clicked.connect(self.generar_vista)
         self.b_nuevo = QPushButton("Nuevo tema…")
         self.b_nuevo.clicked.connect(self.nuevo_tema)
+        self.b_fuentes = QPushButton("Instalar fuentes")
+        self.b_fuentes.setToolTip("Descarga de Google Fonts las fuentes de todos los temas registrados que falten (instalar_fuentes.py)")
+        self.b_fuentes.clicked.connect(self.instalar_fuentes)
         self.b_abrir = QPushButton("Abrir carpeta")
         self.b_abrir.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(CARPETA_SALIDA))))
         barra = QHBoxLayout()
-        for b in (self.b_construir, self.b_videos, self.b_parar, self.b_prev, self.b_nuevo, self.b_abrir):
+        for b in (self.b_construir, self.b_videos, self.b_parar, self.b_prev, self.b_nuevo, self.b_fuentes, self.b_abrir):
             barra.addWidget(b)
 
         lay = QVBoxLayout(self)
@@ -206,6 +206,25 @@ class PresentacionesPanel(QWidget):
         lay.addLayout(barra)
         lay.addWidget(self.log, 2)
         self.recargar_temas()
+
+    # ---- presentaciones (incluidas + las del usuario)
+    def recargar_presentaciones(self):
+        actual = self.lista_pres.currentItem().data(Qt.UserRole) if self.lista_pres.currentItem() else None
+        self.lista_pres.clear()
+        filas = list(PRESENTACIONES)
+        try:
+            import presentaciones_usuario as pu
+            filas += [(id_, idioma, f"{tit}  ·  {idioma.upper()}  ·  propia") for id_, tit, idioma in pu.listar()]
+        except Exception as e:  # sin el módulo siguen las incluidas
+            self.log.appendPlainText(f"No se pudieron leer las presentaciones propias: {e}") if hasattr(self, "log") else None
+        for k, idioma, etiqueta in filas:
+            it = QListWidgetItem(etiqueta)
+            it.setData(Qt.UserRole, (k, idioma))
+            self.lista_pres.addItem(it)
+            if (k, idioma) == actual:
+                self.lista_pres.setCurrentItem(it)
+        if self.lista_pres.currentRow() < 0:
+            self.lista_pres.setCurrentRow(0)
 
     # ---- temas
     def recargar_temas(self, seleccionar=None):
@@ -262,12 +281,21 @@ class PresentacionesPanel(QWidget):
 
     # ---- acciones
     def _ocupado(self, si):
-        for b in (self.b_construir, self.b_videos, self.b_prev, self.b_nuevo):
+        for b in (self.b_construir, self.b_videos, self.b_prev, self.b_nuevo, self.b_fuentes):
             b.setEnabled(not si)
         self.b_parar.setEnabled(si)
 
     def _termino(self, codigo):
+        if getattr(self, "_instalando", False):  # las fuentes recién instaladas se registran sin reiniciar la app
+            self._instalando = False
+            n = 0
+            for f in sorted((Path.home() / ".local/share/fonts/codeaerospace").glob("*.ttf")):
+                n += QFontDatabase.addApplicationFont(str(f)) >= 0
+            self.log.appendPlainText(f"{n} archivos de fuente registrados en la app.")
         self.recargar_temas(self._tema_actual().id if self._tema_actual() else None)
+
+    def instalar_fuentes(self):
+        self._instalando = self.ejecutor.correr(python(), ["instalar_fuentes.py"])
 
     def construir(self, solo_videos):
         k, idioma = self.lista_pres.currentItem().data(Qt.UserRole)

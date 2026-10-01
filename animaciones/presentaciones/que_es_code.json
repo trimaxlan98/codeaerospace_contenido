@@ -1,0 +1,221 @@
+{
+  "id": "que_es_code",
+  "idioma": "es",
+  "titulo": "¿Qué es Co.De Aerospace?",
+  "lema": "Ingeniería basada en investigación para la economía NewSpace",
+  "kicker": "PRESENTACIÓN INSTITUCIONAL",
+  "autor": "Co.De Aerospace",
+  "instit": "codeaerospace.com  ·  contacto@codeaerospace.com",
+  "pie": "¿Qué es Co.De Aerospace? · codeaerospace.com",
+  "cierre_titulo": "Rumbo a la WRC-27",
+  "ritmo": 140,
+  "marca": true,
+  "nota": "Presentación institucional armada con los textos públicos de codeaerospace.com (consultado el 2026-09-30). Las cifras, fechas y metas son las que publica el sitio: las líneas ⚠️ marcan lo que hay que confirmar o presentar como meta, no como hecho.",
+  "diapos": [
+    {
+      "tipo": "portada",
+      "guion": "Buenas tardes. En los próximos minutos les voy a contar qué es Co.De Aerospace: qué problema nos ocupa, qué hemos construido, cómo trabajamos y hacia dónde vamos. La versión corta cabe en una línea: hacemos ingeniería basada en investigación para la economía NewSpace, con el foco puesto en las comunicaciones satelitales en órbitas no geoestacionarias."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Co.De Aerospace en una frase",
+      "sub": "Sistemas espaciales avanzados para órbitas no geoestacionarias (NGSO)",
+      "puntos": [
+        "Ingeniería basada en investigación para la economía NewSpace",
+        "Comunicaciones satelitales en órbita baja: rastreo, espectro e inteligencia artificial",
+        "Tres frentes en un mismo ecosistema: investigación, formación técnica e ingeniería digital",
+        "Una misión con fecha en el calendario: la WRC-27 de la UIT"
+      ],
+      "sticker": "WalkerDelta3D",
+      "guion": "Co.De Aerospace desarrolla sistemas espaciales para órbitas no geoestacionarias, lo que en el sector se abrevia NGSO. Trabajamos en tres frentes que se alimentan entre sí: la investigación en comunicaciones satelitales, la formación técnica de ingenieros y la ingeniería digital que, como verán, financia todo lo demás. Y tenemos una fecha en el calendario que ordena las prioridades: la Conferencia Mundial de Radiocomunicaciones de 2027."
+    },
+    {
+      "tipo": "seccion",
+      "titulo": "El problema: el espectro en órbita baja",
+      "sub": "Por qué las órbitas no geoestacionarias importan ahora",
+      "guion": "Empecemos por el problema, porque sin él nada de lo demás tiene sentido."
+    },
+    {
+      "tipo": "video",
+      "clase": "OrbitasLEOMEOGEO",
+      "titulo": "Órbitas no geoestacionarias: más cerca y más rápido",
+      "sub": "LEO, MEO y GEO: altitud y periodo",
+      "guion": "Un satélite geoestacionario vive a casi treinta y seis mil kilómetros y parece quieto en el cielo. Los de órbita media y, sobre todo, los de órbita baja viajan mucho más cerca de la Tierra y le dan la vuelta en minutos u horas. Estar cerca tiene ventajas enormes, pero también un costo: el satélite pasa rápido por encima de nosotros y hay que perseguirlo."
+    },
+    {
+      "tipo": "video",
+      "clase": "ComparaLatencia",
+      "titulo": "Por qué la órbita baja",
+      "sub": "Latencia de ida y vuelta en LEO, MEO y GEO",
+      "guion": "La ventaja más visible es la latencia. Una señal que sube a órbita geoestacionaria y baja tarda lo suficiente para que una videollamada se sienta torpe. En órbita baja ese tiempo se reduce muchísimo. Por eso las nuevas constelaciones se van a órbita baja, y por eso cada vez hay más satélites compartiendo el mismo cielo."
+    },
+    {
+      "tipo": "video",
+      "clase": "Interferencia",
+      "titulo": "Muchas constelaciones, un mismo espectro",
+      "sub": "Solape de haces y coordinación de frecuencia",
+      "guion": "Y ahí aparece el verdadero cuello de botella: el espectro radioeléctrico. Muchas constelaciones quieren usar las mismas bandas y sus haces se solapan. Sin coordinación, se interfieren entre sí y con las redes geoestacionarias que ya existen. Modelar esa interferencia y respetar los límites de la UIT es una de nuestras líneas de trabajo."
+    },
+    {
+      "tipo": "cita",
+      "frase": "Las decisiones de la WRC-27 afectarán a cualquier constelación que opere sobre América Latina durante la próxima década.",
+      "sub": "WRC-27 · Conferencia Mundial de Radiocomunicaciones de la UIT",
+      "sticker": "CoberturaHexagonal",
+      "guion": "La Conferencia Mundial de Radiocomunicaciones de 2027 va a redefinir cómo se reparte el espectro para los sistemas no geoestacionarios. Lo que se decida ahí condiciona la viabilidad técnica y regulatoria de cualquier constelación sobre América Latina. Por eso acompañamos a organizaciones públicas y privadas en su preparación técnica, regulatoria y estratégica.",
+      "cuidado": "Es la lectura que publica Co.De Aerospace sobre la WRC-27. La sede y la fecha (Shanghái, octubre de 2027) hay que confirmarlas con la UIT antes de decirlas en vivo."
+    },
+    {
+      "tipo": "seccion",
+      "titulo": "Lo que construimos",
+      "sub": "Plataformas en operación, no maquetas",
+      "guion": "Pasemos a lo que hemos construido. Todo lo que voy a mostrar está desplegado y corre en infraestructura que administramos nosotros."
+    },
+    {
+      "tipo": "video",
+      "clase": "CadenaTLEaAntena",
+      "titulo": "Sistema APT: posicionamiento y rastreo automático",
+      "sub": "De los elementos orbitales a los motores de la antena",
+      "guion": "El corazón de nuestra investigación es el sistema de Posicionamiento y Rastreo Automático, APT. Parte de los elementos orbitales publicados de cada satélite, propaga su órbita, calcula hacia dónde debe apuntar la antena en azimut y elevación y se lo entrega a un controlador que mueve los motores. Es lo que permite comunicarse en tiempo real con un satélite que cruza el cielo en minutos."
+    },
+    {
+      "tipo": "video",
+      "clase": "AntenaSiguiendo",
+      "titulo": "Una estación terrena que sigue al satélite",
+      "sub": "Seguimiento sobre la máscara de elevación",
+      "guion": "Así se ve el resultado: la antena persigue al satélite durante todo el pase, desde que aparece sobre el horizonte útil hasta que se pierde. El seguimiento tiene que ser preciso y continuo, porque en órbita baja la ventana de contacto es corta."
+    },
+    {
+      "tipo": "video",
+      "clase": "SDRAntenaANumero",
+      "titulo": "Estación terrena con radio definida por software",
+      "sub": "De la antena al espectro: muestreo, I/Q y FFT",
+      "guion": "La estación terrena usa radio definida por software. La señal que capta la antena se digitaliza y todo lo demás ocurre en programas: el espectro, la cascada de frecuencias, la demodulación y la decodificación. Eso nos permite cambiar de satélite o de modulación sin cambiar de hardware.",
+      "cuidado": "El despliegue público de la estación no tiene un receptor de radio conectado: la recepción se demuestra con grabaciones IQ. Decirlo así si preguntan."
+    },
+    {
+      "tipo": "video",
+      "clase": "GemeloDigitalSync",
+      "titulo": "Gemelos digitales satelitales",
+      "sub": "Órbitas reales de CelesTrak, telemetría simulada",
+      "guion": "También construimos gemelos digitales. Toman órbitas reales de catálogos públicos, las propagan y las muestran en un globo en tres dimensiones. Sobre esa geometría real, un modelo simula la telemetría de cada satélite: batería, procesador, temperatura, carga útil. Así se pueden ensayar escenarios sobre una flota completa sin tocar hardware.",
+      "cuidado": "La telemetría de subsistemas es simulada por un modelo determinista: es un entorno de simulación, no monitoreo de satélites en vuelo."
+    },
+    {
+      "tipo": "video",
+      "clase": "ArquitecturaNTN",
+      "titulo": "Proyecto OMNI: la inteligencia artificial como capa de orquestación",
+      "sub": "Núcleo de IA, satélite NGSO, estación terrena y agentes",
+      "guion": "El proyecto OMNI une las piezas: un núcleo de inteligencia artificial conectado a un satélite no geoestacionario, a una estación terrena y a agentes conversacionales. Lo desarrollamos como una simulación ciber-física de la topología completa de la red, con telemetría sintética en tiempo real.",
+      "cuidado": "OMNI es un MVP en simulación, no un servicio operando con satélites reales."
+    },
+    {
+      "tipo": "seccion",
+      "titulo": "Cómo trabajamos",
+      "sub": "Del alcance a la entrega, en cuatro fases",
+      "guion": "Ahora, cómo trabajamos, porque el método importa tanto como la tecnología."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Del alcance a la entrega",
+      "sub": "Un proceso de ingeniería con hitos verificables",
+      "puntos": [
+        "Alcance: requerimientos técnicos, restricciones y criterios de éxito medibles",
+        "Factibilidad: se validan los supuestos críticos antes de comprometer recursos",
+        "Ejecución por hitos: entregables verificables y trazables al alcance original",
+        "Entrega documentada: criterios de aceptación cumplidos y soporte de transición"
+      ],
+      "sticker": "PipelineCompuertas",
+      "guion": "Cada proyecto pasa por cuatro fases. Primero el alcance: requerimientos, restricciones y criterios de éxito que se puedan medir. Luego la factibilidad: validamos los supuestos críticos antes de gastar en ejecución. Después ejecutamos por hitos, cada uno con un entregable verificable. Y al final entregamos con documentación técnica y soporte de transición. Nada pasa a la siguiente fase sin haber cumplido la anterior."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "El modelo CO.DE: tecnología que se autofinancia",
+      "sub": "La ingeniería digital financia la investigación espacial",
+      "puntos": [
+        "CO.DE Strategy desarrolla sitios web, aplicaciones y soluciones de IA para empresas",
+        "Esos ingresos financian la investigación en NGSO, espectro radioeléctrico y WRC-27",
+        "No depende de fondos gubernamentales ni de rondas de inversión",
+        "Cada cliente es, indirectamente, un habilitador de investigación aeroespacial mexicana"
+      ],
+      "sticker": "MallaISL",
+      "guion": "Nuestro modelo es poco común en el ecosistema aeroespacial latinoamericano. La división CO.DE Strategy hace proyectos digitales para empresas: sitios, aplicaciones y soluciones con inteligencia artificial. Esos ingresos financian directamente la investigación en sistemas no geoestacionarios y en espectro. No dependemos de fondos de gobierno ni de rondas de inversión: avanzamos proyecto a proyecto."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "CO.DE Academy: formación técnica",
+      "sub": "Cursos con laboratorios que corren en el navegador",
+      "puntos": [
+        "Simulaciones interactivas en canfret.com y lecciones en video en YouTube",
+        "Señales y sistemas, materiales aeroespaciales, redes satelitales, IA agéntica y sistemas APT",
+        "Rutas de aprendizaje con prerrequisitos entre cursos"
+      ],
+      "sticker": "EspectroFourier",
+      "guion": "El tercer frente es la formación. En CO.DE Academy publicamos cursos de ingeniería con laboratorios que se ejecutan en el navegador y lecciones en video. Los temas van de señales y sistemas a materiales aeroespaciales, redes satelitales, inteligencia artificial agéntica y sistemas de rastreo. Las animaciones que ven en esta presentación salen de la misma herramienta con la que producimos esos cursos."
+    },
+    {
+      "tipo": "seccion",
+      "titulo": "Hacia dónde vamos",
+      "sub": "El mapa de ruta de la misión",
+      "guion": "Termino con hacia dónde vamos."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Mapa de ruta de la misión",
+      "sub": "De la fundación a la WRC-27",
+      "puntos": [
+        "2024 · Fundación: el laboratorio y sus principios de investigación",
+        "2025 · División MicroApps y presentación en el congreso WITCOM 2025",
+        "2026 · Fase beta del sistema APT (tesis de maestría)",
+        "2027 · Estancia alineada con el NASA JPL Roadmap y soporte técnico para la WRC-27"
+      ],
+      "sticker": "NochePases",
+      "guion": "Nuestra hoja de ruta tiene cuatro hitos. La fundación del laboratorio y sus principios de investigación. Después, la división MicroApps y la presentación en el congreso WITCOM de 2025. Luego, la fase beta del sistema de rastreo, que es además una tesis de maestría. Y hacia 2027, una estancia de investigación alineada con la hoja de ruta del JPL de la NASA y el soporte técnico rumbo a la WRC-27.",
+      "cuidado": "La estancia en JPL y el soporte para la WRC-27 son metas de la hoja de ruta, no hechos cumplidos: presentarlas como objetivos."
+    },
+    {
+      "tipo": "video",
+      "clase": "EnjambreDespliegue",
+      "titulo": "La meta: los primeros nodos en órbita",
+      "sub": "Despliegue operativo de la constelación",
+      "guion": "Y la meta que da sentido a todo: el despliegue operativo, es decir, poner en órbita los primeros nodos de comunicación de una constelación. Todo lo anterior, el rastreo, los gemelos digitales, la orquestación con inteligencia artificial y la preparación regulatoria, apunta a llegar ahí con la ingeniería validada.",
+      "cuidado": "Es la última etapa de la hoja de ruta: una meta, no algo ya logrado."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "CO.DE en números",
+      "sub": "Lo que publica codeaerospace.com",
+      "puntos": [
+        "3+ investigadores del IPN",
+        "4 proyectos en producción",
+        "500+ horas de entrenamiento y 150+ ingenieros capacitados",
+        "10+ conferencias"
+      ],
+      "sticker": "TelemetriaEnVivo",
+      "guion": "Algunos números para dimensionar dónde estamos: más de tres investigadores del Politécnico, cuatro proyectos en producción, más de quinientas horas de entrenamiento, más de ciento cincuenta ingenieros capacitados y más de diez conferencias.",
+      "cuidado": "Son las cifras que publica el sitio; confírmalas con el equipo antes de decirlas en vivo."
+    },
+    {
+      "tipo": "cita",
+      "frase": "Guiando el futuro de la ingeniería aeroespacial con precisión y visión.",
+      "sub": "Co.De Aerospace",
+      "sticker": "Tierra3DSatelites",
+      "guion": "Si tuviera que quedarme con una frase, sería la nuestra: guiar el futuro de la ingeniería aeroespacial con precisión y visión. Precisión, porque validamos antes de afirmar. Visión, porque la ventana para influir en cómo se usa la órbita baja sobre América Latina se está abriendo ahora."
+    },
+    {
+      "tipo": "cierre",
+      "guion": "Gracias. Estamos abiertos a alianzas, a colaborar con universidades y a acompañar a organizaciones en la preparación para la WRC-27. Toda la información está en codeaerospace.com. Con gusto respondo sus preguntas."
+    },
+    {
+      "tipo": "respaldo",
+      "titulo": "¿Cómo colaborar con CO.DE?",
+      "sub": "Para las preguntas",
+      "puntos": [
+        "Alianzas estratégicas, inversores ángel y fondeo institucional alineado con la misión 2027",
+        "Sesiones de trabajo sobre el impacto regulatorio de la WRC-27 en tu organización",
+        "Contacto: contacto@codeaerospace.com (respuesta en menos de 24 h)"
+      ],
+      "sticker": "EspacioAireTierra",
+      "guion": "Si preguntan cómo colaborar: estamos abiertos a alianzas estratégicas, inversores ángel y fondeo institucional alineado con la misión 2027; ofrecemos sesiones para evaluar el impacto regulatorio de la WRC-27; y el contacto es contacto arroba codeaerospace punto com, con respuesta en menos de veinticuatro horas."
+    }
+  ]
+}

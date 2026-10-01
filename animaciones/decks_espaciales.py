@@ -24,7 +24,9 @@ Uso:
 Salida: exports/presentaciones/espaciales/<tema>/<archivo>_<tema>.pptx  (mezcla: espaciales/mezcla/<archivo>_<a>-<b>.pptx)
 Fuentes: exports/presentaciones/espaciales/fuentes/ (instalar antes de abrir en PowerPoint).
 """
+import functools
 import io
+import re
 import shutil
 import subprocess
 import sys
@@ -45,6 +47,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import catalogo  # noqa: E402
 import catalogo_tesis  # noqa: E402
 import fondos_espaciales as F  # noqa: E402
+import presentaciones_usuario as PU  # noqa: E402
 import temas_espaciales as TE  # noqa: E402
 import traducciones_en as EN  # noqa: E402
 from empaquetar_ponencia import EXP, nombre_legible  # noqa: E402
@@ -105,10 +108,21 @@ def _sticker_para(deck, clave):
 # presentación → idioma → módulo con CFG y DIAPOS (la divulgación se arma desde ponencia_divulgacion.py)
 DECKS = {"seminario": {"es": "tesis_seminario", "en": "tesis_seminario_en"},
          "comite": {"es": "tesis_comite"}, "divulgacion": {"es": "ponencia_divulgacion"}}
+INCLUIDAS = set(DECKS)
+# presentaciones creadas por el usuario (animaciones/presentaciones/<id>.json, ver presentaciones_usuario.py); una sola lengua cada una
+for _id, _tit, _idioma in PU.listar():
+    if _id not in DECKS:
+        DECKS[_id] = {_idioma: "usuario"}
 
 
 def _cargar(deck, idioma):
     """(cfg, [diapositivas como dict]); el sticker de las diapositivas de solo texto solo se asigna en español."""
+    if DECKS[deck].get(idioma) == "usuario":
+        d = PU.cargar(deck)
+        errores, _ = PU.validar(d)
+        if errores:
+            raise SystemExit(f"la presentación «{deck}» tiene errores:\n  " + "\n  ".join(errores))
+        return PU.a_deck(d)
     if deck == "divulgacion":
         import ponencia_divulgacion as P
         cfg = dict(archivo="redes_orbitales_divulgacion", kicker="PONENCIA DE DIVULGACIÓN  ·  DOS VOCES",
@@ -377,8 +391,67 @@ def texto(s, x, y, w, h, contenido, tam, col, fuente, negrita=False, alinear="l"
     return tb
 
 
-def lineas_est(t, tam, ancho, k_car):
-    """Líneas estimadas de un texto de `tam` pt en `ancho` pulgadas (k_car = ancho medio del carácter en em)."""
+@functools.lru_cache(maxsize=None)
+def _archivo_fuente(familia, negrita):
+    """Ruta del .ttf de la familia (fontconfig) o None si no está instalada (fc-match devolvería otra familia)."""
+    try:
+        r = subprocess.run(["fc-match", "-f", "%{family}|%{file}", f"{familia}:{'bold' if negrita else 'regular'}"],
+                           capture_output=True, text=True, timeout=10).stdout
+    except Exception:
+        return None
+    fams, _, ruta = r.partition("|")
+    return ruta if familia in fams.split(",") and ruta else None
+
+
+@functools.lru_cache(maxsize=None)
+def _fuente_pil(ruta):
+    from PIL import ImageFont
+    return ImageFont.truetype(ruta, 100)
+
+
+def partir(t, tam, ancho, fuente, negrita=False):
+    """Líneas (lista de str) con corte por palabras y las métricas reales de la fuente; None si no está instalada."""
+    ruta = _archivo_fuente(fuente, negrita) if fuente else None
+    if not ruta:
+        return None
+    f = _fuente_pil(ruta)
+    limite = ancho * 72 / tam * 100 * 0.985  # px a 100 pt; 1.5 % de margen por diferencias de render
+    lineas, linea = [], ""
+    for pal in t.split():
+        prueba = f"{linea} {pal}" if linea else pal
+        if linea and f.getlength(prueba) > limite:
+            lineas.append(linea)
+            linea = pal
+        else:
+            linea = prueba
+    return lineas + [linea]
+
+
+def fijar_lineas(tb, t, tam, ancho, fuente, negrita=False):
+    """Si el texto tiene palabras con guion interno («WRC-27»), parte las líneas aquí con saltos explícitos: PowerPoint
+    y LibreOffice cortan en el guion («WRC-» / «27») y ninguna fuente de los temas trae el guion no separable U+2011."""
+    if not re.search(r"\w-\w", t):
+        return
+    lineas = partir(t, tam, ancho, fuente, negrita)
+    if not lineas or len(lineas) < 2:
+        return
+    p = tb.text_frame.paragraphs[0]
+    r0 = p.runs[0]
+    r0.text = lineas[0]
+    for l in lineas[1:]:
+        p.add_line_break()
+        r = p.add_run()
+        r.text = l
+        r.font.name, r.font.size, r.font.bold = r0.font.name, r0.font.size, r0.font.bold
+        r.font.color.rgb = r0.font.color.rgb
+
+
+def lineas_est(t, tam, ancho, k_car, fuente=None, negrita=False):
+    """Líneas de un texto de `tam` pt en `ancho` pulgadas. Con `fuente` instalada se mide con sus métricas reales
+    (corte por palabras como PowerPoint); si no, se estima con k_car = ancho medio del carácter en em."""
+    lineas = partir(t, tam, ancho, fuente, negrita)
+    if lineas:
+        return len(lineas)
     por_linea = max(8, int(ancho * 72 / (tam * k_car)))
     n, actual = 1, 0
     for pal in t.split():
@@ -389,10 +462,14 @@ def lineas_est(t, tam, ancho, k_car):
     return n
 
 
-def ajustar(t, ancho, alto, tams, k_car, inter=1.12):
-    """Primer tamaño de `tams` con el que el texto cabe en alto (pulgadas)."""
+# Paso de línea medido (LibreOffice y PowerPoint): 1.2 em × el interlineado del párrafo, igual en todas las fuentes.
+PASO = 1.2
+
+
+def ajustar(t, ancho, alto, tams, k_car, inter=PASO, fuente=None, negrita=False):
+    """Primer tamaño de `tams` con el que el texto cabe en alto (pulgadas); `inter` = paso de línea en em."""
     for z in tams:
-        if lineas_est(t, z, ancho, k_car) * z * inter / 72 <= alto:
+        if lineas_est(t, z, ancho, k_car, fuente, negrita) * z * inter / 72 <= alto:
             return z
     return tams[-1]
 
@@ -415,6 +492,7 @@ class Diseno:
     def usar(self, tema):
         self.E, self.ent = tema, tema.id
         self.C, self.Fu = tema.color, tema.fuentes
+        self.fl = PASO * 0.95  # avance por línea de los títulos (interlineado 0.95), en em
 
     # ---- idioma
     def t(self, clave):
@@ -512,10 +590,11 @@ class Diseno:
 
     def titulo(self, s, x, y, w, t, tams, alto, alinear="l", col=None):
         k = self.E["k_titulo"]
-        z = ajustar(t, w, alto, [round(v * k) for v in tams], self.E["ancho_car"]["titulo"], 1.0)
-        texto(s, x, y, w, alto, t, z, col or self.C["tinta"], self.Fu["titulo"], negrita=True, alinear=alinear,
-              interlinea=0.95)
-        return z, lineas_est(t, z, w, self.E["ancho_car"]["titulo"])
+        z = ajustar(t, w, alto, [round(v * k) for v in tams], self.E["ancho_car"]["titulo"], PASO * 0.95, self.Fu["titulo"], True)
+        tb = texto(s, x, y, w, alto, t, z, col or self.C["tinta"], self.Fu["titulo"], negrita=True, alinear=alinear,
+                   interlinea=0.95)
+        fijar_lineas(tb, t, z, w, self.Fu["titulo"], True)
+        return z, lineas_est(t, z, w, self.E["ancho_car"]["titulo"], self.Fu["titulo"], True)
 
     def regla(self, s, x, y, w):
         degradado(s, x, y, w, 0.018, self.C["linea"], 0.9, 0.0, 0)
@@ -546,8 +625,8 @@ class Diseno:
         k = self.E["ancho_car"]["cuerpo"]
         sangria = 0.62
         for z in (22, 20, 19, 18, 17, 16, 15, 14):
-            lin = sum(lineas_est(t, z, w - sangria, k) for t in puntos)
-            if lin * z * 1.2 / 72 + (len(puntos) - 1) * z * 0.8 / 72 <= h:
+            lin = sum(lineas_est(t, z, w - sangria, k, self.Fu["cuerpo"]) for t in puntos)
+            if lin * z * PASO * 1.08 / 72 + (len(puntos) - 1) * z * 0.8 / 72 <= h:  # interlineado 1.08 + espacio entre puntos
                 break
         tb = s.shapes.add_textbox(I(x), I(y), I(w), I(h))
         tf = tb.text_frame
@@ -582,7 +661,7 @@ class Diseno:
         self.kicker(s, x, 1.25, w, cfg["kicker"], tam=11)
         tam = cfg.get("tam_titulo", 54) + 6
         z, nl = self.titulo(s, x, 1.62, w, cfg["titulo"], [tam, tam - 6, tam - 12, 40, 36], 2.3)
-        y = 1.62 + min(nl, 3) * z * 1.12 / 72 + 0.2
+        y = 1.62 + min(nl, 3) * z * self.fl / 72 + 0.2
         texto(s, x, y, w, 0.9, cfg["lema"], 24, C["acento"], Fu["cuerpo"])
         y += 0.95
         self.regla(s, x, y, min(w, 6.5))
@@ -606,7 +685,7 @@ class Diseno:
         x, w = (6.2, 6.4) if derecha else (0.85, 9.5)
         self.kicker(s, x, 1.55, w, self.t("GRACIAS  ·  PREGUNTAS"), tam=11)
         z, nl = self.titulo(s, x, 1.95, w, cfg["cierre_titulo"], [52, 46, 40, 36], 2.2)
-        y = 1.95 + min(nl, 3) * z * 1.12 / 72 + 0.3
+        y = 1.95 + min(nl, 3) * z * self.fl / 72 + 0.3
         self.regla(s, x, y, min(w, 6))
         texto(s, x, y + 0.25, w, 0.45, cfg["autor"], 18, C["tinta"], Fu["titulo"], negrita=True)
         texto(s, x, y + 0.68, w, 0.6, cfg["instit"], 13, C["tenue"], Fu["cuerpo"])
@@ -624,7 +703,7 @@ class Diseno:
               negrita=True, alfa=0.9)
         self.kicker(s, x, 2.75, w, f"{self.t('SECCIÓN')} {sec:02d} / {self.nsec:02d}")
         z, nl = self.titulo(s, x, 3.1, w, d["titulo"], [48, 42, 38, 34], 1.9)
-        y = 3.1 + min(nl, 3) * z * 1.12 / 72 + 0.12
+        y = 3.1 + min(nl, 3) * z * self.fl / 72 + 0.12
         texto(s, x, y, w, 0.9, d["sub"], 20, C["acento2"], Fu["cuerpo"])
         # miniaturas de lo que viene
         vids = self.videos_de.get(sec, [])[:6]
@@ -685,7 +764,7 @@ class Diseno:
         x, w = 0.7, 6.35
         self.kicker(s, x, 0.55, 11.9, self.kicker_de(d))
         z, nl = self.titulo(s, x, 0.85, 11.9, d["titulo"], [38, 34, 30, 27], 1.2)
-        y = 0.85 + min(nl, 2) * z * 1.12 / 72 + 0.06
+        y = 0.85 + min(nl, 2) * z * self.fl / 72 + 0.06
         texto(s, x, y, 11.9, 0.4, d["sub"], 17, C["acento2"], self.Fu["cuerpo"])
         y += 0.62
         self.regla(s, x, y, 5.5)
@@ -706,8 +785,12 @@ class Diseno:
               negrita=True, alfa=0.35)
         frase = d["frase"]
         k = self.E["k_titulo"]
-        z = ajustar(frase, w, 3.6, [round(v * k) for v in (44, 40, 36, 32, 28, 25, 23)], self.E["ancho_car"]["titulo"], 1.05)
-        texto(s, x, 1.75, w, 3.7, frase, z, C["tinta"], Fu["titulo"], negrita=True, ancla="m", interlinea=1.0)
+        # el bloque empieza bajo la comilla y se ajusta a 3.25 in dentro de una caja de 3.45 in: con frases largas en
+        # fuentes anchas el texto centrado crecía hacia arriba y se montaba sobre la comilla
+        z = ajustar(frase, w, 3.25, [round(v * k) for v in (44, 40, 36, 32, 28, 25, 23, 21)], self.E["ancho_car"]["titulo"], PASO,
+                    Fu["titulo"], True)
+        tb = texto(s, x, 2.0, w, 3.45, frase, z, C["tinta"], Fu["titulo"], negrita=True, ancla="m", interlinea=1.0)
+        fijar_lineas(tb, frase, z, w, Fu["titulo"], True)
         if d.get("sub"):
             self.regla(s, x, 5.6, 3.5)
             texto(s, x, 5.78, w, 0.9, d["sub"], 18, C["acento2"], Fu["cuerpo"])
@@ -736,7 +819,11 @@ class Diseno:
 # ------------------------------------------------------------------ orquestación
 def construir(temas, deck, idioma="es", reparto="seccion"):
     cfg, ds = presentacion(deck, idioma)
-    return Diseno(temas, deck, cfg, ds, idioma, reparto).construir()
+    destino = Diseno(temas, deck, cfg, ds, idioma, reparto).construir()
+    if deck not in INCLUIDAS:  # presentación de usuario: su guion .md al lado de los demás (exports/GUION_<ID>.md)
+        d = PU.cargar(deck)
+        PU.ruta_guion(d).write_text(PU.guion_md(d), encoding="utf-8")
+    return destino
 
 
 def preparar_videos(temas, decks, idioma="es"):
@@ -779,7 +866,7 @@ def copiar_fuentes():
 def main(argv):
     import argparse
     ap = argparse.ArgumentParser(description="Presentaciones espaciales: temas, idioma y mezcla.")
-    ap.add_argument("nombres", nargs="*", help="ids de tema y/o de presentación (seminario, comite, divulgacion)")
+    ap.add_argument("nombres", nargs="*", help="ids de tema y/o de presentación (seminario, comite, divulgacion y las de presentaciones/)")
     ap.add_argument("--en", action="store_true", help="versión en inglés (solo las presentaciones que la tienen)")
     ap.add_argument("--mezcla", help="temas separados por coma: se reparten en el deck (uno por sección)")
     ap.add_argument("--mezcla-por", choices=["seccion", "diapositiva"], default="seccion")
@@ -798,7 +885,7 @@ def main(argv):
     if desconocidos:
         raise SystemExit(f"no reconozco: {desconocidos}. Temas: {', '.join(TE.TEMAS)}; presentaciones: {', '.join(DECKS)}")
     ids = [n for n in a.nombres if n in TE.TEMAS] or (list(TE.TEMAS) if a.todos else [TE.TEMA_OFICIAL])
-    decks = [n for n in a.nombres if n in DECKS] or list(DECKS)
+    decks = [n for n in a.nombres if n in DECKS] or [k for k in DECKS if k in INCLUIDAS]  # las de usuario, solo si se nombran
     decks = [k for k in decks if idioma in DECKS[k]]
     if not decks:
         raise SystemExit(f"ninguna de esas presentaciones tiene versión en {idioma!r}")

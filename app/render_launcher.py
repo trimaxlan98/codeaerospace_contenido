@@ -2,7 +2,8 @@
 
 Pestañas (cada una es un componente de app/componentes/):
   · Renders          escenas del proyecto (raíz y animaciones/) con tema oscuro/claro e idioma es/en
-  · Presentaciones   decks espaciales: presentación + idioma + temas (uno por tema o mezclados) + temas nuevos
+  · Presentaciones   decks espaciales: presentación + idioma + temas (uno por tema o mezclados) + temas nuevos + fuentes
+  · Nueva presentación   crear y editar presentaciones propias (piezas, textos, guion) y construirlas en un tema
 Uso: python app/render_launcher.py
 """
 import re
@@ -19,6 +20,7 @@ from PySide6.QtWidgets import (
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from componentes import tema_espacial  # noqa: E402
 from componentes.base import ANIM, ROOT, Ejecutor  # noqa: E402
+from componentes.nueva_presentacion import NuevaPresentacionPanel  # noqa: E402
 from componentes.presentaciones import PresentacionesPanel  # noqa: E402
 
 QUALITIES = {"Baja (480p)": ["-ql"], "Media (720p)": ["-qm"], "Alta (1080p)": ["-qh"],
@@ -116,12 +118,26 @@ class Launcher(QMainWindow):
         self.setWindowTitle("Co.De Aerospace · Estudio")
         self.resize(1180, 820)
         self.tabs = QTabWidget()
-        self.tabs.addTab(PresentacionesPanel(), "PRESENTACIONES")
+        self.presentaciones = PresentacionesPanel()
+        self.nueva = NuevaPresentacionPanel()
+        self.tabs.addTab(self.presentaciones, "PRESENTACIONES")
+        self.tabs.addTab(self.nueva, "NUEVA PRESENTACIÓN")
         self.tabs.addTab(RendersPanel(), "RENDERS")
+        self.tabs.currentChanged.connect(self._al_cambiar)
         raiz = QWidget()
         raiz.setObjectName("raiz")
         QVBoxLayout(raiz).addWidget(self.tabs)
         self.setCentralWidget(raiz)
+
+    def _al_cambiar(self, i):
+        if self.tabs.widget(i) is self.presentaciones and hasattr(self.presentaciones, "recargar_presentaciones"):
+            self.presentaciones.recargar_presentaciones()  # muestra las presentaciones propias recién guardadas
+
+    def closeEvent(self, ev):
+        if getattr(self.nueva, "pu", None) and not self.nueva._confirmar_descartar():
+            ev.ignore()
+            return
+        ev.accept()
 
 
 if __name__ == "__main__":

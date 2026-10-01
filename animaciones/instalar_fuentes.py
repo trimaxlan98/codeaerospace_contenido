@@ -124,9 +124,14 @@ def de_los_temas():
     sys.path.insert(0, str(Path(__file__).parent))
     import temas_espaciales as TE
     pedidas = {}
+    pesos = {v: k for k, v in NOMBRE_PESO.items()}
     for t in TE.TEMAS.values():
         for fam in set(t.fuentes.values()) | ({t.manim["FUENTE"], t.manim["FUENTE_CIFRA"]} if t.manim else set()):
-            pedidas.setdefault(fam, [400, 700])
+            base, _, ultimo = fam.rpartition(" ")
+            if base and ultimo in pesos and ultimo != "Regular":  # «Jura Medium» = familia Jura, peso 500
+                pedidas.setdefault(base, [400, 700]).append(pesos[ultimo])
+            else:
+                pedidas.setdefault(fam, [400, 700])
     return pedidas
 
 

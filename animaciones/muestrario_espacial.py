@@ -3,7 +3,8 @@
   exports/presentaciones/espaciales/MUESTRARIO_TEMAS[_EN].jpg   mismas 6 diapositivas del seminario en cada tema registrado
   exports/presentaciones/espaciales/<tema>/<archivo>_<tema>.pdf + _hoja.jpg (todas las diapositivas)
   (también recorre espaciales/mezcla/ y los temas nuevos de animaciones/temas/)
-Uso: python3 muestrario_espacial.py [--en] [tema …] [--nombre=MUESTRARIO_X]   (con temas solo esos; sin ellos, todos)
+Uso: python3 muestrario_espacial.py [--en] [tema …] [--nombre=MUESTRARIO_X] [--deck=ID --paginas=1,2,3]
+     (con temas solo esos; sin ellos, todos. --deck compara otra presentación —p. ej. una propia— con esas diapositivas)
 """
 import glob
 import subprocess
@@ -58,27 +59,32 @@ def main(argv=()):
     ids = [a for a in argv if not a.startswith("--")]
     nombre_out = next((a.split("=", 1)[1] for a in argv if a.startswith("--nombre=")), "MUESTRARIO_TEMAS")
     patron = "seminar_*" if en else "seminario_*"
+    deck = next((a.split("=", 1)[1] for a in argv if a.startswith("--deck=")), None)
+    muestra = MUESTRA
+    if deck:
+        patron = f"{deck}_*"
+        muestra = [int(x) for x in next((a.split("=", 1)[1] for a in argv if a.startswith("--paginas=")), "1,2,3,4").split(",")]
     filas = []
     f = ImageFont.truetype(str(FUENTE), 34)
     for e, E in TEMAS.items():
         if ids and e not in ids:
             continue
         carpeta = SALIDA / e
-        for pptx in sorted(carpeta.glob("*.pptx")):
+        for pptx in sorted(carpeta.glob((patron if deck else "*") + ".pptx")):
             pdf = a_pdf(pptx)
             hoja(paginas(pdf, 36), 6, titulo=f"{E.nombre.upper()}  ·  {pptx.stem}").save(
                 pptx.with_name(pptx.stem + "_hoja.jpg"), quality=85)
             print(pptx.name, "→ pdf y hoja")
         sem = next(iter(sorted(carpeta.glob(patron + ".pdf"))), None)
         if sem:
-            ims = paginas(sem, 50, MUESTRA)
+            ims = paginas(sem, 50, muestra)
             fila = hoja(ims, len(ims), sep=10)
             et = Image.new("RGB", (fila.width, 64), (28, 30, 38))
             fu = E.fuentes
             ImageDraw.Draw(et).text((14, 14), f"{E.nombre.upper()}   ·   {fu['titulo']} / {fu['cuerpo']} / {fu['etiqueta']}",
                                     font=f, fill=(230, 235, 245))
             filas += [et, fila]
-    for pptx in sorted((SALIDA / "mezcla").glob("*.pptx")) if not ids and (SALIDA / "mezcla").is_dir() else []:
+    for pptx in sorted((SALIDA / "mezcla").glob("*.pptx")) if not ids and not deck and (SALIDA / "mezcla").is_dir() else []:
         pdf = a_pdf(pptx)
         hoja(paginas(pdf, 36), 6, titulo=f"MEZCLA  ·  {pptx.stem}").save(pptx.with_name(pptx.stem + "_hoja.jpg"), quality=85)
         print(pptx.name, "→ pdf y hoja")
