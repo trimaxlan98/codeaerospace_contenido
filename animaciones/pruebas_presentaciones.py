@@ -10,6 +10,7 @@
      (en una carpeta temporal) y la pestaña «Presentaciones» ve la presentación guardada
 Sale con código 1 si algo falla. Uso: python3 pruebas_presentaciones.py [--decks que_es_code] [--app]
 """
+import io
 import json
 import re
 import subprocess
@@ -19,6 +20,9 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import numpy as np  # noqa: E402
+from PIL import Image  # noqa: E402
+
 import presentaciones_usuario as PU  # noqa: E402
 import temas_espaciales as TE  # noqa: E402
 
@@ -156,6 +160,7 @@ def t_temas():
 
 
 # ------------------------------------------------------------------ 5. decks construidos
+qn_r = lambda t: "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}" + t  # noqa: E731
 NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main", "p": "http://schemas.openxmlformats.org/presentationml/2006/main"}
 
 
@@ -164,7 +169,7 @@ def t_decks(ids):
     salida = PU.EXP / "presentaciones" / "espaciales"
     for id_ in ids:
         d = PU.cargar(id_)
-        _, ds = PU.a_deck(d)
+        cfg, ds = PU.a_deck(d)
         pptxs = sorted(salida.glob(f"*/{id_}_*.pptx"))
         print(f"5. decks de «{id_}»: {len(pptxs)} construidos")
         prueba(bool(pptxs), f"[{id_}] hay al menos un deck construido")
@@ -174,10 +179,33 @@ def t_decks(ids):
             slides = sorted((n for n in z.namelist() if re.match(r"ppt/slides/slide\d+\.xml$", n)), key=lambda n: int(re.findall(r"\d+", n)[0]))
             et = p.parent.name
             prueba(len(slides) == len(ds), f"[{et}] {len(slides)} diapositivas = {len(ds)}")
-            fuentes_ok = (set(tema.fuentes.values()) | {"Orbitron"}) if tema else None
+            # El «CO.DE AEROSPACE» en Orbitron ya no existe: la marca es la imagen del logo.
+            fuentes_ok = set(tema.fuentes.values()) if tema else None
             for i, (sn, x) in enumerate(zip(slides, ds), 1):
                 xml = etree.fromstring(z.read(sn))
                 rels = z.read(sn.replace("slides/", "slides/_rels/") + ".rels").decode()
+                if x["tipo"] in ("portada", "cierre") and cfg.get("marca"):
+                    logo = [e for e in xml.findall(".//p:pic", NS)
+                            if e.find("p:nvPicPr/p:cNvPr", NS).get("name") == "Logo Co.De Aerospace"]
+                    prueba(len(logo) == 1, f"[{et}] diapositiva {i} ({x['tipo']}): lleva el logo")
+                    if logo:
+                        off = logo[0].find(".//a:xfrm/a:off", NS)
+                        ext = logo[0].find(".//a:xfrm/a:ext", NS)
+                        x0, y0 = int(off.get("x")), int(off.get("y"))
+                        x1, y1 = x0 + int(ext.get("cx")), y0 + int(ext.get("cy"))
+                        dentro = 0 <= x0 and 0 <= y0 and x1 <= 13.333 * 914400 and y1 <= 7.5 * 914400
+                        prueba(dentro, f"[{et}] diapositiva {i}: el logo cabe en la diapositiva")
+                        # Plata sobre temas oscuros, negro sobre claros: se mide la imagen incrustada.
+                        rid = logo[0].find(".//a:blip", NS).get(qn_r("embed"))
+                        destino = re.search(rf'Id="{rid}"[^>]*Target="([^"]+)"', rels) or \
+                            re.search(rf'Target="([^"]+)"[^>]*Id="{rid}"', rels)
+                        img = Image.open(io.BytesIO(z.read("ppt/" + destino.group(1).replace("../", ""))))
+                        a = np.asarray(img.convert("RGBA")).astype(float)
+                        luz = a[..., :3][a[..., 3] > 200].mean()
+                        tinta_clara = contraste(tema.color["tinta"], "#000000") >= 7 if tema else True
+                        ok = luz > 150 if tinta_clara else luz < 60
+                        prueba(ok, f"[{et}] diapositiva {i}: logo {'plata' if luz > 150 else 'negro'} sobre tema "
+                                   f"{'oscuro' if tinta_clara else 'claro'}")
                 if x["tipo"] == "video":
                     prueba("video" in rels and ".mp4" in rels, f"[{et}] diapositiva {i}: tiene el video incrustado")
                 if x["tipo"] in ("texto", "cita", "respaldo") and x.get("sticker"):

@@ -54,6 +54,8 @@ from empaquetar_ponencia import EXP, nombre_legible  # noqa: E402
 from tesis_decks import guion_de, palabras, video_final  # noqa: E402
 
 SALIDA = EXP / "presentaciones" / "espaciales"
+# Logo oficial en PNG transparente (marca/vectorizar_logo.py); va en portada y cierre cuando cfg["marca"].
+LOGO_PNG = {k: Path(__file__).resolve().parent.parent / "marca" / f"logo-codeaerospace-{k}.png" for k in ("plata", "negro")}
 SW, SH = 13.333, 7.5
 CARPETA = {p[0]: c for b in (catalogo.BLOQUES, catalogo_tesis.BLOQUES) for _, c, ps in b for p in ps}
 MUESTRA = {p[0]: p[1] for b in (catalogo.BLOQUES, catalogo_tesis.BLOQUES) for _, _, ps in b for p in ps}
@@ -657,7 +659,7 @@ class Diseno:
         w = self.E["portada_ancho"]
         x = 0.85
         if cfg.get("marca"):
-            texto(s, x, 0.55, 6, 0.35, "CO.DE AEROSPACE", 13, C["tinta"], "Orbitron", negrita=True, spc=5)
+            self.logo(s, x, 0.32, 0.86)
         self.kicker(s, x, 1.25, w, cfg["kicker"], tam=11)
         tam = cfg.get("tam_titulo", 54) + 6
         z, nl = self.titulo(s, x, 1.62, w, cfg["titulo"], [tam, tam - 6, tam - 12, 40, 36], 2.3)
@@ -689,10 +691,25 @@ class Diseno:
         self.regla(s, x, y, min(w, 6))
         texto(s, x, y + 0.25, w, 0.45, cfg["autor"], 18, C["tinta"], Fu["titulo"], negrita=True)
         texto(s, x, y + 0.68, w, 0.6, cfg["instit"], 13, C["tenue"], Fu["cuerpo"])
+        if cfg.get("marca"):
+            self.logo(s, x, min(y + 1.42, SH - 1.55), 1.15)
         if self.E.esquinas:
             self.pie_portada_mision(s)
         self.notas(s, d)
         return s
+
+    def logo(self, s, x, y, alto):
+        """El logo oficial de Co.De Aerospace (marca/, generado del vector): plata en temas oscuros,
+        en una tinta en los claros. Sustituye al «CO.DE AEROSPACE» escrito en Orbitron."""
+        r, g, b = (int(self.C["tinta"][i:i + 2], 16) for i in (1, 3, 5))
+        oscuro = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.5   # tinta clara = fondo oscuro
+        png = LOGO_PNG["plata" if oscuro else "negro"]
+        with Image.open(png) as im:
+            iw, ih = im.size
+        pic = s.shapes.add_picture(str(png), I(x), I(y), I(alto * iw / ih), I(alto))
+        pic.name = "Logo Co.De Aerospace"
+        pic._element.nvPicPr.cNvPr.set("descr", "Logo de Co.De Aerospace")
+        return pic
 
     def seccion(self, d, n):
         sec = d["_sec"]

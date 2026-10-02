@@ -141,8 +141,18 @@ class Launcher(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    import argparse
+    # CO.DE Studio (la app de escritorio) abre el editor directamente en una pestaña o presentación:
+    #   render_launcher.py --pestana nueva --abrir que_es_code
+    ap = argparse.ArgumentParser(description="Co.De Aerospace · Estudio (presentaciones y renders)")
+    ap.add_argument("--pestana", choices=["presentaciones", "nueva", "renders"], default="presentaciones")
+    ap.add_argument("--abrir", metavar="ID", help="presentación propia a abrir en el editor")
+    a, resto = ap.parse_known_args()
+    app = QApplication([sys.argv[0], *resto])
     tema_espacial.aplicar(app)
     w = Launcher()
+    w.tabs.setCurrentIndex(["presentaciones", "nueva", "renders"].index(a.pestana if not a.abrir else "nueva"))
+    if a.abrir and w.nueva.sel.findData(a.abrir) >= 0:
+        w.nueva.sel.setCurrentIndex(w.nueva.sel.findData(a.abrir))
     w.show()
     sys.exit(app.exec())
