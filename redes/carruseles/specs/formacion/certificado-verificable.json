@@ -1,0 +1,97 @@
+{
+  "id": "certificado-verificable",
+  "serie": "formacion",
+  "fondo": {
+    "tema": "lunar",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "CO.DE Academy",
+      "titulo": "¿Cómo sabes que un certificado es auténtico?",
+      "subtitulo": "La respuesta: una firma y una URL pública"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "El problema",
+      "titulo": "Un PDF se edita en un minuto",
+      "cuerpo": "Un certificado en imagen o PDF [[no prueba nada]] por sí solo: cualquiera puede cambiar el nombre, el curso o la fecha. Quien lo recibe necesita una forma de comprobarlo."
+    },
+    {
+      "tipo": "termino",
+      "kicker": "La firma",
+      "termino": "HMAC",
+      "nombre": "HMAC-SHA256",
+      "definicion": "Una firma calculada con una clave secreta. Si cambia un solo dato del certificado, la firma deja de coincidir.",
+      "ejemplo": "Así firma CO.DE Academy sus certificados."
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "La idea",
+      "titulo": "Firmado y comprobable",
+      "pasos": [
+        {
+          "t": "Se firma",
+          "d": "El certificado lleva una firma HMAC-SHA256"
+        },
+        {
+          "t": "Tiene URL pública",
+          "d": "Cualquiera puede abrir esa dirección"
+        },
+        {
+          "t": "Se verifica",
+          "d": "Quien lo recibe comprueba que es auténtico"
+        }
+      ]
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Por qué importa",
+      "titulo": "Dos formas de mostrar un logro",
+      "izq": {
+        "t": "Solo un PDF",
+        "items": [
+          "Se puede editar",
+          "Hay que creerle a quien lo presenta"
+        ]
+      },
+      "der": {
+        "t": "Con URL verificable",
+        "items": [
+          "Firma HMAC-SHA256",
+          "Se comprueba en una URL pública"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Con sinceridad",
+      "titulo": "La plataforma está en beta",
+      "cuerpo": "CO.DE Academy es una plataforma [[en beta]]: desplegada y funcional, con investigación en curso. Los certificados verificables son una de sus funciones documentadas.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Un logro que se puede comprobar",
+      "texto": "Guarda esto para pedir certificados verificables",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, ficha ACADEMIA (certificados HMAC-SHA256 verificables por URL pública), consultado 2026-10-01"
+  ],
+  "pie_texto": "¿Cómo sabes que un certificado es auténtico? Un PDF se edita en un minuto; una firma HMAC-SHA256 con una URL pública de verificación se comprueba. Así lo hace CO.DE Academy, plataforma en beta. Guárdalo antes de aceptar un certificado a ciegas. #Certificados #EducaciónTécnica #CoDeAcademy #Ciberseguridad",
+  "cuidado": [
+    "La fuente solo dice: «certificados firmados y verificables por URL pública» y «HMAC-SHA256». No dice qué muestra la página de verificación ni si hay QR: no se afirma. Confirmar el flujo exacto antes de publicar.",
+    "La explicación de HMAC es criptografía estándar (clave secreta compartida con el verificador del servidor), no cita de la ficha.",
+    "Academy está en beta; sin cifras en este carrusel."
+  ]
+}

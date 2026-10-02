@@ -1,0 +1,100 @@
+{
+ "id": "transferencia-hohmann",
+ "serie": "divulgacion-orbital",
+ "fondo": {
+  "tema": "fisica",
+  "tipo": "portada",
+  "var": 0
+ },
+ "laminas": [
+  {
+   "tipo": "portada",
+   "kicker": "Divulgación orbital",
+   "titulo": "Para subir de órbita, acelera… y terminas más lento",
+   "subtitulo": "La transferencia de Hohmann, paso a paso"
+  },
+  {
+   "tipo": "texto",
+   "numero": "01",
+   "titulo": "No se sube apuntando arriba",
+   "cuerpo": "El motor se enciende a lo largo de la órbita, en el sentido del movimiento. Así ganas energía y el punto opuesto de tu órbita se eleva."
+  },
+  {
+   "tipo": "pasos",
+   "kicker": "Dos encendidos",
+   "titulo": "Hohmann en tres tiempos",
+   "pasos": [
+    {
+     "t": "Primer impulso",
+     "d": "En la órbita baja: se alarga en elipse"
+    },
+    {
+     "t": "Viaje",
+     "d": "Media elipse sin motor, hasta su punto más alto"
+    },
+    {
+     "t": "Segundo impulso",
+     "d": "Arriba: se acelera y la órbita se vuelve circular"
+    }
+   ]
+  },
+  {
+   "tipo": "imagen",
+   "titulo": "Una elipse que toca las dos órbitas",
+   "imagen": "sticker:espacio_orbitas/TransferenciaHohmann",
+   "pie": "Esquema ilustrativo: la elipse es tangente a la órbita baja y a la alta. Las cifras del dibujo son aproximadas."
+  },
+  {
+   "tipo": "dato",
+   "kicker": "De ≈ 400 km a GEO",
+   "cifra": "3.9",
+   "unidad": "km/s en total",
+   "titulo": "El costo en velocidad",
+   "nota": "≈ 2.4 + ≈ 1.5 km/s. Cálculo con la ecuación vis-viva (GM = 398 600 km³/s²). Impulsos instantáneos, órbitas coplanares."
+  },
+  {
+   "tipo": "comparacion",
+   "titulo": "La paradoja: subes y vas más lento",
+   "izq": {
+    "t": "Órbita baja",
+    "items": [
+     "≈ 7.7 km/s",
+     "Vuelta en ≈ 92 min"
+    ]
+   },
+   "der": {
+    "t": "Órbita GEO",
+    "items": [
+     "≈ 3.1 km/s",
+     "Vuelta en ≈ 24 h"
+    ]
+   }
+  },
+  {
+   "tipo": "texto",
+   "numero": "02",
+   "titulo": "¿Cuánto tarda el viaje?",
+   "cuerpo": "Es media elipse: de ≈ 400 km a GEO son algo más de [[5 horas]]. Es la transferencia de dos impulsos que menos combustible gasta entre dos órbitas circulares coplanares, no la más rápida."
+  },
+  {
+   "tipo": "cierre",
+   "titulo": "Órbitas: contra la intuición, con precisión",
+   "texto": "En CO.DE ACADEMY (beta) hay cursos de mecánica orbital, entre otros de ingeniería aeroespacial.",
+   "cta": [
+    "Guarda",
+    "Comparte",
+    "Síguenos"
+   ]
+  }
+ ],
+ "fuentes": [
+  "Cálculo propio con la ecuación vis-viva (μ = 398 600 km³/s²): Δv1 ≈ 2.40, Δv2 ≈ 1.46, tiempo de vuelo ≈ 5.3 h, v_GEO ≈ 3.07 km/s",
+  "Valores estándar: ISS ≈ 400 km, v LEO ≈ 7.7 km/s, GEO 35 786 km",
+  "codeaerospace.com/plataformas, ficha ACADEMIA (consultado 2026-10-01)"
+ ],
+ "pie_texto": "Para subir de órbita se acelera dos veces: una para alargar la órbita en elipse y otra arriba para circularizarla. ¿La paradoja? Terminas yendo más lento que antes. Guárdalo y compártelo con quien ame la física orbital. #Hohmann #mecánicaorbital #espacio #satélites #física",
+ "cuidado": [
+  "Los 3.9 km/s suponen salir de una órbita circular de 400 km sin cambio de plano; ir a GEO desde la inclinación de la ISS exige además un cambio de plano.",
+  "Cifra de cursos de ACADEMIA no citada a propósito: envejece (fuente al 2026-09-18)."
+ ]
+}

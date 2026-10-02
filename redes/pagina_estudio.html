@@ -1,0 +1,132 @@
+<title>Estudio Co.De Aerospace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Mesa de revisión: cabecera de consola, pestañas, rejilla de hojas de contacto que se lee en el celular. */
+:root{
+  --bg:#0a0e27; --panel:#121a3d; --linea:#24305e; --fg:#F1F5F9; --tenue:#93A4BD;
+  --acento:#00D9FF; --ok:#37CFA0; --aviso:#F59E0B; --alto:#FF3C6E;
+  --display:"Rajdhani","Arial Narrow",sans-serif; --texto:"DM Sans",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#F3F6FB; --panel:#FFFFFF; --linea:#D5DDEB; --fg:#0B1430; --tenue:#4F5F7A;
+  --acento:#0A7FA6; --ok:#13865F; --aviso:#A85F00; --alto:#C21E4B; color-scheme:light}}
+:root[data-theme="light"]{--bg:#F3F6FB; --panel:#FFFFFF; --linea:#D5DDEB; --fg:#0B1430; --tenue:#4F5F7A;
+  --acento:#0A7FA6; --ok:#13865F; --aviso:#A85F00; --alto:#C21E4B; color-scheme:light}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--texto)}
+.envoltura{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:20px}
+header{display:grid;gap:6px;border-bottom:1px solid var(--linea);padding-block:4px 16px}
+.eti{font:700 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acento)}
+h1{font:700 clamp(28px,6vw,40px)/1.05 var(--display);margin:0;text-wrap:balance}
+.cifras{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--tenue);font:400 13px/1.4 var(--mono)}
+.cifras b{color:var(--fg);font-variant-numeric:tabular-nums}
+nav.pestanas{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:2}
+button{font:500 14px/1 var(--texto);color:var(--fg);background:var(--panel);border:1px solid var(--linea);border-radius:999px;padding:9px 14px;cursor:pointer}
+button[aria-pressed="true"]{border-color:var(--acento);color:var(--acento)}
+button:focus-visible,summary:focus-visible,video:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.filtros{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filtros label{display:flex;gap:6px;align-items:center;color:var(--tenue);font-size:14px;margin-left:auto}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:16px}
+article{background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:14px;display:grid;gap:8px;min-width:0}
+article h2{font:700 21px/1.15 var(--display);margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font:400 12px/1.4 var(--mono);color:var(--tenue)}
+.chip{border:1px solid var(--linea);border-radius:999px;padding:2px 8px}
+.chip.no{border-color:var(--alto);color:var(--alto)} .chip.av{border-color:var(--aviso);color:var(--aviso)} .chip.var{border-color:var(--acento);color:var(--acento)}
+article img{border-radius:8px;display:block;width:100%;height:auto;background:#000}
+details summary{cursor:pointer;color:var(--tenue);font-size:14px}
+details.cuidado summary{color:var(--aviso)}
+pre{white-space:pre-wrap;font:400 13px/1.5 var(--texto);color:var(--tenue);margin:6px 0 0}
+section h2.sec{font:700 24px/1.1 var(--display);margin:8px 0 0}
+.nota{color:var(--tenue);max-width:65ch;margin:0}
+.videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.videos figure{margin:0;display:grid;gap:6px} .videos video{width:100%;aspect-ratio:9/16;border-radius:10px;background:#000;max-width:100%}
+.videos figcaption{font:400 12px/1.3 var(--mono);color:var(--tenue)}
+.hojas{display:grid;gap:14px} .hojas img{border-radius:10px;border:1px solid var(--linea)}
+ol.dec{display:grid;gap:10px;padding-left:22px;margin:0;max-width:75ch} ol.dec b{font:700 17px/1.2 var(--display)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+
+<div class="envoltura">
+  <header>
+    <span class="eti">Co.De Aerospace · estudio de contenido</span>
+    <h1>Mesa de revisión del estudio</h1>
+    <div class="cifras" id="cifras"></div>
+    <p class="nota">Borradores para revisar. Nada se ha publicado ni subido a Drive. Antes de publicar un carrusel, lee su ⚠️.</p>
+  </header>
+
+  <nav class="pestanas" aria-label="Secciones">
+    <button data-tab="carruseles" aria-pressed="true">Carruseles</button>
+    <button data-tab="logo" aria-pressed="false">Logo y reels</button>
+    <button data-tab="decisiones" aria-pressed="false">Decisiones pendientes</button>
+  </nav>
+
+  <section id="carruseles">
+    <div class="filtros" id="filtros"></div>
+    <div class="rejilla" id="rejilla"></div>
+  </section>
+
+  <section id="logo" hidden>
+    <h2 class="sec">Reels en loop (con sonido)</h2>
+    <p class="nota">Cada uno empalma su último cuadro con el primero; el audio no tiene costura. Toca para oír.</p>
+    <div class="videos" id="videos"></div>
+    <h2 class="sec">El logo en los 18 entornos espaciales</h2>
+    <div class="hojas" id="hojas"></div>
+  </section>
+
+  <section id="decisiones" hidden>
+    <h2 class="sec">Lo que necesito que decidas</h2>
+    <ol class="dec" id="dec"></ol>
+    <p class="nota">Detalle en exports/estudio/informes/ (ronda1 a ronda3) y en INDICE.md.</p>
+  </section>
+</div>
+
+<script>
+const DATOS = /*DATOS*/[];
+const HOJAS = /*HOJAS*/[];
+const VIDEOS = /*VIDEOS*/[];
+const DECISIONES = /*DECISIONES*/[];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const series = [...new Set(DATOS.map(d => d.serie))].sort();
+const conAviso = DATOS.filter(d => d.cuidado).length;
+document.getElementById("cifras").innerHTML =
+  `<span><b>${DATOS.length}</b> carruseles</span><span><b>${series.length}</b> series</span>` +
+  `<span><b>${DATOS.filter(d => d.variante_de).length}</b> variantes A/B</span><span><b>${VIDEOS.length}</b> reels</span>` +
+  `<span><b>${conAviso}</b> con ⚠️ por confirmar</span>`;
+
+let filtro = "*", soloPublicables = false;
+function pintar(){
+  const g = document.getElementById("rejilla");
+  g.innerHTML = DATOS.filter(d => (filtro === "*" || d.serie === filtro) && (!soloPublicables || d.estado !== "no_publicar")).map(d => `
+    <article>
+      <div class="meta"><span class="chip">${esc(d.serie)}</span><span class="chip">${d.n} láminas</span><span class="chip">fondo ${esc(d.tema)}</span>
+        ${d.variante_de ? `<span class="chip var">variante de ${esc(d.variante_de)}</span>` : ""}
+        ${d.estado === "no_publicar" ? `<span class="chip no">⛔ no publicar</span>` : ""}
+        ${d.cuidado ? `<span class="chip av">⚠️ confirmar</span>` : ""}</div>
+      <h2>${esc(d.gancho)}</h2>
+      <img loading="lazy" src="${esc(d.img)}" alt="Las láminas del carrusel ${esc(d.id)}">
+      <details><summary>Texto de la publicación</summary><pre>${esc(d.pie)}</pre></details>
+      ${d.cuidado ? `<details class="cuidado"><summary>Qué confirmar antes de publicar</summary><pre>${esc(d.cuidado)}</pre></details>` : ""}
+      <div class="meta"><span>${esc(d.id)}</span></div>
+    </article>`).join("");
+}
+const f = document.getElementById("filtros");
+f.innerHTML = `<button data-f="*" aria-pressed="true">Todas</button>` + series.map(s => `<button data-f="${esc(s)}" aria-pressed="false">${esc(s)}</button>`).join("") +
+  `<label for="solo"><input type="checkbox" id="solo"> Ocultar los ⛔</label>`;
+f.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  filtro = b.dataset.f; f.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); pintar(); });
+document.getElementById("solo").addEventListener("change", e => { soloPublicables = e.target.checked; pintar(); });
+pintar();
+
+document.getElementById("videos").innerHTML = VIDEOS.map(v => `<figure><video src="${esc(v)}" controls loop playsinline preload="metadata"></video>
+  <figcaption>${esc(v.split("/").pop().replace(".mp4", ""))}</figcaption></figure>`).join("");
+document.getElementById("hojas").innerHTML = HOJAS.map(([fmt, src]) => `<figure style="margin:0;display:grid;gap:6px">
+  <figcaption class="eti">${fmt.replace("x", ":")}</figcaption><img loading="lazy" src="${esc(src)}" alt="El logo sobre los 18 entornos, formato ${fmt}"></figure>`).join("");
+document.getElementById("dec").innerHTML = DECISIONES.map(([t, d]) => `<li><b>${esc(t)}</b><br><span class="nota">${esc(d)}</span></li>`).join("");
+
+document.querySelectorAll("nav.pestanas button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav.pestanas button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  ["carruseles", "logo", "decisiones"].forEach(id => document.getElementById(id).hidden = id !== b.dataset.tab);
+}));
+</script>

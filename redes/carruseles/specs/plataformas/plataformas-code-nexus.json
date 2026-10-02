@@ -1,0 +1,78 @@
+{
+  "id": "plataformas-code-nexus",
+  "serie": "plataformas",
+  "fondo": {
+    "tema": "mision",
+    "tipo": "seccion",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "CODE-Nexus",
+      "titulo": "¿Cómo hablan entre sí seis aplicaciones?",
+      "subtitulo": "El hub que interconecta nuestro clúster"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Un directorio de servicios",
+      "cuerpo": "Cada servicio —la estación terrena, los gemelos digitales, el clasificador— se registra con un **manifiesto validado**. Así el clúster sabe quién existe y cómo llamarlo."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Un bus de eventos firmados",
+      "cuerpo": "Los servicios publican eventos por **webhooks firmados con HMAC-SHA256**. La firma prueba que el mensaje no se alteró, y si la entrega falla, el evento pasa a una cola **dead-letter**."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "En el bus (al 2026-07-30)",
+      "cifra": "2,451",
+      "unidad": "eventos",
+      "titulo": "Eventos que han circulado por el bus",
+      "nota": "Cifra de codeaerospace.com/plataformas del 2026-07-30; envejece sola. Es el volumen de un clúster de seis aplicaciones propias, no de una red de terceros."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Procedencia: de dónde viene cada dato",
+      "cuerpo": "El catálogo científico registra cómo se produjo cada resultado y lo exporta en **W3C PROV-JSON**. Los artefactos viajan con huella **sha256** para comprobar que llegaron íntegros."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Para operar sin sorpresas",
+      "titulo": "Vigilancia continua",
+      "items": [
+        "Sondeo con uptime, p95 y MTTR",
+        "Métricas para Prometheus",
+        "Caché TLE compartida, con estado «obsoleto» explícito"
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "04",
+      "titulo": "Funciona en un VPS o en varios hosts",
+      "cuerpo": "Cada conexión es una URL base más una clave descubierta en el registro. El mismo código sirve en un servidor, en varios o detrás de NAT."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Un clúster que se explica solo",
+      "texto": "Registro, bus y procedencia, en una malla.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Cómo hablan entre sí seis aplicaciones? CODE-Nexus es el hub de nuestro clúster: registro de servicios con manifiestos, bus de eventos con firma HMAC-SHA256 y catálogo científico con procedencia W3C PROV. Guárdalo y compártelo. #arquitectura #microservicios #datos #procedencia #ingenieríaespacial",
+  "cuidado": [
+    "Cifras (2,451 eventos, 6/6 servicios) verificadas el 2026-07-30; envejecen: confirmar antes de publicar.",
+    "Los 1,223 productos del catálogo vienen casi todos de un solo servicio (el clasificador): no se citan.",
+    "Lámina 'Funciona en un VPS o en varios hosts' resume el diseño descrito; no implica despliegue multihost real."
+  ]
+}

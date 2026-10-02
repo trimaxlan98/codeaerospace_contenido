@@ -37,6 +37,28 @@ def _malla():
 XX, YY = _malla()
 
 
+def tamano(ancho, alto):
+    """Cambia el lienzo de TODOS los generadores (ANCHO, ALTO, la malla y los px por pulgada).
+
+    Los entornos posicionan todo en fracciones de ANCHO/ALTO, así que sirven para carruseles 4:5,
+    reels 9:16 o panorámicas de varias láminas. Devuelve el tamaño anterior para restaurarlo.
+    Ojo: `fondo()` usa la caché de 16:9; para otros tamaños llama al generador y guarda tú el archivo.
+    """
+    global ANCHO, ALTO, PX, XX, YY
+    previo = (ANCHO, ALTO)
+    ANCHO, ALTO = int(ancho), int(alto)
+    PX = ANCHO / 13.333
+    XX, YY = _malla()
+    import sys
+    for nombre in ("fondos_tematicos", "fondos_tematicos_2"):      # los plugins copian la malla al importarse
+        m = sys.modules.get(nombre)
+        if m is not None:
+            for k, v in (("W", ANCHO), ("H", ALTO), ("XX", XX), ("YY", YY), ("E", ALTO / 1800.0)):
+                if hasattr(m, k):
+                    setattr(m, k, v)
+    return previo
+
+
 def suave(a, b, x):
     t = np.clip((x - a) / (b - a), 0, 1)
     return t * t * (3 - 2 * t)

@@ -1,0 +1,117 @@
+{
+  "id": "satelite-no-se-cae",
+  "serie": "divulgacion-orbital",
+  "fondo": {
+    "tema": "lunar",
+    "tipo": "portada",
+    "var": 2
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Divulgación orbital",
+      "titulo": "¿Por qué un satélite no se cae?",
+      "subtitulo": "Spoiler: sí se cae. Todo el tiempo."
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "El cañón de Newton",
+      "cuerpo": "Dispara una bala horizontal desde una montaña altísima: a más velocidad, más lejos cae. Pero la Tierra es redonda y el suelo se curva.",
+      "imagen": "sticker:espacio_orbitas/CaidaLibreNewton"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La curvatura de la Tierra",
+      "cifra": "5 m",
+      "unidad": "cada 8 km",
+      "titulo": "Cuánto se «hunde» el suelo",
+      "nota": "Cálculo geométrico con el radio terrestre (≈ 6 371 km): d² / 2R. Es lo que cae un objeto en 1 s (≈ 4.9 m)."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Caer… y fallar el suelo",
+      "cuerpo": "En su primer segundo, un objeto en caída libre baja unos 5 m. Si en ese mismo segundo avanza unos 8 km, el suelo se curvó esos 5 m: **cae, pero nunca llega**. Eso es una órbita."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Velocidad orbital",
+      "cifra": "7.7",
+      "unidad": "km/s",
+      "titulo": "Lo que corre un satélite a ≈ 400 km",
+      "nota": "Valor estándar para la altitud de la ISS: v = √(μ/r)."
+    },
+    {
+      "tipo": "comparacion",
+      "titulo": "Lo que se cree vs. lo que pasa",
+      "izq": {
+        "t": "Mito",
+        "items": [
+          "Arriba no hay gravedad",
+          "Flotan por estar lejos"
+        ]
+      },
+      "der": {
+        "t": "Realidad",
+        "items": [
+          "A 400 km sigue siendo ≈ 89 %",
+          "Flotan: están en caída libre"
+        ]
+      }
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Tres velocidades",
+      "titulo": "Según qué tan rápido lances",
+      "pasos": [
+        {
+          "t": "Más lento",
+          "d": "La bala cae y choca con el suelo"
+        },
+        {
+          "t": "≈ 7.7 km/s",
+          "d": "Órbita circular baja: cae sin llegar"
+        },
+        {
+          "t": "≈ 11 km/s",
+          "d": "Velocidad de escape: no vuelve"
+        }
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Orbitar es caer… y fallar el suelo",
+      "texto": "Guárdalo para cuando alguien diga que en el espacio no hay gravedad.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Valores estándar: R_Tierra ≈ 6 371 km, g ≈ 9.8 m/s², v orbital a 400 km ≈ 7.7 km/s, velocidad de escape en superficie ≈ 11.2 km/s",
+    "Cálculo propio: 8 km² / (2·6 371 km) ≈ 5 m; g a 400 km ≈ 89 % de la de superficie"
+  ],
+  "pie_texto": "Un satélite no flota porque no haya gravedad: cae todo el tiempo, solo que la Tierra se curva al mismo ritmo. Eso lo imaginó Newton con un cañón en una montaña. Guárdalo y compártelo con quien aún crea que arriba no hay gravedad. #mecánicaorbital #satélites #física #espacio #divulgación",
+  "cuidado": [
+    "El «~90 %» sale de g(400 km) = g0·(R/(R+h))² ≈ 8.7 m/s²; confirmar antes de publicar si se quiere citar con más precisión."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "titulo": "Un satélite viaja a 7.7 km/s y aun así está cayendo",
+        "subtitulo": "A 400 km todavía hay ≈ 89 % de la gravedad"
+      }
+    },
+    {
+      "sufijo": "c",
+      "portada": {
+        "titulo": "Entiende en 8 láminas por qué un satélite no se cae",
+        "subtitulo": "Del cañón de Newton a la velocidad orbital"
+      }
+    }
+  ]
+}

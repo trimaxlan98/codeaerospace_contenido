@@ -1,0 +1,86 @@
+{
+  "id": "ia-acotada",
+  "serie": "como-trabajamos",
+  "fondo": {
+    "tema": "neuronal",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Patrón de IA acotada",
+      "titulo": "Nuestros copilotos de IA explican y redactan.",
+      "subtitulo": "Cómo la ponemos a trabajar sin darle el control",
+      "imagen": "marca:simbolo-plata"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Un solo diseño",
+      "titulo": "Todos los copilotos, el mismo patrón",
+      "cuerpo": "Donde hay copiloto en nuestras plataformas, el diseño es casi siempre el mismo (la excepción es PiStation, que usa el CLI local): [[Gemini 2.5]] sobre Vertex AI, con tres límites."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Los tres límites",
+      "titulo": "Una IA con cancha marcada",
+      "items": [
+        "Acotada a los datos de [[la propia organización]]",
+        "De [[solo lectura]]",
+        "Fuera de cualquier [[lazo de control]]"
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "¿Qué es el lazo?",
+      "titulo": "El circuito que mide y corrige",
+      "cuerpo": "Un sensor mide, un controlador compara y un actuador corrige. La IA queda fuera de ese circuito: ayuda a entender lo que pasa, no lo ejecuta.",
+      "imagen": "sticker:seguidor_satelital/LazoPID"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "El reparto",
+      "titulo": "Qué hace y qué no hace",
+      "izq": {
+        "t": "Sí hace",
+        "items": [
+          "Explica",
+          "Redacta"
+        ]
+      },
+      "der": {
+        "t": "No hace",
+        "items": [
+          "Decidir",
+          "Actuar"
+        ]
+      }
+    },
+    {
+      "tipo": "cita",
+      "frase": "El copiloto de IA explica y redacta; no decide ni actúa.",
+      "autor": "codeaerospace.com/plataformas"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Más útil porque está acotada",
+      "texto": "Sigue la serie «cómo trabajamos»",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, «Un mismo patrón de IA» (consultado 2026-10-01; cifras y diseño verificados 2026-07-30)"
+  ],
+  "pie_texto": "Nuestros copilotos de IA, en una frase: explican y redactan; no deciden ni actúan. casi siempre Gemini 2.5 sobre Vertex AI (PiStation es la excepción), acotado a los datos de la organización, de solo lectura y fuera del lazo de control. Guárdalo si estás diseñando un copiloto. #IA #Gemini #IngenieríaDeSoftware #CoDeAerospace",
+  "cuidado": [
+    "Excepción a decirlo siempre: el copiloto de PiStation corre sobre el CLI local, no sobre Vertex AI (lo dice la fuente). No generalizar a «todas» las herramientas sin ese matiz.",
+    "Patrón descrito en la página con verificación del 2026-07-30; confirmar que sigue vigente.",
+    "El sticker LazoPID es ilustrativo (lazo PID de un seguidor de antena); no cita cifras."
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "basura-espacial-kessler",
+  "serie": "divulgacion-orbital",
+  "fondo": {
+    "tema": "solar",
+    "tipo": "contenido",
+    "var": 1
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Divulgación orbital",
+      "titulo": "Síndrome de Kessler: cuando la basura se multiplica",
+      "subtitulo": "Choques a más de 10 km/s: cada uno suma fragmentos"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Velocidades que no existen en tierra",
+      "cuerpo": "A 400 km un satélite viaja a ≈ 7.7 km/s. En un choque frontal la velocidad relativa puede acercarse a 15 km/s (el choque de 2009 fue a ≈ 11.7 km/s): hasta un fragmento diminuto trae energía de sobra para dañar un satélite."
+    },
+    {
+      "tipo": "imagen",
+      "titulo": "Restos de misiones pasadas",
+      "imagen": "sticker:espacio_orbitas/BasuraEspacial",
+      "pie": "Esquema ilustrativo, no a escala: la cifra del dibujo no es un dato."
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "La cascada",
+      "titulo": "Cómo se enciende el dominó",
+      "pasos": [
+        {
+          "t": "Un choque",
+          "d": "Dos objetos se destruyen y sueltan fragmentos"
+        },
+        {
+          "t": "Más fragmentos",
+          "d": "Cada pieza es una bala orbital"
+        },
+        {
+          "t": "Más choques",
+          "d": "Cada impacto produce aún más piezas"
+        },
+        {
+          "t": "Se retroalimenta",
+          "d": "El proceso se alimenta solo"
+        }
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Un caso real",
+      "cifra": "2009",
+      "unidad": "Iridium 33 y Cosmos 2251",
+      "titulo": "Choque accidental entre dos satélites completos",
+      "nota": "10 de febrero de 2009, a unos 790 km de altitud, a ≈ 11.7 km/s de velocidad relativa. Hecho histórico documentado (NASA)."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "No es una explosión: es lenta",
+      "cuerpo": "La idea la propusieron Donald Kessler y Burton Cour-Palais en [[1978]]. La cascada tarda décadas, y a mayor altura los restos duran más: arriba hay menos arrastre atmosférico."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Qué se hace",
+      "titulo": "Cómo se evita",
+      "items": [
+        "Desorbitar el satélite al terminar su misión",
+        "Vaciar baterías y tanques (pasivación)",
+        "Predecir acercamientos con catálogos de órbitas",
+        "Maniobrar para esquivar"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Prevenir empieza por saber dónde está todo",
+      "texto": "Los TLE públicos son el punto de partida. SAT-DT (beta) los propaga con SGP4 en un globo 3D: es simulación, no monitoreo en vuelo.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Kessler y Cour-Palais (1978), Collision frequency of artificial satellites, J. Geophys. Res.",
+    "Evento Iridium 33 / Cosmos 2251 del 2009-02-10 (≈ 790 km)",
+    "Física estándar: v LEO ≈ 7.7 km/s; choque frontal ≈ 2 × 7.7 ≈ 15 km/s",
+    "codeaerospace.com/plataformas, ficha SAT-DT Orbital Twin (consultado 2026-10-01)"
+  ],
+  "pie_texto": "Cada choque en órbita crea fragmentos que pueden causar más choques: eso es el síndrome de Kessler, una cascada lenta que se prevé desde hoy. Guárdalo y compártelo con quien crea que el espacio es infinito. #basuraespacial #Kessler #satélites #órbitas #espacio",
+  "cuidado": [
+    "Confirmar el dato histórico de Iridium–Cosmos (fecha y altitud) con ESA/NASA antes de publicar.",
+    "SAT-DT: TLE reales, telemetría SIMULADA; no es monitoreo de satélites en vuelo ni análisis de conjunciones.",
+    "Los ≈ 15 km/s son el caso frontal ideal (2 × 7.7); las velocidades reales dependen de la geometría."
+  ]
+}

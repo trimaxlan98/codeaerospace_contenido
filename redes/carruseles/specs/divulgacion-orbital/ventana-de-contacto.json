@@ -1,0 +1,102 @@
+{
+  "id": "ventana-de-contacto",
+  "serie": "divulgacion-orbital",
+  "fondo": {
+    "tema": "lunar",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Divulgación orbital",
+      "titulo": "Un satélite pasa… ¿cuánto lo puedes usar?",
+      "subtitulo": "AOS, TCA, LOS y la máscara de elevación"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Anatomía de un pase",
+      "titulo": "Tres momentos clave",
+      "pasos": [
+        {
+          "t": "AOS",
+          "d": "Aparece sobre tu horizonte"
+        },
+        {
+          "t": "TCA",
+          "d": "Punto de máximo acercamiento (elevación máxima)"
+        },
+        {
+          "t": "LOS",
+          "d": "Se oculta de nuevo"
+        }
+      ]
+    },
+    {
+      "tipo": "imagen",
+      "titulo": "El pase visto desde tu antena",
+      "imagen": "sticker:seguidor_satelital/VistaPolarPase",
+      "pie": "Izquierda: vista polar (acimut y elevación). Derecha: la elevación sube, llega a su máximo (TCA) y baja."
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "El horizonte real no es 0°",
+      "cuerpo": "Edificios, cerros y la atmósfera estorban cerca del horizonte. Por eso se fija una [[máscara de elevación]]: bajo ese ángulo, el pase no se cuenta."
+    },
+    {
+      "tipo": "comparacion",
+      "titulo": "Máscara baja vs. máscara alta",
+      "izq": {
+        "t": "Baja (p. ej. 5°)",
+        "items": [
+          "Pase más largo",
+          "Más ruido cerca del suelo"
+        ]
+      },
+      "der": {
+        "t": "Alta (p. ej. 20°)",
+        "items": [
+          "Pase más corto",
+          "Señal más limpia"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "El «ojo de cerradura»",
+      "cuerpo": "En un pase casi sobre tu cabeza (≈ 90°), una antena de acimut y elevación debe girar muy rápido en acimut para no perder al satélite. Por eso esos pases son los más difíciles de seguir."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Antes del pase",
+      "titulo": "Lo que se calcula con anticipación",
+      "items": [
+        "La posición del satélite (TLE + SGP4)",
+        "Los instantes de AOS y LOS",
+        "La elevación máxima del pase",
+        "Si supera la máscara del sitio"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "La ventana se calcula, no se adivina",
+      "texto": "Orbit Eye (obra derivada de ground-station, GPL-3.0) rastrea con SGP4/Skyfield y predice pases AOS/LOS por umbral de elevación.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Conceptos estándar de estaciones terrenas: AOS, TCA, LOS, máscara de elevación",
+    "codeaerospace.com/plataformas, ficha CO.DE Orbit Eye: rastreo con SGP4/Skyfield y predicción de pases AOS/LOS por umbral de elevación (consultado 2026-10-01)"
+  ],
+  "pie_texto": "Un pase satelital no empieza en el horizonte teórico: empieza cuando el satélite supera la máscara de elevación de tu sitio. De AOS a LOS pasan solo unos minutos, y se pueden calcular antes. Guárdalo si quieres entender cómo se planea un contacto. #estaciónterrena #satélites #AOS #LOS #espacio",
+  "cuidado": [
+    "Los valores 5° y 20° de la máscara son ejemplos, no recomendaciones; cada sitio define la suya.",
+    "Orbit Eye es obra derivada de ground-station (GPL-3.0); este despliegue no tiene receptor de radio conectado."
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "plataformas-pistation",
+  "serie": "plataformas",
+  "fondo": {
+    "tema": "mision",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "PiStation Mission Control",
+      "titulo": "Una consola de misión para flotas de Raspberry Pi 5",
+      "subtitulo": "Telemetría, alarmas y paquetes CCSDS"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Un agente en cada Raspberry Pi",
+      "cuerpo": "Cada Pi corre un agente con **44 endpoints**: métricas, contenedores, servicios y un buffer SQLite de 48 horas. La app de escritorio las reúne en un tablero.",
+      "imagen": "sticker:banco_pruebas/TelemetriaEnVivo",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Detecta lo raro con estadística",
+      "cuerpo": "Un **z-score móvil** compara cada lectura con su historia reciente. Si se sale de ±3σ, se marca como anomalía."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Alarmas a la manera industrial",
+      "cuerpo": "Las alarmas siguen el ciclo **ISA-18.2** y salen de una base de datos de misión. Toda acción que cambia algo exige confirmación explícita."
+    },
+    {
+      "tipo": "texto",
+      "numero": "04",
+      "titulo": "Telemetría en formato espacial",
+      "cuerpo": "Sale como paquetes **CCSDS 133.0-B** con cabecera PUS-C, que un Yamcs de stock ingiere sin código a medida. Es el idioma de las agencias espaciales."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Respaldo técnico",
+      "cifra": "1,201",
+      "unidad": "pruebas",
+      "titulo": "Pruebas en verde de la consola",
+      "nota": "Cifra de codeaerospace.com/plataformas, verificada el 2026-07-30."
+    },
+    {
+      "tipo": "texto",
+      "numero": "05",
+      "titulo": "Con honestidad sobre el estado",
+      "cuerpo": "Por defecto corre en **simulador**. En la Pi física se validaron agente, tablero, Docker y systemd; watchdog, GNSS, Sense HAT y SDR solo se probaron simulados."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Control de misión, a escala de escritorio",
+      "texto": "Proyecto propio, sin despliegue público.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Una consola de misión para flotas de Raspberry Pi 5? PiStation Mission Control reúne telemetría, detección de anomalías, alarmas ISA-18.2 y paquetes CCSDS para una flota de Pi. Por defecto corre en simulador; te contamos qué sí se validó en hardware y qué no. Guárdalo y compártelo. #RaspberryPi #CCSDS #controldemisión #ingenieríaespacial #telemetría",
+  "cuidado": [
+    "Modo por defecto = simulador; watchdog, GNSS, Sense HAT y SDR solo simulados (dicho en la lámina 06).",
+    "No se muestran pases APT decodificados (son grabaciones históricas de SatNOGS).",
+    "Proyecto de un solo operador, sin despliegue público; copiloto sobre CLI local, no Vertex AI.",
+    "Las cifras del sticker de telemetría son ilustrativas."
+  ]
+}

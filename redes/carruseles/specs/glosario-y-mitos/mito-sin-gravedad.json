@@ -1,0 +1,98 @@
+{
+  "id": "mito-sin-gravedad",
+  "serie": "glosario-y-mitos",
+  "fondo": {
+    "tema": "marte",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Mito vs. realidad",
+      "titulo": "«En el espacio no hay gravedad»",
+      "subtitulo": "Entonces, ¿por qué flotan los astronautas?"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Mito vs. realidad",
+      "titulo": "Gravedad en órbita",
+      "izq": {
+        "t": "Mito",
+        "items": [
+          "No hay gravedad arriba",
+          "Por eso flotan"
+        ]
+      },
+      "der": {
+        "t": "Realidad",
+        "items": [
+          "Sí hay: casi la misma",
+          "Flotan porque caen"
+        ]
+      }
+    },
+    {
+      "tipo": "dato",
+      "kicker": "A la altura de la ISS",
+      "cifra": "≈ 89 %",
+      "unidad": "de la gravedad del suelo",
+      "titulo": "La gravedad a ~400 km sigue ahí",
+      "nota": "Cálculo estándar: g decrece con el inverso del cuadrado de la distancia al centro de la Tierra (radio ~6 371 km)."
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Estar en órbita es caer",
+      "cuerpo": "La estación y quienes viajan en ella caen juntos hacia la Tierra. Esa **caída libre** es la ingravidez que se siente.",
+      "imagen": "sticker:espacio_orbitas/CaidaLibreNewton"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Cae de lado y el suelo se curva",
+      "cuerpo": "Como avanza de lado a unos 7.7 km/s, la Tierra se curva y el suelo se le aleja. Cae, pero nunca lo alcanza."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Para quedarte con algo",
+      "titulo": "Tres ideas",
+      "items": [
+        "La gravedad llega mucho más lejos",
+        "Ingravidez = caída libre",
+        "Órbita = caer de lado, sin tocar el suelo"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "¿Quién más lo cree todavía?",
+      "texto": "Guárdalo y mándaselo a esa persona.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Física de libro: ley de gravitación universal; ISS a ~400 km (altitud típica), ~7.7 km/s de velocidad orbital; radio medio terrestre ~6 371 km (cálculo (6371/6771)² ≈ 0.89)"
+  ],
+  "pie_texto": "Mito: «en el espacio no hay gravedad». Realidad: a la altura de la ISS hay ≈ 89 % de la gravedad del suelo. Los astronautas flotan porque van en caída libre alrededor de la Tierra. Guárdalo y compártelo con quien aún lo crea. #mitos #gravedad #ISS #física #CoDeAerospace",
+  "cuidado": [
+    "La altitud de la ISS varía (~400 km en cifras redondas); '~90 %' es redondeo de 0.89."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "fondo": {
+        "tema": "orbita"
+      }
+    },
+    {
+      "sufijo": "c",
+      "fondo": {
+        "tema": "mision"
+      }
+    }
+  ]
+}

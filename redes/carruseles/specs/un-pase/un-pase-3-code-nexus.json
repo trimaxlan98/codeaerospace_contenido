@@ -1,0 +1,78 @@
+{
+  "id": "un-pase-3-code-nexus",
+  "serie": "un-pase",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 2
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "UN PASE · 3/5",
+      "titulo": "El veredicto del pase viaja firmado",
+      "subtitulo": "Parte 3: CODE-Nexus, el bus que une el clúster",
+      "imagen": "sticker:plataformas/BusNexus"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "CODE-Nexus",
+      "titulo": "Seis servicios, un hub",
+      "cuerpo": "Estación terrena, dos gemelos digitales, clasificador y suite de gobernanza se **registran** en CODE-Nexus con un manifiesto validado. Nexus los interconecta.",
+      "imagen": "sticker:plataformas/BusNexus"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "El veredicto sale como evento firmado",
+      "cuerpo": "Triage publica cada clasificación al bus. Los eventos viajan por **webhooks con HMAC-SHA256**: quien recibe puede comprobar que el mensaje es auténtico, y si falla la entrega, va a **dead-letter**."
+    },
+    {
+      "tipo": "termino",
+      "kicker": "Vocabulario",
+      "termino": "HMAC",
+      "definicion": "Una firma calculada con una clave secreta compartida. Si el mensaje cambia en el camino, la firma ya no coincide.",
+      "nombre": "Hash-based Message Authentication Code",
+      "ejemplo": "El bus usa HMAC-SHA256 en cada webhook."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Más que un bus",
+      "titulo": "Lo que hace Nexus",
+      "items": [
+        "Registro de servicios y grafo del clúster",
+        "Relay de artefactos con sha256",
+        "Catálogo científico con export W3C PROV-JSON",
+        "Caché TLE compartida con estado stale explícito"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Servicios del clúster",
+      "cifra": "6/6",
+      "unidad": "en línea",
+      "titulo": "Servicios registrados",
+      "nota": "codeaerospace.com/plataformas, verificado el 2026-07-30."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Parte 3 de 5 — sigue en el siguiente",
+      "texto": "El veredicto ya circula por el clúster. Falta ver al satélite entero, dentro de su constelación. Parte 4: SAT-DT Orbital Twin.",
+      "cta": [
+        "Guarda",
+        "Sigue la serie",
+        "Comparte"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "El veredicto del pase viaja firmado. Parte 3 de 5: CODE-Nexus registra los servicios del clúster y mueve eventos por un bus con webhooks HMAC-SHA256, dead-letter y catálogo con procedencia W3C PROV. Recorrido didáctico: un pase imaginario para explicar cinco plataformas; no es un flujo automático de un pase real. Guarda y sigue con la Parte 4. #arquitectura #ciberseguridad #satélites #ingenieríaespacial #IoT",
+  "cuidado": [
+    "La cadena de cinco pasos es una síntesis didáctica nuestra: la fuente describe cada plataforma por separado, no un flujo único de un mismo pase.",
+    "Los 1.223 productos y los eventos del bus envejecen: cifras del 2026-07-30.",
+    "Nexus conecta nuestros propios servicios, no una red de terceros."
+  ]
+}

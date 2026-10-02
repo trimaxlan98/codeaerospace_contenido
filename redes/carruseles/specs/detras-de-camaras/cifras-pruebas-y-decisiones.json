@@ -1,0 +1,100 @@
+{
+  "id": "cifras-pruebas-y-decisiones",
+  "serie": "detras-de-camaras",
+  "fondo": {
+    "tema": "mision",
+    "tipo": "portada",
+    "var": 0,
+    "atenuar": 0.4
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Detrás de cámaras",
+      "titulo": "¿Qué significa «pruebas en verde»?",
+      "subtitulo": "Lo que corremos y lo que no prueba"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Una definición",
+      "titulo": "Una prueba en verde pasó",
+      "cuerpo": "Una prueba automatizada es un programa que revisa que otro programa haga lo que se espera. En verde, [[pasó]]. No dice que todo esté bien: solo que lo que se probó, funciona."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Plataforma de formación",
+      "cifra": "911",
+      "unidad": "pruebas en verde",
+      "titulo": "En CO.DE Academy",
+      "nota": "Ficha ACADEMIA en codeaerospace.com/plataformas: cifras verificadas el 30 de julio de 2026.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Herramienta interna",
+      "cifra": "117",
+      "unidad": "pruebas automatizadas",
+      "titulo": "En ManimStudio",
+      "nota": "Ficha de ManimStudio en codeaerospace.com/plataformas: cifra verificada el 30 de julio de 2026."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Decir lo que no prueban",
+      "titulo": "28 pruebas, con límites",
+      "cuerpo": "En una de nuestras webs, las 28 pruebas verifican el HTML renderizado y los contratos JSON del build, [[no]] el comportamiento del navegador. Escribirlo evita que la cifra prometa de más."
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Qué envejece",
+      "titulo": "No todas las cifras caducan igual",
+      "izq": {
+        "t": "Cambian solas",
+        "items": [
+          "Eventos",
+          "Observaciones",
+          "Catálogos"
+        ]
+      },
+      "der": {
+        "t": "Cambian más despacio",
+        "items": [
+          "Pruebas en verde",
+          "Decisiones de arquitectura"
+        ]
+      }
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Cada ficha lleva",
+      "titulo": "Código, pruebas y decisiones",
+      "items": [
+        "Su [[código]]",
+        "Sus pruebas (o la aclaración de que no las tiene)",
+        "Su registro de decisiones de arquitectura",
+        "La fecha en que se midió todo"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Una cifra con fecha se puede revisar",
+      "texto": "Guarda esto para leer cualquier «pruebas en verde»",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01): cifras verificadas el 2026-07-30; auditoría del catálogo de CO.DE Strategy 2026-09-18"
+  ],
+  "pie_texto": "¿Qué significa «pruebas en verde»? Que lo probado funciona, no que todo esté bien. Por eso varias fichas de nuestras plataformas llevan su fecha y aclaran qué no prueban. Guárdalo para leer con ojo crítico cualquier número de software. #Pruebas #Software #Ingeniería #DetrásDeCámaras",
+  "cuidado": [
+    "911 y 117 verificadas el 2026-07-30; las 28 pruebas de CO.DE Strategy vienen de la auditoría del 2026-09-18. Las de pruebas «no envejecen» según la página, pero el conteo sí cambia al añadir pruebas: reconfirmar.",
+    "La definición de «prueba automatizada» es explicación general, no de la ficha.",
+    "Overlap temático con «cifras-con-fecha» (como-trabajamos): espaciar su publicación.",
+    "No se usa la Matriz de capacidad ni cifras de clientes."
+  ]
+}

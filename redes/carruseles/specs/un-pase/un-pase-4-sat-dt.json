@@ -1,0 +1,75 @@
+{
+  "id": "un-pase-4-sat-dt",
+  "serie": "un-pase",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "UN PASE · 4/5",
+      "titulo": "¿Y si ensayamos toda la constelación?",
+      "subtitulo": "Parte 4: SAT-DT Orbital Twin, el gemelo de la flota",
+      "imagen": "sticker:espacio_orbitas/TrazaTerrestre"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "SAT-DT Orbital Twin",
+      "titulo": "Ese satélite no vuela solo",
+      "cuerpo": "SAT-DT responde qué le pasa a una **constelación entera**. Sincroniza TLE reales de CelesTrak y propaga las órbitas con SGP4 en un globo 3D de CesiumJS.",
+      "imagen": "sticker:constelaciones/WalkerDelta3D"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "La geometría es real; la telemetría, no",
+      "cuerpo": "Sobre esas órbitas, un modelo determinista **simula** batería, CPU, temperatura, carga útil y riesgo de cada satélite. Es un entorno de simulación, no monitoreo de satélites en vuelo.",
+      "sello": "simulacion"
+    },
+    {
+      "tipo": "termino",
+      "kicker": "Vocabulario",
+      "termino": "What-if",
+      "definicion": "Un escenario hipotético: inyectas un evento en la flota simulada y comparas qué cambia, sin tocar hardware.",
+      "ejemplo": "¿Qué pasa si un satélite pierde batería durante el pase?"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Solidez del código",
+      "cifra": "146",
+      "unidad": "pruebas",
+      "titulo": "En verde en SAT-DT",
+      "nota": "codeaerospace.com/plataformas, verificado el 2026-07-30."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Lo que todavía es piloto",
+      "cuerpo": "El control multiagente **QMIX** existe como piloto de 1.000 episodios, **sin validar**. Lo decimos aquí para que nadie lo tome por un resultado.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Parte 4 de 5 — sigue en el siguiente",
+      "texto": "Ya vimos el pase, su veredicto y la flota. Última pregunta: ¿la antena apunta con 0.1°? Parte 5: ATP-DT.",
+      "cta": [
+        "Guarda",
+        "Sigue la serie",
+        "Comparte"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Y si ensayamos toda la constelación? Parte 4 de 5: SAT-DT Orbital Twin usa TLE reales y SGP4, pero con telemetría SIMULADA, para probar escenarios what-if sin tocar hardware. Es un entorno de simulación, no monitoreo en vuelo. Recorrido didáctico: un pase imaginario para explicar cinco plataformas; no es un flujo automático de un pase real. Guarda y sigue con la Parte 5. #gemelodigital #constelaciones #simulación #satélites #ingenieríaespacial",
+  "cuidado": [
+    "La cadena de cinco pasos es una síntesis didáctica nuestra: la fuente describe cada plataforma por separado, no un flujo único de un mismo pase.",
+    "Plataforma en beta. TLE reales, telemetría SIMULADA: no es monitoreo de satélites en vuelo.",
+    "QMIX es un piloto de 1.000 episodios sin validar: no presentarlo como logro.",
+    "El sticker TrazaTerrestre es ilustrativo (cifras dentro no citables)."
+  ]
+}

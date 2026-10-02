@@ -1,0 +1,102 @@
+{
+  "id": "fft-y-cascada",
+  "serie": "espectro-y-senales",
+  "fondo": {
+    "tema": "nebulosa",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "FFT y cascada",
+      "titulo": "¿Cómo se «ve» una señal de radio?",
+      "subtitulo": "Del ruido al espectro, y del espectro a la cascada"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Fourier",
+      "titulo": "Una señal es una suma de tonos",
+      "cuerpo": "Toda señal se arma sumando ondas simples. Si sabes cuánto hay de cada [[frecuencia]], conoces la señal.",
+      "imagen": "sticker:antenas_robots/EspectroFourier"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "La FFT",
+      "titulo": "La FFT, en tres pasos",
+      "pasos": [
+        {
+          "t": "Toma una ventana",
+          "d": "Un trozo corto de muestras I/Q"
+        },
+        {
+          "t": "Calcula la FFT",
+          "d": "Algoritmo rápido de la transformada de Fourier"
+        },
+        {
+          "t": "Lee el espectro",
+          "d": "Potencia que hay en cada frecuencia"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "El espectro",
+      "titulo": "Una foto de un instante",
+      "cuerpo": "Un pico significa que hay una señal en esa frecuencia. El suelo irregular que lo rodea es el [[ruido]]. Si el pico es alto, la señal se distingue bien."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "kicker": "La cascada",
+      "titulo": "La cascada apila las fotos",
+      "cuerpo": "Cada FFT nueva es una fila de color que empuja a las anteriores: frecuencia a lo ancho, [[tiempo]] hacia abajo, potencia en el color.",
+      "imagen": "sticker:antenas_robots/SDRAntenaANumero"
+    },
+    {
+      "tipo": "texto",
+      "numero": "04",
+      "kicker": "El Doppler",
+      "titulo": "Un tono fijo es una raya recta",
+      "cuerpo": "Un satélite que se mueve dibuja una [[curva]] en la cascada: el efecto Doppler, de unos pocos kHz en VHF.",
+      "imagen": "sticker:seguidor_satelital/DopplerEnS"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "CO.DE Triage",
+      "cifra": "0.949",
+      "unidad": "AUC",
+      "titulo": "Una CNN que clasifica cascadas de pases SatNOGS",
+      "nota": "Test intacto de 731 observaciones (el pronóstico de calidad de la plataforma llega a 0.806 en estaciones no vistas). Cifras verificadas el 2026-07-30 en codeaerospace.com/plataformas."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Una imagen vale mil muestras",
+      "texto": "La cascada convierte números en algo que cualquiera puede leer.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, fichas CO.DE Orbit Eye y CO.DE Triage (consultado 2026-10-01)",
+    "Teoría de Fourier y procesamiento de señales, conocimiento de libro"
+  ],
+  "pie_texto": "Una señal de radio no se ve a simple vista, pero con una FFT se convierte en un espectro y con una cascada (waterfall) en una imagen que cambia en el tiempo. Hoy: cómo se pasa de muestras I/Q a picos de frecuencia, por qué un satélite dibuja una curva Doppler y cómo una CNN puede leer esas imágenes. Guárdalo y compártelo. #FFT #waterfall #SDR #señales #satélites #CoDeAerospace",
+  "cuidado": [
+    "CO.DE Triage: el AUC 0.949 es sobre un test intacto de 731 observaciones; 0.806 corresponde a estaciones no vistas. Cifras verificadas el 2026-07-30; revisar si siguen vigentes antes de publicar.",
+    "El sticker de Doppler y el de SDR usan valores ilustrativos; no citarlos como dato. La magnitud «unos pocos kHz en VHF» es orden de magnitud de LEO, no una medición nuestra."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "imagen": "sticker:antenas_robots/SDRAntenaANumero"
+      }
+    }
+  ]
+}

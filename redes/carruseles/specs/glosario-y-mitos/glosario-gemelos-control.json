@@ -1,0 +1,74 @@
+{
+  "id": "glosario-gemelos-control",
+  "serie": "glosario-y-mitos",
+  "fondo": {
+    "tema": "caos",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Glosario · gemelos y control",
+      "titulo": "Gemelos digitales y control en 5 términos",
+      "subtitulo": "Para probar antes de construir"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Gemelo digital",
+      "titulo": "Gemelo digital: el sistema, en simulación",
+      "cuerpo": "Modelo que replica un sistema real para ensayar sin tocarlo. **Ejemplo:** probar una falla en la simulación, no en el satélite.",
+      "imagen": "sticker:banco_pruebas/GemeloDigitalSync"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Lazo cerrado",
+      "titulo": "Lazo cerrado: medir y corregir",
+      "cuerpo": "El control compara lo medido con lo deseado y corrige el error. **Ejemplo:** el sensor de la antena le dice al motor cuánto se desvió."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "kicker": "PID",
+      "titulo": "PID: tres formas de corregir",
+      "cuerpo": "Controlador que suma la acción **proporcional**, **integral** y **derivativa** del error. **Ejemplo:** mover una antena siguiendo un pase.",
+      "imagen": "sticker:seguidor_satelital/LazoPID"
+    },
+    {
+      "tipo": "texto",
+      "numero": "04",
+      "kicker": "Presupuesto de apuntamiento",
+      "titulo": "Presupuesto de apuntamiento",
+      "cuerpo": "Suma de todos los errores permitidos para que la antena siga acertando. **Ejemplo:** un diseño se propone un presupuesto de 0.1° de error.",
+      "imagen": "sticker:seguidor_satelital/GemeloDigitalATP"
+    },
+    {
+      "tipo": "texto",
+      "numero": "05",
+      "kicker": "Monte Carlo",
+      "titulo": "Monte Carlo: repetir con azar",
+      "cuerpo": "Muchas simulaciones con perturbaciones aleatorias para ver qué tan seguido se cumple una meta. **Ejemplo:** ¿cuántas veces alcanza los 0.1°?"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Primero el gemelo, luego el hierro",
+      "texto": "En Co.De, ATP-DT (en beta) es un banco de pruebas de diseño para dimensionar una estación terrena antes de construirla.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Definiciones estándar de libro (control y simulación)",
+    "codeaerospace.com/plataformas (consultado 2026-10-01): ATP-DT, beta, banco de pruebas de diseño con presupuesto de apuntamiento de 0.1°, controladores PD/PID/LQR/H∞, campañas Monte Carlo"
+  ],
+  "pie_texto": "Gemelo digital, lazo cerrado, PID, presupuesto de apuntamiento y Monte Carlo: 5 términos para entender cómo se diseña una estación terrena antes de construirla. Guárdalo y compártelo con tu equipo de control. #gemelodigital #control #PID #MonteCarlo #CoDeAerospace",
+  "cuidado": [
+    "ATP-DT es beta y banco de pruebas de diseño (0.1° es el presupuesto de diseño, no un logro medido).",
+    "Los 0.1° del ejemplo son el presupuesto de la plataforma; confirmar que se desea mencionarlo."
+  ]
+}

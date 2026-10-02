@@ -1,0 +1,113 @@
+{
+  "id": "latencia-orbita-baja",
+  "serie": "espectro-y-senales",
+  "fondo": {
+    "tema": "electromagnetismo",
+    "tipo": "portada",
+    "var": 1
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Latencia",
+      "titulo": "Tu videollamada depende de la velocidad de la luz",
+      "subtitulo": "Por qué importa la altura de la órbita"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "El límite físico",
+      "cifra": "~300",
+      "unidad": "km por milisegundo",
+      "titulo": "Lo que recorre la luz en 1 ms",
+      "nota": "c = 299 792 km/s en el vacío; es un límite, ninguna señal de radio va más rápido."
+    },
+    {
+      "tipo": "imagen",
+      "kicker": "Cuanto más alto, más espera",
+      "titulo": "Solo propagación",
+      "imagen": "sticker:constelaciones/ComparaLatencia",
+      "pie": "La ilustración cuenta ida y vuelta completa (4·d/c): ≈ 7, 107 y 477 ms (MEO a 8 000 km). Luego: solo subir y bajar (2·d/c)."
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "GEO",
+      "titulo": "Lejos, pero quieto",
+      "cuerpo": "A 35 786 km, subir y bajar suma más de 70 000 km: unos [[240 ms]] solo en propagación, sin contar equipos ni red. Una conversación se siente con retraso."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "LEO",
+      "titulo": "Cerca y muy rápido",
+      "cuerpo": "A 550 km, por ejemplo, subir y bajar suma unos 1 100 km: cerca de [[4 ms]]. Es la ventaja de la órbita baja.",
+      "imagen": "sticker:espacio_orbitas/OrbitasLEOMEOGEO"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "No todo es ventaja",
+      "titulo": "El precio de estar cerca",
+      "izq": {
+        "t": "Lo bueno",
+        "items": [
+          "Menos latencia",
+          "Menos pérdida por distancia"
+        ]
+      },
+      "der": {
+        "t": "El costo",
+        "items": [
+          "Cada satélite pasa en minutos",
+          "Hacen falta muchos satélites",
+          "Hay que cambiar de satélite"
+        ]
+      }
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Latencia real",
+      "titulo": "Lo que suma además de la distancia",
+      "items": [
+        "Procesamiento a bordo y en tierra",
+        "Colas en la red",
+        "Enlaces entre satélites",
+        "La ruta terrestre hasta el servidor"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "La física pone el piso",
+      "texto": "La latencia real siempre es mayor que el mínimo de la luz.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "animaciones/presentaciones/que_es_code.json (diapositiva «Por qué la órbita baja»)",
+    "Velocidad de la luz y GEO a 35 786 km, conocimiento de libro"
+  ],
+  "pie_texto": "La luz recorre unos 300 km cada milisegundo, y por eso la altura de la órbita decide cuánto tarda tu mensaje. En GEO, subir y bajar toma unos 240 ms solo de propagación; en LEO, a 550 km de altura, unos 4 ms. Pero estar cerca tiene un costo: más satélites y más cambios de satélite. Guárdalo para tu próxima videollamada. #latencia #LEO #GEO #satélites #órbita #CoDeAerospace",
+  "cuidado": [
+    "Todas las cifras de latencia son mínimos teóricos de propagación (en el cenit, sin equipos ni red), calculados como distancia dividida entre c; los 550 km son un valor de ejemplo, no un dato de un sistema específico.",
+    "El sticker de ComparaLatencia y OrbitasLEOMEOGEO usa cifras ilustrativas (por ejemplo la altura MEO); no citarlas como dato."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "titulo": "¿Cuánto retrasa la luz tu videollamada?",
+        "subtitulo": "Por qué importa la altura de la órbita"
+      }
+    },
+    {
+      "sufijo": "c",
+      "portada": {
+        "titulo": "En GEO, la luz tarda unos 240 ms solo en subir y bajar",
+        "subtitulo": "Mínimo teórico; en LEO, a 550 km, son unos 4 ms"
+      }
+    }
+  ]
+}

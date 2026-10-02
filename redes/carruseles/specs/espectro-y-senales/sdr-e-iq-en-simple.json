@@ -1,0 +1,116 @@
+{
+  "id": "sdr-e-iq-en-simple",
+  "serie": "espectro-y-senales",
+  "fondo": {
+    "tema": "electromagnetismo",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Radio definida por software",
+      "titulo": "Una radio que es un programa",
+      "subtitulo": "SDR e I/Q explicados en palabras simples"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Dos formas de hacer radio",
+      "titulo": "Clásica vs. definida por software",
+      "izq": {
+        "t": "Radio clásica",
+        "items": [
+          "Un circuito por cada modo",
+          "Cambiar de modo = rediseñar"
+        ]
+      },
+      "der": {
+        "t": "SDR",
+        "items": [
+          "El modo es código",
+          "Cambiar = actualizar el programa"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "La idea",
+      "titulo": "La señal se vuelve números",
+      "cuerpo": "La antena capta la onda, un conversor la mide millones de veces por segundo y desde ahí todo es [[software]].",
+      "imagen": "sticker:antenas_robots/SDRAntenaANumero"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "La cadena",
+      "titulo": "De la antena al número",
+      "pasos": [
+        {
+          "t": "Antena",
+          "d": "Capta la onda de radio"
+        },
+        {
+          "t": "LNA y filtro",
+          "d": "Amplifica con poco ruido y filtra"
+        },
+        {
+          "t": "Mezclador",
+          "d": "Baja la banda de interés a cerca de cero"
+        },
+        {
+          "t": "ADC",
+          "d": "Convierte la señal en números"
+        },
+        {
+          "t": "FFT",
+          "d": "El software muestra el espectro"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "I/Q",
+      "titulo": "Cada muestra son dos números",
+      "cuerpo": "Se llaman [[I]] y [[Q]]. Juntos dicen cuánta señal hay y en qué punto de su ciclo va (la fase). Con esa pareja se puede reconstruir la onda completa."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Para qué sirve",
+      "titulo": "Con I/Q puedes…",
+      "items": [
+        "Ver cuánta energía hay en cada frecuencia",
+        "Demodular distintos tipos de modulación",
+        "Medir y corregir el [[Doppler]]",
+        "Grabar la señal y analizarla después"
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "kicker": "CO.DE Orbit Eye",
+      "titulo": "Un ejemplo: CO.DE Orbit Eye",
+      "cuerpo": "Orbit Eye, obra derivada del proyecto ground-station (GPL-3.0), opera receptores SDR con FFT, cascada y varios decodificadores. Este despliegue no tiene receptor conectado: la recepción se muestra con [[grabaciones IQ]].",
+      "sello": "grabacion"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "La radio ahora se actualiza",
+      "texto": "Mismo hardware, nuevas señales: lo cambia el programa.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, ficha CO.DE Orbit Eye (consultado 2026-10-01)",
+    "animaciones/presentaciones/que_es_code.json (diapositiva SDR)"
+  ],
+  "pie_texto": "¿Y si una radio fuera solo un programa? Eso es la radio definida por software (SDR): la antena capta la señal, un conversor la vuelve números I/Q y todo lo demás ocurre en código. Repasamos la cadena de la antena al espectro y qué significan I y Q. Guárdalo para cuando quieras entender cómo se escucha un satélite. #SDR #radiodefinidaporsoftware #satélites #ingeniería #CoDeAerospace",
+  "cuidado": [
+    "Orbit Eye es obra derivada del proyecto ground-station (Stratos Goudelis, GPL-3.0); el despliegue actual NO tiene receptor de radio conectado y la recepción se demuestra con grabaciones IQ. Verificar el texto de la lámina 7 antes de publicar.",
+    "El sticker de la lámina 3 usa cifras ilustrativas; no citarlas como dato."
+  ]
+}

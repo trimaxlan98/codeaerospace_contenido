@@ -1,0 +1,82 @@
+{
+  "id": "un-pase-5-atp-dt",
+  "serie": "un-pase",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "UN PASE · 5/5",
+      "titulo": "¿La antena apunta con 0.1° de error?",
+      "subtitulo": "Parte 5: ATP-DT, el cierre de la serie",
+      "imagen": "sticker:seguidor_satelital/MontajeAzEl"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "ATP-DT Ground Station Twin",
+      "titulo": "Un pase dura minutos",
+      "cuerpo": "Para no perder al satélite, la antena debe moverse en **acimut y elevación** con un presupuesto de error de 0.1°. ATP-DT lo prueba en simulación antes de construir la estación.",
+      "imagen": "sticker:seguidor_satelital/AntenaSiguiendo"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "La antena, como un brazo robótico",
+      "cuerpo": "El gemelo modela la montura como un manipulador de **dos grados de libertad** y simula el lazo completo: sensar, controlar, actuar y apuntar, con perturbaciones orbitales realistas.",
+      "imagen": "sticker:seguidor_satelital/GemeloDigitalATP",
+      "sello": "simulacion"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Cinco controladores conmutables",
+      "titulo": "Se comparan estrategias",
+      "items": [
+        "PD y PID",
+        "LQR",
+        "H∞",
+        "Lazo abierto, como referencia"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La meta del diseño",
+      "cifra": "0.1°",
+      "unidad": "de error",
+      "titulo": "Presupuesto de apuntamiento a cumplir",
+      "nota": "Presupuesto de diseño que el banco verifica (codeaerospace.com/plataformas, 2026-07-30); no es una medición de una antena real.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Un pase, cinco plataformas",
+      "cuerpo": "Rastrear y escuchar, clasificar, firmar, ensayar la flota, apuntar la antena. Recorrido didáctico: un pase imaginario para explicar cinco plataformas; no es un flujo automático de un pase real.",
+      "imagen": "sticker:plataformas/UnPaseCincoPlataformas",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Fin de la serie: un pase, cinco plataformas",
+      "texto": "Cinco plataformas de Co.De, un mismo pase. Guarda la serie completa y compártela con quien construye estaciones terrenas.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿La antena apunta con 0.1° de error? Parte 5 y última: ATP-DT Ground Station Twin modela la montura como un brazo robótico de 2 grados de libertad y simula el lazo completo para ver si un diseño cumple el presupuesto de 0.1°. Plataforma en beta, banco de pruebas de diseño. Guarda la serie completa y compártela. #estaciónterrena #control #gemelodigital #satélites #ingenieríaespacial",
+  "cuidado": [
+    "La cadena de cinco pasos es una síntesis didáctica nuestra: la fuente describe cada plataforma por separado, no un flujo único de un mismo pase.",
+    "ATP-DT está en beta: banco de pruebas de diseño, NO una antena operativa. 0.1° es presupuesto de diseño, no resultado medido.",
+    "Consola tras autenticación; se muestra en demostración guiada.",
+    "Las cifras dentro de los stickers (Az 205°, El 12°, Error 0.3°) son ilustrativas."
+  ]
+}

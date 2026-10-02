@@ -1,0 +1,18 @@
+{
+  "id": "espectro-recurso-escaso",
+  "serie": "espectro-y-senales",
+  "fondo": {"tema": "espectro", "tipo": "portada", "var": 1},
+  "laminas": [
+    {"tipo": "portada", "kicker": "Espectro radioeléctrico", "titulo": "El recurso invisible que no se puede fabricar", "subtitulo": "Qué es el espectro y por qué hay que repartirlo"},
+    {"tipo": "texto", "numero": "01", "kicker": "Ondas", "titulo": "Una onda con una frecuencia", "cuerpo": "Las ondas de radio son radiación electromagnética, de la misma familia que la luz visible. Se describen con su [[frecuencia]]: cuántas oscilaciones hace por segundo, medidas en hercios (Hz)."},
+    {"tipo": "dato", "kicker": "Frecuencia y tamaño", "cifra": "2.2 m", "titulo": "Longitud de onda de una señal de 137 MHz", "nota": "λ = c / f = 299 792 458 m/s ÷ 137 000 000 Hz ≈ 2.19 m. Más frecuencia, onda más corta."},
+    {"tipo": "lista", "kicker": "Un mismo recurso", "titulo": "Todos usan el espectro", "items": ["Radio y televisión", "Telefonía móvil y [[Wi-Fi]]", "Navegación por satélite", "Radar y aviación", "Comunicaciones [[satelitales]]"]},
+    {"tipo": "texto", "numero": "02", "kicker": "Por qué es escaso", "titulo": "No se gasta, pero se ocupa", "cuerpo": "Dos señales distintas en la misma [[frecuencia]], el mismo lugar y el mismo momento se estorban entre sí. Por eso el espectro no se agota, pero tampoco alcanza para todos a la vez."},
+    {"tipo": "pasos", "kicker": "Cómo se reparte", "titulo": "Cuatro formas de repartir", "pasos": [{"t": "Por frecuencia", "d": "Cada servicio recibe sus propias bandas"}, {"t": "Por lugar", "d": "La misma banda en zonas lejanas entre sí"}, {"t": "Por tiempo", "d": "Los usuarios se turnan el canal"}, {"t": "Por acuerdo", "d": "Países y operadores coordinan sus usos"}]},
+    {"tipo": "comparacion", "kicker": "Y ahora, en órbita", "titulo": "El cielo se está llenando", "izq": {"t": "Satélite GEO", "items": ["Parece quieto en el cielo", "Una sola antena lo cubre"]}, "der": {"t": "Constelación NGSO", "items": ["Muchos satélites en movimiento", "Todos comparten el espectro"]}},
+    {"tipo": "cierre", "titulo": "Un recurso común, bien repartido", "texto": "Guarda esta serie: sigue el espectro y las señales, sin ecuaciones de más.", "cta": ["Guarda", "Comparte", "Síguenos"]}
+  ],
+  "fuentes": ["Física de ondas electromagnéticas (c = λ f), conocimiento de libro", "animaciones/presentaciones/que_es_code.json (problema del espectro en órbita baja)"],
+  "pie_texto": "El espectro radioeléctrico no se gasta, pero no hay espacio para todos al mismo tiempo. En este carrusel: qué es una frecuencia, por qué una señal de 137 MHz mide más de dos metros, quién usa el espectro y cómo se reparte, y por qué las constelaciones de órbita baja lo hacen más importante. Guárdalo y compártelo con quien siga preguntándose cómo viaja el Wi-Fi. #espectro #radiofrecuencia #satélites #NewSpace #CoDeAerospace",
+  "cuidado": ["La lámina «Cuatro formas de repartir» es una simplificación didáctica de cómo se coordina el espectro; sin cifras ni afirmaciones regulatorias específicas.", "La lámina GEO vs NGSO es cualitativa; ninguna cifra de operadores ni de mercado."]
+}

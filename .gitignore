@@ -20,6 +20,9 @@ media/
 # genera studio/frontend/tools/brand_icons.mjs y nginx los sirve desde
 # dist/; sin ellos produccion se queda sin favicon en silencio).
 !studio/frontend/public/*.png
+# Marca de Co.De Aerospace: logos oficiales y derivados que usan el motor de carruseles y los reels
+!marca/*.png
+!marca/derivados/*.png
 
 # Python
 __pycache__/

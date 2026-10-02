@@ -1,0 +1,108 @@
+{
+  "id": "cifras-con-fecha",
+  "serie": "como-trabajamos",
+  "fondo": {
+    "tema": "electronica",
+    "tipo": "portada",
+    "var": 2
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Cifras con fecha",
+      "titulo": "Una cifra sin fecha no es un dato",
+      "subtitulo": "Por qué publicamos cuándo y cómo medimos"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Cómo medimos",
+      "titulo": "Se ejecuta, no se estima",
+      "cuerpo": "Las cifras de nuestras plataformas salen de [[ejecutar comandos]] contra cada repositorio y cada servicio. Nada estimado."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La fecha importa",
+      "cifra": "30 jul",
+      "unidad": "de 2026",
+      "titulo": "Día en que se ejecutaron los comandos",
+      "nota": "codeaerospace.com/plataformas: cifras verificadas el 30 de julio de 2026."
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Qué envejece",
+      "titulo": "No todas las cifras caducan igual",
+      "izq": {
+        "t": "Cambian solas",
+        "items": [
+          "Eventos",
+          "Observaciones",
+          "Catálogos"
+        ]
+      },
+      "der": {
+        "t": "Cambian más despacio",
+        "items": [
+          "Pruebas en verde",
+          "Decisiones de arquitectura"
+        ]
+      }
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Un ejemplo con su fecha",
+      "cifra": "149",
+      "unidad": "lecciones",
+      "titulo": "En el catálogo de CO.DE Academy",
+      "nota": "Las que expone la API pública el 2026-09-18 (16 cursos, de 2 a 18 lecciones)."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Nuestra regla",
+      "titulo": "Cada cifra publicada lleva",
+      "items": [
+        "Su [[fecha]] de verificación",
+        "Su [[origen]]: de dónde sale",
+        "Su fecha, su origen y [[cómo se midió]]"
+      ]
+    },
+    {
+      "tipo": "cita",
+      "frase": "Lo que no se pudo comprobar no está en esta página.",
+      "autor": "codeaerospace.com/plataformas"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Pregunta siempre: ¿de cuándo es?",
+      "texto": "Guarda esta regla para leer cualquier cifra",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas 2026-07-30; catálogo de Academy 2026-09-18)"
+  ],
+  "pie_texto": "Una cifra sin fecha no es un dato. En Co.De publicamos cuándo y cómo medimos: ejecutamos comandos contra cada repositorio y servicio, y lo que envejece lleva su fecha. Guárdalo para leer con ojo crítico cualquier número. #DatosConFecha #Ingeniería #Transparencia #CoDeAerospace",
+  "cuidado": [
+    "Fechas de verificación: 2026-07-30 (plataformas, pruebas, arquitectura) y 2026-09-18 (catálogo de Academy). Reconfirmar 149 lecciones / 16 cursos antes de publicar: es una cifra que envejece.",
+    "La tercera viñeta de la regla («alcance») es la práctica editorial de este carrusel; la fuente solo garantiza fecha y verificación por comandos.",
+    "No se usa la Matriz de capacidad ni cifras de clientes."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "titulo": "¿De cuándo es esa cifra que acabas de leer?"
+      }
+    },
+    {
+      "sufijo": "c",
+      "portada": {
+        "titulo": "Aprende a leer una cifra: fecha, origen y alcance"
+      }
+    }
+  ]
+}

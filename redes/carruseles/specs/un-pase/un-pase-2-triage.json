@@ -1,0 +1,85 @@
+{
+  "id": "un-pase-2-triage",
+  "serie": "un-pase",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 1
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "UN PASE · 2/5",
+      "titulo": "Un pase deja una cascada. ¿Tenía señal?",
+      "subtitulo": "Parte 2: la cascada del pase se clasifica con una CNN",
+      "imagen": "sticker:plataformas/TriageCascadas"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "CO.DE Triage",
+      "titulo": "Un pase deja una cascada",
+      "cuerpo": "El **waterfall** es el espectrograma del pase: frecuencia contra tiempo. Si hubo señal, se ve un trazo; si no, solo ruido. Revisar cientos a ojo es lento.",
+      "imagen": "sticker:plataformas/TriageCascadas"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Una CNN que corre en CPU",
+      "cuerpo": "CO.DE Triage clasifica cada waterfall como **good/bad** con una CNN **convnext_nano** sobre ONNX Runtime. Así un operador revisa solo los pases con señal, no todos."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Qué tan bien separa",
+      "cifra": "0.949",
+      "unidad": "AUC",
+      "titulo": "En un test intacto de 731 observaciones",
+      "nota": "codeaerospace.com/plataformas, cifra verificada el 2026-07-30."
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Lectura honesta",
+      "titulo": "Dos números, dos modelos",
+      "izq": {
+        "t": "Test intacto",
+        "items": [
+          "AUC 0.949",
+          "731 observaciones"
+        ]
+      },
+      "der": {
+        "t": "Pronóstico en estaciones no vistas",
+        "items": [
+          "AUC 0.806",
+          "Es el pronóstico de calidad, no la CNN"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Descarta antes que adivinar",
+      "cuerpo": "En producción opera con un umbral calibrado: **descarta parte de los casos dudosos** en lugar de forzar un veredicto. Preferimos callar a equivocarnos."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Parte 2 de 5 — sigue en el siguiente",
+      "texto": "El pase ya tiene veredicto: con señal o sin señal. ¿Cómo viaja ese veredicto a las demás plataformas? Parte 3: CODE-Nexus.",
+      "cta": [
+        "Guarda",
+        "Sigue la serie",
+        "Comparte"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "Un pase deja una cascada. ¿Tenía señal? Parte 2 de 5: CO.DE Triage clasifica el waterfall con una CNN en CPU (AUC 0.949 en un test intacto de 731 observaciones; el pronóstico de calidad llega a 0.806 en estaciones no vistas) y descarta los casos dudosos en vez de adivinar. Recorrido didáctico con un pase imaginario, no un flujo real. Guarda y sigue con la Parte 3. #inteligenciaartificial #SatNOGS #satélites #visiónporcomputadora #ingenieríaespacial",
+  "cuidado": [
+    "La cadena de cinco pasos es una síntesis didáctica nuestra: la fuente describe cada plataforma por separado, no un flujo único de un mismo pase.",
+    "Triage clasifica observaciones de la red abierta SatNOGS; en esta serie el «mismo pase» es un recurso narrativo.",
+    "AUC 0.949 es de un test intacto de 731 observaciones; 0.806 en estaciones no vistas. No generalizar.",
+    "Cifras verificadas el 2026-07-30."
+  ]
+}

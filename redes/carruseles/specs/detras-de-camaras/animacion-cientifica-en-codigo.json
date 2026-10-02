@@ -1,0 +1,22 @@
+{
+  "id": "animacion-cientifica-en-codigo",
+  "serie": "detras-de-camaras",
+  "fondo": {"tema": "robotica", "tipo": "portada", "var": 0, "atenuar": 0.45},
+  "laminas": [
+    {"tipo": "portada", "kicker": "Detrás de cámaras", "titulo": "Una animación científica se escribe, no se dibuja", "subtitulo": "Manim y ManimStudio", "imagen": "sticker:espacio_orbitas/TrazaTerrestre"},
+    {"tipo": "texto", "numero": "01", "kicker": "La idea", "titulo": "Cada cuadro sale de un programa", "cuerpo": "Con Manim, una escena es código [[Python]]: describes qué objetos hay y cómo cambian en el tiempo, y el programa genera el video. Si cambias un número, se vuelve a calcular todo."},
+    {"tipo": "pasos", "kicker": "ManimStudio", "titulo": "Del código al video", "pasos": [
+      {"t": "Escribir", "d": "Editor Python en el navegador"},
+      {"t": "Validar", "d": "Análisis estático, sin ejecutar el código"},
+      {"t": "Renderizar", "d": "Contenedor sin red, con el log en vivo"},
+      {"t": "Exportar", "d": "ZIP con manifiesto y lista para ffmpeg"}]},
+    {"tipo": "lista", "kicker": "Seguridad del render", "titulo": "Un contenedor con las puertas cerradas", "items": ["Sin red y de [[solo lectura]]", "Sin capacidades extra", "Límites de CPU, memoria y procesos", "Un render a la vez, en cola"]},
+    {"tipo": "dato", "kicker": "Escenas escritas", "cifra": "70", "unidad": "scripts de animación", "titulo": "En la herramienta", "nota": "Ficha de ManimStudio en codeaerospace.com/plataformas: cifra verificada el 30 de julio de 2026."},
+    {"tipo": "dato", "kicker": "Respaldo", "cifra": "117", "unidad": "pruebas automatizadas", "titulo": "Para que el estudio no se rompa", "nota": "Ficha de ManimStudio en codeaerospace.com/plataformas: cifra verificada el 30 de julio de 2026."},
+    {"tipo": "texto", "numero": "02", "kicker": "Aviso", "titulo": "Es una herramienta interna", "cuerpo": "ManimStudio es de un solo usuario y sin registro público: es la que produce el material [[audiovisual]] de nuestros cursos. No es un producto que se pueda contratar."},
+    {"tipo": "cierre", "titulo": "La ciencia también se programa", "texto": "Guarda esto si te interesa Manim", "cta": ["Guarda", "Comparte", "Sigue"]}
+  ],
+  "fuentes": ["codeaerospace.com/plataformas, ficha ManimStudio (cifras 2026-07-30), consultado 2026-10-01"],
+  "pie_texto": "Detrás de cámaras: una animación científica se escribe en código. Con Manim cada escena es un programa Python; en ManimStudio se valida sin ejecutarlo y se renderiza en un contenedor aislado, sin red. Es una herramienta interna con 117 pruebas (verificadas el 30 de julio de 2026). Guárdalo si quieres empezar con Manim. #Manim #Python #AnimaciónCientífica #DetrásDeCámaras",
+  "cuidado": ["Cifras (70 scripts, 117 pruebas) verificadas el 2026-07-30; envejecen si se añaden scripts. Reconfirmar.", "ManimStudio es interna, de un solo usuario y sin registro público: no invitar a usarla.", "Solapa en tema con la pieza «manimstudio-cursos» de la serie como-trabajamos; aquí el ángulo es el código. Evitar publicarlas cerca.", "La frase «si cambias un número, se vuelve a calcular» es del funcionamiento general de Manim, no de la ficha."]
+}

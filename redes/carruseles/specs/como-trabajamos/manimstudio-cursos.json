@@ -1,0 +1,102 @@
+{
+  "id": "manimstudio-cursos",
+  "serie": "como-trabajamos",
+  "fondo": {
+    "tema": "robotica",
+    "tipo": "portada",
+    "var": 1
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "ManimStudio · CO.DE Academy",
+      "titulo": "Así se producen las animaciones de nuestros cursos",
+      "subtitulo": "Código Python que se convierte en video",
+      "imagen": "marca:simbolo-plata"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "La herramienta",
+      "titulo": "Una consola web para Manim",
+      "cuerpo": "ManimStudio es nuestra herramienta [[interna]] de producción: se escribe Python en el navegador y se renderizan animaciones con Manim. Produce el material audiovisual de los cursos."
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "El flujo",
+      "titulo": "De la idea al video",
+      "pasos": [
+        {
+          "t": "Escribir",
+          "d": "Código Python en el navegador, con escenas detectadas"
+        },
+        {
+          "t": "Validar",
+          "d": "Análisis estático, sin ejecutar el código"
+        },
+        {
+          "t": "Renderizar",
+          "d": "En un contenedor aislado, con log en vivo"
+        },
+        {
+          "t": "Exportar",
+          "d": "ZIP con manifiesto y lista para ffmpeg"
+        }
+      ]
+    },
+    {
+      "tipo": "lista",
+      "kicker": "El render, aislado",
+      "titulo": "Un contenedor con las puertas cerradas",
+      "items": [
+        "Sin red y de [[solo lectura]]",
+        "Sin capacidades extra",
+        "Límites de CPU, memoria y procesos",
+        "Un render a la vez, en cola"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Pruebas automatizadas",
+      "cifra": "117",
+      "unidad": "pruebas",
+      "titulo": "Respaldan la herramienta",
+      "nota": "codeaerospace.com/plataformas: cifras verificadas el 30 de julio de 2026."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Primitivas propias",
+      "cifra": "10",
+      "unidad": "primitivas Manim",
+      "titulo": "Órbitas, señal y redes, listas para reutilizar",
+      "nota": "Ficha de ManimStudio en codeaerospace.com/plataformas (verificada el 30 de julio de 2026)."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "El destino",
+      "titulo": "Lecciones en CO.DE Academy",
+      "cuerpo": "Las animaciones acompañan cursos de ingeniería con laboratorios que corren en el navegador y lecciones en video en YouTube. La plataforma publicaba 16 cursos al 2026-09-18. CO.DE Academy está en beta.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Código que se vuelve lección",
+      "texto": "Cursos de CO.DE Academy (plataforma en beta)",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, fichas ManimStudio (cifras 2026-07-30) y CO.DE Academy (catálogo 2026-09-18), consultado 2026-10-01"
+  ],
+  "pie_texto": "Cómo producimos las animaciones de CO.DE Academy (plataforma en beta): ManimStudio, una consola web que valida el código Python sin ejecutarlo y lo renderiza en un contenedor aislado, sin red y de solo lectura. Guárdalo si te interesa Manim o producir contenido técnico. #Manim #Python #Educación #CoDeAcademy",
+  "cuidado": [
+    "ManimStudio es herramienta interna de un solo usuario y sin registro público: no presentarla como producto ni invitar a registrarse.",
+    "Cifras (117 pruebas, 10 primitivas) verificadas el 2026-07-30; «16 cursos» del 2026-09-18. Reconfirmar antes de publicar.",
+    "No se nombra ningún curso concreto ni se citan cifras de lecciones por curso."
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "id": "plataformas-atp-dt",
+  "serie": "plataformas",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "seccion",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "ATP-DT Ground Station Twin",
+      "titulo": "¿Puede una antena apuntar con 0.1° de error?",
+      "subtitulo": "Se prueba en simulación antes de construirla"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Apuntar es difícil",
+      "cuerpo": "Un satélite en órbita baja cruza el cielo en minutos. La antena debe moverse en **acimut y elevación**, sin perderlo, con un presupuesto de error de 0.1°.",
+      "imagen": "sticker:seguidor_satelital/VistaPolarPase"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "La antena, como un brazo robótico",
+      "cuerpo": "El gemelo modela la montura como un manipulador de **dos grados de libertad** y simula el lazo completo: sensar, controlar, actuar y apuntar, con perturbaciones realistas.",
+      "imagen": "sticker:seguidor_satelital/GemeloDigitalATP",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Un lazo que se corrige solo",
+      "cuerpo": "El controlador compara hacia dónde debe apuntar con hacia dónde apunta, y corrige el error una y otra vez.",
+      "imagen": "sticker:seguidor_satelital/LazoPID"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Cinco controladores conmutables",
+      "titulo": "Compara estrategias",
+      "items": [
+        "PD y PID",
+        "LQR",
+        "H∞",
+        "Lazo abierto, como referencia"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La meta del diseño",
+      "cifra": "0.1°",
+      "unidad": "de error",
+      "titulo": "Presupuesto de apuntamiento a cumplir",
+      "nota": "Es el presupuesto de diseño que el banco de pruebas verifica; no una medición de una antena real.",
+      "sello": "meta"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Más herramientas",
+      "titulo": "Antes de construir",
+      "items": [
+        "Campañas Monte Carlo con progreso en vivo",
+        "Informe de robustez: Bode, Nyquist, Lyapunov",
+        "Del error de apunte a la pérdida de ganancia"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Dimensiona antes de soldar",
+      "texto": "Banco de pruebas de diseño, hoy en beta.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Puede una antena apuntar con 0.1° de error? ATP-DT Ground Station Twin modela la montura como un brazo robótico de dos grados de libertad y simula todo el lazo de control para comprobar si un diseño cumple ese presupuesto, antes de construir la estación. Guárdalo y compártelo. #estaciónterrena #control #gemelodigital #satélites #ingenieríaespacial",
+  "cuidado": [
+    "Plataforma en beta: banco de pruebas de diseño, NO una antena operativa. 0.1° es presupuesto de diseño, no resultado medido.",
+    "La consola está tras autenticación; demostración guiada.",
+    "Las cifras de los stickers (p. ej. 'Error 0.3°') son ilustrativas."
+  ]
+}

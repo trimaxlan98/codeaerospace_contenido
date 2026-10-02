@@ -1,0 +1,106 @@
+{
+  "id": "mito-quietos-y-basura",
+  "serie": "glosario-y-mitos",
+  "fondo": {
+    "tema": "aerodinamica",
+    "tipo": "portada",
+    "var": 2
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Mito vs. realidad",
+      "titulo": "2 mitos sobre lo que orbita sobre ti",
+      "subtitulo": "Satélites «quietos» y basura «inofensiva»"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Mito 1",
+      "titulo": "«Los satélites están quietos»",
+      "izq": {
+        "t": "Mito",
+        "items": [
+          "Cuelgan fijos en el cielo",
+          "Como luces en un techo"
+        ]
+      },
+      "der": {
+        "t": "Realidad",
+        "items": [
+          "Casi todos se mueven rápido",
+          "Solo los GEO parecen fijos"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "En órbita baja corren",
+      "cuerpo": "A unos 400 km la ISS avanza a unos 7.7 km/s y da una vuelta en ~92 min. Por eso cruza el cielo en pocos minutos. El esquema dibuja LEO a 550 km.",
+      "imagen": "sticker:espacio_orbitas/OrbitasLEOMEOGEO"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La excepción",
+      "cifra": "35 786",
+      "unidad": "km sobre el ecuador",
+      "titulo": "Solo en GEO se \"quedan quietos\"",
+      "nota": "Altitud estándar de la órbita geoestacionaria: su periodo coincide con la rotación de la Tierra, así que parece fija desde el suelo."
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Mito 2",
+      "titulo": "«La basura espacial no es un problema»",
+      "izq": {
+        "t": "Mito",
+        "items": [
+          "Espacio enorme, nada choca",
+          "Cuatro piezas sueltas"
+        ]
+      },
+      "der": {
+        "t": "Realidad",
+        "items": [
+          "Decenas de miles rastreadas",
+          "Chocan a km/s: un tornillo es un proyectil"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Una colisión crea más basura",
+      "cuerpo": "En 2009 chocaron los satélites Iridium 33 y Cosmos 2251 y generaron miles de fragmentos. Es el riesgo en cadena que describe el **síndrome de Kessler**.",
+      "imagen": "sticker:espacio_orbitas/BasuraEspacial"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Resumen",
+      "titulo": "Lo que sí es verdad",
+      "items": [
+        "En LEO todo se mueve a gran velocidad",
+        "GEO es la excepción: parece fijo",
+        "La basura es un riesgo real y en aumento"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "¿Cuál mito creías?",
+      "texto": "Cuéntanos en comentarios y guarda el post.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Mecánica orbital de libro: ISS ~400 km, ~7.7 km/s, ~92 min; GEO 35 786 km",
+    "Colisión Iridium 33 / Cosmos 2251 (10 feb 2009); síndrome de Kessler (D. Kessler y B. Cour-Palais, 1978); catálogos de objetos rastreados (decenas de miles) sin cifra exacta"
+  ],
+  "pie_texto": "Dos mitos sobre lo que orbita sobre ti: no, los satélites no están quietos (solo los GEO lo parecen), y sí, la basura espacial es un problema real. Guárdalo y compártelo. ¿Cuál creías? #mitos #basuraespacial #satélites #GEO #CoDeAerospace",
+  "cuidado": [
+    "El sticker BasuraEspacial muestra una cifra ilustrativa; el texto solo dice 'decenas de miles rastreadas'.",
+    "Confirmar datos de la colisión de 2009 antes de publicar si se quiere añadir cifras de fragmentos."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "cuatro-fases",
+  "serie": "como-trabajamos",
+  "fondo": {"tema": "electronica", "tipo": "portada", "var": 0},
+  "laminas": [
+    {"tipo": "portada", "kicker": "Cómo trabajamos", "titulo": "Cuatro fases, cada una con algo que se puede comprobar", "subtitulo": "Del alcance a la entrega"},
+    {"tipo": "pasos", "kicker": "El proceso", "titulo": "Del alcance a la entrega", "pasos": [
+      {"t": "Alcance", "d": "Requerimientos, restricciones y criterios de éxito medibles"},
+      {"t": "Factibilidad", "d": "Validamos supuestos críticos antes de comprometer recursos"},
+      {"t": "Ejecución por hitos", "d": "Entregables verificables y trazables al alcance"},
+      {"t": "Entrega documentada", "d": "Documentación, aceptación cumplida y transición"}]},
+    {"tipo": "texto", "numero": "01", "kicker": "Alcance", "titulo": "Primero, qué significa «terminado»", "cuerpo": "Antes de escribir código definimos requerimientos técnicos, restricciones y [[criterios de éxito medibles]], junto con el equipo del proyecto."},
+    {"tipo": "comparacion", "kicker": "Ejemplo ilustrativo", "titulo": "Un criterio de éxito, bien y mal", "izq": {"t": "Vago", "items": ["«Que cargue rápido»", "«Que se vea bien»"]}, "der": {"t": "Medible", "items": ["Un tiempo de respuesta con un límite", "Una prueba que pasa o falla"]}},
+    {"tipo": "texto", "numero": "02", "kicker": "Factibilidad", "titulo": "Validar antes de gastar", "cuerpo": "Evaluamos el espacio de diseño y comprobamos los [[supuestos críticos]] antes de comprometer recursos de ejecución. Si un supuesto no se sostiene, se descubre aquí."},
+    {"tipo": "texto", "numero": "03", "kicker": "Ejecución por hitos", "titulo": "Desarrollo iterativo, con evidencia", "cuerpo": "Cada hito deja un entregable [[verificable]], trazable al alcance original. No se avanza sin poder señalar qué criterio quedó cumplido."},
+    {"tipo": "lista", "kicker": "04 · Entrega", "titulo": "Una entrega no es un archivo", "items": ["Documentación técnica", "Criterios de aceptación cumplidos", "Soporte de transición"]},
+    {"tipo": "cierre", "titulo": "Hitos que se pueden verificar", "texto": "El proceso completo está en codeaerospace.com/services", "cta": ["Guarda", "Comparte", "Sigue"]}
+  ],
+  "fuentes": ["codeaerospace.com/services, sección «Cómo trabajamos» (consultado 2026-10-01)"],
+  "pie_texto": "Del alcance a la entrega en cuatro fases, cada una con hitos verificables: alcance, factibilidad, ejecución por hitos y entrega documentada. Guárdalo para tu próximo proyecto técnico. #Ingeniería #GestiónDeProyectos #CoDeAerospace #Método",
+  "cuidado": ["Las cuatro fases y sus descripciones son textuales de /services (2026-10-01).", "Los criterios «vago vs medible» son ejemplos pedagógicos, no un caso real ni un dato de Co.De."]
+}

@@ -1,0 +1,87 @@
+{
+  "id": "mecanica-orbital-en-el-navegador",
+  "serie": "formacion",
+  "fondo": {
+    "tema": "calculo",
+    "tipo": "portada",
+    "var": 0,
+    "atenuar": 0.45
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "CO.DE Academy",
+      "titulo": "¿Se aprende mecánica orbital desde el navegador?",
+      "subtitulo": "Lecciones con ecuaciones y laboratorios interactivos",
+      "imagen": "sticker:espacio_orbitas/TransferenciaHohmann"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "La lección",
+      "titulo": "Se escribe como un documento técnico",
+      "cuerpo": "Las lecciones de CO.DE Academy se escriben en Markdown con [[ecuaciones]] en KaTeX. Y admiten bloques interactivos y cuestionarios autocalificados dentro del mismo texto."
+    },
+    {
+      "tipo": "formula",
+      "kicker": "Una ecuación de ejemplo",
+      "titulo": "Velocidad en órbita circular",
+      "formula": "v = √(μ / r)",
+      "pasos": [
+        "μ = 398 600 km³/s²",
+        "r = 6 378 + 400 = 6 778 km"
+      ],
+      "resultado": "v ≈ 7.67 km/s",
+      "nota": "Ejemplo ilustrativo de física estándar: órbita a ~400 km de altura (como la ISS).",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Qué trae cada lección",
+      "titulo": "No es solo leer",
+      "items": [
+        "Texto con ecuaciones KaTeX",
+        "[[Simulaciones]] que corren en el navegador",
+        "Cuestionarios autocalificados",
+        "Video propio y subtítulos"
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Laboratorios con código",
+      "titulo": "El código corre aislado",
+      "cuerpo": "Los laboratorios que ejecutan código corren en un servicio aparte con acceso [[aislado]] a Docker. El resto de las simulaciones se ejecuta en tu navegador, sin instalar nada."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Catálogo al 2026-09-18",
+      "cifra": "16",
+      "unidad": "cursos publicados",
+      "titulo": "Entre ellos, mecánica orbital",
+      "nota": "Ficha ACADEMIA en codeaerospace.com/plataformas: de 2 a 18 lecciones por curso, al 2026-09-18.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Practicar ayuda a entender",
+      "texto": "Guarda esto para tu ruta de estudio",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, ficha ACADEMIA (catálogo 2026-09-18), consultado 2026-10-01",
+    "Física estándar: μ de la Tierra 398 600 km³/s², radio ecuatorial 6 378 km"
+  ],
+  "pie_texto": "¿Se aprende mecánica orbital desde el navegador? En CO.DE Academy las lecciones llevan ecuaciones, simulaciones y cuestionarios en la misma página; los laboratorios con código corren en un servicio aislado. La plataforma está en beta. Guárdalo si quieres empezar en ingeniería espacial. #MecánicaOrbital #IngenieríaAeroespacial #CoDeAcademy #Aprender",
+  "cuidado": [
+    "Academy está en BETA (sin usuarios externos según la leyenda de estados de la página): no invitar a «registrarse» sin confirmar el acceso actual.",
+    "16 cursos (de 2 a 18 lecciones) es del 2026-09-18 y envejece: reconfirmar.",
+    "La fuente lista «mecánica orbital» entre los cursos pero no dice que contenga la ecuación v=√(μ/r): la lámina 3 es un ejemplo ilustrativo de física estándar, no contenido citado de un curso.",
+    "Dominio de la plataforma: la ficha dice canfret.com; confirmar qué enlace poner en la bio."
+  ]
+}

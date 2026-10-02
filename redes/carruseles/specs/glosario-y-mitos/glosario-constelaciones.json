@@ -1,0 +1,17 @@
+{
+  "id": "glosario-constelaciones",
+  "serie": "glosario-y-mitos",
+  "fondo": {"tema": "lanzamiento", "tipo": "portada", "var": 1},
+  "laminas": [
+    {"tipo": "portada", "kicker": "Glosario · constelaciones", "titulo": "Constelaciones en 5 palabras", "subtitulo": "LEO, NGSO, ISL, handover y Walker"},
+    {"tipo": "texto", "numero": "01", "kicker": "LEO", "titulo": "LEO: órbita baja", "cuerpo": "Órbita terrestre baja, de unos cientos a unos 2 000 km de altura. **Ejemplo:** la ISS, a unos 400 km.", "imagen": "sticker:espacio_orbitas/OrbitasLEOMEOGEO"},
+    {"tipo": "texto", "numero": "02", "kicker": "NGSO", "titulo": "NGSO: todo lo que no es GEO", "cuerpo": "Órbita no geoestacionaria: LEO, MEO y otras. **Ejemplo:** el satélite se mueve respecto al suelo, así que hace falta una flota para cubrir de forma continua."},
+    {"tipo": "texto", "numero": "03", "kicker": "ISL", "titulo": "ISL: satélites que hablan entre sí", "cuerpo": "Enlace entre satélites, sin pasar por tierra. **Ejemplo:** un mensaje salta de satélite en satélite antes de bajar.", "imagen": "sticker:constelaciones/MallaISL"},
+    {"tipo": "texto", "numero": "04", "kicker": "Handover", "titulo": "Handover: el relevo del enlace", "cuerpo": "Cambio de satélite (o de haz) que atiende a un usuario. **Ejemplo:** el satélite se aleja del horizonte y otro toma tu conexión.", "imagen": "sticker:constelaciones/HandoverSatelital"},
+    {"tipo": "texto", "numero": "05", "kicker": "Walker", "titulo": "Walker: el patrón de la flota", "cuerpo": "Constelación de planos orbitales con la misma inclinación y satélites repartidos con simetría. **Ejemplo:** 3 planos de 6 satélites.", "imagen": "sticker:constelaciones/WalkerDelta3D"},
+    {"tipo": "cierre", "titulo": "Cinco palabras, una constelación", "texto": "Guárdalo para tu próxima lectura de un paper de comunicaciones satelitales.", "cta": ["Guarda", "Comparte", "Sigue"]}
+  ],
+  "fuentes": ["Definiciones estándar de libro (mecánica orbital y redes satelitales no terrestres)"],
+  "pie_texto": "Constelaciones en 5 palabras: LEO, NGSO, ISL, handover y Walker. Una definición de una línea y un ejemplo para cada una. Guárdalo para tu próximo paper y compártelo con quien aún diga que 'es solo un satélite'. #constelaciones #LEO #NTN #6G #CoDeAerospace",
+  "cuidado": ["Ejemplo de Walker (3 planos de 6) es hipotético, no de una constelación real; el sticker muestra valores ilustrativos."]
+}

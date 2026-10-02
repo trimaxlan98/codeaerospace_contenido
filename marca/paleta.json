@@ -1,0 +1,19 @@
+{
+  "nombre": "Co.De Aerospace",
+  "nota": "Colores medidos en los PNG oficiales del logo (marca/originales) y en codeaerospace.com. Fuente única de verdad: la usan marca_aerospace.py (Manim), la app de escritorio y las presentaciones.",
+  "colores": [
+    { "id": "fondo", "nombre": "Fondo del logo", "hex": "#080F15", "uso": "fondo de videos, app y piezas oscuras" },
+    { "id": "marino", "nombre": "Marino web", "hex": "#0A0E27", "uso": "fondo de codeaerospace.com" },
+    { "id": "plata", "nombre": "Plata", "hex": "#F2F3F4", "uso": "logo y títulos sobre fondo oscuro (arriba del degradado)" },
+    { "id": "plata_baja", "nombre": "Plata baja", "hex": "#D3D5D8", "uso": "abajo del degradado plata" },
+    { "id": "tinta", "nombre": "Tinta", "hex": "#0A0D12", "uso": "logo en una tinta sobre fondos claros" },
+    { "id": "papel", "nombre": "Papel", "hex": "#F7F8F9", "uso": "fondo claro" },
+    { "id": "cian", "nombre": "Cian", "hex": "#00D9FF", "uso": "acento único: enlaces, órbitas activas, reglas" },
+    { "id": "tenue", "nombre": "Tenue", "hex": "#8E99A6", "uso": "texto secundario sobre el fondo" },
+    { "id": "ambar", "nombre": "Ámbar", "hex": "#F59E0B", "uso": "acento de CO.DE Academy (división de cursos)" }
+  ],
+  "tipografia": {
+    "marca": "Montserrat (la más cercana a las letras del logo; OFL, en studio/content/manim_extensions/fonts)",
+    "web": "Rajdhani, DM Sans, Space Mono y Orbitron (codeaerospace.com)"
+  }
+}

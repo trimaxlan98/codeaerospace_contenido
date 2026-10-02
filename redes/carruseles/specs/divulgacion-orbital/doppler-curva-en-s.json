@@ -1,0 +1,100 @@
+{
+  "id": "doppler-curva-en-s",
+  "serie": "divulgacion-orbital",
+  "fondo": {
+    "tema": "fisica",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Divulgación orbital",
+      "titulo": "La curva en S: el Doppler de un satélite",
+      "subtitulo": "Por qué la frecuencia cambia durante un pase"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "La ambulancia del espacio",
+      "cuerpo": "Si la fuente se acerca, las ondas llegan comprimidas (más agudo). Si se aleja, estiradas (más grave). Con una señal de radio pasa igual: cambia la frecuencia que recibes."
+    },
+    {
+      "tipo": "imagen",
+      "kicker": "Un pase en LEO",
+      "titulo": "La curva en S",
+      "imagen": "sticker:seguidor_satelital/DopplerEnS",
+      "pie": "Esquema ilustrativo: frecuencia recibida contra tiempo durante un pase. Las cifras del dibujo son un ejemplo."
+    },
+    {
+      "tipo": "pasos",
+      "titulo": "Leer la S en tres tramos",
+      "pasos": [
+        {
+          "t": "Se acerca",
+          "d": "Frecuencia por encima de la nominal"
+        },
+        {
+          "t": "Punto más cercano",
+          "d": "Frecuencia nominal; la curva cae más rápido"
+        },
+        {
+          "t": "Se aleja",
+          "d": "Frecuencia por debajo de la nominal"
+        }
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "La regla",
+      "cifra": "3 kHz",
+      "unidad": "a 137 MHz",
+      "titulo": "Corrimiento máximo típico en LEO",
+      "nota": "El corrimiento ≈ f · v/c, con v ≈ 7 km/s hacia el observador (cerca del horizonte). Cálculo aproximado; depende de cada pase."
+    },
+    {
+      "tipo": "comparacion",
+      "titulo": "Pase alto vs. pase bajo",
+      "izq": {
+        "t": "Pase alto",
+        "items": [
+          "S muy empinada",
+          "Pasa cerca: cambia rápido"
+        ]
+      },
+      "der": {
+        "t": "Pase bajo",
+        "items": [
+          "S más suave",
+          "Más lejos: cambia lento"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Por qué importa",
+      "cuerpo": "Un receptor de banda estrecha que no corrige el Doppler se sale de la señal. Por eso la estación calcula la curva con la órbita y sintoniza siguiéndola."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Una S que se calcula antes del pase",
+      "texto": "Orbit Eye (obra derivada de ground-station, GPL-3.0) corrige el Doppler en radio y rotor por Hamlib. Su despliegue no tiene receptor conectado: la recepción se demuestra con grabaciones IQ.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Física estándar del efecto Doppler: Δf ≈ f·v_r/c, c = 299 792 km/s",
+    "Cálculo propio: 137 MHz × 7 km/s ÷ 299 792 km/s ≈ 3.2 kHz",
+    "codeaerospace.com/plataformas, ficha CO.DE Orbit Eye (consultado 2026-10-01)"
+  ],
+  "pie_texto": "Cuando un satélite pasa sobre ti, su frecuencia baja dibujando una S: más aguda al acercarse, nominal en el punto más cercano y más grave al alejarse. Esa curva se puede calcular antes del pase. Guárdalo si te gusta la radio y el espacio. #Doppler #SDR #satélites #radioafición #espacio",
+  "cuidado": [
+    "Orbit Eye es obra derivada de ground-station (GPL-3.0, Stratos Goudelis); este despliegue no tiene receptor de radio conectado.",
+    "Los ≈ 3 kHz son un orden de magnitud para 137 MHz; el valor real depende de la altitud y la geometría del pase."
+  ]
+}

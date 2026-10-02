@@ -1,0 +1,84 @@
+{
+  "id": "mito-ia-pilotea",
+  "serie": "glosario-y-mitos",
+  "fondo": {
+    "tema": "calculo",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Mito vs. realidad",
+      "titulo": "«La IA ya pilotea los satélites»",
+      "subtitulo": "Y por qué en Co.De nuestros copilotos no deciden"
+    },
+    {
+      "tipo": "comparacion",
+      "kicker": "Mito vs. realidad",
+      "titulo": "¿Quién maneja?",
+      "izq": {
+        "t": "Mito",
+        "items": [
+          "La IA toma el volante",
+          "Decide y ejecuta sola"
+        ]
+      },
+      "der": {
+        "t": "Realidad",
+        "items": [
+          "El control es verificable",
+          "Nuestros copilotos solo explican"
+        ]
+      }
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "El lazo de control es de ingeniería",
+      "cuerpo": "Sensar, decidir y actuar lo resuelven algoritmos de control diseñados y probados, como el **PID**. Se pueden analizar y demostrar.",
+      "imagen": "sticker:seguidor_satelital/LazoPID"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "La IA entra a explicar y redactar",
+      "cuerpo": "Resumir telemetría, redactar informes, responder preguntas sobre los datos. Útil, pero sin mandar comandos."
+    },
+    {
+      "tipo": "cita",
+      "frase": "El copiloto de IA explica y redacta; no decide ni actúa.",
+      "autor": "Patrón de IA en codeaerospace.com/plataformas"
+    },
+    {
+      "tipo": "lista",
+      "kicker": "El patrón de Co.De",
+      "titulo": "El patrón habitual de nuestros copilotos",
+      "items": [
+        "Casi siempre Gemini 2.5 sobre Vertex AI (PiStation usa el CLI local)",
+        "Acotado a los datos de la organización",
+        "De solo lectura",
+        "[[Fuera]] de cualquier lazo de control"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Más IA, con las manos fuera del volante",
+      "texto": "Guárdalo para cuando alguien te diga que la IA ya pilotea satélites.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01): 'Un mismo patrón de IA' — Gemini 2.5 sobre Vertex AI, acotado a los datos de la organización, de solo lectura y fuera de cualquier lazo de control; la IA explica y redacta; no decide ni actúa",
+    "Ingeniería de control de libro (PID)"
+  ],
+  "pie_texto": "Mito: «la IA ya pilotea los satélites». En Co.De el copiloto de IA explica y redacta, pero no decide ni actúa: es de solo lectura y vive fuera de cualquier lazo de control. Guárdalo y compártelo con quien dude. #IA #satélites #control #ingenieríaespacial #CoDeAerospace",
+  "cuidado": [
+    "La afirmación 'el control a bordo lo hacen algoritmos verificables' es general; el patrón de Co.De es el de la fuente (excepción: el copiloto de PiStation corre sobre CLI local, no Vertex AI; no se menciona).",
+    "No es una afirmación de que ningún satélite en el mundo use IA a bordo."
+  ]
+}

@@ -1,0 +1,525 @@
+ 
+ Plataformas en producción | CO.DE Aerospace 
+ CDMX 23:17:53 
+ WRC-27 T-402d 03:42:06 T-402d 
+ CO.DE Aerospace 
+ Divisiones 
+ CO.DE Strategy // Deployments 
+ CO.DE Academy // Deployments 
+ Compañía 
+ Plataformas Investigación Impacto Alianzas 
+ Servicios 
+ WRC-2027 
+ Blog 
+ Iniciar sesión 
+ EN Solicitar Diagnóstico 
+ EN 
+ SYS::PORTAFOLIO // PLATAFORMAS EN PRODUCCIÓN 
+ Lo que construimos y mantenemos en línea 
+ Cada plataforma de esta página está desplegada, tiene dominio propio con HTTPS y corre sobre infraestructura que administramos nosotros. No son maquetas ni pruebas de concepto: son sistemas en operación, con su código, sus pruebas y su registro de decisiones de arquitectura.
+ 0 
+ Plataformas desplegadas
+ 0 
+ Dominios propios con HTTPS
+ 0 
+ Pruebas en verde
+ 0 
+ Áreas de trabajo
+ Cómo operamos 
+ Lo que comparten todas
+ Una sola infraestructura
+ Todo corre en un VPS que administramos nosotros: contenedores publicados solo en la interfaz local, detrás de nginx con TLS de Let’s Encrypt. Por eso el stack de cada ficha no repite Docker ni nginx: se dan por descontados.
+ Un mismo patrón de IA
+ Donde hay copiloto es siempre el mismo diseño: Gemini 2.5 sobre Vertex AI, acotado a los datos de la propia organización, de solo lectura y fuera de cualquier lazo de control. La IA explica y redacta; no decide ni actúa.
+ Dominios heredados
+ Varios dominios no describen lo que sirven: son nombres que ya teníamos y reutilizamos en lugar de comprar otros. El producto es el que dice la ficha, no el que sugiere la URL.
+ Cifras con fecha
+ Las cifras salieron de ejecutar comandos contra cada repositorio y cada servicio el 30 de julio de 2026. Las que cambian solas —eventos, observaciones, catálogos— envejecen; las de pruebas y arquitectura, no.
+ Qué significa cada estado
+ En producción — Desplegada, en uso diario y con datos reales.
+ Beta — Desplegada y funcional; investigación en curso, sin usuarios externos.
+ Interna — Herramienta nuestra, sin registro público.
+ Todas 19 Espacio y segmento terreno 2 Gemelos digitales 2 Infraestructura científica 4 Investigación y formación 4 Operación de negocio 7 
+ Catálogo de plataformas
+ Waterfall SDR · curva Doppler 
+ 01 Estación terrena 
+ Con cuenta Interna 
+ CO.DE Orbit Eye
+ codeaerospace.space 
+ Despliegue y extensión del proyecto de código abierto ground-station (GPL-3.0).
+ El software rastrea satélites propagando TLE de CelesTrak y TinyGS con SGP4/Skyfield, calcula pases AOS/LOS y opera receptores SDR con una cadena DSP completa: FFT, waterfall, múltiples VFO, demodulación y decodificación. Nuestro trabajo sobre el proyecto original es el sistema visual, el asistente Orbit Eye AI, correcciones de accesibilidad y el adaptador que lo conecta al clúster CODE-Nexus.
+ // Capacidades 
+ Rastreo en tiempo real con SGP4/Skyfield 
+ Predicción de pases AOS/LOS por umbral de elevación 
+ Waterfall y FFT en vivo con varios VFO por receptor 
+ Decodificadores SSTV, AFSK, FSK, GFSK, GMSK, BPSK y Morse 
+ Grabación y reproducción de IQ en formato SigMF 
+ Rotor y radio por Hamlib con corrección Doppler 
+ Interfaz web en siete idiomas 
+ Asistente Orbit Eye AI sobre Gemini 2.5 
+ 144
+ Comandos de API
+ 355
+ Satélites sincronizados
+ 7
+ Idiomas de interfaz
+ Obra derivada del proyecto ground-station de Stratos Goudelis, bajo GPL-3.0. El catálogo de satélites se sincroniza desde CelesTrak y TinyGS, no lo compilamos nosotros. Este despliegue no tiene receptor de radio conectado: las capacidades de recepción y decodificación están en el código y se demuestran con reproducción de grabaciones IQ.
+ // Stack Python 3.12 FastAPI Socket.IO Skyfield / SGP4 SoapySDR · RTL-SDR · UHD React 19 SQLAlchemy Docker 
+ Cola de triaje · veredicto por pase 
+ 02 Visión por computadora 
+ En producción 
+ CO.DE Triage
+ migracion.ca 
+ Clasifica waterfalls de pases satelitales con una CNN que corre en CPU.
+ Ingiere observaciones de la red abierta SatNOGS —espectrograma más metadatos— y las clasifica con una CNN convnext_nano sobre ONNX Runtime, de modo que un operador revisa solo los pases con señal en lugar de todos. La página pública Score Your Pass añade un pronóstico de calidad construido sobre un estudio observacional caso-control de 7.499 observaciones, que se ejecuta entero en el navegador.
+ // Capacidades 
+ Clasificación good/bad con CNN convnext_nano en CPU 
+ Ingesta automática de SatNOGS cada 30 minutos 
+ Umbral calibrado para precisión alta sobre la clase con señal 
+ Dashboard de operador con KPIs, filtros y galería 
+ Pronóstico de calidad que corre en el navegador 
+ API REST con X-API-Key y cola con reintentos 
+ Publica cada clasificación al bus de CODE-Nexus 
+ Servidor MCP con 7 herramientas de solo lectura 
+ 0.949
+ AUC en test intacto
+ 7,499
+ Waterfalls etiquetados
+ 301
+ Pruebas en verde
+ El AUC de 0.949 se midió sobre un conjunto de prueba intacto de 731 observaciones; el pronóstico alcanza 0.806 en estaciones no vistas durante el entrenamiento. En producción el clasificador opera con un umbral calibrado, así que descarta parte de los casos dudosos en lugar de forzar un veredicto.
+ // Stack Python 3.11 FastAPI ONNX Runtime PyTorch · timm LightGBM SQLite Docker Compose nginx 
+ Traza orbital · ventana de enlace 
+ 03 Gemelo digital 
+ Con cuenta Beta 
+ SAT-DT Orbital Twin
+ orbitaltwin.space 
+ Responde qué le pasa a una constelación entera: flota, escenarios what-if y gobernanza de IA.
+ Sincroniza TLE reales de CelesTrak, propaga órbitas con SGP4 y las representa en un globo 3D de CesiumJS. Sobre esa geometría real, un modelo determinista simula la telemetría de cada satélite —batería, CPU, temperatura, carga útil, riesgo— y la distribuye por WebSocket, de modo que se pueden ensayar escenarios what-if sobre una flota completa sin tocar hardware.
+ // Capacidades 
+ Propagación SGP4 con TLE sincronizados de CelesTrak 
+ Globo 3D CesiumJS con posiciones y trazas de tierra 
+ Telemetría simulada por satélite distribuida por WebSocket 
+ Escenarios what-if con inyección de eventos y comparación 
+ Registro de modelos de IA con aprobación y clases de riesgo 
+ Copiloto Gemini 2.5 para análisis de flota 
+ Aislamiento por organización con Row-Level Security, probado en código 
+ Control multiagente QMIX en piloto, tras compuerta de gobernanza 
+ 146
+ Pruebas en verde
+ 66
+ Endpoints de API
+ 17
+ Decisiones de arquitectura
+ Los TLE son datos reales de CelesTrak; la telemetría de subsistemas la genera un simulador determinista. Es un entorno de simulación, no monitoreo de satélites en vuelo. El checkpoint QMIX es un piloto de 1.000 episodios, sin validar.
+ // Stack Python 3.13 FastAPI SQLAlchemy 2 async PostgreSQL 17 Redis 8 React 19 · TypeScript CesiumJS Docker Compose 
+ Plot azimut-elevación · arco del pase 
+ 04 Ingeniería de control 
+ Con cuenta Beta 
+ ATP-DT Ground Station Twin
+ atpsystem.space 
+ Responde si una sola antena alcanza su presupuesto de apuntamiento de 0.1°.
+ Modela la montura de antena como un manipulador robótico de dos grados de libertad y simula el lazo completo de sensado, control, actuación y apuntamiento bajo perturbaciones orbitales realistas, para comprobar si un diseño cumple un presupuesto de error de 0.1°. Sirve como banco de pruebas para dimensionar una estación terrena antes de construirla y sostiene un posgrado en arquitecturas de control ATP.
+ // Capacidades 
+ Propagación SGP4 de TLE a acimut y elevación 
+ Cinco controladores conmutables: PD, PID, LQR, H∞ y lazo abierto 
+ Informe de robustez: Routh-Hurwitz, Lyapunov, Bode, Nyquist 
+ Campañas Monte Carlo con progreso en vivo por WebSocket 
+ Modelo de enlace: error de apunte a pérdida de ganancia 
+ Clasificador de nivel de autonomía L0–L5 sobre umbral de riesgo 
+ Globo 3D con el arco del pase AOS–TCA–LOS 
+ Copiloto AI acotado y fuera del lazo de control 
+ 175
+ Pruebas en verde
+ 26
+ Decisiones de arquitectura
+ 41
+ Operaciones REST
+ La consola está detrás de autenticación: el enlace lleva a la pantalla de acceso. Es un despliegue de una sola organización, orientado a investigación; podemos mostrarlo en una demostración guiada.
+ // Stack Python 3.13 FastAPI NumPy · SciPy PostgreSQL 17 Redis 8 React 19 · TypeScript CesiumJS Docker Compose 
+ Malla del clúster · eventos en tránsito 
+ 05 Interconexión 
+ En producción 
+ CODE-Nexus
+ aptsystem.space 
+ El hub que interconecta el clúster: registro de servicios, bus firmado y procedencia.
+ Cada servicio del clúster —la estación terrena, los dos gemelos digitales, el clasificador y la suite de gobernanza— se registra con un manifiesto validado, publica eventos firmados, empuja artefactos y cataloga sus productos científicos con procedencia. Toda arista es URL base más clave de API descubierta en el registro, así que el mismo código funciona en un VPS, en varios hosts o detrás de NAT.
+ // Capacidades 
+ Registro de servicios con manifiestos y grafo del clúster 
+ Bus de eventos con webhooks HMAC-SHA256 y dead-letter 
+ Relay store-and-forward de artefactos con sha256 
+ Catálogo científico con export W3C PROV-JSON 
+ Sondeo continuo con uptime, p95, MTTR y Prometheus 
+ Caché TLE compartida con TTL y estado stale explícito 
+ Panel web sin build: grafo SVG, bus y contratos 
+ Servidor MCP con 13 herramientas del clúster 
+ 6/6
+ Servicios registrados en línea
+ 2,451
+ Eventos en el bus
+ 121
+ Pruebas en verde
+ Los 1.223 productos del catálogo provienen casi en su totalidad de un solo servicio, el clasificador de pases: es el volumen real de un clúster de seis aplicaciones nuestras, no de una red de terceros.
+ // Stack Python 3.12 FastAPI Pydantic SQLite WAL httpx JSON Schema W3C PROV-JSON Docker · nginx 
+ Cadena de experimento · etapa activa 
+ 06 MLOps científico 
+ Con cuenta En producción 
+ Lab Suite
+ call2hire.org 
+ Lanza experimentos de refuerzo desde el navegador y guarda la evidencia de que son reproducibles.
+ Lanza desde el navegador cinco herramientas de laboratorio —registro de experimentos, barridos con Optuna, pipeline reproducible, verificador de resultados y un gemelo NTN— sobre un catálogo cerrado de seis acciones: el cliente nunca envía comandos, solo un identificador y una entrada validada. Encima construye gates de falsabilidad, manifiestos de procedencia y una bitácora append-only con cadena de hashes verificable.
+ // Capacidades 
+ Cola de trabajos con catálogo cerrado y logs en vivo 
+ Gates de falsabilidad computados sobre corridas reales 
+ Manifiestos de procedencia con hash sha256 de recompensas 
+ Comparador de corridas: permutación, bootstrap y Cohen’s d 
+ Bitácora append-only con cadena de hashes verificable 
+ Copiloto Gemini de solo lectura con grounding 
+ Dashboards de labctl, Optuna, pipeline y result-guard 
+ CLI unificada y servidor MCP con 18 herramientas 
+ 183
+ Pruebas en verde
+ 43
+ Rutas HTTP y WebSocket
+ 18
+ Herramientas MCP
+ Instalación de un solo administrador, sin registro público: el enlace lleva a la pantalla de acceso. Da soporte a la validación de un doctorado en curso sobre gobernanza autónoma de redes 6G no terrestres.
+ // Stack Python 3.13 FastAPI Pydantic SQLite WAL Optuna PyTorch CPU React 18 · TypeScript Docker · nginx 
+ Clúster de tres máquinas · mensajes por el bus 
+ 07 Banco de pruebas distribuido 
+ Uso interno Interna 
+ PADA NTN Testbed
+ Se instala en el equipo del cliente
+ Tres máquinas reales degradan la red con tc/netem para medir cómo se recupera una política de handover NTN.
+ Cada rol del banco —satélite, dos gateways, UE, gobernanza, generador de topología y colector— corre en su propio contenedor sobre un Swarm de tres máquinas físicas y habla por MQTT autenticado, con el last-will del broker como modelo de caída de enlace. El generador publica el estado deseado de cada enlace desde un escenario CSV trazable a 3GPP TR 38.821 y cada nodo lo aplica a su propio egreso con tc/netem: la latencia y la pérdida que se miden son las del kernel, no las declaradas. Una CLI de biblioteca estándar levanta el clúster, inyecta campañas de fallos declarativas y cierra cada corrida con un manifiesto de procedencia y un informe de veredictos.
+ // Capacidades 
+ Una sola imagen multi-arch para amd64, arm64 y armv7 
+ Degradación de red real por nodo con tc/netem y filtros u32 
+ Bus MQTT autenticado con ACL por rol y last-will como caída de enlace 
+ Cambio de política en caliente: heurística, QMIX y mock 
+ Escenario de enlace CSV trazable a 3GPP TR 38.821 (LEO 600 km) 
+ Campañas de fallos declarativas en JSON: kill, stop y override 
+ Informe V&V por corrida con manifiesto de procedencia 
+ Dashboard sin build con MQTT sobre websockets y RTT en canvas 
+ 86
+ Pruebas sin clúster
+ 9
+ Servicios en tres máquinas
+ 5.5 s
+ Recuperación tras un SIGKILL
+ Instrumento de laboratorio en LAN privada, de un solo operador y sin despliegue público: el clúster se enciende por sesión de trabajo y no hay dominio que visitar. La política QMIX es solo inferencia sobre un checkpoint entrenado en el repositorio de la tesis que este banco valida. Los 5,5 s de recuperación son una sola observación de la corrida citable del 2026-07-27; la serie de repeticiones que permitiría citar mediana y p95 está implementada, pero pendiente de ejecutar.
+ // Stack Python 3.11 paho-mqtt 1.6.1 Eclipse Mosquitto 2 Docker Swarm 29.6.1 Docker Buildx multi-arch iproute2 · tc/netem PyTorch CPU MQTT.js 
+ Rail de telemetría · anomalía fuera de ±3σ 
+ 08 Consola de misión 
+ En sitio Interna 
+ PiStation Mission Control
+ Se instala en el equipo del cliente
+ Consola de misión para una flota de Raspberry Pi 5: telemetría en vivo, alarmas a bordo y rail CCSDS.
+ Un agente FastAPI corre en cada Raspberry Pi 5 y expone 44 endpoints —métricas, buffer SQLite de 48 h, contenedores Docker, unidades systemd en whitelist, journal y un rail de telemetría—, mientras la app de escritorio hace el trabajo pesado: tablero en vivo con detección de anomalías por z-score móvil, alarmas a bordo con ciclo ISA-18.2 sembradas desde una base de datos de misión y administración donde cada acción mutante exige confirmación explícita. Un sidecar de numpy/scipy añade espectrogramas STFT, predicción de pases SGP4, lazo AX.25/AFSK1200 y decodificación APT. La telemetría sale además como paquetes CCSDS 133.0-B con cabecera PUS-C, que un Yamcs de stock ingiere sin una línea de Java a medida.
+ // Capacidades 
+ Agente por nodo: 44 endpoints y buffer SQLite de 48 horas 
+ Ejecución solo por whitelist en argv, nunca a través de un shell 
+ Detección de anomalías por z-score móvil sobre la telemetría 
+ Alarmas a bordo con ciclo ISA-18.2 desde una base de datos de misión 
+ Sidecar de señales con 16 métodos: STFT, SGP4, AX.25 y CFDP 
+ Rail CCSDS 133.0-B con PUS-C que un Yamcs de stock ingiere 
+ Diseñador de sistemas que exporta compose, stack de Swarm y DEPLOY.md 
+ Copiloto sobre el CLI local que exige aprobación antes de ejecutar 
+ 1,201
+ Pruebas en verde
+ 44
+ Endpoints del agente
+ 16
+ Métodos del sidecar DSP
+ Proyecto propio de un solo operador, sin despliegue público: se entrega como app de escritorio que habla con la Pi únicamente por LAN. El modo por defecto es un simulador de alta fidelidad; contra la Raspberry Pi 5 física se validaron el agente, el tablero, Docker y systemd, el seguimiento de logs y el reinicio por polkit, pero watchdog, GNSS, Sense HAT y SDR siguen sin periféricos conectados y solo se han probado simulados. Los pases APT decodificados son grabaciones históricas de SatNOGS: el APT analógico de los NOAA POES está fuera del aire. Su copiloto es la excepción al patrón de IA de esta página: corre sobre el CLI local, no sobre Vertex AI.
+ // Stack Python 3.11 FastAPI Electron 43 React 18 · TypeScript NumPy · SciPy sgp4 Yamcs 5.13 · Open MCT Prometheus 
+ Laboratorio · avance del módulo 
+ 09 Educación técnica 
+ Beta 
+ ACADEMIA
+ canfret.com 
+ Cursos de ingeniería con laboratorios que se ejecutan en el navegador.
+ Plataforma de educación técnica con tres roles y matriz de permisos central. Las lecciones se escriben en Markdown con ecuaciones KaTeX y admiten bloques interactivos, cuestionarios autocalificados y simulaciones que corren en el navegador. Hoy sirve 16 cursos —aeroespacial, señales, álgebra lineal, materiales, mecánica orbital, estaciones terrenas, IA y más— con video propio, rutas de aprendizaje, certificados firmados y verificables por URL pública, y un canal de YouTube donde salen las lecciones en video.
+ // Capacidades 
+ 16 cursos publicados, de 2 a 18 lecciones cada uno 
+ Lecciones en Markdown con KaTeX y seis bloques interactivos embebibles 
+ Simulaciones nativas en React en lugar de HTML embebido 
+ Video con transcodificación HLS, subtítulos WebVTT y URLs prefirmadas 
+ Rutas de aprendizaje con prerrequisitos entre cursos 
+ Certificados HMAC-SHA256 verificables por URL pública 
+ Tutor de IA persistente y calificación asistida con revisión humana 
+ Sesiones en vivo con chat, encuestas, preguntas y pizarra 
+ 16
+ Cursos publicados
+ 149
+ Lecciones en el catálogo
+ 911
+ Pruebas en verde
+ El catálogo cuenta las lecciones que expone la API pública el 2026-09-18; incluye cursos cortos, de 2 y 3 lecciones, junto a los de 9 a 18. Los laboratorios que ejecutan código corren en un servicio aparte con acceso aislado a Docker (labs-runner), ya desplegado junto a la aplicación; el resto de las simulaciones corre en el navegador.
+ // Stack Next.js 15 React 19 · TypeScript Prisma 6 PostgreSQL 16 Redis 7 · BullMQ MinIO / S3 WebSocket KaTeX Tailwind CSS 
+ Corpus consultado · respuesta citada 
+ 10 Investigación 6G 
+ Con cuenta Beta 
+ ResearchAI Platform
+ codeaerospace.tech 
+ Mesa de trabajo para investigación 6G: papers de arXiv, búsqueda y redacción citable.
+ Reúne en un solo lugar el chat con modelos de lenguaje, la biblioteca de papers importados de arXiv, una bóveda de memos en Markdown, un editor modular con citas BibTeX y pipelines programados. Está pensada para quien acumula literatura y notas dispersas y necesita buscarlas, contrastarlas y convertirlas en texto citable sin salir de la herramienta.
+ // Capacidades 
+ Chat con streaming SSE y contexto híbrido de documentos 
+ Búsqueda global FTS5 sobre bóveda, papers, docs y chats 
+ Fichas de línea de investigación valoradas por el modelo 
+ Búsqueda e importación de papers desde la API de arXiv 
+ Bibliografía BibTeX y ensamblado LaTeX desde la bóveda 
+ Pipelines programados por cron que persisten memos 
+ Extracción de texto de PDF para usarlo como contexto 
+ Sesión JWT en cookie httpOnly con aislamiento por usuario 
+ 68
+ Endpoints REST
+ 13
+ Tablas de datos
+ 6
+ Paneles de trabajo
+ // Stack Node.js 20 Express 4 SQLite WAL · FTS5 Vertex AI · Gemini 2.5 React 18 Zustand Vite 5 Docker Compose 
+ Render de escena · trazo progresivo 
+ 11 Animación científica 
+ Uso interno Interna 
+ ManimStudio
+ coderesearch.space 
+ Consola web que renderiza animaciones Manim en contenedor aislado y arma cursos.
+ El código Python se edita en el navegador, se valida por análisis estático sin ejecutarlo y se renderiza dentro de un contenedor sin red, de solo lectura y con límites de CPU, memoria y procesos, mientras el log llega en vivo. Los videos se agrupan en proyectos con estilo compartido y se exportan en un ZIP con manifiesto y lista de concatenación para ffmpeg.
+ // Capacidades 
+ Editor Python con CodeMirror 6 y detección de escenas por AST 
+ Renders en contenedor sin red, solo lectura y sin capacidades 
+ Cola de un render a la vez con log en vivo por SSE 
+ Biblioteca de videos con miniatura, descarga y cuota de disco 
+ Proyectos: clips ordenados, estilo común y exportación ZIP 
+ Asistente Gemini 2.5 que explica, corrige y genera scripts 
+ Monitoreo de CPU, RAM y disco con gráficas SVG propias 
+ Diez primitivas Manim propias: órbitas, señal, redes 
+ 117
+ Pruebas automatizadas
+ 70
+ Scripts de animación
+ 44
+ Endpoints HTTP
+ Herramienta interna de producción de contenido, de un solo usuario y sin registro público. Es la que produce el material audiovisual de nuestros cursos.
+ // Stack Python 3.13 FastAPI Manim CE 0.20.1 SQLite WAL React 18 CodeMirror 6 Docker Vertex AI · Gemini 2.5 
+ Cadena de validación · se detiene sin evidencia 
+ 12 Panel de investigación 
+ En sitio Interna 
+ Tesis 6G Command Center
+ Se instala en el equipo del cliente
+ Lee el repositorio de una tesis doctoral y publica su estado real, incluidos los criterios que la invalidarían.
+ El Command Center no guarda datos propios: parsea en vivo los Markdown y JSON del repositorio de la tesis —lista de verificación, gates, manuscrito consolidado, historial git— y los sirve por 32 rutas REST más un canal SSE que un watcher de archivos dispara en cada cambio. Sus 22 módulos van del conteo real de palabras por capítulo a un runner de pytest restringido a una lista blanca de suites. Los veredictos de los gates de validación se leen del archivo fuente y se cruzan con el JSON de la corrida que los respalda: si el estado declarado contradice a la evidencia, la interfaz muestra el conflicto en vez de ocultarlo.
+ // Capacidades 
+ Parseo en vivo de la lista de verificación, los gates y el manuscrito 
+ Refresco por SSE disparado por un watcher de archivos 
+ Veredictos de gates cruzados con el JSON de su corrida 
+ Aviso explícito cuando el estado declarado contradice a la evidencia 
+ Runner de pytest limitado a una lista blanca, con salida en streaming 
+ Grafo 3D de conocimiento entre documentos, cargado bajo demanda 
+ Diff de palabras por capítulo entre revisiones git 
+ Degradación automática de datos en vivo a instantánea estática 
+ 22
+ Módulos de la interfaz
+ 32
+ Rutas de la API
+ 75
+ Pruebas en verde
+ Es un artefacto académico de un solo inquilino: acompaña a una tesis doctoral concreta del IPN y necesita el repositorio de esa tesis en el mismo sistema de archivos para mostrar datos reales; sin él cae a un respaldo documental curado. No tiene despliegue público: se ejecuta en local, como servidor autoalojado o como aplicación de escritorio. Las simulaciones que incluye son modelos didácticos etiquetados como tales, no los experimentos de la tesis. La licencia es académica restringida: no se redistribuye ni se usa comercialmente.
+ // Stack React 18.3 Vite 5.4 Tailwind CSS 3.4 Express 4.22 Server-Sent Events three.js 0.185 Electron 31.7 Vitest 4.1 
+ Atlas de sistemas · elección y brief a agente 
+ 13 Atlas de diseño y embudo comercial 
+ En producción 
+ CO.DE Strategy
+ codestrategy.io 
+ Un atlas navegable de sistemas de diseño que además es el embudo comercial de la división.
+ La unidad de fondeo tecnológico de CO.DE dejó de ser sólo una landing: codestrategy.io es a la vez su sitio comercial y un catálogo vivo de 180 direcciones visuales, 450 componentes, 80 materiales de superficie, 88 escenas con 164 presets de movimiento y 84 perfiles de capacidad. El cliente elige un lenguaje visual antes de que se escriba una línea, lo deja en un brief versionado y ese brief viaja por URLs estables y JSON a un agente de código. El diagnóstico gratuito entra por el mismo sitio.
+ // Capacidades 
+ Atlas de 180 sistemas visuales, cada uno con ficha, JSON-LD y prompt de implementación 
+ Component Foundry de 450 piezas con IDs estables, 32 de ellas matemáticas 
+ 80 materiales de superficie con receta CSS y regla de contraste 
+ 88 escenas y 164 presets de movimiento con alternativa de movimiento reducido 
+ Perfiles de capacidad que componen tema, piezas, materia y movimiento por ID 
+ Contrato para agentes: /agent.txt y una API JSON versionada 
+ Configurador de brief en cinco pasos con exportación .md y .json 
+ Captación de diagnósticos gratuitos por POST /api/leads 
+ 180
+ Sistemas visuales
+ 450
+ Componentes catalogados
+ 28
+ Pruebas en verde
+ Las cifras del catálogo son las que devuelven sus API públicas el día de la auditoría (2026-09-18). El atlas describe direcciones de diseño, no trabajo de clientes. Las 28 pruebas verifican el HTML renderizado y los contratos JSON del build, no el comportamiento del navegador.
+ // Stack React 19 TypeScript 5.9 vinext (Next.js sobre Vite 8) Tailwind CSS 4 Drizzle ORM Docker · nginx 
+ Invitación · confirmaciones y pase QR 
+ 14 Invitaciones digitales 
+ Beta 
+ Festiva · Proyecto Digital MX
+ codejobhunter.space 
+ Plataforma self-service de invitaciones interactivas con RSVP y pase QR, en web y Android.
+ Nació como la función de invitaciones digitales de un sitio de fotografía y salió a ser producto propio. Cualquiera se registra gratis y arma invitaciones para bodas, XV años, cumpleaños, bautizos, graduaciones o eventos corporativos: elige plantilla, edita con un lienzo libre de stickers y textos, sube la galería y comparte un enlace general o uno individual por invitado. Cada invitado confirma asistencia desde su enlace y recibe un pase con código QR; el anfitrión sigue las confirmaciones desde su cuenta y un administrador modera el contenido.
+ // Capacidades 
+ Wizard de invitación con 12 plantillas más un editor libre con stickers y textos 
+ Seis tipos de evento: boda, XV años, cumpleaños, bautizo, graduación y corporativo 
+ Enlace general o individual por invitado, con número de mesa y tamaño de grupo 
+ Confirmación de asistencia (RSVP) y pase con código QR por invitado 
+ Música de fondo, mapas, cuenta regresiva, código de vestimenta y mesa de regalos 
+ App Android con el mismo código React mediante Capacitor 
+ Cuenta de usuario con recuperación de contraseña y borrado de cuenta y datos 
+ Panel de administración con moderación, reportes de contenido y respaldos diarios 
+ 12
+ Plantillas de invitación
+ 6
+ Tipos de evento
+ 80
+ Rutas HTTP
+ «Festiva» es un nombre de marca provisional y el dominio en línea, codejobhunter.space, es de pruebas: ambos se sustituirán al definir la marca final. No tiene pruebas automatizadas; las cifras salen de contar plantillas y rutas en el código. La app Android está preparada, pero no está publicada en Google Play. Su base de datos es SQLite, adecuada al volumen actual.
+ // Stack React 19 TypeScript Vite 6 Tailwind CSS 3 Framer Motion Express 4 Prisma 5 · SQLite Capacitor 8 
+ Serie de saldo · gasto por categoría 
+ 15 Finanzas personales 
+ Con cuenta En producción 
+ Finanzas App
+ codefinance.space 
+ Finanzas personales mobile-first con presupuestos, deudas y categorización por IA.
+ Cubre el ciclo completo: ingresos, presupuestos por categoría, transacciones, deudas, inversiones y fondo de emergencia. Integra Gemini para clasificar gastos a partir de su descripción, responder consultas con el contexto financiero real del usuario y redactar el análisis de los reportes semanales y mensuales.
+ // Capacidades 
+ Categorización automática de gastos con IA 
+ Chat financiero con contexto real, en el plan avanzado 
+ Presupuestos por categoría con ciclo mensual configurable 
+ Deudas con planes de pago, cuotas y proyecciones 
+ Reportes semanal y mensual con análisis generado por IA 
+ Inversiones: rendimientos, ROI y tablero de seguimiento 
+ Detección de gastos hormiga con comparativa mes a mes 
+ Logros, rachas y glosario financiero integrado 
+ 20
+ Pantallas de la app
+ 26
+ Modelos de datos
+ 43
+ Pruebas en verde
+ No hay conexión bancaria ni importación de archivos: los movimientos se capturan en la app. Es una decisión de alcance, no una limitación pendiente.
+ // Stack Node.js · Express PostgreSQL 16 Prisma ORM React 18 · Vite Zustand Framer Motion Gemini API Docker Compose 
+ Pipeline de candidatos · cambio de etapa 
+ 16 ATS de reclutamiento 
+ En producción 
+ Gestión Empresa
+ conectionjob.ca 
+ Ciclo completo de reclutamiento con pipeline Kanban y seguimiento público por folio.
+ Administra el alta de candidatos, el reparto entre asesores, la agenda de entrevistas y el seguimiento del pipeline por estados. Los candidatos consultan el avance de su proceso en un portal público con solo su número de folio, sin crear cuenta.
+ // Capacidades 
+ Pipeline Kanban con arrastrar y soltar entre estados 
+ Portal público de seguimiento por folio, sin cuenta 
+ Carga masiva de candidatos desde Excel con reparto 
+ Tres roles jerárquicos: admin, gerente y asesor 
+ Métricas de embudo, estancados y cortes semanales 
+ Filtros por fuente, etiquetas y días sin movimiento 
+ Calendario de entrevistas y timeline por candidato 
+ Fichas de depósito y notificaciones dentro de la app 
+ 87
+ Endpoints de API
+ 15
+ Pantallas de la app
+ 30
+ Pruebas en verde
+ // Stack Python 3.12 Flask 3 SQLAlchemy 2 MariaDB 10.11 Redis 7 React 19 · TypeScript TanStack Query Docker Compose 
+ Ocupación en vivo · histórico del día 
+ 17 Panel operativo 
+ Con cuenta En producción 
+ Visor de gimnasio
+ integralconsulting.site 
+ Panel móvil que refleja en vivo las métricas del gimnasio desde la app de mostrador.
+ La aplicación de recepción empuja sus datos al servidor por una API autenticada y el visor los presenta como socios activos, personas dentro, cobro del día y asistencias, además de contabilidad por día, semana o mes, historial de pagos exportable y padrón de socios. Pensado para consultarse desde el teléfono del dueño.
+ // Capacidades 
+ Panel móvil con cuatro KPIs y refresco cada 10 segundos 
+ Ingesta por API con llave desde la app de mostrador 
+ Aviso de gimnasio fuera de línea tras 15 minutos sin sincronizar 
+ Semáforo de membresías por vencer según días restantes 
+ Contabilidad con desglose por método de pago 
+ Historial de pagos con filtros y exportación a CSV 
+ Padrón de socios buscable y reporte de socios sin pago 
+ Registro de accesos del torniquete con foto 
+ 5 min
+ Cadencia de sincronización
+ 10 s
+ Refresco del panel
+ 76
+ Pruebas automatizadas
+ Instalado para un gimnasio independiente de Ciudad de México. Es la mitad remota de Gym Manager, no un SaaS multi-cliente: el panel solo lee, nunca origina ni edita datos.
+ // Stack Node.js 20 Express 4 SQLite SPA en JavaScript CSS puro Docker Compose Nginx Let's Encrypt 
+ Control de acceso · registro de entrada 
+ 18 Escritorio 
+ En sitio En producción 
+ Gym Manager
+ Se instala en el equipo del cliente
+ Gestión de gimnasio en escritorio: socios, pagos, accesos y torniquete, todo local.
+ Aplicación de escritorio multiplataforma que administra padrón, membresías, pagos, entradas y salidas y personal, con la base de datos guardada íntegramente en la computadora de recepción. Sustituye un sistema anterior de Microsoft Access —incluye el script que migra los datos viejos— y se integra con el lector facial y el torniquete instalados en el gimnasio.
+ // Capacidades 
+ Padrón de socios, membresías, pagos, visitas y notas 
+ Check-in que bloquea la entrada si la membresía venció 
+ Reconocimiento facial que nunca sale de la PC del gimnasio 
+ Migración de datos desde el sistema Access anterior 
+ Tickets térmicos ESC/POS con folio en Windows y Linux 
+ Marcajes del lector facial vía servidor ADMS 
+ Foto de webcam en cada apertura del torniquete 
+ Sincronización cifrada cada 5 minutos con el panel web 
+ 36
+ Rutas de API internas
+ 12
+ Tablas de datos
+ 10
+ Migraciones de esquema
+ Se instala en la computadora del cliente, así que no tiene enlace público. Los descriptores faciales se calculan y se guardan en esa máquina; al panel remoto solo viaja el resumen de métricas. Hoy corre en un gimnasio; el soporte multi-sucursal está en el plan, no implementado.
+ // Stack Electron 42 Next.js 16 React 19 · TypeScript Drizzle ORM SQLite face-api.js ESC/POS · CUPS GitHub Actions 
+ Enlace ADMS · marcaje y rebote descartado 
+ 19 Integración de hardware 
+ En sitio En producción 
+ CO.DE ADMS Bridge
+ Se instala en el equipo del cliente
+ Servidor ADMS que habla el protocolo push de ZKTeco y convierte cada marcaje facial en un evento para la app del gimnasio.
+ El terminal biométrico habla un protocolo HTTP propietario de ZKTeco que no está documentado en detalle; este servidor lo implementa a partir de la inspección del tráfico real del equipo. Resuelve el handshake, entrega el código de registro que el firmware exige para salir de su bucle inicial y a partir de ahí recibe cada marcaje en tiempo real —rostro, huella o tarjeta— en los dos formatos que el equipo puede usar. Cada evento se guarda en SQLite y se reenvía por webhook a la aplicación de gimnasio, con una ventana anti-rebote que descarta lecturas repetidas del mismo socio. En sentido inverso mantiene una cola de comandos persistida que el terminal recoge en su sondeo, que es lo que permite abrir la puerta desde la app.
+ // Capacidades 
+ Handshake ADMS con código de registro y sesión persistidos por número de serie 
+ Ingesta de marcajes en los dos formatos del equipo, clave=valor y posicional 
+ Ventana anti-rebote configurable que descarta el mismo socio en 30 segundos 
+ Cola de comandos en SQLite entregada en el sondeo, con acuse de ejecución 
+ Apertura remota de puerta por HTTP, protegida con cabecera secreta 
+ Webhook a la app de gimnasio con secreto releído en cada evento 
+ Vista de texto plano con los últimos marcajes y los terminales vistos 
+ Esquema autocreado y migrado en caliente, con registro de rutas desconocidas 
+ 10
+ Endpoints HTTP
+ 4
+ Tablas de datos
+ 10
+ Variantes de comando probadas
+ El protocolo no está publicado por ZKTeco: se determinó inspeccionando el tráfico de un solo equipo, un SpeedFace-V3L(Lite), y no se ha validado contra otros modelos. Corre en la LAN cerrada de un gimnasio, sin enlace público y sin TLS; salvo la apertura de puerta, ningún endpoint pide autenticación. No tiene pruebas automatizadas: las cifras de arriba salen de enumerar el código y la base de datos, y el ciclo completo del protocolo se comprobó con el cliente de pruebas de Flask. El terminal decide el acceso por su cuenta y avisa después, así que este servidor registra y reenvía, nunca bloquea en tiempo real.
+ // Stack Python 3.14 Flask 3.1 Werkzeug 3.1 SQLite 3.46 Gunicorn systemd ZKTeco Push 2.0.33 
+ // Cifras verificadas el 2026-07-30 ejecutando comandos contra cada repositorio y cada servicio. Nada estimado; lo que no se pudo comprobar no está en esta página.
+ Hablemos de tu sistema 
+ CO.DE Aerospace
+ Ecosistema de ingeniería avanzada y formación técnica de alto impacto.
+ contacto@codeaerospace.com 
+ @co.de_aero 
+ @co.de_academy 
+ @co.de_strategy 
+ @CoDeAcademy-mx 
+ Servicios
+ Plataformas Web Empresariales 
+ IA y Automatización Agéntica 
+ Apps Móviles Full-Stack 
+ Capacitación en Realidad Virtual 
+ IoT Industrial y Control 
+ Empresa
+ Plataformas 
+ Trayectoria 
+ Alianzas 
+ CO.DE Academy 
+ Contacto 
+ Recursos
+ WRC-2027 Portal 
+ ITU Official Site 
+ Documento de Alcance (SOW) 
+ (c) 2026 CO.DE Aerospace. Todos los derechos reservados.
+ v1.11.0 
+ Política de Privacidad Términos de Servicio Aviso Legal 

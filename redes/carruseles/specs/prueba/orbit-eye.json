@@ -1,0 +1,102 @@
+{
+  "id": "orbit-eye",
+  "serie": "prueba",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "CO.DE Orbit Eye",
+      "titulo": "Así se escucha un satélite desde tierra",
+      "subtitulo": "Una estación terrena que vive en el software"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "El satélite pasa en minutos",
+      "cuerpo": "En órbita baja un satélite cruza el cielo en pocos minutos. El software calcula cada pase —[[AOS]] y [[LOS]]— propagando sus TLE con **SGP4**.",
+      "imagen": "sticker:seguidor_satelital/NochePases"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Catálogo sincronizado",
+      "cifra": "355",
+      "unidad": "satélites",
+      "titulo": "Sincronizados desde CelesTrak y TinyGS",
+      "nota": "El catálogo no lo compilamos nosotros: se sincroniza de fuentes abiertas."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "La cadena DSP",
+      "titulo": "De la antena al dato",
+      "items": [
+        "FFT y [[cascada]] en vivo",
+        "Varios VFO por receptor",
+        "Corrección Doppler por Hamlib",
+        "Grabación IQ en formato SigMF"
+      ]
+    },
+    {
+      "tipo": "pasos",
+      "titulo": "Un pase, paso a paso",
+      "pasos": [
+        {
+          "t": "Predecir",
+          "d": "SGP4 calcula cuándo sube y se oculta"
+        },
+        {
+          "t": "Apuntar",
+          "d": "El rotor sigue al satélite"
+        },
+        {
+          "t": "Escuchar",
+          "d": "La radio corrige el Doppler"
+        },
+        {
+          "t": "Decodificar",
+          "d": "SSTV, AFSK, FSK, GMSK, BPSK, Morse"
+        }
+      ]
+    },
+    {
+      "tipo": "comparacion",
+      "titulo": "Radio clásica vs. definida por software",
+      "izq": {
+        "t": "Clásica",
+        "items": [
+          "Un circuito por modo",
+          "Cambiar = soldar"
+        ]
+      },
+      "der": {
+        "t": "SDR",
+        "items": [
+          "El modo es código",
+          "Cambiar = actualizar"
+        ]
+      }
+    },
+    {
+      "tipo": "cita",
+      "frase": "No son maquetas: son sistemas en operación.",
+      "autor": "codeaerospace.com/plataformas"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Ingeniería espacial hecha en México",
+      "texto": "Conoce las 19 plataformas en codeaerospace.com"
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01)"
+  ],
+  "pie_texto": "Así funciona una estación terrena definida por software. #satélites #SDR",
+  "cuidado": [
+    "NO PUBLICAR (verificación ronda 3): no avisa que no hay receptor conectado y la lámina 8 atribuye a México una obra derivada (GPL-3.0). Usar un-pase-1-orbit-eye.",
+    "Orbit Eye es obra derivada de ground-station (GPL-3.0); el despliegue no tiene receptor conectado."
+  ],
+  "estado": "no_publicar"
+}

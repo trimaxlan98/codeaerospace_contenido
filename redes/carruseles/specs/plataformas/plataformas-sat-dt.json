@@ -1,0 +1,113 @@
+{
+  "id": "plataformas-sat-dt",
+  "serie": "plataformas",
+  "fondo": {
+    "tema": "mision",
+    "tipo": "portada",
+    "var": 2
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "SAT-DT Orbital Twin",
+      "titulo": "¿Y si pudieras probar qué le pasa a toda una constelación?",
+      "subtitulo": "Un gemelo digital: ensayas sin tocar hardware"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Un gemelo digital",
+      "cuerpo": "Es una réplica en software que modela el sistema real. Sirve para preguntar «¿qué pasaría si…?» sin arriesgar nada en órbita.",
+      "imagen": "sticker:banco_pruebas/GemeloDigitalSync"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "La geometría es real",
+      "cuerpo": "Sincroniza **TLE reales** de CelesTrak y propaga las órbitas con **SGP4**. Muestra posiciones calculadas con SGP4 a partir de TLE reales, en un globo 3D."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "La telemetría es simulada",
+      "cuerpo": "Sobre esa geometría, un modelo determinista simula batería, CPU, temperatura y riesgo de cada satélite. No es monitoreo de satélites en vuelo.",
+      "imagen": "sticker:banco_pruebas/TelemetriaEnVivo"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Escenarios what-if",
+      "titulo": "Ensayar una falla",
+      "pasos": [
+        {
+          "t": "Elige flota",
+          "d": "Una constelación completa, no un solo satélite"
+        },
+        {
+          "t": "Inyecta evento",
+          "d": "Por ejemplo, una degradación"
+        },
+        {
+          "t": "Observa",
+          "d": "La telemetría simulada llega por WebSocket"
+        },
+        {
+          "t": "Compara",
+          "d": "Contrasta contra el escenario base"
+        }
+      ]
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Gobernanza de IA",
+      "titulo": "Con reglas desde el diseño",
+      "items": [
+        "Registro de modelos con aprobación y riesgo",
+        "Copiloto Gemini 2.5 para analizar la flota",
+        "Aislamiento por organización (RLS), probado en código"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Respaldo técnico",
+      "cifra": "146",
+      "unidad": "pruebas",
+      "titulo": "Pruebas en verde del gemelo",
+      "nota": "Cifra de codeaerospace.com/plataformas, verificada el 2026-07-30. Plataforma en fase beta."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Probar antes de lanzar",
+      "texto": "Simulación honesta: TLE reales, telemetría simulada.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Y si pudieras probar qué le pasa a toda una constelación sin tocar hardware? SAT-DT Orbital Twin es un gemelo digital: usa TLE reales de CelesTrak y simula la telemetría de cada satélite para ensayar escenarios what-if. Es un entorno de simulación, no monitoreo en vuelo. Guárdalo y compártelo. #gemelodigital #constelaciones #satélites #ingenieríaespacial #simulación",
+  "cuidado": [
+    "Plataforma en beta. TLE reales, telemetría SIMULADA: dejarlo claro siempre.",
+    "El control multiagente QMIX es un piloto de 1,000 episodios sin validar: NO se menciona como logro (omitido a propósito).",
+    "Las cifras del sticker de telemetría son ilustrativas."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "titulo": "Se pueden ensayar fallas de una constelación sin tocar hardware",
+        "subtitulo": "Gemelo digital con TLE reales y telemetría simulada"
+      }
+    },
+    {
+      "sufijo": "c",
+      "portada": {
+        "titulo": "146 pruebas en verde respaldan este gemelo digital",
+        "subtitulo": "Cifra verificada el 2026-07-30; plataforma en beta"
+      }
+    }
+  ]
+}

@@ -87,4 +87,10 @@ BLOQUES = [
         ("EnjambreRobots", "Agentes que se organizan en anillo y estrella", "Enjambres / coordinación", True),
         ("RoverLunar", "Rover con antena apuntando a la Tierra", "Exploración e enlace Tierra–Luna", False),
     ]),
+    ("Plataformas Co.De", "plataformas_codeae", [
+        ("BusNexus", "CODE-Nexus: hub con seis servicios en anillo y eventos firmados por el bus", "Presentar el clúster de plataformas interconectado", False),
+        ("TriageCascadas", "Waterfalls que pasan por una CNN y salen separados en con señal y sin señal", "CO.DE Triage: clasificar pases satelitales", False),
+        ("RielTelemetria", "Raspberry Pi emitiendo telemetría con banda ±3σ y una anomalía fuera de la banda", "PiStation: detección de anomalías a bordo", False),
+        ("UnPaseCincoPlataformas", "Un pase satelital y la cadena rastreo, recepción, clasificación, bus y gemelo", "Mostrar cómo trabajan juntas las plataformas", False),
+    ]),
 ]

@@ -1,0 +1,81 @@
+{
+  "id": "glosario-estacion-terrena",
+  "serie": "glosario-y-mitos",
+  "fondo": {
+    "tema": "calculo",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Glosario · estación terrena",
+      "titulo": "6 términos que oirás en una estación terrena",
+      "subtitulo": "Guárdalo: te ahorra media reunión"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "TLE",
+      "titulo": "TLE: dónde estaba el satélite",
+      "cuerpo": "Dos líneas de texto con los elementos orbitales de un objeto en una fecha dada. **Ejemplo:** CelesTrak publica TLE de miles de satélites.",
+      "imagen": "sticker:seguidor_satelital/CadenaTLEaAntena"
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "SGP4",
+      "titulo": "SGP4: dónde estará",
+      "cuerpo": "Modelo que convierte un TLE en posición y velocidad para otro instante. **Ejemplo:** así se calcula a qué hora sale el próximo pase."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "kicker": "AOS / LOS",
+      "titulo": "AOS y LOS: se abre y se cierra el enlace",
+      "cuerpo": "[[AOS]] es adquisición de señal: el satélite aparece sobre tu horizonte. [[LOS]] es pérdida de señal: se oculta. **Ejemplo:** entre ambos dura el pase.",
+      "imagen": "sticker:seguidor_satelital/NochePases"
+    },
+    {
+      "tipo": "texto",
+      "numero": "04",
+      "kicker": "SDR",
+      "titulo": "SDR: la radio es software",
+      "cuerpo": "Radio definida por software: el hardware digitaliza y el modo (FM, BPSK, Morse…) se elige por código. **Ejemplo:** un RTL-SDR de bajo costo."
+    },
+    {
+      "tipo": "texto",
+      "numero": "05",
+      "kicker": "IQ",
+      "titulo": "IQ: la señal en dos coordenadas",
+      "cuerpo": "Muestras en fase (I) y en cuadratura (Q): guardan amplitud y fase. **Ejemplo:** una grabación IQ se puede reproducir y decodificar después.",
+      "imagen": "sticker:antenas_robots/SDRAntenaANumero"
+    },
+    {
+      "tipo": "texto",
+      "numero": "06",
+      "kicker": "Doppler",
+      "titulo": "Doppler: la frecuencia se mueve",
+      "cuerpo": "Corrimiento de frecuencia por el movimiento relativo. **Ejemplo:** sube al acercarse el satélite, cruza la frecuencia nominal y baja al alejarse.",
+      "imagen": "sticker:seguidor_satelital/DopplerEnS"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Seis términos, un pase completo",
+      "texto": "Guarda este glosario y mándaselo a quien arme su primera estación.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Definiciones estándar de libro (mecánica orbital y radiocomunicaciones)",
+    "codeaerospace.com/plataformas (consultado 2026-10-01): Orbit Eye propaga TLE con SGP4 y predice pases AOS/LOS"
+  ],
+  "pie_texto": "6 siglas de una estación terrena en una sola mano: TLE, SGP4, AOS/LOS, SDR, IQ y Doppler, cada una con definición de una línea y un ejemplo. Guárdalo para tu próxima reunión de radio satelital y compártelo con quien esté empezando. ¿Qué sigla falta? Cuéntanos. #estacionterrena #satélites #SDR #ingenieríaespacial #CoDeAerospace",
+  "cuidado": [
+    "Ninguna cifra; los stickers muestran valores ilustrativos (no se citan)."
+  ]
+}

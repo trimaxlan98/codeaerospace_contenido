@@ -1,0 +1,103 @@
+{
+  "id": "banco-que-rompe-la-red",
+  "serie": "detras-de-camaras",
+  "fondo": {
+    "tema": "electronica",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Detrás de cámaras",
+      "titulo": "Un banco de pruebas que rompe la red a propósito",
+      "subtitulo": "Tres máquinas reales, fallos declarados",
+      "imagen": "sticker:banco_pruebas/EmuladorCanal"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "El montaje",
+      "titulo": "Tres máquinas físicas, nueve servicios",
+      "cuerpo": "Cada rol del banco corre en su propio contenedor sobre un Swarm de [[tres máquinas]] reales, en nueve servicios. Entre los roles: satélite, dos gateways, UE, gobernanza, generador de topología y colector. Hablan por MQTT autenticado."
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Cómo se degrada la red",
+      "titulo": "Del escenario al kernel",
+      "pasos": [
+        {
+          "t": "Escenario CSV",
+          "d": "Trazable a 3GPP TR 38.821 (LEO 600 km)"
+        },
+        {
+          "t": "Generador",
+          "d": "Publica el estado deseado de cada enlace"
+        },
+        {
+          "t": "tc/netem",
+          "d": "Cada nodo lo aplica en su propio egreso"
+        },
+        {
+          "t": "Informe",
+          "d": "Veredictos y manifiesto de procedencia"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Por qué importa",
+      "titulo": "Lo medido es del kernel, no lo declarado",
+      "cuerpo": "La latencia y la pérdida que se miden son las que aplica el [[kernel]] con tc/netem, no valores escritos en un reporte. Y la caída de un enlace se modela con el last-will del broker."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Campañas de fallos",
+      "titulo": "El caos, declarado en JSON",
+      "items": [
+        "[[kill]]: se mata un proceso",
+        "stop: se detiene un servicio",
+        "override: se fuerza un estado",
+        "Todo queda en el informe de la corrida"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Una sola observación",
+      "cifra": "5.5 s",
+      "unidad": "tras un SIGKILL",
+      "titulo": "Recuperación observada en una corrida",
+      "nota": "Corrida citable del 2026-07-27 (ficha de la plataforma). Es UNA observación: no es mediana ni p95; esa serie está implementada, pendiente de ejecutar."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Pruebas sin clúster",
+      "cifra": "86",
+      "unidad": "pruebas",
+      "titulo": "Se pueden correr sin encender las máquinas",
+      "nota": "Ficha del banco en codeaerospace.com/plataformas: cifra verificada el 30 de julio de 2026."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Si no se rompe a propósito, no se sabe",
+      "texto": "Guarda esto si te interesan las redes y las pruebas",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, ficha del banco de pruebas distribuido PADA NTN Testbed (cifras 2026-07-30; corrida del 2026-07-27), consultado 2026-10-01"
+  ],
+  "pie_texto": "Detrás de cámaras: un banco de pruebas que rompe la red a propósito. Tres máquinas reales, cada una degrada su propio enlace con tc/netem a partir de un escenario trazable a 3GPP TR 38.821, y cada corrida cierra con un informe y un manifiesto de procedencia. En una corrida del 2026-07-27 la recuperación tras un SIGKILL fue de 5.5 s: una sola observación. Guárdalo si te interesa la ingeniería de pruebas. #Redes #Linux #BancoDePruebas #DetrásDeCámaras",
+  "cuidado": [
+    "Los 5.5 s son UNA observación de la corrida del 2026-07-27, no mediana ni p95. La lámina lo dice; no recortar la nota.",
+    "Instrumento de laboratorio en LAN privada, de un solo operador y sin despliegue público: no ofrecerlo ni invitar a visitarlo.",
+    "Por regla, aquí solo se cuenta la ingeniería del banco: no se mencionan políticas, métodos ni resultados de la tesis. Se omitió a propósito la capacidad «cambio de política en caliente» de la ficha.",
+    "86 pruebas verificadas el 2026-07-30.",
+    "Sticker EmuladorCanal: sus valores son ilustrativos."
+  ]
+}

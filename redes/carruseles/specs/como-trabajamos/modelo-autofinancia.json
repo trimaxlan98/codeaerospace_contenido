@@ -1,0 +1,92 @@
+{
+  "id": "modelo-autofinancia",
+  "serie": "como-trabajamos",
+  "fondo": {
+    "tema": "robotica",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "El modelo CO.DE",
+      "titulo": "Así se paga la investigación aeroespacial en Co.De",
+      "subtitulo": "Proyectos digitales que financian investigación, uno a uno",
+      "imagen": "marca:simbolo-plata"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "Dos frentes",
+      "titulo": "Una división digital y un laboratorio",
+      "cuerpo": "[[CO.DE Strategy]] desarrolla sitios web, aplicaciones y soluciones de IA para empresas. CO.DE Aerospace investiga órbitas no geoestacionarias (NGSO), espectro y la WRC-27."
+    },
+    {
+      "tipo": "cita",
+      "frase": "Cada proyecto digital de CO.DE Strategy financia investigación aeroespacial real.",
+      "autor": "codeaerospace.com/services"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "El ciclo",
+      "titulo": "Del proyecto a la investigación",
+      "pasos": [
+        {
+          "t": "Proyecto digital",
+          "d": "Sitios, apps y soluciones de IA para empresas"
+        },
+        {
+          "t": "Ingreso",
+          "d": "El trabajo de Strategy sostiene al laboratorio"
+        },
+        {
+          "t": "Investigación",
+          "d": "NGSO, espectro radioeléctrico y WRC-27"
+        },
+        {
+          "t": "Plataformas",
+          "d": "Con código y pruebas, no maquetas"
+        }
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "El resultado, a la vista",
+      "cifra": "19",
+      "unidad": "plataformas en el catálogo",
+      "titulo": "Con código, pruebas y fecha, no maquetas",
+      "nota": "Fichas del catálogo de codeaerospace.com/plataformas al 2026-07-30; incluyen herramientas internas y plataformas en beta."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Qué significa",
+      "titulo": "Un modelo con tres consecuencias",
+      "items": [
+        "Recibes un proyecto con hitos [[verificables]]",
+        "Tu proyecto habilita investigación mexicana",
+        "Cada proyecto digital financia investigación aeroespacial real"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Ingeniería que se sostiene a sí misma",
+      "texto": "Conoce el modelo en codeaerospace.com",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/services (consultado 2026-10-01)",
+    "codeaerospace.com/plataformas (cifras verificadas 2026-07-30)",
+    "animaciones/presentaciones/que_es_code.json (2026-09-30)"
+  ],
+  "pie_texto": "¿Quién paga la investigación aeroespacial en Co.De? Nuestros proyectos digitales. CO.DE Strategy hace sitios, apps y soluciones de IA; ese trabajo financia la investigación en órbitas no geoestacionarias y espectro. Guárdalo y compártelo con quien se pregunte cómo se financia la investigación espacial. #NewSpace #IngenieríaMéxico #CoDeAerospace #Aeroespacial",
+  "cuidado": [
+    "«19 plataformas»: cifra de codeaerospace.com/plataformas verificada el 2026-07-30; reconfirmar el conteo antes de publicar.",
+    "La relación proyecto digital → investigación viene de /services y de la presentación institucional (2026-09-30); la presentación también menciona inversores ángel y fondeo institucional, por eso no se afirma «sin rondas de inversión». Confirmar que sigue vigente.",
+    "Sin nombres de clientes ni sus proyectos (solo tecnología y modelo)."
+  ]
+}

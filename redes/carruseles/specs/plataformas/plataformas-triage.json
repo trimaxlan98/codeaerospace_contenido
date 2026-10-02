@@ -1,0 +1,105 @@
+{
+  "id": "plataformas-triage",
+  "serie": "plataformas",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 1
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "CO.DE Triage",
+      "titulo": "¿Y si una IA revisa los pases satelitales por ti?",
+      "subtitulo": "Una CNN que separa los pases con señal de los vacíos"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Mucho cielo, poca señal",
+      "cuerpo": "La red abierta [[SatNOGS]] graba miles de pases. Cada uno deja un espectrograma (la «cascada») y muchos salen vacíos: nadie quiere revisarlos uno por uno.",
+      "imagen": "sticker:antenas_robots/SDRAntenaANumero"
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Cómo funciona",
+      "titulo": "Del pase al veredicto",
+      "pasos": [
+        {
+          "t": "Ingesta",
+          "d": "Trae observaciones de SatNOGS cada 30 min"
+        },
+        {
+          "t": "Clasifica",
+          "d": "Una CNN mira la cascada y los metadatos"
+        },
+        {
+          "t": "Veredicto",
+          "d": "Buena o mala, con umbral calibrado"
+        },
+        {
+          "t": "Revisión",
+          "d": "La persona revisa los pases que el clasificador marca con señal"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Una CNN que corre en CPU",
+      "cuerpo": "Una red convolucional aprende a reconocer trazas de señal en una imagen, como tus ojos reconocen una línea en una gráfica. Corre en CPU con **ONNX Runtime**: sin GPU."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Prueba con datos que no vio",
+      "cifra": "0.949",
+      "unidad": "AUC",
+      "titulo": "En un test intacto de 731 observaciones",
+      "nota": "AUC: qué tan bien ordena los pases buenos por encima de los malos (1.0 = perfecto). Test intacto; cifra verificada el 2026-07-30 en codeaerospace.com/plataformas."
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Con estaciones nuevas baja",
+      "cuerpo": "El pronóstico de calidad, que corre entero en tu navegador, llega a **0.806** en estaciones que no vio al entrenar. Es otro modelo que el clasificador, y es el dato honesto: con estaciones nuevas, rinde menos."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "Para quien opera",
+      "titulo": "Lo que ofrece la plataforma",
+      "items": [
+        "Panel con indicadores, filtros y galería",
+        "Umbral calibrado: prefiere descartar a dudar",
+        "API REST con llave y cola con reintentos",
+        "Publica cada veredicto al bus de CODE-Nexus"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Menos pases que revisar",
+      "texto": "Guárdalo y compártelo con quien escucha satélites.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Y si una IA revisa los pases satelitales por ti? CO.DE Triage clasifica los espectrogramas de la red abierta SatNOGS con una CNN que corre en CPU, para que una persona revise solo los pases con señal. Medimos 0.949 de AUC en un test intacto de 731 observaciones, y su pronóstico de calidad llega a 0.806 en estaciones que no vio al entrenar. Guárdalo y compártelo. #satélites #SatNOGS #IA #visiónporcomputadora #ingenieríaespacial",
+  "cuidado": [
+    "Cifras verificadas por la página el 2026-07-30 (7,499 waterfalls etiquetados; las de observaciones envejecen).",
+    "El 0.806 es del pronóstico de calidad (estaciones no vistas), no del clasificador: confirmar redacción con el equipo.",
+    "Triage opera con umbral calibrado: descarta parte de los casos dudosos."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "portada": {
+        "imagen": "sticker:plataformas/TriageCascadas"
+      }
+    }
+  ]
+}

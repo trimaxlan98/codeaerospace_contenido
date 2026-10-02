@@ -1,0 +1,18 @@
+{
+  "id": "interferencia-ngso-geo",
+  "serie": "espectro-y-senales",
+  "fondo": {"tema": "nebulosa", "tipo": "portada", "var": 2},
+  "laminas": [
+    {"tipo": "portada", "kicker": "NGSO y GEO", "titulo": "Muchos satélites, una sola banda: ¿quién gana?", "subtitulo": "Interferencia entre constelaciones y redes geoestacionarias"},
+    {"tipo": "texto", "numero": "01", "kicker": "Definición", "titulo": "Qué es interferir", "cuerpo": "Interferencia es energía no deseada que llega al receptor y se suma a la señal útil. Con más [[ruido]], caben menos datos por segundo."},
+    {"tipo": "imagen", "kicker": "Haces que se solapan", "titulo": "Dos satélites, una misma zona", "imagen": "sticker:ntn_6g/Interferencia", "pie": "Cuando los haces de dos satélites cubren la misma zona, el usuario puede recibir ambos. Ilustración conceptual."},
+    {"tipo": "comparacion", "kicker": "Dos tipos de órbita", "titulo": "GEO vs. NGSO", "izq": {"t": "GEO", "items": ["Fijo respecto al suelo", "A 35 786 km de altura", "Apuntas la antena una vez"]}, "der": {"t": "NGSO", "items": ["Se mueve respecto al suelo", "Más cerca de la Tierra", "Hacen falta muchos satélites"]}},
+    {"tipo": "texto", "numero": "02", "kicker": "El problema geométrico", "titulo": "Cuando se alinean", "cuerpo": "Los satélites GEO están sobre el ecuador. En ciertos momentos, un NGSO queda casi en la misma dirección que uno GEO visto desde tierra: una antena que apunta a uno también \"ve\" al otro."},
+    {"tipo": "lista", "kicker": "Cómo se mitiga", "titulo": "Formas de convivir", "items": ["Separar frecuencias entre servicios", "Limitar la potencia que llega a tierra", "Cuidar hacia dónde apuntan los [[haces]]", "[[Coordinar]] entre operadores y países"]},
+    {"tipo": "texto", "numero": "03", "kicker": "Quién pone las reglas", "titulo": "La UIT y la WRC-27", "cuerpo": "La [[UIT]] es la agencia de la ONU para las telecomunicaciones y mantiene el Reglamento de Radiocomunicaciones. Cada tanto, una Conferencia Mundial lo revisa; la próxima es la [[WRC-27]]."},
+    {"tipo": "cierre", "titulo": "Compartir el cielo con reglas", "texto": "La coordinación técnica evita que unos satélites tapen a otros.", "cta": ["Guarda", "Comparte", "Síguenos"]}
+  ],
+  "fuentes": ["animaciones/presentaciones/que_es_code.json (diapositivas de interferencia y WRC-27)", "codeaerospace.com/plataformas y /services (consultado 2026-10-01)", "Órbitas: GEO a 35 786 km, conocimiento de libro"],
+  "pie_texto": "Cada vez más constelaciones en órbita baja comparten bandas con las redes geoestacionarias que ya existían. ¿Cómo se evita que se interfieran? En este carrusel: qué es interferir, por qué GEO y NGSO se alinean a veces, cómo se mitiga y qué papel juegan la UIT y la WRC-27. Guárdalo y compártelo con quien trabaje en comunicaciones. #NGSO #espectro #UIT #WRC27 #satélites #CoDeAerospace",
+  "cuidado": ["Lámina 5: la mención a «limitar la potencia que llega a tierra» y a coordinación entre operadores y países es una descripción general; confirmar redacción con el marco regulatorio de la UIT (Reglamento de Radiocomunicaciones) antes de publicar.", "Lámina 7: «cada tanto» evita dar un intervalo; confirmar con la UIT la periodicidad de las conferencias si se quiere precisar.", "WRC-27: la sede y la fecha exactas NO se mencionan y deben confirmarse con la UIT. Que su resultado afecte a las constelaciones es la lectura que publica Co.De Aerospace, no un resultado ya decidido.", "El sticker de Interferencia es conceptual; sus formas no representan haces reales."]
+}

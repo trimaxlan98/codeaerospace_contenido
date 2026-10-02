@@ -1,0 +1,94 @@
+{
+  "id": "ruta-ingenieria-espacial",
+  "serie": "formacion",
+  "fondo": {
+    "tema": "aerodinamica",
+    "tipo": "portada",
+    "var": 2,
+    "atenuar": 0.4
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Ruta de estudio",
+      "titulo": "Cómo empezar en ingeniería espacial",
+      "subtitulo": "Señales, órbitas, estaciones terrenas e IA",
+      "imagen": "sticker:espacio_orbitas/Tierra3DSatelites"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "El problema",
+      "titulo": "Hay mucho por aprender y no sabes por dónde",
+      "cuerpo": "Órbitas, antenas, espectro, control, IA... Sin un orden, todo parece igual de urgente. Aquí va una [[ruta]] posible, con la lógica de cada paso."
+    },
+    {
+      "tipo": "pasos",
+      "kicker": "Una ruta propuesta",
+      "titulo": "Cuatro etapas",
+      "pasos": [
+        {
+          "t": "1. Señales",
+          "d": "Qué es una señal y cómo se analiza"
+        },
+        {
+          "t": "2. Órbitas",
+          "d": "Dónde está el satélite y cómo se mueve"
+        },
+        {
+          "t": "3. Estaciones terrenas",
+          "d": "Cómo se le apunta y se le escucha"
+        },
+        {
+          "t": "4. IA",
+          "d": "Cómo ayuda a decidir y a clasificar"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "kicker": "Por qué ese orden",
+      "titulo": "Primero escuchas, luego ubicas",
+      "cuerpo": "Un satélite es, para quien lo estudia, una fuente de [[señal]] que se mueve. Entender la señal y entender la órbita te prepara para apuntar una antena. La IA llega al final: necesita datos que ya sepas leer."
+    },
+    {
+      "tipo": "lista",
+      "kicker": "La base",
+      "titulo": "Antes o en paralelo",
+      "items": [
+        "[[Álgebra lineal]] para vectores y matrices",
+        "Materiales, si te interesa el hardware",
+        "Aeroespacial: la visión general"
+      ]
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Catálogo al 2026-09-18",
+      "cifra": "16",
+      "unidad": "cursos en el catálogo",
+      "titulo": "Con rutas y prerrequisitos entre cursos",
+      "nota": "Ficha ACADEMIA en codeaerospace.com/plataformas, al 2026-09-18. Plataforma en beta.",
+      "sello": "beta"
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Empieza por el paso 1",
+      "texto": "Guarda la ruta y compártela con quien empieza",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Sigue"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas, ficha ACADEMIA (catálogo 2026-09-18), consultado 2026-10-01"
+  ],
+  "pie_texto": "¿Por dónde empezar en ingeniería espacial? Una ruta propuesta: señales, órbitas, estaciones terrenas e IA, con álgebra lineal como base. CO.DE Academy (en beta) ofrece cursos de estas materias, con rutas y prerrequisitos entre cursos. Guárdala para cuando la necesites. #IngenieríaEspacial #RutaDeEstudio #CoDeAcademy #Aeroespacial",
+  "cuidado": [
+    "El ORDEN señales → órbitas → estaciones terrenas → IA es una propuesta editorial, no la ruta oficial de la plataforma: confirmar con el equipo de Academy si coincide con sus rutas antes de publicar.",
+    "La fuente solo lista las materias (aeroespacial, señales, álgebra lineal, materiales, mecánica orbital, estaciones terrenas, IA «y más») y dice que hay rutas con prerrequisitos; no se citan nombres de cursos ni su número de lecciones.",
+    "16 cursos es del 2026-09-18 y envejece. Academy está en beta."
+  ]
+}

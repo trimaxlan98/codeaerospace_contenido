@@ -1,0 +1,78 @@
+{
+  "id": "un-pase-1-orbit-eye",
+  "serie": "un-pase",
+  "fondo": {
+    "tema": "orbita",
+    "tipo": "portada",
+    "var": 0
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "UN PASE · 1/5",
+      "titulo": "¿Cómo se sigue UN pase satelital de principio a fin?",
+      "subtitulo": "Recorrido didáctico con un pase imaginario · Parte 1: rastrear y escuchar",
+      "imagen": "sticker:seguidor_satelital/VistaPolarPase",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "kicker": "CO.DE Orbit Eye",
+      "titulo": "Primero, saber cuándo pasa",
+      "cuerpo": "Orbit Eye toma los **TLE** de CelesTrak y TinyGS y los propaga con **SGP4/Skyfield**. Con eso rastrea el satélite y calcula sus pases.",
+      "imagen": "sticker:seguidor_satelital/NochePases"
+    },
+    {
+      "tipo": "termino",
+      "kicker": "Vocabulario del pase",
+      "termino": "AOS · LOS",
+      "definicion": "AOS: el satélite aparece sobre el umbral de elevación. LOS: se pierde bajo él. Entre los dos está la ventana del pase.",
+      "nombre": "Acquisition / Loss of Signal",
+      "ejemplo": "Orbit Eye predice los pases AOS/LOS por umbral de elevación."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "Y entonces, se escucha",
+      "cuerpo": "Con un receptor SDR, el software corre una cadena DSP completa: **FFT**, waterfall, varios VFO, demodulación y decodificación. El waterfall es el «dibujo» de la señal en el tiempo.",
+      "imagen": "sticker:seguidor_satelital/DopplerEnS",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "texto",
+      "numero": "03",
+      "titulo": "Aquí no hay antena conectada",
+      "cuerpo": "Este despliegue **no tiene receptor de radio**. La recepción se demuestra reproduciendo **grabaciones IQ**: lo que ves es una reproducción, no una escucha en vivo.",
+      "sello": "grabacion"
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Catálogo sincronizado",
+      "cifra": "355",
+      "unidad": "satélites",
+      "titulo": "Que Orbit Eye sincroniza desde CelesTrak y TinyGS",
+      "nota": "Cifra de codeaerospace.com/plataformas, verificada el 2026-07-30; el catálogo cambia solo."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Parte 1 de 5 — sigue en el siguiente",
+      "texto": "Ya sabemos cuándo pasa y cómo se escucha. Falta saber si ese pase trae señal (Parte 2: Triage). Recorrido didáctico: un pase imaginario para explicar cinco plataformas; no es un flujo automático de un pase real.",
+      "cta": [
+        "Guarda",
+        "Sigue la serie",
+        "Comparte"
+      ]
+    }
+  ],
+  "fuentes": [
+    "codeaerospace.com/plataformas (consultado 2026-10-01; cifras verificadas por la página el 2026-07-30)"
+  ],
+  "pie_texto": "¿Cómo se sigue UN pase satelital de principio a fin? Arrancamos una serie didáctica de 5 partes con un pase imaginario (no es un flujo automático de un pase real). Parte 1: CO.DE Orbit Eye predice el pase con SGP4 (AOS/LOS) y muestra cómo se escucha con una cadena SDR, usando grabaciones IQ. Orbit Eye es obra derivada del proyecto ground-station (GPL-3.0, Stratos Goudelis). Guarda la serie y sigue la Parte 2. #satélites #SDR #SGP4 #estaciónterrena #ingenieríaespacial",
+  "cuidado": [
+    "Orbit Eye es obra derivada de ground-station (GPL-3.0, Stratos Goudelis): menciónalo si se publica con descripción técnica.",
+    "Sin receptor conectado: la recepción es reproducción de grabaciones IQ (sello grabacion).",
+    "355 satélites sincronizados: cifra de 2026-07-30; puede haber cambiado.",
+    "Las cifras dentro de los stickers (137 MHz, ±3 kHz, 21:00–01:00) son ilustrativas."
+  ]
+}

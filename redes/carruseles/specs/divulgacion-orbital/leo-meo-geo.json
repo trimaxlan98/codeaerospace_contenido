@@ -1,0 +1,106 @@
+{
+  "id": "leo-meo-geo",
+  "serie": "divulgacion-orbital",
+  "fondo": {
+    "tema": "lunar",
+    "tipo": "portada",
+    "var": 3
+  },
+  "laminas": [
+    {
+      "tipo": "portada",
+      "kicker": "Divulgación orbital",
+      "titulo": "Tres pisos de órbita: LEO, MEO y GEO",
+      "subtitulo": "Cuanto más alto, más lento y más lejos"
+    },
+    {
+      "tipo": "imagen",
+      "kicker": "El edificio orbital",
+      "titulo": "Tres altitudes, tres usos",
+      "imagen": "sticker:espacio_orbitas/OrbitasLEOMEOGEO",
+      "pie": "Esquema no a escala: LEO dibujado a 550 km (95 min). En medio, MEO: los satélites GPS orbitan a ≈ 20 200 km con periodo de ≈ 12 h.",
+      "sello": "ilustracion"
+    },
+    {
+      "tipo": "texto",
+      "numero": "01",
+      "titulo": "Más alto, más lento",
+      "cuerpo": "Kepler: cuanto más grande la órbita, más largo el periodo. La ISS (≈ 400 km, en LEO) va a ≈ 7.7 km/s y da una vuelta en ≈ 92 min. Más arriba, la vuelta tarda más."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "Órbita geoestacionaria",
+      "cifra": "35 786",
+      "unidad": "km de altitud",
+      "titulo": "GEO: el periodo es un día",
+      "nota": "Periodo = un día sidéreo ≈ 23 h 56 min. Valores estándar."
+    },
+    {
+      "tipo": "texto",
+      "numero": "02",
+      "titulo": "¿Por qué parece quieto?",
+      "cuerpo": "En GEO el satélite tarda lo mismo que la Tierra en girar y orbita sobre el [[ecuador]]. Desde el suelo se queda en el mismo punto del cielo: **la antena no tiene que moverse**."
+    },
+    {
+      "tipo": "dato",
+      "kicker": "El precio de la altura",
+      "cifra": "0.24 s",
+      "unidad": "solo subir y bajar",
+      "titulo": "La luz tarda en llegar a GEO",
+      "nota": "2 × 35 786 km ÷ 299 792 km/s ≈ 0.24 s, justo bajo el satélite y sin contar procesamiento."
+    },
+    {
+      "tipo": "comparacion",
+      "titulo": "LEO vs. GEO",
+      "izq": {
+        "t": "LEO",
+        "items": [
+          "Retardo: ≈ 3 ms (400 km)",
+          "Cruza el cielo en minutos",
+          "Se necesitan muchos"
+        ]
+      },
+      "der": {
+        "t": "GEO",
+        "items": [
+          "Retardo: ≈ 0.24 s",
+          "Fijo en el cielo",
+          "Con tres cubres casi todo el planeta, salvo los polos"
+        ]
+      }
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Elegir órbita es elegir qué sacrificas",
+      "texto": "Latencia, cobertura, tiempo de contacto: todo depende de la altura. Guárdalo y compártelo.",
+      "cta": [
+        "Guarda",
+        "Comparte",
+        "Síguenos"
+      ]
+    }
+  ],
+  "fuentes": [
+    "Valores estándar: GEO 35 786 km, periodo 23 h 56 min; ISS ≈ 400 km y ≈ 92 min; v LEO ≈ 7.7 km/s; GPS ≈ 20 200 km y ≈ 12 h; c = 299 792 km/s",
+    "Cálculo propio: 2·400 km/c ≈ 2.7 ms; 2·35 786 km/c ≈ 0.24 s"
+  ],
+  "pie_texto": "LEO, MEO y GEO no son etiquetas al azar: la altura decide el periodo, el retraso de la señal y cuántos satélites necesitas. En GEO solo la luz tarda ≈ 0.24 s en subir y bajar. Guárdalo para tu próxima clase o conversación espacial. #órbitas #satélites #GEO #LEO #espacio",
+  "cuidado": [
+    "Latencias calculadas solo por propagación (satélite justo encima, línea recta); en la práctica hay más retardo.",
+    "El 'LEO ≈ 3 ms' usa 400 km; no es la altitud de ninguna constelación comercial."
+  ],
+  "variantes": [
+    {
+      "sufijo": "b",
+      "fondo": {
+        "tema": "orbita"
+      }
+    },
+    {
+      "sufijo": "c",
+      "fondo": {
+        "tema": "nebulosa"
+      }
+    }
+  ]
+}
