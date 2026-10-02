@@ -6,30 +6,46 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self' file:; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data: http://127.0.0.1:*; media-src http://127.0.0.1:*; connect-src 'none'"
     />
-    <title>CO.DE Studio</title>
+    <title>CO.DE Studio · Co.De Aerospace</title>
     <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <nav class="rail" aria-label="Secciones">
-      <div class="rail__brand" title="CO.DE Studio">
-        <img src="../build/icon.png" alt="" width="34" height="34" />
+      <div class="rail__brand" title="CO.DE Studio · Co.De Aerospace">
+        <img src="marca/emblema-codeaerospace.svg" alt="Co.De Aerospace" width="46" height="44" />
       </div>
-      <button class="rail__btn is-active" data-view="estudio" title="Estudio (Ctrl+1)">
+      <button class="rail__btn is-active" data-view="inicio" title="Inicio (Ctrl+1)">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="5.2" transform="rotate(-28 12 12)" /><circle cx="12" cy="12" r="2.4" /><circle cx="18.6" cy="6.6" r="1.3" /></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="rail__btn" data-view="estudio" title="Estudio de video (Ctrl+2)">
         <svg viewBox="0 0 24 24"><path d="M4 5h16v11H4z" /><path d="M8 20h8M12 16v4" /><path d="m10 8.5 4 2-4 2z" /></svg>
         <span>Estudio</span>
       </button>
-      <button class="rail__btn" data-view="exports" title="Exports (Ctrl+2)">
+      <button class="rail__btn" data-view="presentaciones" title="Presentaciones (Ctrl+3)">
+        <svg viewBox="0 0 24 24"><path d="M3 4h18M5 4v10h14V4" /><path d="M12 14v3M8 21l4-4 4 4" /><path d="M8 8h5M8 11h8" /></svg>
+        <span>Presentar</span>
+      </button>
+      <button class="rail__btn" data-view="marca" title="Marca (Ctrl+4)">
+        <svg viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7z" /><path d="M8.5 13.5a4 4 0 1 0 0-3" /></svg>
+        <span>Marca</span>
+      </button>
+      <button class="rail__btn" data-view="exports" title="Exports (Ctrl+5)">
         <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m10 11 4 2-4 2z" /></svg>
         <span>Exports</span>
       </button>
-      <button class="rail__btn" data-view="terminal" title="Terminal (Ctrl+3)">
+      <button class="rail__btn" data-view="terminal" title="Terminal (Ctrl+6)">
         <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" /><path d="m7 10 3 2-3 2M12 15h5" /></svg>
         <span>Terminal</span>
       </button>
-      <button class="rail__btn" data-view="sistema" title="Sistema (Ctrl+4)">
+      <button class="rail__btn" data-view="sistema" title="Sistema (Ctrl+7)">
         <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /><circle cx="8" cy="6" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="10" cy="18" r="1.6" /></svg>
         <span>Sistema</span>
+      </button>
+      <button class="rail__btn" data-view="contenido" title="Estudio de contenido: carruseles y reels con ./codeae (Ctrl+8)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="14" rx="1.5" /><path d="M18 8v8M21 10v4" /><path d="m7 15 2-3 2 2 2-3" /></svg>
+        <span>Contenido</span>
       </button>
       <div class="rail__spacer"></div>
       <button class="rail__status" id="railStatus" data-view="sistema" title="Servicios">
@@ -39,8 +55,67 @@
     </nav>
 
     <main class="views">
+      <!-- ─── Inicio ──────────────────────────────────────────── -->
+      <section class="view is-active" id="view-inicio">
+        <div class="inicio">
+          <header class="inicio__hero">
+            <img class="inicio__logo" src="marca/logo-codeaerospace.svg" alt="Co.De Aerospace" />
+            <div class="inicio__texto">
+              <p class="eyebrow">CO.DE Studio</p>
+              <h1>Videos, presentaciones y marca de Co.De Aerospace</h1>
+              <p class="muted">Todo sale de este checkout: escenas Manim, presentaciones con temas y el kit de marca.
+                <span id="inicioRepo" class="mono"></span></p>
+              <div class="inicio__estado" id="inicioEstado"></div>
+            </div>
+          </header>
+          <div class="accesos">
+            <button class="acceso" data-ir="estudio"><b>Estudio de video</b><span>Escenas, renders, cursos y presentaciones de proyecto</span><kbd>Ctrl 2</kbd></button>
+            <button class="acceso" data-ir="presentaciones"><b>Presentaciones</b><span>Construir en 18 temas, guion con advertencias, PPTX y PDF</span><kbd>Ctrl 3</kbd></button>
+            <button class="acceso" data-ir="editor"><b>Nueva presentación</b><span>El editor de diapositivas, guion y piezas</span><kbd>editor</kbd></button>
+            <button class="acceso" data-ir="marca"><b>Marca</b><span>Logo vectorial, paleta y el logo animado en Manim</span><kbd>Ctrl 4</kbd></button>
+            <button class="acceso" data-ir="curso"><b>Nuevo curso con Claude</b><span>Arma el encargo y Claude Code lo produce</span><kbd>terminal</kbd></button>
+            <button class="acceso" data-ir="exports"><b>Exports</b><span>Lo producido, por tema y proyecto</span><kbd>Ctrl 5</kbd></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Presentaciones ──────────────────────────────────── -->
+      <section class="view" id="view-presentaciones">
+        <header class="bar">
+          <div class="seg" role="tablist" aria-label="Presentaciones o temas">
+            <button class="seg__btn is-active" data-pres-tab="lista">Presentaciones</button>
+            <button class="seg__btn" data-pres-tab="temas">Temas</button>
+          </div>
+          <span class="bar__url" id="presResumen"></span>
+          <div class="bar__spacer"></div>
+          <button class="btn btn--accent" id="presNueva">Nueva presentación</button>
+          <button class="btn btn--ghost" id="presFuentes" title="Descarga e instala las fuentes de Google que usan los temas">Instalar fuentes</button>
+          <button class="btn btn--ghost" id="presPruebas" title="pruebas_presentaciones.py --app">Pruebas</button>
+          <button class="icon-btn" id="presRefrescar" title="Volver a leer">
+            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>
+          </button>
+        </header>
+        <div class="pres" id="presLista">
+          <aside class="pres__lista"><ul id="presItems"></ul></aside>
+          <div class="pres__main" id="presMain"><p class="vacio">Leyendo presentaciones…</p></div>
+        </div>
+        <div class="pres pres--temas" id="presTemas" hidden><div class="temas-grid" id="temasGrid"></div></div>
+      </section>
+
+      <!-- ─── Marca ───────────────────────────────────────────── -->
+      <section class="view" id="view-marca">
+        <header class="bar">
+          <span class="bar__titulo">Marca Co.De Aerospace</span>
+          <div class="bar__spacer"></div>
+          <button class="btn btn--accent" id="marcaRender">Renderizar animaciones</button>
+          <button class="btn btn--ghost" id="marcaSonda" title="Compara el logo vectorial y el último cuadro animado con el PNG oficial">Sonda de la marca</button>
+          <button class="btn btn--ghost" id="marcaCarpeta">Abrir marca/</button>
+        </header>
+        <div class="marca" id="marcaBody"><p class="vacio">Leyendo la marca…</p></div>
+      </section>
+
       <!-- ─── Estudio ─────────────────────────────────────────── -->
-      <section class="view is-active" id="view-estudio">
+      <section class="view" id="view-estudio">
         <header class="bar">
           <div class="seg" role="tablist" aria-label="Instancia">
             <button class="seg__btn is-active" data-target="local">Local</button>
@@ -144,6 +219,40 @@
               <button class="card-btn" data-act="shell"><b>Shell</b><span>bash -l en el repo</span></button>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ─── Contenido (./codeae) ────────────────────────────── -->
+      <section class="view" id="view-contenido">
+        <header class="bar">
+          <span class="bar__titulo">Estudio de contenido</span>
+          <span class="bar__url" id="estResumen"></span>
+          <div class="bar__spacer"></div>
+          <button class="btn btn--ghost" id="estIndice" title="./codeae indice">Actualizar índice</button>
+          <button class="btn btn--ghost" id="estPaquete" title="./codeae paquete ID… --nombre X">Crear paquete</button>
+          <button class="btn btn--ghost" id="estSubir" title="Lista el paquete y pide confirmación antes de subir">Subir a Drive</button>
+          <button class="icon-btn" id="estRefrescar" title="Volver a leer ./codeae piezas">
+            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>
+          </button>
+        </header>
+        <div class="pres">
+          <aside class="pres__lista est__lista">
+            <div class="est__filtros">
+              <input id="estFiltro" type="search" placeholder="Filtrar por id, serie o detalle…" autocomplete="off" />
+              <div class="seg seg--sm" role="tablist" aria-label="Tipo">
+                <button class="seg__btn is-active" data-est-tipo="">Todo</button>
+                <button class="seg__btn" data-est-tipo="carrusel">Carruseles</button>
+                <button class="seg__btn" data-est-tipo="video">Videos</button>
+              </div>
+              <div class="seg seg--sm" role="tablist" aria-label="Estado">
+                <button class="seg__btn is-active" data-est-estado="">Todas</button>
+                <button class="seg__btn" data-est-estado="hechas">✓ Hechas</button>
+                <button class="seg__btn" data-est-estado="faltan">Faltan</button>
+              </div>
+            </div>
+            <div id="estItems"></div>
+          </aside>
+          <div class="pres__main" id="estMain"><p class="vacio">Leyendo ./codeae piezas…</p></div>
         </div>
       </section>
 
@@ -280,6 +389,94 @@
         <footer class="modal__foot">
           <button class="btn btn--ghost" value="cancel" formnovalidate>Cancelar</button>
           <button class="btn btn--accent" value="ok">Abrir en la terminal</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Construir una presentación en uno o varios temas -->
+    <dialog class="modal" id="construirDlg">
+      <form method="dialog" id="construirForm">
+        <header class="modal__head">
+          <div>
+            <p class="eyebrow">decks_espaciales.py · en la Terminal</p>
+            <h2 id="construirTitulo">Construir</h2>
+          </div>
+        </header>
+        <div class="modal__body modal__body--uno">
+          <div class="field field--wide">
+            <span>Temas <button type="button" class="link" id="construirTodos">todos</button> · <button type="button" class="link" id="construirNinguno">ninguno</button></span>
+            <div class="temas-check" id="construirTemas"></div>
+          </div>
+          <label class="field" id="construirIdiomaCampo">
+            <span>Idioma</span>
+            <select name="idioma" id="construirIdioma"></select>
+          </label>
+          <pre class="preview field--wide" id="construirOrden"></pre>
+        </div>
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" value="cancel" formnovalidate>Cancelar</button>
+          <button class="btn btn--accent" value="ok">Construir en la terminal</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Guion de una presentación -->
+    <dialog class="modal modal--guion" id="guionDlg">
+      <header class="modal__head modal__head--fila">
+        <div>
+          <p class="eyebrow">Guion · notas del orador</p>
+          <h2 id="guionTitulo"></h2>
+        </div>
+        <div class="row">
+          <button class="btn btn--ghost btn--sm" id="guionAbrir">Abrir .md</button>
+          <button class="btn btn--ghost btn--sm" id="guionCerrar">Cerrar</button>
+        </div>
+      </header>
+      <article class="guion" id="guionCuerpo"></article>
+    </dialog>
+
+    <!-- Crear paquete de entrega -->
+    <dialog class="modal modal--chico" id="estPaqueteDlg">
+      <form method="dialog" id="estPaqueteForm">
+        <header class="modal__head">
+          <div>
+            <p class="eyebrow">./codeae paquete</p>
+            <h2 id="estPaqueteTitulo">Crear paquete</h2>
+          </div>
+        </header>
+        <div class="modal__body modal__body--uno">
+          <label class="field">
+            <span>Nombre del paquete (letras, números, . _ -)</span>
+            <input name="nombre" id="estPaqueteNombre" pattern="[A-Za-z0-9][A-Za-z0-9._\-]*" required autocomplete="off" />
+          </label>
+          <pre class="preview" id="estPaqueteOrden"></pre>
+        </div>
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" value="cancel" formnovalidate>Cancelar</button>
+          <button class="btn btn--accent" value="ok">Crear en la terminal</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Subir a Drive: lista primero, sube solo con confirmación explícita -->
+    <dialog class="modal" id="estSubirDlg">
+      <form method="dialog" id="estSubirForm">
+        <header class="modal__head">
+          <div>
+            <p class="eyebrow">./codeae subir · Drive: Mac-Pro-code/Estudio-CoDe</p>
+            <h2 id="estSubirTitulo">Subir a Drive</h2>
+          </div>
+        </header>
+        <div class="modal__body modal__body--uno">
+          <label class="field">
+            <span>Paquete</span>
+            <select id="estSubirPaquete"></select>
+          </label>
+          <pre class="preview est__lista-subida" id="estSubirLista">—</pre>
+        </div>
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" value="cancel" formnovalidate>Cancelar</button>
+          <button class="btn btn--accent" value="ok" id="estSubirOk" disabled>Subir</button>
         </footer>
       </form>
     </dialog>

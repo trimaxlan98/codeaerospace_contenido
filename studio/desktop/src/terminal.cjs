@@ -30,6 +30,14 @@ const TAREAS = {
   },
   'tests': { titulo: 'Tests del backend', cmd: 'cd studio/backend && venv/bin/python -m pytest -q' },
   'git': { titulo: 'Estado de git', cmd: 'git status -sb && echo && git log --oneline -12' },
+  'pres-pruebas': {
+    titulo: 'Pruebas de presentaciones',
+    cmd: 'python3 animaciones/pruebas_presentaciones.py --app',
+  },
+  'fuentes': { titulo: 'Instalar fuentes de los temas', cmd: 'python3 animaciones/instalar_fuentes.py' },
+  'marca-render': { titulo: 'Renderizar animaciones del logo', cmd: 'bash marca/renderizar_animaciones.sh' },
+  'marca-sonda': { titulo: 'Sonda de la marca', cmd: 'python3 studio/tools/sonda_marca.py --render' },
+  'marca-vector': { titulo: 'Vectorizar el logo', cmd: 'python3 marca/vectorizar_logo.py && python3 studio/tools/sonda_marca.py' },
   'claude': { titulo: 'Claude Code', cmd: 'claude' },
   'claude-continue': { titulo: 'Claude · continuar', cmd: 'claude --continue' },
 };
@@ -100,6 +108,8 @@ class Terminals {
    * opts: { tarea?, prompt?, modo?, perfil?, cols, rows }
    *   tarea  -> clave de TAREAS
    *   prompt -> lanza `claude` con ese prompt inicial
+   *   orden  -> linea ya validada por el proceso principal (p. ej. construir un deck). El
+   *             renderer NUNCA la manda: main.cjs la quita de lo que llega por IPC.
    */
   create(opts = {}) {
     const { spawn } = loadPty();
@@ -111,6 +121,9 @@ class Terminals {
       const delim = `__PROMPT_${crypto.randomBytes(4).toString('hex')}__`;
       body = `claude${flag} "$(cat <<'${delim}'\n${opts.prompt}\n${delim}\n)"`;
       titulo = opts.titulo || 'Claude · curso';
+    } else if (opts.orden) {
+      body = opts.orden;
+      titulo = opts.titulo || 'Tarea';
     } else if (opts.tarea && TAREAS[opts.tarea]) {
       body = TAREAS[opts.tarea].cmd;
       titulo = TAREAS[opts.tarea].titulo;

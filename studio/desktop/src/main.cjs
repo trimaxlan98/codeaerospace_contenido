@@ -15,6 +15,8 @@ const { Services } = require('./services.cjs');
 const { createLocalServer } = require('./localServer.cjs');
 const { catalogar, listar } = require('./exports.cjs');
 const { Terminals, TAREAS } = require('./terminal.cjs');
+const P = require('./presentaciones.cjs');
+const E = require('./estudio.cjs');
 
 const PROD_URL = 'https://coderesearch.space';
 const ABRIBLES = new Set([
@@ -36,6 +38,8 @@ let terminals = null;
 let local = null;
 let uiUrl = null;
 let catalogCache = null;
+let presCache = null;
+const subidas = new E.Autorizaciones(); // tokens de un solo uso: sin listar y confirmar no hay subida
 let quitting = false;
 
 function send(channel, ...args) {
@@ -199,7 +203,84 @@ function registerIpc() {
     if (/^https?:\/\//.test(String(url))) shell.openExternal(String(url));
   });
 
-  ipcMain.handle('term:create', (_e, opts) => terminals.create(opts || {}));
+  // ── Presentaciones con temas (animaciones/) y kit de marca (marca/) ──
+  ipcMain.handle('pres:catalog', async (_e, refresh) => {
+    if (!repo()) return null;
+    if (!presCache || refresh) {
+      try {
+        presCache = { ok: true, ...(await P.catalogo(config)) };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
+    return presCache;
+  });
+  ipcMain.handle('pres:guion', (_e, rel) => {
+    const full = P.rutaEnRepo(repo(), rel);
+    if (path.extname(full).toLowerCase() !== '.md') throw new Error('Solo guiones .md');
+    return fs.readFileSync(full, 'utf-8');
+  });
+  ipcMain.handle('pres:editor', (_e, deck) => P.abrirEditor(config, deck ? String(deck) : null));
+  ipcMain.handle('marca:catalog', () => (repo() ? P.marca(repo()) : null));
+  ipcMain.handle('repo:open', async (_e, rel) => {
+    const full = P.rutaEnRepo(repo(), rel);
+    if (!fs.statSync(full).isDirectory() && !ABRIBLES.has(path.extname(full).toLowerCase())) {
+      return { ok: false, error: 'Ese tipo de archivo no se abre desde la app; usa «Mostrar en carpeta».' };
+    }
+    const err = await shell.openPath(full);
+    return err ? { ok: false, error: err } : { ok: true };
+  });
+  ipcMain.handle('repo:reveal', (_e, rel) => {
+    const full = P.rutaEnRepo(repo(), rel);
+    if (fs.statSync(full).isDirectory()) shell.openPath(full);
+    else shell.showItemInFolder(full);
+    return true;
+  });
+  ipcMain.handle('repo:copyPath', (_e, rel) => {
+    const full = P.rutaEnRepo(repo(), rel);
+    clipboard.writeText(full);
+    return full;
+  });
+  // ── Estudio de contenido (./codeae): lista blanca y ids validados en src/estudio.cjs ──
+  ipcMain.handle('estudio:piezas', async () => {
+    if (!repo()) return { ok: false, error: 'Configura el repositorio en Sistema.' };
+    try {
+      const [lista, est] = await Promise.all([E.piezas(config), E.estado(config)]);
+      return { ok: true, piezas: lista, estado: est };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  });
+  ipcMain.handle('estudio:preview', (_e, p) => E.previewRel(repo(), p || {}));
+  ipcMain.handle('estudio:subirListar', (_e, paquete) => E.subirListar(config, String(paquete || ''), subidas));
+  ipcMain.handle('clip:text', (_e, text) => {
+    clipboard.writeText(String(text).slice(0, 2000));
+    return true;
+  });
+
+  ipcMain.handle('term:create', (_e, raw) => {
+    // `orden` solo la arma el proceso principal (validada); lo que llega del renderer se descarta.
+    const { orden: _descartada, construir, validar, ...opts } = raw || {};
+    if (construir) {
+      const conocidos = presCache?.ok
+        ? { temas: presCache.temas.map((t) => t.id), decks: presCache.presentaciones.map((p) => p.id) }
+        : null;
+      const temas = construir.temas || [];
+      opts.orden = P.ordenConstruir(construir, conocidos);
+      opts.titulo = `Construir · ${construir.deck} · ${temas.length === 1 ? temas[0] : `${temas.length} temas`}`;
+      presCache = null; // los decks nuevos aparecen al volver a la vista
+    } else if (validar) {
+      opts.orden = P.ordenValidar(validar);
+      opts.titulo = `Validar · ${validar}`;
+    }
+    if (raw?.estudio) {
+      // Subcomando de ./codeae: lista blanca + ids validados; la subida confirmada solo con token de un listado previo.
+      const { orden, titulo } = E.ordenTerminal(raw.estudio, subidas);
+      opts.orden = orden;
+      opts.titulo = titulo;
+    }
+    return terminals.create(opts);
+  });
   ipcMain.on('term:write', (_e, id, data) => terminals.write(id, data));
   ipcMain.on('term:resize', (_e, id, cols, rows) => terminals.resize(id, cols, rows));
   ipcMain.on('term:kill', (_e, id) => terminals.kill(id));
@@ -214,8 +295,8 @@ function createWindow() {
     y: saved.y,
     minWidth: 1080,
     minHeight: 680,
-    backgroundColor: '#05070a',
-    title: 'CO.DE Studio',
+    backgroundColor: '#080f15',
+    title: 'CO.DE Studio · Co.De Aerospace',
     icon: ICON,
     autoHideMenuBar: true,
     show: false,

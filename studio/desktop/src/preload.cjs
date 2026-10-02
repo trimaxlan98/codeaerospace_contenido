@@ -31,6 +31,23 @@ contextBridge.exposeInMainWorld('studio', {
     reveal: (rel) => ipcRenderer.invoke('exports:reveal', rel),
     copyPath: (rel) => ipcRenderer.invoke('exports:copyPath', rel),
   },
+  pres: {
+    catalog: (refresh) => ipcRenderer.invoke('pres:catalog', !!refresh),
+    guion: (rel) => ipcRenderer.invoke('pres:guion', rel),
+    editor: (deck) => ipcRenderer.invoke('pres:editor', deck || null),
+  },
+  estudio: {
+    piezas: () => ipcRenderer.invoke('estudio:piezas'),
+    preview: (p) => ipcRenderer.invoke('estudio:preview', p),
+    subirListar: (paquete) => ipcRenderer.invoke('estudio:subirListar', paquete),
+  },
+  marca: () => ipcRenderer.invoke('marca:catalog'),
+  repo: {
+    open: (rel) => ipcRenderer.invoke('repo:open', rel),
+    reveal: (rel) => ipcRenderer.invoke('repo:reveal', rel),
+    copyPath: (rel) => ipcRenderer.invoke('repo:copyPath', rel),
+  },
+  copiar: (text) => ipcRenderer.invoke('clip:text', text),
   openRepo: () => ipcRenderer.invoke('shell:openRepo'),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
 

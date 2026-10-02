@@ -1,5 +1,7 @@
 // Prueba de humo con la app real: arranca, espera a los servicios, recorre
-// las cuatro vistas, guarda una captura de cada una y sale.
+// las ocho vistas (y los dialogos de presentaciones), guarda una captura de
+// cada una y sale. Falla (codigo 1) si el catalogo de presentaciones o la
+// marca no cargan.
 //
 //   CODE_STUDIO_SHOTS=/tmp/shots npx electron test/smoke.cjs --no-sandbox
 //
@@ -29,8 +31,50 @@ app.on('browser-window-created', (_e, win) => {
         await sleep(500);
       }
       console.log('[smoke] servicios:', state);
+      await sleep(2500);
+      await shot('0-inicio');
+
+      await js("show('estudio')");
       await sleep(5000);
       await shot('1-estudio');
+
+      await js("show('presentaciones')");
+      for (let i = 0; i < 60 && !(await js('!!(Pres.cat)')); i++) await sleep(500);
+      const pres = await js('Pres.cat && ({ok: Pres.cat.ok, error: Pres.cat.error, n: Pres.cat.presentaciones?.length, temas: Pres.cat.temas?.length})');
+      console.log('[smoke] presentaciones:', JSON.stringify(pres));
+      if (!pres?.ok || !pres.n || pres.temas < 18) throw new Error('el catalogo de presentaciones no cargo');
+      await js("Pres.sel = 'que_es_code'; Pres.render()");
+      await sleep(2000);
+      await shot('1b-presentaciones');
+      await js("Guion.open(Pres.cat.presentaciones.find((p) => p.id === 'que_es_code'))");
+      await sleep(1500);
+      await shot('1c-guion');
+      await js('Guion.dlg.close()');
+      await js("Construir.open(Pres.cat.presentaciones.find((p) => p.id === 'que_es_code'))");
+      await sleep(800);
+      await shot('1d-construir');
+      await js("Construir.dlg.close('cancel')"); // NO se construye en la prueba de humo
+      await js("Pres.setTab('temas')");
+      await sleep(2500);
+      await shot('1e-temas');
+      await js("Pres.setTab('lista')");
+
+      await js("show('marca')");
+      for (let i = 0; i < 20 && !(await js('!!Marca.cat')); i++) await sleep(300);
+      const marca = await js('({logos: Marca.cat.logos.length, colores: Marca.cat.paleta?.colores.length, anim: Marca.cat.animaciones.length})');
+      console.log('[smoke] marca:', JSON.stringify(marca));
+      if (marca.logos < 7 || !marca.colores) throw new Error('el kit de marca no cargo');
+      await sleep(2500);
+      await shot('1f-marca');
+
+      await js("show('contenido')");
+      for (let i = 0; i < 60 && !(await js('!!Contenido.datos')); i++) await sleep(500);
+      const cont = await js('Contenido.datos && ({n: Contenido.datos.piezas.length, paquetes: Contenido.datos.estado.paquetes.length})');
+      console.log('[smoke] contenido:', JSON.stringify(cont));
+      if (!cont?.n) throw new Error('./codeae piezas no cargo');
+      await js('Contenido.actual = Contenido.datos.piezas[0].id; Contenido.render()'); // NO se renderiza ni se sube nada
+      await sleep(1500);
+      await shot('1g-contenido');
 
       await js("show('exports')");
       await sleep(1500);
