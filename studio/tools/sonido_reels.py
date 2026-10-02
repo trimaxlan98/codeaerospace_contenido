@@ -148,6 +148,31 @@ def logo_vivo(m):
         m.poner(t0, whoosh(0.32 * T, 1800, 5200, 0.035, 0.45), pan=(-0.5, 0.5)[turno % 2])
 
 
+# ── Doppler real (36-reel-datos-reales.py): el tono sigue la curva S REAL del pase de la ISS ───────────
+
+def doppler_real(m):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "content/manim_extensions"))
+    from datos_orbitales.ejemplos import pase_estrella
+    e = pase_estrella()
+    d = e["doppler"]
+    u_d = d["t"] / d["t"][-1]
+    T = m.T
+    t = np.arange(m.n) / SR
+    u = t / T                                                        # tiempo de fase (el video empieza en `desfase`)
+    df = np.interp(u, u_d, d["df"] / 1e3)                            # kHz, + al acercarse
+    suave = lambda v: np.clip(v, 0, 1) ** 2 * (3 - 2 * np.clip(v, 0, 1))
+    env = np.minimum(suave(u / 0.07), suave((1 - u) / 0.07))        # el pase aparece y desaparece (empalme limpio)
+    colchon(m, notas=(A(-24), A(-17), A(-12)), vol=0.26)
+    ruido_circular(m, 800, 4000, 0.03 * 1.0, lambda tt_: 0.6 + 0.4 * np.interp(tt_ / T, u_d, np.abs(d["df"]) / np.abs(d["df"]).max()))
+    f = 900 + 70 * df                                                # 207…1593 Hz: baja como el Doppler
+    fase = 2 * np.pi * np.cumsum(f) / SR
+    m.sumar((np.sin(fase) + 0.25 * np.sin(2 * fase)) * env * 0.12)
+    m.poner(e["t_cruce_s"] / d["t"][-1] * T, pluck(A(12), 1.4, 0.22))        # cruce por cero: el punto más cercano
+    m.poner(0.0, pluck(A(0), 1.2, 0.12))
+
+
+REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
+
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
 
 REELS = {
@@ -170,9 +195,10 @@ def master(m, desfase):
 
 def main():
     raiz = Path(__file__).resolve().parents[2] / "exports"
-    grupos = [(raiz / "marca-codeaerospace/reels-promo", REELS), (raiz / "estudio/logo_vivo", REELS_VIVO)]
+    grupos = [(raiz / "marca-codeaerospace/reels-promo", REELS), (raiz / "estudio/logo_vivo", REELS_VIVO),
+              (raiz / "estudio/reels_datos", REELS_DATOS)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)

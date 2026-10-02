@@ -21,10 +21,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 EST = REPO / "exports" / "estudio"
 SPECS = REPO / "redes" / "carruseles" / "specs"
-REELS = [REPO / "exports/marca-codeaerospace/reels-promo/con_sonido",
+REELS = [REPO / "exports/marca-codeaerospace/reels-promo/con_sonido", REPO / "exports/marca-codeaerospace/reels-promo/con_voz",
+         EST / "logo_vivo/con_sonido", EST / "reels_datos/con_sonido",
          REPO / "exports/marca-codeaerospace/vertical/con_sonido",
          REPO / "exports/marca-codeaerospace/con_sonido",
          EST / "logo_entornos/animados/con_sonido"]
+REELS = list(dict.fromkeys(REELS))
 COLUMNAS = ["id_pieza", "variante_de", "serie_pilar", "formato", "fecha_pub", "hora", "gancho", "gancho_tipo",
             "fondo_tema", "portada_tipo", "n_laminas_o_duracion_s", "voz", "colab", "variable_en_prueba",
             "alcance_7d", "alcance_no_seg_%", "vistas_7d", "guardados", "envios", "comentarios", "likes",
@@ -92,6 +94,10 @@ def escribir_indice(cs, rs):
          "| `logo_entornos/{16x9,4x5,9x16}/` | El logo oficial sobre los 18 entornos espaciales (fijos); `HOJA_*.jpg` para comparar |",
          "| `logo_entornos/animados/` | El logo entrando (orbital) sobre entornos, 9:16; `con_sonido/` con audio |",
          "| `../marca-codeaerospace/reels-promo/con_sonido/` | Reels promocionales en loop perfecto (Orbit Eye, ATP-DT, el modelo) |",
+         "| `../marca-codeaerospace/reels-promo/con_voz/` | Los mismos reels con voz en off (prueba A/B voz vs sin voz) |",
+         "| `reels_datos/con_sonido/` | Reels con DATOS REALES (SGP4 + CelesTrak): curva Doppler real de la ISS |",
+         "| `logo_vivo/con_sonido/` | «Logo vivo»: loops de 8 s sobre entornos espaciales |",
+         "| `paquetes/<nombre>/` | Entregas finales armadas con `./codeae paquete` (lo que se sube a Drive) |",
          "| `../marca-codeaerospace/vertical/con_sonido/` | Reels de marca 9:16 |",
          "| `informes/` | Estudio por rondas de agentes (motor, producto, contenido, síntesis, contrato de pieza, datos reales) |",
          "| `experimentos/registro_publicaciones.csv` | Una fila por pieza: anota métricas a 7 días para saber qué funciona |",

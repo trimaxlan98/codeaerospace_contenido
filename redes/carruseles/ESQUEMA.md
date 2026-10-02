@@ -30,7 +30,7 @@ si hay advertencias, `<id>_CUIDADO.txt`.
 `seccion`, `contenido` (sobrio), `cierre`. `var`: 0–3 cambia la semilla. El fondo es UNA panorámica de todo el
 carrusel cortada en láminas: el horizonte continúa al deslizar.
 
-Sello de rigor (cualquier lámina): `"sello": "ilustracion" | "simulacion" | "grabacion" | "beta" | "meta"` pone una
+Sello de rigor (cualquier lámina): `"sello": "ilustracion" | "simulacion" | "grabacion" | "beta" | "meta" | "dato"` («dato» = calculado con datos reales y su época) pone una
 etiqueta ámbar abajo a la derecha. Úsalo SIEMPRE que la lámina muestre algo ilustrativo, simulado, una grabación
 (no en vivo), una beta o una meta (no un hecho).
 
@@ -52,6 +52,7 @@ variable por variante (solo el gancho, o solo el fondo) para que la comparación
 | `comparacion` | titulo*, izq* {t, items}, der* {t, items}, kicker | 2–4 ítems por lado, ≤ 40 car. |
 | `termino` | termino*, definicion*, nombre (expansión de la sigla), ejemplo, kicker, imagen | término ≤ 12 car.; definición ≤ 160 — para GLOSARIOS |
 | `formula` | formula*, titulo, kicker, pasos (lista de sustituciones), resultado, nota | fórmula ≤ 24 car. (admite λ Δ μ √ ≈ subíndices); muestra el cálculo, no solo la cifra |
+| `grafica` | titulo*, x*, y* (listas ≥ 10 puntos), y_escala, y_unidad, y_etiqueta, x_etiqueta, x_modo ("mmss"), marcas [{x, texto, lado}], nota | UNA serie; el título dice qué se grafica (sin leyenda); etiqueta solo 2–3 puntos; la procedencia de los datos va en `nota`. Se genera desde datos con `generar_desde_datos.py` |
 | `cita` | frase*, autor | frase ≤ 110 |
 | `imagen` | imagen*, titulo, kicker, pie | pie ≤ 150 |
 | `cierre` | titulo*, texto, cta (lista de 2–3 palabras) | título ≤ 45 |

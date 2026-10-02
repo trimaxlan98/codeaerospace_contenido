@@ -296,7 +296,8 @@ def marco(img, i, n, final=False, acento=CIAN):
 
 
 SELLOS = {"ilustracion": "ILUSTRACIÓN", "simulacion": "SIMULACIÓN", "grabacion": "GRABACIÓN IQ",
-          "beta": "BETA", "meta": "META, NO HECHO", "mito": "MITO", "realidad": "REALIDAD"}
+          "beta": "BETA", "meta": "META, NO HECHO", "mito": "MITO", "realidad": "REALIDAD",
+          "dato": "DATO REAL"}
 
 
 def sello(img, clave):
@@ -502,7 +503,7 @@ def l_formula(img, s, dy=0):
                                       fill=hex2rgb(TINTA), anchor="mm")
     y += alto_f + 34
     for p in s.get("pasos", []):
-        h, _ = escribir(img, (M + 20, y), p, "formula_txt", 40, ANCHO - 40, 120, TINTA, interlineado=1.25)
+        h, _ = escribir(img, (M + 20, y), p, "formula_txt", 36, ANCHO - 40, 120, TINTA, interlineado=1.25)
         y += h + 16
     if s.get("resultado"):
         y += 10
@@ -512,6 +513,99 @@ def l_formula(img, s, dy=0):
         h, _ = escribir(img, (M, y), s["nota"], "cuerpo", 32, ANCHO, Y1 - y, TENUE, interlineado=1.32)
         y += h
     return y
+
+
+def _ticks_bonitos(lo, hi, n=5):
+    """Marcas de eje en números redondos (1, 2, 2.5, 5 × 10^k)."""
+    rango = max(hi - lo, 1e-9)
+    paso = rango / max(n - 1, 1)
+    mag = 10 ** np.floor(np.log10(paso))
+    paso = min((m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= paso), default=10 * mag)
+    ini = np.ceil(lo / paso) * paso
+    return [round(float(v), 10) for v in np.arange(ini, hi + paso * 0.01, paso)]
+
+
+def _fmt_x(v, modo):
+    if modo == "mmss":
+        v = int(round(v))
+        return f"{v // 60}:{v % 60:02d}"
+    return f"{v:g}"
+
+
+def l_grafica(img, s, dy=0):
+    """Gráfica de UNA serie (línea): título que dice qué se grafica (sin leyenda), ejes con marcas redondas,
+    cuadrícula discreta, marcador con anillo del color del panel y etiquetas solo en los puntos clave.
+    Campos: x, y (listas), y_escala (divide y), y_unidad, y_etiqueta, x_etiqueta, x_modo ("mmss"|""),
+    marcas [{x, texto, lado: "arriba"|"abajo"|"izq"|"der"}], nota."""
+    y = cabeza(img, s, Y0 + 20 + dy, 76, 220)
+    SS = 2
+    esc = float(s.get("y_escala", 1.0))
+    xs = np.asarray(s["x"], float)
+    ys = np.asarray(s["y"], float) / esc
+    alto_panel = min(840, int(Y1 - y - (170 if s.get("nota") else 30)))
+    caja = (M - 4, int(y), W - M + 4, int(y) + alto_panel)
+    vidrio(img, caja)
+    cx0, cy0, cx1, cy1 = caja
+    ml, mr, mt, mb = 118, 46, 56, 92                       # márgenes internos del panel
+    px0, px1, py0, py1 = cx0 + ml, cx1 - mr, cy0 + mt, cy1 - mb
+    lo, hi = float(ys.min()), float(ys.max())
+    pad = (hi - lo) * 0.20                                  # holgura arriba y abajo para las etiquetas
+    ty = _ticks_bonitos(lo - pad, hi + pad, 5)
+    ymin, ymax = min(ty[0], lo - pad), max(ty[-1], hi + pad)
+    xmin, xmax = float(xs.min()), float(xs.max())
+    fx = lambda v: px0 + (v - xmin) / (xmax - xmin) * (px1 - px0)
+    fy = lambda v: py1 - (v - ymin) / (ymax - ymin) * (py1 - py0)
+    modo = s.get("x_modo", "")
+    paso_x = 60 if modo == "mmss" and (xmax - xmin) > 150 else None
+    tx = list(np.arange(0, xmax + 0.1, paso_x)) if paso_x else _ticks_bonitos(xmin, xmax, 6)
+
+    capa = Image.new("RGBA", (W * SS, H * SS), (0, 0, 0, 0))
+    d = ImageDraw.Draw(capa, "RGBA")
+    S_ = lambda p: (p[0] * SS, p[1] * SS)
+    gris = hex2rgb(TINTA, 40)
+    for v in ty:                                           # cuadrícula: hairline discreta
+        yy = fy(v)
+        d.line([S_((px0, yy)), S_((px1, yy))], fill=hex2rgb(TINTA, 150 if abs(v) < 1e-9 else 40), width=SS * (2 if abs(v) < 1e-9 else 1))
+    for v in tx:
+        d.line([S_((fx(v), py1)), S_((fx(v), py1 + 10))], fill=hex2rgb(TENUE, 160), width=SS)
+    pts = [S_((fx(a), fy(b))) for a, b in zip(xs, ys)]
+    d.line(pts, fill=hex2rgb(CIAN), width=SS * 4, joint="curve")             # línea de 4 px a 1080 (≈ 2 px de diseño)
+    for a, b in zip(pts[:1] + pts[-1:], [0, 0]):
+        pass
+    marcas = s.get("marcas", [])
+    for m in marcas:                                       # marcador ≥ 8 px con anillo del color del panel
+        i = int(np.argmin(np.abs(xs - m["x"])))
+        cxm, cym = fx(xs[i]), fy(ys[i])
+        d.ellipse([S_((cxm - 12, cym - 12)), S_((cxm + 12, cym + 12))], fill=hex2rgb(PANEL))
+        d.ellipse([S_((cxm - 8, cym - 8)), S_((cxm + 8, cym + 8))], fill=hex2rgb(CIAN))
+    cap = capa.resize((W, H), Image.LANCZOS)
+    base = img.convert("RGBA")
+    base.alpha_composite(cap)
+    img.paste(base.convert("RGB"))
+    d2 = ImageDraw.Draw(img, "RGBA")
+    f_t = fuente("mono", 22)
+    for v in ty:
+        d2.text((px0 - 16, fy(v)), f"{v:g}", font=f_t, fill=hex2rgb(TENUE), anchor="rm")
+    for v in tx:
+        d2.text((fx(v), py1 + 22), _fmt_x(v, modo), font=f_t, fill=hex2rgb(TENUE), anchor="mt")
+    if s.get("y_etiqueta"):
+        escribir(img, (cx0 + 28, cy0 + 14), s["y_etiqueta"], "mono_negrita", 22, cx1 - cx0 - 56, 34, TENUE, tracking=0.06, sombra=False)
+    if s.get("x_etiqueta"):
+        d2.text(((px0 + px1) / 2, cy1 - 30), s["x_etiqueta"], font=fuente("mono_negrita", 22), fill=hex2rgb(TENUE), anchor="mm")
+    for m in marcas:                                       # etiquetas directas en tinta (nunca en el color de la serie)
+        i = int(np.argmin(np.abs(xs - m["x"])))
+        cxm, cym = fx(xs[i]), fy(ys[i])
+        lado = m.get("lado", "arriba")
+        f_m = fuente("cuerpo_negrita", 28)
+        tw = f_m.getlength(m["texto"])
+        off = {"arriba": (0, -34), "abajo": (0, 34), "izq": (-26 - tw / 2, 0), "der": (26 + tw / 2, 0)}[lado]
+        tx_, ty_ = min(max(cxm + off[0], px0 + tw / 2 + 6), px1 - tw / 2 - 6), cym + off[1] + m.get("dy", 0)
+        d2.text((tx_, ty_), m["texto"], font=f_m, fill=hex2rgb(TINTA), anchor="mm")
+    fin = int(y) + alto_panel + 22
+    if s.get("nota"):
+        h, _ = escribir(img, (M, fin), s["nota"], "cuerpo", 30, ANCHO, Y1 - fin, TENUE, interlineado=1.32)
+        fin += h
+    return fin
 
 
 def l_cita(img, s, dy=0):
@@ -555,12 +649,12 @@ def l_cierre(img, s, dy=0):
 
 
 LAMINAS = {"portada": l_portada, "texto": l_texto, "dato": l_dato, "lista": l_lista, "pasos": l_pasos,
-           "comparacion": l_comparacion, "termino": l_termino, "formula": l_formula, "cita": l_cita,
+           "comparacion": l_comparacion, "termino": l_termino, "formula": l_formula, "grafica": l_grafica, "cita": l_cita,
            "imagen": l_imagen, "cierre": l_cierre}
-CENTRABLES = {"texto", "dato", "lista", "pasos", "comparacion", "termino", "formula"}
+CENTRABLES = {"texto", "dato", "lista", "pasos", "comparacion", "termino", "formula", "grafica"}
 REQUERIDOS = {"portada": ["titulo"], "texto": ["titulo"], "dato": ["cifra", "titulo"], "lista": ["titulo", "items"],
               "pasos": ["titulo", "pasos"], "comparacion": ["titulo", "izq", "der"], "termino": ["termino", "definicion"],
-              "formula": ["formula"], "cita": ["frase"], "imagen": ["imagen"], "cierre": ["titulo"]}
+              "formula": ["formula"], "grafica": ["titulo", "x", "y"], "cita": ["frase"], "imagen": ["imagen"], "cierre": ["titulo"]}
 
 
 # ── Validación ────────────────────────────────────────────────────────────────────────────────
@@ -590,6 +684,8 @@ def validar(spec):
             errores.append(f"lámina {i + 1}: imagen de la tesis (privada) «{img}»")
         if img.startswith("sticker:") and not (STICKERS / f"{img[8:]}.png").exists():
             errores.append(f"lámina {i + 1}: no existe el sticker «{img}»")
+        if t == "grafica" and (len(l.get("x", [])) != len(l.get("y", [])) or len(l.get("x", [])) < 10):
+            errores.append(f"lámina {i + 1} (grafica): x e y deben tener la misma longitud (≥ 10 puntos)")
         if t == "lista" and not 2 <= len(l.get("items", [])) <= 5:
             avisos.append(f"lámina {i + 1}: lista de {len(l.get('items', []))} ítems (mejor 2–5)")
         procedencia = l.get("nota", "") + " " + " ".join(spec.get("cuidado", []))
@@ -661,6 +757,9 @@ def alt_texto(l):
         partes.append(f"{l['termino']}" + (f" ({l['nombre']})" if l.get("nombre") else "") + ": " + _limpio(l["definicion"]))
     elif t == "formula":
         partes.append(f"Fórmula {l['formula']}" + (f", resultado {_limpio(l['resultado'])}" if l.get("resultado") else ""))
+    elif t == "grafica":
+        partes.append(f"Gráfica: {_limpio(l['titulo'])}. Eje horizontal {l.get('x_etiqueta', 'tiempo')}, eje vertical {l.get('y_etiqueta', '')}"
+                      + ("; puntos señalados: " + "; ".join(_limpio(m["texto"]) for m in l.get("marcas", [])) if l.get("marcas") else ""))
     elif t == "cita":
         partes.append(f"Cita: «{_limpio(l['frase'])}»")
     elif t == "lista":

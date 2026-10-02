@@ -113,5 +113,117 @@ class Fondos(unittest.TestCase):
             self.assertIn("_v72", r.name)
 
 
+class CLI(unittest.TestCase):
+    """codeae: el registro ve todas las piezas y la subida a Drive exige confirmación."""
+
+    @classmethod
+    def setUpClass(cls):
+        import codeae
+        cls.C = codeae
+
+    def test_registro_completo_y_ids_unicos(self):
+        vs, cs = self.C._videos(), self.C._specs()
+        self.assertGreaterEqual(len(vs), 30)
+        self.assertGreaterEqual(len(cs), 50)
+        self.assertFalse(set(vs) & set(cs), "un id no puede ser de carrusel y de video a la vez")
+        for v in vs.values():
+            self.assertTrue((self.C.EXP / v.archivo).exists(), v.id)
+            self.assertIsNotNone(v.audio_fn, v.id)
+
+    def test_subir_sin_confirmar_nunca_llama_a_rclone(self):
+        import argparse
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            self.C.EST = Path(tmp)
+            (Path(tmp) / "paquetes" / "p").mkdir(parents=True)
+            (Path(tmp) / "paquetes" / "p" / "a.txt").write_text("x")
+            with mock.patch.object(self.C.subprocess, "run") as run:
+                self.C.cmd_subir(argparse.Namespace(paquete="p", confirmo=False))
+                run.assert_not_called()
+                self.C.cmd_subir(argparse.Namespace(paquete="p", confirmo=True))
+                self.assertEqual(run.call_count, 1)
+                self.assertEqual(run.call_args[0][0][:2], ["rclone", "copy"])
+        self.C.EST = REPO / "exports" / "estudio"
+
+    def test_paquete_omite_no_publicar(self):
+        import argparse
+        cs = self.C._specs()
+        self.assertEqual(cs["orbit-eye"][1].get("estado"), "no_publicar")
+        with tempfile.TemporaryDirectory() as tmp:
+            self.C.EST = Path(tmp)
+            self.C.cmd_paquete(argparse.Namespace(ids=["orbit-eye"], nombre="t"))
+            self.assertFalse(any((Path(tmp) / "paquetes" / "t").rglob("*.png")))
+        self.C.EST = REPO / "exports" / "estudio"
+
+
+class DatosOrbitales(unittest.TestCase):
+    """Datos orbitales reales (muestra congelada de la ISS del 2026-10-02; sin red)."""
+
+    @classmethod
+    def setUpClass(cls):
+        from datetime import timedelta  # noqa: F401
+        import datos_orbitales as DO
+        from datos_orbitales.fuentes import MUESTRAS
+        cls.DO = DO
+        cls.el = DO.cargar(MUESTRAS / "iss_2026-10-02.json")
+
+    def test_geometria_de_la_iss(self):
+        from datetime import timedelta
+        ts = [self.el.epoca + timedelta(minutes=m) for m in range(0, 185)]
+        lat, lon, h = self.DO.posicion_geodetica(self.el, ts)
+        self.assertLess(abs(lat).max(), 51.9)                       # inclinación 51.63° + achatamiento
+        self.assertTrue(((h > 400) & (h < 450)).all())              # la ISS orbita a ~420 km
+        subidas = np.where((lat[:-1] < 0) & (lat[1:] >= 0))[0]
+        self.assertAlmostEqual(float(np.diff(subidas).mean()), 92.0, delta=1.0)    # periodo ≈ 92 min
+
+    def test_pases_bordes_y_duracion(self):
+        from datos_orbitales.observador import topocentrico
+        ps = self.DO.pases(self.el, self.DO.CDMX, self.el.epoca, dias=2, el_min=10)
+        self.assertGreaterEqual(len(ps), 6)
+        for p in ps:
+            e = topocentrico(self.el, self.DO.CDMX, [p.aos.timestamp(), p.los.timestamp()])[1]
+            self.assertTrue(np.allclose(e, 10.0, atol=0.1), e)       # el pase empieza y acaba en la máscara
+            self.assertGreaterEqual(p.el_max, 10.0)
+            self.assertTrue(60 < p.duracion_s < 660)                 # un pase de ISS dura de 1 a 11 min
+            self.assertGreater(p.rango_min_km, 400)
+
+    def test_doppler_orbita_circular_550km(self):
+        from datos_orbitales.fuentes import Elementos
+        a = 6378.137 + 550
+        n = np.sqrt(398600.8 / a ** 3) * 86400 / (2 * np.pi)
+        omm = dict(self.el.omm, MEAN_MOTION=n, ECCENTRICITY=0.0001, INCLINATION=53.0, BSTAR=0.0,
+                   MEAN_MOTION_DOT=0.0, MEAN_MOTION_DDOT=0.0)
+        c = Elementos(1, "CIRC550", self.el.epoca, omm, "celestrak", self.el.descargado)
+        ps = self.DO.pases(c, self.DO.CDMX, c.epoca, dias=3, el_min=0.0)
+        mx = max(self.DO.curva_doppler(c, self.DO.CDMX, p, 437e6)["df_max"] for p in ps)
+        # Cota física: v·RT/(RT+h)·f0/c = 10.19 kHz (pase cenital sin rotación terrestre); la rotación la baja.
+        self.assertLessEqual(mx, 10.2e3)
+        self.assertGreater(mx, 9.3e3)
+
+    def test_doppler_signo_y_cruce(self):
+        p = self.DO.pases(self.el, self.DO.CDMX, self.el.epoca, dias=2, el_min=10)[2]
+        d = self.DO.curva_doppler(self.el, self.DO.CDMX, p, 145.8e6)
+        self.assertGreater(d["df"][0], 0)                            # se acerca: frecuencia sube
+        self.assertLess(d["df"][-1], 0)                              # se aleja: frecuencia baja
+        self.assertLess(abs(d["t_cruce"] - p.duracion_s / 2), 30)    # cruza por cero cerca del TCA
+
+    def test_sello_y_epoca_caducada(self):
+        from datetime import timedelta
+        ahora = self.el.epoca + timedelta(days=1)
+        self.assertEqual(self.DO.sello(self.el, 3, ahora)["rigor"], "dato")
+        self.assertIn("época 2026-10-02", self.DO.sello(self.el, 3, ahora)["texto"])
+        tarde = self.el.epoca + timedelta(days=4)
+        self.assertEqual(self.DO.sello(self.el, 3, tarde)["rigor"], "simulacion")
+        with self.assertRaises(self.DO.EpocaCaducada):
+            self.DO.exigir_vigente(self.el, 3, tarde)
+
+    def test_traza_corta_el_antimeridiano_y_privacidad(self):
+        _, lat, lon = self.DO.traza_terrestre(self.el, self.el.epoca, minutos=180)
+        self.assertTrue(np.isnan(lon).any())
+        self.assertTrue((np.nanmax(np.abs(lon)) <= 180))
+        o = self.DO.Observador(19.4326, -99.1332, 2240, redondeo_deg=0.1).publicable()
+        self.assertEqual((o.lat, o.lon), (19.4, -99.1))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

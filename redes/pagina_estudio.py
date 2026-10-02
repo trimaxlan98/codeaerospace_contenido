@@ -20,7 +20,8 @@ import indice_estudio as IE  # noqa: E402
 
 EST = REPO / "exports" / "estudio"
 OUT = EST / "pagina"
-VIDEOS = [REPO / "exports/marca-codeaerospace/reels-promo/con_sonido" / f"{n}.mp4" for n in ("ReelOrbitEye", "ReelATP", "ReelModelo")] + \
+VIDEOS = [EST / "reels_datos/con_sonido/ReelDopplerReal.mp4"] + \
+         [REPO / "exports/marca-codeaerospace/reels-promo/con_sonido" / f"{n}.mp4" for n in ("ReelOrbitEye", "ReelATP", "ReelModelo")] + \
          [EST / "logo_vivo/con_sonido" / f"LogoVivo{n}.mp4" for n in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")]
 DECISIONES = [
     ("Versionar el motor en git", "marca/, redes/ y los módulos nuevos aún no están en git. Recomendado: sí, tras revisar que no entre nada de la tesis ni de clientes."),

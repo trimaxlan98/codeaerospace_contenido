@@ -67,3 +67,9 @@ studio/content/datos/tesis-6g-privado/
 
 # Salidas de las animaciones (videos, PNG, presentaciones, guiones generados)
 exports/
+
+# Caché de elementos orbitales descargados (se regenera; las muestras congeladas sí se versionan)
+studio/content/datos_orbitales/cache/
+
+# Voz sintetizada (se regenera con studio/tools/voz_reels.py; los guiones sí se versionan)
+studio/content/voz/wav/
