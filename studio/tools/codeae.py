@@ -247,8 +247,8 @@ def _finales(i, vs, cs):
         arch = sorted(c.glob(f"{i}_[0-9][0-9].png")) + [c / f"{i}_pie.txt", c / f"{i}_alt.txt", c / f"{i}_CUIDADO.txt"]
         return "carruseles/" + s["serie"] + "/" + i, [x for x in arch if x.exists()]
     v = vs[i]
-    m = v.salida / "con_sonido" / f"{i}.mp4"
-    return "videos/" + v.grupo, [m] if m.exists() else []
+    arch = [v.salida / "con_sonido" / f"{i}.mp4"] + sorted((v.salida / "con_voz").glob(f"{i}_voz*.mp4"))   # con voz en off (A/B)
+    return "videos/" + v.grupo, [x for x in arch if x.exists()]
 
 
 def cmd_paquete(a):

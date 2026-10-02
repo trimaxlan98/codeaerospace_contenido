@@ -22,14 +22,16 @@ EST = REPO / "exports" / "estudio"
 OUT = EST / "pagina"
 VIDEOS = [EST / "reels_datos/con_sonido/ReelDopplerReal.mp4"] + \
          [REPO / "exports/marca-codeaerospace/reels-promo/con_sonido" / f"{n}.mp4" for n in ("ReelOrbitEye", "ReelATP", "ReelModelo")] + \
+         [REPO / "exports/marca-codeaerospace/reels-promo/con_voz" / f"{n}_voz.mp4" for n in ("ReelOrbitEye", "ReelATP", "ReelModelo")] + \
          [EST / "logo_vivo/con_sonido" / f"LogoVivo{n}.mp4" for n in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")]
 DECISIONES = [
-    ("Versionar el motor en git", "marca/, redes/ y los módulos nuevos aún no están en git. Recomendado: sí, tras revisar que no entre nada de la tesis ni de clientes."),
-    ("Voz humana en los reels", "Probar reel con voz en off contra sin voz (variable A/B)."),
-    ("Datos orbitales reales", "Instalar sgp4 y descargar TLE de CelesTrak con caché: habilita pases reales de la ISS, curva Doppler real, etc."),
-    ("Cadencia", "Propuesta: 2 carruseles y 1 reel por semana; el plan A/B está en experimentos/plan_ab_ronda1.md."),
-    ("Un solo frente", "Unificar la app de escritorio (Electron) como único frente del estudio."),
-    ("Subida a Drive", "Nada se subió. PARA_DRIVE.md lista los finales; confirma qué subir."),
+    ("Hecho · Versionado en git", "Motor, carruseles, CLI y datos orbitales están en git (commits 39d2d5e y 306ae38, firmados como Alan Rosas Palacios). Pendiente de tu revisión: la sección «Contenido» de la app de escritorio, que quedó mezclada con tus cambios sin confirmar en studio/desktop."),
+    ("Hecho · Reels con voz", "Voz neuronal local (Piper es_MX-ald, licencia unlicense) en los 3 reels, variantes A (voz libre) y B (lazo de frase). Pendiente: oírlas (yo no puedo), decidir si regrabas con tu voz con los guiones de studio/content/voz/guiones/, y revisar si Instagram pide etiquetar audio generado con IA."),
+    ("Hecho · Datos reales", "sgp4 instalado; módulo datos_orbitales con CelesTrak y época visible. Primera pieza: curva Doppler real de un pase de la ISS (carrusel y reel). El pase es el sábado 3 de octubre, 09:06 hora de CDMX: verifica la hora en NASA Spot the Station antes de anunciarlo."),
+    ("Hecho · Cadencia mínima", "2 carruseles + 1 reel por semana. Calendario de 6 semanas con el plan A/B y la prueba de voz en docs/estudio/calendario_6_semanas.md."),
+    ("Hecho · Estudio unificado", "Una sola CLI (./codeae) y un solo frente: la app de escritorio, sección «Contenido» (Ctrl+8). Subir a Drive pide confirmación propia."),
+    ("Hecho · Drive", "Subidos los carruseles (53) y los 4 reels nuevos con sus variantes de voz a Mac-Pro-code/Estudio-CoDe/2026-10-02. No se subieron los logos animados ni los reels de marca de ayer; dime si los quieres."),
+    ("Pendiente · Siguiente ronda de datos reales", "Traza terrestre de la ISS, «pases de la semana», Starlink en un globo (necesita costas del mundo: Natural Earth)."),
 ]
 
 
