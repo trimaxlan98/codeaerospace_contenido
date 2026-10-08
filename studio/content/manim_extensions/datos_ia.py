@@ -29,7 +29,7 @@ def neurona():
 # Colina del error (descenso por gradiente): curva con un mínimo local y uno global
 def error(x):
     x = np.asarray(x, float)
-    return 0.18 * x ** 4 - 0.9 * x ** 2 + 0.35 * x + 1.6
+    return 0.18 * x ** 4 - 0.9 * x ** 2 + 0.35 * x + 1.95
 
 
 def derivada(x):

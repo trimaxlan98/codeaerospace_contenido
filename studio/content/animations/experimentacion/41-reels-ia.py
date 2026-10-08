@@ -82,25 +82,25 @@ class ReelIaNeurona(Scene):
     def construct(self):
         n = "ReelIaNeurona"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "¿Qué es una\nneurona artificial?", self.VAR, chip_txt="Ilustración", **SERIE)
-        N = np.array([0.9, 1.6, 0]); RN = 1.0
-        ent = [np.array([-4.9, y, 0]) for y in (3.9, 1.6, -0.7)]
+        N = np.array([1.2, 1.6, 0]); RN = 1.25
+        ent = [np.array([-5.0, y, 0]) for y in (4.3, 1.6, -1.1)]
         z, sal = DI.neurona()
         for k, (p, x, w) in enumerate(zip(ent, DI.NEURONA_X, DI.NEURONA_W)):
             col = POS if w > 0 else NEG
-            ln = Line(p + RIGHT * 0.55, N + LEFT * RN, stroke_width=3 + 9 * abs(w), color=col).set_z_index(4)
+            ln = Line(p + RIGHT * 0.7, N + LEFT * RN, stroke_width=4 + 12 * abs(w), color=col).set_z_index(4)
             self.add(aparece(ln, pel, 5.0 + 0.3 * k))
-            c = VGroup(Circle(radius=0.55).set_fill(est.fondo, 1).set_stroke(est.tinta, 3), texto(est, f"{x:.1f}", 34, est.tinta, "cifra", "SEMIBOLD")).move_to(p).set_z_index(8)
+            c = VGroup(Circle(radius=0.7).set_fill(est.fondo, 1).set_stroke(est.tinta, 3.5), texto(est, f"{x:.1f}", 44, est.tinta, "cifra", "SEMIBOLD")).move_to(p).set_z_index(8)
             self.add(aparece(c, pel, 0.6 + 0.5 * k))
-            mid = (p + RIGHT * 0.55) * 0.45 + (N + LEFT * RN) * 0.55
-            et = texto(est, f"{w:+.1f}".replace("-", "−"), 32, col, "cifra", "SEMIBOLD").move_to(mid + UP * 0.42).set_z_index(9)
+            mid = (p + RIGHT * 0.7) * 0.45 + (N + LEFT * RN) * 0.55
+            et = texto(est, f"{w:+.1f}".replace("-", "−"), 40, col, "cifra", "SEMIBOLD").move_to(mid + UP * 0.42).set_z_index(9)
             self.add(aparece(et, pel, 5.4 + 0.3 * k))
             pulso = punto(col, 0.1)
-            pulso.add_updater(lambda m, p=p, k=k: fundir(m.move_to((p + RIGHT * 0.55) + ((N + LEFT * RN) - (p + RIGHT * 0.55)) * (((pel.t - 7.0 - 0.2 * k) % 1.6) / 1.6)),
+            pulso.add_updater(lambda m, p=p, k=k: fundir(m.move_to((p + RIGHT * 0.7) + ((N + LEFT * RN) - (p + RIGHT * 0.7)) * (((pel.t - 7.0 - 0.2 * k) % 1.6) / 1.6)),
                                                         rampa(pel.t, 7.0, 0.3) * (1 - rampa(pel.t, 11.5, 0.4))))
             self.add(pulso)
-        self.add(aparece(texto(est, "entradas", 30, est.tenue).move_to([-4.9, 5.0, 0]).set_z_index(9), pel, 0.6))
-        self.add(aparece(texto(est, "pesos", 30, est.tenue).move_to([-1.8, 4.3, 0]).set_z_index(9), pel, 5.2))
-        nucleo = VGroup(Circle(radius=RN).set_fill(NEG, 0.25).set_stroke(NEG, 4), texto(est, "Σ", 64, est.tinta, "cuerpo", "SEMIBOLD")).move_to(N).set_z_index(8)
+        self.add(aparece(texto(est, "entradas", 34, est.tenue).move_to([-5.0, 5.4, 0]).set_z_index(9), pel, 0.6))
+        self.add(aparece(texto(est, "pesos", 34, est.tenue).move_to([-1.8, 4.9, 0]).set_z_index(9), pel, 5.2))
+        nucleo = VGroup(Circle(radius=RN).set_fill(NEG, 0.25).set_stroke(NEG, 4), texto(est, "Σ", 84, est.tinta, "cuerpo", "SEMIBOLD")).move_to(N).set_z_index(8)
         nucleo.add_updater(lambda m: fundir(m, rampa(pel.t, 1.2) * (1 + 0.0)))
         fundir(nucleo, 0)
         self.add(nucleo)
@@ -108,15 +108,15 @@ class ReelIaNeurona(Scene):
         brillo.add_updater(lambda m: fundir(m, rampa(pel.t, 12.6, 0.8) * (0.75 + 0.25 * np.sin(5 * pel.t))))
         fundir(brillo, 0)
         self.add(brillo)
-        S = np.array([5.2, 1.6, 0])
-        self.add(aparece(Arrow(N + RIGHT * RN, S + LEFT * 0.6, buff=0, stroke_width=6, color=POS).set_z_index(6), pel, 12.6))
-        self.add(aparece(VGroup(Circle(radius=0.6).set_fill(POS, 0.25).set_stroke(POS, 4), texto(est, f"{sal:.2f}", 34, est.tinta, "cifra", "SEMIBOLD")).move_to(S).set_z_index(8), pel, 13.0))
-        self.add(aparece(texto(est, "respuesta", 30, est.tenue).move_to(S + DOWN * 0.95).set_z_index(9), pel, 13.0))
+        S = np.array([5.5, 1.6, 0])
+        self.add(aparece(Arrow(N + RIGHT * RN, S + LEFT * 0.75, buff=0, stroke_width=7, color=POS).set_z_index(6), pel, 12.6))
+        self.add(aparece(VGroup(Circle(radius=0.75).set_fill(POS, 0.25).set_stroke(POS, 4), texto(est, f"{sal:.2f}", 40, est.tinta, "cifra", "SEMIBOLD")).move_to(S).set_z_index(8), pel, 13.0))
+        self.add(aparece(texto(est, "respuesta", 32, est.tenue).move_to(S + DOWN * 1.2).set_z_index(9), pel, 13.0))
         # la suma, término a término
         terminos = " + ".join(f"{x:.1f}×{w:.1f}".replace("-", "−") for x, w in zip(DI.NEURONA_X, DI.NEURONA_W))
-        self.add(aparece(texto(est, terminos, 30, est.tinta, "cifra", "MEDIUM").move_to([0, -2.6, 0]).set_z_index(9), pel, 8.0))
-        self.add(aparece(texto(est, f"− 0.3 (sesgo) = {z:.2f}", 30, est.tinta, "cifra", "MEDIUM").move_to([0, -3.4, 0]).set_z_index(9), pel, 9.0))
-        self.add(aparece(texto(est, "si la suma es alta, responde fuerte", 32, POS, "cuerpo", "SEMIBOLD").move_to([0, -4.5, 0]).set_z_index(9), pel, 13.4))
+        self.add(aparece(texto(est, terminos, 40, est.tinta, "cifra", "MEDIUM", ancho_max=12.6).move_to([0, -2.4, 0]).set_z_index(9), pel, 8.0))
+        self.add(aparece(texto(est, f"− 0.3 (sesgo) = {z:.2f}", 40, est.tinta, "cifra", "MEDIUM").move_to([0, -3.4, 0]).set_z_index(9), pel, 9.0))
+        self.add(aparece(texto(est, "si la suma es alta, responde fuerte", 38, POS, "cuerpo", "SEMIBOLD", ancho_max=12.6).move_to([0, -4.7, 0]).set_z_index(9), pel, 13.4))
 
         leyendas(self, est, pel, n, [
             ("Recibe números de entrada", "como los votos de varios amigos"),
@@ -184,7 +184,7 @@ class ReelIaPalabras(Scene):
     def construct(self):
         n = "ReelIaPalabras"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "Las palabras como\npuntos en un mapa", self.VAR, chip_txt="Mapa ilustrativo", **SERIE)
-        C = np.array([0.0, -0.2, 0]); K = 2.55
+        C = np.array([-0.45, -0.55, 0]); K = 2.8
         P = lambda w: C + K * np.array([*AT.vector(w), 0])
         grupos = {"animales": (["gato", "perro", "felino", "pez"], POS), "personas": (["hombre", "mujer", "rey", "reina"], est.calido),
                   "cielo": (["sol", "luna"], "#FDE68A"), "dinero": (["dinero", "cliente", "comisiones"], NEG), "afuera": (["parque"], est.tenue)}
@@ -192,18 +192,20 @@ class ReelIaPalabras(Scene):
         for nombre, (pal, col) in grupos.items():
             for w in pal:
                 t0 = 0.8 + 0.28 * k; k += 1
-                g = VGroup(Dot(P(w), radius=0.11, color=col), texto(est, w, 30, col, "cuerpo", "SEMIBOLD").next_to(P(w), DOWN if w in ("felino", "reina", "luna") else UP, buff=0.12)).set_z_index(8)
+                dir_ = {"gato": UP, "perro": RIGHT, "felino": LEFT, "pez": DOWN, "hombre": LEFT, "mujer": LEFT, "rey": RIGHT, "reina": UP,
+                        "sol": UP, "luna": DOWN, "dinero": LEFT, "comisiones": RIGHT, "cliente": RIGHT, "parque": UP}[w]
+                g = VGroup(Dot(P(w), radius=0.13, color=col), texto(est, w, 34, col, "cuerpo", "SEMIBOLD").next_to(P(w), dir_, buff=0.14)).set_z_index(8)
                 self.add(aparece(g, pel, t0))
         for nombre, (pal, col) in list(grupos.items())[:4]:
             pts = np.array([P(w) for w in pal])
-            c = pts.mean(0); r = max(np.linalg.norm(pts - c, axis=1).max() + 0.7, 0.9)
+            c = pts.mean(0); r = max(np.linalg.norm(pts - c, axis=1).max() + 0.6, 0.9)
             self.add(aparece(Circle(radius=r).move_to(c).set_stroke(col, 2.5).set_fill(col, 0.06).set_z_index(4), pel, 6.3))
         A1 = Arrow(P("hombre"), P("rey"), buff=0.12, stroke_width=6, color=est.calido, max_tip_length_to_length_ratio=0.25).set_z_index(9)
         A2 = Arrow(P("mujer"), P("mujer") + (P("rey") - P("hombre")), buff=0.12, stroke_width=6, color=POS, max_tip_length_to_length_ratio=0.25).set_z_index(9)
         self.add(aparece(A1, pel, 12.6), aparece(A2, pel, 13.6))
         anillo = Circle(radius=0.45).move_to(P("reina")).set_stroke(POS, 5).set_z_index(9)
         self.add(aparece(anillo, pel, 14.4))
-        self.add(aparece(texto(est, "misma dirección: «realeza»", 30, est.tinta).move_to([0, -4.9, 0]).set_z_index(9), pel, 13.6))
+        self.add(aparece(texto(est, "misma dirección: «realeza»", 36, est.tinta).move_to([0, -5.2, 0]).set_z_index(9), pel, 13.6))
 
         leyendas(self, est, pel, n, [
             ("Para una IA, cada palabra es un punto", "las parecidas quedan cerca"),
@@ -220,10 +222,10 @@ class ReelIaAtencion(Scene):
     def construct(self):
         n = "ReelIaAtencion"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "¿Cómo lee un modelo\nde lenguaje?", self.VAR, chip_txt="Ilustración", **SERIE)
-        frases = [("el banco cobra comisiones al cliente", 1, 3.0, NEG, 1.0), ("me siento en el banco del parque", 4, -2.4, POS, 9.5)]
+        frases = [("el banco cobra comisiones al cliente", 1, 3.2, NEG, 1.0), ("me siento en el banco del parque", 4, -2.0, POS, 9.5)]
         for frase, iq, y, col, t0 in frases:
             pal = frase.split()
-            fichas = VGroup(*[ficha(est, w, est.calido if i == iq else est.linea, 32) for i, w in enumerate(pal)]).arrange(RIGHT, buff=0.18)
+            fichas = VGroup(*[ficha(est, w, est.calido if i == iq else est.linea, 46) for i, w in enumerate(pal)]).arrange(RIGHT, buff=0.16)
             if fichas.width > 13.4:
                 fichas.scale_to_fit_width(13.4)
             fichas.move_to([0, y, 0])
@@ -236,10 +238,10 @@ class ReelIaAtencion(Scene):
                 arco = ArcBetweenPoints(q + UP * 0.05, fichas[i].get_top() + UP * 0.05, angle=-PI * 0.55 if i > iq else PI * 0.55)
                 arco.set_stroke(col, 2 + 22 * w, 0.25 + 0.75 * min(1, w * 3)).set_z_index(6)
                 self.add(aparece(arco, pel, t0 + 1.5 + 0.15 * i))
-                et = texto(est, f"{w * 100:.0f} %", 28, col if w > 0.15 else est.tenue, "cifra", "SEMIBOLD").next_to(fichas[i], DOWN, buff=0.22).set_z_index(9)
+                et = texto(est, f"{w * 100:.0f} %", 34, col if w > 0.15 else est.tenue, "cifra", "SEMIBOLD").next_to(fichas[i], DOWN, buff=0.22).set_z_index(9)
                 self.add(aparece(et, pel, t0 + 2.6))
-        self.add(aparece(texto(est, "banco = dinero", 40, NEG, "cuerpo", "SEMIBOLD").move_to([0, 0.6, 0]).set_z_index(9), pel, 6.0))
-        self.add(aparece(texto(est, "banco = asiento", 40, POS, "cuerpo", "SEMIBOLD").move_to([0, -4.8, 0]).set_z_index(9), pel, 14.0))
+        self.add(aparece(texto(est, "banco = dinero", 52, NEG, "cuerpo", "SEMIBOLD").move_to([0, 0.3, 0]).set_z_index(9), pel, 6.0))
+        self.add(aparece(texto(est, "banco = asiento", 52, POS, "cuerpo", "SEMIBOLD").move_to([0, -5.0, 0]).set_z_index(9), pel, 14.0))
 
         leyendas(self, est, pel, n, [
             ("Cada palabra mira a las demás", "y decide en cuáles fijarse: eso es «atención»"),
@@ -256,34 +258,34 @@ class ReelIaSiguiente(Scene):
     def construct(self):
         n = "ReelIaSiguiente"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "Adivinar la\nsiguiente palabra", self.VAR, chip_txt="Ilustración", **SERIE)
-        frase = texto(est, DI.FRASE_SIG, 44, est.tinta, "cuerpo", "SEMIBOLD", ancho_max=11.0).move_to([-0.9, 4.2, 0]).set_z_index(9)
+        frase = texto(est, DI.FRASE_SIG, 56, est.tinta, "cuerpo", "SEMIBOLD", ancho_max=11.4).move_to([-0.9, 4.3, 0]).set_z_index(9)
         self.add(aparece(frase, pel, 0.6))
         cursor = Rectangle(width=0.12, height=0.75).set_fill(est.calido, 1).set_stroke(width=0).next_to(frase, RIGHT, buff=0.2).set_z_index(9)
         cursor.add_updater(lambda m: fundir(m, rampa(pel.t, 0.6) * (1 - rampa(pel.t, 7.0, 0.2)) * (0.5 + 0.5 * np.sign(np.sin(6 * pel.v)))))
         fundir(cursor, 0)
         self.add(cursor)
-        X0, BW = -2.2, 7.4
+        X0, BW = -1.9, 7.6
         for k, (w, p) in enumerate(DI.OPCIONES_SIG):
-            y = 2.0 - 1.15 * k
+            y = 2.3 - 1.3 * k
             t0 = 2.0 + 0.4 * k
             col = POS if k == 0 else est.tenue
-            self.add(aparece(texto(est, w, 36, est.tinta, "cuerpo", "SEMIBOLD").move_to([X0 - 0.35, y, 0], aligned_edge=RIGHT).set_z_index(9), pel, t0))
-            self.add(aparece(Rectangle(width=BW, height=0.55).set_fill(est.linea, 0.5).set_stroke(width=0).move_to([X0 + BW / 2, y, 0]).set_z_index(5), pel, t0))
-            b = Rectangle(width=0.01, height=0.55).set_z_index(6)
-            b.add_updater(lambda m, p=p, y=y, t0=t0, col=col: m.become(Rectangle(width=max(BW * p * rampa(pel.t, t0 + 0.2, 1.2), 0.01), height=0.55)
+            self.add(aparece(texto(est, w, 44, est.tinta, "cuerpo", "SEMIBOLD").move_to([X0 - 0.35, y, 0], aligned_edge=RIGHT).set_z_index(9), pel, t0))
+            self.add(aparece(Rectangle(width=BW, height=0.7).set_fill(est.linea, 0.5).set_stroke(width=0).move_to([X0 + BW / 2, y, 0]).set_z_index(5), pel, t0))
+            b = Rectangle(width=0.01, height=0.7).set_z_index(6)
+            b.add_updater(lambda m, p=p, y=y, t0=t0, col=col: m.become(Rectangle(width=max(BW * p * rampa(pel.t, t0 + 0.2, 1.2), 0.01), height=0.7)
                                                                          .set_fill(col, rampa(pel.t, t0)).set_stroke(width=0).move_to([X0, y, 0], aligned_edge=LEFT).set_z_index(6)))
             self.add(b)
-            self.add(aparece(texto(est, f"{p * 100:.0f} %", 30, est.tinta, "cifra", "SEMIBOLD").move_to([X0 + BW * p + 0.75, y, 0]).set_z_index(9), pel, t0 + 1.2))
-        elegida = ficha(est, "Tierra", POS, 44).set_z_index(10)
+            self.add(aparece(texto(est, f"{p * 100:.0f} %", 38, est.tinta, "cifra", "SEMIBOLD").move_to([X0 + BW * p + 0.85, y, 0]).set_z_index(9), pel, t0 + 1.2))
+        elegida = ficha(est, "Tierra", POS, 54).set_z_index(10)
         destino = frase.get_right() + RIGHT * 1.35
-        origen = np.array([X0 - 1.5, 2.0, 0])
+        origen = np.array([X0 - 1.5, 2.3, 0])
         elegida.add_updater(lambda m: fundir(m.move_to(origen + (destino - origen) * suave((pel.t - 7.0) / 1.2)), rampa(pel.t, 6.6, 0.4)))
         fundir(elegida, 0)
         self.add(elegida)
         bucle = VGroup(Arc(radius=0.8, start_angle=0.3, angle=TAU - 0.9, stroke_width=6, color=est.calido).add_tip(tip_length=0.3),
-                       ).move_to([0, -4.2, 0]).set_z_index(8)
+                       ).move_to([-4.6, -4.0, 0]).set_z_index(8)
         self.add(aparece(bucle, pel, 10.5))
-        self.add(aparece(texto(est, "y otra vez, palabra por palabra", 32, est.tinta).move_to([0, -5.4, 0]).set_z_index(9), pel, 10.8))
+        self.add(aparece(texto(est, "y otra vez,\npalabra por palabra", 36, est.tinta).move_to([0.4, -4.0, 0]).set_z_index(9), pel, 10.8))
 
         leyendas(self, est, pel, n, [
             ("Un chatbot no «sabe» la respuesta", "calcula qué palabra es más probable después"),
@@ -303,7 +305,7 @@ class ReelIaPixeles(Scene):
         Nn = 10
         yy, xx = np.mgrid[0:Nn, 0:Nn]
         img = np.clip(60 + 150 * np.exp(-((xx - 3.2) ** 2 + (yy - 3.0) ** 2) / 6) + 90 * np.exp(-((xx - 7) ** 2 + (yy - 6.5) ** 2) / 4) + 15 * np.sin(xx + 2 * yy), 0, 255).astype(int)
-        L = 0.52; G0 = np.array([-5.6, 4.9, 0])
+        L = 0.6; G0 = np.array([-6.5, 5.0, 0])
         celdas = VGroup()
         for i in range(Nn):
             for j in range(Nn):
@@ -318,21 +320,21 @@ class ReelIaPixeles(Scene):
         Z = (3, 2)                                                         # ventana de 4×4 que se amplía
         marco = Square(4 * L).set_stroke(est.calido, 5).move_to(G0 + np.array([L * (Z[1] + 2), -L * (Z[0] + 2), 0])).set_z_index(8)
         self.add(aparece(marco, pel, 5.5))
-        LZ = 0.98; Z0 = np.array([1.75, 4.9, 0])
+        LZ = 1.1; Z0 = np.array([2.0, 4.9, 0])
         for i in range(4):
             for j in range(4):
                 v = img[Z[0] + i, Z[1] + j]
                 p = Z0 + np.array([LZ * (j + 0.5), -LZ * (i + 0.5), 0])
                 sq = Square(LZ).set_fill(interpolate_color(ManimColor("#0B0620"), ManimColor("#E9D5FF"), v / 255), 1).set_stroke(est.calido, 2).move_to(p).set_z_index(6)
-                num = texto(est, str(v), 30, est.tinta if v < 140 else "#120C24", "cifra", "SEMIBOLD").move_to(p).set_z_index(8)
+                num = texto(est, str(v), 38, est.tinta if v < 140 else "#120C24", "cifra", "SEMIBOLD").move_to(p).set_z_index(8)
                 self.add(aparece(sq, pel, 6.2 + 0.05 * (i * 4 + j)), aparece(num, pel, 7.0 + 0.08 * (i * 4 + j)))
         self.add(aparece(DashedLine(marco.get_corner(UR), Z0, stroke_width=2.5, color=est.calido).set_z_index(7), pel, 6.0))
         self.add(aparece(DashedLine(marco.get_corner(DR), Z0 + DOWN * 4 * LZ, stroke_width=2.5, color=est.calido).set_z_index(7), pel, 6.0))
-        self.add(aparece(texto(est, "0 = negro · 255 = blanco", 28, est.tenue).move_to([3.7, 0.4, 0]).set_z_index(9), pel, 7.8))
+        self.add(aparece(texto(est, "0 = negro · 255 = blanco", 32, est.tenue).move_to([4.2, 0.1, 0]).set_z_index(9), pel, 7.8))
         cuenta = lambda: int(36_000_000 * rampa(pel.t, 11.8, 2.4))
-        self.add(Viva(est, lambda: f"{cuenta():,}".replace(",", " "), [0, -2.4, 0], 96, est.calido, f_op=lambda: rampa(pel.t, 11.5)))
-        self.add(aparece(texto(est, "números en una foto de celular", 34, est.tinta).move_to([0, -3.6, 0]).set_z_index(9), pel, 11.8))
-        self.add(aparece(texto(est, "12 millones de píxeles × 3 colores", 30, est.tenue).move_to([0, -4.4, 0]).set_z_index(9), pel, 12.4))
+        self.add(Viva(est, lambda: f"{cuenta():,}".replace(",", " "), [0, -2.5, 0], 120, est.calido, f_op=lambda: rampa(pel.t, 11.5)))
+        self.add(aparece(texto(est, "números en una foto de celular", 42, est.tinta).move_to([0, -3.8, 0]).set_z_index(9), pel, 11.8))
+        self.add(aparece(texto(est, "12 millones de píxeles × 3 colores", 36, est.tenue).move_to([0, -4.7, 0]).set_z_index(9), pel, 12.4))
 
         leyendas(self, est, pel, n, [
             ("Una imagen es una cuadrícula", "cada cuadrito es un píxel"),
@@ -361,7 +363,7 @@ class ReelIaMemoriza(Scene):
             self.add(aparece(Dot([fx(x), fy(y), 0], radius=0.13, color=est.tinta).set_z_index(8), pel, 0.6 + 0.12 * k))
         xs = np.linspace(-3.0, 3.0, 300)
         suave_c = np.polyval(np.polyfit(xt, yt, 3), xs)
-        memo = np.polyval(np.polyfit(xt, yt, len(xt) - 1), xs)
+        memo = np.interp(xs, xt, yt)
         for curva, col, t0, nombre, yl in ((suave_c, POS, 4.0, "entendió la tendencia", 4.55), (memo, est.calido, 6.5, "memorizó cada punto", 4.55)):
             c = VMobject().set_z_index(6)
 
@@ -371,14 +373,14 @@ class ReelIaMemoriza(Scene):
             c.add_updater(dibujar)
             dibujar(c)
             self.add(c)
-        self.add(aparece(texto(est, "entendió la tendencia", 30, POS, "cuerpo", "SEMIBOLD").move_to([-3.3, Y1 + 0.75, 0]).set_z_index(9), pel, 4.0))
-        self.add(aparece(texto(est, "memorizó cada punto", 30, est.calido, "cuerpo", "SEMIBOLD").move_to([3.3, Y1 + 0.75, 0]).set_z_index(9), pel, 6.5))
+        self.add(aparece(texto(est, "entendió la tendencia", 34, POS, "cuerpo", "SEMIBOLD").move_to([-3.1, Y1 + 0.8, 0]).set_z_index(9), pel, 4.0))
+        self.add(aparece(texto(est, "memorizó cada punto", 34, est.calido, "cuerpo", "SEMIBOLD").move_to([3.4, Y1 + 0.8, 0]).set_z_index(9), pel, 6.5))
         for k, (x, y) in enumerate(zip(xe, ye)):
             g = VGroup(Square(0.3).rotate(PI / 4).set_fill("#FDE68A", 1).set_stroke(width=0).move_to([fx(x), fy(y), 0]))
-            ym = float(np.polyval(np.polyfit(xt, yt, len(xt) - 1), x))
+            ym = float(np.interp(x, xt, yt))
             g.add(DashedLine([fx(x), fy(y), 0], [fx(x), fy(ym), 0], stroke_width=3, color=ROJO))
             self.add(aparece(g.set_z_index(8), pel, 12.6 + 0.25 * k))
-        self.add(aparece(texto(est, "examen: datos nuevos", 30, "#FDE68A", "cuerpo", "SEMIBOLD").move_to([0, Y0 - 0.85, 0]).set_z_index(9), pel, 12.6))
+        self.add(aparece(texto(est, "examen: datos nuevos", 36, "#FDE68A", "cuerpo", "SEMIBOLD").move_to([0, Y0 - 0.85, 0]).set_z_index(9), pel, 12.6))
 
         leyendas(self, est, pel, n, [
             ("Dos alumnos estudian los mismos ejercicios", "uno entiende la idea; el otro memoriza"),
@@ -395,21 +397,21 @@ class ReelIaSesgo(Scene):
     def construct(self):
         n = "ReelIaSesgo"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "Basura entra,\nbasura sale", self.VAR, chip_txt="Ilustración", **SERIE)
-        self.add(aparece(texto(est, "ejemplos para entrenar", 32, est.tenue).move_to([0, 4.9, 0]).set_z_index(9), pel, 0.5))
+        self.add(aparece(texto(est, "ejemplos para entrenar", 36, est.tenue).move_to([0, 5.0, 0]).set_z_index(9), pel, 0.5))
         for k in range(12):
             i, j = divmod(k, 6)
-            g = gato("#FB923C" if k % 4 else "#F59E0B", 0.85).move_to([-5.4 + 2.15 * j, 3.6 - 1.5 * i, 0])
+            g = gato("#FB923C" if k % 4 else "#F59E0B", 1.25).move_to([-5.5 + 2.2 * j, 3.7 - 1.8 * i, 0])
             self.add(aparece(g, pel, 0.6 + 0.15 * k))
-        self.add(aparece(texto(est, "todos naranjas", 32, est.calido, "cuerpo", "SEMIBOLD").move_to([0, 1.5, 0]).set_z_index(9), pel, 3.2))
-        caja = VGroup(RoundedRectangle(corner_radius=0.25, width=2.6, height=1.4).set_fill(NEG, 0.2).set_stroke(NEG, 3),
-                      texto(est, "IA", 44, est.tinta, "titulo", "BOLD")).move_to([0, -0.4, 0]).set_z_index(8)
+        self.add(aparece(texto(est, "todos naranjas", 40, est.calido, "cuerpo", "SEMIBOLD").move_to([0, 0.8, 0]).set_z_index(9), pel, 3.2))
+        caja = VGroup(RoundedRectangle(corner_radius=0.3, width=3.4, height=1.8).set_fill(NEG, 0.2).set_stroke(NEG, 3.5),
+                      texto(est, "IA", 60, est.tinta, "titulo", "BOLD")).move_to([0, -0.9, 0]).set_z_index(8)
         self.add(aparece(caja, pel, 4.0))
-        g_ok = gato("#FB923C", 1.1).move_to([-4.0, -3.0, 0]); g_mal = gato("#26262E", 1.1).move_to([4.0, -3.0, 0])
-        g_mal[2].set_stroke("#9CA3AF", 2)
+        g_ok = gato("#FB923C", 1.7).move_to([-3.6, -3.3, 0]); g_mal = gato("#3A3A48", 1.7).move_to([3.6, -3.3, 0])
+        g_mal[2].set_stroke("#C4B5FD", 3)
         self.add(aparece(g_ok, pel, 6.5), aparece(g_mal, pel, 9.5))
-        self.add(aparece(texto(est, "gato: 98 %", 34, POS, "cuerpo", "SEMIBOLD").move_to([-4.0, -4.5, 0]).set_z_index(9), pel, 7.3))
-        self.add(aparece(texto(est, "¿gato? 12 %", 34, ROJO, "cuerpo", "SEMIBOLD").move_to([4.0, -4.5, 0]).set_z_index(9), pel, 10.3))
-        for p, t0 in (([-4.0, -1.9, 0], 6.8), ([4.0, -1.9, 0], 9.8)):
+        self.add(aparece(texto(est, "gato: 98 %", 42, POS, "cuerpo", "SEMIBOLD").move_to([-3.6, -5.0, 0]).set_z_index(9), pel, 7.3))
+        self.add(aparece(texto(est, "¿gato? 12 %", 42, ROJO, "cuerpo", "SEMIBOLD").move_to([3.6, -5.0, 0]).set_z_index(9), pel, 10.3))
+        for p, t0 in (([-3.6, -2.2, 0], 6.8), ([3.6, -2.2, 0], 9.8)):
             self.add(aparece(Arrow(caja.get_bottom(), p, buff=0.15, stroke_width=4, color=est.tenue).set_z_index(7), pel, t0))
 
         leyendas(self, est, pel, n, [
@@ -427,10 +429,10 @@ class ReelIaInventa(Scene):
     def construct(self):
         n = "ReelIaInventa"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "Cuando la IA\ninventa", self.VAR, chip_txt="Ejemplo ilustrativo", **SERIE)
-        q = burbuja(est, ["¿Quién fue el primer mexicano", "en el espacio?"], est.tenue, 9.6).move_to([1.6, 4.0, 0])
+        q = burbuja(est, ["¿Quién fue el primer mexicano", "en el espacio?"], est.tenue, 10.6, 42).move_to([1.2, 4.1, 0])
         self.add(aparece(q, pel, 0.5))
         r_lineas = ["Fue en 1969: viajó con Neil Armstrong", "a bordo del Apolo 11."]
-        r = burbuja(est, r_lineas, NEG, 11.0).move_to([-0.9, 1.4, 0])
+        r = burbuja(est, r_lineas, NEG, 12.4, 42).move_to([-0.3, 1.2, 0])
         texto_r = r[1]
         r[0].add_updater(lambda m: fundir(m, rampa(pel.t, 2.0)))
         fundir(r[0], 0)
@@ -441,14 +443,14 @@ class ReelIaInventa(Scene):
             g.add_updater(lambda m, t_i=t_i: m.set_opacity(rampa(pel.t, t_i, 0.05)))
             g.set_opacity(0)
         self.add(texto_r)
-        sello = VGroup(RoundedRectangle(corner_radius=0.15, width=4.6, height=1.0).set_fill(est.fondo, 0.85).set_stroke(ROJO, 5),
-                       texto(est, "INVENTADO", 44, ROJO, "titulo", "BOLD")).rotate(0.12).move_to([3.4, 0.2, 0]).set_z_index(10)
+        sello = VGroup(RoundedRectangle(corner_radius=0.15, width=5.4, height=1.2).set_fill(est.fondo, 0.85).set_stroke(ROJO, 5),
+                       texto(est, "INVENTADO", 54, ROJO, "titulo", "BOLD")).rotate(0.12).move_to([3.3, -0.4, 0]).set_z_index(10)
         self.add(aparece(sello, pel, 6.6, 0.3))
-        v = burbuja(est, ["Verificado: Rodolfo Neri Vela, en 1985,", "a bordo del transbordador Atlantis."], POS, 11.4).move_to([0, -2.6, 0])
+        v = burbuja(est, ["Verificado: Rodolfo Neri Vela, en 1985,", "a bordo del transbordador Atlantis."], POS, 12.4, 40).move_to([0, -2.8, 0])
         self.add(aparece(v, pel, 12.6))
-        palomita = VGroup(Line([-0.3, 0, 0], [-0.05, -0.28, 0], stroke_width=8, color=POS), Line([-0.05, -0.28, 0], [0.42, 0.3, 0], stroke_width=8, color=POS)).move_to([5.1, -1.35, 0]).set_z_index(10)
+        palomita = VGroup(Line([-0.3, 0, 0], [-0.05, -0.28, 0], stroke_width=8, color=POS), Line([-0.05, -0.28, 0], [0.42, 0.3, 0], stroke_width=8, color=POS)).move_to([5.6, -1.3, 0]).set_z_index(10)
         self.add(aparece(palomita, pel, 13.2))
-        self.add(aparece(texto(est, "fuente: NASA · Agencia Espacial Mexicana", 26, est.tenue).move_to([0, -4.4, 0]).set_z_index(9), pel, 13.4))
+        self.add(aparece(texto(est, "fuente: NASA · Agencia Espacial Mexicana", 32, est.tenue).move_to([0, -4.9, 0]).set_z_index(9), pel, 13.4))
 
         leyendas(self, est, pel, n, [
             ("Suena seguro… y está mal", "eligió palabras probables, no verdaderas"),
@@ -465,19 +467,19 @@ class ReelIaEspacio(Scene):
     def construct(self):
         n = "ReelIaEspacio"; TB = DI.CUERPO[n]
         est, pel = preparar_serie(self, TB, KICKER, "IA a bordo de\nun satélite", self.VAR, chip_txt="Hecho real · ESA 2020", **SERIE)
-        SAT = np.array([0.0, 3.6, 0])
+        SAT = np.array([0.0, 3.4, 0])
         sat = VGroup(Square(0.9).set_fill(est.fondo, 1).set_stroke(est.tinta, 3),
                      Rectangle(width=1.6, height=0.6).set_fill("#3B8FD9", 0.6).set_stroke(est.tinta, 2).shift(LEFT * 1.35),
                      Rectangle(width=1.6, height=0.6).set_fill("#3B8FD9", 0.6).set_stroke(est.tinta, 2).shift(RIGHT * 1.35),
-                     texto(est, "IA", 30, NEG, "titulo", "BOLD")).move_to(SAT).set_z_index(9)
+                     texto(est, "IA", 30, NEG, "titulo", "BOLD")).scale(1.6).move_to(SAT).set_z_index(9)
         self.add(aparece(sat, pel, 0.4))
-        cuerpo_ia = Square(0.9).move_to(SAT).set_stroke(NEG, 5).set_fill(opacity=0).set_z_index(10)
+        cuerpo_ia = Square(1.44).move_to(SAT).set_stroke(NEG, 5).set_fill(opacity=0).set_z_index(10)
         cuerpo_ia.add_updater(lambda m: m.set_stroke(opacity=rampa(pel.t, 6.5) * (0.6 + 0.4 * np.sin(6 * pel.t))))
         self.add(cuerpo_ia)
         EST_P = np.array([0.0, -4.6, 0])
         antena = VGroup(Arc(radius=0.6, start_angle=PI + 0.5, angle=PI - 1.0, stroke_width=5, color=est.tinta).move_to(EST_P + UP * 0.5),
                         Line(EST_P, EST_P + UP * 0.45, stroke_width=5, color=est.tinta)).set_z_index(8)
-        self.add(aparece(antena, pel, 0.6), aparece(texto(est, "estación en tierra", 28, est.tenue).move_to(EST_P + RIGHT * 2.6 + UP * 0.3).set_z_index(9), pel, 0.8))
+        self.add(aparece(antena, pel, 0.6), aparece(texto(est, "estación en tierra", 34, est.tenue).move_to(EST_P + RIGHT * 3.0 + UP * 0.3).set_z_index(9), pel, 0.8))
         rng = np.random.default_rng(31)
 
         def foto(nublada, sem):
@@ -490,7 +492,7 @@ class ReelIaEspacio(Scene):
                 nube = gaussian_filter(r.random((40, 40)), 4); nube = np.clip((nube - nube.mean()) / nube.std() * 0.6 + 0.85, 0, 1)
                 rgb = rgb * (1 - nube[..., None]) + 245 * nube[..., None]
             im = ImageMobject(rgb.astype(np.uint8)).set_z_index(7)
-            im.stretch_to_fit_width(1.1).stretch_to_fit_height(1.1)
+            im.stretch_to_fit_width(1.6).stretch_to_fit_height(1.6)
             return im
         nub = [True, True, False, True, True, False, True, True, True, False, True, False]
         for k, nb in enumerate(nub):
@@ -515,9 +517,9 @@ class ReelIaEspacio(Scene):
                 m.move_to(p).set_opacity(max(0, min(1, op)))
             im.add_updater(mover)
             self.add(im)
-        self.add(aparece(texto(est, "nubladas: a la basura", 32, ROJO, "cuerpo", "SEMIBOLD").move_to([-3.9, 5.15, 0]).set_z_index(9), pel, 7.5))
-        self.add(aparece(texto(est, "despejadas: a tierra", 32, VERDE, "cuerpo", "SEMIBOLD").move_to([0, -2.4, 0]).set_z_index(9), pel, 9.0))
-        self.add(aparece(texto(est, "2 de cada 3 lugares, bajo nubes", 30, est.tinta).move_to([0, 1.2 - 0.0, 0]).set_z_index(9), pel, 1.6, hasta=6.3))
+        self.add(aparece(texto(est, "nubladas: a la basura", 38, ROJO, "cuerpo", "SEMIBOLD").move_to([-3.2, 5.3, 0]).set_z_index(9), pel, 7.5))
+        self.add(aparece(texto(est, "despejadas: a tierra", 38, VERDE, "cuerpo", "SEMIBOLD").move_to([-3.4, -1.0, 0]).set_z_index(9), pel, 9.0))
+        self.add(aparece(texto(est, "2 de cada 3 lugares,\nbajo nubes", 40, est.tinta).move_to([-3.7, -0.4, 0]).set_z_index(9), pel, 1.6, hasta=6.3))
 
         leyendas(self, est, pel, n, [
             ("Dos tercios de la Tierra están bajo nubes", "muchas fotos desde el espacio salen blancas"),
