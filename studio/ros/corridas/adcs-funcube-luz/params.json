@@ -1,0 +1,28 @@
+{
+ "paquete": "sat_adcs",
+ "launch": "adcs.launch.py",
+ "args": {
+  "time_scale": 0,
+  "record_dir": "/out"
+ },
+ "defaults": {
+  "sat": "FUNCUBE-1",
+  "station": "cdmx",
+  "start_utc": "2026-10-02T20:30:00",
+  "seed": 7,
+  "w0_deg_s": 8.0,
+  "model_degree": 4,
+  "band": "X",
+  "d_sat": 0.3
+ },
+ "estacion": {
+  "nombre": "Ciudad de Mexico",
+  "lat": 19.4326,
+  "lon": -99.1332,
+  "alt_m": 2240,
+  "mascara_deg": 5
+ },
+ "repo": "ros2-workspace",
+ "commit": "c24bf7d",
+ "imagen": "ros2-jazzy-dev"
+}

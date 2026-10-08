@@ -1,0 +1,39 @@
+[INFO] [launch]: All log files can be found below /tmp/roslog/2026-10-02-19-20-48-622301-287cede5a1d7-29
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sim_clock-1]: process started with pid [34]
+[INFO] [adcs_sim-2]: process started with pid [35]
+[INFO] [adcs_controller-3]: process started with pid [36]
+[INFO] [adcs_monitor-4]: process started with pid [37]
+[INFO] [adcs_recorder-5]: process started with pid [38]
+[sim_clock-1] [INFO] [1790968850.700129697] [sim_clock]: reloj simulado lockstep, paso 1 s, maxima velocidad
+[adcs_recorder-5] [INFO] [1790968850.700892743] [adcs_recorder]: grabando en /out
+[adcs_controller-3] [INFO] [1790968851.270306426] [adcs_controller]: campo de a bordo: IGRF grado 4; error contra IGRF-13 completo en la orbita: 3.9 % rms (1.7 deg rms de direccion); umbral de detumbling |w| < 0.594 deg/s
+[adcs_sim-2] [INFO] [1790968851.981515684] [adcs_sim]: pase real FUNCUBE-1 (AO-73) (NORAD 39444) sobre Ciudad de Mexico: AOS t=6413 s (2026-10-02 22:16:53 UTC), duracion 589 s, el max 79.4 deg; fin del escenario t=7032 s
+[adcs_controller-3] [INFO] [1790968852.055090698] [adcs_controller]: t=0 s: modo DETUMBLE
+[adcs_sim-2] [INFO] [1790968852.057635923] [adcs_sim]: lazo cerrado: arranca el escenario
+[sim_clock-1] [INFO] [1790968852.058943761] [sim_clock]: lazo cerrado: avance en lockstep
+[adcs_controller-3] [INFO] [1790968911.464354655] [adcs_controller]: t=4247 s: modo NADIR
+[adcs_controller-3] [INFO] [1790968956.821611096] [adcs_controller]: t=6264 s: modo TRACK_GS
+[adcs_controller-3] [INFO] [1790968974.837778812] [adcs_controller]: t=7002 s: modo NADIR
+[adcs_sim-2] [INFO] [1790968975.462531980] [adcs_sim]: fin del escenario
+[adcs_monitor-4] [INFO] [1790968975.614333694] [adcs_monitor]: RESUMEN detumble: |w| 8.00 -> < 0.594 deg/s en t=3111 s (real); modo NADIR desde t=4247 s (espera al Sol para el TRIAD)
+[adcs_monitor-4] [INFO] [1790968975.615974836] [adcs_monitor]: RESUMEN NADIR (regimen, tras 207 s): n=1809 rms=1.019 p95=1.792 max=1.838 deg
+[adcs_monitor-4] [INFO] [1790968975.616692457] [adcs_monitor]: RESUMEN TRACK_GS (en pase, el>=5 deg): n=588 rms=0.615 p95=0.809 max=0.846 deg | umbral 2.40 deg (perdida 1 dB, haz 8.3 deg)
+[adcs_monitor-4] [INFO] [1790968975.617354251] [adcs_monitor]: RESUMEN conocimiento (rms est-verdad, bore-sight): 0.886 deg (1-sigma del filtro, eje peor: 0.121 deg) | ruedas: h max 0.816 mNms = 46.1% de la capacidad
+[adcs_monitor-4] [INFO] [1790968975.618008344] [adcs_monitor]: RESUMEN enlace X (antena del satelite 0.3 m): perdida por apuntamiento rms=0.075 max=0.124 dB | margen min=14.05 dB | cerrado 100.0%
+[adcs_monitor-4] [INFO] [1790968975.618680551] [adcs_monitor]: RESUMEN veredicto: CUMPLE (p95 TRACK_GS <= umbral)
+[adcs_monitor-4] [INFO] [1790968975.619658428] [adcs_monitor]: RESUMEN muestras: n=7033 hasta t=7032 s (paso 1 s)
+[adcs_recorder-5] [INFO] [1790968975.745379987] [adcs_recorder]: metrics.json escrito en /out
+[INFO] [adcs_recorder-5]: process has finished cleanly [pid 38]
+[INFO] [adcs_monitor-4]: sending signal 'SIGINT' to process[adcs_monitor-4]
+[INFO] [adcs_controller-3]: sending signal 'SIGINT' to process[adcs_controller-3]
+[INFO] [adcs_sim-2]: sending signal 'SIGINT' to process[adcs_sim-2]
+[INFO] [sim_clock-1]: sending signal 'SIGINT' to process[sim_clock-1]
+[INFO] [adcs_monitor-4]: process has finished cleanly [pid 37]
+[INFO] [adcs_sim-2]: process has finished cleanly [pid 35]
+[INFO] [sim_clock-1]: process has finished cleanly [pid 34]
+[INFO] [adcs_controller-3]: process has finished cleanly [pid 36]
+
+real	2m10.965s
+user	0m0.033s
+sys	0m0.031s

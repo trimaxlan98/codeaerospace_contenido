@@ -74,6 +74,16 @@ def _videos():
         v.append(Video(n, "35-logo-vivo.py", EST / "logo_vivo", "1080,1920", 30, "reels", (f, T, d), True, "logo-vivo"))
     for n, (f, T, d) in SR.REELS_DATOS.items():
         v.append(Video(n, "36-reel-datos-reales.py", EST / "reels_datos", "1080,1920", 30, "reels", (f, T, d), True, "datos-reales"))
+    for n, (f, T, d) in SR.REELS_DIVULGACION.items():
+        v.append(Video(n, "37-reels-divulgacion.py", EST / "reels_divulgacion", "1080,1920", 30, "reels", (f, T, d), True, "divulgacion"))
+    for n, (f, T, d) in SR.REELS_ATS.items():
+        v.append(Video(n, "38-reels-ats.py", EST / "reels_ats", "1080,1920", 30, "reels", (f, T, d), True, "ats"))
+    for n, (f, T, d) in SR.REELS_TRIAGE.items():
+        v.append(Video(n, "39-reels-triage.py", EST / "reels_triage", "1080,1920", 30, "reels", (f, T, d), True, "triage"))
+    for n, (f, T, d) in SR.REELS_CLIMA.items():
+        v.append(Video(n, "40-reels-clima.py", EST / "reels_clima", "1080,1920", 30, "reels", (f, T, d), True, "clima"))
+    for n, (f, T, d) in SR.REELS_IA.items():
+        v.append(Video(n, "41-reels-ia.py", EST / "reels_ia", "1080,1920", 30, "reels", (f, T, d), True, "ia"))
     return {x.id: x for x in v}
 
 
