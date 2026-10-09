@@ -1492,6 +1492,146 @@ def _registrar_el():
 
 REELS_EL = _registrar_el()
 
+
+# ══ Serie «Cálculo en el espacio» (45-reels-calculo.py): tiempos en datos_ca.py y en la escena ═══════════════════════════
+def _ca():
+    _fisica()
+    import datos_ca as DC
+    return DC
+
+
+def _fin_ca(m, DC, nombre, mc):
+    _leyendas_ats(mc, DC, nombre)
+    _cierre_sonoro(m, _fisica(), DC.CUERPO[nombre])
+
+
+_NOTAS_CA = (A(-24), A(-15), A(-12))            # colchón grave con sexta: «pizarrón tranquilo»
+
+
+def ca_derivada(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCADerivada", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    t = np.arange(m.n) / SR
+    u = np.clip((t - F.H0 - 1.0) / 10.5, 0, 1)
+    pend = 1 + 0.2 * np.pi * np.cos(2 * np.pi * (0.08 + 0.84 * (0.5 - 0.5 * np.cos(np.pi * u))))
+    _tono(m, 220 * pend, _env(m, F, 1.0, 12.3, 0.4, 0.6), 0.02, F)                          # el tono sigue a la pendiente
+    mc.poner(7.0, whoosh(4.8, 400, 2400, 0.05, 0.5)); mc.poner(11.8, pluck(A(7), 1.2, 0.18))
+    mc.poner(13.0, golpe(55, 0.6, 0.16)); mc.poner(13.2, pluck(A(12), 1.4, 0.18))
+    _fin_ca(m, DC, "ReelCADerivada", mc)
+
+
+def ca_integral(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAIntegral", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    for j, (nb, t0) in enumerate(((4, 1.0), (8, 2.6), (16, 4.2))):
+        for k in range(min(nb, 8)):
+            mc.poner(t0 + 0.07 * k, clic(0.04, 1200 + 150 * j + 40 * k), pan=-0.4 + 0.1 * k)       # cada rebanada
+    mc.poner(5.8, brillo_(0.8, 0.4))
+    mc.poner(7.0, glide(300, 900, 2.0, 0.04)); mc.poner(9.0, pluck(A(7), 1.2, 0.18))
+    mc.poner(13.0, gota(900, 0.2, 0.05)); mc.poner(14.5, pluck(A(-5), 1.2, 0.16))
+    _fin_ca(m, DC, "ReelCAIntegral", mc)
+
+
+def ca_maximo(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAMaximo", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    for j in range(3):
+        t0 = 0.8 + 1.4 * j
+        mc.poner(t0, golpe(80, 0.25, 0.12)); mc.poner(t0 + DC.T_AIRE_TIERRA_S, clic(0.06, 900))
+    mc.poner(6.6, golpe(70, 0.4, 0.14)); mc.poner(6.6, glide(300, 700, DC.V_SALTO / 1.62, 0.035))
+    mc.poner(6.6 + DC.V_SALTO / 1.62, pluck(A(12), 1.6, 0.2))                                  # arriba: pendiente cero
+    mc.poner(6.6 + DC.V_SALTO / 1.62, glide(700, 300, DC.V_SALTO / 1.62, 0.03))
+    mc.poner(6.6 + DC.T_AIRE_LUNA_S, golpe(60, 0.6, 0.16))
+    mc.poner(12.8, pluck(A(7), 1.4, 0.16))
+    _fin_ca(m, DC, "ReelCAMaximo", mc)
+
+
+def ca_pasos(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAPasos", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    for k in range(DC.PASOS_MAL):
+        mc.poner(0.8 + 8.2 * k / DC.PASOS_MAL, clic(0.05, 900 + 60 * k), pan=-0.4 + 0.04 * k)    # cada paso, cada vez más agudo
+    mc.poner(12.8, whoosh(3.2, 300, 1500, 0.04, 0.5)); mc.poner(16.0, pluck(A(12), 1.6, 0.2))
+    _fin_ca(m, DC, "ReelCAPasos", mc)
+
+
+def ca_giro(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAGiro", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    _zumbido(m, F, 0.4, 20.0, 90, 0.02, vib=2.0)                                              # el anillo que gira
+    mc.poner(1.6, pluck(A(5), 1.0, 0.14)); mc.poner(3.4, pluck(A(0), 1.0, 0.14))
+    mc.poner(7.0, golpe(55, 0.6, 0.16)); mc.poner(7.2, pluck(A(7), 1.4, 0.18))
+    mc.poner(13.0, glide(400, 1100, 1.2, 0.04))
+    _fin_ca(m, DC, "ReelCAGiro", mc)
+
+
+def ca_tasas(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCATasas", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    S = 1 / (1 / 3.6 - 1 / (3.6 * DC.T_MARTE_D / DC.T_TIERRA_D))
+    for k in range(3):
+        t0 = 1.0 + k * S
+        if t0 < 20:
+            mc.poner(t0, brillo_(0.8, 0.4)); mc.poner(t0, pluck(A(12), 1.4, 0.18))             # cada alineación
+    for k in range(6):
+        mc.poner(1.0 + 3.6 * k, gota(700, 0.12, 0.03), pan=-0.3)                                # cada año de la Tierra
+    _fin_ca(m, DC, "ReelCATasas", mc)
+
+
+def ca_plutonio(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAPlutonio", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    for k in range(4):
+        mc.poner(1.6 + 1.0 * k, pluck(A(12 - 5 * k), 1.0, 0.18 / (k + 1) ** 0.5), pan=-0.3 + 0.2 * k)   # cada mitad, más grave
+    mc.poner(7.0, pluck(A(7), 1.2, 0.16)); mc.poner(8.4, glide(600, 480, 1.6, 0.03))
+    mc.poner(13.6, glide(600, 300, 1.6, 0.035))
+    _fin_ca(m, DC, "ReelCAPlutonio", mc)
+
+
+def ca_aire(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAAire", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    _siseo(m, F, 0.4, 12.0, 0.018, 600, 3000)                                                 # el aire
+    for k in range(1, 6):
+        mc.poner(1.6 + 0.8 * k, pluck(A(-5 + 3 * k), 0.9, 0.16 / k ** 0.5), pan=-0.3 + 0.12 * k)
+    mc.poner(7.0, golpe(60, 0.5, 0.14)); mc.poner(9.0, whoosh(1.2, 500, 1500, 0.04, 0.5))
+    mc.poner(13.0, glide(400, 1600, 2.0, 0.03))
+    _fin_ca(m, DC, "ReelCAAire", mc)
+
+
+def ca_horizonte(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCAHorizonte", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    for t0, nota in ((0.8, A(0)), (6.8, A(7)), (13.3, A(12))):
+        mc.poner(t0 - 0.8, whoosh(1.6, 300, 1500, 0.035, 0.6)); mc.poner(t0, pluck(nota, 1.4, 0.18))
+    mc.poner(7.6, brillo_(0.6, 0.3))
+    _fin_ca(m, DC, "ReelCAHorizonte", mc)
+
+
+def ca_tunel(m):
+    DC = _ca(); F = _fisica()
+    mc, tb = _base(m, DC, "ReelCATunel", _NOTAS_CA, 0.25, (900, 4000, 0.010))
+    t = np.arange(m.n) / SR
+    fase = 2 * np.pi * np.clip(t - F.H0 - 1.0, 0, None) / 8.0
+    _tono(m, 260 + 140 * np.abs(np.sin(fase)), _env(m, F, 1.0, 20.0, 0.6, 0.6), 0.018, F)     # más agudo al pasar por el centro
+    for k in range(4):
+        mc.poner(1.0 + 4.0 * k + 4.0, clic(0.08, 1000), pan=(-0.3, 0.3)[k % 2])                 # cada llegada a un extremo
+    mc.poner(5.2, pluck(A(7), 1.2, 0.16)); mc.poner(13.4, pluck(A(12), 1.4, 0.18))
+    _fin_ca(m, DC, "ReelCATunel", mc)
+
+
+_FUNCIONES_CA = {"ReelCADerivada": ca_derivada, "ReelCAIntegral": ca_integral, "ReelCAMaximo": ca_maximo, "ReelCAPasos": ca_pasos,
+                 "ReelCAGiro": ca_giro, "ReelCATasas": ca_tasas, "ReelCAPlutonio": ca_plutonio, "ReelCAAire": ca_aire,
+                 "ReelCAHorizonte": ca_horizonte, "ReelCATunel": ca_tunel}
+
+
+def _registrar_ca():
+    DC = _ca()
+    return {n: (f, DC.duracion(n), 0.0) for n, f in _FUNCIONES_CA.items()}
+
+
+REELS_CA = _registrar_ca()
+
 REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
 
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
@@ -1523,9 +1663,10 @@ def main():
               (raiz / "estudio/reels_ia", REELS_IA),
               (raiz / "estudio/reels_robotica", REELS_ROB),
               (raiz / "estudio/reels_em", REELS_EM),
-              (raiz / "estudio/reels_electronica", REELS_EL)]
+              (raiz / "estudio/reels_electronica", REELS_EL),
+              (raiz / "estudio/reels_calculo", REELS_CA)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM, **REELS_EL})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM, **REELS_EL, **REELS_CA})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)

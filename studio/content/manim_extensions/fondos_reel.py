@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 W, H = 1080, 1920
 _CACHE = Path(__file__).resolve().parents[3] / "exports" / "estudio" / "_fondos" / "reel"
-VERSION = 13
+VERSION = 14
 
 
 def fila(y):
@@ -345,8 +345,61 @@ def electronica(var=0, modo="cuerpo"):
     img += (gaussian_filter(Cu * (yy < cima + 64), 6) * 0.25)[..., None] * _rgb("#F2B84B")
     return np.clip(img, 0, 1)
 
+
+def calculo(var=0, modo="cuerpo"):
+    """Cálculo: el «horizonte» es la gráfica de una función (colinas suaves); el área bajo la curva se llena con rectángulos de
+    Riemann en tiza ámbar sobre índigo, con curvas de nivel finas; una tangente toca la curva en un punto. Resplandor ámbar que sube
+    por distancia a la curva (sin bordes). Cielo medianoche limpio con estrellas finas."""
+    from scipy.ndimage import distance_transform_edt
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    base = _rgb("#080C1B")
+    img = np.ones((H, W, 3)) * base
+    cima = fila(-9.55) if modo == "cuerpo" else fila(-7.2)
+    _estrellas(img, 300, 171 + var, cima - 220)
+    fase = (0.0, 1.7, 3.1)[var % 3]
+    x = np.arange(W, dtype=float)
+
+    def f(xv):
+        u = xv / W * 2 * np.pi
+        return cima + 70 + 42 * np.sin(1.3 * u + fase) + 24 * np.sin(2.9 * u + 2 * fase) + 10 * np.sin(6.1 * u + fase)
+    fx = f(x)
+    bajo = yy >= fx[None, :]
+    # relleno índigo que se oscurece hacia abajo + curvas de nivel finas
+    prof = np.clip((yy - fx[None, :]) / 380, 0, 1)
+    img = np.where(bajo[..., None], (_rgb("#1E2A6B") * (1 - 0.6 * prof[..., None]) * 0.55 + base * 0.45), img)
+    campo = (yy - fx[None, :]) / 26 + 0.8 * np.sin(xx / 90 + fase) * np.cos(yy / 70)
+    nivel = np.exp(-((campo - np.round(campo)) / 0.07) ** 2) * bajo * (1 - prof)
+    img += nivel[..., None] * _rgb("#6366F1") * 0.35
+    # rectángulos de Riemann (altura = f en el punto medio), contorno de tiza ámbar
+    capa = Image.new("L", (W, H), 0); dc = ImageDraw.Draw(capa)
+    paso = 60
+    for k in range(-1, W // paso + 2):
+        x0 = k * paso + (0, 20, 40)[var % 3]
+        ym = float(f(np.array([x0 + paso / 2]))[0])
+        dc.rectangle([x0 + 3, ym, x0 + paso - 3, H + 10], outline=150, width=2)
+    tiza = gaussian_filter(np.asarray(capa, float) / 255, 0.6)
+    img += tiza[..., None] * _rgb("#FBBF24") * 0.55 * (1 - 0.7 * prof[..., None])
+    # la curva: trazo de tiza brillante
+    d_curva = np.abs(yy - fx[None, :])
+    img += (np.exp(-(d_curva / 2.2) ** 2) * 0.9)[..., None] * _rgb("#FBBF24")
+    # tangente en un punto
+    x0 = W * (0.30, 0.68, 0.48)[var % 3]
+    y0 = float(f(np.array([x0]))[0])
+    m = float((f(np.array([x0 + 1.0])) - f(np.array([x0 - 1.0])))[0] / 2.0)
+    capa = Image.new("L", (W, H), 0); dt_ = ImageDraw.Draw(capa)
+    L = 260
+    dx = L / np.sqrt(1 + m * m)
+    dt_.line([(x0 - dx, y0 - m * dx), (x0 + dx, y0 + m * dx)], fill=255, width=3)
+    dt_.ellipse([x0 - 9, y0 - 9, x0 + 9, y0 + 9], fill=255)
+    tg = gaussian_filter(np.asarray(capa, float) / 255, 0.7)
+    img = img * (1 - 0.5 * tg[..., None]) + tg[..., None] * _rgb("#F3EFE6") * 0.85
+    # resplandor ámbar que sube desde la curva
+    fuera = np.where(~bajo, fx[None, :] - yy, 0.0)
+    img += ((np.exp(-fuera / 40) * 0.16 + np.exp(-fuera / 220) * 0.09 + np.exp(-fuera / 1000) * 0.045) * ~bajo)[..., None] * _rgb("#FB923C")
+    return np.clip(img, 0, 1)
+
 GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica, "electromagnetismo": electromagnetismo,
-               "electronica": electronica}
+               "electronica": electronica, "calculo": calculo}
 
 
 def fondo_reel(tema, var=0, modo="cuerpo"):

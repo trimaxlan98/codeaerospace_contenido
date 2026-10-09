@@ -80,6 +80,15 @@ Pedido del dueño: los reels «se cortaban muy seco» y se perdía el texto al l
   cuadro): crear con `set_fill(color, op)` y en el updater cambiar solo el color; (2) helper `vive(m, f)` = opacidad por función (más
   simple que `aparece` para «aparece en t0 y se va en t1»); (3) helper `ion()` (partícula con estela que pasa por un blanco en t)
   reutilizable para cualquier serie de radiación.
+- **Serie «Cálculo en el espacio» (2026-10-09)**: `45-reels-calculo.py` + `datos_ca.py` (cuentas de `calculo_espacio.py`, con
+  pruebas: haversine, órbita circular, h = v²/2g, Euler explícito, ω²r, periodo sinódico, 2^(−t/T½), √(2Rh), túnel x'' = −(g/R)x),
+  fondo **«calculo»** (la gráfica de una función como horizonte, área con rectángulos de Riemann y curvas de nivel, una tangente,
+  resplandor ámbar), grupo codeae «calculo», pies en `docs/estudio/series/calculo_PIES_Y_CUIDADO.md`, memoria `project-serie-calculo`.
+  Una idea del cálculo por reel; se evitaron temas ya hechos en la serie de física (escape, cohete, Hohmann). Trampas: (1)
+  `m.become(DashedLine(...))` en un updater sobre un `Line` provoca `RecursionError` (DashedLine anida submobjetos cada cuadro):
+  usar `Line` fino o `DashedVMobject` fijo; (2) un `Circle` enorme para la Tierra tapa la leyenda y el horizonte del fondo: dibujar
+  solo un arco con relleno tenue que termine en y = −5.6; (3) helper `dibujo(pel, f_puntos, t0, color)` = curva que crece con el
+  tiempo (gráficas que se trazan).
 - **Estación con GPU (Windows/WSL2)**: prompt listo en `docs/estudio/PROMPT_ESTACION_ROBOTICA_3D.md` para la serie «Robótica 3D»
   (motor3d + corridas reales de `atp_rover.cli`, rama `estudio/robotica-3d`). Verificador de entorno: `python3 studio/tools/verificar_entorno_3d.py`
   (en la Mac-Pro también hay GPU: AMD Pitcairn por radeonsi, y `motor3d` dibuja; la CLI del rover genera `telemetry.jsonl` sin ROS en ~45 s).
