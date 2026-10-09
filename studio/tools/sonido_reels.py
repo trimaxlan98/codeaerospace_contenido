@@ -1206,6 +1206,144 @@ def _registrar_rob():
 
 REELS_ROB = _registrar_rob()
 
+# ══ Serie «Electromagnetismo» (43-reels-em.py): tiempos en datos_em.py y en la escena ═══════════════════════════════════
+def _em():
+    _fisica()
+    import datos_em as DE
+    return DE
+
+
+def _fin_em(m, DE, nombre, mc):
+    _leyendas_ats(mc, DE, nombre)
+    _cierre_sonoro(m, _fisica(), DE.CUERPO[nombre])
+
+
+_NOTAS_EM = (A(-24), A(-19), A(-12))            # colchón grave, quinta abierta: «campo»
+
+
+def _zumbido(m, F, t0, t1, f0, vol=0.025, vib=0.0):
+    t = np.arange(m.n) / SR
+    _tono(m, f0 + vib * np.sin(2 * np.pi * 0.5 * t), _env(m, F, t0, t1, 0.5, 0.6), vol, F)
+
+
+def em_escudo(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMEscudo", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    for k in range(4):
+        mc.poner(0.6 + 0.5 * k, pluck(A(-5 + 3 * k), 1.0, 0.14), pan=-0.3 + 0.2 * k)          # las líneas del campo
+    _siseo(m, F, 6.0, 20.0, 0.03, 1500, 5000)                                                 # el viento solar
+    mc.poner(7.0, whoosh(1.6, 300, 1600, 0.05, 0.6))
+    mc.poner(13.0, golpe(55, 0.8, 0.2)); mc.poner(13.2, pluck(A(7), 1.4, 0.2))
+    _fin_em(m, DE, "ReelEMEscudo", mc)
+
+
+def em_espiral(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMEspiral", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    t = np.arange(m.n) / SR
+    _tono(m, 330 * (1 + 0.04 * np.sin(2 * np.pi * 2.2 * t)), _env(m, F, 0.6, 12.3, 0.4, 0.8), 0.03, F)   # el giro
+    for j in range(3):
+        mc.poner(7.0 + 2.5 + 5.0 * j, clic(0.08, 1500), pan=0.4)                                 # rebotes (aprox.)
+        mc.poner(7.0 + 5.0 * j, clic(0.08, 1500), pan=-0.4)
+    mc.poner(12.8, golpe(50, 0.9, 0.22)); mc.poner(13.0, pluck(A(5), 1.4, 0.2))
+    _fin_em(m, DE, "ReelEMEspiral", mc)
+
+
+def em_aurora(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMAurora", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    for j in range(8):
+        mc.poner(0.8 + 0.6 * j, gota(700 + 40 * j, 0.12, 0.05), pan=0.3 - 0.08 * j)
+    t = np.arange(m.n) / SR
+    for f0, nt in ((A(12), 0.0), (A(16), 0.7), (A(19), 1.4)):
+        m.sumar(np.sin(2 * np.pi * ciclo_entero(f0, m.T) * t) * _env(m, F, 6.4 + nt, 20.0, 1.2, 0.8) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.25 * t + nt)) * 0.012)
+    mc.poner(12.8, pluck(A(7), 1.4, 0.18)); mc.poner(13.2, pluck(A(12), 1.6, 0.18))
+    _fin_em(m, DE, "ReelEMAurora", mc)
+
+
+def em_torque(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMTorque", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    _zumbido(m, F, 1.0, 12.4, 120, 0.03)                                                      # corriente en la bobina
+    mc.poner(1.0, clic(0.08, 900))
+    t = np.arange(m.n) / SR
+    u = np.clip(t - F.H0 - 2.0, 0, None)
+    _tono(m, 260 + 120 * np.exp(-0.32 * u) * np.cos(0.9 * u), _env(m, F, 2.0, 12.4, 0.4, 0.6), 0.02, F)
+    mc.poner(13.6, whoosh(2.4, 300, 1200, 0.04, 0.6)); mc.poner(15.6, pluck(A(7), 1.4, 0.2))
+    _fin_em(m, DE, "ReelEMTorque", mc)
+
+
+def em_luz(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMLuz", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    mc.poner(0.4, pluck(A(-5), 1.0, 0.16), pan=-0.3); mc.poner(1.0, pluck(A(-1), 1.0, 0.16), pan=0.3)
+    mc.poner(6.0, golpe(60, 0.6, 0.18))
+    mc.poner(7.4, whoosh(2.4, 200, 3000, 0.05, 0.8)); mc.poner(9.8, brillo_(1.0, 0.5)); mc.poner(9.8, pluck(A(12), 1.6, 0.22))
+    t = np.arange(m.n) / SR
+    m.sumar(np.sin(2 * np.pi * ciclo_entero(A(7), m.T) * t) * _env(m, F, 12.6, 20.0, 0.8, 0.8) * (0.7 + 0.3 * np.sin(2 * np.pi * 1.25 * t)) * 0.015)
+    _fin_em(m, DE, "ReelEMLuz", mc)
+
+
+def em_bandas(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMBandas", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    for k in range(4):
+        mc.poner(0.5 + 1.2 * k, pluck(A(-5 + 5 * k), 1.0, 0.16), pan=-0.3 + 0.2 * k)          # ondas más chicas, nota más alta
+    mc.poner(13.0, brillo_(1.0, 0.5)); mc.poner(13.0, pluck(A(19), 1.6, 0.2))
+    _fin_em(m, DE, "ReelEMBandas", mc)
+
+
+def em_antena(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMAntena", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    for j in range(12):
+        mc.poner(1.0 + 1.0 * j, gota(520, 0.18, 0.06), pan=0.0)                                 # cada frente que sale
+    mc.poner(12.8, golpe(55, 0.7, 0.2)); mc.poner(13.6, pluck(A(7), 1.4, 0.2))
+    _fin_em(m, DE, "ReelEMAntena", mc)
+
+
+def em_ionosfera(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMIonosfera", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    _siseo(m, F, 0.6, 20.0, 0.015, 2500, 6000)
+    for k, t0 in enumerate((6.0 + 5.0 / 4, 6.0 + 5.0 * 3 / 4)):
+        mc.poner(t0, clic(0.1, 1100), pan=-0.3 + 0.6 * k)                                       # rebotes en la capa
+    mc.poner(12.8, whoosh(2.5, 400, 3000, 0.05, 0.8)); mc.poner(15.3, pluck(A(12), 1.6, 0.22))
+    _fin_em(m, DE, "ReelEMIonosfera", mc)
+
+
+def em_cable(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMCable", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    _zumbido(m, F, 5.5, 20.0, 150, 0.025)
+    for j in range(8):
+        mc.poner(5.5 + 0.12 * j, clic(0.05, 1800 + 60 * j), pan=-0.3 + 0.08 * j)
+    mc.poner(8.0, pluck(A(7), 1.4, 0.2))
+    mc.poner(12.8, golpe(50, 0.9, 0.22)); mc.poner(12.9, glide(400, 200, 0.8, 0.05))
+    _fin_em(m, DE, "ReelEMCable", mc)
+
+
+def em_senal(m):
+    DE = _em(); F = _fisica()
+    mc, tb = _base(m, DE, "ReelEMSenal", _NOTAS_EM, 0.25, (900, 4000, 0.012))
+    for k in range(3):
+        mc.poner(1.0 + 1.6 * k, pluck(A(7 - 5 * k), 1.0, 0.18 / (k + 1)), pan=-0.3 + 0.3 * k)  # cada vez más débil
+    mc.poner(13.0, glide(900, 120, 3.0, 0.04)); mc.poner(16.0, gota(1800, 0.2, 0.03))
+    _fin_em(m, DE, "ReelEMSenal", mc)
+
+
+_FUNCIONES_EM = {"ReelEMEscudo": em_escudo, "ReelEMEspiral": em_espiral, "ReelEMAurora": em_aurora, "ReelEMTorque": em_torque,
+                 "ReelEMLuz": em_luz, "ReelEMBandas": em_bandas, "ReelEMAntena": em_antena, "ReelEMIonosfera": em_ionosfera,
+                 "ReelEMCable": em_cable, "ReelEMSenal": em_senal}
+
+
+def _registrar_em():
+    DE = _em()
+    return {n: (f, DE.duracion(n), 0.0) for n, f in _FUNCIONES_EM.items()}
+
+
+REELS_EM = _registrar_em()
+
 REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
 
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
@@ -1235,9 +1373,10 @@ def main():
               (raiz / "estudio/reels_ats", REELS_ATS), (raiz / "estudio/reels_triage", REELS_TRIAGE),
               (raiz / "estudio/reels_clima", REELS_CLIMA),
               (raiz / "estudio/reels_ia", REELS_IA),
-              (raiz / "estudio/reels_robotica", REELS_ROB)]
+              (raiz / "estudio/reels_robotica", REELS_ROB),
+              (raiz / "estudio/reels_em", REELS_EM)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)

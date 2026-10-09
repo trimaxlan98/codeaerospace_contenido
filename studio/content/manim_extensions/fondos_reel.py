@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 W, H = 1080, 1920
 _CACHE = Path(__file__).resolve().parents[3] / "exports" / "estudio" / "_fondos" / "reel"
-VERSION = 10
+VERSION = 12
 
 
 def fila(y):
@@ -237,7 +237,50 @@ def robotica(var=0, modo="cuerpo"):
     return np.clip(img, 0, 1)
 
 
-GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica}
+def electromagnetismo(var=0, modo="cuerpo"):
+    """Electromagnetismo: el «horizonte» es el limbo de la Tierra (siempre azul) con una cortina de aurora verde y unas pocas líneas
+    del campo dipolar (r = L·sen²θ) que salen del limbo y vuelven a él, solo en la franja baja. Resplandor azul que sube sin bordes."""
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    base = _rgb("#0A1124")
+    img = np.ones((H, W, 3)) * base
+    cima = fila(-9.6) if modo == "cuerpo" else fila(-7.2)
+    rng = np.random.default_rng(2300 + var)
+    _estrellas(img, 320, 131 + var, cima - 260)
+    R = 3000.0
+    cx = W * (0.5 + (0.0, 0.08, -0.08)[var % 3])
+    cy = cima + R
+    d = np.hypot(xx - cx, yy - cy)
+    dentro = d < R
+    prof = np.clip((R - d) / 140, 0, 1)
+    nubes = _ruido(4, 77 + var)
+    tierra = _rampa(prof, ["#2C86D6", "#14478C", "#0B2A57", "#071A38"]) * (0.9 + 0.25 * nubes[..., None])
+    img = np.where(dentro[..., None], tierra, img)
+    fuera = np.clip(d - R, 0, None)
+    img += (np.exp(-fuera / 6) * 0.45 * ~dentro + np.exp(-(R - d).clip(0) / 5) * 0.25 * dentro)[..., None] * _rgb("#8FD8FF")   # atmósfera: borde fino
+    img += ((np.exp(-fuera / 40) * 0.16 + np.exp(-fuera / 200) * 0.09 + np.exp(-fuera / 900) * 0.045) * ~dentro)[..., None] * _rgb("#3B9CFF")
+    # aurora: cortina de rayos verticales sobre el limbo (verde abajo, violeta arriba), más intensa hacia un lado
+    cortina = gaussian_filter1d(rng.random(W), 2.0); cortina = (cortina - cortina.min()) / (np.ptp(cortina) + 1e-9)
+    lado = np.exp(-((np.arange(W) - W * (0.28, 0.7, 0.45)[var % 3]) / (W * 0.30)) ** 2)
+    alto = 28 + 55 * cortina * lado
+    perfil = np.clip(fuera / 8, 0, 1) * np.exp(-np.clip(fuera - 8, 0, None) / alto[None, :]) * (fuera < 260)
+    inten = (0.2 + 0.8 * cortina[None, :] ** 2) * lado[None, :] * perfil * ~dentro
+    mezcla = np.clip(fuera / 110, 0, 1)[..., None]
+    img += inten[..., None] * (_rgb("#3DFF9A") * (1 - mezcla) * 0.75 + _rgb("#B07CFF") * mezcla * 0.5)
+    # líneas de campo: arcos dipolares con los pies sobre el limbo, solo por debajo de y = −8.3
+    capa = Image.new("L", (W, H), 0); dl = ImageDraw.Draw(capa)
+    tope = fila(-8.3) if modo == "cuerpo" else cima - 200
+    alto_max = max(cima - tope, 40)
+    for k, (x0, ancho) in enumerate(((0.5, 0.95), (0.5, 0.7), (0.5, 0.48), (0.5, 0.28))):
+        th = np.linspace(0.0, np.pi, 400)
+        xs_ = W * (x0 + (0.0, 0.08, -0.08)[var % 3]) - np.cos(th) * W * ancho / 2
+        ys_ = cima - alto_max * (ancho / 0.95) ** 0.8 * np.sin(th) ** 3
+        pts = [(float(a), float(b) + (R - np.sqrt(max(R * R - (a - cx) ** 2, 0)))) for a, b in zip(xs_, ys_)]
+        dl.line(pts, fill=int(120 - 20 * k), width=2)
+    lineas = gaussian_filter(np.asarray(capa, float) / 255, 0.7)
+    img += lineas[..., None] * _rgb("#8CC8FF") * 0.55 * ~dentro[..., None]
+    return np.clip(img, 0, 1)
+
+GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica, "electromagnetismo": electromagnetismo}
 
 
 def fondo_reel(tema, var=0, modo="cuerpo"):
