@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 W, H = 1080, 1920
 _CACHE = Path(__file__).resolve().parents[3] / "exports" / "estudio" / "_fondos" / "reel"
-VERSION = 8
+VERSION = 10
 
 
 def fila(y):
@@ -191,7 +191,53 @@ def neuronal(var=0, modo="cuerpo"):
     return np.clip(img, 0, 1)
 
 
-GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal}
+def robotica(var=0, modo="cuerpo"):
+    """Robótica: el «horizonte» es una hilera de engranes de metal con borde naranja de seguridad; el resplandor sube por distancia
+    a los engranes (sin bordes). Cielo grafito con estrellas finas y una regla de cotas en el borde inferior."""
+    from scipy.ndimage import distance_transform_edt
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    base = _rgb("#111820")
+    img = np.ones((H, W, 3)) * base
+    cima = fila(-9.75) if modo == "cuerpo" else fila(-7.2)
+    rng = np.random.default_rng(1700 + var)
+    _estrellas(img, 300, 91 + var, cima - 200)
+    gears = [(-0.02, 250, 22), (0.31, 175, 18), (0.58, 215, 20), (0.93, 270, 24)]
+    gears = [(g[0] + (0, 0.04, -0.03)[var % 3], g[1], g[2]) for g in gears]
+    masc = Image.new("L", (W, H), 0); dm = ImageDraw.Draw(masc)
+    huecos = Image.new("L", (W, H), 0); dh = ImageDraw.Draw(huecos)
+    for fx, R, nt in gears:
+        cx, cy = fx * W, cima + R * 0.62
+        pts = []
+        for k in range(nt * 4):
+            a = 2 * np.pi * k / (nt * 4) + 0.3 * fx
+            r = R if (k % 4) in (0, 1) else R * 0.86
+            pts.append((cx + r * np.cos(a), cy + r * np.sin(a)))
+        dm.polygon(pts, fill=255)
+        dh.ellipse([cx - R * 0.32, cy - R * 0.32, cx + R * 0.32, cy + R * 0.32], fill=255)
+        for j in range(6):
+            a = 2 * np.pi * j / 6
+            hx, hy = cx + R * 0.62 * np.cos(a), cy + R * 0.62 * np.sin(a)
+            dh.ellipse([hx - R * 0.06, hy - R * 0.06, hx + R * 0.06, hy + R * 0.06], fill=255)
+    M = np.asarray(masc, float) / 255; Hh = np.asarray(huecos, float) / 255
+    lo_alto = M * (1 - Hh)
+    d_fuera = distance_transform_edt(M < 0.5)                                  # distancia al engrane más cercano (afuera)
+    d_dentro = distance_transform_edt(M >= 0.5)
+    cepillado = gaussian_filter(rng.random((H, W)), (0.6, 40)); cepillado = (cepillado - cepillado.mean()) / (cepillado.std() + 1e-9)
+    metal = _rgb("#2A3644")[None, None] * (0.75 + 0.35 * np.clip((yy - cima) / 220, 0, 1))[..., None] + 0.025 * cepillado[..., None]
+    img = np.where((M >= 0.5)[..., None], metal, img)
+    img = np.where((Hh >= 0.5)[..., None], base * 0.7, img)                       # núcleo y tornillos: huecos oscuros
+    borde = np.exp(-(np.abs(np.where(M >= 0.5, d_dentro, d_fuera)) / 1.6) ** 2) * np.clip(1 - np.abs(Hh - 0.5) * 0, 0, 1)
+    img += borde[..., None] * _rgb("#FF7A1A") * 1.1
+    fuera = np.where(M < 0.5, d_fuera, 0.0)
+    img += ((np.exp(-fuera / 40) * 0.30 + np.exp(-fuera / 200) * 0.14 + np.exp(-fuera / 900) * 0.07) * (M < 0.5))[..., None] * _rgb("#FF7A1A")
+    # regla de cotas en el borde inferior
+    for x in range(0, W, 24):
+        largo = 26 if x % 120 == 0 else 12
+        img[H - 8 - largo:H - 8, x:x + 2] = _rgb("#FF7A1A") * 0.55
+    return np.clip(img, 0, 1)
+
+
+GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica}
 
 
 def fondo_reel(tema, var=0, modo="cuerpo"):
@@ -214,4 +260,4 @@ def tiene(tema):
 if __name__ == "__main__":
     for v in range(3):
         for m in ("cuerpo", "cierre"):
-            print(fondo_reel("solar", v, m), fondo_reel("espectro", v, m), fondo_reel("neuronal", v, m))
+            print(fondo_reel("solar", v, m), fondo_reel("espectro", v, m), fondo_reel("neuronal", v, m), fondo_reel("robotica", v, m))

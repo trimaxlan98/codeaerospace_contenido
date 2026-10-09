@@ -1062,6 +1062,150 @@ def _registrar_ia():
 
 REELS_IA = _registrar_ia()
 
+# ══ Serie «Robótica» (42-reels-robotica.py): tiempos en datos_rob.py y en la escena ═══════════════════════════════════
+def _rob():
+    _fisica()
+    import datos_rob as DR
+    return DR
+
+
+def _fin_rob(m, DR, nombre, mc):
+    _leyendas_ats(mc, DR, nombre)
+    _cierre_sonoro(m, _fisica(), DR.CUERPO[nombre])
+
+
+_NOTAS_ROB = (A(-26), A(-17), A(-12))           # colchón grave y «mecánico»
+
+
+def rob_bogie(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobBogie", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    t = np.arange(m.n) / SR
+    env = np.clip((t - F.H0 - 1.2) / 0.4, 0, 1) * np.clip((F.H0 + 14.2 - t) / 0.5, 0, 1)
+    _tono(m, 110 + 12 * np.sin(2 * np.pi * 3.0 * t), env, 0.03, F)                        # el zumbido del motor
+    for k in range(7):
+        mc.poner(3.0 + 1.55 * k, clic(0.07, 900 + 80 * (k % 3)), pan=-0.3 + 0.1 * k)       # cada rueda sube a la roca
+    mc.poner(12.8, pluck(A(7), 1.4, 0.22)); mc.poner(13.3, pluck(A(12), 1.6, 0.24))
+    _fin_rob(m, DR, "ReelRobBogie", mc)
+
+
+def rob_patina(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobPatina", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    t = np.arange(m.n) / SR
+    env = np.clip((t - F.H0 - 1.2) / 0.4, 0, 1) * np.clip((F.H0 + 11.2 - t) / 0.5, 0, 1)
+    _tono(m, 140, env, 0.03, F)
+    _siseo(m, F, 1.2, 11.0, 0.04, 1200, 4500)                                             # la arena que sale despedida
+    mc.poner(11.0, golpe(55, 0.8, 0.22)); mc.poner(11.2, pluck(A(-2), 1.4, 0.2))
+    _fin_rob(m, DR, "ReelRobPatina", mc)
+
+
+def rob_mundos(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobMundos", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for k in range(5):
+        mc.poner(0.6 + 0.35 * k, gota(500 + 70 * k, 0.15, 0.08), pan=-0.4 + 0.2 * k)
+    mc.poner(2.0, whoosh(3.2, 300, 1800, 0.05, 0.6))
+    for k in range(5):
+        mc.poner(5.2 + 0.25 * k, pluck(A(-5 + 2 * k), 0.9, 0.12), pan=-0.4 + 0.2 * k)
+    mc.poner(12.6, golpe(48, 0.9, 0.25)); mc.poner(12.7, glide(300, 150, 1.0, 0.04))
+    _fin_rob(m, DR, "ReelRobMundos", mc)
+
+
+def rob_ruta(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobRuta", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for j in range(50):
+        mc.poner(3.5 + j * 6.0 / 50, clic(0.04, 2200 + 20 * j), pan=-0.4 + 0.016 * j)      # el buscador prueba casillas
+    mc.poner(10.0, pluck(A(12), 1.6, 0.26)); mc.poner(10.0, brillo_(1.0, 0.5))
+    t = np.arange(m.n) / SR
+    _tono(m, 260 + 90 * np.clip((t - F.H0 - 12.8) / 5.5, 0, 1), _env(m, F, 12.8, 18.4, 0.3, 0.4), 0.03, F)
+    _fin_rob(m, DR, "ReelRobRuta", mc)
+
+
+def rob_alarmas(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobAlarmas", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    t = np.arange(m.n) / SR
+    a = np.clip((t - F.H0 - 1.5) / 9.0, 0, 1) * 38.0
+    _tono(m, 200 + 8 * a, _env(m, F, 1.5, 10.5, 0.3, 0.5), 0.035, F)                      # el tono sube con la inclinación
+    for j in range(6):
+        mc.poner(8.6 + 0.4 * j, clic(0.1, 1200), pan=0.2)                                  # alarma
+    mc.poner(8.6, golpe(60, 0.7, 0.25))
+    mc.poner(13.5, pluck(A(7), 1.4, 0.22)); mc.poner(14.2, pluck(A(12), 1.6, 0.25))
+    _fin_rob(m, DR, "ReelRobAlarmas", mc)
+
+
+def rob_retardo(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobRetardo", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    mc.poner(1.2, whoosh(1.2, 600, 2400, 0.06, 0.5), pan=-0.2); mc.poner(3.0, whoosh(1.2, 2400, 600, 0.05, 0.5), pan=0.2)
+    mc.poner(6.0, whoosh(7.0, 200, 1400, 0.06, 0.9)); mc.poner(14.0, whoosh(7.0, 1400, 200, 0.05, 0.1))
+    for j in range(11):
+        mc.poner(6.0 + 0.62 * j, clic(0.05, 1400), pan=0.0)                                # el reloj cuenta minutos
+    mc.poner(13.0, golpe(55, 0.8, 0.22)); mc.poner(13.0, glide(400, 200, 0.5, 0.05))
+    _fin_rob(m, DR, "ReelRobRetardo", mc)
+
+
+def rob_autonomo(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobAutonomo", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for k, t0 in enumerate((1.0, 3.2, 5.4, 8.2)):
+        mc.poner(t0, pluck(A(-5 + 3 * k), 1.0, 0.16), pan=-0.3 + 0.2 * k)
+    t = np.arange(m.n) / SR
+    u = np.clip((t - F.H0 - 2.0) / 11.0, 0, 1)
+    _tono(m, 180 + 360 * u, _env(m, F, 2.0, 13.0, 0.4, 0.5), 0.03, F)
+    mc.poner(13.0, pluck(A(12), 1.6, 0.26)); mc.poner(13.0, brillo_(1.0, 0.5))
+    _fin_rob(m, DR, "ReelRobAutonomo", mc)
+
+
+def rob_validacion(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobValidacion", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for k in range(30):
+        mc.poner(0.5 + 0.03 * k, gota(500 + 15 * k, 0.1, 0.05), pan=-0.4 + 0.027 * k)
+    mc.poner(6.5, golpe(52, 0.9, 0.26)); mc.poner(6.6, glide(500, 260, 0.9, 0.05))          # los casos nuevos: baja
+    mc.poner(13.0, whoosh(1.0, 400, 2200, 0.05, 0.6)); mc.poner(13.9, pluck(A(12), 1.6, 0.26))
+    _fin_rob(m, DR, "ReelRobValidacion", mc)
+
+
+def rob_ros(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobROS", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for t0, nt in ((0.6, -5), (1.6, 0), (7.0, 4), (7.6, 7)):
+        mc.poner(t0, pluck(A(nt), 1.0, 0.16), pan=(-0.3, 0.3)[int(t0) % 2])
+    for j in range(12):
+        mc.poner(3.0 + 1.8 * j / 2.0, clic(0.05, 2000 + 150 * (j % 3)), pan=-0.4 + 0.07 * j)   # mensajes
+    for j in range(14):
+        mc.poner(13.5 + 0.5 * j, clic(0.06, 1300), pan=0.0)                                     # el reloj común
+    mc.poner(14.0, pluck(A(12), 1.6, 0.25))
+    _fin_rob(m, DR, "ReelRobROS", mc)
+
+
+def rob_cerebro(m):
+    DR = _rob(); F = _fisica()
+    mc, tb = _base(m, DR, "ReelRobCerebro", _NOTAS_ROB, 0.25, (700, 3200, 0.012))
+    for t0 in (1.0, 5.6, 11.4):
+        mc.poner(t0, whoosh(0.8, 600, 1800, 0.05, 0.5)); mc.poner(t0 + 0.8, golpe(70, 0.4, 0.22))   # el enchufe
+    t = np.arange(m.n) / SR
+    for a, b, f0 in ((1.6, 6.2, 330.0), (6.2, 11.4, 392.0)):
+        m.sumar(np.sin(2 * np.pi * ciclo_entero(f0, m.T) * t) * _env(m, F, a, b, 0.5, 0.5) * (0.7 + 0.3 * np.sin(1.4 * 2 * np.pi * (t - F.H0 - a))) * 0.03)
+    mc.poner(12.6, pluck(A(-2), 1.6, 0.2))
+    _fin_rob(m, DR, "ReelRobCerebro", mc)
+
+
+_FUNCIONES_ROB = {"ReelRobBogie": rob_bogie, "ReelRobPatina": rob_patina, "ReelRobMundos": rob_mundos, "ReelRobRuta": rob_ruta,
+                  "ReelRobAlarmas": rob_alarmas, "ReelRobRetardo": rob_retardo, "ReelRobAutonomo": rob_autonomo,
+                  "ReelRobValidacion": rob_validacion, "ReelRobROS": rob_ros, "ReelRobCerebro": rob_cerebro}
+
+
+def _registrar_rob():
+    DR = _rob()
+    return {n: (f, DR.duracion(n), 0.0) for n, f in _FUNCIONES_ROB.items()}
+
+
+REELS_ROB = _registrar_rob()
+
 REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
 
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
@@ -1090,9 +1234,10 @@ def main():
               (raiz / "estudio/reels_datos", REELS_DATOS), (raiz / "estudio/reels_divulgacion", REELS_DIVULGACION),
               (raiz / "estudio/reels_ats", REELS_ATS), (raiz / "estudio/reels_triage", REELS_TRIAGE),
               (raiz / "estudio/reels_clima", REELS_CLIMA),
-              (raiz / "estudio/reels_ia", REELS_IA)]
+              (raiz / "estudio/reels_ia", REELS_IA),
+              (raiz / "estudio/reels_robotica", REELS_ROB)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)

@@ -84,6 +84,8 @@ def _videos():
         v.append(Video(n, "40-reels-clima.py", EST / "reels_clima", "1080,1920", 30, "reels", (f, T, d), True, "clima"))
     for n, (f, T, d) in SR.REELS_IA.items():
         v.append(Video(n, "41-reels-ia.py", EST / "reels_ia", "1080,1920", 30, "reels", (f, T, d), True, "ia"))
+    for n, (f, T, d) in SR.REELS_ROB.items():
+        v.append(Video(n, "42-reels-robotica.py", EST / "reels_robotica", "1080,1920", 30, "reels", (f, T, d), True, "robotica"))
     return {x.id: x for x in v}
 
 
