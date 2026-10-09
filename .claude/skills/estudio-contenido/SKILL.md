@@ -70,6 +70,16 @@ Pedido del dueño: los reels «se cortaban muy seco» y se perdía el texto al l
   con el MISMO `--media_dir` chocan en la caché de textos (`FileNotFoundError …/texts/*.svg`): un `--media_dir` por escena; (2) lambdas
   en bucles que usan la variable del bucle (`y`) sin enlazarla (`y=y`) dibujan todo en la última fila; (3) líneas de corriente alrededor
   de un obstáculo: resolver ψ = y(1 − A²/r²) con `brentq` fuera del círculo (el punto fijo diverge).
+- **Serie «Electrónica espacial» (2026-10-09)**: `44-reels-electronica.py` + `datos_el.py` (cuentas de `electronica_espacio.py`,
+  numpy puro con pruebas en su `__main__`: carga de un ion por LET, 3p²−2p³ del voto triple, Hamming (7,4) con síndrome, eclipse,
+  celdas solares, equilibrio radiativo, tiempo de bajada), fondo **«electronica»** (canto de una placa: contactos dorados de conector,
+  pistas a 45°, chip QFP, resplandor verde), grupo codeae «electronica», pies en `docs/estudio/series/electronica_PIES_Y_CUIDADO.md`,
+  memoria `project-serie-electronica`. Cifras públicas verificadas en la web (RAD750 hasta 200 MHz; Ingenuity con Snapdragon 801,
+  72 vuelos; celda CESI 26.5 cm² al 28 %; COTS ~5 krad; ~1 krad/año en LEO con blindaje, NASA NEPP). Trampas: (1) un `Rectangle` sin
+  relleno inicial queda invisible si luego se le da color en un updater con `aparece()` (fundir guarda la opacidad 0 del primer
+  cuadro): crear con `set_fill(color, op)` y en el updater cambiar solo el color; (2) helper `vive(m, f)` = opacidad por función (más
+  simple que `aparece` para «aparece en t0 y se va en t1»); (3) helper `ion()` (partícula con estela que pasa por un blanco en t)
+  reutilizable para cualquier serie de radiación.
 - **Estación con GPU (Windows/WSL2)**: prompt listo en `docs/estudio/PROMPT_ESTACION_ROBOTICA_3D.md` para la serie «Robótica 3D»
   (motor3d + corridas reales de `atp_rover.cli`, rama `estudio/robotica-3d`). Verificador de entorno: `python3 studio/tools/verificar_entorno_3d.py`
   (en la Mac-Pro también hay GPU: AMD Pitcairn por radeonsi, y `motor3d` dibuja; la CLI del rover genera `telemetry.jsonl` sin ROS en ~45 s).

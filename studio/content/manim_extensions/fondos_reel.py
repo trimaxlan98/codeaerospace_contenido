@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 W, H = 1080, 1920
 _CACHE = Path(__file__).resolve().parents[3] / "exports" / "estudio" / "_fondos" / "reel"
-VERSION = 12
+VERSION = 13
 
 
 def fila(y):
@@ -280,7 +280,73 @@ def electromagnetismo(var=0, modo="cuerpo"):
     img += lineas[..., None] * _rgb("#8CC8FF") * 0.55 * ~dentro[..., None]
     return np.clip(img, 0, 1)
 
-GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica, "electromagnetismo": electromagnetismo}
+
+def electronica(var=0, modo="cuerpo"):
+    """Electrónica: el «horizonte» es el borde de una placa de circuito (máscara verde casi negra) con contactos de conector
+    dorados en el canto, pistas en bus a 45° que bajan a un chip QFP, vías y pads de cobre; resplandor verde que sube desde el
+    canto (suma de exponenciales con la distancia a la placa). Cielo verde-negro limpio con estrellas finas."""
+    from scipy.ndimage import distance_transform_edt
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    base = _rgb("#04120D")
+    img = np.ones((H, W, 3)) * base
+    cima = fila(-9.55) if modo == "cuerpo" else fila(-7.2)
+    rng = np.random.default_rng(2600 + var)
+    _estrellas(img, 300, 151 + var, cima - 220)
+    placa = yy >= cima
+    tex = _ruido(1.2, 31 + var)
+    img = np.where(placa[..., None], _rgb("#0A2E20")[None, None] * (0.85 + 0.25 * tex[..., None])
+                   * (1.0 - 0.35 * np.clip((yy - cima) / 400, 0, 1))[..., None], img)
+    # cobre: pistas en bus con un quiebre a 45°, contactos en el canto, chip QFP, vías
+    cobre = Image.new("L", (W, H), 0); dc = ImageDraw.Draw(cobre)
+    seda = Image.new("L", (W, H), 0); ds = ImageDraw.Draw(seda)
+    paso = 34
+    x_chip = W * (0.70, 0.30, 0.55)[var % 3]
+    lado = 230
+    cy = cima + 120 + lado / 2
+    for k in range(int(W / paso) + 1):                                     # contactos dorados (conector de canto)
+        x = 10 + k * paso
+        if abs(x - x_chip) < lado / 2 + 40:
+            continue
+        dc.rectangle([x, cima + 4, x + paso * 0.62, cima + 60], fill=255)
+    for k in range(int(W / paso) + 1):                                     # pistas: del contacto bajan y giran a 45° hacia el chip
+        x = 10 + k * paso + paso * 0.31
+        if abs(x - x_chip) < lado / 2 + 40:
+            continue
+        y1 = cima + 60 + 10 + abs(x - x_chip) * 0.08
+        s = np.sign(x_chip - x)
+        largo = min(abs(x - x_chip) - lado / 2 - 20, 160)
+        pts = [(x, cima + 60), (x, y1), (x + s * largo, y1 + largo), (x + s * largo, H)]
+        dc.line(pts, fill=200, width=6, joint="curve")
+        if k % 3 == 0:
+            vx, vy = x + s * largo, y1 + largo + 40 + (k % 5) * 18
+            dc.ellipse([vx - 9, vy - 9, vx + 9, vy + 9], fill=255)
+    # chip QFP: cuerpo negro y patas de cobre por los cuatro lados
+    x0, y0 = x_chip - lado / 2, cy - lado / 2
+    for j in range(12):
+        t = x0 + 18 + j * (lado - 36) / 11
+        dc.rectangle([t - 4, y0 - 26, t + 4, y0 - 2], fill=255)
+        dc.rectangle([x0 - 26, y0 + 18 + j * (lado - 36) / 11 - 4, x0 - 2, y0 + 18 + j * (lado - 36) / 11 + 4], fill=255)
+        dc.rectangle([x0 + lado + 2, y0 + 18 + j * (lado - 36) / 11 - 4, x0 + lado + 26, y0 + 18 + j * (lado - 36) / 11 + 4], fill=255)
+    ds.rectangle([x0 - 40, y0 - 40, x0 + lado + 40, y0 + lado + 40], outline=255, width=2)
+    ds.text((x0 - 40, y0 - 72), "U1", fill=255)
+    Cu = gaussian_filter(np.asarray(cobre, float) / 255, 0.6) * placa
+    img = img * (1 - 0.85 * Cu[..., None]) + Cu[..., None] * _rgb("#E0A84A") * (0.75 + 0.25 * tex[..., None])
+    Sd = gaussian_filter(np.asarray(seda, float) / 255, 0.5) * placa
+    img += Sd[..., None] * _rgb("#D9F5EA") * 0.35
+    cuerpo = (np.abs(xx - x_chip) < lado / 2) & (np.abs(yy - cy) < lado / 2)
+    img = np.where(cuerpo[..., None], _rgb("#111614")[None, None] * (0.9 + 0.2 * tex[..., None]), img)
+    pin1 = np.hypot(xx - (x0 + 30), yy - (y0 + 30)) < 10
+    img = np.where(pin1[..., None], _rgb("#2A332F")[None, None], img)
+    # canto de la placa: filo verde brillante y resplandor que sube (sin bordes)
+    fuera = np.clip(cima - yy, 0, None)
+    img += (np.exp(-np.abs(yy - cima) / 2.5) * 0.55)[..., None] * _rgb("#34E5A0")
+    img += ((np.exp(-fuera / 40) * 0.18 + np.exp(-fuera / 220) * 0.10 + np.exp(-fuera / 1000) * 0.05) * ~placa)[..., None] * _rgb("#34E5A0")
+    # brillo cálido sobre los contactos (como luz rasante)
+    img += (gaussian_filter(Cu * (yy < cima + 64), 6) * 0.25)[..., None] * _rgb("#F2B84B")
+    return np.clip(img, 0, 1)
+
+GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica, "electromagnetismo": electromagnetismo,
+               "electronica": electronica}
 
 
 def fondo_reel(tema, var=0, modo="cuerpo"):

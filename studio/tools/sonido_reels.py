@@ -1344,6 +1344,154 @@ def _registrar_em():
 
 REELS_EM = _registrar_em()
 
+
+# ══ Serie «Electrónica espacial» (44-reels-electronica.py): tiempos en datos_el.py y en la escena ════════════════════════
+def _el():
+    _fisica()
+    import datos_el as DL
+    return DL
+
+
+def _fin_el(m, DL, nombre, mc):
+    _leyendas_ats(mc, DL, nombre)
+    _cierre_sonoro(m, _fisica(), DL.CUERPO[nombre])
+
+
+_NOTAS_EL = (A(-24), A(-17), A(-10))            # colchón grave con séptima: «circuito»
+
+
+def _golpe_ion(mc, t0, pan=0.0):
+    mc.poner(t0 - 0.5, whoosh(0.6, 800, 4000, 0.04, 0.5), pan=pan)
+    mc.poner(t0, clic(0.06, 2600), pan=pan); mc.poner(t0 + 0.02, golpe(70, 0.4, 0.14))
+
+
+def el_bit(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELBit", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    for k in range(10):
+        mc.poner(0.2 + 0.12 * k, clic(0.04, 1500 + 90 * k), pan=-0.4 + 0.08 * k)          # las celdas
+    _golpe_ion(mc, 3.2, -0.2); _golpe_ion(mc, 15.0, 0.3)
+    mc.poner(7.4, glide(300, 900, 1.4, 0.04)); mc.poner(8.6, gota(1800, 0.15, 0.04))
+    mc.poner(10.0, pluck(A(7), 1.2, 0.18)); mc.poner(13.2, pluck(A(5), 1.4, 0.16))
+    _fin_el(m, DL, "ReelELBit", mc)
+
+
+def el_voto(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELVoto", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    for k in range(3):
+        mc.poner(0.9 + 0.3 * k, pluck(A(-5 + 4 * k), 1.0, 0.14), pan=-0.4 + 0.4 * k)
+    mc.poner(2.6, pluck(A(7), 1.2, 0.16))
+    _golpe_ion(mc, 7.0, 0.0)
+    mc.poner(8.8, clic(0.06, 1200)); mc.poner(10.2, clic(0.06, 1600))
+    mc.poner(13.6, brillo_(0.8, 0.4)); mc.poner(13.7, pluck(A(12), 1.4, 0.18))
+    _fin_el(m, DL, "ReelELVoto", mc)
+
+
+def el_hamming(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELHamming", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    for k in range(7):
+        mc.poner(0.5 + 0.45 * k + (0.8 if k >= 4 else 0), clic(0.05, 1400 + 120 * k), pan=-0.45 + 0.15 * k)
+    _golpe_ion(mc, 6.6, 0.2)
+    for r, ok in enumerate((True, False, False)):
+        mc.poner(8.0 + r, pluck(A(7) if ok else A(1), 0.9, 0.15), pan=-0.3 + 0.3 * r)
+    mc.poner(11.0, pluck(A(5), 1.2, 0.16))
+    mc.poner(13.2, brillo_(0.9, 0.4)); mc.poner(13.3, pluck(A(12), 1.5, 0.2))
+    _fin_el(m, DL, "ReelELHamming", mc)
+
+
+def el_dosis(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELDosis", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    rng = np.random.default_rng(44)
+    for j in range(26):
+        mc.poner(0.8 + 0.43 * j, clic(0.03, rng.uniform(2200, 4200)), pan=rng.uniform(-0.6, 0.6))   # el «contador Geiger»
+    for k in range(3):
+        mc.poner(6.8 + 1.6 * k, pluck(A(-3 + 5 * k), 1.2, 0.16), pan=-0.3 + 0.3 * k)
+    mc.poner(13.2, pluck(A(14), 1.6, 0.18))
+    _fin_el(m, DL, "ReelELDosis", mc)
+
+
+def el_latch(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELLatch", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    _golpe_ion(mc, 3.6, -0.3)
+    _zumbido(m, F, 3.7, 7.2, 110, 0.04)                                                      # la corriente desbocada
+    t = np.arange(m.n) / SR
+    m.sumar(np.sin(2 * np.pi * ciclo_entero(880, m.T) * t) * _env(m, F, 5.6, 7.2, 0.3, 0.05) * 0.010)   # alarma
+    mc.poner(7.2, clic(0.1, 700)); mc.poner(7.25, golpe(50, 0.6, 0.18))
+    mc.poner(8.6, clic(0.08, 1100)); mc.poner(8.8, pluck(A(7), 1.2, 0.16))
+    _fin_el(m, DL, "ReelELLatch", mc)
+
+
+def el_panel(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELPanel", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    t = np.arange(m.n) / SR
+    m.sumar(np.sin(2 * np.pi * ciclo_entero(A(12), m.T) * t) * _env(m, F, 1.8, 20.0, 1.2, 0.8) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t)) * 0.010)
+    mc.poner(6.4, golpe(60, 0.6, 0.18)); mc.poner(6.5, pluck(A(7), 1.4, 0.2))
+    mc.poner(8.2, glide(300, 500, 1.0, 0.03)); mc.poner(9.2, glide(300, 900, 1.0, 0.03))
+    _fin_el(m, DL, "ReelELPanel", mc)
+
+
+def el_bateria(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELBateria", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    a0 = 0.75 - np.arcsin(2.9 / 3.4) / (2 * np.pi)
+    for k in range(5):                                                                     # cada noche y cada amanecer
+        mc.poner(4.0 * (k + a0), gota(500, 0.2, 0.04), pan=0.3)
+        mc.poner(4.0 * (k + 1.5 - a0), gota(1100, 0.15, 0.04), pan=-0.3)
+    mc.poner(13.0, pluck(A(7), 1.4, 0.18))
+    _fin_el(m, DL, "ReelELBateria", mc)
+
+
+def el_calor(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELCalor", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    _siseo(m, F, 1.0, 12.0, 0.02, 600, 2500)                                                  # el aire del ventilador
+    mc.poner(7.2, glide(250, 700, 3.0, 0.035))                                                # el termómetro sube
+    mc.poner(13.0, golpe(55, 0.6, 0.16)); mc.poner(13.6, pluck(A(5), 1.4, 0.18))
+    _fin_el(m, DL, "ReelELCalor", mc)
+
+
+def el_bajada(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELBajada", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    for k in range(4):
+        t0 = 0.8 + 4.4 * k
+        _siseo(m, F, t0, t0 + 3.4, 0.014, 3000, 7000)                                         # el enlace
+        for j in range(10):
+            mc.poner(t0 + 0.3 + 0.3 * j, clic(0.03, 2400 + 200 * (j % 3)), pan=-0.4 + 0.08 * j)
+        mc.poner(t0 + 3.4, pluck(PENTA[k % 5] if k < 3 else A(12), 1.0, 0.13))
+    _fin_el(m, DL, "ReelELBajada", mc)
+
+
+def el_lento(m):
+    DL = _el(); F = _fisica()
+    mc, tb = _base(m, DL, "ReelELLento", _NOTAS_EL, 0.25, (1200, 5000, 0.010))
+    for j in range(16):
+        mc.poner(0.5 + 0.8 * j, clic(0.05, 900), pan=-0.3)                                     # el reloj lento
+    mc.poner(7.0, golpe(60, 0.6, 0.16)); mc.poner(8.0, pluck(A(7), 1.2, 0.16))
+    t = np.arange(m.n) / SR
+    m.sumar(np.sign(np.sin(2 * np.pi * ciclo_entero(150, m.T) * t)) * _env(m, F, 13.0, 20.0, 0.8, 0.8)
+            * (0.5 + 0.5 * np.sin(2 * np.pi * ciclo_entero(9 / np.pi, m.T) * t) ** 2) * 0.004)   # las aspas de Ingenuity
+    mc.poner(13.4, pluck(A(12), 1.6, 0.18))
+    _fin_el(m, DL, "ReelELLento", mc)
+
+
+_FUNCIONES_EL = {"ReelELBit": el_bit, "ReelELVoto": el_voto, "ReelELHamming": el_hamming, "ReelELDosis": el_dosis,
+                 "ReelELLatch": el_latch, "ReelELPanel": el_panel, "ReelELBateria": el_bateria, "ReelELCalor": el_calor,
+                 "ReelELBajada": el_bajada, "ReelELLento": el_lento}
+
+
+def _registrar_el():
+    DL = _el()
+    return {n: (f, DL.duracion(n), 0.0) for n, f in _FUNCIONES_EL.items()}
+
+
+REELS_EL = _registrar_el()
+
 REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
 
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
@@ -1374,9 +1522,10 @@ def main():
               (raiz / "estudio/reels_clima", REELS_CLIMA),
               (raiz / "estudio/reels_ia", REELS_IA),
               (raiz / "estudio/reels_robotica", REELS_ROB),
-              (raiz / "estudio/reels_em", REELS_EM)]
+              (raiz / "estudio/reels_em", REELS_EM),
+              (raiz / "estudio/reels_electronica", REELS_EL)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM, **REELS_EL})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)
