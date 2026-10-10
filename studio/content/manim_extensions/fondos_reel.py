@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 W, H = 1080, 1920
 _CACHE = Path(__file__).resolve().parents[3] / "exports" / "estudio" / "_fondos" / "reel"
-VERSION = 14
+VERSION = 17
 
 
 def fila(y):
@@ -398,8 +398,46 @@ def calculo(var=0, modo="cuerpo"):
     img += ((np.exp(-fuera / 40) * 0.16 + np.exp(-fuera / 220) * 0.09 + np.exp(-fuera / 1000) * 0.045) * ~bajo)[..., None] * _rgb("#FB923C")
     return np.clip(img, 0, 1)
 
+
+def caos(var=0, modo="cuerpo"):
+    """Caos: el «horizonte» es el diagrama de bifurcación del mapa logístico x → r·x(1−x) (r de 2.9 a 4 a lo ancho): ramas que se
+    duplican y se deshacen en caos, en ámbar → rosa → violeta según r, con un resplandor que sube desde la densidad de puntos.
+    Cielo casi negro con estrellas finas."""
+    from scipy.ndimage import distance_transform_edt
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    base = _rgb("#07060A")
+    img = np.ones((H, W, 3)) * base
+    cima = fila(-9.45) if modo == "cuerpo" else fila(-7.1)
+    _estrellas(img, 300, 191 + var, cima - 240)
+    alto = H - 6 - cima
+    r0, r1 = (2.9, 4.0) if var % 3 != 1 else (3.4, 4.0)
+    espejo = var % 3 == 2
+    dens = np.zeros((H, W))
+    cols = np.arange(W)
+    r = r0 + (r1 - r0) * (cols / (W - 1))
+    if espejo:
+        r = r[::-1]
+    xk = np.full(W, 0.5)
+    for _ in range(300):
+        xk = r * xk * (1 - xk)
+    for _ in range(500):
+        xk = r * xk * (1 - xk)
+        fil = (H - 6 - xk * alto).astype(int)
+        np.add.at(dens, (fil, cols), 1.0)
+    dens = gaussian_filter(dens, 0.6)
+    d = np.log1p(dens * 3) / np.log1p(dens.max() * 3)
+    u = (r - 2.9) / 1.1
+    color = _rampa(np.clip(u, 0, 1)[None, :].repeat(H, 0), ["#FBBF24", "#FB923C", "#FB7185", "#A78BFA"])
+    img += (np.clip(d * 1.6, 0, 1))[..., None] * color * 0.95
+    # resplandor que sube desde la mancha de puntos (sin bordes)
+    masc = dens > 0.05
+    fuera = distance_transform_edt(~masc)
+    glow = np.exp(-fuera / 40) * 0.14 + np.exp(-fuera / 220) * 0.08 + np.exp(-fuera / 1000) * 0.04
+    img += glow[..., None] * _rampa(np.clip(u, 0, 1)[None, :].repeat(H, 0), ["#FB923C", "#FB7185", "#8B5CF6"]) * 0.9
+    return np.clip(img, 0, 1)
+
 GENERADORES = {"solar": solar, "espectro": espectro, "neuronal": neuronal, "robotica": robotica, "electromagnetismo": electromagnetismo,
-               "electronica": electronica, "calculo": calculo}
+               "electronica": electronica, "calculo": calculo, "caos": caos}
 
 
 def fondo_reel(tema, var=0, modo="cuerpo"):

@@ -89,6 +89,19 @@ Pedido del dueño: los reels «se cortaban muy seco» y se perdía el texto al l
   usar `Line` fino o `DashedVMobject` fijo; (2) un `Circle` enorme para la Tierra tapa la leyenda y el horizonte del fondo: dibujar
   solo un arco con relleno tenue que termine en y = −5.6; (3) helper `dibujo(pel, f_puntos, t0, color)` = curva que crece con el
   tiempo (gráficas que se trazan).
+- **Serie «Caos y gravedad» (2026-10-09, elegida por Claude: «sorpréndeme»)**: `46-reels-caos.py` + `datos_co.py`; simulaciones
+  REALES en `caos_gravedad.py` (N cuerpos y problema restringido con DOP853 rtol 1e-11/1e-12, pruebas de energía y Jacobi) congeladas
+  por `studio/tools/caos_congelar.py` en `studio/content/datos_caos/` (figura ocho; problema pitagórico de Burrau y su gemela a 1e-6;
+  Jano y Epimeteo con masas reales → intercambio cada 3.99 años, ~8 min de cálculo; giro de Hiperión de Wisdom–Peale–Mignard) y datos
+  reales de la NASA/JPL SBDB Query API (`https://ssd-api.jpl.nasa.gov/sbdb_query.api?fields=a&sb-class=IMB,MBA,OMB`: 1 473 671
+  semiejes → histograma con los huecos de Kirkwood; `sb-class=TJN`: 16 406 troyanos). Fondo **«caos»** (diagrama de bifurcación del
+  mapa logístico como horizonte; el resplandor sale de `distance_transform_edt` a los puntos — con una máscara difuminada quedaba un
+  halo negro). Audio que sale de la simulación (golpes en los encuentros cercanos reales, batido que crece con la separación, tics en
+  cada media vuelta de Hiperión). Pies en `docs/estudio/series/caos_PIES_Y_CUIDADO.md`, memoria `project-serie-caos`. Lecciones:
+  (1) la figura ocho es ESTABLE (no sirve para mostrar caos: usar el pitagórico); (2) el pitagórico necesita suavizado 1e-3 o el
+  integrador se detiene en un encuentro cercano (decirlo en el ⚠️); (3) Hiperión: la gráfica de ritmo de giro parecía periódica, una
+  «foto por vuelta» (sección de Poincaré) muestra el caos; hay un preprint de 2024 que lo discute → reel honesto «la ciencia sigue»;
+  (4) las simulaciones pesadas SIEMPRE congeladas: el render solo interpola.
 - **Estación con GPU (Windows/WSL2)**: prompt listo en `docs/estudio/PROMPT_ESTACION_ROBOTICA_3D.md` para la serie «Robótica 3D»
   (motor3d + corridas reales de `atp_rover.cli`, rama `estudio/robotica-3d`). Verificador de entorno: `python3 studio/tools/verificar_entorno_3d.py`
   (en la Mac-Pro también hay GPU: AMD Pitcairn por radeonsi, y `motor3d` dibuja; la CLI del rover genera `telemetry.jsonl` sin ROS en ~45 s).

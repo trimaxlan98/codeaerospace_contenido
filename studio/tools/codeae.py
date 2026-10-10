@@ -92,6 +92,8 @@ def _videos():
         v.append(Video(n, "44-reels-electronica.py", EST / "reels_electronica", "1080,1920", 30, "reels", (f, T, d), True, "electronica"))
     for n, (f, T, d) in SR.REELS_CA.items():
         v.append(Video(n, "45-reels-calculo.py", EST / "reels_calculo", "1080,1920", 30, "reels", (f, T, d), True, "calculo"))
+    for n, (f, T, d) in SR.REELS_CO.items():
+        v.append(Video(n, "46-reels-caos.py", EST / "reels_caos", "1080,1920", 30, "reels", (f, T, d), True, "caos"))
     return {x.id: x for x in v}
 
 

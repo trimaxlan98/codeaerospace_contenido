@@ -1632,6 +1632,165 @@ def _registrar_ca():
 
 REELS_CA = _registrar_ca()
 
+
+# ══ Serie «Caos y gravedad» (46-reels-caos.py): tiempos en datos_co.py y en la escena; varios sonidos salen de la simulación ═══
+def _co():
+    _fisica()
+    import datos_co as DO
+    return DO
+
+
+def _fin_co(m, DO, nombre, mc):
+    _leyendas_ats(mc, DO, nombre)
+    _cierre_sonoro(m, _fisica(), DO.CUERPO[nombre])
+
+
+_NOTAS_CO = (A(-24), A(-18), A(-13))            # colchón grave con tritono suave: «inestable»
+
+
+def _encuentros(DO, X, umbral=0.35):
+    """Tiempos (de simulación) de los encuentros cercanos entre cualquier par de cuerpos."""
+    d = np.min([np.linalg.norm(X[:, i] - X[:, j], axis=1) for i, j in ((0, 1), (0, 2), (1, 2))], axis=0)
+    cerca = (d < umbral).astype(int)
+    return DO.PIT_T[1:][np.diff(cerca) == 1]
+
+
+def co_ocho(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOOcho", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for k in range(3):                                                                       # la figura ocho: un ostinato de 4 s
+        for j in range(3):
+            mc.poner(0.3 + 4.0 * k + 4.0 * j / 3, pluck(PENTA[j * 2], 0.9, 0.12), pan=-0.4 + 0.4 * j)
+    for te in _encuentros(DO, DO.PIT_A):                                                     # encuentros reales del pitagórico
+        t = 7.0 + te * 10.8 / 72.0
+        if t < 18.0:
+            mc.poner(t, clic(0.08, 1600 + 200 * np.sin(te)), pan=float(np.sin(te)) * 0.5); mc.poner(t, golpe(90, 0.25, 0.08))
+    mc.poner(7.0 + 60 * 10.8 / 72.0, whoosh(2.0, 300, 2400, 0.05, 0.4))                     # la expulsión
+    _fin_co(m, DO, "ReelCOOcho", mc)
+
+
+def co_mariposa(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOMariposa", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    t = np.arange(m.n) / SR
+    ts = np.clip((t - F.H0 - 0.6) * 72.0 / 17.0, 0, 72)
+    sep = np.interp(ts, DO.PIT_T, np.maximum(DO.PIT_SEP, 1e-6))
+    det = 0.002 * (np.log10(sep) + 6)                                                         # el batido crece con la diferencia
+    env = _env(m, F, 0.6, 18.0, 0.6, 0.8)
+    _tono(m, np.full(m.n, 330.0), env, 0.018, F)
+    _tono(m, 330.0 * (1 + det), env, 0.018, F)
+    mc.poner(18.0, golpe(55, 0.8, 0.16))
+    _fin_co(m, DO, "ReelCOMariposa", mc)
+
+
+def co_lagrange(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOLagrange", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for k in range(5):
+        mc.poner(1.6 + 0.4 * (k + 1), pluck(PENTA[k], 1.0, 0.13), pan=-0.4 + 0.2 * k)
+    for j in range(4):
+        mc.poner(6.4 + 1.5 * j, gota(1200, 0.2, 0.04), pan=0.3)                               # el pulso de L2
+    rng = np.random.default_rng(7)
+    for j in range(24):
+        mc.poner(12.8 + 0.25 * j, gota(rng.uniform(1600, 2600), 0.08, 0.025), pan=rng.uniform(-0.6, 0.6))   # troyanos
+    _fin_co(m, DO, "ReelCOLagrange", mc)
+
+
+def co_herradura(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOHerradura", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for k in range(10):
+        mc.poner(0.6 + k * 17.0 / 9.0, clic(0.04, 900), pan=-0.2)                              # cada año
+    for c in DO.CO_CAMBIOS:
+        t = 0.6 + c * 17.0 / 9.0
+        mc.poner(t - 0.6, whoosh(1.2, 300, 1400, 0.04, 0.6)); mc.poner(t, brillo_(0.8, 0.4)); mc.poner(t, pluck(A(12), 1.4, 0.18))
+    _fin_co(m, DO, "ReelCOHerradura", mc)
+
+
+def co_hiperion(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOHiperion", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for TH, f0, pan in ((DO.LUNA_TH, 700, -0.4), (DO.HIP_TH, 1500, 0.4)):
+        vueltas = np.floor(TH / np.pi)
+        for to in DO.HIP_T[1:][np.diff(vueltas) != 0]:                                        # cada media vuelta del giro
+            t = 0.6 + to * 12.0 / 40.0
+            if t < 13.0:
+                mc.poner(t, clic(0.05, f0), pan=pan)
+    mc.poner(13.0, pluck(A(7), 1.4, 0.16)); mc.poner(13.6, pluck(A(6), 1.4, 0.14))
+    _fin_co(m, DO, "ReelCOHiperion", mc)
+
+
+def co_kirkwood(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOKirkwood", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    rng = np.random.default_rng(9)
+    for j in range(40):
+        mc.poner(0.8 + 0.08 * j, gota(rng.uniform(900, 2400), 0.06, 0.02), pan=-0.6 + 0.03 * j)   # el histograma se llena
+    for j in range(4):
+        mc.poner(6.6 + 0.9 * j, pluck(A(-5 + 4 * j), 1.2, 0.15), pan=-0.3 + 0.2 * j)
+    mc.poner(13.0, golpe(55, 0.6, 0.14)); mc.poner(13.2, pluck(A(12), 1.4, 0.16))
+    _fin_co(m, DO, "ReelCOKirkwood", mc)
+
+
+def co_honda(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOHonda", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for k in range(3):
+        mc.poner(1.6 + k / 0.22, whoosh(1.4, 300, 1800, 0.04, 0.5), pan=-0.3 + 0.3 * k)       # cada paso junto a Júpiter
+    mc.poner(6.6, pluck(A(0), 1.0, 0.14)); mc.poner(8.8, pluck(A(4), 1.0, 0.14))
+    mc.poner(10.2, glide(300, 900, 1.2, 0.04)); mc.poner(10.4, pluck(A(12), 1.4, 0.18))
+    for j in range(4):
+        mc.poner(13.4 + 0.4 * j, gota(600 + 250 * j, 0.15, 0.04), pan=-0.3 + 0.2 * j)        # Júpiter, Saturno, Urano, Neptuno
+    _fin_co(m, DO, "ReelCOHonda", mc)
+
+
+def co_kessler(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOKessler", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    rng = np.random.default_rng(5)
+    for tc in (2.6, 8.0, 9.4, 10.6, 11.4):
+        mc.poner(tc, golpe(70, 0.5, 0.18)); mc.poner(tc, whoosh(0.5, 2000, 6000, 0.03, 0.2))
+        for j in range(6):
+            mc.poner(tc + 0.03 * j, clic(0.03, rng.uniform(2500, 4500)), pan=rng.uniform(-0.6, 0.6))
+    mc.poner(13.4, glide(250, 400, 3.6, 0.03)); mc.poner(13.4, glide(250, 1200, 3.6, 0.03))
+    _fin_co(m, DO, "ReelCOKessler", mc)
+
+
+def co_prediccion(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOPrediccion", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    for j in range(12):
+        mc.poner(0.6 + 0.5 * j, clic(0.04, 1000), pan=(-0.2, 0.2)[j % 2])                     # el reloj
+    t = np.arange(m.n) / SR
+    myr = np.clip((t - F.H0 - 6.6) * 120.0 / 9.0, 0, 120)
+    disp = np.clip(15 * np.exp(myr / 5.0) / 1.5e11, 0, 1)
+    env = _env(m, F, 6.6, 20.0, 0.8, 0.8)
+    for k, f0 in enumerate((440.0, 554.4, 659.3)):
+        _tono(m, f0 * (1 + 0.03 * disp * (k - 1)), env, 0.010, F)                            # el acorde se desafina con el error
+    _fin_co(m, DO, "ReelCOPrediccion", mc)
+
+
+def co_atajo(m):
+    DO = _co(); F = _fisica()
+    mc, tb = _base(m, DO, "ReelCOAtajo", _NOTAS_CO, 0.25, (900, 4000, 0.010))
+    mc.poner(1.0, whoosh(3.0, 400, 2400, 0.05, 0.4)); mc.poner(4.0, pluck(A(7), 1.2, 0.16))
+    mc.poner(6.6, glide(200, 600, 2.8, 0.03)); mc.poner(9.4, glide(600, 260, 2.8, 0.03))     # se aleja y regresa
+    mc.poner(12.2, pluck(A(12), 1.4, 0.18)); mc.poner(13.2, brillo_(0.8, 0.4))
+    _fin_co(m, DO, "ReelCOAtajo", mc)
+
+
+_FUNCIONES_CO = {"ReelCOOcho": co_ocho, "ReelCOMariposa": co_mariposa, "ReelCOLagrange": co_lagrange, "ReelCOHerradura": co_herradura,
+                 "ReelCOHiperion": co_hiperion, "ReelCOKirkwood": co_kirkwood, "ReelCOHonda": co_honda, "ReelCOKessler": co_kessler,
+                 "ReelCOPrediccion": co_prediccion, "ReelCOAtajo": co_atajo}
+
+
+def _registrar_co():
+    DO = _co()
+    return {n: (f, DO.duracion(n), 0.0) for n, f in _FUNCIONES_CO.items()}
+
+
+REELS_CO = _registrar_co()
+
 REELS_DATOS = {"ReelDopplerReal": (doppler_real, 12.0, 4.2)}
 
 REELS_VIVO = {f"LogoVivo{t}": (logo_vivo, 8.0, 0.0) for t in ("Orbita", "Nebulosa", "Marte", "Lunar", "Fisica", "Espectro")}
@@ -1664,9 +1823,10 @@ def main():
               (raiz / "estudio/reels_robotica", REELS_ROB),
               (raiz / "estudio/reels_em", REELS_EM),
               (raiz / "estudio/reels_electronica", REELS_EL),
-              (raiz / "estudio/reels_calculo", REELS_CA)]
+              (raiz / "estudio/reels_calculo", REELS_CA),
+              (raiz / "estudio/reels_caos", REELS_CO)]
     if len(sys.argv) > 1:
-        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM, **REELS_EL, **REELS_CA})]
+        grupos = [(Path(sys.argv[1]), {**REELS, **REELS_VIVO, **REELS_DATOS, **REELS_DIVULGACION, **REELS_ATS, **REELS_TRIAGE, **REELS_CLIMA, **REELS_IA, **REELS_ROB, **REELS_EM, **REELS_EL, **REELS_CA, **REELS_CO})]
     for carpeta, reels in grupos:
         if carpeta.exists():
             mezclar(carpeta, reels)
